@@ -3,7 +3,7 @@ import 'package:artbooking/main_mobile.dart';
 import 'package:artbooking/main_web.dart';
 import 'package:artbooking/router/router.dart';
 import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user.dart';
+import 'package:artbooking/state/user_state.dart';
 import 'package:artbooking/utils/app_localstorage.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -34,8 +34,7 @@ class AppState extends State<App> {
     appLocalStorage.initialize()
       .then((value) {
         final savedLang = appLocalStorage.getLang();
-        // print('savedLang: $savedLang');
-        // userState.setLang(savedLang);
+        userState.setLang(savedLang);
 
         // autoLogin();
 
@@ -102,7 +101,7 @@ class AppState extends State<App> {
       }
 
       appLocalStorage.setUserName(authResult.user.displayName);
-      userState.setUserConnected();
+      userState.setUserConnected(true);
 
     } catch (error) {
       debugPrint(error.toString());

@@ -1,8 +1,9 @@
 import 'package:artbooking/utils/app_localstorage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:mobx/mobx.dart';
 
-part 'user.g.dart';
+part 'user_state.g.dart';
 
 class UserState = UserStateBase with _$UserState;
 
@@ -10,20 +11,13 @@ abstract class UserStateBase with Store {
   FirebaseUser _userAuth;
 
   @observable
+  String username = '';
+
+  @observable
+  bool isConnected = false;
+
+  @observable
   String lang = 'en';
-
-  @observable
-  bool isQuotidianNotifActive = true;
-
-  @observable
-  bool isUserConnected = false;
-
-  @observable
-  String _name = '';
-
-  /// Last time the favourites has been updated.
-  @observable
-  DateTime updatedFavAt = DateTime.now();
 
   Future<FirebaseUser> get userAuth async {
     if (_userAuth != null) {
@@ -37,37 +31,10 @@ abstract class UserStateBase with Store {
     }
 
     if (_userAuth != null) {
-      setUserName(_userAuth.displayName);
+      setUsername(_userAuth.displayName);
     }
 
     return _userAuth;
-  }
-
-  String get name { return _name; }
-
-  /// To use chen user's data has changed.
-  void clearAuthCache() {
-    _userAuth = null;
-  }
-
-  @action
-  void setLang(String newLang) {
-    lang = newLang;
-  }
-
-  @action
-  void setUserConnected() {
-    isUserConnected = true;
-  }
-
-  @action
-  void setUserDisconnected() {
-    isUserConnected = false;
-  }
-
-  @action
-  void setUserName(String newName) {
-    _name = newName;
   }
 
   /// Signin user with credentials if FirebaseAuth is null.
@@ -89,22 +56,39 @@ abstract class UserStateBase with Store {
         );
 
       _userAuth = auth.user;
-      isUserConnected = true;
+      isConnected = true;
 
     } catch (error) {
+      debugPrint(error.toString());
       appLocalStorage.clearUserAuthData();
     }
+  }
+
+  /// Use on sign out / user's data has changed.
+  @action
+  void clearAuthCache() {
+    _userAuth = null;
+  }
+
+  @action
+  void setLang(String newLang) {
+    lang = newLang;
+  }
+
+  @action
+  void setUserConnected(bool connected) {
+    isConnected = connected;
+  }
+
+  @action
+  void setUsername(String name) {
+    username = name;
   }
 
   @action
   void signOut() {
     _userAuth = null;
-    isUserConnected = false;
-  }
-
-  @action
-  void updateFavDate() {
-    updatedFavAt = DateTime.now();
+    isConnected = false;
   }
 }
 

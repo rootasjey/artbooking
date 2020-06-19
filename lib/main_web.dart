@@ -14,7 +14,7 @@ class _MainWebState extends State<MainWeb> {
   @override
   initState() {
     super.initState();
-    // loadBrightness();
+    loadBrightness();
   }
 
   @override
