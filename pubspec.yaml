@@ -40,6 +40,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_mobx: 1.0.1
+  google_fonts: 1.1.0
   mobx: 1.0.2
   mobx_codegen: 1.0.2
   share: 0.6.3+5
