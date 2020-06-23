@@ -9,8 +9,23 @@ class FluroRouter {
 
   static void setupWebRouter() {
     router.define(
+      ForgotPasswordRoute,
+      handler: WebRouteHandlers.forgotPassword,
+    );
+
+    router.define(
       RootRoute,
       handler: WebRouteHandlers.home,
+    );
+
+    router.define(
+      SigninRoute,
+      handler: WebRouteHandlers.signin,
+    );
+
+    router.define(
+      SignupRoute,
+      handler: WebRouteHandlers.signup,
     );
   }
 }
