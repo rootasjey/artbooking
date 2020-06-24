@@ -236,16 +236,16 @@ async function populateUserData(snapshot: functions.firestore.DocumentSnapshot) 
       'user:managedata': false,
     },
     'stats': {
-      'arts': {
+      'illustrations': {
         'added': 0,
         'favourites': 0,
+        'lists': 0,
       },
       'contests': {
         'created': 0,
         'entered': 0,
       }
     },
-    'tokens': {},
     'urls': {
       'image': '',
     },
