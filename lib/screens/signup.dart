@@ -632,19 +632,14 @@ class _SignupState extends State<Signup> {
           'nameLowerCase': name,
           'pricing': 'free',
           'rights': {
-            'user:managedata'     : false,
-            'user:manageauthor'   : false,
-            'user:managequote'    : false,
-            'user:managequotidian': false,
-            'user:managereference': false,
-            'user:proposeart'   : true,
-            'user:readart'      : true,
-            'user:validatequote'  : false,
+            'user:managedata': false,
           },
           'stats': {
-            'favourites': 0,
-            'lists': 0,
-            'uploaded': 0,
+            'illustrations': {
+              'added': 0,
+              'favourites': 0,
+              'lists': 0,
+            }
           },
           'urls': {
             'image': '',
