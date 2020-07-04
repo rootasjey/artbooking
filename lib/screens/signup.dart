@@ -653,6 +653,9 @@ class _SignupState extends State<Signup> {
       );
 
       userState.setUserConnected(true);
+      appLocalStorage.setUserName(username);
+      userState.setUsername(username);
+      userState.setUid(user.uid);
 
       setState(() {
         isSigningUp = false;

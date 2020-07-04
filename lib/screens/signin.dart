@@ -426,7 +426,12 @@ class _SigninState extends State<Signin> {
         password: password,
       );
 
+      final username = authResult.user.displayName;
+
       userState.setUserConnected(true);
+      appLocalStorage.setUserName(username);
+      userState.setUsername(username);
+      userState.setUid(authResult.user.uid);
 
       setState(() {
         isSigningIn = false;

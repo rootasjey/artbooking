@@ -14,6 +14,9 @@ abstract class UserStateBase with Store {
   String username = '';
 
   @observable
+  String uid = '';
+
+  @observable
   bool isConnected = false;
 
   @observable
@@ -83,6 +86,11 @@ abstract class UserStateBase with Store {
   @action
   void setUsername(String name) {
     username = name;
+  }
+
+  @action
+  void setUid(String newUid) {
+    uid = newUid;
   }
 
   @action

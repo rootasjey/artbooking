@@ -9,8 +9,18 @@ class FluroRouter {
 
   static void setupWebRouter() {
     router.define(
+      DashboardRoute,
+      handler: WebRouteHandlers.dashbard,
+    );
+
+    router.define(
       ForgotPasswordRoute,
       handler: WebRouteHandlers.forgotPassword,
+    );
+
+    router.define(
+      IllustrationsRoute,
+      handler: WebRouteHandlers.illustrations,
     );
 
     router.define(
@@ -26,6 +36,11 @@ class FluroRouter {
     router.define(
       SignupRoute,
       handler: WebRouteHandlers.signup,
+    );
+
+    router.define(
+      UploadRoute,
+      handler: WebRouteHandlers.upload,
     );
   }
 }

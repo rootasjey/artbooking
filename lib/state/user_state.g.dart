@@ -26,6 +26,23 @@ mixin _$UserState on UserStateBase, Store {
     }, _$usernameAtom, name: '${_$usernameAtom.name}_set');
   }
 
+  final _$uidAtom = Atom(name: 'UserStateBase.uid');
+
+  @override
+  String get uid {
+    _$uidAtom.context.enforceReadPolicy(_$uidAtom);
+    _$uidAtom.reportObserved();
+    return super.uid;
+  }
+
+  @override
+  set uid(String value) {
+    _$uidAtom.context.conditionallyRunInAction(() {
+      super.uid = value;
+      _$uidAtom.reportChanged();
+    }, _$uidAtom, name: '${_$uidAtom.name}_set');
+  }
+
   final _$isConnectedAtom = Atom(name: 'UserStateBase.isConnected');
 
   @override
@@ -104,6 +121,16 @@ mixin _$UserState on UserStateBase, Store {
   }
 
   @override
+  void setUid(String newUid) {
+    final _$actionInfo = _$UserStateBaseActionController.startAction();
+    try {
+      return super.setUid(newUid);
+    } finally {
+      _$UserStateBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void signOut() {
     final _$actionInfo = _$UserStateBaseActionController.startAction();
     try {
@@ -116,7 +143,7 @@ mixin _$UserState on UserStateBase, Store {
   @override
   String toString() {
     final string =
-        'username: ${username.toString()},isConnected: ${isConnected.toString()},lang: ${lang.toString()}';
+        'username: ${username.toString()},uid: ${uid.toString()},isConnected: ${isConnected.toString()},lang: ${lang.toString()}';
     return '{$string}';
   }
 }

@@ -5,6 +5,7 @@ import 'package:artbooking/router/router.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user_state.dart';
 import 'package:artbooking/utils/app_localstorage.dart';
+import 'package:artbooking/utils/snack.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -37,7 +38,7 @@ class AppState extends State<App> {
         final savedLang = appLocalStorage.getLang();
         userState.setLang(savedLang);
 
-        // autoLogin();
+        autoLogin();
 
         setState(() {
           isReady = true;
@@ -103,8 +104,18 @@ class AppState extends State<App> {
         return;
       }
 
-      appLocalStorage.setUserName(authResult.user.displayName);
+      final username = authResult.user.displayName;
+
+      appLocalStorage.setUserName(username);
       userState.setUserConnected(true);
+      userState.setUsername(username);
+      userState.setUid(authResult.user.uid);
+
+      showSnack(
+        context: context,
+        message: "Welcome back $username",
+        type: SnackType.info,
+      );
 
     } catch (error) {
       debugPrint(error.toString());
