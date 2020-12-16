@@ -29,7 +29,6 @@ class _IllustrationsState extends State<Illustrations> {
 
       fetch();
     });
-
   }
 
   @override
@@ -102,12 +101,12 @@ class _IllustrationsState extends State<Illustrations> {
 
   void fetch() async {
     try {
-      final snapshot = await Firestore.instance
-      .collection('illustrations')
-      .where('author.id', isEqualTo: userState.uid)
-      .getDocuments();
+      final snapshot = await FirebaseFirestore.instance
+          .collection('illustrations')
+          .where('author.id', isEqualTo: userState.uid)
+          .get();
 
-      if (snapshot.documents.isEmpty) {
+      if (snapshot.docs.isEmpty) {
         setState(() {
           isLoading = false;
         });
@@ -115,9 +114,9 @@ class _IllustrationsState extends State<Illustrations> {
         return;
       }
 
-      snapshot.documents.forEach((doc) {
-        final data = doc.data;
-        data['id'] = doc.documentID;
+      snapshot.docs.forEach((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
 
         illustrationsList.add(Illustration.fromJSON(data));
       });
@@ -125,7 +124,6 @@ class _IllustrationsState extends State<Illustrations> {
       setState(() {
         isLoading = false;
       });
-
     } catch (error) {
       debugPrint(error.toString());
 

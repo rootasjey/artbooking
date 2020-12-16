@@ -64,11 +64,9 @@ class _UploadState extends State<Upload> {
     return SliverList(
       delegate: SliverChildListDelegate([
         Padding(padding: const EdgeInsets.only(top: 180.0)),
-
         Center(
           child: uploadContainer(),
         ),
-
         Container(
           padding: const EdgeInsets.only(
             top: 100.0,
@@ -78,7 +76,6 @@ class _UploadState extends State<Upload> {
           width: 300.0,
           child: uploadedFilesList(),
         ),
-
         Container(
           padding: const EdgeInsets.only(
             top: 100.0,
@@ -88,7 +85,6 @@ class _UploadState extends State<Upload> {
           width: 300.0,
           child: onlineFilesList(),
         ),
-
         Padding(padding: const EdgeInsets.only(top: 200.0)),
       ]),
     );
@@ -106,7 +102,9 @@ class _UploadState extends State<Upload> {
           ),
         ),
         child: InkWell(
-          onTap: () { uploadImage(); },
+          onTap: () {
+            uploadImage();
+          },
           child: uploadProgress(),
         ),
       ),
@@ -115,28 +113,23 @@ class _UploadState extends State<Upload> {
 
   Widget uploadProgress() {
     return StreamBuilder<fb.UploadTaskSnapshot>(
-      stream: uploadTasks.length > 0 ?
-        uploadTasks.first.task.onStateChanged :
-        null,
-
+      stream:
+          uploadTasks.length > 0 ? uploadTasks.first.task.onStateChanged : null,
       builder: (context, snapshot) {
         Widget progressBar = Padding(padding: EdgeInsets.zero);
 
         final event = snapshot?.data;
 
-        double progressPercent = event != null
-          ? event.bytesTransferred / event.totalBytes * 100
-          : 0;
+        double progressPercent =
+            event != null ? event.bytesTransferred / event.totalBytes * 100 : 0;
 
         if (snapshot.connectionState == ConnectionState.none) {
           progressPercent = 0;
         }
 
-
         if (progressPercent == 100) {
           isUploadCompleted = true;
           isUploading = false;
-
         } else if (progressPercent > 0) {
           progressBar = Positioned(
             bottom: 20.0,
@@ -168,15 +161,11 @@ class _UploadState extends State<Upload> {
         });
 
         if (item.isExpanded && item.imageUrl == null) {
-          item.task
-            .snapshot
-            .ref
-            .getDownloadURL()
-            .then((uri) {
-              setState(() {
-                item.imageUrl = uri;
-              });
+          item.task.snapshot.ref.getDownloadURL().then((uri) {
+            setState(() {
+              item.imageUrl = uri;
             });
+          });
         }
       },
       children: uploadTasks.map<ExpansionPanel>((uploadedItem) {
@@ -192,11 +181,7 @@ class _UploadState extends State<Upload> {
                 });
 
                 if (uploadedItem.isExpanded && uploadedItem.imageUrl == null) {
-                  uploadedItem.task
-                  .snapshot
-                  .ref
-                  .getDownloadURL()
-                  .then((uri) {
+                  uploadedItem.task.snapshot.ref.getDownloadURL().then((uri) {
                     setState(() {
                       uploadedItem.imageUrl = uri;
                     });
@@ -223,7 +208,6 @@ class _UploadState extends State<Upload> {
                     setState(() {
                       uploadTasks.remove(uploadedItem);
                     });
-
                   } catch (error) {
                     debugPrint(error);
                   }
@@ -245,14 +229,13 @@ class _UploadState extends State<Upload> {
                       elevation: 2.0,
                       child: Image.network(
                         uploadedItem.imageUrl != null
-                        ? uploadedItem.imageUrl.toString()
-                        : '',
+                            ? uploadedItem.imageUrl.toString()
+                            : '',
                         fit: BoxFit.cover,
                       ),
                     ),
                   ),
                 ),
-
                 metaData(),
               ],
             ),
@@ -272,13 +255,11 @@ class _UploadState extends State<Upload> {
         });
 
         if (item.isExpanded && item.imageUrl == null) {
-          item.element
-            .getDownloadURL()
-            .then((uri) {
-              setState(() {
-                item.imageUrl = uri;
-              });
+          item.element.getDownloadURL().then((uri) {
+            setState(() {
+              item.imageUrl = uri;
             });
+          });
         }
       },
       children: onlineItems.map<ExpansionPanel>((onlineItem) {
@@ -292,13 +273,11 @@ class _UploadState extends State<Upload> {
                 });
 
                 if (onlineItem.isExpanded && onlineItem.imageUrl == null) {
-                  onlineItem.element
-                    .getDownloadURL()
-                    .then((uri) {
-                      setState(() {
-                        onlineItem.imageUrl = uri;
-                      });
+                  onlineItem.element.getDownloadURL().then((uri) {
+                    setState(() {
+                      onlineItem.imageUrl = uri;
                     });
+                  });
                 }
               },
               title: Text(
@@ -342,14 +321,14 @@ class _UploadState extends State<Upload> {
                     child: Card(
                       elevation: 2.0,
                       child: Image.network(
-                        onlineItem.imageUrl != null ?
-                        onlineItem.imageUrl.toString() : '',
+                        onlineItem.imageUrl != null
+                            ? onlineItem.imageUrl.toString()
+                            : '',
                         fit: BoxFit.cover,
                       ),
                     ),
                   ),
                 ),
-
                 metaData(),
               ],
             ),
@@ -369,7 +348,6 @@ class _UploadState extends State<Upload> {
               Icons.add,
               size: 40.0,
             ),
-
             Padding(
               padding: const EdgeInsets.only(top: 20.0),
               child: Opacity(
@@ -392,9 +370,9 @@ class _UploadState extends State<Upload> {
         child: Column(
           children: <Widget>[
             Text(
-              uploadTasks.length > 1 ?
-                'Uploading ${uploadTasks.length} files' :
-                'Uploading ${uploadTasks.first.task.snapshot.ref.name}',
+              uploadTasks.length > 1
+                  ? 'Uploading ${uploadTasks.length} files'
+                  : 'Uploading ${uploadTasks.first.task.snapshot.ref.name}',
               style: TextStyle(
                 fontSize: 20.0,
               ),
@@ -409,14 +387,13 @@ class _UploadState extends State<Upload> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(
-              uploadTasks.length > 1 ?
-                'Uploaded ${uploadTasks.length} files' :
-                'Uploaded ${uploadTasks.first.task.snapshot.ref.name}',
-              style: TextStyle(
-                fontSize: 20.0,
-              ),
+            uploadTasks.length > 1
+                ? 'Uploaded ${uploadTasks.length} files'
+                : 'Uploaded ${uploadTasks.first.task.snapshot.ref.name}',
+            style: TextStyle(
+              fontSize: 20.0,
             ),
-
+          ),
           Padding(
             padding: const EdgeInsets.only(left: 30.0),
             child: Icon(
@@ -448,7 +425,6 @@ class _UploadState extends State<Upload> {
               ),
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.only(
               top: 20.0,
@@ -466,18 +442,17 @@ class _UploadState extends State<Upload> {
                 hintText: 'Description',
                 border: OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: stateColors.primary,
-                    width: 2.0,
-                  )
-                ),
+                    borderSide: BorderSide(
+                  color: stateColors.primary,
+                  width: 2.0,
+                )),
               ),
             ),
           ),
-
           CheckboxListTile(
             title: Text('is Private?'),
-            subtitle: Text('If true, only you will be able to view this illustration'),
+            subtitle: Text(
+                'If true, only you will be able to view this illustration'),
             value: false,
             onChanged: (value) {},
           ),
@@ -507,15 +482,12 @@ class _UploadState extends State<Upload> {
           // print(element.name);
           final metadata = await element.getMetadata();
 
-          onlineItems.add(
-            OnlineItem(
-              name: element.name,
-              size: metadata.size / 1000,
-              element: element,
-            )
-          );
+          onlineItems.add(OnlineItem(
+            name: element.name,
+            size: metadata.size / 1000,
+            element: element,
+          ));
         });
-
       } catch (error) {
         debugPrint(error.toString());
       }
@@ -533,10 +505,12 @@ class _UploadState extends State<Upload> {
       (changeEvent) {
         final file = uploadInput.files.first;
 
-        if (!file.name.contains(RegExp(r'^([a-zA-Z0-9\s_\.\-\(\):])*.(?:jpg|jpeg|png|gif)$'))) {
+        if (!file.name.contains(
+            RegExp(r'^([a-zA-Z0-9\s_\.\-\(\):])*.(?:jpg|jpeg|png|gif)$'))) {
           showSnack(
             context: context,
-            message: 'Please provide an image extension to your file before uploading.',
+            message:
+                'Please provide an image extension to your file before uploading.',
             type: SnackType.error,
           );
 
@@ -574,9 +548,8 @@ class _UploadState extends State<Upload> {
     final filePath = 'users/$username/illustrations/$fileName';
 
     try {
-      final newDoc = await Firestore.instance
-      .collection('illustrations')
-      .add({
+      final newDoc =
+          await FirebaseFirestore.instance.collection('illustrations').add({
         'author': {
           'id': userState.uid,
         },
@@ -609,15 +582,14 @@ class _UploadState extends State<Upload> {
         try {
           final uri = await task.snapshot.ref.getDownloadURL();
 
-          await newDoc
-          .setData({
+          await newDoc.set(
+            {
               'urls': {
                 'original': uri.toString(),
               },
             },
-            merge: true,
+            SetOptions(merge: true),
           );
-
         } catch (error) {
           debugPrint(error.toString());
         }
@@ -633,7 +605,6 @@ class _UploadState extends State<Upload> {
       setState(() {
         isUploading = true;
       });
-
     } catch (error) {
       debugPrint(error.toString());
       setState(() {

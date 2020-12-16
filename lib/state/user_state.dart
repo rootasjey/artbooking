@@ -8,7 +8,7 @@ part 'user_state.g.dart';
 class UserState = UserStateBase with _$UserState;
 
 abstract class UserStateBase with Store {
-  FirebaseUser _userAuth;
+  User _userAuth;
 
   @observable
   String username = '';
@@ -22,12 +22,12 @@ abstract class UserStateBase with Store {
   @observable
   String lang = 'en';
 
-  Future<FirebaseUser> get userAuth async {
+  Future<User> get userAuth async {
     if (_userAuth != null) {
       return _userAuth;
     }
 
-    _userAuth = await FirebaseAuth.instance.currentUser();
+    _userAuth = FirebaseAuth.instance.currentUser;
 
     if (_userAuth == null) {
       await _signin();
@@ -48,19 +48,18 @@ abstract class UserStateBase with Store {
       final email = credentialsMap['email'];
       final password = credentialsMap['password'];
 
-      if ((email == null || email.isEmpty) || (password == null || password.isEmpty)) {
+      if ((email == null || email.isEmpty) ||
+          (password == null || password.isEmpty)) {
         return null;
       }
 
-      final auth = await FirebaseAuth.instance
-        .signInWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+      final auth = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
       _userAuth = auth.user;
       isConnected = true;
-
     } catch (error) {
       debugPrint(error.toString());
       appLocalStorage.clearUserAuthData();

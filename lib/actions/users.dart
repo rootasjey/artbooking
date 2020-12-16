@@ -4,17 +4,16 @@ import 'package:flutter/material.dart';
 
 Future<bool> checkEmailAvailability(String email) async {
   try {
-    final callable = CloudFunctions(
-      app: FirebaseApp.instance,
+    final callable = FirebaseFunctions.instanceFor(
+      app: Firebase.app(),
       region: 'europe-west3',
-    ).getHttpsCallable(
-      functionName: 'users-checkEmailAvailability',
+    ).httpsCallable(
+      'users-checkEmailAvailability',
     );
 
     final resp = await callable.call({'email': email});
     final isOk = resp.data['isAvailable'] as bool;
     return isOk;
-
   } catch (error) {
     debugPrint(error.toString());
     return false;
@@ -22,23 +21,23 @@ Future<bool> checkEmailAvailability(String email) async {
 }
 
 bool checkEmailFormat(String email) {
-  return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,}")
-    .hasMatch(email);
+  return RegExp(
+          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,}")
+      .hasMatch(email);
 }
 
 Future<bool> checkNameAvailability(String username) async {
   try {
-    final callable = CloudFunctions(
-      app: FirebaseApp.instance,
+    final callable = FirebaseFunctions.instanceFor(
+      app: Firebase.app(),
       region: 'europe-west3',
-    ).getHttpsCallable(
-      functionName: 'users-checkNameAvailability',
+    ).httpsCallable(
+      'users-checkNameAvailability',
     );
 
     final resp = await callable.call({'name': username});
     final isOk = resp.data['isAvailable'] as bool;
     return isOk;
-
   } catch (error) {
     debugPrint(error.toString());
     return false;

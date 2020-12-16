@@ -38,8 +38,8 @@ class _SignupState extends State<Signup> {
   Timer nameTimer;
 
   bool isCheckingAuth = false;
-  bool isCompleted    = false;
-  bool isSigningUp    = false;
+  bool isCompleted = false;
+  bool isSigningUp = false;
 
   final usernameNode = FocusNode();
   final passwordNode = FocusNode();
@@ -78,7 +78,6 @@ class _SignupState extends State<Signup> {
                   ),
                 ],
               ),
-
               Padding(
                 padding: const EdgeInsets.only(
                   top: 60.0,
@@ -124,7 +123,6 @@ class _SignupState extends State<Signup> {
             color: Colors.green,
           ),
         ),
-
         Padding(
           padding: const EdgeInsets.only(top: 30.0, bottom: 0.0),
           child: Text(
@@ -135,9 +133,10 @@ class _SignupState extends State<Signup> {
             ),
           ),
         ),
-
         Padding(
-          padding: const EdgeInsets.only(top: 15.0,),
+          padding: const EdgeInsets.only(
+            top: 15.0,
+          ),
           child: FlatButton(
             onPressed: () {
               FluroRouter.router.navigateTo(
@@ -194,24 +193,22 @@ class _SignupState extends State<Signup> {
               emailTimer = null;
             }
 
-            emailTimer = Timer(
-              1.seconds,
-              () async {
-                final isAvailable = await checkEmailAvailability(email);
-                if (!isAvailable) {
-                  setState(() {
-                    isCheckingEmail = false;
-                    emailErrorMessage = 'This email address is not available';
-                  });
-
-                  return;
-                }
-
+            emailTimer = Timer(1.seconds, () async {
+              final isAvailable = await checkEmailAvailability(email);
+              if (!isAvailable) {
                 setState(() {
                   isCheckingEmail = false;
-                  emailErrorMessage = '';
+                  emailErrorMessage = 'This email address is not available';
                 });
+
+                return;
+              }
+
+              setState(() {
+                isCheckingEmail = false;
+                emailErrorMessage = '';
               });
+            });
           },
           validator: (value) {
             if (value.isEmpty) {
@@ -231,12 +228,10 @@ class _SignupState extends State<Signup> {
         top: 8.0,
         left: 40.0,
       ),
-      child: Text(
-        emailErrorMessage,
-        style: TextStyle(
-          color: Colors.red.shade300,
-        )
-      ),
+      child: Text(emailErrorMessage,
+          style: TextStyle(
+            color: Colors.red.shade300,
+          )),
     );
   }
 
@@ -258,15 +253,12 @@ class _SignupState extends State<Signup> {
               ),
             ),
           ),
-
           FadeInY(
             delay: .3,
             beginY: 50.0,
             child: Opacity(
               opacity: .6,
-              child: Text(
-                'Create a new account'
-              ),
+              child: Text('Create a new account'),
             ),
           ),
         ],
@@ -280,21 +272,11 @@ class _SignupState extends State<Signup> {
       children: <Widget>[
         header(),
         emailInput(),
-
-        if (isCheckingEmail)
-          emailProgress(),
-
-        if (emailErrorMessage.isNotEmpty)
-          emailInputError(),
-
+        if (isCheckingEmail) emailProgress(),
+        if (emailErrorMessage.isNotEmpty) emailInputError(),
         nameInput(),
-
-        if (isCheckingName)
-          nameProgress(),
-
-        if (nameErrorMessage.isNotEmpty)
-          nameInputError(),
-
+        if (isCheckingName) nameProgress(),
+        if (nameErrorMessage.isNotEmpty) nameInputError(),
         passwordInput(),
         confirmPasswordInput(),
         validationButton(),
@@ -305,7 +287,9 @@ class _SignupState extends State<Signup> {
 
   Widget emailProgress() {
     return Container(
-      padding: const EdgeInsets.only(left: 40.0,),
+      padding: const EdgeInsets.only(
+        left: 40.0,
+      ),
       child: LinearProgressIndicator(),
     );
   }
@@ -322,7 +306,9 @@ class _SignupState extends State<Signup> {
             TextFormField(
               focusNode: usernameNode,
               decoration: InputDecoration(
-                icon: Icon(Icons.person_outline,),
+                icon: Icon(
+                  Icons.person_outline,
+                ),
                 labelText: 'Username',
               ),
               textInputAction: TextInputAction.next,
@@ -337,9 +323,9 @@ class _SignupState extends State<Signup> {
                 if (!isWellFormatted) {
                   setState(() {
                     isCheckingName = false;
-                    nameErrorMessage = username.length < 3 ?
-                      'Please use at least 3 characters' :
-                      'Please use alpha-numerical (A-Z, 0-9) characters and underscore (_)';
+                    nameErrorMessage = username.length < 3
+                        ? 'Please use at least 3 characters'
+                        : 'Please use alpha-numerical (A-Z, 0-9) characters and underscore (_)';
                   });
 
                   return;
@@ -350,26 +336,23 @@ class _SignupState extends State<Signup> {
                   nameTimer = null;
                 }
 
-                nameTimer = Timer(
-                  1.seconds,
-                  () async {
-                    final isAvailable = await checkNameAvailability(username);
+                nameTimer = Timer(1.seconds, () async {
+                  final isAvailable = await checkNameAvailability(username);
 
-                    if (!isAvailable) {
-                      setState(() {
-                        isCheckingName = false;
-                        nameErrorMessage = 'This name is not available';
-                      });
-
-                      return;
-                    }
-
+                  if (!isAvailable) {
                     setState(() {
                       isCheckingName = false;
-                      nameErrorMessage = '';
+                      nameErrorMessage = 'This name is not available';
                     });
+
+                    return;
                   }
-                );
+
+                  setState(() {
+                    isCheckingName = false;
+                    nameErrorMessage = '';
+                  });
+                });
               },
               onFieldSubmitted: (_) => passwordNode.nextFocus(),
               validator: (value) {
@@ -392,18 +375,18 @@ class _SignupState extends State<Signup> {
         top: 8.0,
         left: 40.0,
       ),
-      child: Text(
-        nameErrorMessage,
-        style: TextStyle(
-          color: Colors.red.shade300,
-        )
-      ),
+      child: Text(nameErrorMessage,
+          style: TextStyle(
+            color: Colors.red.shade300,
+          )),
     );
   }
 
   Widget nameProgress() {
     return Container(
-      padding: const EdgeInsets.only(left: 40.0,),
+      padding: const EdgeInsets.only(
+        left: 40.0,
+      ),
       child: LinearProgressIndicator(),
     );
   }
@@ -425,7 +408,9 @@ class _SignupState extends State<Signup> {
               ),
               obscureText: true,
               onChanged: (value) {
-                if (value.length == 0) { return; }
+                if (value.length == 0) {
+                  return;
+                }
                 password = value;
               },
               validator: (value) {
@@ -459,7 +444,9 @@ class _SignupState extends State<Signup> {
               ),
               obscureText: true,
               onChanged: (value) {
-                if (value.length == 0) { return; }
+                if (value.length == 0) {
+                  return;
+                }
                 confirmPassword = value;
               },
               validator: (value) {
@@ -511,7 +498,10 @@ class _SignupState extends State<Signup> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0),
-                    child: Icon(Icons.arrow_forward, color: Colors.white,),
+                    child: Icon(
+                      Icons.arrow_forward,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
@@ -528,22 +518,21 @@ class _SignupState extends State<Signup> {
       beginY: 50.0,
       child: Center(
         child: FlatButton(
-          onPressed: () {
-            FluroRouter.router.navigateTo(
-              context,
-              SigninRoute,
-            );
-          },
-          child: Opacity(
-            opacity: .6,
-            child: Text(
-              "I already have an account",
-              style: TextStyle(
-                decoration: TextDecoration.underline,
+            onPressed: () {
+              FluroRouter.router.navigateTo(
+                context,
+                SigninRoute,
+              );
+            },
+            child: Opacity(
+              opacity: .6,
+              child: Text(
+                "I already have an account",
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                ),
               ),
-            ),
-          )
-        ),
+            )),
       ),
     );
   }
@@ -563,7 +552,6 @@ class _SignupState extends State<Signup> {
       if (userAuth != null) {
         FluroRouter.router.navigateTo(context, DashboardRoute);
       }
-
     } catch (error) {
       setState(() {
         isCheckingAuth = false;
@@ -572,7 +560,9 @@ class _SignupState extends State<Signup> {
   }
 
   void createAccount() async {
-    if (!inputValuesOk()) { return; }
+    if (!inputValuesOk()) {
+      return;
+    }
 
     setState(() {
       isSigningUp = true;
@@ -594,8 +584,8 @@ class _SignupState extends State<Signup> {
 
     try {
       // ?NOTE: Triming because of TAB key on Desktop.
-      final result = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email.trim(), password: password.trim());
+      final result = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email.trim(), password: password.trim());
 
       final user = result.user;
 
@@ -606,46 +596,40 @@ class _SignupState extends State<Signup> {
 
         showSnack(
           context: context,
-          message: 'An occurred while creating your account. Please try again or contact us if the problem persists.',
+          message:
+              'An occurred while creating your account. Please try again or contact us if the problem persists.',
           type: SnackType.error,
         );
 
         return;
       }
 
-      final name = username.isNotEmpty ?
-        username : email.substring(0, email.indexOf('@'));
+      final name = username.isNotEmpty
+          ? username
+          : email.substring(0, email.indexOf('@'));
 
-      final userUpdateInfo = UserUpdateInfo();
-        userUpdateInfo.displayName = name;
-
-      await user.updateProfile(userUpdateInfo);
-
-      await Firestore.instance
-        .collection('users')
-        .document(user.uid)
-        .setData({
-          'email': user.email,
-          'flag': '',
-          'lang': 'en',
-          'name': name,
-          'nameLowerCase': name,
-          'pricing': 'free',
-          'rights': {
-            'user:managedata': false,
-          },
-          'stats': {
-            'illustrations': {
-              'added': 0,
-              'favourites': 0,
-              'lists': 0,
-            }
-          },
-          'urls': {
-            'image': '',
-          },
-          'uid': user.uid,
-        });
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'email': user.email,
+        'flag': '',
+        'lang': 'en',
+        'name': name,
+        'nameLowerCase': name,
+        'pricing': 'free',
+        'rights': {
+          'user:managedata': false,
+        },
+        'stats': {
+          'illustrations': {
+            'added': 0,
+            'favourites': 0,
+            'lists': 0,
+          }
+        },
+        'urls': {
+          'image': '',
+        },
+        'uid': user.uid,
+      });
 
       appLocalStorage.setCredentials(
         email: email,
@@ -661,7 +645,6 @@ class _SignupState extends State<Signup> {
         isSigningUp = false;
         isCompleted = true;
       });
-
     } catch (error) {
       debugPrint(error.toString());
 
@@ -671,7 +654,8 @@ class _SignupState extends State<Signup> {
 
       showSnack(
         context: context,
-        message: 'An occurred while creating your account. Please try again or contact us if the problem persists.',
+        message:
+            'An occurred while creating your account. Please try again or contact us if the problem persists.',
         type: SnackType.error,
       );
     }
@@ -728,9 +712,9 @@ class _SignupState extends State<Signup> {
     if (!checkUsernameFormat(username)) {
       showSnack(
         context: context,
-        message: username.length < 3 ?
-          'Please use at least 3 characters' :
-          'Please use alpha-numerical (A-Z, 0-9) characters and underscore (_)',
+        message: username.length < 3
+            ? 'Please use at least 3 characters'
+            : 'Please use alpha-numerical (A-Z, 0-9) characters and underscore (_)',
         type: SnackType.error,
       );
 
