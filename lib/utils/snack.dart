@@ -1,9 +1,8 @@
 import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/types/enums.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
-
-enum SnackType { error, info, success }
 
 Future showSnack({
   BuildContext context,
@@ -13,14 +12,22 @@ Future showSnack({
   SnackType type,
 }) {
   Color color;
-  if (type == SnackType.error) { color = Colors.red; }
-  else if (type == SnackType.success) { color =  Colors.green; }
-  else { color = stateColors.softBackground; }
+  if (type == SnackType.error) {
+    color = Colors.red;
+  } else if (type == SnackType.success) {
+    color = Colors.green;
+  } else {
+    color = stateColors.softBackground;
+  }
 
   IconData iconData;
-  if (type == SnackType.error) { iconData = Icons.error; }
-  else if (type == SnackType.success) { iconData = Icons.check_circle; }
-  else { iconData = Icons.info; }
+  if (type == SnackType.error) {
+    iconData = Icons.error;
+  } else if (type == SnackType.success) {
+    iconData = Icons.check_circle;
+  } else {
+    iconData = Icons.info;
+  }
 
   return Flushbar(
     backgroundColor: color,

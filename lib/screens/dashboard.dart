@@ -1,6 +1,4 @@
 import 'package:artbooking/components/sliver_appbar_header.dart';
-import 'package:artbooking/router/route_names.dart';
-import 'package:artbooking/router/router.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -28,17 +26,21 @@ class _DashboardState extends State<Dashboard> {
   Widget bodyListContent() {
     return SliverList(
       delegate: SliverChildListDelegate([
-        Padding(padding: const EdgeInsets.only(top: 80.0,),),
+        Padding(
+          padding: const EdgeInsets.only(
+            top: 80.0,
+          ),
+        ),
         userIdentity(),
-
         Divider(
           thickness: 1.0,
           height: 200.0,
         ),
-
         sectionsView(),
-
-        Padding(padding: const EdgeInsets.only(bottom: 200.0,))
+        Padding(
+            padding: const EdgeInsets.only(
+          bottom: 200.0,
+        ))
       ]),
     );
   }
@@ -53,32 +55,31 @@ class _DashboardState extends State<Dashboard> {
           clipBehavior: Clip.hardEdge,
           color: Colors.transparent,
           child: Ink.image(
-            image: NetworkImage('https://drawinghowtos.com/wp-content/uploads/2019/04/fox-colored.png'),
+            image: NetworkImage(
+                'https://drawinghowtos.com/wp-content/uploads/2019/04/fox-colored.png'),
             fit: BoxFit.cover,
             width: 150.0,
             height: 150.0,
             child: InkWell(
               onTap: () {
                 showDialog(
-                  context: context,
-                  barrierDismissible: true,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      content: Container(
-                        child: Image(
-                          image: AssetImage('https://drawinghowtos.com/wp-content/uploads/2019/04/fox-colored.png')
-                        ,),
-                      ),
-                    );
-                  }
-                );
+                    context: context,
+                    barrierDismissible: true,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        content: Container(
+                          child: Image(
+                            image: AssetImage(
+                                'https://drawinghowtos.com/wp-content/uploads/2019/04/fox-colored.png'),
+                          ),
+                        ),
+                      );
+                    });
               },
             ),
           ),
         ),
-
         Padding(padding: const EdgeInsets.only(left: 50.0)),
-
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -89,7 +90,6 @@ class _DashboardState extends State<Dashboard> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-
             Opacity(
               opacity: .6,
               child: Text(
@@ -100,7 +100,6 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.only(top: 25.0),
               child: FlatButton(
@@ -137,7 +136,7 @@ class _DashboardState extends State<Dashboard> {
             child: Card(
               child: InkWell(
                 onTap: () {
-                  FluroRouter.router.navigateTo(context, IllustrationsRoute);
+                  // Go to IllustrationsRoute
                 },
                 child: Center(
                   child: Text(

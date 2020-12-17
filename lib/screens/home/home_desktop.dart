@@ -1,18 +1,16 @@
 import 'dart:ui';
 
-import 'package:artbooking/router/route_names.dart';
-import 'package:artbooking/router/router.dart';
 import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user_state.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Home extends StatefulWidget {
+class HomeDesktop extends StatefulWidget {
   @override
-  _HomeState createState() => _HomeState();
+  _HomeDesktopState createState() => _HomeDesktopState();
 }
 
-class _HomeState extends State<Home> with TickerProviderStateMixin {
+class _HomeDesktopState extends State<HomeDesktop>
+    with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,12 +43,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               ),
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.only(left: 30.0),
-            child: userState.isConnected ?
-              dashboardButton() :
-              signinButton(),
+            // child: stateUser.isConnected ? dashboardButton() : signinButton(),
           ),
         ],
       ),
@@ -64,13 +59,14 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       clipBehavior: Clip.hardEdge,
       color: Colors.transparent,
       child: Ink.image(
-        image: NetworkImage('https://drawinghowtos.com/wp-content/uploads/2019/04/fox-colored.png'),
+        image: NetworkImage(
+            'https://drawinghowtos.com/wp-content/uploads/2019/04/fox-colored.png'),
         fit: BoxFit.cover,
         width: 60.0,
         height: 60.0,
         child: InkWell(
           onTap: () {
-            return FluroRouter.router.navigateTo(context, DashboardRoute);
+            // Go to DashboardRoute
           },
         ),
       ),
@@ -80,7 +76,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   Widget signinButton() {
     return RaisedButton(
       onPressed: () {
-        FluroRouter.router.navigateTo(context, SigninRoute);
+        // Go to SigninRoute
       },
       color: stateColors.primary,
       shape: RoundedRectangleBorder(
@@ -139,10 +135,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                   ),
                 ),
               ),
-
               RaisedButton(
                 onPressed: () {
-                  FluroRouter.router.navigateTo(context, SigninRoute);
+                  // Go to SigninRoute
                 },
                 color: stateColors.primary,
                 shape: RoundedRectangleBorder(
@@ -175,7 +170,6 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               fontSize: 60.0,
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.only(
               top: 10.0,
@@ -201,7 +195,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         elevation: 4.0,
         color: Colors.transparent,
         child: Ink.image(
-          image: NetworkImage('https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/art%2Fjeremie_corpinot%2FFlorale%2Fflorale_0_1080.png?alt=media&token=cd3a1f4d-f935-4cc7-b118-a9e6dca3de65'),
+          image: NetworkImage(
+              'https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/art%2Fjeremie_corpinot%2FFlorale%2Fflorale_0_1080.png?alt=media&token=cd3a1f4d-f935-4cc7-b118-a9e6dca3de65'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(Colors.red, BlendMode.colorBurn),
           height: MediaQuery.of(context).size.height,

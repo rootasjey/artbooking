@@ -1,17 +1,19 @@
 import 'dart:async';
 
-import 'package:artbooking/actions/users.dart';
-import 'package:artbooking/components/fade_in_y.dart';
-import 'package:artbooking/components/loading_animation.dart';
-import 'package:artbooking/router/route_names.dart';
-import 'package:artbooking/router/router.dart';
-import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user_state.dart';
-import 'package:artbooking/utils/app_localstorage.dart';
-import 'package:artbooking/utils/snack.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:artbooking/types/enums.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:artbooking/actions/users.dart';
+import 'package:artbooking/components/app_icon.dart';
+import 'package:artbooking/components/fade_in_x.dart';
+import 'package:artbooking/components/fade_in_y.dart';
+import 'package:artbooking/components/loading_animation.dart';
+import 'package:artbooking/screens/home/home_desktop.dart';
+import 'package:artbooking/screens/signin.dart';
+import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/state/user.dart';
+import 'package:artbooking/utils/app_storage.dart';
+import 'package:artbooking/utils/snack.dart';
 import 'package:supercharged/supercharged.dart';
 
 class Signup extends StatefulWidget {
@@ -48,13 +50,15 @@ class _SignupState extends State<Signup> {
   @override
   initState() {
     super.initState();
-    checkAuth();
+    ensureNotConnected();
   }
 
   @override
   void dispose() {
     super.dispose();
+    usernameNode.dispose();
     passwordNode.dispose();
+    confirmPasswordNode.dispose();
   }
 
   @override
@@ -64,23 +68,11 @@ class _SignupState extends State<Signup> {
         children: [
           Column(
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
-                    child: IconButton(
-                      onPressed: () {
-                        FluroRouter.router.pop(context);
-                      },
-                      icon: Icon(Icons.arrow_back),
-                    ),
-                  ),
-                ],
+              AppIcon(
+                padding: const EdgeInsets.only(top: 30.0, bottom: 60.0),
               ),
               Padding(
                 padding: const EdgeInsets.only(
-                  top: 60.0,
                   bottom: 300.0,
                 ),
                 child: SizedBox(
@@ -96,10 +88,6 @@ class _SignupState extends State<Signup> {
   }
 
   Widget body() {
-    if (isCompleted) {
-      return completedContainer();
-    }
-
     if (isSigningUp) {
       return Padding(
         padding: const EdgeInsets.only(top: 80.0),
@@ -112,59 +100,15 @@ class _SignupState extends State<Signup> {
     return idleContainer();
   }
 
-  Widget completedContainer() {
-    return Column(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: 30.0),
-          child: Icon(
-            Icons.check_circle,
-            size: 80.0,
-            color: Colors.green,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 30.0, bottom: 0.0),
-          child: Text(
-            'Your account has been successfully created!',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20.0,
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(
-            top: 15.0,
-          ),
-          child: FlatButton(
-            onPressed: () {
-              FluroRouter.router.navigateTo(
-                context,
-                DashboardRoute,
-              );
-            },
-            child: Opacity(
-              opacity: .6,
-              child: Text(
-                'Go to your dashboard',
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget emailInput() {
     return FadeInY(
-      delay: .5,
+      delay: 0.5,
       beginY: 50.0,
       child: Padding(
         padding: EdgeInsets.only(top: 60.0),
         child: TextFormField(
           autofocus: true,
-          onFieldSubmitted: (_) => usernameNode.nextFocus(),
+          textInputAction: TextInputAction.next,
           decoration: InputDecoration(
             icon: Icon(Icons.email),
             labelText: 'Email',
@@ -210,6 +154,7 @@ class _SignupState extends State<Signup> {
               });
             });
           },
+          onFieldSubmitted: (_) => usernameNode.requestFocus(),
           validator: (value) {
             if (value.isEmpty) {
               return 'Email cannot be empty';
@@ -236,33 +181,50 @@ class _SignupState extends State<Signup> {
   }
 
   Widget header() {
-    return Center(
-      child: Column(
-        children: <Widget>[
-          FadeInY(
-            beginY: 50.0,
-            child: Padding(
-              padding: EdgeInsets.only(bottom: 10.0),
-              child: Text(
-                'Sign Up',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 25.0,
-                  fontWeight: FontWeight.bold,
+    return Row(
+      children: <Widget>[
+        FadeInX(
+          beginX: 10.0,
+          delay: 2.0,
+          child: Padding(
+            padding: const EdgeInsets.only(
+              right: 20.0,
+            ),
+            child: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: Icon(Icons.arrow_back),
+            ),
+          ),
+        ),
+        Column(
+          children: <Widget>[
+            FadeInY(
+              beginY: 50.0,
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 10.0),
+                child: Text(
+                  'Sign Up',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 25.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-          ),
-          FadeInY(
-            delay: .3,
-            beginY: 50.0,
-            child: Opacity(
-              opacity: .6,
-              child: Text('Create a new account'),
+            FadeInY(
+              delay: 0.3,
+              beginY: 50.0,
+              child: Opacity(
+                opacity: .6,
+                child: Text('Create a new account'),
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -354,7 +316,7 @@ class _SignupState extends State<Signup> {
                   });
                 });
               },
-              onFieldSubmitted: (_) => passwordNode.nextFocus(),
+              onFieldSubmitted: (_) => passwordNode.requestFocus(),
               validator: (value) {
                 if (value.isEmpty) {
                   return 'name cannot be empty';
@@ -402,6 +364,7 @@ class _SignupState extends State<Signup> {
           children: <Widget>[
             TextFormField(
               focusNode: passwordNode,
+              textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 icon: Icon(Icons.lock_outline),
                 labelText: 'Password',
@@ -413,6 +376,7 @@ class _SignupState extends State<Signup> {
                 }
                 password = value;
               },
+              onFieldSubmitted: (_) => confirmPasswordNode.requestFocus(),
               validator: (value) {
                 if (value.isEmpty) {
                   return 'Password cannot be empty';
@@ -449,6 +413,7 @@ class _SignupState extends State<Signup> {
                 }
                 confirmPassword = value;
               },
+              onFieldSubmitted: (value) => signUpProcess(),
               validator: (value) {
                 if (value.isEmpty) {
                   return 'Confirm password cannot be empty';
@@ -475,7 +440,7 @@ class _SignupState extends State<Signup> {
         child: Padding(
           padding: const EdgeInsets.only(top: 60.0),
           child: RaisedButton(
-            onPressed: () => createAccount(),
+            onPressed: () => signUpProcess(),
             color: stateColors.primary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(
@@ -519,10 +484,8 @@ class _SignupState extends State<Signup> {
       child: Center(
         child: FlatButton(
             onPressed: () {
-              FluroRouter.router.navigateTo(
-                context,
-                SigninRoute,
-              );
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => Signin()));
             },
             child: Opacity(
               opacity: .6,
@@ -537,20 +500,21 @@ class _SignupState extends State<Signup> {
     );
   }
 
-  void checkAuth() async {
+  void ensureNotConnected() async {
     setState(() {
       isCheckingAuth = true;
     });
 
     try {
-      final userAuth = await userState.userAuth;
+      final userAuth = FirebaseAuth.instance.currentUser;
 
       setState(() {
         isCheckingAuth = false;
       });
 
       if (userAuth != null) {
-        FluroRouter.router.navigateTo(context, DashboardRoute);
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) => HomeDesktop()));
       }
     } catch (error) {
       setState(() {
@@ -559,7 +523,7 @@ class _SignupState extends State<Signup> {
     }
   }
 
-  void createAccount() async {
+  void signUpProcess() async {
     if (!inputValuesOk()) {
       return;
     }
@@ -582,69 +546,54 @@ class _SignupState extends State<Signup> {
       return;
     }
 
+    // ?NOTE: Triming because of TAB key on Desktop insert blank spaces.
+    email = email.trim();
+    password = password.trim();
+
     try {
-      // ?NOTE: Triming because of TAB key on Desktop.
-      final result = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email.trim(), password: password.trim());
+      final respCreateAcc = await createAccount(
+        email: email,
+        username: username,
+        password: password,
+      );
 
-      final user = result.user;
+      if (!respCreateAcc.success) {
+        final exception = respCreateAcc.error;
 
-      if (user == null) {
         setState(() {
           isSigningUp = false;
         });
 
         showSnack(
           context: context,
-          message:
-              'An occurred while creating your account. Please try again or contact us if the problem persists.',
+          message: "[code: ${exception.code}] - ${exception.message}",
           type: SnackType.error,
         );
 
         return;
       }
 
-      final name = username.isNotEmpty
-          ? username
-          : email.substring(0, email.indexOf('@'));
-
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-        'email': user.email,
-        'flag': '',
-        'lang': 'en',
-        'name': name,
-        'nameLowerCase': name,
-        'pricing': 'free',
-        'rights': {
-          'user:managedata': false,
-        },
-        'stats': {
-          'illustrations': {
-            'added': 0,
-            'favourites': 0,
-            'lists': 0,
-          }
-        },
-        'urls': {
-          'image': '',
-        },
-        'uid': user.uid,
-      });
-
-      appLocalStorage.setCredentials(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      userState.setUserConnected(true);
-      appLocalStorage.setUserName(username);
-      userState.setUsername(username);
-      userState.setUid(user.uid);
+      isSigningUp = false;
+      isCompleted = true;
 
-      setState(() {
-        isSigningUp = false;
-        isCompleted = true;
-      });
+      appStorage.setCredentials(
+        email: email,
+        password: password,
+      );
+
+      stateUser.setUserConnected();
+      // PushNotifications.linkAuthUser(respCreateAcc.user.id);
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => HomeDesktop(),
+        ),
+      );
     } catch (error) {
       debugPrint(error.toString());
 
@@ -654,8 +603,8 @@ class _SignupState extends State<Signup> {
 
       showSnack(
         context: context,
-        message:
-            'An occurred while creating your account. Please try again or contact us if the problem persists.',
+        message: "An occurred while creating your account. " +
+            "Please try again or contact us if the problem persists.",
         type: SnackType.error,
       );
     }

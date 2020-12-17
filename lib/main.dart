@@ -1,10 +1,10 @@
 import 'package:artbooking/components/full_page_loading.dart';
 import 'package:artbooking/main_mobile.dart';
 import 'package:artbooking/main_web.dart';
-import 'package:artbooking/router/router.dart';
 import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user_state.dart';
-import 'package:artbooking/utils/app_localstorage.dart';
+import 'package:artbooking/state/user.dart';
+import 'package:artbooking/types/enums.dart';
+import 'package:artbooking/utils/app_storage.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,26 +24,20 @@ class App extends StatefulWidget {
 class AppState extends State<App> {
   bool isReady = false;
 
-  AppState() {
-    if (kIsWeb) { FluroRouter.setupWebRouter(); }
-    else { FluroRouter.setupMobileRouter(); }
-  }
-
   @override
   void initState() {
     super.initState();
 
-    appLocalStorage.initialize()
-      .then((value) {
-        final savedLang = appLocalStorage.getLang();
-        userState.setLang(savedLang);
+    appStorage.initialize().then((value) {
+      final savedLang = appStorage.getLang();
+      stateUser.setLang(savedLang);
 
-        autoLogin();
+      autoLogin();
 
-        setState(() {
-          isReady = true;
-        });
+      setState(() {
+        isReady = true;
       });
+    });
   }
 
   @override
@@ -86,19 +80,22 @@ class AppState extends State<App> {
 
   void autoLogin() async {
     try {
-      final credentials = appLocalStorage.getCredentials();
+      final credentials = appStorage.getCredentials();
 
-      if (credentials == null) { return; }
+      if (credentials == null) {
+        return;
+      }
 
       final email = credentials['email'];
       final password = credentials['password'];
 
-      if ((email == null || email.isEmpty) || (password == null || password.isEmpty)) {
+      if ((email == null || email.isEmpty) ||
+          (password == null || password.isEmpty)) {
         return;
       }
 
       final authResult = await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email, password: password);
+          .signInWithEmailAndPassword(email: email, password: password);
 
       if (authResult.user == null) {
         return;
@@ -106,17 +103,15 @@ class AppState extends State<App> {
 
       final username = authResult.user.displayName;
 
-      appLocalStorage.setUserName(username);
-      userState.setUserConnected(true);
-      userState.setUsername(username);
-      userState.setUid(authResult.user.uid);
+      appStorage.setUserName(username);
+      stateUser.setUserConnected();
+      stateUser.setUserName(username);
 
       showSnack(
         context: context,
         message: "Welcome back $username",
         type: SnackType.info,
       );
-
     } catch (error) {
       debugPrint(error.toString());
     }

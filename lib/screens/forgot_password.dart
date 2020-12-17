@@ -1,7 +1,6 @@
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/loading_animation.dart';
-import 'package:artbooking/router/route_names.dart';
-import 'package:artbooking/router/router.dart';
+import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +71,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             color: Colors.green,
           ),
         ),
-
         Container(
           width: width > 400.0 ? 320.0 : 280.0,
           // padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -88,25 +86,20 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   ),
                 ),
               ),
-
               Opacity(
                 opacity: .6,
-                child: Text(
-                  'Please check your spam folder too'
-                ),
+                child: Text('Please check your spam folder too'),
               ),
             ],
           ),
         ),
-
         Padding(
-          padding: const EdgeInsets.only(top: 55.0,),
+          padding: const EdgeInsets.only(
+            top: 55.0,
+          ),
           child: FlatButton(
             onPressed: () {
-              FluroRouter.router.navigateTo(
-                context,
-                RootRoute,
-              );
+              // Go to root/home
             },
             child: Opacity(
               opacity: .6,
@@ -183,7 +176,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             ),
           ),
         ),
-
         FadeInY(
           beginY: 50.0,
           child: Opacity(
@@ -240,14 +232,12 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         isCompleted = false;
       });
 
-      await FirebaseAuth.instance
-        .sendPasswordResetEmail(email: email);
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
 
       setState(() {
         isLoading = false;
         isCompleted = true;
       });
-
     } catch (error) {
       debugPrint(error.toString());
 
@@ -256,10 +246,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       });
 
       showSnack(
-        context: context,
-        type: SnackType.error,
-        message: "Sorry, this email doesn't exist."
-      );
+          context: context,
+          type: SnackType.error,
+          message: "Sorry, this email doesn't exist.");
     }
   }
 }

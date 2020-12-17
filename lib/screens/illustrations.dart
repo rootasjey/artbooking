@@ -1,9 +1,8 @@
 import 'package:artbooking/components/sliver_appbar_header.dart';
-import 'package:artbooking/state/user_state.dart';
 import 'package:artbooking/types/illustration.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mobx/mobx.dart';
 
 class Illustrations extends StatefulWidget {
   @override
@@ -18,17 +17,7 @@ class _IllustrationsState extends State<Illustrations> {
   initState() {
     super.initState();
 
-    setState(() {
-      isLoading = true;
-    });
-
-    autorun((reaction) {
-      if (userState.uid.isEmpty) {
-        return;
-      }
-
-      fetch();
-    });
+    fetch();
   }
 
   @override
@@ -100,10 +89,20 @@ class _IllustrationsState extends State<Illustrations> {
   }
 
   void fetch() async {
+    setState(() {
+      isLoading = true;
+    });
+
     try {
+      final userAuth = FirebaseAuth.instance.currentUser;
+
+      if (userAuth == null) {
+        throw Exception("User is not authenticated.");
+      }
+
       final snapshot = await FirebaseFirestore.instance
           .collection('illustrations')
-          .where('author.id', isEqualTo: userState.uid)
+          .where('author.id', isEqualTo: userAuth.uid)
           .get();
 
       if (snapshot.docs.isEmpty) {

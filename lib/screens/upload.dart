@@ -2,10 +2,12 @@ import 'dart:html';
 
 import 'package:artbooking/components/sliver_appbar_header.dart';
 import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user_state.dart';
+import 'package:artbooking/state/user.dart';
+import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/uploaded_item.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase/firebase.dart' as fb;
 import 'package:mobx/mobx.dart';
@@ -464,7 +466,7 @@ class _UploadState extends State<Upload> {
   void fetch() {
     // print('fetch?');
     autorun((reaction) async {
-      final username = userState.username;
+      final username = stateUser.username;
       // print('username: $username');
 
       if (username == null || username.isEmpty) {
@@ -544,14 +546,20 @@ class _UploadState extends State<Upload> {
   /// file upload
   uploadToFirebase(File imageFile) async {
     final fileName = '${imageFile.name}';
-    final username = userState.username;
+    final username = stateUser.username;
     final filePath = 'users/$username/illustrations/$fileName';
 
     try {
+      final userAuth = FirebaseAuth.instance.currentUser;
+
+      if (userAuth == null) {
+        throw Exception("User is not authenticated.");
+      }
+
       final newDoc =
           await FirebaseFirestore.instance.collection('illustrations').add({
         'author': {
-          'id': userState.uid,
+          'id': userAuth.uid,
         },
         'createdAt': DateTime.now(),
         'description': '',

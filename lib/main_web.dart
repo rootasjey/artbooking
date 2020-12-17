@@ -1,6 +1,5 @@
-import 'package:artbooking/router/router.dart';
 import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/utils/app_localstorage.dart';
+import 'package:artbooking/utils/app_storage.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
@@ -23,16 +22,14 @@ class _MainWebState extends State<MainWeb> {
       title: 'ArtBooking',
       theme: stateColors.themeData,
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-      onGenerateRoute: FluroRouter.router.generator,
     );
   }
 
   void loadBrightness() {
-    final autoBrightness = appLocalStorage.getAutoBrightness();
+    final autoBrightness = appStorage.getAutoBrightness();
 
     if (!autoBrightness) {
-      final currentBrightness = appLocalStorage.getBrightness();
+      final currentBrightness = appStorage.getBrightness();
       stateColors.refreshTheme(currentBrightness);
 
       return;
@@ -46,17 +43,13 @@ class _MainWebState extends State<MainWeb> {
       brightness = Brightness.dark;
     }
 
-    Future.delayed(
-      2.seconds,
-      () {
-        try {
-          DynamicTheme.of(context).setBrightness(brightness);
-          stateColors.refreshTheme(brightness);
-
-        } catch (error) {
-          debugPrint(error.toString());
-        }
+    Future.delayed(2.seconds, () {
+      try {
+        DynamicTheme.of(context).setBrightness(brightness);
+        stateColors.refreshTheme(brightness);
+      } catch (error) {
+        debugPrint(error.toString());
       }
-    );
+    });
   }
 }

@@ -1,5 +1,4 @@
 import 'package:artbooking/router/route_names.dart';
-import 'package:artbooking/router/router.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -25,19 +24,14 @@ class SliverAppHeader extends StatelessWidget {
                 child: Row(
                   children: <Widget>[
                     IconButton(
-                      onPressed: () {
-                        FluroRouter.router.pop(context);
-                      },
+                      onPressed: () {},
                       tooltip: 'Back',
                       icon: Icon(Icons.arrow_back),
                     ),
-
                     Padding(
                       padding: const EdgeInsets.only(left: 15.0),
                       child: FlatButton(
-                        onPressed: () {
-                          FluroRouter.router.navigateTo(context, RootRoute);
-                        },
+                        onPressed: () {},
                         child: Text(
                           'Art Booking',
                           style: GoogleFonts.amaticSc(
@@ -47,12 +41,10 @@ class SliverAppHeader extends StatelessWidget {
                         ),
                       ),
                     ),
-
                     VerticalDivider(
                       thickness: 1.0,
                       width: 32.0,
                     ),
-
                     FlatButton(
                       onPressed: () {
                         // FluroRouter.router.navigateTo(context, RootRoute);
@@ -90,27 +82,26 @@ class SliverAppHeader extends StatelessWidget {
                       clipBehavior: Clip.hardEdge,
                       color: Colors.transparent,
                       child: Ink.image(
-                        image: NetworkImage('https://drawinghowtos.com/wp-content/uploads/2019/04/fox-colored.png'),
+                        image: NetworkImage(
+                            'https://drawinghowtos.com/wp-content/uploads/2019/04/fox-colored.png'),
                         fit: BoxFit.cover,
                         width: 60.0,
                         height: 60.0,
                         child: InkWell(
-                          onTap: () {
-                            return FluroRouter.router.navigateTo(context, DashboardRoute);
-                          },
+                          onTap: () {},
                         ),
                       ),
                     ),
-
-                    Padding(padding: const EdgeInsets.only(left: 30.0,)),
-
+                    Padding(
+                        padding: const EdgeInsets.only(
+                      left: 30.0,
+                    )),
                     RaisedButton(
                       onPressed: () {
-                        if (ModalRoute.of(context).settings.name == UploadRoute) {
+                        if (ModalRoute.of(context).settings.name ==
+                            UploadRoute) {
                           return;
                         }
-
-                        FluroRouter.router.navigateTo(context, UploadRoute);
                       },
                       color: stateColors.primary,
                       shape: RoundedRectangleBorder(
