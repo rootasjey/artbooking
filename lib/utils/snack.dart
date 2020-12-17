@@ -1,50 +1,17 @@
-import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/enums.dart';
-import 'package:flushbar/flushbar.dart';
+import 'package:artbooking/utils/flash_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:supercharged/supercharged.dart';
 
 Future showSnack({
-  BuildContext context,
-  Function onTap,
-  String message,
-  String title,
-  SnackType type,
+  @required BuildContext context,
+  @required String message,
+  SnackType type = SnackType.info,
 }) {
-  Color color;
   if (type == SnackType.error) {
-    color = Colors.red;
+    return FlashHelper.errorBar(context, message: message);
   } else if (type == SnackType.success) {
-    color = Colors.green;
-  } else {
-    color = stateColors.softBackground;
+    return FlashHelper.successBar(context, message: message);
   }
 
-  IconData iconData;
-  if (type == SnackType.error) {
-    iconData = Icons.error;
-  } else if (type == SnackType.success) {
-    iconData = Icons.check_circle;
-  } else {
-    iconData = Icons.info;
-  }
-
-  return Flushbar(
-    backgroundColor: color,
-    duration: 5.seconds,
-    icon: Icon(
-      iconData,
-      color: Colors.white,
-    ),
-    title: title,
-    messageText: Text(
-      message,
-      overflow: TextOverflow.ellipsis,
-      maxLines: 5,
-      style: TextStyle(
-        color: Colors.white,
-      ),
-    ),
-    onTap: onTap,
-  ).show(context);
+  return FlashHelper.infoBar(context, message: message);
 }
