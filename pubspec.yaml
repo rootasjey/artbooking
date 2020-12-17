@@ -30,6 +30,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: 1.0.0
   dynamic_theme: 1.0.1
+  file_picker: 2.1.4
   firebase_auth: 0.18.4+1
   firebase_core: 0.5.3
   firebase_analytics: 6.3.0
