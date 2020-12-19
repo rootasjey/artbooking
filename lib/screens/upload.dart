@@ -7,6 +7,7 @@ import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/uploaded_item.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase/firebase.dart' as fb;
@@ -499,6 +500,18 @@ class _UploadState extends State<Upload> {
   /// A "select file/folder" window will appear. User will have to choose a file.
   /// This file will be then read, and uploaded to firebase storage;
   uploadImage() async {
+    final pickerResult = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      withData: true,
+    );
+
+    if (pickerResult == null) {
+      return;
+    }
+
+    pickerResult.files.first
+
+    // -------
     // HTML input element
     InputElement uploadInput = FileUploadInputElement();
     uploadInput.click();
