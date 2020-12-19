@@ -180,11 +180,11 @@ export const createAccount = functions
               deleted: 0,
               entered: 0,
             },
-            illustrations: {
+            images: {
               added: 0,
               deleted: 0,
               fav: 0,
-              lists: 0, // user's custom illustrations lists
+              lists: 0, // user's custom images lists
             },
             notifications: {
               total: 0,
@@ -276,12 +276,12 @@ export const deleteAccount = functions
       }
 
       const stats = userData.stats;
-      const totalItemsCount = (stats.illustrations.created - stats.illustrations.deleted) +
-        stats.illustrations.fav + stats.illustrations.lists + stats.notifications.total +
+      const totalItemsCount = (stats.images.created - stats.images.deleted) +
+        stats.images.fav + stats.images.lists + stats.notifications.total +
         (stats.boards.created - stats.boards.deleted) + stats.boards.fav;
 
       // Add delete entry.
-      // Eventually set the illustrations.author.id field to anonymous's id.
+      // Eventually set the images.author.id field to anonymous's id.
       await firestore
         .collection('todelete')
         .doc(userAuth.uid)
