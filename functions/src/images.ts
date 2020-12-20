@@ -93,13 +93,13 @@ export const deleteDocument = functions
 
     try {
       // Delete files from Cloud Storage
-      const data = await adminApp.storage()
+      const dir = await adminApp.storage()
         .bucket()
         .getFiles({
           directory: `users/${userAuth.uid}/images/${id}`
         });
         
-      const files = data[0];
+      const files = dir[0];
 
       for await (const file of files) {
         await file.delete();
