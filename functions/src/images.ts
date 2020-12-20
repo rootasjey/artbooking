@@ -76,6 +76,7 @@ export const createDocument = functions
  * Delete an image document from Firestore and from Cloud Storage.
  */
 export const deleteDocument = functions
+  .region('europe-west3')
   .https
   .onCall(async (data: DeleteImageParams, context) => {
     const userAuth = context.auth;
@@ -125,6 +126,7 @@ export const deleteDocument = functions
  * Update description, name, license, visibility if specified.
  */
 export const updateDocumentStrings = functions
+  .region('europe-west3')
   .https
   .onCall(async (data: UpdateImageStringParams, context) => {
     const userAuth = context.auth;
@@ -163,7 +165,9 @@ export const updateDocumentStrings = functions
   });
 
 export const updateDocumentCategories = functions
-  .https.onCall(async (data: UpdateImageCategoriesParams, context) => {
+  .region('europe-west3')
+  .https
+  .onCall(async (data: UpdateImageCategoriesParams, context) => {
     const userAuth = context.auth;
 
     if (!userAuth) {
@@ -195,7 +199,9 @@ export const updateDocumentCategories = functions
   });
 
 export const updateDocumentTopics = functions
-  .https.onCall(async (data: UpdateImageTopicsParams, context) => {
+  .region('europe-west3')
+  .https
+  .onCall(async (data: UpdateImageTopicsParams, context) => {
     const userAuth = context.auth;
 
     if (!userAuth) {
