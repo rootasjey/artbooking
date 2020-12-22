@@ -123,6 +123,55 @@ export const deleteDocument = functions
   });
 
 /**
+ * On storage file creation, get download link
+ * and set it to the Firestore matching document.
+ */
+export const onStorageUpload = functions
+  .region('europe-west3')
+  .storage
+  .object()
+  .onFinalize(async (metadata) => {
+    const customMetadata = metadata.metadata;
+
+    if (!customMetadata) {
+      return;
+    }
+
+    const { firestoreId, userId, visibility } = customMetadata;
+
+    if (!firestoreId || !userId) {
+      return;
+    }
+
+    const storageUrl = `${metadata.name}`;
+
+    const imageFile = adminApp.storage()
+      .bucket()
+      .file(storageUrl);
+
+    if (!await imageFile.exists()) {
+      console.log('file does not exist')
+      return;
+    }
+
+    if (visibility) {
+      await imageFile.makePublic();
+    }
+
+    await adminApp.firestore()
+      .collection('images')
+      .doc(firestoreId)
+      .set({
+        urls: {
+          original: imageFile.publicUrl(),
+          storage: storageUrl,
+        },
+      }, { 
+        merge: true, 
+      });
+  });
+
+/**
  * Update description, name, license, visibility if specified.
  */
 export const updateDocumentStrings = functions
