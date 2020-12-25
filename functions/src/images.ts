@@ -179,12 +179,120 @@ export const onStorageUpload = functions
   });
 
 /**
- * Update description, name, license, visibility if specified.
+ * Set the image's author id same as user's id.
  */
-export const updateDocumentStrings = functions
+export const setUserAuthor = functions
   .region('europe-west3')
   .https
-  .onCall(async (data: UpdateImageStringParams, context) => {
+  .onCall(async (data: SetUserAuthorParams, context) => {
+    const userAuth = context.auth;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
+        'an authenticated user.');
+    }
+
+    const { imageId } = data;
+
+    try {
+      const doc = await adminApp.firestore()
+        .collection('images')
+        .doc(imageId)
+        .get();
+
+      const docData = doc.data();
+
+      if (!docData) {
+        throw new functions.https.HttpsError('not-found', "The document doesn't exists anymore. " +
+          "Please try again later or contact us.");
+      }
+
+      if (docData.user.id !== userAuth.uid) {
+        throw new functions.https.HttpsError('permission-denied', "You don't have access to this document.");
+      }
+
+      await doc.ref
+        .set({
+          author: {
+            id: userAuth.uid,
+          },
+        },
+          {
+            merge: true,
+          }
+        );
+
+      return {
+        imageId,
+        success: true,
+      }
+    } catch (error) {
+      throw new functions.https.HttpsError('internal', "There was an internal error. " +
+        "Please try again later or contact us.");
+    }
+  });
+
+/**
+ * Unset the image's author id same as user's id.
+ */
+export const unsetUserAuthor = functions
+  .region('europe-west3')
+  .https
+  .onCall(async (data: SetUserAuthorParams, context) => {
+    const userAuth = context.auth;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
+        'an authenticated user.');
+    }
+
+    const { imageId } = data;
+
+    try {
+      const doc = await adminApp.firestore()
+        .collection('images')
+        .doc(imageId)
+        .get();
+
+      const docData = doc.data();
+
+      if (!docData) {
+        throw new functions.https.HttpsError('not-found', "The document doesn't exists anymore. " +
+          "Please try again later or contact us.");
+      }
+
+      if (docData.user.id !== userAuth.uid) {
+        throw new functions.https.HttpsError('permission-denied', "You don't have access to this document.");
+      }
+
+      await doc.ref
+        .set({
+          author: {
+            id: '',
+          },
+        },
+          {
+            merge: true,
+          }
+        );
+
+      return {
+        imageId,
+        success: true,
+      }
+    } catch (error) {
+      throw new functions.https.HttpsError('internal', "There was an internal error. " +
+        "Please try again later or contact us.");
+    }
+  });
+
+/**
+ * Update description, name, license, visibility if specified.
+ */
+export const updateDocumentProperties = functions
+  .region('europe-west3')
+  .https
+  .onCall(async (data: UpdateImagePropsParams, context) => {
     const userAuth = context.auth;
 
     if (!userAuth) {
@@ -288,7 +396,7 @@ export const updateDocumentTopics = functions
     }
   });
 
-function checkUpdateParams(data: UpdateImageStringParams) {
+function checkUpdateParams(data: UpdateImagePropsParams) {
   if (!data) {
     throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
       "a valid [description], [id], [name], [license] and [visibility] parameters..");

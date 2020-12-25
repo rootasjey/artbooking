@@ -47,12 +47,16 @@ interface NotifFuncParams {
   notifSnapshot: FirebaseFirestore.QueryDocumentSnapshot;
 }
 
+interface SetUserAuthorParams {
+  imageId: string;
+}
+
 interface UpdateEmailParams {
   newEmail: string;
   idToken: string;
 }
 
-interface UpdateImageStringParams {
+interface UpdateImagePropsParams {
   /// Image's description.
   description: string,
   
