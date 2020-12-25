@@ -21,13 +21,17 @@ export const createDocument = functions
         "a valid [name] parameter which is the image's name.");
     }
 
+    const author: any = {};
+
+    if (data.isUserAuthor) {
+      author.id = userAuth.token.uid;
+    }
+
     try {
       const addedDoc = await adminApp.firestore()
         .collection('images')
         .add({
-          author: {
-            id: userAuth.token.uid,
-          },
+          author,
           categories: {},
           createdAt: adminApp.firestore.Timestamp.now(),
           description: '',
@@ -57,6 +61,9 @@ export const createDocument = functions
               t720: '',
               t1080: '',
             },
+          },
+          user: {
+            id: userAuth.token.uid,
           },
           visibility: data.visibility ?? 'private',
         });

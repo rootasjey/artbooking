@@ -15,6 +15,7 @@ interface CreateUserAccountParams {
 
 interface CreateImageParams {
   name: string;
+  isUserAuthor: boolean;
   visibility: Visibility;
 }
 
