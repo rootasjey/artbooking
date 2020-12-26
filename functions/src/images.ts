@@ -130,6 +130,59 @@ export const deleteDocument = functions
   });
 
 /**
+ * Delete multiple images documents from Firestore and from Cloud Storage.
+ */
+export const deleteDocuments = functions
+  .region('europe-west3')
+  .https
+  .onCall(async (data: DeleteMultipleImagesParams, context) => {
+    const userAuth = context.auth;
+    const { ids } = data;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
+        'an authenticated user.');
+    }
+
+    if (!data || !ids || ids.length === 0) {
+      throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
+        "a valid [ids] argument which is an array of images ids to delete.");
+    }
+
+    for await (const id of ids) {
+      try {
+        // Delete files from Cloud Storage
+        const dir = await adminApp.storage()
+          .bucket()
+          .getFiles({
+            directory: `users/${userAuth.uid}/images/${id}`
+          });
+
+        const files = dir[0];
+
+        for await (const file of files) {
+          await file.delete();
+        }
+
+        // Delete Firestore document
+        await adminApp.firestore()
+          .collection('images')
+          .doc(id)
+          .delete();
+
+      } catch (error) {
+        throw new functions.https.HttpsError('internal', "There was an internal error. " +
+          "Please try again later or contact us.");
+      }
+    }
+
+    return {
+      ids,
+      success: true,
+    };
+  });
+
+/**
  * On storage file creation, get download link
  * and set it to the Firestore matching document.
  */
