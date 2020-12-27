@@ -1,6 +1,8 @@
 import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/loading_animation.dart';
+import 'package:artbooking/components/sliver_appbar_header.dart';
+import 'package:artbooking/screens/home/home.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/enums.dart';
@@ -39,35 +41,24 @@ class _SigninState extends State<Signin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        children: <Widget>[
-          Column(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
-                    child: IconButton(
-                      onPressed: () {
-                        // Router.pop
-                      },
-                      icon: Icon(Icons.arrow_back),
-                    ),
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppHeader(),
+          SliverPadding(
+            padding: const EdgeInsets.only(
+              top: 60.0,
+              bottom: 300.0,
+            ),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate.fixed([
+                Center(
+                  child: SizedBox(
+                    width: 320.0,
+                    child: body(),
                   ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: 60.0,
-                  bottom: 300.0,
                 ),
-                child: SizedBox(
-                  width: 320.0,
-                  child: body(),
-                ),
-              ),
-            ],
+              ]),
+            ),
           ),
         ],
       ),
@@ -206,30 +197,49 @@ class _SigninState extends State<Signin> {
   }
 
   Widget header() {
-    return Column(
-      children: <Widget>[
+    return Row(
+      children: [
         FadeInY(
-          beginY: 50.0,
+          beginY: 10.0,
           child: Padding(
-            padding: EdgeInsets.only(bottom: 10.0),
-            child: Text(
-              'Sign In',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 25.0,
-                fontWeight: FontWeight.bold,
-              ),
+            padding: const EdgeInsets.only(
+              right: 20.0,
+            ),
+            child: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: Icon(Icons.arrow_back),
             ),
           ),
         ),
-        FadeInY(
-          delay: .3,
-          beginY: 50.0,
-          child: Opacity(
-            opacity: .6,
-            child: Text('Connect to your existing account'),
-          ),
-        )
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            FadeInY(
+              beginY: 10.0,
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 10.0),
+                child: Text(
+                  'Sign In',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 25.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            FadeInY(
+              delay: .3,
+              beginY: 50.0,
+              child: Opacity(
+                opacity: .6,
+                child: Text('Connect to your existing account'),
+              ),
+            )
+          ],
+        ),
       ],
     );
   }
@@ -287,6 +297,7 @@ class _SigninState extends State<Signin> {
               onChanged: (value) {
                 password = value;
               },
+              onFieldSubmitted: (_) => signInProcess(),
               validator: (value) {
                 if (value.isEmpty) {
                   return 'Password login cannot be empty';
@@ -308,7 +319,7 @@ class _SigninState extends State<Signin> {
       child: Padding(
         padding: const EdgeInsets.only(top: 80.0),
         child: RaisedButton(
-          onPressed: () => signIn(),
+          onPressed: () => signInProcess(),
           color: stateColors.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(
@@ -391,7 +402,7 @@ class _SigninState extends State<Signin> {
     return true;
   }
 
-  void signIn() async {
+  void signInProcess() async {
     if (!inputValuesOk()) {
       return;
     }
@@ -430,7 +441,9 @@ class _SigninState extends State<Signin> {
         isCompleted = true;
       });
 
-      // Go to DashboardRoute
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => Home()),
+      );
     } catch (error) {
       debugPrint(error.toString());
 

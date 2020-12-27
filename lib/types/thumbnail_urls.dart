@@ -1,14 +1,14 @@
 class ThumbnailUrls {
-  String s1024;
-  String s128;
-  String s512;
-  String s64;
+  String t1024;
+  String t128;
+  String t512;
+  String t64;
 
   ThumbnailUrls({
-    this.s1024 = '',
-    this.s128 = '',
-    this.s512 = '',
-    this.s64 = '',
+    this.t1024 = '',
+    this.t128 = '',
+    this.t512 = '',
+    this.t64 = '',
   });
 
   factory ThumbnailUrls.empty() {
@@ -17,10 +17,10 @@ class ThumbnailUrls {
 
   factory ThumbnailUrls.fromJSON(Map<String, dynamic> json) {
     return ThumbnailUrls(
-      s1024: json['s1024'],
-      s128: json['s128'],
-      s512: json['s512'],
-      s64: json['s64'],
+      t1024: json['t1024'],
+      t128: json['t128'],
+      t512: json['t512'],
+      t64: json['t64'],
     );
   }
 }

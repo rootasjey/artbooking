@@ -1,4 +1,5 @@
 import 'package:artbooking/components/sliver_appbar_header.dart';
+import 'package:artbooking/screens/illustrations.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -136,7 +137,9 @@ class _DashboardState extends State<Dashboard> {
             child: Card(
               child: InkWell(
                 onTap: () {
-                  // Go to IllustrationsRoute
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => Illustrations()),
+                  );
                 },
                 child: Center(
                   child: Text(

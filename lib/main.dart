@@ -1,18 +1,26 @@
+import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/full_page_loading.dart';
 import 'package:artbooking/main_mobile.dart';
 import 'package:artbooking/main_web.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
-import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/utils/app_storage.dart';
-import 'package:artbooking/utils/snack.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-void main() {
+void main() async {
+  LicenseRegistry.addLicense(() async* {
+    final license = await rootBundle.loadString('google_fonts/OFL.txt');
+    yield LicenseEntryWithLineBreaks(['google_fonts'], license);
+  });
+
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  await appStorage.initialize();
   runApp(App());
 }
 
@@ -27,28 +35,28 @@ class AppState extends State<App> {
   @override
   void initState() {
     super.initState();
+    initAsync();
+  }
 
-    appStorage.initialize().then((value) {
-      final savedLang = appStorage.getLang();
-      stateUser.setLang(savedLang);
+  void initAsync() async {
+    final savedLang = appStorage.getLang();
+    stateUser.setLang(savedLang);
 
-      autoLogin();
+    await autoLogin();
 
-      setState(() {
-        isReady = true;
-      });
-    });
+    setState(() => isReady = true);
   }
 
   @override
   Widget build(BuildContext context) {
+    final brightness = getBrightness();
+    stateColors.refreshTheme(brightness);
+
     if (isReady) {
       return DynamicTheme(
         defaultBrightness: Brightness.light,
         data: (brightness) => ThemeData(
-          textTheme: GoogleFonts.latoTextTheme(
-            ThemeData(brightness: brightness).textTheme,
-          ),
+          fontFamily: GoogleFonts.josefinSans().fontFamily,
           brightness: brightness,
         ),
         themedWidgetBuilder: (context, theme) {
@@ -63,57 +71,64 @@ class AppState extends State<App> {
       );
     }
 
-    return MaterialApp(
-      title: 'ArtBooking',
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Center(
-          child: SizedBox(
-            width: 200.0,
-            height: 200.0,
-            child: FullPageLoading(),
-          ),
-        ),
+    // On the web, if an user accesses an auth route (w/o going first to home),
+    // they will be redirected to the Sign in screen before the app auth them.
+    // This waiting screen solves this issue.
+    return DynamicTheme(
+      defaultBrightness: brightness,
+      data: (brightness) => ThemeData(
+        fontFamily: GoogleFonts.raleway().fontFamily,
+        brightness: brightness,
       ),
+      themedWidgetBuilder: (_, theme) {
+        stateColors.themeData = theme;
+        return MaterialApp(
+          title: 'ArtBooking',
+          theme: stateColors.themeData,
+          debugShowCheckedModeBanner: true,
+          home: Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: 200.0,
+                height: 200.0,
+                child: FullPageLoading(),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
-  void autoLogin() async {
+  Future autoLogin() async {
     try {
-      final credentials = appStorage.getCredentials();
+      final userCred = await userSignin();
 
-      if (credentials == null) {
-        return;
+      if (userCred == null) {
+        userSignOut(context: context, autoNavigateAfter: false);
+        // PushNotifications.unlinkAuthUser();
       }
-
-      final email = credentials['email'];
-      final password = credentials['password'];
-
-      if ((email == null || email.isEmpty) ||
-          (password == null || password.isEmpty)) {
-        return;
-      }
-
-      final authResult = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
-
-      if (authResult.user == null) {
-        return;
-      }
-
-      final username = authResult.user.displayName;
-
-      appStorage.setUserName(username);
-      stateUser.setUserConnected();
-      stateUser.setUserName(username);
-
-      showSnack(
-        context: context,
-        message: "Welcome back $username",
-        type: SnackType.info,
-      );
     } catch (error) {
       debugPrint(error.toString());
+      userSignOut(context: context, autoNavigateAfter: false);
+      // PushNotifications.unlinkAuthUser();
     }
+  }
+
+  Brightness getBrightness() {
+    final autoBrightness = appStorage.getAutoBrightness();
+
+    if (!autoBrightness) {
+      return appStorage.getBrightness();
+    }
+
+    Brightness brightness = Brightness.light;
+    final now = DateTime.now();
+
+    if (now.hour < 6 || now.hour > 17) {
+      brightness = Brightness.dark;
+    }
+
+    return brightness;
   }
 }

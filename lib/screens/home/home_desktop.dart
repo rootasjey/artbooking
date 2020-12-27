@@ -1,6 +1,10 @@
 import 'dart:ui';
 
+import 'package:artbooking/components/sliver_appbar_header.dart';
+import 'package:artbooking/screens/dashboard.dart';
+import 'package:artbooking/screens/signin.dart';
 import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/state/user.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -14,17 +18,57 @@ class _HomeDesktopState extends State<HomeDesktop>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        children: <Widget>[
-          Stack(
-            children: <Widget>[
-              heroContent(),
-              header(),
-            ],
+      body: CustomScrollView(
+        slivers: [
+          SliverAppHeader(
+            showBackButton: false,
           ),
+          body(),
         ],
       ),
     );
+  }
+
+  Widget body() {
+    return SliverPadding(
+      padding: const EdgeInsets.only(top: 120.0),
+      sliver: SliverList(
+        delegate: SliverChildListDelegate.fixed([
+          Column(
+            children: [
+              Text(
+                "ArtBooking",
+                style: GoogleFonts.amaticSc(
+                  fontSize: 120.0,
+                ),
+              ),
+              Opacity(
+                opacity: 0.6,
+                child: Text(
+                  "Your personal inspirations",
+                  style: TextStyle(
+                    fontSize: 26.0,
+                  ),
+                  // style: GoogleFonts.amaticSc(
+                  //   fontSize: 30.0,
+                  // ),
+                ),
+              ),
+            ],
+          ),
+        ]),
+      ),
+    );
+
+    // return Container(
+    //   height: MediaQuery.of(context).size.height,
+    //   child: Row(
+    //     children: <Widget>[
+    //       heroIllustration(),
+    //       textIllustration(),
+    //     ],
+    //   ),
+    // );
   }
 
   Widget header() {
@@ -45,7 +89,8 @@ class _HomeDesktopState extends State<HomeDesktop>
           ),
           Padding(
             padding: const EdgeInsets.only(left: 30.0),
-            // child: stateUser.isConnected ? dashboardButton() : signinButton(),
+            child:
+                stateUser.isUserConnected ? dashboardButton() : signinButton(),
           ),
         ],
       ),
@@ -66,7 +111,9 @@ class _HomeDesktopState extends State<HomeDesktop>
         height: 60.0,
         child: InkWell(
           onTap: () {
-            // Go to DashboardRoute
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => Dashboard()),
+            );
           },
         ),
       ),
@@ -76,7 +123,9 @@ class _HomeDesktopState extends State<HomeDesktop>
   Widget signinButton() {
     return RaisedButton(
       onPressed: () {
-        // Go to SigninRoute
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => Signin()),
+        );
       },
       color: stateColors.primary,
       shape: RoundedRectangleBorder(
@@ -92,18 +141,6 @@ class _HomeDesktopState extends State<HomeDesktop>
             color: Colors.white,
           ),
         ),
-      ),
-    );
-  }
-
-  Widget heroContent() {
-    return Container(
-      height: MediaQuery.of(context).size.height,
-      child: Row(
-        children: <Widget>[
-          heroIllustration(),
-          textIllustration(),
-        ],
       ),
     );
   }
@@ -137,14 +174,10 @@ class _HomeDesktopState extends State<HomeDesktop>
               ),
               RaisedButton(
                 onPressed: () {
-                  // Go to SigninRoute
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => Signin()),
+                  );
                 },
-                color: stateColors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(25.0),
-                  ),
-                ),
                 child: Text(
                   'Sign in',
                   style: TextStyle(
@@ -198,7 +231,7 @@ class _HomeDesktopState extends State<HomeDesktop>
           image: NetworkImage(
               'https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/art%2Fjeremie_corpinot%2FFlorale%2Fflorale_0_1080.png?alt=media&token=cd3a1f4d-f935-4cc7-b118-a9e6dca3de65'),
           fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(Colors.red, BlendMode.colorBurn),
+          // colorFilter: ColorFilter.mode(Colors.red, BlendMode.colorBurn),
           height: MediaQuery.of(context).size.height,
           child: InkWell(
             onTap: () {},

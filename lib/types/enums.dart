@@ -18,3 +18,12 @@ enum SnackType {
   info,
   success,
 }
+
+enum ImageVisibility {
+  acl,
+  challenge,
+  contest,
+  gallery,
+  private,
+  public,
+}

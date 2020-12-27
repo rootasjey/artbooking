@@ -33,11 +33,11 @@ class _HomeState extends State<Home> {
   initState() {
     super.initState();
 
-    stateUser.setFirstLaunch(appStorage.isFirstLanch());
+    // stateUser.setFirstLaunch(appStorage.isFirstLanch());
 
-    reactionDisposer = autorun((reaction) {
-      isFirstLaunch = stateUser.isFirstLaunch;
-    });
+    // reactionDisposer = autorun((reaction) {
+    //   isFirstLaunch = stateUser.isFirstLaunch;
+    // });
   }
 
   @override
@@ -53,20 +53,20 @@ class _HomeState extends State<Home> {
         OverlayEntry(
           builder: (_) => LayoutBuilder(
             builder: (context, constraints) {
-              if (mustShowOnBoardingDesktop(constraints.maxWidth)) {
-                isPopupVisible = true;
-                showDesktopDialog(context);
-                return homeView(constraints);
-              }
+              // if (mustShowOnBoardingDesktop(constraints.maxWidth)) {
+              //   isPopupVisible = true;
+              //   showDesktopDialog(context);
+              //   return homeView(constraints);
+              // }
 
-              if (mustShowOnBoardingMobile(constraints.maxWidth)) {
-                if (mustHidePopup()) {
-                  isPopupVisible = false;
-                  popupController.dismiss();
-                }
+              // if (mustShowOnBoardingMobile(constraints.maxWidth)) {
+              //   if (mustHidePopup()) {
+              //     isPopupVisible = false;
+              //     popupController.dismiss();
+              //   }
 
-                return OnBoarding();
-              }
+              //   return OnBoarding();
+              // }
 
               return homeView(constraints);
             },
@@ -78,7 +78,7 @@ class _HomeState extends State<Home> {
 
   Widget homeView(BoxConstraints constraints) {
     if (constraints.maxWidth < Constants.maxMobileWidth ||
-        constraints.maxHeight < Constants.maxMobileWidth) {
+        constraints.maxHeight < Constants.maxMobileHeight) {
       return HomeMobile(
         initialIndex: widget.mobileInitialIndex,
       );

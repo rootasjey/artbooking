@@ -8,8 +8,8 @@ class AppIcon extends StatefulWidget {
 
   AppIcon({
     this.onTap,
-    this.padding = const EdgeInsets.symmetric(vertical: 80.0),
-    this.size = 60.0,
+    this.padding = EdgeInsets.zero,
+    this.size = 40.0,
   });
 
   @override
@@ -20,21 +20,19 @@ class _AppIconState extends State<AppIcon> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: widget.padding,
-      child: Material(
-        shape: CircleBorder(),
-        clipBehavior: Clip.hardEdge,
-        color: Colors.transparent,
-        child: Ink.image(
-          image: AssetImage('assets/images/app-icon-90.png'),
+      child: InkWell(
+        highlightColor: Colors.transparent,
+        focusColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        onTap: widget.onTap ?? defaultOnTap,
+        child: Image.asset(
+          'assets/images/app-icon-96.png',
           fit: BoxFit.cover,
           width: widget.size,
           height: widget.size,
-          child: InkWell(
-            onTap: widget.onTap ?? defaultOnTap,
-          ),
         ),
       ),
+      padding: widget.padding,
     );
   }
 
