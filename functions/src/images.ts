@@ -1,6 +1,14 @@
+import { Storage } from '@google-cloud/storage';
 import * as functions from 'firebase-functions';
+// @ts-ignore
+import * as fs  from 'fs-extra';
+import { tmpdir } from 'os';
+import { join, dirname } from 'path';
+import * as sharp from 'sharp';
 
 import { adminApp } from './adminApp';
+
+const gcs = new Storage();
 
 /**
  * Create a new document with predefined values.
@@ -187,10 +195,16 @@ export const deleteDocuments = functions
  * and set it to the Firestore matching document.
  */
 export const onStorageUpload = functions
+  .runWith({
+    memory: '2GB',
+    timeoutSeconds: 180,
+  })
   .region('europe-west3')
   .storage
   .object()
   .onFinalize(async (metadata) => {
+    // 0. Check if the function must run
+    //    and if there're no missing data.
     const customMetadata = metadata.metadata;
 
     if (!customMetadata) {
@@ -203,7 +217,18 @@ export const onStorageUpload = functions
       return;
     }
 
-    const storageUrl = `${metadata.name}`;
+    const filePath = metadata.name || '';
+    const fileName = filePath.split('/').pop() || '';
+
+    const storageUrl = filePath;
+
+    // Exit if thumbnail or not an image file.
+    const contentType = metadata.contentType || '';
+
+    if (fileName.includes('thumb@') || !contentType.includes('image')) {
+      console.info(`Exiting function => existing image or non-file image: ${filePath}`);
+      return false;
+    }
 
     const imageFile = adminApp.storage()
       .bucket()
@@ -214,17 +239,72 @@ export const onStorageUpload = functions
       return;
     }
 
+    // -> Start to process the image file.
     if (visibility) {
       await imageFile.makePublic();
     }
 
-    await adminApp.firestore()
+    // Generate thumbnails
+    // -------------------
+    const bucket = gcs.bucket(metadata.bucket);
+    const bucketDir = dirname(filePath);
+
+    const workingDir = join(tmpdir(), 'thumbs');
+    const tmpFilePath = join(workingDir, fileName);
+
+    // 1. Ensure thumbnail directory exissts.
+    await fs.ensureDir(workingDir);
+
+    // 2. Download source file.
+    await bucket.file(filePath).download({
+      destination: tmpFilePath,
+    });
+
+    // 3. Resize the images and define an array of upload promises.
+    const sizes = [360, 480, 720, 1080];
+    const extension = metadata.metadata?.extension ||
+      fileName.substring(fileName.lastIndexOf('.'));
+
+    const uploadPromises = sizes.map(async (size) => {
+      const thumbName = `thumb@${size}${extension}`;
+      const thumbPath = join(workingDir, thumbName);
+
+      // Resize source image.
+      await sharp(tmpFilePath)
+        .resize(size)
+        .toFile(thumbPath);
+
+      return bucket.upload(thumbPath, {
+        destination: join(bucketDir, thumbName),
+      });
+    });
+
+    // 4. Run the upload operations.
+    const uploadResponses = await Promise.all(uploadPromises);
+
+    // 5. Clean up the tmp/thumbs from file system.
+    await fs.remove(workingDir);
+
+    // 6. Retrieve thumbnail urls.
+    const thumbnails: any = {};
+
+    uploadResponses.map((upResp) => {
+      const upFile = upResp[0];
+      let key = upFile.name.split('/').pop() || '';
+      key = key.replace('thumb@', 't');
+
+      thumbnails[key] = upFile.publicUrl();
+    });
+
+    // Save new properties to Firestore.
+    return await adminApp.firestore()
       .collection('images')
       .doc(firestoreId)
       .set({
         urls: {
           original: imageFile.publicUrl(),
           storage: storageUrl,
+          thumbnails,
         },
       }, { 
         merge: true, 
