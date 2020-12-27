@@ -10,6 +10,12 @@ import { adminApp } from './adminApp';
 
 const gcs = new Storage();
 
+interface GenerateImageThumbsParams {
+  filename: string;
+  filepath: string;
+  objectMeta: functions.storage.ObjectMetadata;
+}
+
 /**
  * Create a new document with predefined values.
  */
@@ -202,31 +208,22 @@ export const onStorageUpload = functions
   .region('europe-west3')
   .storage
   .object()
-  .onFinalize(async (metadata) => {
-    // 0. Check if the function must run
-    //    and if there're no missing data.
-    const customMetadata = metadata.metadata;
-
-    if (!customMetadata) {
-      return;
-    }
+  .onFinalize(async (objectMeta) => {
+    const customMetadata = objectMeta.metadata;
+    if (!customMetadata) { return; }
 
     const { firestoreId, userId, visibility } = customMetadata;
+    if (!firestoreId || !userId) { return; }
 
-    if (!firestoreId || !userId) {
-      return;
-    }
-
-    const filePath = metadata.name || '';
-    const fileName = filePath.split('/').pop() || '';
-
-    const storageUrl = filePath;
+    const filepath = objectMeta.name || '';
+    const filename = filepath.split('/').pop() || '';
+    const storageUrl = filepath;
 
     // Exit if thumbnail or not an image file.
-    const contentType = metadata.contentType || '';
+    const contentType = objectMeta.contentType || '';
 
-    if (fileName.includes('thumb@') || !contentType.includes('image')) {
-      console.info(`Exiting function => existing image or non-file image: ${filePath}`);
+    if (filename.includes('thumb@') || !contentType.includes('image')) {
+      console.info(`Exiting function => existing image or non-file image: ${filepath}`);
       return false;
     }
 
@@ -246,54 +243,10 @@ export const onStorageUpload = functions
 
     // Generate thumbnails
     // -------------------
-    const bucket = gcs.bucket(metadata.bucket);
-    const bucketDir = dirname(filePath);
-
-    const workingDir = join(tmpdir(), 'thumbs');
-    const tmpFilePath = join(workingDir, fileName);
-
-    // 1. Ensure thumbnail directory exissts.
-    await fs.ensureDir(workingDir);
-
-    // 2. Download source file.
-    await bucket.file(filePath).download({
-      destination: tmpFilePath,
-    });
-
-    // 3. Resize the images and define an array of upload promises.
-    const sizes = [360, 480, 720, 1080];
-    const extension = metadata.metadata?.extension ||
-      fileName.substring(fileName.lastIndexOf('.'));
-
-    const uploadPromises = sizes.map(async (size) => {
-      const thumbName = `thumb@${size}${extension}`;
-      const thumbPath = join(workingDir, thumbName);
-
-      // Resize source image.
-      await sharp(tmpFilePath)
-        .resize(size)
-        .toFile(thumbPath);
-
-      return bucket.upload(thumbPath, {
-        destination: join(bucketDir, thumbName),
-      });
-    });
-
-    // 4. Run the upload operations.
-    const uploadResponses = await Promise.all(uploadPromises);
-
-    // 5. Clean up the tmp/thumbs from file system.
-    await fs.remove(workingDir);
-
-    // 6. Retrieve thumbnail urls.
-    const thumbnails: any = {};
-
-    uploadResponses.map((upResp) => {
-      const upFile = upResp[0];
-      let key = upFile.name.split('/').pop() || '';
-      key = key.replace('thumb@', 't');
-
-      thumbnails[key] = upFile.publicUrl();
+    const thumbnails = await generateImageThumbs({
+      filename,
+      filepath,
+      objectMeta,
     });
 
     // Save new properties to Firestore.
@@ -529,6 +482,14 @@ export const updateDocumentTopics = functions
     }
   });
 
+// ----------------
+// Helper functions
+// ----------------
+
+/**
+ * Check properties presence.
+ * @param data Object containing updated properties.
+ */
 function checkUpdateParams(data: UpdateImagePropsParams) {
   if (!data) {
     throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
@@ -561,4 +522,77 @@ function checkUpdateParams(data: UpdateImagePropsParams) {
     throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
       "a valid [visibility] parameter which is the image's visibility.");
   }
+}
+
+/**
+ * Create several thumbnails from an original file.
+ * @param params Object conaining file's metadata.
+ */
+async function generateImageThumbs(
+  params: GenerateImageThumbsParams
+): Promise<ThumbnailUrls> {
+  const { objectMeta, filename, filepath } = params;
+
+  const thumbnails: ThumbnailUrls = {
+    t1080: '',
+    t360: '',
+    t480: '',
+    t720: '',
+  };
+
+  const allowedExt = ['jpg', 'jpeg', 'png', 'webp', 'tiff'];
+  const extension = objectMeta.metadata?.extension ||
+    filename.substring(filename.lastIndexOf('.'));
+
+  if (!allowedExt.includes(extension)) {
+    return thumbnails;
+  }
+
+  const bucket = gcs.bucket(objectMeta.bucket);
+  const bucketDir = dirname(filepath);
+
+  const workingDir = join(tmpdir(), 'thumbs');
+  const tmpFilePath = join(workingDir, filename);
+
+  // 1. Ensure thumbnail directory exists.
+  await fs.ensureDir(workingDir);
+
+  // 2. Download source file.
+  await bucket.file(filepath).download({
+    destination: tmpFilePath,
+  });
+
+  // 3. Resize the images and define an array of upload promises.
+  const sizes = [360, 480, 720, 1080];
+
+  const uploadPromises = sizes.map(async (size) => {
+    const thumbName = `thumb@${size}${extension}`;
+    const thumbPath = join(workingDir, thumbName);
+
+    // Resize source image.
+    await sharp(tmpFilePath)
+      .resize(size, size, { withoutEnlargement: true })
+      .toFile(thumbPath);
+
+    return bucket.upload(thumbPath, {
+      destination: join(bucketDir, thumbName),
+    });
+  });
+
+  // 4. Run the upload operations.
+  const uploadResponses = await Promise.all(uploadPromises);
+
+  // 5. Clean up the tmp/thumbs from file system.
+  await fs.remove(workingDir);
+
+  // 6. Retrieve thumbnail urls.
+  uploadResponses.map((upResp) => {
+    const upFile = upResp[0];
+    let key = upFile.name.split('/').pop() || '';
+    key = key.replace('thumb@', 't');
+
+    thumbnails[key] = upFile.publicUrl();
+  });
+
+  return thumbnails;
 }

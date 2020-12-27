@@ -45,7 +45,6 @@ interface DeleteListParams {
   listId: string;
   idToken: string;
 }
-
 interface NotifFuncParams {
   userId: string;
   userData: any;
@@ -54,6 +53,14 @@ interface NotifFuncParams {
 
 interface SetUserAuthorParams {
   imageId: string;
+}
+
+interface ThumbnailUrls {
+  [key: string]: String,
+  t360: String;
+  t480: String;
+  t720: String;
+  t1080: String;
 }
 
 interface UpdateEmailParams {
