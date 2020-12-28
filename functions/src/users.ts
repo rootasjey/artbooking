@@ -165,7 +165,7 @@ export const createAccount = functions
             },
           },
           stats: {
-            boards: {
+            books: {
               created: 0,
               deleted: 0,
               fav: 0,
@@ -174,29 +174,49 @@ export const createAccount = functions
               created: 0,
               deleted: 0,
               entered: 0,
+              won: 0,
             },
             contests: {
               created: 0,
               deleted: 0,
               entered: 0,
+              won: 0,
+            },
+            galleries: {
+              created: 0,
+              deleted: 0,
+              entered: 0,
+              opened: 0,
             },
             images: {
               added: 0,
               deleted: 0,
               fav: 0,
-              lists: 0, // user's custom images lists
+              updated: 0,
             },
             notifications: {
               total: 0,
               unread: 0,
             },
+            storage: {
+              total: 0,
+              used: 0,
+            },
           },
           urls: {
-            image: '',
-            twitter: '',
+            artstation: '',
+            devianart: '',
+            discord: '',
+            dribbble: '',
             facebook: '',
             instagram: '',
+            patreon: '',
+            pp: '',
+            thumblr: '',
+            tiktok: '',
+            tipeee: '',
             twitch: '',
+            twitter: '',
             website: '',
             wikipedia: '',
             youtube: '',
