@@ -21,6 +21,8 @@ class Upload extends StatefulWidget {
 }
 
 class _UploadState extends State<Upload> {
+  bool isLoading = false;
+
   ScrollController _scrollController = ScrollController();
   final uploadTasks = <UploadTask>[];
   final doneTasks = <UploadTask>[];
@@ -42,13 +44,14 @@ class _UploadState extends State<Upload> {
         controller: _scrollController,
         slivers: <Widget>[
           SliverAppHeader(),
-          body(),
+          headerAndBody(),
           SliverList(
             delegate: SliverChildListDelegate.fixed([
               successImagesText(),
             ]),
           ),
           successImagesGrid(),
+          emptyView(),
           SliverPadding(
             padding: const EdgeInsets.only(bottom: 200.0),
           ),
@@ -57,13 +60,48 @@ class _UploadState extends State<Upload> {
     );
   }
 
-  Widget body() {
+  Widget headerAndBody() {
     return SliverList(
       delegate: SliverChildListDelegate([
         header(),
         uploadsListProgress(),
-        // uploadedImagesWrap(),
       ]),
+    );
+  }
+
+  Widget emptyView() {
+    if (uploadTasks.isNotEmpty || doneTasks.isNotEmpty) {
+      return SliverPadding(
+        padding: EdgeInsets.zero,
+      );
+    }
+
+    return SliverPadding(
+      padding: const EdgeInsets.only(left: 80.0),
+      sliver: SliverList(
+        delegate: SliverChildListDelegate.fixed([
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Nothing to show",
+                style: TextStyle(
+                  fontSize: 26.0,
+                ),
+              ),
+              Opacity(
+                opacity: 0.6,
+                child: Text(
+                  "Try uploading an image file to fill up this space",
+                  style: TextStyle(
+                    fontSize: 18.0,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ]),
+      ),
     );
   }
 
@@ -89,12 +127,23 @@ class _UploadState extends State<Upload> {
               ),
             ),
           ),
-          Text(
-            'Uploads',
-            style: TextStyle(
-              fontSize: 80.0,
-              fontWeight: FontWeight.w700,
-            ),
+          Wrap(
+            spacing: 20.0,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Text(
+                'Uploads',
+                style: TextStyle(
+                  fontSize: 80.0,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              if (isLoading)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: CircularProgressIndicator(),
+                ),
+            ],
           ),
           Wrap(
             spacing: 20.0,
@@ -229,11 +278,21 @@ class _UploadState extends State<Upload> {
         top: 20.0,
         bottom: 10.0,
       ),
-      child: Text(
-        "You've successfully uploaded ${doneTasks.length} illustrations",
-        style: TextStyle(
-          fontSize: 18.0,
-        ),
+      child: Wrap(
+        spacing: 10.0,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Icon(Icons.check, size: 28.0),
+          Opacity(
+            opacity: 0.6,
+            child: Text(
+              "You've successfully uploaded ${doneTasks.length} illustrations",
+              style: TextStyle(
+                fontSize: 24.0,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -318,6 +377,10 @@ class _UploadState extends State<Upload> {
         throw Exception("User is not authenticated.");
       }
 
+      setState(() {
+        isLoading = true;
+      });
+
       final result = await createImageDocument(
         name: imageFile.name,
         visibility: imageVisibility,
@@ -328,6 +391,10 @@ class _UploadState extends State<Upload> {
           context: context,
           message: "There was an issue while uploading your image.",
         );
+
+        setState(() {
+          isLoading = false;
+        });
 
         return;
       }
@@ -380,12 +447,17 @@ class _UploadState extends State<Upload> {
         setState(() {
           uploadTasks.remove(uploadTask);
           doneTasks.add(uploadTask);
+          isLoading = uploadTasks.isNotEmpty;
         });
       }, onError: (error) {
         debugPrint(error.toString());
       });
     } catch (error) {
       debugPrint(error.toString());
+
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
