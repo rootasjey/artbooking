@@ -38,7 +38,7 @@ class _HomeDesktopState extends State<HomeDesktop>
             children: [
               Text(
                 "ArtBooking",
-                style: GoogleFonts.amaticSc(
+                style: GoogleFonts.yellowtail(
                   fontSize: 120.0,
                 ),
               ),

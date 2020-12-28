@@ -56,7 +56,7 @@ class AppState extends State<App> {
       return DynamicTheme(
         defaultBrightness: Brightness.light,
         data: (brightness) => ThemeData(
-          fontFamily: GoogleFonts.josefinSans().fontFamily,
+          fontFamily: GoogleFonts.ibmPlexSans().fontFamily,
           brightness: brightness,
         ),
         themedWidgetBuilder: (context, theme) {
@@ -77,7 +77,7 @@ class AppState extends State<App> {
     return DynamicTheme(
       defaultBrightness: brightness,
       data: (brightness) => ThemeData(
-        fontFamily: GoogleFonts.raleway().fontFamily,
+        fontFamily: GoogleFonts.ibmPlexSans().fontFamily,
         brightness: brightness,
       ),
       themedWidgetBuilder: (_, theme) {
