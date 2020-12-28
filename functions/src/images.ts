@@ -83,10 +83,31 @@ export const createDocument = functions
           visibility: data.visibility ?? 'private',
         });
 
-        return {
-          id: addedDoc.id,
-          success: true,
-        };
+      // Update user's stats
+      const userDoc = await adminApp.firestore()
+        .collection('users')
+        .doc(userAuth.uid)
+        .get();
+
+      const userData = userDoc.data();
+
+      if (userData) {
+        let added: number = userData.stats?.image?.added;
+        if (typeof added !== 'number') {
+          added = 0;
+        }
+
+        await userDoc
+          .ref
+          .update({
+            'stats.images.added': added++,
+          });
+      }
+
+      return {
+        id: addedDoc.id,
+        success: true,
+      };
 
     } catch (error) {
       throw new functions.https.HttpsError('internal', "There was an internal error. " +
@@ -134,10 +155,32 @@ export const deleteDocument = functions
         .doc(id)
         .delete();
 
+      // Update user's stats
+      const userDoc = await adminApp.firestore()
+        .collection('users')
+        .doc(userAuth.uid)
+        .get();
+
+      const userData = userDoc.data();
+
+      if (userData) {
+        let added: number = userData.stats?.image?.added;
+        if (typeof added !== 'number') {
+          added = 0;
+        }
+
+        await userDoc
+          .ref
+          .update({
+            'stats.images.added': added--,
+          });
+      }
+
       return {
         id,
         success: true,
       };
+
     } catch (error) {
       throw new functions.https.HttpsError('internal', "There was an internal error. " +
         "Please try again later or contact us.");
@@ -189,6 +232,30 @@ export const deleteDocuments = functions
         throw new functions.https.HttpsError('internal', "There was an internal error. " +
           "Please try again later or contact us.");
       }
+    }
+
+    // Update user's stats
+    const userDoc = await adminApp.firestore()
+      .collection('users')
+      .doc(userAuth.uid)
+      .get();
+
+    const userData = userDoc.data();
+
+    if (userData) {
+      let added: number = userData.stats?.image?.added;
+      if (typeof added !== 'number') {
+        added = 0;
+      }
+
+      added = added - ids.length;
+      added = added >= 0 ? added : 0;
+
+      await userDoc
+        .ref
+        .update({
+          'stats.images.added': added,
+        });
     }
 
     return {
