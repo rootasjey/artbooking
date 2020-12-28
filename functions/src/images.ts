@@ -14,6 +14,7 @@ interface GenerateImageThumbsParams {
   filename: string;
   filepath: string;
   objectMeta: functions.storage.ObjectMetadata;
+  visibility: string;
 }
 
 /**
@@ -69,7 +70,7 @@ export const createDocument = functions
               write: '',
             },
             storage: '',
-            thumbnail: {
+            thumbnails: {
               t360: '',
               t480: '',
               t720: '',
@@ -237,7 +238,7 @@ export const onStorageUpload = functions
     }
 
     // -> Start to process the image file.
-    if (visibility) {
+    if (visibility === 'public') {
       await imageFile.makePublic();
     }
 
@@ -247,6 +248,7 @@ export const onStorageUpload = functions
       filename,
       filepath,
       objectMeta,
+      visibility,
     });
 
     // Save new properties to Firestore.
@@ -531,7 +533,7 @@ function checkUpdateParams(data: UpdateImagePropsParams) {
 async function generateImageThumbs(
   params: GenerateImageThumbsParams
 ): Promise<ThumbnailUrls> {
-  const { objectMeta, filename, filepath } = params;
+  const { objectMeta, filename, filepath, visibility } = params;
 
   const thumbnails: ThumbnailUrls = {
     t1080: '',
@@ -566,7 +568,7 @@ async function generateImageThumbs(
   const sizes = [360, 480, 720, 1080];
 
   const uploadPromises = sizes.map(async (size) => {
-    const thumbName = `thumb@${size}${extension}`;
+    const thumbName = `thumb@${size}.${extension}`;
     const thumbPath = join(workingDir, thumbName);
 
     // Resize source image.
@@ -576,6 +578,10 @@ async function generateImageThumbs(
 
     return bucket.upload(thumbPath, {
       destination: join(bucketDir, thumbName),
+      metadata: {
+        metadata: objectMeta.metadata,
+      },
+      public: visibility === 'public',
     });
   });
 
@@ -586,13 +592,13 @@ async function generateImageThumbs(
   await fs.remove(workingDir);
 
   // 6. Retrieve thumbnail urls.
-  uploadResponses.map((upResp) => {
+  for (const upResp of uploadResponses) {
     const upFile = upResp[0];
     let key = upFile.name.split('/').pop() || '';
-    key = key.replace('thumb@', 't');
+    key = key.substring(0, key.lastIndexOf('.')).replace('thumb@', 't');
 
     thumbnails[key] = upFile.publicUrl();
-  });
+  }
 
   return thumbnails;
 }
