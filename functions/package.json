@@ -15,12 +15,15 @@
   "main": "lib/index.js",
   "dependencies": {
     "@google-cloud/storage": "5.7.0",
+    "algoliasearch": "4.8.3",
+    "deep-equal": "2.0.5",
     "firebase-admin": "9.4.2",
     "firebase-functions": "3.13.0",
     "fs-extra": "9.0.1",
     "sharp": "0.27.0"
   },
   "devDependencies": {
+    "@types/deep-equal": "1.0.1",
     "@types/sharp": "0.26.1",
     "firebase-functions-test": "0.2.3",
     "tslint": "6.1.3",
