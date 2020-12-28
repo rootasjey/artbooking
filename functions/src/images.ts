@@ -52,6 +52,12 @@ export const createDocument = functions
           description: '',
           license: '',
           name: data.name,
+          stats: {
+            downloads: 0,
+            fav: 0,
+            shares: 0,
+            views: 0,
+          },
           timelapse: {
             createdAt: null,
             description: '',
