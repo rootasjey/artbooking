@@ -6,6 +6,7 @@ import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SliverAppHeader extends StatefulWidget {
   final bool showBackButton;
@@ -152,13 +153,19 @@ class _SliverAppHeaderState extends State<SliverAppHeader> {
       top: 30.0,
       child: Row(
         children: [
-          TextButton(
+          TextButton.icon(
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => Signin()),
               );
             },
-            child: Text('Signin'),
+            icon: Icon(FontAwesomeIcons.signInAlt),
+            label: Text(
+              'Signin',
+              style: TextStyle(
+                fontSize: 16.0,
+              ),
+            ),
           ),
         ],
       ),
