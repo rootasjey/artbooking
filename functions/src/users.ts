@@ -193,9 +193,15 @@ export const createAccount = functions
               total: 0,
               unread: 0,
             },
-            storage: {
-              total: 0,
-              used: 0,
+            storage: { // all number values are in bytes
+              images: {
+                total: 0,
+                used: 0,
+              },
+              videos: {
+                total: 0,
+                used: 0,
+              },
             },
           },
           urls: {
