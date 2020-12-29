@@ -478,7 +478,17 @@ class _IllustrationsState extends State<Illustrations> {
       final userAuth = FirebaseAuth.instance.currentUser;
 
       if (userAuth == null) {
-        throw Exception("User is not authenticated.");
+        debugPrint("User is not authenticated.");
+
+        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => Signin()),
+          );
+        });
+
+        setState(() {
+          isLoading = false;
+        });
       }
 
       final snapshot = await FirebaseFirestore.instance
@@ -511,12 +521,6 @@ class _IllustrationsState extends State<Illustrations> {
       });
     } catch (error) {
       debugPrint(error.toString());
-
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => Signin()),
-        );
-      });
 
       setState(() {
         isLoading = false;
