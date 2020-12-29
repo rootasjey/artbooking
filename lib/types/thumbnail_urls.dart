@@ -17,10 +17,10 @@ class ThumbnailUrls {
 
   factory ThumbnailUrls.fromJSON(Map<String, dynamic> json) {
     return ThumbnailUrls(
-      t1024: json['t1024'],
-      t128: json['t128'],
-      t512: json['t512'],
-      t64: json['t64'],
+      t1024: json['t1080'],
+      t128: json['t720'],
+      t512: json['t480'],
+      t64: json['t360'],
     );
   }
 }

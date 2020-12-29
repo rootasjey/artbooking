@@ -5,12 +5,12 @@ class Urls {
   String original;
   ShareUrls share;
   String storage;
-  ThumbnailUrls thumbnail;
+  ThumbnailUrls thumbnails;
 
   Urls({
     this.original = '',
     this.storage = '',
-    this.thumbnail,
+    this.thumbnails,
     this.share,
   });
 
@@ -19,7 +19,7 @@ class Urls {
       original: json['original'],
       share: ShareUrls.fromJSON(json['share']),
       storage: json['storage'],
-      thumbnail: ThumbnailUrls.fromJSON(json['thumbnail']),
+      thumbnails: ThumbnailUrls.fromJSON(json['thumbnails']),
     );
   }
 }

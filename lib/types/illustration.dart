@@ -60,7 +60,6 @@ class Illustration {
       createdAt: (json['createdAt'] as Timestamp).toDate(),
       description: json['description'],
       id: json['id'],
-      private: json['isPrivate'],
       name: json['name'],
       updatedAt: (json['updatedAt'] as Timestamp).toDate(),
       urls: Urls.fromJSON(json['urls']),
