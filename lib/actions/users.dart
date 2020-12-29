@@ -8,7 +8,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:artbooking/screens/home/home.dart';
-import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/utils/app_storage.dart';
 import 'package:flutter/services.dart';
@@ -296,11 +295,16 @@ Future<UserCredential> userSignin({String email, String password}) async {
     return null;
   }
 
-  appStorage.setUserName(userCred.user.displayName);
   await userGetAndSetAvatarUrl(userCred);
   // PushNotifications.linkAuthUser(userCred.user.uid);
 
+  appStorage.setCredentials(
+    email: email,
+    password: password,
+  );
+
   stateUser.setUserConnected();
+  appStorage.setUserName(userCred.user.displayName);
   stateUser.setUserName(userCred.user.displayName);
 
   return userCred;
@@ -329,10 +333,7 @@ Future userGetAndSetAvatarUrl(UserCredential authResult) async {
       .get();
 
   final data = user.data;
-  final avatarUrl = data()['urls']['image'];
+  final avatarUrl = data()['urls']['pp'];
 
-  String imageName = avatarUrl.replaceFirst('local:', '');
-  String path = 'assets/images/$imageName-${stateColors.iconExt}.png';
-
-  stateUser.setAvatarUrl(path);
+  stateUser.setAvatarUrl(avatarUrl);
 }

@@ -4,9 +4,7 @@ import 'package:artbooking/components/loading_animation.dart';
 import 'package:artbooking/components/sliver_appbar_header.dart';
 import 'package:artbooking/screens/home/home.dart';
 import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/enums.dart';
-import 'package:artbooking/utils/app_storage.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -412,8 +410,7 @@ class _SigninState extends State<Signin> {
     });
 
     try {
-      final authResult = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
+      final authResult = await userSignin(email: email, password: password);
 
       if (authResult.user == null) {
         showSnack(
@@ -424,17 +421,6 @@ class _SigninState extends State<Signin> {
 
         return;
       }
-
-      appStorage.setCredentials(
-        email: email,
-        password: password,
-      );
-
-      final username = authResult.user.displayName;
-
-      stateUser.setUserConnected();
-      appStorage.setUserName(username);
-      stateUser.setUserName(username);
 
       setState(() {
         isSigningIn = false;
