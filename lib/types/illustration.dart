@@ -67,4 +67,8 @@ class Illustration {
       visibility: imageVisibility,
     );
   }
+
+  String getThumbnail() {
+    return urls.thumbnails.t512 ?? urls.thumbnails.t1024 ?? urls.original;
+  }
 }

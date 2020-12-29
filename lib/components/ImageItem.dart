@@ -105,7 +105,7 @@ class _ImageItemState extends State<ImageItem> with TickerProviderStateMixin {
           scale: scaleAnimation,
           child: Ink.image(
             image: NetworkImage(
-              illustration.urls.original,
+              illustration.getThumbnail(),
             ),
             fit: BoxFit.cover,
             child: InkWell(
