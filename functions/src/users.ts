@@ -144,11 +144,6 @@ export const createAccount = functions
           name: username,
           nameLowerCase: username.toLowerCase(),
           pricing: 'free',
-          quota: {
-            current: 0,
-            date: new Date(),
-            limit: 1,
-          },
           rights: {
             'user:managedata': false,
           },
