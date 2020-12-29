@@ -52,6 +52,7 @@ export const createDocument = functions
           description: '',
           license: '',
           name: data.name,
+          size: 0, // File's ize in bytes
           stats: {
             downloads: 0,
             fav: 0,
@@ -325,18 +326,34 @@ export const onStorageUpload = functions
     });
 
     // Save new properties to Firestore.
-    return await adminApp.firestore()
+    await adminApp.firestore()
       .collection('images')
       .doc(firestoreId)
       .set({
+        size: parseFloat(objectMeta.size),
         urls: {
           original: imageFile.publicUrl(),
           storage: storageUrl,
           thumbnails,
         },
       }, { 
-        merge: true, 
+        merge: true,
       });
+
+    const userDoc = await adminApp.firestore()
+      .collection('users')
+      .doc(userId)
+      .get();
+
+    const userData = userDoc.data();
+    if (!userData) { return false; }
+
+    let storageImagesUsed: number = userData.stats.storage.images.used;
+    storageImagesUsed += parseFloat(objectMeta.size);
+
+    return userDoc
+      .ref
+      .update('stats.storage.images.used', storageImagesUsed);
   });
 
 /**
