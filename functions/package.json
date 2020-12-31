@@ -20,6 +20,7 @@
     "firebase-admin": "9.4.2",
     "firebase-functions": "3.13.0",
     "fs-extra": "9.0.1",
+    "image-size": "0.9.3",
     "sharp": "0.27.0"
   },
   "devDependencies": {
