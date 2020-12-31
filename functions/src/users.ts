@@ -164,17 +164,22 @@ export const createAccount = functions
               created: 0,
               deleted: 0,
               fav: 0,
+              own: 0,
             },
             challenges: {
               created: 0,
               deleted: 0,
               entered: 0,
+              own: 0,
+              participating: 0,
               won: 0,
             },
             contests: {
               created: 0,
               deleted: 0,
               entered: 0,
+              own: 0,
+              participating: 0,
               won: 0,
             },
             galleries: {
@@ -182,11 +187,13 @@ export const createAccount = functions
               deleted: 0,
               entered: 0,
               opened: 0,
+              own: 0,
             },
             images: {
               added: 0,
               deleted: 0,
               fav: 0,
+              own: 0,
               updated: 0,
             },
             notifications: {
