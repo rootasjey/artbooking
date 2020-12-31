@@ -97,10 +97,10 @@ export const createDocument = functions
         .get();
 
       const userData = userDoc.data();
-
+      
       if (userData) {
-        let added: number = userData.stats?.image?.added;
-        let own: number = userData.stats?.image?.own;
+        let added: number = userData.stats?.images?.added;
+        let own: number = userData.stats?.images?.own;
         
         if (typeof added !== 'number') {
           added = 0;
@@ -110,11 +110,14 @@ export const createDocument = functions
           own = 0;
         }
 
+        added++;
+        own++;
+
         await userDoc
           .ref
           .update({
-            'stats.images.added': added++,
-            'stats.images.own': own++,
+            'stats.images.added': added,
+            'stats.images.own': own,
           });
       }
 
@@ -187,8 +190,8 @@ export const deleteDocument = functions
       const userData = userDoc.data();
 
       if (userData) {
-        let deleted: number = userData.stats?.image?.deleted;
-        let own: number = userData.stats?.image?.own;
+        let deleted: number = userData.stats?.images?.deleted;
+        let own: number = userData.stats?.images?.own;
 
         if (typeof deleted !== 'number') {
           deleted = 0;
@@ -198,14 +201,17 @@ export const deleteDocument = functions
           own = 0;
         }
 
+        own = own > 0 ? own - 1 : 0;
+        deleted++
+
         // Update used storage.
         let storageImagesUsed: number = userData.stats.storage.images.used;
         storageImagesUsed -= imageBytesToRemove;
 
         await userDoc.ref
           .update({
-            'stats.images.own': own--,
-            'stats.images.deleted': deleted++,
+            'stats.images.own': own,
+            'stats.images.deleted': deleted,
             'stats.storage.images.used': storageImagesUsed,
           });
       }
@@ -286,8 +292,8 @@ export const deleteDocuments = functions
     const userData = userDoc.data();
 
     if (userData) {
-      let own: number = userData.stats?.image?.own;
-      let deleted: number = userData.stats?.image?.deleted;
+      let own: number = userData.stats?.images?.own;
+      let deleted: number = userData.stats?.images?.deleted;
 
       if (typeof own !== 'number') {
         own = 0;
@@ -301,7 +307,6 @@ export const deleteDocuments = functions
       own = own >= 0 ? own : 0;
 
       deleted += ids.length;
-
 
       // Update used storage.
       let storageImagesUsed: number = userData.stats.storage.images.used;
