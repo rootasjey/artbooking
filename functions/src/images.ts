@@ -100,14 +100,21 @@ export const createDocument = functions
 
       if (userData) {
         let added: number = userData.stats?.image?.added;
+        let own: number = userData.stats?.image?.own;
+        
         if (typeof added !== 'number') {
           added = 0;
+        }
+        
+        if (typeof own !== 'number') {
+          own = 0;
         }
 
         await userDoc
           .ref
           .update({
             'stats.images.added': added++,
+            'stats.images.own': own++,
           });
       }
 
@@ -128,16 +135,16 @@ export const createDocument = functions
 export const deleteDocument = functions
   .region('europe-west3')
   .https
-  .onCall(async (data: DeleteImageParams, context) => {
+  .onCall(async (params: DeleteImageParams, context) => {
     const userAuth = context.auth;
-    const { id } = data;
+    const { id } = params;
 
     if (!userAuth) {
       throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
         'an authenticated user.');
     }
 
-    if (!data || !id) {
+    if (!params || !id) {
       throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
         "a valid [id] argument which is the image's id to delete.");
     }
@@ -157,10 +164,19 @@ export const deleteDocument = functions
       }
 
       // Delete Firestore document
-      await adminApp.firestore()
+      const imageDoc = await adminApp.firestore()
         .collection('images')
         .doc(id)
-        .delete();
+        .get();
+
+      let imageBytesToRemove = 0;
+      const imageData = imageDoc.data();
+      
+      if (imageData) {
+        imageBytesToRemove = imageData.size ?? 0;
+      }
+
+      await imageDoc.ref.delete();
 
       // Update user's stats
       const userDoc = await adminApp.firestore()
@@ -171,15 +187,26 @@ export const deleteDocument = functions
       const userData = userDoc.data();
 
       if (userData) {
-        let added: number = userData.stats?.image?.added;
-        if (typeof added !== 'number') {
-          added = 0;
+        let deleted: number = userData.stats?.image?.deleted;
+        let own: number = userData.stats?.image?.own;
+
+        if (typeof deleted !== 'number') {
+          deleted = 0;
         }
 
-        await userDoc
-          .ref
+        if (typeof own !== 'number') {
+          own = 0;
+        }
+
+        // Update used storage.
+        let storageImagesUsed: number = userData.stats.storage.images.used;
+        storageImagesUsed -= imageBytesToRemove;
+
+        await userDoc.ref
           .update({
-            'stats.images.added': added--,
+            'stats.images.own': own--,
+            'stats.images.deleted': deleted++,
+            'stats.storage.images.used': storageImagesUsed,
           });
       }
 
@@ -200,20 +227,22 @@ export const deleteDocument = functions
 export const deleteDocuments = functions
   .region('europe-west3')
   .https
-  .onCall(async (data: DeleteMultipleImagesParams, context) => {
+  .onCall(async (params: DeleteMultipleImagesParams, context) => {
     const userAuth = context.auth;
-    const { ids } = data;
+    const { ids } = params;
 
     if (!userAuth) {
       throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
         'an authenticated user.');
     }
 
-    if (!data || !ids || ids.length === 0) {
+    if (!params || !ids || ids.length === 0) {
       throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
         "a valid [ids] argument which is an array of images ids to delete.");
     }
 
+    let imagesBytesToRemove: number = 0;
+    
     for await (const id of ids) {
       try {
         // Delete files from Cloud Storage
@@ -230,10 +259,17 @@ export const deleteDocuments = functions
         }
 
         // Delete Firestore document
-        await adminApp.firestore()
+        const imageDoc = await adminApp.firestore()
           .collection('images')
           .doc(id)
-          .delete();
+          .get();
+
+        const imageData = imageDoc.data();
+        if (imageData) {
+          imagesBytesToRemove += imageData.size as number;
+        }
+
+        await imageDoc.ref.delete();
 
       } catch (error) {
         throw new functions.https.HttpsError('internal', "There was an internal error. " +
@@ -250,18 +286,33 @@ export const deleteDocuments = functions
     const userData = userDoc.data();
 
     if (userData) {
-      let added: number = userData.stats?.image?.added;
-      if (typeof added !== 'number') {
-        added = 0;
+      let own: number = userData.stats?.image?.own;
+      let deleted: number = userData.stats?.image?.deleted;
+
+      if (typeof own !== 'number') {
+        own = 0;
       }
 
-      added = added - ids.length;
-      added = added >= 0 ? added : 0;
+      if (typeof deleted !== 'number') {
+        deleted = 0;
+      }
 
-      await userDoc
-        .ref
+      own = own - ids.length;
+      own = own >= 0 ? own : 0;
+
+      deleted += ids.length;
+
+
+      // Update used storage.
+      let storageImagesUsed: number = userData.stats.storage.images.used;
+      storageImagesUsed -= imagesBytesToRemove;
+
+
+      await userDoc.ref
         .update({
-          'stats.images.added': added,
+          'stats.images.own': own,
+          'stats.images.deleted': deleted,
+          'stats.storage.images.used': storageImagesUsed,
         });
     }
 
@@ -340,6 +391,7 @@ export const onStorageUpload = functions
         merge: true,
       });
 
+    // Update used storage.
     const userDoc = await adminApp.firestore()
       .collection('users')
       .doc(userId)
