@@ -2,6 +2,7 @@ import { Storage } from '@google-cloud/storage';
 import * as functions from 'firebase-functions';
 // @ts-ignore
 import * as fs  from 'fs-extra';
+const sizeOf = require('image-size');
 import { tmpdir } from 'os';
 import { join, dirname } from 'path';
 import * as sharp from 'sharp';
@@ -11,6 +12,7 @@ import { adminApp } from './adminApp';
 const gcs = new Storage();
 
 interface GenerateImageThumbsParams {
+  extension: string;
   filename: string;
   filepath: string;
   objectMeta: functions.storage.ObjectMetadata;
@@ -23,7 +25,7 @@ interface GenerateImageThumbsParams {
 export const createDocument = functions
   .region('europe-west3')
   .https
-  .onCall(async (data: CreateImageParams, context) => {
+  .onCall(async (params: CreateImageParams, context) => {
     const userAuth = context.auth;
 
     if (!userAuth) {
@@ -31,14 +33,14 @@ export const createDocument = functions
         'an authenticated user.');
     }
       
-    if (!data || !data.name) {
+    if (!params || !params.name) {
       throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
         "a valid [name] parameter which is the image's name.");
     }
 
     const author: any = {};
 
-    if (data.isUserAuthor) {
+    if (params.isUserAuthor) {
       author.id = userAuth.token.uid;
     }
 
@@ -50,8 +52,13 @@ export const createDocument = functions
           categories: {},
           createdAt: adminApp.firestore.Timestamp.now(),
           description: '',
+          dimensions: {
+            height: 0,
+            width: 0,
+          },
+          extension: '',
           license: '',
-          name: data.name,
+          name: params.name,
           size: 0, // File's ize in bytes
           stats: {
             downloads: 0,
@@ -87,7 +94,7 @@ export const createDocument = functions
           user: {
             id: userAuth.token.uid,
           },
-          visibility: data.visibility ?? 'private',
+          visibility: params.visibility ?? 'private',
         });
 
       // Update user's stats
@@ -372,20 +379,31 @@ export const onStorageUpload = functions
       await imageFile.makePublic();
     }
 
+    const extension = objectMeta.metadata?.extension ||
+      filename.substring(filename.lastIndexOf('.'));
+
     // Generate thumbnails
     // -------------------
-    const thumbnails = await generateImageThumbs({
+    const { dimensions, thumbnails } = await generateImageThumbs({
+      extension,
       filename,
       filepath,
       objectMeta,
       visibility,
     });
 
+    const { height, width } = dimensions;
+
     // Save new properties to Firestore.
     await adminApp.firestore()
       .collection('images')
       .doc(firestoreId)
       .set({
+        dimensions: {
+          height,
+          width,
+        },
+        extension,
         size: parseFloat(objectMeta.size),
         urls: {
           original: imageFile.publicUrl(),
@@ -679,8 +697,8 @@ function checkUpdateParams(data: UpdateImagePropsParams) {
  */
 async function generateImageThumbs(
   params: GenerateImageThumbsParams
-): Promise<ThumbnailUrls> {
-  const { objectMeta, filename, filepath, visibility } = params;
+): Promise<GenerateImageThumbsResult> {
+  const { objectMeta, extension, filename, filepath, visibility } = params;
 
   const thumbnails: ThumbnailUrls = {
     t1080: '',
@@ -690,11 +708,15 @@ async function generateImageThumbs(
   };
 
   const allowedExt = ['jpg', 'jpeg', 'png', 'webp', 'tiff'];
-  const extension = objectMeta.metadata?.extension ||
-    filename.substring(filename.lastIndexOf('.'));
 
   if (!allowedExt.includes(extension)) {
-    return thumbnails;
+    return {
+      dimensions: {
+        height: 0,
+        width: 0,
+      },
+      thumbnails,
+    };
   }
 
   const bucket = gcs.bucket(objectMeta.bucket);
@@ -710,6 +732,15 @@ async function generateImageThumbs(
   await bucket.file(filepath).download({
     destination: tmpFilePath,
   });
+
+  // 2.1. Trye calculate dimensions.
+  let dimensions = { height: 0, width: 0 };
+
+  try {
+    dimensions = sizeOf(tmpFilePath);
+  } catch (error) {
+    console.error(error);
+  }
 
   // 3. Resize the images and define an array of upload promises.
   const sizes = [360, 480, 720, 1080];
@@ -747,5 +778,5 @@ async function generateImageThumbs(
     thumbnails[key] = upFile.publicUrl();
   }
 
-  return thumbnails;
+  return { dimensions, thumbnails };
 }

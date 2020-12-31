@@ -45,6 +45,16 @@ interface DeleteListParams {
   listId: string;
   idToken: string;
 }
+
+interface GenerateImageThumbsResult {
+  dimensions: ImageDimensions;
+  thumbnails: ThumbnailUrls;
+}
+
+interface ImageDimensions {
+  height: number;
+  width: number;
+}
 interface NotifFuncParams {
   userId: string;
   userData: any;
