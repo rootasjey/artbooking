@@ -140,7 +140,7 @@ class _UploadState extends State<Upload> {
               ),
               if (isLoading)
                 Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
+                  padding: const EdgeInsets.only(top: 16.0),
                   child: CircularProgressIndicator(),
                 ),
             ],
@@ -207,8 +207,6 @@ class _UploadState extends State<Upload> {
           progressPercent = 0;
         }
 
-        print('progressPercent: $progressPercent');
-
         if (progressPercent == 100) {
         } else if (progressPercent > 0) {
           progressBar = LinearProgressIndicator(
@@ -272,6 +270,9 @@ class _UploadState extends State<Upload> {
       return Container();
     }
 
+    final illustrationsText =
+        doneTasks.length > 1 ? 'illustrations' : 'illustration';
+
     return Padding(
       padding: const EdgeInsets.only(
         left: 80.0,
@@ -286,7 +287,7 @@ class _UploadState extends State<Upload> {
           Opacity(
             opacity: 0.6,
             child: Text(
-              "You've successfully uploaded ${doneTasks.length} illustrations",
+              "You've successfully uploaded ${doneTasks.length} $illustrationsText",
               style: TextStyle(
                 fontSize: 24.0,
               ),
