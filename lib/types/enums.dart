@@ -27,3 +27,15 @@ enum ImageVisibility {
   private,
   public,
 }
+
+enum UserMenuSelect {
+  about,
+  books,
+  contests,
+  challenges,
+  dashboard,
+  galleries,
+  illustrations,
+  settings,
+  upload,
+}
