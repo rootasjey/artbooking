@@ -295,7 +295,6 @@ Future<UserCredential> userSignin({String email, String password}) async {
     return null;
   }
 
-  await userGetAndSetAvatarUrl(userCred);
   // PushNotifications.linkAuthUser(userCred.user.uid);
 
   appStorage.setCredentials(
@@ -325,16 +324,4 @@ void userSignOut({
       MaterialPageRoute(builder: (_) => Home()),
     );
   }
-}
-
-Future userGetAndSetAvatarUrl(UserCredential authResult) async {
-  final user = await FirebaseFirestore.instance
-      .collection('users')
-      .doc(authResult.user.uid)
-      .get();
-
-  final data = user.data;
-  final avatarUrl = data()['urls']['pp'];
-
-  stateUser.setAvatarUrl(avatarUrl);
 }
