@@ -37,5 +37,6 @@ enum UserMenuSelect {
   galleries,
   illustrations,
   settings,
+  signout,
   upload,
 }

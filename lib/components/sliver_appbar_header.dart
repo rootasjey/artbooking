@@ -1,3 +1,4 @@
+import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/app_icon.dart';
 import 'package:artbooking/components/upload_manager.dart';
 import 'package:artbooking/screens/dashboard.dart';
@@ -138,15 +139,20 @@ class _SliverAppHeaderState extends State<SliverAppHeader> {
                       .push(MaterialPageRoute(builder: (_) => Dashboard()));
                   break;
                 case UserMenuSelect.illustrations:
-                  Navigator.of(context)
-                      .push(MaterialPageRoute(builder: (_) => Dashboard()));
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => Dashboard(
+                            initialIndex: 1,
+                          )));
+                  break;
+                case UserMenuSelect.signout:
+                  userSignOut(autoNavigateAfter: true, context: context);
                   break;
                 default:
               }
             },
             itemBuilder: (_) => <PopupMenuEntry<UserMenuSelect>>[
               PopupMenuItem(
-                value: UserMenuSelect.illustrations,
+                value: UserMenuSelect.dashboard,
                 child: Wrap(
                   spacing: 10.0,
                   crossAxisAlignment: WrapCrossAlignment.center,
@@ -168,13 +174,24 @@ class _SliverAppHeaderState extends State<SliverAppHeader> {
                 ),
               ),
               PopupMenuItem(
-                value: UserMenuSelect.illustrations,
+                value: UserMenuSelect.settings,
                 child: Wrap(
                   spacing: 10.0,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Icon(Icons.settings),
                     Text('Settings'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: UserMenuSelect.signout,
+                child: Wrap(
+                  spacing: 10.0,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Icon(FontAwesomeIcons.signOutAlt),
+                    Text('Sign out'),
                   ],
                 ),
               ),
