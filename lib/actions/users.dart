@@ -304,7 +304,7 @@ Future<UserCredential> userSignin({String email, String password}) async {
 
   stateUser.setUserConnected();
   appStorage.setUserName(userCred.user.displayName);
-  stateUser.fetchFirestore(userCred.user.uid);
+  await stateUser.fetchFirestore(userCred.user.uid);
   stateUser.setUserName(userCred.user.displayName);
 
   return userCred;
@@ -319,9 +319,14 @@ void userSignOut({
 
   // PushNotifications.unlinkAuthUser();
 
-  if (autoNavigateAfter) {
+  if (autoNavigateAfter && context != null) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => Home()),
     );
+  }
+
+  if (autoNavigateAfter && context == null) {
+    debugPrint("You must provide a valide [context] parameter "
+        "to navigate to another page");
   }
 }

@@ -64,7 +64,7 @@ abstract class StateUserBase with Store {
     username = name;
   }
 
-  void fetchFirestore(String id) async {
+  Future fetchFirestore(String id) async {
     final userDoc =
         await FirebaseFirestore.instance.collection('users').doc(id).get();
 
