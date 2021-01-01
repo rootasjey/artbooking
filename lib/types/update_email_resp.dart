@@ -1,5 +1,5 @@
 import 'package:artbooking/types/cloud_func_error.dart';
-import 'package:artbooking/types/partial_user.dart';
+import 'package:artbooking/types/user/partial_user.dart';
 
 class UpdateEmailResp {
   bool success;
