@@ -139,6 +139,7 @@ export const createAccount = functions
         .collection('users')
         .doc(userRecord.uid)
         .set({
+          createdAt: adminApp.firestore.Timestamp.now(),
           email: email,
           lang: 'en',
           name: username,
@@ -211,6 +212,7 @@ export const createAccount = functions
               },
             },
           },
+          updatedAt: adminApp.firestore.Timestamp.now(),
           urls: {
             artstation: '',
             devianart: '',
@@ -497,6 +499,7 @@ export const updateEmail = functions
         .doc(userAuth.uid)
         .update({
           email: newEmail,
+          updatedAt: adminApp.firestore.Timestamp.now(),
         });
 
       return {
@@ -554,6 +557,7 @@ export const updateUsername = functions
         .update({
           name: newUsername,
           nameLowerCase: newUsername.toLowerCase(),
+          updatedAt: adminApp.firestore.Timestamp.now(),
         });
 
       return {

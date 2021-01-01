@@ -125,6 +125,7 @@ export const createDocument = functions
           .update({
             'stats.images.added': added,
             'stats.images.own': own,
+            updatedAt: adminApp.firestore.Timestamp.now(),
           });
       }
 
@@ -220,6 +221,7 @@ export const deleteDocument = functions
             'stats.images.own': own,
             'stats.images.deleted': deleted,
             'stats.storage.images.used': storageImagesUsed,
+            updatedAt: adminApp.firestore.Timestamp.now(),
           });
       }
 
@@ -325,6 +327,7 @@ export const deleteDocuments = functions
           'stats.images.own': own,
           'stats.images.deleted': deleted,
           'stats.storage.images.used': storageImagesUsed,
+          updatedAt: adminApp.firestore.Timestamp.now(),
         });
     }
 
@@ -428,7 +431,10 @@ export const onStorageUpload = functions
 
     return userDoc
       .ref
-      .update('stats.storage.images.used', storageImagesUsed);
+      .update({
+        'stats.storage.images.used': storageImagesUsed,
+        updatedAt: adminApp.firestore.Timestamp.now(),
+      });
   });
 
 /**
