@@ -1,7 +1,5 @@
-import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/router/route_names.dart';
 import 'package:artbooking/screens/signin.dart';
-import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -21,103 +19,13 @@ class _SideBarHeaderState extends State<SideBarHeader> {
 
   Widget authenticatedView() {
     return ListTile(
-      leading: Observer(
-        builder: (context) {
-          if (stateUser.avatarUrl.isEmpty) {
-            final arrStr = stateUser.username.split(' ');
-            String initials = '';
-
-            if (arrStr.length > 0) {
-              initials = arrStr.length > 1
-                  ? arrStr
-                      .reduce((value, element) => value + element.substring(1))
-                  : arrStr.first;
-
-              if (initials != null && initials.isNotEmpty) {
-                initials = initials.substring(0, 1);
-              }
-            }
-
-            return CircleAvatar(
-              backgroundColor: stateColors.primary,
-              radius: 20.0,
-              child: Text(
-                initials,
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-            );
-          }
-
-          return Material(
-            elevation: 4.0,
-            shape: CircleBorder(),
-            clipBehavior: Clip.hardEdge,
-            child: InkWell(
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Image.asset(
-                  stateUser.avatarUrl,
-                  width: 50.0,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
+      leading: Icon(Icons.person_outline_rounded),
       title: Tooltip(
         message: stateUser.username,
         child: Text(
           stateUser.username,
           overflow: TextOverflow.ellipsis,
         ),
-      ),
-      trailing: PopupMenuButton<String>(
-        icon: Icon(Icons.keyboard_arrow_down),
-        tooltip: 'Menu',
-        onSelected: (value) {
-          if (value == 'signout') {
-            userSignOut(context: context);
-            return;
-          }
-
-          // Rerouter.push(
-          //   context: context,
-          //   value: value,
-          // );
-        },
-        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-          const PopupMenuItem(
-              value: RootRoute,
-              child: ListTile(
-                leading: Icon(Icons.home),
-                title: Text(
-                  'Home',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              )),
-          const PopupMenuItem(
-            value: AccountRoute,
-            child: ListTile(
-              leading: Icon(Icons.settings),
-              title: Text(
-                'Settings',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          const PopupMenuItem(
-            value: 'signout',
-            child: ListTile(
-              leading: Icon(Icons.exit_to_app),
-              title: Text(
-                'Sign out',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
