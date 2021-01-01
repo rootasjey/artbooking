@@ -1,5 +1,6 @@
+import 'package:artbooking/types/user/user_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:artbooking/utils/app_storage.dart';
 import 'package:mobx/mobx.dart';
 
 part 'user.g.dart';
@@ -7,7 +8,7 @@ part 'user.g.dart';
 class StateUser = StateUserBase with _$StateUser;
 
 abstract class StateUserBase with Store {
-  User _userAuth;
+  UserFirestore userFirestore;
 
   @observable
   String avatarUrl = '';
@@ -32,29 +33,6 @@ abstract class StateUserBase with Store {
   /// Last time the favourites has been updated.
   @observable
   DateTime updatedFavAt = DateTime.now();
-
-  Future<User> get userAuth async {
-    if (_userAuth != null) {
-      return _userAuth;
-    }
-
-    _userAuth = FirebaseAuth.instance.currentUser;
-
-    if (_userAuth == null) {
-      await _signin();
-    }
-
-    if (_userAuth != null) {
-      setUserName(_userAuth.displayName);
-    }
-
-    return _userAuth;
-  }
-
-  /// Use on sign out / user's data has changed.
-  void clearAuthCache() {
-    _userAuth = null;
-  }
 
   @action
   void setAvatarUrl(String url) {
@@ -86,34 +64,16 @@ abstract class StateUserBase with Store {
     username = name;
   }
 
-  /// Signin user with credentials if FirebaseAuth is null.
-  Future _signin() async {
-    try {
-      final credentialsMap = appStorage.getCredentials();
+  void fetchFirestore(String id) async {
+    final userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(id).get();
 
-      final email = credentialsMap['email'];
-      final password = credentialsMap['password'];
-
-      if ((email == null || email.isEmpty) ||
-          (password == null || password.isEmpty)) {
-        return null;
-      }
-
-      final auth = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      _userAuth = auth.user;
-      isUserConnected = true;
-    } catch (error) {
-      appStorage.clearUserAuthData();
-    }
+    final userData = userDoc.data();
+    userFirestore = UserFirestore.fromJSON(userData);
   }
 
   @action
   Future signOut() async {
-    _userAuth = null;
     await FirebaseAuth.instance.signOut();
     setUserDisconnected();
   }

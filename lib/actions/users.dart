@@ -305,6 +305,7 @@ Future<UserCredential> userSignin({String email, String password}) async {
 
   stateUser.setUserConnected();
   appStorage.setUserName(userCred.user.displayName);
+  stateUser.fetchFirestore(userCred.user.uid);
   stateUser.setUserName(userCred.user.displayName);
 
   return userCred;
