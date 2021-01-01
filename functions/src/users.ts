@@ -222,7 +222,7 @@ export const createAccount = functions
             instagram: '',
             patreon: '',
             pp: '',
-            thumblr: '',
+            tumblr: '',
             tiktok: '',
             tipeee: '',
             twitch: '',
