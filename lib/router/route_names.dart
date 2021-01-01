@@ -1,3 +1,4 @@
+const String AccountRoute         = '/settings';
 const String DashboardRoute       = '/dashboard';
 const String ForgotPasswordRoute  = '/forgotpassword';
 const String IllustrationsRoute   = '/illustrations';
