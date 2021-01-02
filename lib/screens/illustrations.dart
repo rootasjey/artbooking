@@ -35,7 +35,6 @@ class _IllustrationsState extends State<Illustrations> {
 
   int limit = 20;
 
-  // List<Illustration> selectedtemss = [];
   Map<String, Illustration> multiSelectedItems = Map();
 
   ScrollController scrollController = ScrollController();
