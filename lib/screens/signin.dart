@@ -2,12 +2,16 @@ import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/loading_animation.dart';
 import 'package:artbooking/components/sliver_appbar_header.dart';
+import 'package:artbooking/screens/dashboard.dart';
 import 'package:artbooking/screens/home/home.dart';
+import 'package:artbooking/screens/signup.dart';
 import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:supercharged/supercharged.dart';
 
 class Signin extends StatefulWidget {
   @override
@@ -135,7 +139,7 @@ class _SigninState extends State<Signin> {
 
   Widget emailInput() {
     return FadeInY(
-      delay: .5,
+      delay: 0.1.seconds,
       beginY: 50.0,
       child: Padding(
         padding: EdgeInsets.only(
@@ -171,7 +175,7 @@ class _SigninState extends State<Signin> {
 
   Widget forgotPassword() {
     return FadeInY(
-      delay: 1.5,
+      delay: 0.3.seconds,
       beginY: 50.0,
       child: FlatButton(
           onPressed: () {
@@ -229,7 +233,7 @@ class _SigninState extends State<Signin> {
               ),
             ),
             FadeInY(
-              delay: .3,
+              delay: 0.3.seconds,
               beginY: 50.0,
               child: Opacity(
                 opacity: .6,
@@ -244,22 +248,19 @@ class _SigninState extends State<Signin> {
 
   Widget noAccountButton() {
     return FadeInY(
-      delay: 2.5,
+      delay: 0.5.seconds,
       beginY: 50.0,
       child: FlatButton(
           onPressed: () async {
-            // await FluroRouter.router.navigateTo(
-            //   context,
-            //   SignupRoute,
-            // );
+            await Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => Signup()),
+            );
 
-            // if (userState.isConnected) {
-            //   await FluroRouter.router.navigateTo(
-            //     context,
-            //     DashboardRoute,
-            //     replace: true,
-            //   );
-            // }
+            if (stateUser.isUserConnected) {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => Dashboard()),
+              );
+            }
           },
           child: Opacity(
             opacity: .6,
@@ -275,7 +276,7 @@ class _SigninState extends State<Signin> {
 
   Widget passwordInput() {
     return FadeInY(
-      delay: 1.0,
+      delay: 0.2.seconds,
       beginY: 50.0,
       child: Padding(
         padding: EdgeInsets.only(
@@ -312,7 +313,7 @@ class _SigninState extends State<Signin> {
 
   Widget validationButton() {
     return FadeInY(
-      delay: 2,
+      delay: 0.4.seconds,
       beginY: 50.0,
       child: Padding(
         padding: const EdgeInsets.only(top: 80.0),

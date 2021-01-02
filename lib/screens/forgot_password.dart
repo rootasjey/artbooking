@@ -4,6 +4,7 @@ import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:supercharged/supercharged.dart';
 
 class ForgotPassword extends StatefulWidget {
   @override
@@ -125,7 +126,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   Widget emailInput() {
     return FadeInY(
-      delay: 1.5,
+      delay: 1.5.seconds,
       beginY: 50.0,
       child: Padding(
         padding: EdgeInsets.only(
@@ -196,7 +197,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   Widget validationButton() {
     return FadeInY(
-      delay: 2,
+      delay: 2.0.seconds,
       beginY: 50.0,
       child: Padding(
         padding: const EdgeInsets.only(top: 80.0),

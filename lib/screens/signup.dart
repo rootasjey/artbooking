@@ -102,7 +102,7 @@ class _SignupState extends State<Signup> {
 
   Widget emailInput() {
     return FadeInY(
-      delay: 0.5,
+      delay: 0.5.seconds,
       beginY: 50.0,
       child: Padding(
         padding: EdgeInsets.only(top: 60.0),
@@ -185,7 +185,7 @@ class _SignupState extends State<Signup> {
       children: <Widget>[
         FadeInX(
           beginX: 10.0,
-          delay: 2.0,
+          delay: 200.milliseconds,
           child: Padding(
             padding: const EdgeInsets.only(
               right: 20.0,
@@ -215,7 +215,7 @@ class _SignupState extends State<Signup> {
               ),
             ),
             FadeInY(
-              delay: 0.3,
+              delay: 0.3.seconds,
               beginY: 50.0,
               child: Opacity(
                 opacity: .6,
@@ -258,7 +258,7 @@ class _SignupState extends State<Signup> {
 
   Widget nameInput() {
     return FadeInY(
-      delay: 1.0,
+      delay: 1.0.seconds,
       beginY: 50.0,
       child: Padding(
         padding: EdgeInsets.only(top: 30.0),
@@ -355,7 +355,7 @@ class _SignupState extends State<Signup> {
 
   Widget passwordInput() {
     return FadeInY(
-      delay: 1.5,
+      delay: 1.5.seconds,
       beginY: 50.0,
       child: Padding(
         padding: EdgeInsets.only(top: 30.0),
@@ -393,7 +393,7 @@ class _SignupState extends State<Signup> {
 
   Widget confirmPasswordInput() {
     return FadeInY(
-      delay: 2.0,
+      delay: 2.0.seconds,
       beginY: 50.0,
       child: Padding(
         padding: EdgeInsets.only(top: 30.0),
@@ -434,7 +434,7 @@ class _SignupState extends State<Signup> {
 
   Widget validationButton() {
     return FadeInY(
-      delay: 2.5,
+      delay: 2.5.seconds,
       beginY: 50.0,
       child: Center(
         child: Padding(
@@ -479,7 +479,7 @@ class _SignupState extends State<Signup> {
 
   Widget alreadyHaveAccountButton() {
     return FadeInY(
-      delay: 3.0,
+      delay: 3.0.seconds,
       beginY: 50.0,
       child: Center(
         child: FlatButton(
