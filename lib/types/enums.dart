@@ -1,3 +1,12 @@
+enum AniProps {
+  color,
+  height,
+  opacity,
+  translateX,
+  translateY,
+  width,
+}
+
 enum DiscoverType {
   authors,
   references,
