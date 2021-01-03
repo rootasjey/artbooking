@@ -1,4 +1,4 @@
-import 'package:artbooking/actions/images.dart';
+import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/create_image_doc_resp.dart';
@@ -325,7 +325,7 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
       widget.onBeforeDelete();
     }
 
-    final response = await deleteImageDocument(imageId: illu.id);
+    final response = await deleteIllustrationDocument(imageId: illu.id);
 
     if (widget.onAfterDelete != null) {
       widget.onAfterDelete(response);

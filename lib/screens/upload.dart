@@ -1,4 +1,4 @@
-import 'package:artbooking/actions/images.dart';
+import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/image_item.dart';
 import 'package:artbooking/components/sliver_appbar_header.dart';
 import 'package:artbooking/components/upload_manager.dart';
@@ -382,7 +382,7 @@ class _UploadState extends State<Upload> {
         isLoading = true;
       });
 
-      final result = await createImageDocument(
+      final result = await createIllustrationDocument(
         name: imageFile.name,
         visibility: imageVisibility,
       );

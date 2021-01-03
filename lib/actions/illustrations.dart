@@ -7,7 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-Future<CreateImageDocResp> createImageDocument({
+Future<CreateImageDocResp> createIllustrationDocument({
   @required String name,
   ContentVisibility visibility = ContentVisibility.private,
 }) async {
@@ -57,7 +57,7 @@ Future<CreateImageDocResp> createImageDocument({
   }
 }
 
-Future<CreateImageDocResp> deleteImageDocument({
+Future<CreateImageDocResp> deleteIllustrationDocument({
   @required String imageId,
 }) async {
   try {
@@ -105,7 +105,7 @@ Future<CreateImageDocResp> deleteImageDocument({
   }
 }
 
-Future<CreateImageDocResp> deleteImagesDocuments({
+Future<CreateImageDocResp> deleteIllustrationsDocuments({
   @required List<String> imagesIds,
 }) async {
   try {

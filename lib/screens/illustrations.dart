@@ -1,4 +1,4 @@
-import 'package:artbooking/actions/images.dart';
+import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/image_item.dart';
 import 'package:artbooking/components/full_page_loading.dart';
 import 'package:artbooking/components/sliver_appbar_header.dart';
@@ -452,7 +452,7 @@ class _IllustrationsState extends State<Illustrations> {
       forceMultiSelect = false;
     });
 
-    final response = await deleteImagesDocuments(
+    final response = await deleteIllustrationsDocuments(
       imagesIds: imagesIds,
     );
 
