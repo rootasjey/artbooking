@@ -1,4 +1,5 @@
 import 'package:artbooking/components/sidebar_header.dart';
+import 'package:artbooking/screens/books.dart';
 import 'package:artbooking/screens/illustrations.dart';
 import 'package:artbooking/screens/settings.dart';
 import 'package:artbooking/screens/stats_overview.dart';
@@ -24,6 +25,7 @@ class _DashboardState extends State<Dashboard> {
   List<Widget> _sectionsChildren = [
     StatsOverview(),
     Illustrations(),
+    Books(),
     Settings(),
   ];
 
@@ -65,7 +67,7 @@ class _DashboardState extends State<Dashboard> {
           leading: Icon(Icons.image),
         ),
         sectionTileItem(
-          index: 8,
+          index: 2,
           title: 'Books',
           leading: Icon(Icons.my_library_books),
         ),
@@ -93,7 +95,7 @@ class _DashboardState extends State<Dashboard> {
           endIndent: 60.0,
         ),
         sectionTileItem(
-          index: 2,
+          index: 6,
           title: 'Settings',
           leading: Icon(Icons.settings),
         ),

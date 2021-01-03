@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 
 Future<CreateImageDocResp> createImageDocument({
   @required String name,
-  ImageVisibility visibility = ImageVisibility.private,
+  ContentVisibility visibility = ContentVisibility.private,
 }) async {
   try {
     final callable = FirebaseFunctions.instanceFor(

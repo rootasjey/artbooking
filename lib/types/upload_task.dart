@@ -1,4 +1,4 @@
-import 'package:artbooking/types/illustration.dart';
+import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:firebase/firebase.dart' as fb;
 
 class UploadTask {

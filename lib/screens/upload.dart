@@ -1,10 +1,10 @@
 import 'package:artbooking/actions/images.dart';
-import 'package:artbooking/components/ImageItem.dart';
+import 'package:artbooking/components/image_item.dart';
 import 'package:artbooking/components/sliver_appbar_header.dart';
 import 'package:artbooking/components/upload_manager.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/enums.dart';
-import 'package:artbooking/types/illustration.dart';
+import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/upload_task.dart';
 import 'package:artbooking/utils/converters.dart';
 import 'package:artbooking/utils/snack.dart';
@@ -29,7 +29,7 @@ class _UploadState extends State<Upload> {
 
   final files = <String>[];
 
-  ImageVisibility imageVisibility = ImageVisibility.public;
+  ContentVisibility imageVisibility = ContentVisibility.public;
 
   @override
   initState() {

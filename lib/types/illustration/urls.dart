@@ -1,5 +1,5 @@
 import 'package:artbooking/types/share_urls.dart';
-import 'package:artbooking/types/thumbnail_urls.dart';
+import 'package:artbooking/types/illustration/thumbnail_urls.dart';
 
 class Urls {
   String original;

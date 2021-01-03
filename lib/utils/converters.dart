@@ -1,18 +1,18 @@
 import 'package:artbooking/types/enums.dart';
 
-String imageVisibilityToString(ImageVisibility visibility) {
+String imageVisibilityToString(ContentVisibility visibility) {
   switch (visibility) {
-    case ImageVisibility.acl:
+    case ContentVisibility.acl:
       return 'acl';
-    case ImageVisibility.challenge:
+    case ContentVisibility.challenge:
       return 'challenge';
-    case ImageVisibility.contest:
+    case ContentVisibility.contest:
       return 'challenge';
-    case ImageVisibility.gallery:
+    case ContentVisibility.gallery:
       return 'gallery';
-    case ImageVisibility.private:
+    case ContentVisibility.private:
       return 'private';
-    case ImageVisibility.public:
+    case ContentVisibility.public:
       return 'public';
     default:
       return 'private';

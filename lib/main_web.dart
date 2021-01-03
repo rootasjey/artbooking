@@ -1,3 +1,4 @@
+import 'package:artbooking/screens/dashboard.dart';
 import 'package:artbooking/screens/home/home.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,8 @@ class _MainWebState extends State<MainWeb> {
       title: 'ArtBooking',
       theme: stateColors.themeData,
       debugShowCheckedModeBanner: false,
-      home: Home(),
+      // home: Home(),
+      home: Dashboard(),
     );
   }
 }

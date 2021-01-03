@@ -1,12 +1,12 @@
 import 'package:artbooking/actions/images.dart';
-import 'package:artbooking/components/image_item.dart';
+import 'package:artbooking/components/book_item.dart';
 import 'package:artbooking/components/full_page_loading.dart';
 import 'package:artbooking/components/sliver_appbar_header.dart';
 import 'package:artbooking/components/upload_manager.dart';
 import 'package:artbooking/screens/signin.dart';
 import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/enums.dart';
-import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,12 +15,12 @@ import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:supercharged/supercharged.dart';
 
-class Illustrations extends StatefulWidget {
+class Books extends StatefulWidget {
   @override
-  _IllustrationsState createState() => _IllustrationsState();
+  _BooksState createState() => _BooksState();
 }
 
-class _IllustrationsState extends State<Illustrations> {
+class _BooksState extends State<Books> {
   bool isLoading;
   bool descending = true;
   bool hasNext = true;
@@ -30,12 +30,12 @@ class _IllustrationsState extends State<Illustrations> {
 
   DocumentSnapshot lastDoc;
 
-  final illustrationsList = <Illustration>[];
+  final booksList = <Book>[];
   final keyboardFocusNode = FocusNode();
 
   int limit = 20;
 
-  Map<String, Illustration> multiSelectedItems = Map();
+  Map<String, Book> multiSelectedItems = Map();
 
   ScrollController scrollController = ScrollController();
 
@@ -135,7 +135,7 @@ class _IllustrationsState extends State<Illustrations> {
       );
     }
 
-    if (illustrationsList.isEmpty) {
+    if (booksList.isEmpty) {
       return emptyView();
     }
 
@@ -201,7 +201,7 @@ class _IllustrationsState extends State<Illustrations> {
             child: Opacity(
               opacity: 0.6,
               child: Text(
-                "You haven't upload any illustration yet",
+                "You haven't created any book yet",
                 style: TextStyle(
                   fontSize: 20.0,
                 ),
@@ -214,9 +214,9 @@ class _IllustrationsState extends State<Illustrations> {
               onPressed: () {
                 appUploadManager.pickImage(context);
               },
-              icon: Icon(Icons.upload_outlined),
+              icon: Icon(Icons.library_add),
               label: Text(
-                "Upload",
+                "create",
                 style: TextStyle(
                   fontSize: 16.0,
                 ),
@@ -241,16 +241,16 @@ class _IllustrationsState extends State<Illustrations> {
         ),
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            final illustration = illustrationsList.elementAt(index);
-            final selected = multiSelectedItems.containsKey(illustration.id);
+            final book = booksList.elementAt(index);
+            final selected = multiSelectedItems.containsKey(book.id);
 
-            return ImageItem(
-              illustration: illustration,
+            return BookItem(
+              book: book,
               selected: selected,
               selectionMode: selectionMode,
               onBeforeDelete: () {
                 setState(() {
-                  illustrationsList.removeAt(index);
+                  booksList.removeAt(index);
                 });
               },
               onAfterDelete: (response) {
@@ -259,7 +259,7 @@ class _IllustrationsState extends State<Illustrations> {
                 }
 
                 setState(() {
-                  illustrationsList.insert(index, illustration);
+                  booksList.insert(index, book);
                 });
               },
               onBeforePressed: () {
@@ -269,13 +269,12 @@ class _IllustrationsState extends State<Illustrations> {
 
                 if (selected) {
                   setState(() {
-                    multiSelectedItems.remove(illustration.id);
+                    multiSelectedItems.remove(book.id);
                     forceMultiSelect = multiSelectedItems.length > 0;
                   });
                 } else {
                   setState(() {
-                    multiSelectedItems.putIfAbsent(
-                        illustration.id, () => illustration);
+                    multiSelectedItems.putIfAbsent(book.id, () => book);
                   });
                 }
 
@@ -284,19 +283,18 @@ class _IllustrationsState extends State<Illustrations> {
               onLongPress: (selected) {
                 if (selected) {
                   setState(() {
-                    multiSelectedItems.remove(illustration.id);
+                    multiSelectedItems.remove(book.id);
                   });
                   return;
                 }
 
                 setState(() {
-                  multiSelectedItems.putIfAbsent(
-                      illustration.id, () => illustration);
+                  multiSelectedItems.putIfAbsent(book.id, () => book);
                 });
               },
             );
           },
-          childCount: illustrationsList.length,
+          childCount: booksList.length,
         ),
       ),
     );
@@ -340,7 +338,7 @@ class _IllustrationsState extends State<Illustrations> {
         ),
         TextButton.icon(
           onPressed: () {
-            illustrationsList.forEach((illustration) {
+            booksList.forEach((illustration) {
               multiSelectedItems.putIfAbsent(
                   illustration.id, () => illustration);
             });
@@ -441,11 +439,11 @@ class _IllustrationsState extends State<Illustrations> {
 
   void deleteSelection() async {
     multiSelectedItems.entries.forEach((multiSelectItem) {
-      illustrationsList.removeWhere((item) => item.id == multiSelectItem.key);
+      booksList.removeWhere((item) => item.id == multiSelectItem.key);
     });
 
     final copyItems = multiSelectedItems.values.toList();
-    final imagesIds = multiSelectedItems.keys.toList();
+    final booksIds = multiSelectedItems.keys.toList();
 
     setState(() {
       multiSelectedItems.clear();
@@ -453,7 +451,7 @@ class _IllustrationsState extends State<Illustrations> {
     });
 
     final response = await deleteImagesDocuments(
-      imagesIds: imagesIds,
+      imagesIds: booksIds,
     );
 
     if (!response.success) {
@@ -464,7 +462,7 @@ class _IllustrationsState extends State<Illustrations> {
         type: SnackType.error,
       );
 
-      illustrationsList.addAll(copyItems);
+      booksList.addAll(copyItems);
     }
   }
 
@@ -491,7 +489,7 @@ class _IllustrationsState extends State<Illustrations> {
       }
 
       final snapshot = await FirebaseFirestore.instance
-          .collection('images')
+          .collection('books')
           .where('user.id', isEqualTo: userAuth.uid)
           .orderBy('createdAt', descending: descending)
           .limit(limit)
@@ -510,7 +508,7 @@ class _IllustrationsState extends State<Illustrations> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        illustrationsList.add(Illustration.fromJSON(data));
+        booksList.add(Book.fromJSON(data));
       });
 
       setState(() {
@@ -542,7 +540,7 @@ class _IllustrationsState extends State<Illustrations> {
       }
 
       final snapshot = await FirebaseFirestore.instance
-          .collection('images')
+          .collection('books')
           .where('user.id', isEqualTo: userAuth.uid)
           .orderBy('createdAt', descending: descending)
           .limit(limit)
@@ -562,7 +560,7 @@ class _IllustrationsState extends State<Illustrations> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        illustrationsList.add(Illustration.fromJSON(data));
+        booksList.add(Book.fromJSON(data));
       });
 
       setState(() {

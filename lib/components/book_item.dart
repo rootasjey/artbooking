@@ -1,23 +1,23 @@
 import 'package:artbooking/actions/images.dart';
 import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/create_image_doc_resp.dart';
-import 'package:artbooking/types/illustration.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:supercharged/supercharged.dart';
 
-class ImageItem extends StatefulWidget {
+class BookItem extends StatefulWidget {
   final bool selected;
   final bool selectionMode;
-  final Illustration illustration;
+  final Book book;
   final VoidCallback onBeforeDelete;
   final Function(CreateImageDocResp) onAfterDelete;
   final Function(bool) onLongPress;
   final Function onBeforePressed;
 
-  ImageItem({
-    @required this.illustration,
+  BookItem({
+    @required this.book,
     this.selected = false,
     this.selectionMode = false,
     this.onAfterDelete,
@@ -27,10 +27,10 @@ class ImageItem extends StatefulWidget {
   });
 
   @override
-  _ImageItemState createState() => _ImageItemState();
+  _BookItemState createState() => _BookItemState();
 }
 
-class _ImageItemState extends State<ImageItem> with TickerProviderStateMixin {
+class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
   Animation<double> scaleAnimation;
   AnimationController scaleAnimationController;
 
@@ -93,7 +93,7 @@ class _ImageItemState extends State<ImageItem> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final illustration = widget.illustration;
+    // final book = widget.book;
 
     return SizedBox(
       width: size,
@@ -104,8 +104,8 @@ class _ImageItemState extends State<ImageItem> with TickerProviderStateMixin {
         child: ScaleTransition(
           scale: scaleAnimation,
           child: Ink.image(
-            image: NetworkImage(
-              illustration.getThumbnail(),
+            image: AssetImage(
+              'assets/images/gummy-canvas.png',
             ),
             fit: BoxFit.cover,
             child: InkWell(
@@ -154,7 +154,7 @@ class _ImageItemState extends State<ImageItem> with TickerProviderStateMixin {
   }
 
   Widget caption() {
-    final illustration = widget.illustration;
+    final illustration = widget.book;
 
     return Align(
       alignment: Alignment.bottomCenter,
@@ -319,7 +319,7 @@ class _ImageItemState extends State<ImageItem> with TickerProviderStateMixin {
   }
 
   void deleteImageItem() async {
-    final illu = widget.illustration;
+    final illu = widget.book;
 
     if (widget.onBeforeDelete != null) {
       widget.onBeforeDelete();
