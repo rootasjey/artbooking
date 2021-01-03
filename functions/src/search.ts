@@ -5,15 +5,15 @@ import deepEqual = require('deep-equal');
 const env = functions.config();
 
 const client = algolia(env.algolia.appid, env.algolia.apikey);
-const imagesIndex = client.initIndex('images');
+const illustrationsIndex = client.initIndex('illustrations');
 const usersIndex = client.initIndex('users');
 
-// Images index
-// ------------
-export const onIndexImage = functions
+// Illustrations index
+// -------------------
+export const onIndexIllustration = functions
   .region('europe-west3')
   .firestore
-  .document('images/{imageId}')
+  .document('illustrations/{illustrationId}')
   .onCreate(async (snapshot) => {
     const data = snapshot.data();
     const objectID = snapshot.id;
@@ -23,35 +23,35 @@ export const onIndexImage = functions
       return;
     }
 
-    return imagesIndex.saveObject({
+    return illustrationsIndex.saveObject({
       objectID,
       ...data,
-    })
+    });
   });
 
-export const onReIndexImage = functions
+export const onReIndexIllustration = functions
   .region('europe-west3')
   .firestore
-  .document('images/{imageId}')
+  .document('illustrations/{illustrationId}')
   .onUpdate(async (snapshot) => {
     const data = snapshot.after.data();
     const objectID = snapshot.after.id;
 
     // Remove image from index if not public anymore.
     if (data.visibility !== 'public') {
-      return imagesIndex.deleteObject(objectID);
+      return illustrationsIndex.deleteObject(objectID);
     }
 
-    return imagesIndex.saveObject({
+    return illustrationsIndex.saveObject({
       objectID,
       ...data,
     })
   });
 
-export const onUnIndexImage = functions
+export const onUnIndexIllustration = functions
   .region('europe-west3')
   .firestore
-  .document('images/{imageId}')
+  .document('illustrations/{illustrationId}')
   .onDelete(async (snapshot) => {
     const data = snapshot.data();
     const objectID = snapshot.id;
@@ -61,7 +61,7 @@ export const onUnIndexImage = functions
       return;
     }
 
-    return imagesIndex.deleteObject(objectID);
+    return illustrationsIndex.deleteObject(objectID);
   });
 
 // Users index

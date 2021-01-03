@@ -36,7 +36,7 @@ interface DeleteImageParams {
   id: string;
 }
 
-interface DeleteMultipleImagesParams {
+interface DeleteMultipleIllustrationsParams {
   /// Array of images ids.
   ids: string[];
 }

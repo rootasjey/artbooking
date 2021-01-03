@@ -46,7 +46,7 @@ export const createDocument = functions
 
     try {
       const addedDoc = await adminApp.firestore()
-        .collection('images')
+        .collection('illustrations')
         .add({
           author,
           categories: {},
@@ -106,8 +106,8 @@ export const createDocument = functions
       const userData = userDoc.data();
       
       if (userData) {
-        let added: number = userData.stats?.images?.added;
-        let own: number = userData.stats?.images?.own;
+        let added: number = userData.stats?.illustrations?.added;
+        let own: number = userData.stats?.illustrations?.own;
         
         if (typeof added !== 'number') {
           added = 0;
@@ -123,8 +123,8 @@ export const createDocument = functions
         await userDoc
           .ref
           .update({
-            'stats.images.added': added,
-            'stats.images.own': own,
+            'stats.illustrations.added': added,
+            'stats.illustrations.own': own,
             updatedAt: adminApp.firestore.Timestamp.now(),
           });
       }
@@ -165,7 +165,7 @@ export const deleteDocument = functions
       const dir = await adminApp.storage()
         .bucket()
         .getFiles({
-          directory: `users/${userAuth.uid}/images/${id}`
+          directory: `users/${userAuth.uid}/illustrations/${id}`
         });
         
       const files = dir[0];
@@ -176,7 +176,7 @@ export const deleteDocument = functions
 
       // Delete Firestore document
       const imageDoc = await adminApp.firestore()
-        .collection('images')
+        .collection('illustrations')
         .doc(id)
         .get();
 
@@ -198,8 +198,8 @@ export const deleteDocument = functions
       const userData = userDoc.data();
 
       if (userData) {
-        let deleted: number = userData.stats?.images?.deleted;
-        let own: number = userData.stats?.images?.own;
+        let deleted: number = userData.stats?.illustrations?.deleted;
+        let own: number = userData.stats?.illustrations?.own;
 
         if (typeof deleted !== 'number') {
           deleted = 0;
@@ -213,14 +213,14 @@ export const deleteDocument = functions
         deleted++
 
         // Update used storage.
-        let storageImagesUsed: number = userData.stats.storage.images.used;
-        storageImagesUsed -= imageBytesToRemove;
+        let storageIllustrationsUsed: number = userData.stats.storage.illustrations.used;
+        storageIllustrationsUsed -= imageBytesToRemove;
 
         await userDoc.ref
           .update({
-            'stats.images.own': own,
-            'stats.images.deleted': deleted,
-            'stats.storage.images.used': storageImagesUsed,
+            'stats.illustrations.own': own,
+            'stats.illustrations.deleted': deleted,
+            'stats.storage.illustrations.used': storageIllustrationsUsed,
             updatedAt: adminApp.firestore.Timestamp.now(),
           });
       }
@@ -237,12 +237,12 @@ export const deleteDocument = functions
   });
 
 /**
- * Delete multiple images documents from Firestore and from Cloud Storage.
+ * Delete multiple illustrations documents from Firestore and from Cloud Storage.
  */
 export const deleteDocuments = functions
   .region('europe-west3')
   .https
-  .onCall(async (params: DeleteMultipleImagesParams, context) => {
+  .onCall(async (params: DeleteMultipleIllustrationsParams, context) => {
     const userAuth = context.auth;
     const { ids } = params;
 
@@ -253,10 +253,10 @@ export const deleteDocuments = functions
 
     if (!params || !ids || ids.length === 0) {
       throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
-        "a valid [ids] argument which is an array of images ids to delete.");
+        "a valid [ids] argument which is an array of illustrations ids to delete.");
     }
 
-    let imagesBytesToRemove: number = 0;
+    let illustrationsBytesToRemove: number = 0;
     
     for await (const id of ids) {
       try {
@@ -264,7 +264,7 @@ export const deleteDocuments = functions
         const dir = await adminApp.storage()
           .bucket()
           .getFiles({
-            directory: `users/${userAuth.uid}/images/${id}`
+            directory: `users/${userAuth.uid}/illustrations/${id}`
           });
 
         const files = dir[0];
@@ -275,13 +275,13 @@ export const deleteDocuments = functions
 
         // Delete Firestore document
         const imageDoc = await adminApp.firestore()
-          .collection('images')
+          .collection('illustrations')
           .doc(id)
           .get();
 
         const imageData = imageDoc.data();
         if (imageData) {
-          imagesBytesToRemove += imageData.size as number;
+          illustrationsBytesToRemove += imageData.size as number;
         }
 
         await imageDoc.ref.delete();
@@ -301,8 +301,8 @@ export const deleteDocuments = functions
     const userData = userDoc.data();
 
     if (userData) {
-      let own: number = userData.stats?.images?.own;
-      let deleted: number = userData.stats?.images?.deleted;
+      let own: number = userData.stats?.illustrations?.own;
+      let deleted: number = userData.stats?.illustrations?.deleted;
 
       if (typeof own !== 'number') {
         own = 0;
@@ -318,15 +318,15 @@ export const deleteDocuments = functions
       deleted += ids.length;
 
       // Update used storage.
-      let storageImagesUsed: number = userData.stats.storage.images.used;
-      storageImagesUsed -= imagesBytesToRemove;
+      let storageIllustrationsUsed: number = userData.stats.storage.illustrations.used;
+      storageIllustrationsUsed -= illustrationsBytesToRemove;
 
 
       await userDoc.ref
         .update({
-          'stats.images.own': own,
-          'stats.images.deleted': deleted,
-          'stats.storage.images.used': storageImagesUsed,
+          'stats.illustrations.own': own,
+          'stats.illustrations.deleted': deleted,
+          'stats.storage.illustrations.used': storageIllustrationsUsed,
           updatedAt: adminApp.firestore.Timestamp.now(),
         });
     }
@@ -399,7 +399,7 @@ export const onStorageUpload = functions
 
     // Save new properties to Firestore.
     await adminApp.firestore()
-      .collection('images')
+      .collection('illustrations')
       .doc(firestoreId)
       .set({
         dimensions: {
@@ -426,13 +426,13 @@ export const onStorageUpload = functions
     const userData = userDoc.data();
     if (!userData) { return false; }
 
-    let storageImagesUsed: number = userData.stats.storage.images.used;
-    storageImagesUsed += parseFloat(objectMeta.size);
+    let storageIllustrationsUsed: number = userData.stats.storage.illustrations.used;
+    storageIllustrationsUsed += parseFloat(objectMeta.size);
 
     return userDoc
       .ref
       .update({
-        'stats.storage.images.used': storageImagesUsed,
+        'stats.storage.illustrations.used': storageIllustrationsUsed,
         updatedAt: adminApp.firestore.Timestamp.now(),
       });
   });
@@ -455,7 +455,7 @@ export const setUserAuthor = functions
 
     try {
       const doc = await adminApp.firestore()
-        .collection('images')
+        .collection('illustrations')
         .doc(imageId)
         .get();
 
@@ -509,7 +509,7 @@ export const unsetUserAuthor = functions
 
     try {
       const doc = await adminApp.firestore()
-        .collection('images')
+        .collection('illustrations')
         .doc(imageId)
         .get();
 
@@ -564,7 +564,7 @@ export const updateDocumentProperties = functions
 
     try {
       await adminApp.firestore()
-        .collection('images')
+        .collection('illustrations')
         .doc(id)
         .set({
           description,
@@ -607,7 +607,7 @@ export const updateDocumentCategories = functions
 
     try {
       await adminApp.firestore()
-        .collection('images')
+        .collection('illustrations')
         .doc(id)
         .set({categories}, {merge: true});
 
@@ -641,7 +641,7 @@ export const updateDocumentTopics = functions
 
     try {
       await adminApp.firestore()
-        .collection('images')
+        .collection('illustrations')
         .doc(id)
         .set({ topics }, { merge: true });
 
