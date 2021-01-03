@@ -738,6 +738,8 @@ async function generateImageThumbs(
 
   const thumbnails: ThumbnailUrls = {
     t1080: '',
+    t1920: '',
+    t2400: '',
     t360: '',
     t480: '',
     t720: '',
@@ -779,7 +781,9 @@ async function generateImageThumbs(
   }
 
   // 3. Resize the images and define an array of upload promises.
-  const sizes = [360, 480, 720, 1080];
+  const sizes = Object
+    .keys(thumbnails)
+    .map((key) => parseInt(key.replace('t', '')));
 
   const uploadPromises = sizes.map(async (size) => {
     const thumbName = `thumb@${size}.${extension}`;
