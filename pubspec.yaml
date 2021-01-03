@@ -82,6 +82,7 @@ flutter:
     - assets/images/app-icon-512.png
     - assets/images/app-icon-1080.png
     - assets/images/default-avatar.png
+    - assets/images/gummy-canvas.png
     - assets/images/user-dark.png
     - assets/images/user-light.png
 
