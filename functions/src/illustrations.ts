@@ -57,7 +57,23 @@ export const createDocument = functions
             width: 0,
           },
           extension: '',
-          license: '',
+          license: {
+            custom: false,
+            description: '',
+            name: '',
+            existingLicenseId: '',
+            usage: {
+              edit: false,
+              print: false,
+              sell: false,
+              share: false,
+              showAttribution: true,
+              useInOtherFree: false,
+              useInOtherOss: false,
+              useInOtherPaid: false,
+              view: false,
+            },
+          },
           name: params.name,
           size: 0, // File's ize in bytes
           stats: {
@@ -89,12 +105,14 @@ export const createDocument = functions
               t480: '',
               t720: '',
               t1080: '',
+              t1920: '',
+              t2400: '',
             },
           },
           user: {
             id: userAuth.token.uid,
           },
-          visibility: params.visibility ?? 'private',
+          visibility: checkVisibilityOrGetDefault(params.visibility),
         });
 
       // Update user's stats
@@ -695,6 +713,18 @@ function checkUpdateParams(data: UpdateImagePropsParams) {
     throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
       "a valid [visibility] parameter which is the image's visibility.");
   }
+}
+
+function checkVisibilityOrGetDefault(visibilityParam: string) {
+  let defaultVisibility = 'private';
+
+  const allowedVisibility = [ 'acl', 'challenge', 'contest', 'gallery', 'private', 'public'];
+
+  if (allowedVisibility.indexOf(visibilityParam) > -1) {
+    return visibilityParam;
+  }
+
+  return defaultVisibility;
 }
 
 /**
