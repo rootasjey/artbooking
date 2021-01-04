@@ -157,28 +157,10 @@ interface SetUserAuthorParams {
   imageId: string;
 }
 
-interface SimpleIllustration {
-  author: {
-    id: string;
-  };
-  categories: Record<string, boolean>,
+interface BookIllustration {
   createdAt: any;
   id: string;
-  license: {
-    custom: boolean;
-    name: string;
-    existingLicenseId: string;
-  };
-  name: string;
-  topics: Record<string, boolean>;
-  urls: {
-    t360: string;
-    t480: string;
-    t720: string;
-    t1080: string;
-    t1920: string;
-    t2400: string;
-  };
+  updatedAt: any;
   vScaleFactor: {
     height: number;
     mobileHeight: number;

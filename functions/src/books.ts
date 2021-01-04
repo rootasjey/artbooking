@@ -25,7 +25,7 @@ export const addIllustrations = functions
     const { bookId, illustrationsIds } = params;
 
     try {
-      const simpleIllustrations = await createSimpleIllustrations(illustrationsIds);
+      const minimalIllustrations = await createBookIllustrations(illustrationsIds);
 
       const bookDoc = await adminApp.firestore()
         .collection('books')
@@ -37,8 +37,8 @@ export const addIllustrations = functions
         throw new functions.https.HttpsError('not-found', "The book to update doesn't exist anymore.");
       }
 
-      const bookIllustrations: SimpleIllustration[] = bookData.illustrations;
-      const newBookIllustrations = bookIllustrations.concat(simpleIllustrations);
+      const bookIllustrations: BookIllustration[] = bookData.illustrations;
+      const newBookIllustrations = bookIllustrations.concat(minimalIllustrations);
 
       await adminApp.firestore()
         .collection('books')
@@ -78,7 +78,7 @@ export const createDocument = functions
         "a valid [name] parameter which is the illustration's name.");
     }
 
-    const simpleIllustrations = await createSimpleIllustrations(params.illustrations);
+    const bookIllustrations = await createBookIllustrations(params.illustrations);
 
     try {
       const addedBook = await adminApp.firestore()
@@ -86,7 +86,7 @@ export const createDocument = functions
         .add({
           createdAt: adminApp.firestore.FieldValue.serverTimestamp,
           description: params.description,
-          illustrations: simpleIllustrations,
+          illustrations: bookIllustrations,
           layout: 'grid',
           layoutMobile: 'grid',
           layoutOrientation: 'vertical',
@@ -272,7 +272,7 @@ export const deleteDocuments = functions
           own = 0;
         }
 
-        own = own > 0 ? own - 1 : 0;
+        own = own > 0 ? own - successCount : 0;
         deleted += successCount;
 
         await userDoc.ref
@@ -329,9 +329,9 @@ export const removeIllustrations = functions
         throw new functions.https.HttpsError('not-found', "The book to update doesn't exist anymore.");
       }
 
-      const bookIllustrations: SimpleIllustration[] = bookData.illustrations;
+      const bookIllustrations: BookIllustration[] = bookData.illustrations;
       const newBookIllustrations = bookIllustrations
-        .filter(illus => illustrationsIds.indexOf(illus.id) < 0);
+        .filter(illus => !illustrationsIds.includes(illus.id));
 
       await adminApp.firestore()
         .collection('books')
@@ -444,8 +444,7 @@ export const updateIllusPosition = functions
         throw new functions.https.HttpsError('not-found', "The book to update doesn't exist anymore.");
       }
 
-      const illustrations: SimpleIllustration[] = bookData.illustrations;
-      // const index = bookIllustrations.findIndex((item) => item.id === illustrationId);
+      const illustrations: BookIllustration[] = bookData.illustrations;
       const deletedItems = illustrations.splice(beforePosition, 1);
 
       if (!deletedItems || deletedItems.length === 0) {
@@ -613,41 +612,18 @@ function checkUpdateBookPropsParam(params: UpdateBookPropertiesParams) {
  * Create an array of simple illustrations objects.
  * @param ids - Illustrations' ids to create.
  */
-async function createSimpleIllustrations(ids: string[]) {
+async function createBookIllustrations(ids: string[]) {
   if (!ids || ids.length === 0) {
     return [];
   }
 
-  const arrayResult: SimpleIllustration[] = [];
+  const arrayResult: BookIllustration[] = [];
 
-  for await (const id of ids) {
-    const illustrationDoc = await adminApp.firestore()
-      .collection('illustrations')
-      .doc(id)
-      .get();
-
-    const illustrationData = illustrationDoc.data();
-    if (!illustrationData) { continue; }
-
-    const { author, categories, license, name, topics, urls } = illustrationData;
-    const { t360, t480, t720, t1080, t1920, t2400 } = urls;
-
+  for (const id of ids) {
     arrayResult.push({
-      author,
-      categories,
       createdAt: adminApp.firestore.FieldValue.serverTimestamp,
-      id: illustrationDoc.id,
-      license,
-      name,
-      topics,
-      urls: {
-        t360,
-        t480,
-        t720,
-        t1080,
-        t1920,
-        t2400,
-      },
+      id,
+      updatedAt: adminApp.firestore.FieldValue.serverTimestamp,
       vScaleFactor: {
         height: 1,
         width: 1,
