@@ -65,3 +65,20 @@ export function sendNotification(notificationData: any) {
   req.write(JSON.stringify(notificationData));
   req.end();
 }
+
+/**
+ * Check and return the passed value.
+ * If the passed value is unknown, return a default one.
+ * @param visibilityParam - Visibility value. Accepted values: acl, challenge, contest, gallery, private, public.
+ */
+export function checkOrGetDefaultVisibility(visibilityParam: string) {
+  let defaultVisibility = 'private';
+
+  const allowedVisibility = ['acl', 'challenge', 'contest', 'gallery', 'private', 'public'];
+
+  if (allowedVisibility.indexOf(visibilityParam) > -1) {
+    return visibilityParam;
+  }
+
+  return defaultVisibility;
+}

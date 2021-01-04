@@ -8,6 +8,7 @@ import { join, dirname } from 'path';
 import * as sharp from 'sharp';
 
 import { adminApp } from './adminApp';
+import { checkOrGetDefaultVisibility } from './utils';
 
 const gcs = new Storage();
 
@@ -25,7 +26,7 @@ interface GenerateImageThumbsParams {
 export const createDocument = functions
   .region('europe-west3')
   .https
-  .onCall(async (params: CreateImageParams, context) => {
+  .onCall(async (params: CreateIllustrationParams, context) => {
     const userAuth = context.auth;
 
     if (!userAuth) {
@@ -112,7 +113,7 @@ export const createDocument = functions
           user: {
             id: userAuth.token.uid,
           },
-          visibility: checkVisibilityOrGetDefault(params.visibility),
+          visibility: checkOrGetDefaultVisibility(params.visibility),
         });
 
       // Update user's stats
@@ -153,6 +154,7 @@ export const createDocument = functions
       };
 
     } catch (error) {
+      console.error(error);
       throw new functions.https.HttpsError('internal', "There was an internal error. " +
         "Please try again later or contact us.");
     }
@@ -164,7 +166,7 @@ export const createDocument = functions
 export const deleteDocument = functions
   .region('europe-west3')
   .https
-  .onCall(async (params: DeleteImageParams, context) => {
+  .onCall(async (params: DeleteIllustrationParams, context) => {
     const userAuth = context.auth;
     const { id } = params;
 
@@ -713,18 +715,6 @@ function checkUpdateParams(data: UpdateImagePropsParams) {
     throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
       "a valid [visibility] parameter which is the image's visibility.");
   }
-}
-
-function checkVisibilityOrGetDefault(visibilityParam: string) {
-  let defaultVisibility = 'private';
-
-  const allowedVisibility = [ 'acl', 'challenge', 'contest', 'gallery', 'private', 'public'];
-
-  if (allowedVisibility.indexOf(visibilityParam) > -1) {
-    return visibilityParam;
-  }
-
-  return defaultVisibility;
 }
 
 /**
