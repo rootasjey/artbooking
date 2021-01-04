@@ -1,0 +1,661 @@
+import * as functions from 'firebase-functions';
+import { adminApp } from './adminApp';
+import { checkOrGetDefaultVisibility } from './utils';
+
+/**
+ * Add illustrations to an existing book.
+ */
+export const addIllustrations = functions
+  .region('europe-west3')
+  .https
+  .onCall(async (params: UpdateBookIllustrationsParams, context) => {
+    const userAuth = context.auth;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
+        'an authenticated user.');
+    }
+
+    if (!params || !params.bookId || !params.illustrationsIds || params.illustrationsIds.length === 0) {
+      throw new functions.https.HttpsError('invalid-argument',
+        "The function must be called with a valid [id] and [illustrationsIds] parameters " +
+        "which are respectively the book's id and the illustrations' ids array to add.");
+    }
+
+    const { bookId, illustrationsIds } = params;
+
+    try {
+      const simpleIllustrations = await createSimpleIllustrations(illustrationsIds);
+
+      const bookDoc = await adminApp.firestore()
+        .collection('books')
+        .doc(bookId)
+        .get();
+
+      const bookData = bookDoc.data();
+      if (!bookData) {
+        throw new functions.https.HttpsError('not-found', "The book to update doesn't exist anymore.");
+      }
+
+      const bookIllustrations: SimpleIllustration[] = bookData.illustrations;
+      const newBookIllustrations = bookIllustrations.concat(simpleIllustrations);
+
+      await adminApp.firestore()
+        .collection('books')
+        .doc(bookId)
+        .update({
+          illustrations: newBookIllustrations,
+        });
+
+      return {
+        illustrationsIds,
+        success: true,
+      };
+
+    } catch (error) {
+      console.error(error);
+      throw new functions.https.HttpsError('internal', "There was an internal error. " +
+        "Please try again later or contact us.");
+    }
+  });
+
+/**
+ * Create a book document in Firestore.
+ */
+export const createDocument = functions
+  .region('europe-west3')
+  .https
+  .onCall(async (params: CreateBookParams, context) => {
+    const userAuth = context.auth;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
+        'an authenticated user.');
+    }
+
+    if (!params || !params.name) {
+      throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
+        "a valid [name] parameter which is the illustration's name.");
+    }
+
+    const simpleIllustrations = await createSimpleIllustrations(params.illustrations);
+
+    try {
+      const addedBook = await adminApp.firestore()
+        .collection('books')
+        .add({
+          createdAt: adminApp.firestore.FieldValue.serverTimestamp,
+          description: params.description,
+          illustrations: simpleIllustrations,
+          layout: 'grid',
+          layoutMobile: 'grid',
+          layoutOrientation: 'vertical',
+          layoutOrientationMobile: 'vertical',
+          matrice: [],
+          name: params.name,
+          updatedAt: adminApp.firestore.FieldValue.serverTimestamp,
+          urls: {
+            cover: '',
+            icon: '',
+          },
+          user: {
+            id: userAuth.uid,
+          },
+          visibility: checkOrGetDefaultVisibility(params.visibility),
+        });
+
+      // Update user's stats
+      const userDoc = await adminApp.firestore()
+        .collection('users')
+        .doc(userAuth.uid)
+        .get();
+
+      const userData = userDoc.data();
+
+      if (userData) {
+        let added: number = userData.stats?.books?.added;
+        let own: number = userData.stats?.books?.own;
+
+        if (typeof added !== 'number') {
+          added = 0;
+        }
+
+        if (typeof own !== 'number') {
+          own = 0;
+        }
+
+        added++;
+        own++;
+
+        await userDoc
+          .ref
+          .update({
+            'stats.books.added': added,
+            'stats.books.own': own,
+            updatedAt: adminApp.firestore.Timestamp.now(),
+          });
+      }
+
+      return {
+        id: addedBook.id,
+        success: true,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new functions.https.HttpsError('internal', "There was an internal error. " +
+        "Please try again later or contact us.");
+    }
+  });
+
+/**
+ * Delete a book document from Firestore.
+ */
+export const deleteDocument = functions
+  .region('europe-west3')
+  .https
+  .onCall(async (params: DeleteBookParams, context) => {
+    const userAuth = context.auth;
+    const { id } = params;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
+        'an authenticated user.');
+    }
+
+    if (!params || !id) {
+      throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
+        "a valid [id] argument which is the illustration's id to delete.");
+    }
+
+    try {
+      await adminApp.firestore()
+        .collection('books')
+        .doc(id)
+        .delete();
+
+      // Update user's stats
+      // -------------------
+      const userDoc = await adminApp.firestore()
+        .collection('users')
+        .doc(userAuth.uid)
+        .get();
+
+      const userData = userDoc.data();
+
+      if (userData) {
+        let deleted: number = userData.stats?.books?.deleted;
+        let own: number = userData.stats?.books?.own;
+
+        if (typeof deleted !== 'number') {
+          deleted = 0;
+        }
+
+        if (typeof own !== 'number') {
+          own = 0;
+        }
+
+        own = own > 0 ? own - 1 : 0;
+        deleted++
+
+        await userDoc.ref
+          .update({
+            'stats.books.own': own,
+            'stats.books.deleted': deleted,
+            updatedAt: adminApp.firestore.Timestamp.now(),
+          });
+      }
+
+      return {
+        id,
+        success: true,
+      };
+    } catch (error) {
+      throw new functions.https.HttpsError('internal', "There was an internal error. " +
+        "Please try again later or contact us.");
+    }
+  });
+
+/**
+ * Delete multiple books documents from Firestore.
+ */
+export const deleteDocuments = functions
+  .region('europe-west3')
+  .https
+  .onCall(async (params: DeleteBooksParams, context) => {
+    const userAuth = context.auth;
+    const { ids } = params;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
+        'an authenticated user.');
+    }
+
+    if (!params || !ids || ids.length === 0) {
+      throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
+        "a valid [ids] argument which is an array of illustrations' ids to delete.");
+    }
+
+    /** How many operations succeeded. */
+    let successCount = 0;
+
+    for await (const id of ids) {
+      try {
+        await adminApp.firestore()
+          .collection('books')
+          .doc(id)
+          .delete();
+
+        successCount++;
+
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    try { // Update user's stats
+      const userDoc = await adminApp.firestore()
+        .collection('users')
+        .doc(userAuth.uid)
+        .get();
+
+      const userData = userDoc.data();
+
+      if (userData) {
+        let deleted: number = userData.stats?.books?.deleted;
+        let own: number = userData.stats?.books?.own;
+
+        if (typeof deleted !== 'number') {
+          deleted = 0;
+        }
+
+        if (typeof own !== 'number') {
+          own = 0;
+        }
+
+        own = own > 0 ? own - 1 : 0;
+        deleted += successCount;
+
+        await userDoc.ref
+          .update({
+            'stats.books.own': own,
+            'stats.books.deleted': deleted,
+            updatedAt: adminApp.firestore.Timestamp.now(),
+          });
+      }
+
+      return {
+        ids,
+        successCount,
+        success: successCount === ids.length,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new functions.https.HttpsError('internal', "There was an internal error. " +
+        "Please try again later or contact us.");
+    }
+  });
+
+/**
+ * Delete illustrations from an existing book.
+ */
+export const removeIllustrations = functions
+  .region('europe-west3')
+  .https
+  .onCall(async (params: UpdateBookIllustrationsParams, context) => {
+    const userAuth = context.auth;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
+        'an authenticated user.');
+    }
+
+    if (!params || !params.bookId || !params.illustrationsIds || params.illustrationsIds.length === 0) {
+      throw new functions.https.HttpsError('invalid-argument',
+        "The function must be called with a valid [id] and [illustrationsIds] parameters " +
+        "which are respectively the book's id and an illustrations' ids array.");
+    }
+
+    const { bookId, illustrationsIds } = params;
+
+    try {
+      const bookDoc = await adminApp.firestore()
+        .collection('books')
+        .doc(bookId)
+        .get();
+        
+      const bookData = bookDoc.data();
+      
+      if (!bookData){
+        throw new functions.https.HttpsError('not-found', "The book to update doesn't exist anymore.");
+      }
+
+      const bookIllustrations: SimpleIllustration[] = bookData.illustrations;
+      const newBookIllustrations = bookIllustrations
+        .filter(illus => illustrationsIds.indexOf(illus.id) < 0);
+
+      await adminApp.firestore()
+        .collection('books')
+        .doc(bookId)
+        .update({
+          illustrations: newBookIllustrations,
+        });
+
+      return {
+        illustrationsIds,
+        success: true,
+      };
+      
+    } catch (error) {
+      console.error(error);
+      throw new functions.https.HttpsError('internal', "There was an internal error. " +
+        "Please try again later or contact us.");
+    }
+  });
+
+/**
+ * Update book's properties.
+ */
+export const updateBookProperties = functions
+  .region('europe-west3')
+  .https
+  .onCall(async (params: UpdateBookPropertiesParams, context) => {
+    const userAuth = context.auth;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
+        'an authenticated user.');
+    }
+
+    checkUpdateBookPropsParam(params);
+
+    const { 
+      description, 
+      bookId, 
+      layout, 
+      layoutMobile, 
+      layoutOrientation, 
+      layoutOrientationMobile, 
+      name, 
+      urls, 
+      visibility, 
+    } = params;
+
+    try {
+      await adminApp.firestore()
+        .collection('books')
+        .doc(bookId)
+        .update({
+          description,
+          layout,
+          layoutMobile,
+          layoutOrientation,
+          layoutOrientationMobile,
+          name,
+          urls,
+          visibility,
+        });
+
+      return {
+        bookId,
+        success: true,
+      };
+
+    } catch (error) {
+      throw new functions.https.HttpsError('internal', "There was an internal error. " +
+        "Please try again later or contact us.");
+    }
+  });
+
+/**
+ * Update illustrations' position in an existing book.
+ * For all [layout] except {extendedGrid} with the [matrice] property.
+ */
+export const updateIllusPosition = functions
+  .region('europe-west3')
+  .https
+  .onCall(async (params: UpdateIllusPositionParams, context) => {
+    const userAuth = context.auth;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
+        'an authenticated user.');
+    }
+
+    if (!params || !params.bookId || !params.beforePosition || 
+        !params.afterPosition || !params.illustrationId) {
+      throw new functions.https.HttpsError('invalid-argument',
+        "The function must be called with a valid [bookId], [illustrationId], " +
+        "[beforePosition] and [afterPosition] parameters " +
+        "which are respectively the book's id, the illustration's id, " +
+        "the position before and the position after the update.");
+    }
+
+    const { bookId, illustrationId, afterPosition, beforePosition } = params;
+
+    try {
+      const bookDoc = await adminApp.firestore()
+        .collection('books')
+        .doc(bookId)
+        .get();
+        
+      const bookData = bookDoc.data();
+
+      if (!bookData){
+        throw new functions.https.HttpsError('not-found', "The book to update doesn't exist anymore.");
+      }
+
+      const illustrations: SimpleIllustration[] = bookData.illustrations;
+      // const index = bookIllustrations.findIndex((item) => item.id === illustrationId);
+      const deletedItems = illustrations.splice(beforePosition, 1);
+
+      if (!deletedItems || deletedItems.length === 0) {
+        throw new functions.https.HttpsError('invalid-argument', 
+          "Invalid [beforePosition] argument. The number specified may be out of range.")
+      }
+
+      const illusToMove = deletedItems[0];
+      illustrations.splice(afterPosition, 0, illusToMove);
+
+      await adminApp.firestore()
+        .collection('books')
+        .doc(bookId)
+        .update({
+          illustrations,
+        });
+
+      return {
+        illustrationId,
+        success: true,
+      };
+      
+    } catch (error) {
+      console.error(error);
+      throw new functions.https.HttpsError('internal', "There was an internal error. " +
+        "Please try again later or contact us.");
+    }
+  });
+
+// ----------------
+// Helper functions
+// ----------------
+
+/**
+ * Check new book's properties types and values.
+ * @param params - Updated book's properties.
+ */
+function checkUpdateBookPropsParam(params: UpdateBookPropertiesParams) {
+  if (!params) {
+    throw new functions.https.HttpsError('invalid-argument',
+      "The function must be called with a valid [id] and [illustrationsIds] parameters " +
+      "which are respectively the book's id and an illustrations' ids array.");
+  }
+
+  const {
+    description,
+    layout,
+    layoutMobile,
+    layoutOrientation,
+    layoutOrientationMobile,
+    name,
+    visibility,
+  } = params;
+
+  if (typeof description !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      "The function must have a [description] parameter which is the updated Book's description.",
+    )
+  }
+
+  if (typeof layout !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      "The function must have a [layout] parameter which is the updated Book's layout.",
+    );
+  }
+
+  const allowedLayouts = [
+    'adaptativeGrid',
+    'customExtendedGrid',
+    'customGrid',
+    'customList',
+    'grid',
+    'horizontalList',
+    'horizontalListWide',
+    'largeGrid',
+    'smallGrid',
+    'twoPagesBook',
+    'verticalList',
+    'verticalListWide',
+  ];
+
+  if (!allowedLayouts.includes(layout)) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      "Allow values for [layout] parameter are: adaptativeGrid, customExtendedGrid," +
+      "customGrid, customList, grid, horizontalList, horizontalListWide," +
+      " largeGrid, smallGrid, twoPagesBook, verticalList, verticalListWide.",
+    );
+  }
+
+  if (typeof layoutMobile !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      "The function must have a [layoutMobile] parameter which is the updated Book's layout on small screens.",
+    )
+  }
+
+  if (!allowedLayouts.includes(layoutMobile)) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      "Allow values for [layout] parameter are: adaptativeGrid, customExtendedGrid," +
+      "customGrid, customList, grid, horizontalList, horizontalListWide," +
+      " largeGrid, smallGrid, twoPagesBook, verticalList, verticalListWide.",
+    );
+  }
+
+  const allowedLayoutOrientations = ['both', 'horizontal', 'vertical'];
+
+  if (typeof layoutOrientation !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      "The function must have a [layoutOrientation] parameter which is the updated Book's layout orientation.",
+    )
+  }
+
+  if (!allowedLayoutOrientations.includes(layoutOrientation)) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      "Allow values for [layoutOrientation] parameter are: both, horizontal, vertical,"
+    );
+  }
+
+  if (typeof layoutOrientationMobile !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      "The function must have a [layoutOrientationMbile] parameter " +
+      "which is the updated Book's layout orientation on small screens.",
+    )
+  }
+
+  if (!allowedLayoutOrientations.includes(layoutOrientationMobile)) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      "Allow values for [layoutOrientationMobile] parameter are: both, horizontal, vertical."
+    );
+  }
+
+  if (typeof name !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      "The function must have a [name] parameter which is the updated Book's name.",
+    )
+  }
+
+  if (typeof visibility !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      "The function must have a [visibility] parameter which is the updated Book's visibility.",
+    )
+  }
+
+  const allowedVisibility = ['acl', 'challenge', 'contest', 'gallery', 'private', 'public'];
+
+  if (!allowedVisibility.includes(visibility)) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      "Allow values for [visibility] parameter are: 'acl', 'challenge', 'contest', 'gallery', 'private', 'public'."
+    );
+  }
+}
+
+/**
+ * Create an array of simple illustrations objects.
+ * @param ids - Illustrations' ids to create.
+ */
+async function createSimpleIllustrations(ids: string[]) {
+  if (!ids || ids.length === 0) {
+    return [];
+  }
+
+  const arrayResult: SimpleIllustration[] = [];
+
+  for await (const id of ids) {
+    const illustrationDoc = await adminApp.firestore()
+      .collection('illustrations')
+      .doc(id)
+      .get();
+
+    const illustrationData = illustrationDoc.data();
+    if (!illustrationData) { continue; }
+
+    const { author, categories, license, name, topics, urls } = illustrationData;
+    const { t360, t480, t720, t1080, t1920, t2400 } = urls;
+
+    arrayResult.push({
+      author,
+      categories,
+      createdAt: adminApp.firestore.FieldValue.serverTimestamp,
+      id: illustrationDoc.id,
+      license,
+      name,
+      topics,
+      urls: {
+        t360,
+        t480,
+        t720,
+        t1080,
+        t1920,
+        t2400,
+      },
+      vScaleFactor: {
+        height: 1,
+        width: 1,
+        mobileHeight: 1,
+        mobileWidth: 1,
+      },
+    });
+  }
+
+  return arrayResult;
+}
