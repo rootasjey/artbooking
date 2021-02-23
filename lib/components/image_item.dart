@@ -248,7 +248,7 @@ class _ImageItemState extends State<ImageItem> with TickerProviderStateMixin {
   void confirmDeletion() async {
     showCustomModalBottomSheet(
       context: context,
-      builder: (context, controller) {
+      builder: (context) {
         return Material(
           child: SafeArea(
             top: false,

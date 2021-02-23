@@ -493,9 +493,7 @@ class _SettingsState extends State<Settings> {
   Future showUpdateNameDialog() async {
     await showCupertinoModalBottomSheet(
       context: context,
-      builder: (context, scrollController) => UpdateUsername(
-        scrollController: scrollController,
-      ),
+      builder: (context) => UpdateUsername(),
     );
 
     checkAuth();

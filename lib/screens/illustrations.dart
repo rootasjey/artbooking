@@ -369,7 +369,7 @@ class _IllustrationsState extends State<Illustrations> {
   void confirmDeletion() async {
     showCustomModalBottomSheet(
       context: context,
-      builder: (context, controller) {
+      builder: (context) {
         return Material(
           child: SafeArea(
             top: false,
@@ -491,7 +491,7 @@ class _IllustrationsState extends State<Illustrations> {
       }
 
       final snapshot = await FirebaseFirestore.instance
-          .collection('images')
+          .collection('illustrations')
           .where('user.id', isEqualTo: userAuth.uid)
           .orderBy('createdAt', descending: descending)
           .limit(limit)
@@ -542,7 +542,7 @@ class _IllustrationsState extends State<Illustrations> {
       }
 
       final snapshot = await FirebaseFirestore.instance
-          .collection('images')
+          .collection('illustrations')
           .where('user.id', isEqualTo: userAuth.uid)
           .orderBy('createdAt', descending: descending)
           .limit(limit)

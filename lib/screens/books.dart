@@ -110,7 +110,7 @@ class _BooksState extends State<Books> {
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
           Text(
-            'Illustrations',
+            'Books',
             style: TextStyle(
               fontSize: 80.0,
               fontWeight: FontWeight.w900,
@@ -367,7 +367,7 @@ class _BooksState extends State<Books> {
   void confirmDeletion() async {
     showCustomModalBottomSheet(
       context: context,
-      builder: (context, controller) {
+      builder: (context) {
         return Material(
           child: SafeArea(
             top: false,

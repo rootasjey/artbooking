@@ -1,5 +1,4 @@
 import 'package:artbooking/screens/dashboard.dart';
-import 'package:artbooking/screens/home/home.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:flutter/material.dart';
 

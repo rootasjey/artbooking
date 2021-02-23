@@ -13,13 +13,10 @@ import 'package:artbooking/utils/snack.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:supercharged/supercharged.dart';
 
 class UpdateUsername extends StatefulWidget {
-  final ScrollController scrollController;
-
-  UpdateUsername({this.scrollController});
-
   @override
   _UpdateUsernameState createState() => _UpdateUsernameState();
 }
@@ -58,7 +55,7 @@ class _UpdateUsernameState extends State<UpdateUsername> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
-        controller: widget.scrollController,
+        controller: ModalScrollController.of(context),
         slivers: <Widget>[
           SliverPadding(
             padding: const EdgeInsets.only(top: 10.0),

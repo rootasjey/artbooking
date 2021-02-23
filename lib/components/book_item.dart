@@ -248,7 +248,7 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
   void confirmDeletion() async {
     showCustomModalBottomSheet(
       context: context,
-      builder: (context, controller) {
+      builder: (context) {
         return Material(
           child: SafeArea(
             top: false,
