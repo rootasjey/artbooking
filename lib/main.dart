@@ -1,11 +1,9 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/full_page_loading.dart';
-import 'package:artbooking/main_mobile.dart';
-import 'package:artbooking/main_web.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/utils/app_storage.dart';
-import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -53,20 +51,35 @@ class AppState extends State<App> {
     stateColors.refreshTheme(brightness);
 
     if (isReady) {
-      return DynamicTheme(
-        defaultBrightness: Brightness.light,
-        data: (brightness) => ThemeData(
+      return AdaptiveTheme(
+        light: ThemeData(
+          brightness: Brightness.light,
           fontFamily: GoogleFonts.ibmPlexSans().fontFamily,
-          brightness: brightness,
         ),
-        themedWidgetBuilder: (context, theme) {
+        dark: ThemeData(
+          brightness: Brightness.dark,
+          fontFamily: GoogleFonts.raleway().fontFamily,
+        ),
+        initial: brightness == Brightness.light
+            ? AdaptiveThemeMode.light
+            : AdaptiveThemeMode.dark,
+        builder: (theme, darkTheme) {
           stateColors.themeData = theme;
 
-          if (kIsWeb) {
-            return MainWeb();
-          }
-
-          return MainMobile();
+          return MaterialApp(
+            title: 'ArtBooking',
+            theme: stateColors.themeData,
+            debugShowCheckedModeBanner: true,
+            home: Scaffold(
+              body: Center(
+                child: SizedBox(
+                  width: 200.0,
+                  height: 200.0,
+                  child: FullPageLoading(),
+                ),
+              ),
+            ),
+          );
         },
       );
     }
@@ -74,13 +87,19 @@ class AppState extends State<App> {
     // On the web, if an user accesses an auth route (w/o going first to home),
     // they will be redirected to the Sign in screen before the app auth them.
     // This waiting screen solves this issue.
-    return DynamicTheme(
-      defaultBrightness: brightness,
-      data: (brightness) => ThemeData(
+    return AdaptiveTheme(
+      light: ThemeData(
+        brightness: Brightness.light,
         fontFamily: GoogleFonts.ibmPlexSans().fontFamily,
-        brightness: brightness,
       ),
-      themedWidgetBuilder: (_, theme) {
+      dark: ThemeData(
+        brightness: Brightness.dark,
+        fontFamily: GoogleFonts.raleway().fontFamily,
+      ),
+      initial: brightness == Brightness.light
+          ? AdaptiveThemeMode.light
+          : AdaptiveThemeMode.dark,
+      builder: (theme, darkTheme) {
         stateColors.themeData = theme;
         return MaterialApp(
           title: 'ArtBooking',

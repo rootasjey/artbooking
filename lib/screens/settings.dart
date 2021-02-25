@@ -15,7 +15,6 @@ import 'package:artbooking/utils/app_storage.dart';
 import 'package:artbooking/utils/brightness.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -61,7 +60,7 @@ class _SettingsState extends State<Settings> {
     initNotifState();
 
     isThemeAuto = appStorage.getAutoBrightness();
-    currentBrightness = DynamicTheme.of(context).brightness;
+    currentBrightness = appStorage.getBrightness();
   }
 
   @override

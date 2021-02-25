@@ -1,5 +1,5 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:artbooking/state/colors.dart';
-import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
 
@@ -35,7 +35,12 @@ class MainMobileState extends State<MainMobile> {
 
     Future.delayed(2.seconds, () {
       try {
-        DynamicTheme.of(context).setBrightness(brightness);
+        if (brightness == Brightness.dark) {
+          AdaptiveTheme.of(context).setDark();
+        } else {
+          AdaptiveTheme.of(context).setLight();
+        }
+
         stateColors.refreshTheme(brightness);
       } catch (error) {
         debugPrint(error.toString());

@@ -1,6 +1,6 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/utils/app_storage.dart';
-import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 
 /// Refresh current theme with auto brightness.
@@ -13,14 +13,24 @@ void setAutoBrightness(BuildContext context) {
     brightness = Brightness.dark;
   }
 
-  DynamicTheme.of(context).setBrightness(brightness);
+  if (brightness == Brightness.dark) {
+    AdaptiveTheme.of(context).setDark();
+  } else {
+    AdaptiveTheme.of(context).setLight();
+  }
+
   stateColors.refreshTheme(brightness);
   appStorage.setAutoBrightness(true);
 }
 
 /// Refresh current theme with a specific brightness.
 void setBrightness(BuildContext context, Brightness brightness) {
-  DynamicTheme.of(context).setBrightness(brightness);
+  if (brightness == Brightness.dark) {
+    AdaptiveTheme.of(context).setDark();
+  } else {
+    AdaptiveTheme.of(context).setLight();
+  }
+
   stateColors.refreshTheme(brightness);
   appStorage.setAutoBrightness(false);
   appStorage.setBrightness(brightness);
