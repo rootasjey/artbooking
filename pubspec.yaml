@@ -23,6 +23,8 @@ environment:
 
 dependencies:
   adaptive_theme: 1.1.0
+  animations: 1.1.2
+  auto_route:  1.0.0-beta.10
   cloud_firestore: 0.14.4
   cloud_functions: 0.7.2
   cross_local_storage: 1.1.1
