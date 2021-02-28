@@ -110,9 +110,7 @@ class _AddIllustrationState extends State<AddIllustration> {
   Widget header() {
     return Padding(
       padding: const EdgeInsets.only(
-        top: 80.0,
-        left: 80.0,
-        bottom: 100.0,
+        left: 60.0,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,20 +133,29 @@ class _AddIllustrationState extends State<AddIllustration> {
                 ),
             ],
           ),
+          Padding(
+            padding: const EdgeInsets.only(top: 12.0),
+          ),
           Wrap(
             spacing: 20.0,
             runSpacing: 20.0,
             children: [
               OutlinedButton.icon(
                   onPressed: pickImage,
-                  icon: Icon(UniconsLine.upload),
+                  icon: Padding(
+                    padding: const EdgeInsets.only(bottom: 6.0),
+                    child: Icon(UniconsLine.upload),
+                  ),
                   label: Padding(
                     padding: const EdgeInsets.all(12.0),
-                    child: Text('Add illustration'),
+                    child: Text('Upload more'),
                   )),
               OutlinedButton.icon(
                   onPressed: () {},
-                  icon: Icon(UniconsLine.times),
+                  icon: Padding(
+                    padding: const EdgeInsets.only(bottom: 6.0),
+                    child: Icon(UniconsLine.times),
+                  ),
                   label: Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Text('Clear all'),
