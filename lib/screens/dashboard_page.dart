@@ -1,5 +1,6 @@
 import 'package:artbooking/components/desktop_app_bar.dart';
 import 'package:artbooking/components/side_menu_item.dart';
+import 'package:artbooking/components/upload_manager.dart';
 import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
@@ -155,7 +156,9 @@ class _DashboardPageState extends State<DashboardPage> {
             left: 40.0,
             bottom: 20.0,
             child: RaisedButton(
-              onPressed: () {},
+              onPressed: () {
+                appUploadManager.pickImage(context);
+              },
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(
                   Radius.circular(30.0),
