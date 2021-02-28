@@ -1,12 +1,13 @@
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/page_app_bar.dart';
-import 'package:artbooking/screens/signin.dart';
+import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/types/enums.dart';
+import 'package:artbooking/state/user.dart';
 import 'package:artbooking/utils/app_storage.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/snack.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
@@ -62,7 +63,6 @@ class _UpdatePasswordState extends State<UpdatePassword> {
       bottomPadding: EdgeInsets.only(
         bottom: 10.0,
       ),
-      showNavBackIcon: true,
     );
   }
 
@@ -228,22 +228,22 @@ class _UpdatePasswordState extends State<UpdatePassword> {
         Column(
           children: <Widget>[
             FadeInY(
-              delay: 0.0.seconds,
+              delay: 0.milliseconds,
               beginY: beginY,
               child: helpCard(),
             ),
             FadeInY(
-              delay: 0.1.seconds,
+              delay: 100.milliseconds,
               beginY: beginY,
               child: currentPasswordInput(),
             ),
             FadeInY(
-              delay: 0.2.seconds,
+              delay: 200.milliseconds,
               beginY: beginY,
               child: newPasswordInput(),
             ),
             FadeInY(
-              delay: 0.3.seconds,
+              delay: 300.milliseconds,
               beginY: beginY,
               child: validationButton(),
             ),
@@ -357,24 +357,14 @@ class _UpdatePasswordState extends State<UpdatePassword> {
       return;
     }
 
-    setState(() {
-      isUpdating = true;
-    });
+    setState(() => isUpdating = true);
 
     try {
-      final userAuth = FirebaseAuth.instance.currentUser;
+      final userAuth = stateUser.userAuth;
 
       if (userAuth == null) {
-        setState(() {
-          isUpdating = false;
-        });
-
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => Signin(),
-          ),
-        );
-
+        setState(() => isUpdating = false);
+        context.router.navigate(SigninRoute());
         return;
       }
 
@@ -396,35 +386,30 @@ class _UpdatePasswordState extends State<UpdatePassword> {
     } catch (error) {
       debugPrint(error.toString());
 
-      setState(() {
-        isUpdating = false;
-      });
+      setState(() => isUpdating = false);
 
-      showSnack(
+      Snack.e(
         context: context,
-        message:
-            "Error while updating your password. Please try again or contact us.",
-        type: SnackType.error,
+        message: "Error while updating your password. "
+            "Please try again or contact us.",
       );
     }
   }
 
   bool inputValuesOk() {
     if (password.isEmpty) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "Password cannot be empty.",
-        type: SnackType.error,
       );
 
       return false;
     }
 
     if (newPassword.isEmpty) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "New password cannot be empty.",
-        type: SnackType.error,
       );
 
       return false;

@@ -1,8 +1,8 @@
 import 'package:artbooking/components/sidebar_header.dart';
-import 'package:artbooking/screens/books.dart';
-import 'package:artbooking/screens/illustrations.dart';
+import 'package:artbooking/screens/my_books.dart';
+import 'package:artbooking/screens/my_illustrations.dart';
 import 'package:artbooking/screens/settings.dart';
-import 'package:artbooking/screens/stats_overview.dart';
+import 'package:artbooking/screens/my_activity.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -23,9 +23,9 @@ class _DashboardState extends State<Dashboard> {
   int _sectionIndex = 0;
 
   List<Widget> _sectionsChildren = [
-    StatsOverview(),
-    Illustrations(),
-    Books(),
+    MyActivity(),
+    MyIllustrations(),
+    MyBooks(),
     Settings(),
   ];
 

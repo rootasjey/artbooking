@@ -1,12 +1,11 @@
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/book_item.dart';
+import 'package:artbooking/components/default_app_bar.dart';
 import 'package:artbooking/components/full_page_loading.dart';
-import 'package:artbooking/components/sliver_appbar_header.dart';
 import 'package:artbooking/components/upload_manager.dart';
 import 'package:artbooking/screens/signin.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/book.dart';
-import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,13 +13,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:supercharged/supercharged.dart';
+import 'package:unicons/unicons.dart';
 
-class Books extends StatefulWidget {
+class MyBooks extends StatefulWidget {
   @override
-  _BooksState createState() => _BooksState();
+  _MyBooksState createState() => _MyBooksState();
 }
 
-class _BooksState extends State<Books> {
+class _MyBooksState extends State<MyBooks> {
   bool isLoading;
   bool descending = true;
   bool hasNext = true;
@@ -89,7 +89,7 @@ class _BooksState extends State<Books> {
         child: CustomScrollView(
           controller: scrollController,
           slivers: <Widget>[
-            SliverAppHeader(),
+            DefaultAppBar(),
             header(),
             body(),
             SliverPadding(
@@ -148,26 +148,40 @@ class _BooksState extends State<Books> {
     }
 
     return Wrap(
+      spacing: 12.0,
+      runSpacing: 12.0,
       children: [
-        TextButton.icon(
+        OutlinedButton.icon(
           onPressed: () {
             setState(() {
               forceMultiSelect = !forceMultiSelect;
             });
           },
-          icon: Icon(Icons.select_all),
-          label: Text(
-            'Multi-select',
+          icon: Padding(
+            padding: const EdgeInsets.only(bottom: 6.0),
+            child: Icon(UniconsLine.layers_alt),
+          ),
+          label: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Text(
+              'Multi-select',
+            ),
           ),
           style: forceMultiSelect
               ? TextButton.styleFrom(primary: Colors.lightGreen)
               : TextButton.styleFrom(),
         ),
-        TextButton.icon(
+        OutlinedButton.icon(
           onPressed: () {},
-          icon: Icon(Icons.sort),
-          label: Text(
-            'Sort',
+          icon: Padding(
+            padding: const EdgeInsets.only(bottom: 6.0),
+            child: Icon(UniconsLine.sort),
+          ),
+          label: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Text(
+              'Sort',
+            ),
           ),
         ),
       ],
@@ -182,46 +196,51 @@ class _BooksState extends State<Books> {
       ),
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
-          Padding(
-            padding: const EdgeInsets.only(
-              bottom: 12.0,
-            ),
-            child: Text(
-              "It's lonely there",
-              style: TextStyle(
-                fontSize: 40.0,
-                color: stateColors.primary,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              bottom: 12.0,
-            ),
-            child: Opacity(
-              opacity: 0.6,
-              child: Text(
-                "You haven't created any book yet",
-                style: TextStyle(
-                  fontSize: 20.0,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 12.0,
+                ),
+                child: Text(
+                  "It's lonely there",
+                  style: TextStyle(
+                    fontSize: 32.0,
+                    color: stateColors.primary,
+                  ),
                 ),
               ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.topLeft,
-            child: OutlinedButton.icon(
-              onPressed: () {
-                appUploadManager.pickImage(context);
-              },
-              icon: Icon(Icons.library_add),
-              label: Text(
-                "create",
-                style: TextStyle(
-                  fontSize: 16.0,
+              Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 12.0,
+                ),
+                child: Opacity(
+                  opacity: 0.6,
+                  child: Text(
+                    "You haven't created any book yet.",
+                    style: TextStyle(
+                      fontSize: 16.0,
+                    ),
+                  ),
                 ),
               ),
-            ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  appUploadManager.pickImage(context);
+                },
+                icon: Icon(UniconsLine.book_medical),
+                label: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Text(
+                    "create",
+                    style: TextStyle(
+                      fontSize: 16.0,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ]),
       ),
@@ -455,11 +474,10 @@ class _BooksState extends State<Books> {
     );
 
     if (!response.success) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "Sorry, there was an issue while deleting your illustrations. "
             "Try again or contact us if the issue persists.",
-        type: SnackType.error,
       );
 
       booksList.addAll(copyItems);

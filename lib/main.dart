@@ -1,14 +1,18 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
-import 'package:artbooking/actions/users.dart';
-import 'package:artbooking/components/full_page_loading.dart';
+import 'package:artbooking/router/app_router.gr.dart';
+import 'package:artbooking/router/auth_guard.dart';
+import 'package:artbooking/router/no_auth_guard.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
+import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/app_storage.dart';
+import 'package:artbooking/utils/brightness.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supercharged/supercharged.dart';
 
 void main() async {
   LicenseRegistry.addLicense(() async* {
@@ -19,135 +23,132 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await appStorage.initialize();
-  runApp(App());
+  await Future.wait([_autoLogin(), _initLang()]);
+
+  final brightness = BrightnessUtils.getCurrent();
+
+  final savedThemeMode = brightness == Brightness.dark
+      ? AdaptiveThemeMode.dark
+      : AdaptiveThemeMode.light;
+
+  return runApp(App(
+    savedThemeMode: savedThemeMode,
+    brightness: brightness,
+  ));
 }
 
+/// Main app class.
 class App extends StatefulWidget {
-  @override
+  final AdaptiveThemeMode savedThemeMode;
+  final Brightness brightness;
+
+  const App({
+    Key key,
+    this.savedThemeMode,
+    this.brightness,
+  }) : super(key: key);
+
   AppState createState() => AppState();
 }
 
+/// Main app class state.
 class AppState extends State<App> {
-  bool isReady = false;
-
-  @override
-  void initState() {
-    super.initState();
-    initAsync();
-  }
-
-  void initAsync() async {
-    final savedLang = appStorage.getLang();
-    stateUser.setLang(savedLang);
-
-    await autoLogin();
-
-    setState(() => isReady = true);
-  }
-
   @override
   Widget build(BuildContext context) {
-    final brightness = getBrightness();
-    stateColors.refreshTheme(brightness);
+    stateColors.refreshTheme(widget.brightness);
+    stateUser.setFirstLaunch(appStorage.isFirstLanch());
 
-    if (isReady) {
-      return AdaptiveTheme(
-        light: ThemeData(
-          brightness: Brightness.light,
-          fontFamily: GoogleFonts.ibmPlexSans().fontFamily,
-        ),
-        dark: ThemeData(
-          brightness: Brightness.dark,
-          fontFamily: GoogleFonts.raleway().fontFamily,
-        ),
-        initial: brightness == Brightness.light
-            ? AdaptiveThemeMode.light
-            : AdaptiveThemeMode.dark,
-        builder: (theme, darkTheme) {
-          stateColors.themeData = theme;
-
-          return MaterialApp(
-            title: 'ArtBooking',
-            theme: stateColors.themeData,
-            debugShowCheckedModeBanner: true,
-            home: Scaffold(
-              body: Center(
-                child: SizedBox(
-                  width: 200.0,
-                  height: 200.0,
-                  child: FullPageLoading(),
-                ),
-              ),
-            ),
-          );
-        },
-      );
-    }
-
-    // On the web, if an user accesses an auth route (w/o going first to home),
-    // they will be redirected to the Sign in screen before the app auth them.
-    // This waiting screen solves this issue.
     return AdaptiveTheme(
       light: ThemeData(
         brightness: Brightness.light,
-        fontFamily: GoogleFonts.ibmPlexSans().fontFamily,
+        fontFamily: GoogleFonts.raleway().fontFamily,
       ),
       dark: ThemeData(
         brightness: Brightness.dark,
         fontFamily: GoogleFonts.raleway().fontFamily,
       ),
-      initial: brightness == Brightness.light
+      initial: widget.brightness == Brightness.light
           ? AdaptiveThemeMode.light
           : AdaptiveThemeMode.dark,
       builder: (theme, darkTheme) {
         stateColors.themeData = theme;
-        return MaterialApp(
-          title: 'ArtBooking',
-          theme: stateColors.themeData,
-          debugShowCheckedModeBanner: true,
-          home: Scaffold(
-            body: Center(
-              child: SizedBox(
-                width: 200.0,
-                height: 200.0,
-                child: FullPageLoading(),
-              ),
-            ),
-          ),
+
+        return AppWithTheme(
+          brightness: widget.brightness,
+          theme: theme,
+          darkTheme: darkTheme,
         );
       },
     );
   }
+}
 
-  Future autoLogin() async {
-    try {
-      final userCred = await userSignin();
+/// Because we need a [context] with adaptive theme data available in it.
+class AppWithTheme extends StatefulWidget {
+  final ThemeData theme;
+  final ThemeData darkTheme;
+  final Brightness brightness;
 
-      if (userCred == null) {
-        userSignOut(context: context, autoNavigateAfter: false);
-        // PushNotifications.unlinkAuthUser();
+  const AppWithTheme({
+    Key key,
+    @required this.brightness,
+    @required this.darkTheme,
+    @required this.theme,
+  }) : super(key: key);
+
+  @override
+  _AppWithThemeState createState() => _AppWithThemeState();
+}
+
+class _AppWithThemeState extends State<AppWithTheme> {
+  final appRouter = AppRouter(
+    // adminAuthGuard: AdminAuthGuard(),
+    authGuard: AuthGuard(),
+    noAuthGuard: NoAuthGuard(),
+  );
+
+  @override
+  initState() {
+    super.initState();
+    Future.delayed(250.milliseconds, () {
+      if (widget.brightness == Brightness.dark) {
+        AdaptiveTheme.of(context).setDark();
+        return;
       }
-    } catch (error) {
-      debugPrint(error.toString());
-      userSignOut(context: context, autoNavigateAfter: false);
-      // PushNotifications.unlinkAuthUser();
-    }
+
+      AdaptiveTheme.of(context).setLight();
+    });
   }
 
-  Brightness getBrightness() {
-    final autoBrightness = appStorage.getAutoBrightness();
-
-    if (!autoBrightness) {
-      return appStorage.getBrightness();
-    }
-
-    Brightness brightness = Brightness.light;
-    final now = DateTime.now();
-
-    if (now.hour < 6 || now.hour > 17) {
-      brightness = Brightness.dark;
-    }
-
-    return brightness;
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      title: 'ArtBooking',
+      theme: widget.theme,
+      darkTheme: widget.darkTheme,
+      debugShowCheckedModeBanner: false,
+      routerDelegate: appRouter.delegate(),
+      routeInformationParser: appRouter.defaultRouteParser(),
+    );
   }
+}
+
+// Initialization functions.
+// ------------------------
+Future _autoLogin() async {
+  try {
+    final userCred = await stateUser.signin();
+
+    if (userCred == null) {
+      stateUser.signOut();
+    }
+  } catch (error) {
+    appLogger.e(error);
+    stateUser.signOut();
+  }
+}
+
+Future _initLang() async {
+  final savedLang = appStorage.getLang();
+  stateUser.setLang(savedLang);
 }

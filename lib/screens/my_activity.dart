@@ -1,5 +1,5 @@
+import 'package:artbooking/components/default_app_bar.dart';
 import 'package:artbooking/components/full_page_loading.dart';
-import 'package:artbooking/components/sliver_appbar_header.dart';
 import 'package:artbooking/screens/dashboard.dart';
 import 'package:artbooking/screens/signin.dart';
 import 'package:artbooking/state/colors.dart';
@@ -8,12 +8,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 
-class StatsOverview extends StatefulWidget {
+class MyActivity extends StatefulWidget {
   @override
-  _StatsOverviewState createState() => _StatsOverviewState();
+  _MyActivityState createState() => _MyActivityState();
 }
 
-class _StatsOverviewState extends State<StatsOverview> {
+class _MyActivityState extends State<MyActivity> {
   final _scrollController = ScrollController();
 
   bool isLoading = false;
@@ -30,7 +30,7 @@ class _StatsOverviewState extends State<StatsOverview> {
       body: CustomScrollView(
         controller: _scrollController,
         slivers: <Widget>[
-          SliverAppHeader(),
+          DefaultAppBar(),
           SliverList(
             delegate: SliverChildListDelegate([
               mainContentTitle(),
@@ -69,16 +69,6 @@ class _StatsOverviewState extends State<StatsOverview> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Opacity(
-            opacity: 0.6,
-            child: Text(
-              'Dashboard',
-              style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.w200,
-              ),
-            ),
-          ),
           Text(
             'Activity',
             style: TextStyle(

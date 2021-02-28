@@ -4,16 +4,16 @@ import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/page_app_bar.dart';
+import 'package:artbooking/components/sliver_edge_padding.dart';
+import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/screens/signin.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
-import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/snack.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:supercharged/supercharged.dart';
 
 class UpdateUsername extends StatefulWidget {
@@ -31,6 +31,7 @@ class _UpdateUsernameState extends State<UpdateUsername> {
   final beginY = 10.0;
   final passwordNode = FocusNode();
   final usernameController = TextEditingController();
+  final _pageScrollController = ScrollController();
 
   String currentUsername = '';
   String nameErrorMessage = '';
@@ -55,12 +56,10 @@ class _UpdateUsernameState extends State<UpdateUsername> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
-        controller: ModalScrollController.of(context),
+        controller: _pageScrollController,
         slivers: <Widget>[
-          SliverPadding(
-            padding: const EdgeInsets.only(top: 10.0),
-            sliver: appBar(),
-          ),
+          SliverEdgePadding(),
+          appBar(),
           body(),
         ],
       ),
@@ -82,7 +81,6 @@ class _UpdateUsernameState extends State<UpdateUsername> {
         left: titleLeftPadding,
       ),
       expandedHeight: 90.0,
-      showCloseButton: true,
     );
   }
 
@@ -103,10 +101,20 @@ class _UpdateUsernameState extends State<UpdateUsername> {
       delegate: SliverChildListDelegate([
         Column(
           children: [
-            FadeInY(beginY: 10.0, child: currentUsernameCard()),
-            FadeInY(beginY: 10.0, delay: 0.4.seconds, child: usernameInput()),
             FadeInY(
-                beginY: 10.0, delay: 0.8.seconds, child: validationButton()),
+              beginY: 10.0,
+              child: currentUsernameCard(),
+            ),
+            FadeInY(
+              beginY: 10.0,
+              delay: 100.milliseconds,
+              child: usernameInput(),
+            ),
+            FadeInY(
+              beginY: 10.0,
+              delay: 200.milliseconds,
+              child: validationButton(),
+            ),
           ],
         ),
       ]),
@@ -178,7 +186,7 @@ class _UpdateUsernameState extends State<UpdateUsername> {
                     Opacity(
                       opacity: 0.6,
                       child: Text(
-                        'Current email',
+                        'Current username',
                       ),
                     ),
                   ],
@@ -301,7 +309,8 @@ class _UpdateUsernameState extends State<UpdateUsername> {
                 isCheckingName = true;
               });
 
-              final isWellFormatted = checkUsernameFormat(newUserName);
+              final isWellFormatted =
+                  UsersActions.checkUsernameFormat(newUserName);
 
               if (!isWellFormatted) {
                 setState(() {
@@ -320,7 +329,8 @@ class _UpdateUsernameState extends State<UpdateUsername> {
               }
 
               nameTimer = Timer(1.seconds, () async {
-                isNameAvailable = await checkNameAvailability(newUserName);
+                isNameAvailable =
+                    await UsersActions.checkUsernameAvailability(newUserName);
 
                 if (!isNameAvailable) {
                   setState(() {
@@ -394,7 +404,7 @@ class _UpdateUsernameState extends State<UpdateUsername> {
     });
 
     try {
-      final userAuth = FirebaseAuth.instance.currentUser;
+      final userAuth = stateUser.userAuth;
 
       setState(() {
         isCheckingAuth = false;
@@ -424,7 +434,7 @@ class _UpdateUsernameState extends State<UpdateUsername> {
   }
 
   bool inputValuesOk() {
-    final isWellFormatted = checkUsernameFormat(newUserName);
+    final isWellFormatted = UsersActions.checkUsernameFormat(newUserName);
 
     if (!isWellFormatted) {
       setState(() {
@@ -450,7 +460,8 @@ class _UpdateUsernameState extends State<UpdateUsername> {
     });
 
     try {
-      isNameAvailable = await checkNameAvailability(newUserName);
+      isNameAvailable =
+          await UsersActions.checkUsernameAvailability(newUserName);
 
       if (!isNameAvailable) {
         setState(() {
@@ -458,28 +469,27 @@ class _UpdateUsernameState extends State<UpdateUsername> {
           isUpdating = false;
         });
 
-        showSnack(
+        Snack.e(
           context: context,
           message: "The name $newUserName is not available",
-          type: SnackType.error,
         );
 
         return;
       }
 
-      final userAuth = FirebaseAuth.instance.currentUser;
+      final userAuth = stateUser.userAuth;
 
       if (userAuth == null) {
-        isCompleted = false;
-        isUpdating = false;
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => Signin()),
-        );
+        setState(() {
+          isCompleted = false;
+          isUpdating = false;
+        });
 
+        context.router.navigate(SigninRoute());
         return;
       }
 
-      final usernameUpdateResp = await updateUsername(newUserName);
+      final usernameUpdateResp = await stateUser.updateUsername(newUserName);
 
       if (!usernameUpdateResp.success) {
         final exception = usernameUpdateResp.error;
@@ -489,10 +499,9 @@ class _UpdateUsernameState extends State<UpdateUsername> {
           isUpdating = false;
         });
 
-        showSnack(
+        Snack.e(
           context: context,
           message: "[code: ${exception.code}] - ${exception.message}",
-          type: SnackType.error,
         );
 
         return;
@@ -505,12 +514,11 @@ class _UpdateUsernameState extends State<UpdateUsername> {
         newUserName = '';
       });
 
-      stateUser.setUserName(currentUsername);
+      stateUser.setUsername(currentUsername);
 
-      showSnack(
+      Snack.s(
         context: context,
         message: 'Your username has been successfully updated.',
-        type: SnackType.success,
       );
 
       // Navigator.of(context).pop();
@@ -522,11 +530,10 @@ class _UpdateUsernameState extends State<UpdateUsername> {
         isUpdating = false;
       });
 
-      showSnack(
+      Snack.e(
         context: context,
         message: 'Sorry, there was an error. '
             'Can you try again later or contact us if the issue persists?',
-        type: SnackType.error,
       );
     }
   }

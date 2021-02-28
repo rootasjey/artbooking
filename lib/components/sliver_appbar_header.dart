@@ -1,4 +1,3 @@
-import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/app_icon.dart';
 import 'package:artbooking/components/upload_manager.dart';
 import 'package:artbooking/screens/dashboard.dart';
@@ -145,7 +144,10 @@ class _SliverAppHeaderState extends State<SliverAppHeader> {
                           )));
                   break;
                 case UserMenuSelect.signout:
-                  userSignOut(autoNavigateAfter: true, context: context);
+                  stateUser.signOut(
+                    context: context,
+                    redirectOnComplete: true,
+                  );
                   break;
                 default:
               }

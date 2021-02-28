@@ -7,6 +7,51 @@ enum AniProps {
   width,
 }
 
+enum AppBarDevelopers {
+  apiReference,
+  apiStatus,
+  documentation,
+  github,
+  portal,
+}
+
+enum AppBarDiscover {
+  authors,
+  references,
+  random,
+}
+
+enum AppBarGroupedSectionItems {
+  github,
+  authors,
+  references,
+  random,
+  about,
+  contact,
+  tos,
+}
+
+enum AppBarResources {
+  about,
+  androidApp,
+  contact,
+  iosApp,
+  tos,
+}
+
+enum AppBarQuotesBy {
+  authors,
+  references,
+  topics,
+}
+
+enum AppBarSettings {
+  allSettings,
+  selectLang,
+  en,
+  fr,
+}
+
 enum BookLayout {
   /// Display illustrations on a grid with a size adapted to the aspect ratio
   /// of each illustration's dimensions.

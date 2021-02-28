@@ -1,22 +1,23 @@
 import 'dart:async';
 
-import 'package:artbooking/types/enums.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:artbooking/components/desktop_app_bar.dart';
+import 'package:artbooking/router/app_router.gr.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:artbooking/actions/users.dart';
-import 'package:artbooking/components/app_icon.dart';
 import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/loading_animation.dart';
-import 'package:artbooking/screens/home/home_desktop.dart';
-import 'package:artbooking/screens/signin.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
-import 'package:artbooking/utils/app_storage.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:supercharged/supercharged.dart';
 
 class Signup extends StatefulWidget {
+  final void Function(bool isAuthenticated) onSignupResult;
+
+  const Signup({Key key, this.onSignupResult}) : super(key: key);
+
   @override
   _SignupState createState() => _SignupState();
 }
@@ -48,12 +49,6 @@ class _SignupState extends State<Signup> {
   final confirmPasswordNode = FocusNode();
 
   @override
-  initState() {
-    super.initState();
-    ensureNotConnected();
-  }
-
-  @override
   void dispose() {
     super.dispose();
     usernameNode.dispose();
@@ -64,23 +59,28 @@ class _SignupState extends State<Signup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        children: [
-          Column(
-            children: <Widget>[
-              AppIcon(
-                padding: const EdgeInsets.only(top: 30.0, bottom: 60.0),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  bottom: 300.0,
+      body: CustomScrollView(
+        slivers: [
+          DesktopAppBar(
+            automaticallyImplyLeading: true,
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.only(
+              top: 100.0,
+              bottom: 300.0,
+            ),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate.fixed([
+                Column(
+                  children: <Widget>[
+                    SizedBox(
+                      width: 300.0,
+                      child: body(),
+                    ),
+                  ],
                 ),
-                child: SizedBox(
-                  width: 300.0,
-                  child: body(),
-                ),
-              ),
-            ],
+              ]),
+            ),
           ),
         ],
       ),
@@ -102,7 +102,7 @@ class _SignupState extends State<Signup> {
 
   Widget emailInput() {
     return FadeInY(
-      delay: 0.5.seconds,
+      delay: 0.milliseconds,
       beginY: 50.0,
       child: Padding(
         padding: EdgeInsets.only(top: 60.0),
@@ -121,7 +121,7 @@ class _SignupState extends State<Signup> {
               isCheckingEmail = true;
             });
 
-            final isWellFormatted = checkEmailFormat(email);
+            final isWellFormatted = UsersActions.checkEmailFormat(email);
 
             if (!isWellFormatted) {
               setState(() {
@@ -138,7 +138,8 @@ class _SignupState extends State<Signup> {
             }
 
             emailTimer = Timer(1.seconds, () async {
-              final isAvailable = await checkEmailAvailability(email);
+              final isAvailable =
+                  await UsersActions.checkEmailAvailability(email);
               if (!isAvailable) {
                 setState(() {
                   isCheckingEmail = false;
@@ -182,47 +183,50 @@ class _SignupState extends State<Signup> {
 
   Widget header() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        FadeInX(
-          beginX: 10.0,
-          delay: 200.milliseconds,
-          child: Padding(
-            padding: const EdgeInsets.only(
-              right: 20.0,
-            ),
-            child: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: Icon(Icons.arrow_back),
+        if (context.router.stack.length > 1)
+          FadeInX(
+            beginX: 10.0,
+            delay: 100.milliseconds,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                right: 20.0,
+              ),
+              child: IconButton(
+                onPressed: () => context.router.pop(),
+                icon: Icon(Icons.arrow_back),
+              ),
             ),
           ),
-        ),
-        Column(
-          children: <Widget>[
-            FadeInY(
-              beginY: 50.0,
-              child: Padding(
-                padding: EdgeInsets.only(bottom: 10.0),
-                child: Text(
-                  'Sign Up',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 25.0,
-                    fontWeight: FontWeight.bold,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              FadeInY(
+                beginY: 50.0,
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 10.0),
+                  child: Text(
+                    'Sign Up',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 25.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-            ),
-            FadeInY(
-              delay: 0.3.seconds,
-              beginY: 50.0,
-              child: Opacity(
-                opacity: .6,
-                child: Text('Create a new account'),
+              FadeInY(
+                delay: 200.milliseconds,
+                beginY: 50.0,
+                child: Opacity(
+                  opacity: 0.6,
+                  child: Text('Create a new account'),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
@@ -230,7 +234,6 @@ class _SignupState extends State<Signup> {
 
   Widget idleContainer() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         header(),
         emailInput(),
@@ -258,7 +261,7 @@ class _SignupState extends State<Signup> {
 
   Widget nameInput() {
     return FadeInY(
-      delay: 1.0.seconds,
+      delay: 100.milliseconds,
       beginY: 50.0,
       child: Padding(
         padding: EdgeInsets.only(top: 30.0),
@@ -280,7 +283,8 @@ class _SignupState extends State<Signup> {
                   isCheckingName = true;
                 });
 
-                final isWellFormatted = checkUsernameFormat(username);
+                final isWellFormatted =
+                    UsersActions.checkUsernameFormat(username);
 
                 if (!isWellFormatted) {
                   setState(() {
@@ -299,7 +303,8 @@ class _SignupState extends State<Signup> {
                 }
 
                 nameTimer = Timer(1.seconds, () async {
-                  final isAvailable = await checkNameAvailability(username);
+                  final isAvailable =
+                      await UsersActions.checkUsernameAvailability(username);
 
                   if (!isAvailable) {
                     setState(() {
@@ -355,7 +360,7 @@ class _SignupState extends State<Signup> {
 
   Widget passwordInput() {
     return FadeInY(
-      delay: 1.5.seconds,
+      delay: 200.milliseconds,
       beginY: 50.0,
       child: Padding(
         padding: EdgeInsets.only(top: 30.0),
@@ -393,7 +398,7 @@ class _SignupState extends State<Signup> {
 
   Widget confirmPasswordInput() {
     return FadeInY(
-      delay: 2.0.seconds,
+      delay: 400.milliseconds,
       beginY: 50.0,
       child: Padding(
         padding: EdgeInsets.only(top: 30.0),
@@ -434,14 +439,14 @@ class _SignupState extends State<Signup> {
 
   Widget validationButton() {
     return FadeInY(
-      delay: 2.5.seconds,
+      delay: 500.milliseconds,
       beginY: 50.0,
       child: Center(
         child: Padding(
           padding: const EdgeInsets.only(top: 60.0),
           child: RaisedButton(
             onPressed: () => signUpProcess(),
-            color: stateColors.primary,
+            color: stateColors.accent,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(
                 Radius.circular(7.0),
@@ -479,48 +484,24 @@ class _SignupState extends State<Signup> {
 
   Widget alreadyHaveAccountButton() {
     return FadeInY(
-      delay: 3.0.seconds,
+      delay: 700.milliseconds,
       beginY: 50.0,
-      child: Center(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 8.0),
         child: FlatButton(
-            onPressed: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (_) => Signin()));
-            },
-            child: Opacity(
-              opacity: .6,
-              child: Text(
-                "I already have an account",
-                style: TextStyle(
-                  decoration: TextDecoration.underline,
-                ),
+          onPressed: () => context.router.navigate(SigninRoute()),
+          child: Opacity(
+            opacity: 0.6,
+            child: Text(
+              "I already have an account",
+              style: TextStyle(
+                decoration: TextDecoration.underline,
               ),
-            )),
+            ),
+          ),
+        ),
       ),
     );
-  }
-
-  void ensureNotConnected() async {
-    setState(() {
-      isCheckingAuth = true;
-    });
-
-    try {
-      final userAuth = FirebaseAuth.instance.currentUser;
-
-      setState(() {
-        isCheckingAuth = false;
-      });
-
-      if (userAuth != null) {
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (_) => HomeDesktop()));
-      }
-    } catch (error) {
-      setState(() {
-        isCheckingAuth = false;
-      });
-    }
   }
 
   void signUpProcess() async {
@@ -528,19 +509,16 @@ class _SignupState extends State<Signup> {
       return;
     }
 
-    setState(() {
-      isSigningUp = true;
-    });
+    setState(() => isSigningUp = true);
 
     if (!await valuesAvailabilityCheck()) {
       setState(() {
         isSigningUp = false;
       });
 
-      showSnack(
+      Snack.e(
         context: context,
         message: 'The email or name entered is not available.',
-        type: SnackType.error,
       );
 
       return;
@@ -551,7 +529,7 @@ class _SignupState extends State<Signup> {
     password = password.trim();
 
     try {
-      final respCreateAcc = await createAccount(
+      final respCreateAcc = await UsersActions.createAccount(
         email: email,
         username: username,
         password: password,
@@ -560,111 +538,105 @@ class _SignupState extends State<Signup> {
       if (!respCreateAcc.success) {
         final exception = respCreateAcc.error;
 
-        setState(() {
-          isSigningUp = false;
-        });
+        setState(() => isSigningUp = false);
 
-        showSnack(
+        Snack.e(
           context: context,
           message: "[code: ${exception.code}] - ${exception.message}",
-          type: SnackType.error,
         );
 
         return;
       }
 
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final userCred = await stateUser.signin(
         email: email,
         password: password,
       );
-
-      isSigningUp = false;
-      isCompleted = true;
-
-      appStorage.setCredentials(
-        email: email,
-        password: password,
-      );
-
-      stateUser.setUserConnected();
-      // PushNotifications.linkAuthUser(respCreateAcc.user.id);
-
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => HomeDesktop(),
-        ),
-      );
-    } catch (error) {
-      debugPrint(error.toString());
 
       setState(() {
         isSigningUp = false;
+        isCompleted = true;
       });
 
-      showSnack(
+      if (userCred == null) {
+        Snack.e(
+          context: context,
+          message: "There was an issue while connecting to your new account.",
+        );
+
+        return;
+      }
+
+      // PushNotifications.linkAuthUser(respCreateAcc.user.id);
+
+      if (widget.onSignupResult != null) {
+        widget.onSignupResult(true);
+        return;
+      }
+
+      context.router.navigate(HomeRoute());
+    } catch (error) {
+      debugPrint(error.toString());
+
+      setState(() => isSigningUp = false);
+
+      Snack.e(
         context: context,
-        message: "An occurred while creating your account. " +
+        message: "An occurred while creating your account. "
             "Please try again or contact us if the problem persists.",
-        type: SnackType.error,
       );
     }
   }
 
   Future<bool> valuesAvailabilityCheck() async {
-    final isEmailOk = await checkEmailAvailability(email);
-    final isNameOk = await checkNameAvailability(username);
-
+    final isEmailOk = await UsersActions.checkEmailAvailability(email);
+    final isNameOk = await UsersActions.checkUsernameAvailability(username);
     return isEmailOk && isNameOk;
   }
 
   bool inputValuesOk() {
     if (password.isEmpty || confirmPassword.isEmpty) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "Password cannot be empty",
-        type: SnackType.error,
       );
 
       return false;
     }
 
     if (confirmPassword != password) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "Password & confirm passwords don't match",
-        type: SnackType.error,
       );
 
       return false;
     }
 
     if (username.isEmpty) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "Name cannot be empty",
-        type: SnackType.error,
       );
 
       return false;
     }
 
-    if (!checkEmailFormat(email)) {
-      showSnack(
+    if (!UsersActions.checkEmailFormat(email)) {
+      Snack.e(
         context: context,
         message: "The value specified is not a valid email",
-        type: SnackType.error,
       );
 
       return false;
     }
 
-    if (!checkUsernameFormat(username)) {
-      showSnack(
+    if (!UsersActions.checkUsernameFormat(username)) {
+      Snack.e(
         context: context,
         message: username.length < 3
             ? 'Please use at least 3 characters'
             : 'Please use alpha-numerical (A-Z, 0-9) characters and underscore (_)',
-        type: SnackType.error,
       );
 
       return false;

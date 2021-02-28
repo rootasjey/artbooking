@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:artbooking/components/sliver_appbar_header.dart';
+import 'package:artbooking/components/desktop_app_bar.dart';
 import 'package:artbooking/screens/dashboard.dart';
 import 'package:artbooking/screens/signin.dart';
 import 'package:artbooking/state/colors.dart';
@@ -20,9 +20,7 @@ class _HomeDesktopState extends State<HomeDesktop>
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppHeader(
-            showBackButton: false,
-          ),
+          DesktopAppBar(),
           body(),
         ],
       ),

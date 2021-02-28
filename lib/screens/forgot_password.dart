@@ -1,7 +1,12 @@
+import 'package:artbooking/actions/users.dart';
+import 'package:artbooking/components/desktop_app_bar.dart';
+import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/loading_animation.dart';
-import 'package:artbooking/types/enums.dart';
+import 'package:artbooking/router/app_router.gr.dart';
+import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/utils/snack.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
@@ -22,20 +27,26 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        children: <Widget>[
-          Column(
-            children: <Widget>[
-              // NavBackHeader(),
-
-              Padding(
-                padding: const EdgeInsets.only(bottom: 300.0),
-                child: SizedBox(
-                  width: 320,
-                  child: body(),
-                ),
+      body: CustomScrollView(
+        slivers: <Widget>[
+          DesktopAppBar(
+            title: "Recover account",
+            automaticallyImplyLeading: true,
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate.fixed([
+              Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(top: 60.0, bottom: 300.0),
+                    child: SizedBox(
+                      width: 320,
+                      child: body(),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ]),
           ),
         ],
       ),
@@ -100,7 +111,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           ),
           child: FlatButton(
             onPressed: () {
-              // Go to root/home
+              context.router.navigate(HomeRoute());
             },
             child: Opacity(
               opacity: .6,
@@ -117,7 +128,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   Widget idleContainer() {
     return Column(
       children: <Widget>[
-        formHeader(),
+        header(),
         emailInput(),
         validationButton(),
       ],
@@ -126,7 +137,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   Widget emailInput() {
     return FadeInY(
-      delay: 1.5.seconds,
+      delay: 100.milliseconds,
       beginY: 50.0,
       child: Padding(
         padding: EdgeInsets.only(
@@ -146,6 +157,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               onChanged: (value) {
                 email = value;
               },
+              onFieldSubmitted: (value) => sendResetLink(),
               validator: (value) {
                 if (value.isEmpty) {
                   return 'Email login cannot be empty';
@@ -160,35 +172,54 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     );
   }
 
-  Widget formHeader() {
-    return Column(
-      children: <Widget>[
-        FadeInY(
-          beginY: 50.0,
-          child: Padding(
-            padding: EdgeInsets.only(top: 10.0),
-            child: Text(
-              'Forgot Password',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 25.0,
-                fontWeight: FontWeight.bold,
+  Widget header() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (context.router.stack.length > 1)
+          FadeInX(
+            beginX: 10.0,
+            delay: 100.milliseconds,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                right: 20.0,
+              ),
+              child: IconButton(
+                onPressed: () => context.router.pop(),
+                icon: Icon(Icons.arrow_back),
               ),
             ),
           ),
-        ),
-        FadeInY(
-          beginY: 50.0,
-          child: Opacity(
-            opacity: .6,
-            child: Container(
-              width: 300.0,
-              padding: EdgeInsets.only(top: 10.0),
-              child: Text(
-                'We will send a reset link to your mail box',
-                textAlign: TextAlign.center,
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              FadeInY(
+                beginY: 50.0,
+                child: Padding(
+                  padding: EdgeInsets.only(top: 10.0),
+                  child: Text(
+                    'Forgot Password',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 25.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ),
-            ),
+              FadeInY(
+                beginY: 50.0,
+                child: Opacity(
+                  opacity: 0.6,
+                  child: Text(
+                    'We will send a reset link to your mail box',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 3,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -197,14 +228,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   Widget validationButton() {
     return FadeInY(
-      delay: 2.0.seconds,
+      delay: 200.milliseconds,
       beginY: 50.0,
       child: Padding(
         padding: const EdgeInsets.only(top: 80.0),
         child: RaisedButton(
-          onPressed: () {
-            sendResetLink();
-          },
+          onPressed: sendResetLink,
+          color: stateColors.accent,
+          textColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(5.0)),
           ),
@@ -226,7 +257,32 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     );
   }
 
+  bool inputValuesOk() {
+    if (email.isEmpty) {
+      Snack.e(
+        context: context,
+        message: "Email field can't be empty. Please enter your email.",
+      );
+
+      return false;
+    }
+
+    if (!UsersActions.checkEmailFormat(email)) {
+      Snack.e(
+        context: context,
+        message: "The value specified is not a valid email",
+      );
+
+      return false;
+    }
+
+    return true;
+  }
+
   void sendResetLink() async {
+    if (!inputValuesOk()) {
+      return;
+    }
     try {
       setState(() {
         isLoading = true;
@@ -246,10 +302,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         isLoading = false;
       });
 
-      showSnack(
-          context: context,
-          type: SnackType.error,
-          message: "Sorry, this email doesn't exist.");
+      Snack.e(
+        context: context,
+        message: "Sorry, this email doesn't exist.",
+      );
     }
   }
 }

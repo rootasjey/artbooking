@@ -4,11 +4,13 @@ import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/page_app_bar.dart';
-import 'package:artbooking/screens/signin.dart';
+import 'package:artbooking/components/sliver_edge_padding.dart';
+import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/types/enums.dart';
+import 'package:artbooking/state/user.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/snack.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
@@ -38,12 +40,6 @@ class _UpdateEmailState extends State<UpdateEmail> {
   Timer emailTimer;
 
   @override
-  void initState() {
-    super.initState();
-    checkAuth();
-  }
-
-  @override
   void dispose() {
     passwordNode.dispose();
     emailController.dispose();
@@ -56,6 +52,7 @@ class _UpdateEmailState extends State<UpdateEmail> {
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
+          SliverEdgePadding(),
           appBar(),
           body(),
         ],
@@ -78,7 +75,6 @@ class _UpdateEmailState extends State<UpdateEmail> {
         left: titleLeftPadding,
       ),
       expandedHeight: 90.0,
-      showNavBackIcon: true,
     );
   }
 
@@ -104,22 +100,22 @@ class _UpdateEmailState extends State<UpdateEmail> {
             child: Column(
               children: <Widget>[
                 FadeInY(
-                  delay: 0.0.seconds,
+                  delay: 0.milliseconds,
                   beginY: beginY,
                   child: currentEmailCard(),
                 ),
                 FadeInY(
-                  delay: 0.1.seconds,
+                  delay: 100.milliseconds,
                   beginY: beginY,
                   child: emailInput(),
                 ),
                 FadeInY(
-                  delay: 0.2.seconds,
+                  delay: 200.milliseconds,
                   beginY: beginY,
                   child: passwordInput(),
                 ),
                 FadeInY(
-                  delay: 0.3.seconds,
+                  delay: 300.milliseconds,
                   beginY: beginY,
                   child: validationButton(),
                 ),
@@ -221,37 +217,38 @@ class _UpdateEmailState extends State<UpdateEmail> {
           ),
           onTap: () {
             showDialog(
-                context: context,
-                builder: (context) {
-                  return SimpleDialog(
-                    title: Text(
-                      'This is your current email',
-                      style: TextStyle(
-                        fontSize: 15.0,
-                      ),
+              context: context,
+              builder: (context) {
+                return SimpleDialog(
+                  title: Text(
+                    'This is your current email',
+                    style: TextStyle(
+                      fontSize: 15.0,
                     ),
-                    children: <Widget>[
-                      Divider(
-                        color: stateColors.secondary,
-                        thickness: 1.0,
+                  ),
+                  children: <Widget>[
+                    Divider(
+                      color: stateColors.secondary,
+                      thickness: 1.0,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 25.0,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 25.0,
-                        ),
-                        child: Opacity(
-                          opacity: 0.6,
-                          child: Text(
-                            currentEmail,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                      child: Opacity(
+                        opacity: 0.6,
+                        child: Text(
+                          currentEmail,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                    ],
-                  );
-                });
+                    ),
+                  ],
+                );
+              },
+            );
           },
         ),
       ),
@@ -282,7 +279,7 @@ class _UpdateEmailState extends State<UpdateEmail> {
                 isCheckingEmail = true;
               });
 
-              final isWellFormatted = checkEmailFormat(email);
+              final isWellFormatted = UsersActions.checkEmailFormat(email);
 
               if (!isWellFormatted) {
                 setState(() {
@@ -299,7 +296,8 @@ class _UpdateEmailState extends State<UpdateEmail> {
               }
 
               emailTimer = Timer(1.seconds, () async {
-                final isAvailable = await checkEmailAvailability(email);
+                final isAvailable =
+                    await UsersActions.checkEmailAvailability(email);
 
                 if (!isAvailable) {
                   setState(() {
@@ -442,30 +440,6 @@ class _UpdateEmailState extends State<UpdateEmail> {
     );
   }
 
-  void checkAuth() async {
-    setState(() {
-      isCheckingAuth = true;
-    });
-
-    try {
-      final userAuth = FirebaseAuth.instance.currentUser;
-
-      setState(() {
-        isCheckingAuth = false;
-      });
-
-      if (userAuth == null) {
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => Signin()));
-      }
-
-      setState(() {
-        currentEmail = userAuth.email;
-      });
-    } catch (error) {
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => Signin()));
-    }
-  }
-
   void updateEmailProcess() async {
     if (!inputValuesOk()) {
       return;
@@ -477,32 +451,21 @@ class _UpdateEmailState extends State<UpdateEmail> {
 
     try {
       if (!await valuesAvailabilityCheck()) {
-        setState(() {
-          isUpdating = false;
-        });
+        setState(() => isUpdating = false);
 
-        showSnack(
+        Snack.e(
           context: context,
           message: 'The email entered is not available.',
-          type: SnackType.error,
         );
 
         return;
       }
 
-      final userAuth = FirebaseAuth.instance.currentUser;
+      final userAuth = stateUser.userAuth;
 
       if (userAuth == null) {
-        setState(() {
-          isUpdating = false;
-        });
-
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => Signin(),
-          ),
-        );
-
+        setState(() => isUpdating = false);
+        context.router.navigate(SigninRoute());
         return;
       }
 
@@ -514,7 +477,7 @@ class _UpdateEmailState extends State<UpdateEmail> {
       await userAuth.reauthenticateWithCredential(credentials);
       final idToken = await userAuth.getIdToken();
 
-      final respUpdateEmail = await updateEmail(email, idToken);
+      final respUpdateEmail = await stateUser.updateEmail(email, idToken);
 
       if (!respUpdateEmail.success) {
         final exception = respUpdateEmail.error;
@@ -523,14 +486,15 @@ class _UpdateEmailState extends State<UpdateEmail> {
           isUpdating = false;
         });
 
-        showSnack(
+        Snack.e(
           context: context,
           message: "[code: ${exception.code}] - ${exception.message}",
-          type: SnackType.error,
         );
 
         return;
       }
+
+      stateUser.clearAuthCache();
 
       setState(() {
         isUpdating = false;
@@ -543,45 +507,41 @@ class _UpdateEmailState extends State<UpdateEmail> {
         isUpdating = false;
       });
 
-      showSnack(
+      Snack.e(
         context: context,
         message:
             "Error while updating your email. Please try again later or contact us.",
-        type: SnackType.error,
       );
     }
   }
 
   Future<bool> valuesAvailabilityCheck() async {
-    return await checkEmailAvailability(email);
+    return await UsersActions.checkEmailAvailability(email);
   }
 
   bool inputValuesOk() {
     if (email.isEmpty) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "Email cannot be empty.",
-        type: SnackType.error,
       );
 
       return false;
     }
 
     if (password.isEmpty) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "Password cannot be empty.",
-        type: SnackType.error,
       );
 
       return false;
     }
 
-    if (!checkEmailFormat(email)) {
-      showSnack(
+    if (!UsersActions.checkEmailFormat(email)) {
+      Snack.e(
         context: context,
         message: "The value specified is not a valid email.",
-        type: SnackType.error,
       );
 
       return false;

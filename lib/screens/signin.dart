@@ -1,19 +1,23 @@
 import 'package:artbooking/actions/users.dart';
+import 'package:artbooking/components/desktop_app_bar.dart';
+import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/loading_animation.dart';
-import 'package:artbooking/components/sliver_appbar_header.dart';
-import 'package:artbooking/screens/dashboard.dart';
-import 'package:artbooking/screens/home/home.dart';
-import 'package:artbooking/screens/signup.dart';
+import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
-import 'package:artbooking/types/enums.dart';
+import 'package:artbooking/utils/app_logger.dart';
+import 'package:artbooking/utils/app_storage.dart';
 import 'package:artbooking/utils/snack.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
 
 class Signin extends StatefulWidget {
+  final void Function(bool isAuthenticated) onSigninResult;
+
+  const Signin({Key key, this.onSigninResult}) : super(key: key);
+
   @override
   _SigninState createState() => _SigninState();
 }
@@ -24,20 +28,18 @@ class _SigninState extends State<Signin> {
 
   bool isCheckingAuth = false;
   bool isCompleted = false;
-  bool isSigningIn = false;
+  bool isConnecting = false;
 
   final passwordNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    checkAuth();
-  }
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
 
   @override
   void dispose() {
-    super.dispose();
+    passwordController.dispose();
+    emailController.dispose();
     passwordNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -45,19 +47,23 @@ class _SigninState extends State<Signin> {
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
-          SliverAppHeader(),
+          DesktopAppBar(
+            automaticallyImplyLeading: true,
+          ),
           SliverPadding(
             padding: const EdgeInsets.only(
-              top: 60.0,
+              top: 100.0,
               bottom: 300.0,
             ),
             sliver: SliverList(
               delegate: SliverChildListDelegate.fixed([
-                Center(
-                  child: SizedBox(
-                    width: 320.0,
-                    child: body(),
-                  ),
+                Column(
+                  children: <Widget>[
+                    SizedBox(
+                      width: 320.0,
+                      child: body(),
+                    ),
+                  ],
                 ),
               ]),
             ),
@@ -68,60 +74,13 @@ class _SigninState extends State<Signin> {
   }
 
   Widget body() {
-    if (isCompleted) {
-      return completedContainer();
-    }
-
-    if (isSigningIn) {
-      return Padding(
-        padding: const EdgeInsets.only(top: 80.0),
-        child: LoadingAnimation(
-          textTitle: 'Signing in...',
-        ),
+    if (isConnecting) {
+      return LoadingAnimation(
+        textTitle: 'Signing in...',
       );
     }
 
     return idleContainer();
-  }
-
-  Widget completedContainer() {
-    return Column(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: 30.0),
-          child: Icon(
-            Icons.check_circle,
-            size: 80.0,
-            color: Colors.green,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 30.0, bottom: 0.0),
-          child: Text(
-            'You are now logged in!',
-            style: TextStyle(
-              fontSize: 20.0,
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(
-            top: 15.0,
-          ),
-          child: FlatButton(
-            onPressed: () {
-              // Go to DashboardRoute
-            },
-            child: Opacity(
-              opacity: .6,
-              child: Text(
-                'Go to your dashboard',
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
   }
 
   Widget idleContainer() {
@@ -139,7 +98,7 @@ class _SigninState extends State<Signin> {
 
   Widget emailInput() {
     return FadeInY(
-      delay: 0.1.seconds,
+      delay: 100.milliseconds,
       beginY: 50.0,
       child: Padding(
         padding: EdgeInsets.only(
@@ -151,6 +110,8 @@ class _SigninState extends State<Signin> {
           children: <Widget>[
             TextFormField(
               autofocus: true,
+              controller: emailController,
+              textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 icon: Icon(Icons.email),
                 labelText: 'Email',
@@ -159,6 +120,7 @@ class _SigninState extends State<Signin> {
               onChanged: (value) {
                 email = value;
               },
+              onFieldSubmitted: (value) => passwordNode.requestFocus(),
               validator: (value) {
                 if (value.isEmpty) {
                   return 'Email login cannot be empty';
@@ -175,51 +137,51 @@ class _SigninState extends State<Signin> {
 
   Widget forgotPassword() {
     return FadeInY(
-      delay: 0.3.seconds,
+      delay: 100.milliseconds,
       beginY: 50.0,
       child: FlatButton(
-          onPressed: () {
-            // Go to ForgotPasswordRoute
-          },
-          child: Opacity(
-            opacity: .6,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                Text(
-                  "I forgot my password",
-                  style: TextStyle(
-                    decoration: TextDecoration.underline,
-                  ),
+        onPressed: () => context.router.push(ForgotPasswordRoute()),
+        child: Opacity(
+          opacity: 0.6,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Text(
+                "I forgot my password",
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
                 ),
-              ],
-            ),
-          )),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
   Widget header() {
     return Row(
-      children: [
-        FadeInY(
-          beginY: 10.0,
-          child: Padding(
-            padding: const EdgeInsets.only(
-              right: 20.0,
-            ),
-            child: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: Icon(Icons.arrow_back),
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        if (context.router.stack.length > 1)
+          FadeInX(
+            beginX: 10.0,
+            delay: 200.milliseconds,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                right: 20.0,
+              ),
+              child: IconButton(
+                onPressed: () => context.router.pop(),
+                icon: Icon(Icons.arrow_back),
+              ),
             ),
           ),
-        ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             FadeInY(
-              beginY: 10.0,
+              beginY: 50.0,
               child: Padding(
                 padding: EdgeInsets.only(bottom: 10.0),
                 child: Text(
@@ -233,11 +195,14 @@ class _SigninState extends State<Signin> {
               ),
             ),
             FadeInY(
-              delay: 0.3.seconds,
+              delay: 300.milliseconds,
               beginY: 50.0,
               child: Opacity(
-                opacity: .6,
-                child: Text('Connect to your existing account'),
+                opacity: 0.6,
+                child: Text(
+                  'Connect to your existing account',
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             )
           ],
@@ -248,35 +213,32 @@ class _SigninState extends State<Signin> {
 
   Widget noAccountButton() {
     return FadeInY(
-      delay: 0.5.seconds,
+      delay: 400.milliseconds,
       beginY: 50.0,
-      child: FlatButton(
-          onPressed: () async {
-            await Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => Signup()),
-            );
-
-            if (stateUser.isUserConnected) {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => Dashboard()),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: FlatButton(
+            onPressed: () {
+              context.router.navigate(
+                SignupRoute(onSignupResult: widget.onSigninResult),
               );
-            }
-          },
-          child: Opacity(
-            opacity: .6,
-            child: Text(
-              "I don't have an account",
-              style: TextStyle(
-                decoration: TextDecoration.underline,
+            },
+            child: Opacity(
+              opacity: 0.6,
+              child: Text(
+                "I don't have an account",
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                ),
               ),
-            ),
-          )),
+            )),
+      ),
     );
   }
 
   Widget passwordInput() {
     return FadeInY(
-      delay: 0.2.seconds,
+      delay: 100.milliseconds,
       beginY: 50.0,
       child: Padding(
         padding: EdgeInsets.only(
@@ -288,6 +250,7 @@ class _SigninState extends State<Signin> {
           children: <Widget>[
             TextFormField(
               focusNode: passwordNode,
+              controller: passwordController,
               decoration: InputDecoration(
                 icon: Icon(Icons.lock_outline),
                 labelText: 'Password',
@@ -296,7 +259,7 @@ class _SigninState extends State<Signin> {
               onChanged: (value) {
                 password = value;
               },
-              onFieldSubmitted: (_) => signInProcess(),
+              onFieldSubmitted: (value) => signInProcess(),
               validator: (value) {
                 if (value.isEmpty) {
                   return 'Password login cannot be empty';
@@ -313,13 +276,13 @@ class _SigninState extends State<Signin> {
 
   Widget validationButton() {
     return FadeInY(
-      delay: 0.4.seconds,
+      delay: 200.milliseconds,
       beginY: 50.0,
       child: Padding(
         padding: const EdgeInsets.only(top: 80.0),
         child: RaisedButton(
           onPressed: () => signInProcess(),
-          color: stateColors.primary,
+          color: stateColors.accent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(
               Radius.circular(7.0),
@@ -354,45 +317,20 @@ class _SigninState extends State<Signin> {
     );
   }
 
-  void checkAuth() async {
-    setState(() {
-      isCheckingAuth = true;
-    });
-
-    try {
-      final userAuth = FirebaseAuth.instance.currentUser;
-
-      setState(() {
-        isCheckingAuth = false;
-      });
-
-      if (userAuth != null) {
-        // stateUser.setUserConnected(true);
-        // Go to DashboardRoute
-      }
-    } catch (error) {
-      setState(() {
-        isCheckingAuth = false;
-      });
-    }
-  }
-
   bool inputValuesOk() {
-    if (!checkEmailFormat(email)) {
-      showSnack(
+    if (!UsersActions.checkEmailFormat(email)) {
+      Snack.e(
         context: context,
         message: "The value specified is not a valid email",
-        type: SnackType.error,
       );
 
       return false;
     }
 
     if (password.isEmpty) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "Password cannot be empty",
-        type: SnackType.error,
       );
 
       return false;
@@ -407,41 +345,55 @@ class _SigninState extends State<Signin> {
     }
 
     setState(() {
-      isSigningIn = true;
+      isConnecting = true;
     });
 
     try {
-      final authResult = await userSignin(email: email, password: password);
+      final userCred = await stateUser.signin(
+        email: email,
+        password: password,
+      );
 
-      if (authResult.user == null) {
-        showSnack(
+      if (userCred == null) {
+        appLogger.d("empty user");
+        setState(() {
+          isConnecting = false;
+        });
+
+        Snack.e(
           context: context,
-          type: SnackType.error,
           message: 'The password is incorrect or the user does not exists.',
         );
 
         return;
       }
 
-      setState(() {
-        isSigningIn = false;
-        isCompleted = true;
-      });
-
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => Home()),
+      appStorage.setCredentials(
+        email: email,
+        password: password,
       );
-    } catch (error) {
-      debugPrint(error.toString());
 
-      showSnack(
+      isConnecting = false;
+      isCompleted = true;
+
+      // If this callback is defined,
+      // this page is call from AuthGuard.
+      if (widget.onSigninResult != null) {
+        widget.onSigninResult(true);
+        return;
+      }
+
+      context.router.navigate(HomeRoute());
+    } catch (error) {
+      appLogger.d(error);
+
+      Snack.e(
         context: context,
-        type: SnackType.error,
         message: 'The password is incorrect or the user does not exists.',
       );
 
       setState(() {
-        isSigningIn = false;
+        isConnecting = false;
       });
     }
   }

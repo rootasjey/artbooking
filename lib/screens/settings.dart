@@ -1,35 +1,41 @@
 import 'dart:async';
 
+import 'package:artbooking/components/desktop_app_bar.dart';
 import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
-import 'package:artbooking/components/sliver_appbar_header.dart';
-import 'package:artbooking/screens/delete_account.dart';
-import 'package:artbooking/screens/signin.dart';
-import 'package:artbooking/screens/update_email.dart';
-import 'package:artbooking/screens/update_passeword.dart';
-import 'package:artbooking/screens/update_username.dart';
+import 'package:artbooking/components/page_app_bar.dart';
+import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
-import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/utils/app_storage.dart';
 import 'package:artbooking/utils/brightness.dart';
+import 'package:artbooking/utils/constants.dart';
+import 'package:artbooking/utils/language.dart';
 import 'package:artbooking/utils/snack.dart';
+import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:supercharged/supercharged.dart';
+import 'package:unicons/unicons.dart';
 
 class Settings extends StatefulWidget {
+  final bool showAppBar;
+
+  const Settings({
+    Key key,
+    @PathParam() this.showAppBar = true,
+  }) : super(key: key);
+
   @override
   _SettingsState createState() => _SettingsState();
 }
 
 class _SettingsState extends State<Settings> {
   bool isLoadingLang = false;
-  bool isLoadingImageURL = false;
+  bool isLoadingAvatarUrl = false;
   bool isNameAvailable = false;
   bool isThemeAuto = true;
   bool notificationsON = false;
@@ -40,46 +46,54 @@ class _SettingsState extends State<Settings> {
   double beginY = 20.0;
 
   String avatarUrl = '';
-  String currentUserName = '';
-  String email = '';
   String imageUrl = '';
   String notifLang = 'en';
   String selectedLang = 'English';
 
   Timer nameTimer;
-  Timer timer;
+  Timer quotidiansNotifTimer;
 
-  ScrollController _scrollController = ScrollController();
+  ScrollController _pageScrollController = ScrollController();
 
   @override
   initState() {
     super.initState();
+    initBrightness();
 
-    getLocalLang();
-    checkAuth();
-    initNotifState();
-
-    isThemeAuto = appStorage.getAutoBrightness();
-    currentBrightness = appStorage.getBrightness();
+    setState(() {
+      selectedLang = Language.frontend(stateUser.lang);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: RefreshIndicator(
-          onRefresh: () async {
-            await checkAuth();
-            return null;
-          },
-          child: NotificationListener<ScrollNotification>(
-            child: CustomScrollView(
-              controller: _scrollController,
-              slivers: <Widget>[
-                SliverAppHeader(),
-                body(),
-              ],
-            ),
-          )),
+      body: NotificationListener<ScrollNotification>(
+        child: CustomScrollView(
+          controller: _pageScrollController,
+          slivers: <Widget>[
+            if (widget.showAppBar) appBar(),
+            body(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget appBar() {
+    final width = MediaQuery.of(context).size.width;
+
+    if (width < Constants.maxMobileWidth) {
+      return PageAppBar(
+        textTitle: "Settings",
+        textSubTitle: "You can change your preferences here",
+        titlePadding: const EdgeInsets.only(top: 16.0),
+      );
+    }
+
+    return DesktopAppBar(
+      title: "Settings",
+      automaticallyImplyLeading: true,
     );
   }
 
@@ -92,19 +106,19 @@ class _SettingsState extends State<Settings> {
           return Column(
             children: [
               FadeInY(
-                delay: 0.0.seconds,
+                delay: 0.milliseconds,
                 beginY: 50.0,
                 child: avatar(isUserConnected),
               ),
               accountActions(isUserConnected),
               FadeInY(
-                delay: 0.2.seconds,
+                delay: 100.milliseconds,
                 beginY: 50.0,
                 child: updateUsernameButton(isUserConnected),
               ),
               Padding(padding: const EdgeInsets.only(top: 20.0)),
               FadeInY(
-                delay: 0.3.seconds,
+                delay: 200.milliseconds,
                 beginY: 50.0,
                 child: emailButton(),
               ),
@@ -139,12 +153,12 @@ class _SettingsState extends State<Settings> {
         spacing: 15.0,
         children: <Widget>[
           FadeInX(
-            delay: 0.seconds,
+            delay: 0.milliseconds,
             beginX: 50.0,
             child: updatePasswordButton(),
           ),
           FadeInX(
-            delay: 0.2.seconds,
+            delay: 100.milliseconds,
             beginX: 50.0,
             child: deleteAccountButton(),
           )
@@ -159,7 +173,6 @@ class _SettingsState extends State<Settings> {
       child: Column(
         children: <Widget>[
           themeSwitcher(),
-          // notificationSection(),
           Padding(
               padding: const EdgeInsets.only(
             bottom: 100.0,
@@ -170,24 +183,24 @@ class _SettingsState extends State<Settings> {
   }
 
   Widget avatar(bool isUserConnected) {
-    if (isLoadingImageURL) {
-      return Padding(
-        padding: const EdgeInsets.only(
-          bottom: 30.0,
-        ),
-        child: Material(
-          elevation: 4.0,
-          shape: CircleBorder(),
-          clipBehavior: Clip.hardEdge,
-          child: InkWell(
-            child: Padding(
-              padding: const EdgeInsets.all(40.0),
-              child: CircularProgressIndicator(),
-            ),
-          ),
-        ),
-      );
-    }
+    // if (isLoadingImageURL) {
+    //   return Padding(
+    //     padding: const EdgeInsets.only(
+    //       bottom: 30.0,
+    //     ),
+    //     child: Material(
+    //       elevation: 4.0,
+    //       shape: CircleBorder(),
+    //       clipBehavior: Clip.hardEdge,
+    //       child: InkWell(
+    //         child: Padding(
+    //           padding: const EdgeInsets.all(40.0),
+    //           child: CircularProgressIndicator(),
+    //         ),
+    //       ),
+    //     ),
+    //   );
+    // }
 
     return Padding(
       padding: const EdgeInsets.only(
@@ -200,10 +213,10 @@ class _SettingsState extends State<Settings> {
         child: InkWell(
           child: Padding(
             padding: const EdgeInsets.all(40.0),
-            child: Image.asset(
-              'assets/images/default-avatar.png',
-              width: 150.0,
-              fit: BoxFit.cover,
+            child: Icon(
+              UniconsLine.user_circle,
+              color: stateColors.primary,
+              size: 64.0,
             ),
           ),
         ),
@@ -211,96 +224,43 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  Widget notificationSection() {
-    return SizedBox(
-      width: 400.0,
-      child: Column(
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              FadeInY(
-                delay: 1.6.seconds,
-                beginY: 10.0,
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: 20.0, left: 20.0),
-                  child: Text(
-                    'Notifications',
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
-                      color: stateColors.primary,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Column(
-            children: [
-              FadeInY(
-                delay: 1.9.seconds,
-                beginY: 10.0,
-                child: SwitchListTile(
-                  onChanged: (bool value) {
-                    notificationsON = value;
-
-                    timer?.cancel();
-                    timer = Timer(Duration(seconds: 1),
-                        () => toggleQuotidianNotifications());
-                  },
-                  value: notificationsON,
-                  title: Text('Daily quote'),
-                  subtitle: Text(
-                      "If this is active, you will receive a quote at 8:00am everyday"),
-                  secondary: notificationsON
-                      ? Icon(Icons.notifications_active)
-                      : Icon(Icons.notifications_off),
-                ),
-              ),
-              // if (notificationsON)
-              //   Padding(
-              //     padding: const EdgeInsets.only(top: 16.0),
-              //     child: ListTile(
-              //       leading: Icon(Icons.language),
-              //       title: DropdownButton<String>(
-              //         elevation: 2,
-              //         isDense: true,
-              //         value: notifLang,
-              //         underline: Container(),
-              //         icon: Container(),
-              //         items: Language.available().map((String value) {
-              //           return DropdownMenuItem(
-              //             value: value,
-              //             child: Text(
-              //               Language.frontend(value),
-              //             ),
-              //           );
-              //         }).toList(),
-              //         onChanged: (newValue) {
-              //           setState(() {
-              //             notifLang = newValue;
-              //           });
-
-              //           // PushNotifications.updateLangNotification(newValue);
-              //         },
-              //       ),
-              //       subtitle: Text(
-              //           "Your daily quote will be in the selected language"),
-              //     ),
-              //   ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget body() {
+    double paddingTop = 0.0;
+    bool showBigTitle = false;
+
+    if (MediaQuery.of(context).size.width > 700.0) {
+      paddingTop = widget.showAppBar ? 100.0 : 20.0;
+      showBigTitle = true;
+    }
+
     return SliverPadding(
-      padding: const EdgeInsets.only(top: 20.0),
+      padding: EdgeInsets.only(top: paddingTop),
       sliver: SliverList(
         delegate: SliverChildListDelegate([
+          if (showBigTitle)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 80.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (context.router.root.stack.length > 1)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: IconButton(
+                        onPressed: context.router.pop,
+                        icon: Icon(Icons.arrow_back),
+                      ),
+                    ),
+                  Text(
+                    'Settings',
+                    style: TextStyle(
+                      fontSize: 80.0,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           accountSettings(),
           appSettings(),
         ]),
@@ -318,8 +278,8 @@ class _SettingsState extends State<Settings> {
           child: Card(
             elevation: 4.0,
             child: InkWell(
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => DeleteAccount()),
+              onTap: () => context.router.push(
+                DeleteAccountRoute(),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(15.0),
@@ -344,13 +304,11 @@ class _SettingsState extends State<Settings> {
   Widget emailButton() {
     return FlatButton(
       onPressed: () async {
-        await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => UpdateEmail(),
+        context.router.push(
+          AccountUpdateDeepRoute(
+            children: [UpdateEmailRoute()],
           ),
         );
-
-        checkAuth();
       },
       onLongPress: () {
         showDialog(
@@ -370,7 +328,7 @@ class _SettingsState extends State<Settings> {
                       right: 25.0,
                     ),
                     child: Text(
-                      email,
+                      stateUser.email,
                       style: TextStyle(
                         color: stateColors.primary,
                       ),
@@ -404,7 +362,7 @@ class _SettingsState extends State<Settings> {
                 Padding(
                   padding: const EdgeInsets.only(left: 35.0),
                   child: Text(
-                    email,
+                    stateUser.email,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
@@ -450,7 +408,13 @@ class _SettingsState extends State<Settings> {
 
   Widget updateUsernameButton(bool isUserConnected) {
     return FlatButton(
-      onPressed: () => showUpdateNameDialog(),
+      onPressed: () {
+        context.router.push(
+          AccountUpdateDeepRoute(
+            children: [UpdateUsernameRoute()],
+          ),
+        );
+      },
       child: Container(
         width: 250.0,
         padding: const EdgeInsets.all(5.0),
@@ -475,7 +439,7 @@ class _SettingsState extends State<Settings> {
                 Padding(
                   padding: const EdgeInsets.only(left: 35.0),
                   child: Text(
-                    currentUserName,
+                    stateUser.username,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
@@ -487,15 +451,6 @@ class _SettingsState extends State<Settings> {
         ),
       ),
     );
-  }
-
-  Future showUpdateNameDialog() async {
-    await showCupertinoModalBottomSheet(
-      context: context,
-      builder: (context) => UpdateUsername(),
-    );
-
-    checkAuth();
   }
 
   Widget langSelect() {
@@ -537,12 +492,14 @@ class _SettingsState extends State<Settings> {
   Widget themeSwitcher() {
     return Container(
       width: 400.0,
-      padding: const EdgeInsets.only(bottom: 60.0),
+      padding: EdgeInsets.only(
+        bottom: 60.0,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           FadeInY(
-            delay: 0.6.seconds,
+            delay: 0.milliseconds,
             beginY: 10.0,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -561,7 +518,7 @@ class _SettingsState extends State<Settings> {
             ),
           ),
           FadeInY(
-            delay: 0.8.seconds,
+            delay: 100.milliseconds,
             beginY: 10.0,
             child: Padding(
               padding: const EdgeInsets.all(15.0),
@@ -577,7 +534,7 @@ class _SettingsState extends State<Settings> {
             ),
           ),
           FadeInY(
-            delay: 1.4.seconds,
+            delay: 200.milliseconds,
             beginY: 10.0,
             child: SwitchListTile(
               title: Text('Automatic theme'),
@@ -587,18 +544,18 @@ class _SettingsState extends State<Settings> {
                 setState(() => isThemeAuto = newValue);
 
                 if (newValue) {
-                  setAutoBrightness(context);
+                  BrightnessUtils.setAutoBrightness(context);
                   return;
                 }
 
                 currentBrightness = appStorage.getBrightness();
-                setBrightness(context, currentBrightness);
+                BrightnessUtils.setBrightness(context, currentBrightness);
               },
             ),
           ),
           if (!isThemeAuto)
             FadeInY(
-              delay: 0.seconds,
+              delay: 0.milliseconds,
               beginY: 10.0,
               child: SwitchListTile(
                 title: Text('Lights'),
@@ -608,7 +565,7 @@ class _SettingsState extends State<Settings> {
                   currentBrightness =
                       newValue ? Brightness.light : Brightness.dark;
 
-                  setBrightness(context, currentBrightness);
+                  BrightnessUtils.setBrightness(context, currentBrightness);
                   setState(() {});
                 },
               ),
@@ -629,8 +586,11 @@ class _SettingsState extends State<Settings> {
             elevation: 4.0,
             child: InkWell(
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => UpdatePassword()));
+                context.router.push(
+                  AccountUpdateDeepRoute(
+                    children: [UpdatePasswordRoute()],
+                  ),
+                );
               },
               child: Padding(
                 padding: const EdgeInsets.all(15.0),
@@ -654,69 +614,99 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  void toggleQuotidianNotifications() async {
-    if (notificationsON) {
-      // PushNotifications.activate();
-      return;
-    }
+  AlertDialog showAvatarDialog() {
+    final width = MediaQuery.of(context).size.width;
 
-    // PushNotifications.deactivate();
+    return AlertDialog(
+      actions: <Widget>[
+        FlatButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Text(
+              'CANCEL',
+              style: TextStyle(
+                color: Colors.red,
+              ),
+            ),
+          ),
+        ),
+      ],
+      title: Text(
+        'Choose a profile picture',
+        style: TextStyle(
+          fontSize: 15.0,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      contentPadding: const EdgeInsets.symmetric(
+        vertical: 20.0,
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Divider(
+              thickness: 2.0,
+            ),
+            SizedBox(
+              height: 150.0,
+              width: width > 400.0 ? 400.0 : width,
+              child: ListView(
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                children: <Widget>[
+                  FadeInX(
+                    child: ppCard(
+                      imageName: 'boy',
+                    ),
+                    delay: 100.milliseconds,
+                    beginX: 50.0,
+                  ),
+                  FadeInX(
+                    child: ppCard(imageName: 'employee'),
+                    delay: 200.milliseconds,
+                    beginX: 50.0,
+                  ),
+                  FadeInX(
+                    child: ppCard(imageName: 'lady'),
+                    delay: 300.milliseconds,
+                    beginX: 50.0,
+                  ),
+                  FadeInX(
+                    child: ppCard(
+                      imageName: 'user',
+                    ),
+                    delay: 400.milliseconds,
+                    beginX: 50.0,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
-  Future checkAuth() async {
-    setState(() {
-      isLoadingImageURL = true;
-      isLoadingLang = true;
-    });
+  void initBrightness() {
+    final autoBrightness = appStorage.getAutoBrightness();
+    isThemeAuto = autoBrightness;
 
-    try {
-      final userAuth = FirebaseAuth.instance.currentUser;
+    if (!autoBrightness) {
+      currentBrightness = appStorage.getBrightness();
+    } else {
+      Brightness brightness = Brightness.light;
+      final now = DateTime.now();
 
-      if (userAuth == null) {
-        stateUser.setUserDisconnected();
-
-        setState(() {
-          isLoadingImageURL = false;
-          isLoadingLang = false;
-        });
-
-        return;
+      if (now.hour < 6 || now.hour > 17) {
+        brightness = Brightness.dark;
       }
 
-      final user = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userAuth.uid)
-          .get();
-
-      final data = user.data();
-
-      avatarUrl = data['urls']['image'];
-      currentUserName = data['name'] ?? '';
-
-      stateUser.setUserName(currentUserName);
-
-      setState(() {
-        email = userAuth.email ?? '';
-
-        isLoadingImageURL = false;
-        isLoadingLang = false;
-      });
-    } catch (error) {
-      debugPrint(error.toString());
-
-      setState(() {
-        isLoadingImageURL = false;
-        isLoadingLang = false;
-      });
+      currentBrightness = brightness;
     }
-  }
-
-  void getLocalLang() {
-    // final lang = appStorage.getLang();
-
-    // setState(() {
-    //   selectedLang = Language.frontend(lang);
-    // });
   }
 
   String themeDescription() {
@@ -726,22 +716,10 @@ class _SettingsState extends State<Settings> {
   }
 
   void updateImageUrl({String imageName}) async {
-    setState(() {
-      isLoadingImageURL = true;
-    });
+    setState(() => isLoadingAvatarUrl = true);
 
     try {
-      final userAuth = FirebaseAuth.instance.currentUser;
-
-      if (userAuth == null) {
-        debugPrint("You're not connected anymore.");
-        stateUser.setUserDisconnected();
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => Signin()),
-        );
-
-        return;
-      }
+      final userAuth = stateUser.userAuth;
 
       await FirebaseFirestore.instance
           .collection('users')
@@ -752,25 +730,21 @@ class _SettingsState extends State<Settings> {
 
       setState(() {
         avatarUrl = 'local:$imageName';
-        isLoadingImageURL = false;
+        isLoadingAvatarUrl = false;
       });
 
-      showSnack(
+      Snack.s(
         context: context,
         message: 'Your image has been successfully updated.',
-        type: SnackType.success,
       );
     } catch (error) {
       debugPrint(error.toString());
 
-      setState(() {
-        isLoadingImageURL = false;
-      });
+      setState(() => isLoadingAvatarUrl = false);
 
-      showSnack(
+      Snack.e(
         context: context,
         message: 'Oops, there was an error: ${error.toString()}',
-        type: SnackType.error,
       );
     }
   }
@@ -780,23 +754,17 @@ class _SettingsState extends State<Settings> {
       isLoadingLang = true;
     });
 
-    // final lang = Language.backend(selectedLang);
+    final lang = Language.backend(selectedLang);
 
-    // Language.setLang(lang);
+    Language.setLang(lang);
 
     setState(() {
       isLoadingLang = false;
     });
 
-    showSnack(
+    Snack.s(
       context: context,
       message: 'Your language has been successfully updated.',
-      type: SnackType.success,
     );
-  }
-
-  void initNotifState() async {
-    // notificationsON = await PushNotifications.isActive();
-    setState(() {});
   }
 }

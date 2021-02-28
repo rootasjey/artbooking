@@ -15,12 +15,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase/firebase.dart' as fb;
 import 'package:mime_type/mime_type.dart';
 
-class Upload extends StatefulWidget {
+class AddIllustration extends StatefulWidget {
   @override
-  _UploadState createState() => _UploadState();
+  _AddIllustrationState createState() => _AddIllustrationState();
 }
 
-class _UploadState extends State<Upload> {
+class _AddIllustrationState extends State<AddIllustration> {
   bool isLoading = false;
 
   ScrollController _scrollController = ScrollController();
@@ -388,7 +388,7 @@ class _UploadState extends State<Upload> {
       );
 
       if (!result.success) {
-        showSnack(
+        Snack.e(
           context: context,
           message: "There was an issue while uploading your image.",
         );

@@ -1,5 +1,5 @@
 import 'package:artbooking/router/route_names.dart';
-import 'package:artbooking/screens/upload.dart';
+import 'package:artbooking/screens/add_illustration.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -25,7 +25,7 @@ class UploadManager {
     }
 
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => Upload()),
+      MaterialPageRoute(builder: (_) => AddIllustration()),
     );
   }
 }

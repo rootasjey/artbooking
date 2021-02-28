@@ -1,17 +1,15 @@
-import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/app_icon.dart';
 import 'package:artbooking/components/base_app_bar.dart';
 import 'package:artbooking/components/circle_button.dart';
 import 'package:artbooking/components/fade_in_y.dart';
-import 'package:artbooking/screens/home/home.dart';
-import 'package:artbooking/screens/signin.dart';
+import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
-import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/utils/app_storage.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/snack.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,12 +27,6 @@ class DeleteAccountState extends State<DeleteAccount> {
   double beginY = 10.0;
 
   String password = '';
-
-  @override
-  initState() {
-    super.initState();
-    checkAuth();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,8 +55,12 @@ class DeleteAccountState extends State<DeleteAccount> {
           Padding(
             padding: EdgeInsets.only(left: titleLeftPadding),
             child: CircleButton(
-                onTap: () => Navigator.of(context).pop(),
-                icon: Icon(Icons.arrow_back, color: stateColors.foreground)),
+              onTap: context.router.pop,
+              icon: Icon(
+                Icons.arrow_back,
+                color: stateColors.foreground,
+              ),
+            ),
           ),
           AppIcon(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -159,10 +155,7 @@ class DeleteAccountState extends State<DeleteAccount> {
                 top: 45.0,
               ),
               child: OutlinedButton(
-                onPressed: () {
-                  Navigator.of(context)
-                      .push(MaterialPageRoute(builder: (_) => Home()));
-                },
+                onPressed: () => context.router.navigate(HomeRoute()),
                 child: Opacity(
                   opacity: .6,
                   child: Text(
@@ -210,17 +203,17 @@ class DeleteAccountState extends State<DeleteAccount> {
           child: Column(
             children: <Widget>[
               FadeInY(
-                delay: 0.0.seconds,
+                delay: 0.milliseconds,
                 beginY: beginY,
                 child: warningCard(),
               ),
               FadeInY(
-                delay: 0.1.seconds,
+                delay: 100.milliseconds,
                 beginY: beginY,
                 child: passwordInput(),
               ),
               FadeInY(
-                delay: 0.2.seconds,
+                delay: 200.milliseconds,
                 beginY: beginY,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 60.0),
@@ -376,7 +369,6 @@ class DeleteAccountState extends State<DeleteAccount> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    // contentPadding: const EdgeInsets.all(25.0),
                     children: <Widget>[
                       Divider(
                         color: stateColors.secondary,
@@ -413,19 +405,6 @@ class DeleteAccountState extends State<DeleteAccount> {
     );
   }
 
-  void checkAuth() async {
-    try {
-      final userAuth = FirebaseAuth.instance.currentUser;
-
-      if (userAuth == null) {
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => Signin()));
-      }
-    } catch (error) {
-      debugPrint(error.toString());
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => Signin()));
-    }
-  }
-
   void deleteAccountProcess() async {
     if (!inputValuesOk()) {
       return;
@@ -434,17 +413,11 @@ class DeleteAccountState extends State<DeleteAccount> {
     setState(() => isDeleting = true);
 
     try {
-      final userAuth = FirebaseAuth.instance.currentUser;
+      final userAuth = stateUser.userAuth;
 
       if (userAuth == null) {
         setState(() => isDeleting = false);
-
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => Signin(),
-          ),
-        );
-
+        context.router.navigate(SigninRoute());
         return;
       }
 
@@ -456,7 +429,7 @@ class DeleteAccountState extends State<DeleteAccount> {
       await userAuth.reauthenticateWithCredential(credentials);
       final idToken = await userAuth.getIdToken();
 
-      final respDelAcc = await deleteAccount(idToken);
+      final respDelAcc = await stateUser.deleteAccount(idToken);
 
       if (!respDelAcc.success) {
         final exception = respDelAcc.error;
@@ -465,17 +438,16 @@ class DeleteAccountState extends State<DeleteAccount> {
           isDeleting = false;
         });
 
-        showSnack(
+        Snack.e(
           context: context,
           message: "[code: ${exception.code}] - ${exception.message}",
-          type: SnackType.error,
         );
 
         return;
       }
 
       await stateUser.signOut();
-      stateUser.setUserName('');
+      stateUser.setUsername('');
       appStorage.clearUserAuthData();
 
       // PushNotifications.unlinkAuthUser();
@@ -491,20 +463,18 @@ class DeleteAccountState extends State<DeleteAccount> {
         isDeleting = false;
       });
 
-      showSnack(
+      Snack.e(
         context: context,
         message: (error as PlatformException).message,
-        type: SnackType.error,
       );
     }
   }
 
   bool inputValuesOk() {
     if (password.isEmpty) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "Password cannot be empty.",
-        type: SnackType.error,
       );
 
       return false;
