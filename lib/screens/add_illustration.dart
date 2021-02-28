@@ -1,7 +1,7 @@
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/default_app_bar.dart';
 import 'package:artbooking/components/image_item.dart';
-import 'package:artbooking/components/upload_manager.dart';
+import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
@@ -15,6 +15,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase/firebase.dart' as fb;
 import 'package:mime_type/mime_type.dart';
+import 'package:mobx/mobx.dart';
 import 'package:unicons/unicons.dart';
 
 class AddIllustration extends StatefulWidget {
@@ -33,10 +34,18 @@ class _AddIllustrationState extends State<AddIllustration> {
 
   ContentVisibility imageVisibility = ContentVisibility.public;
 
+  ReactionDisposer _filesReactionDisposer;
+
   @override
   initState() {
     super.initState();
     checkUploadQueue();
+  }
+
+  @override
+  void dispose() {
+    _filesReactionDisposer?.reaction?.dispose();
+    super.dispose();
   }
 
   @override
@@ -141,25 +150,27 @@ class _AddIllustrationState extends State<AddIllustration> {
             runSpacing: 20.0,
             children: [
               OutlinedButton.icon(
-                  onPressed: pickImage,
-                  icon: Padding(
-                    padding: const EdgeInsets.only(bottom: 6.0),
-                    child: Icon(UniconsLine.upload),
-                  ),
-                  label: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Text('Upload more'),
-                  )),
+                onPressed: pickImage,
+                icon: Padding(
+                  padding: const EdgeInsets.only(bottom: 6.0),
+                  child: Icon(UniconsLine.upload),
+                ),
+                label: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Text('Upload more'),
+                ),
+              ),
               OutlinedButton.icon(
-                  onPressed: () {},
-                  icon: Padding(
-                    padding: const EdgeInsets.only(bottom: 6.0),
-                    child: Icon(UniconsLine.times),
-                  ),
-                  label: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Text('Clear all'),
-                  )),
+                onPressed: () {},
+                icon: Padding(
+                  padding: const EdgeInsets.only(bottom: 6.0),
+                  child: Icon(UniconsLine.times),
+                ),
+                label: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Text('Clear all'),
+                ),
+              ),
             ],
           ),
         ],
@@ -463,10 +474,14 @@ class _AddIllustrationState extends State<AddIllustration> {
   }
 
   void checkUploadQueue() {
-    if (appUploadManager.selectedFiles.isEmpty) {
-      return;
-    }
+    _filesReactionDisposer = autorun((reaction) {
+      if (appUploadManager.selectedFiles.isEmpty) {
+        return;
+      }
 
-    uploadImage(appUploadManager.selectedFiles.first);
+      for (var file in appUploadManager.selectedFiles) {
+        uploadImage(file);
+      }
+    });
   }
 }

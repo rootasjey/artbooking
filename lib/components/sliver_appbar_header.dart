@@ -1,5 +1,5 @@
 import 'package:artbooking/components/app_icon.dart';
-import 'package:artbooking/components/upload_manager.dart';
+import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/screens/dashboard.dart';
 import 'package:artbooking/screens/signin.dart';
 import 'package:artbooking/state/colors.dart';

@@ -2,7 +2,7 @@ import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/default_app_bar.dart';
 import 'package:artbooking/components/image_item.dart';
 import 'package:artbooking/components/full_page_loading.dart';
-import 'package:artbooking/components/upload_manager.dart';
+import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/screens/signin.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/illustration/illustration.dart';

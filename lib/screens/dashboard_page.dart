@@ -1,6 +1,6 @@
 import 'package:artbooking/components/desktop_app_bar.dart';
 import 'package:artbooking/components/side_menu_item.dart';
-import 'package:artbooking/components/upload_manager.dart';
+import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
