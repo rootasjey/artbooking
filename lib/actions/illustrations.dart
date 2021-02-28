@@ -1,11 +1,11 @@
 import 'package:artbooking/types/cloud_func_error.dart';
 import 'package:artbooking/types/create_image_doc_resp.dart';
 import 'package:artbooking/types/enums.dart';
+import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/converters.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 Future<CreateImageDocResp> createIllustrationDocument({
   @required String name,
@@ -16,7 +16,7 @@ Future<CreateImageDocResp> createIllustrationDocument({
       app: Firebase.app(),
       region: 'europe-west3',
     ).httpsCallable(
-      'images-createDocument',
+      'illustrations-createDocument',
     );
 
     final response = await callable.call({
@@ -26,26 +26,16 @@ Future<CreateImageDocResp> createIllustrationDocument({
 
     return CreateImageDocResp.fromJSON(response.data);
   } on FirebaseFunctionsException catch (exception) {
-    debugPrint("[code: ${exception.code}] - ${exception.message}");
+    appLogger.e(exception);
     return CreateImageDocResp(
       success: false,
       error: CloudFuncError(
-        code: exception.details['code'],
-        message: exception.details['message'],
-      ),
-    );
-  } on PlatformException catch (exception) {
-    debugPrint(exception.toString());
-
-    return CreateImageDocResp(
-      success: false,
-      error: CloudFuncError(
-        code: exception.details['code'],
-        message: exception.details['message'],
+        code: exception.details != null ? exception.details['code'] : '',
+        message: exception.details != null ? exception.details['message'] : '',
       ),
     );
   } catch (error) {
-    debugPrint(error.toString());
+    appLogger.e(error);
 
     return CreateImageDocResp(
       success: false,
@@ -65,7 +55,7 @@ Future<CreateImageDocResp> deleteIllustrationDocument({
       app: Firebase.app(),
       region: 'europe-west3',
     ).httpsCallable(
-      'images-deleteDocument',
+      'illustrations-deleteDocument',
     );
 
     final response = await callable.call({
@@ -74,26 +64,16 @@ Future<CreateImageDocResp> deleteIllustrationDocument({
 
     return CreateImageDocResp.fromJSON(response.data);
   } on FirebaseFunctionsException catch (exception) {
-    debugPrint("[code: ${exception.code}] - ${exception.message}");
+    appLogger.e(exception);
     return CreateImageDocResp(
       success: false,
       error: CloudFuncError(
-        code: exception.details['code'],
-        message: exception.details['message'],
-      ),
-    );
-  } on PlatformException catch (exception) {
-    debugPrint(exception.toString());
-
-    return CreateImageDocResp(
-      success: false,
-      error: CloudFuncError(
-        code: exception.details['code'],
-        message: exception.details['message'],
+        code: exception.details != null ? exception.details['code'] : '',
+        message: exception.details != null ? exception.details['message'] : '',
       ),
     );
   } catch (error) {
-    debugPrint(error.toString());
+    appLogger.e(error);
 
     return CreateImageDocResp(
       success: false,
@@ -113,7 +93,7 @@ Future<CreateImageDocResp> deleteIllustrationsDocuments({
       app: Firebase.app(),
       region: 'europe-west3',
     ).httpsCallable(
-      'images-deleteDocuments',
+      'illustrations-deleteDocuments',
     );
 
     final response = await callable.call({
@@ -122,26 +102,16 @@ Future<CreateImageDocResp> deleteIllustrationsDocuments({
 
     return CreateImageDocResp.fromJSON(response.data);
   } on FirebaseFunctionsException catch (exception) {
-    debugPrint("[code: ${exception.code}] - ${exception.message}");
+    appLogger.e(exception);
     return CreateImageDocResp(
       success: false,
       error: CloudFuncError(
-        code: exception.details['code'],
-        message: exception.details['message'],
-      ),
-    );
-  } on PlatformException catch (exception) {
-    debugPrint(exception.toString());
-
-    return CreateImageDocResp(
-      success: false,
-      error: CloudFuncError(
-        code: exception.details['code'],
-        message: exception.details['message'],
+        code: exception.details != null ? exception.details['code'] : '',
+        message: exception.details != null ? exception.details['message'] : '',
       ),
     );
   } catch (error) {
-    debugPrint(error.toString());
+    appLogger.e(error);
 
     return CreateImageDocResp(
       success: false,

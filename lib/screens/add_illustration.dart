@@ -1,11 +1,12 @@
 import 'package:artbooking/actions/illustrations.dart';
+import 'package:artbooking/components/default_app_bar.dart';
 import 'package:artbooking/components/image_item.dart';
-import 'package:artbooking/components/sliver_appbar_header.dart';
 import 'package:artbooking/components/upload_manager.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/upload_task.dart';
+import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/converters.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,6 +15,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase/firebase.dart' as fb;
 import 'package:mime_type/mime_type.dart';
+import 'package:unicons/unicons.dart';
 
 class AddIllustration extends StatefulWidget {
   @override
@@ -43,7 +45,7 @@ class _AddIllustrationState extends State<AddIllustration> {
       body: CustomScrollView(
         controller: _scrollController,
         slivers: <Widget>[
-          SliverAppHeader(),
+          DefaultAppBar(),
           headerAndBody(),
           SliverList(
             delegate: SliverChildListDelegate.fixed([
@@ -115,24 +117,12 @@ class _AddIllustrationState extends State<AddIllustration> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Opacity(
-              opacity: 0.6,
-              child: Text(
-                'Illustrations',
-                style: TextStyle(
-                  fontSize: 20.0,
-                ),
-              ),
-            ),
-          ),
           Wrap(
             spacing: 20.0,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(
-                'Uploads',
+                'Upload',
                 style: TextStyle(
                   fontSize: 80.0,
                   fontWeight: FontWeight.w700,
@@ -149,14 +139,20 @@ class _AddIllustrationState extends State<AddIllustration> {
             spacing: 20.0,
             runSpacing: 20.0,
             children: [
-              TextButton.icon(
+              OutlinedButton.icon(
                   onPressed: pickImage,
-                  icon: Icon(Icons.upload_outlined),
-                  label: Text('Upload more illustrations')),
-              TextButton.icon(
+                  icon: Icon(UniconsLine.upload),
+                  label: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Text('Add illustration'),
+                  )),
+              OutlinedButton.icon(
                   onPressed: () {},
-                  icon: Icon(Icons.clear_all),
-                  label: Text('Clear all')),
+                  icon: Icon(UniconsLine.times),
+                  label: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Text('Clear all'),
+                  )),
             ],
           ),
         ],
@@ -430,7 +426,7 @@ class _AddIllustrationState extends State<AddIllustration> {
 
       task.future.asStream().listen((uploadTaskSnapshot) {}, onDone: () async {
         final doc = await FirebaseFirestore.instance
-            .collection('images')
+            .collection('illustrations')
             .doc(result.id)
             .get();
 
@@ -451,14 +447,11 @@ class _AddIllustrationState extends State<AddIllustration> {
           isLoading = uploadTasks.isNotEmpty;
         });
       }, onError: (error) {
-        debugPrint(error.toString());
+        appLogger.e(error);
       });
     } catch (error) {
-      debugPrint(error.toString());
-
-      setState(() {
-        isLoading = false;
-      });
+      appLogger.e(error);
+      setState(() => isLoading = false);
     }
   }
 
