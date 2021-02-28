@@ -1,5 +1,6 @@
 import 'package:artbooking/components/app_icon.dart';
 import 'package:artbooking/components/page_app_bar.dart';
+import 'package:artbooking/state/colors.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -8,7 +9,10 @@ class DefaultAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return PageAppBar(
       title: Padding(
-        padding: const EdgeInsets.only(left: 32.0),
+        padding: const EdgeInsets.only(
+          left: 32.0,
+          top: 16.0,
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -18,6 +22,7 @@ class DefaultAppBar extends StatelessWidget {
             Text(
               "ArtBooking",
               style: GoogleFonts.yellowtail(
+                color: stateColors.foreground.withOpacity(0.6),
                 fontSize: 24.0,
               ),
             ),
