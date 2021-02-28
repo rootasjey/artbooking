@@ -1,5 +1,5 @@
-import 'package:artbooking/router/route_names.dart';
-import 'package:artbooking/screens/add_illustration.dart';
+import 'package:artbooking/router/app_router.gr.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -20,12 +20,14 @@ class UploadManager {
 
     selectedFiles = pickerResult.files;
 
-    if (ModalRoute.of(context).settings.name == UploadRoute) {
+    if (context.router.current.name == AddIllustrationRoute.name) {
       return;
     }
 
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => AddIllustration()),
+    context.router.root.push(
+      DashboardPageRoute(
+        children: [AddIllustrationRoute()],
+      ),
     );
   }
 }
