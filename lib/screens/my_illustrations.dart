@@ -104,7 +104,6 @@ class _MyIllustrationsState extends State<MyIllustrations> {
   Widget header() {
     return SliverPadding(
       padding: const EdgeInsets.only(
-        top: 40.0,
         left: 50.0,
       ),
       sliver: SliverList(

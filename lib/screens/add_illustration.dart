@@ -56,11 +56,7 @@ class _AddIllustrationState extends State<AddIllustration> {
         slivers: <Widget>[
           DefaultAppBar(),
           headerAndBody(),
-          SliverList(
-            delegate: SliverChildListDelegate.fixed([
-              successImagesText(),
-            ]),
-          ),
+          successImagesText(),
           successImagesGrid(),
           emptyView(),
           SliverPadding(
@@ -241,7 +237,7 @@ class _AddIllustrationState extends State<AddIllustration> {
   Widget successImagesGrid() {
     return SliverPadding(
       padding: const EdgeInsets.symmetric(
-        horizontal: 80.0,
+        horizontal: 60.0,
         vertical: 60.0,
       ),
       sliver: SliverGrid(
@@ -281,34 +277,42 @@ class _AddIllustrationState extends State<AddIllustration> {
 
   Widget successImagesText() {
     if (doneTasks.isEmpty) {
-      return Container();
+      return SliverList(
+        delegate: SliverChildListDelegate.fixed([
+          Container(),
+        ]),
+      );
     }
 
     final illustrationsText =
         doneTasks.length > 1 ? 'illustrations' : 'illustration';
 
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: 80.0,
-        top: 20.0,
-        bottom: 10.0,
-      ),
-      child: Wrap(
-        spacing: 10.0,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          Icon(Icons.check, size: 28.0),
-          Opacity(
-            opacity: 0.6,
-            child: Text(
-              "You've successfully uploaded ${doneTasks.length} $illustrationsText",
-              style: TextStyle(
-                fontSize: 24.0,
-              ),
-            ),
+    return SliverList(
+      delegate: SliverChildListDelegate.fixed([
+        Padding(
+          padding: const EdgeInsets.only(
+            left: 60.0,
+            right: 60.0,
+            top: 40.0,
           ),
-        ],
-      ),
+          child: Wrap(
+            spacing: 10.0,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.check, size: 28.0),
+              Opacity(
+                opacity: 0.6,
+                child: Text(
+                  "You've successfully uploaded ${doneTasks.length} $illustrationsText",
+                  style: TextStyle(
+                    fontSize: 24.0,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ]),
     );
   }
 
