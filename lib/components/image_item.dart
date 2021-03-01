@@ -5,6 +5,7 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
 
 class ImageItem extends StatefulWidget {
@@ -30,18 +31,19 @@ class ImageItem extends StatefulWidget {
   _ImageItemState createState() => _ImageItemState();
 }
 
-class _ImageItemState extends State<ImageItem> with TickerProviderStateMixin {
+class _ImageItemState extends State<ImageItem> with AnimationMixin {
   Animation<double> scaleAnimation;
-  AnimationController scaleAnimationController;
-
   Animation<Offset> offsetAnimation;
-  AnimationController offsetAnimationController;
+  Animation<double> opacity;
+
+  AnimationController captionController;
+  AnimationController offsetController;
+  AnimationController scaleController;
 
   bool showCaption = false;
 
   double initElevation = 4.0;
   double size = 300.0;
-
   double elevation = 4.0;
   double scale = 1.0;
 
@@ -51,32 +53,21 @@ class _ImageItemState extends State<ImageItem> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    scaleAnimationController = AnimationController(
-      lowerBound: 0.8,
-      upperBound: 1.0,
-      duration: 500.milliseconds,
-      vsync: this,
-    );
+    captionController = createController();
+    captionController.duration = 300.milliseconds;
+    opacity = 0.0.tweenTo(1.0).animatedBy(captionController);
 
-    scaleAnimation = CurvedAnimation(
-      parent: scaleAnimationController,
-      curve: Curves.fastOutSlowIn,
-    );
+    offsetController = createController()..duration = 250.milliseconds;
 
-    offsetAnimationController = AnimationController(
-      duration: 500.milliseconds,
-      vsync: this,
-    );
+    offsetAnimation =
+        Offset(0, 0.25).tweenTo(Offset.zero).animatedBy(offsetController);
 
-    offsetAnimation = Tween<Offset>(
-      begin: Offset(0, 20.0),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: offsetAnimationController,
-        curve: Curves.ease,
-      ),
-    );
+    scaleController = createController()..duration = 500.milliseconds;
+
+    scaleAnimation = 0.8
+        .tweenTo(1.0)
+        .animatedBy(scaleController)
+        .curve(Curves.fastOutSlowIn);
 
     setState(() {
       size = size;
@@ -86,8 +77,9 @@ class _ImageItemState extends State<ImageItem> with TickerProviderStateMixin {
 
   @override
   dispose() {
-    scaleAnimationController.dispose();
-    offsetAnimationController.dispose();
+    scaleController.dispose();
+    offsetController.dispose();
+    captionController.dispose();
     super.dispose();
   }
 
@@ -119,7 +111,6 @@ class _ImageItemState extends State<ImageItem> with TickerProviderStateMixin {
                   return;
                 }
               },
-              // onLongPress: widget.onLongPress,
               onLongPress: () {
                 if (widget.onLongPress != null) {
                   widget.onLongPress(widget.selected);
@@ -129,13 +120,15 @@ class _ImageItemState extends State<ImageItem> with TickerProviderStateMixin {
                 if (isHover) {
                   elevation = 8.0;
                   showCaption = true;
-                  scaleAnimationController.forward();
-                  offsetAnimationController.forward();
+                  scaleController.forward();
+                  offsetController.forward();
+                  captionController.forward();
                 } else {
                   elevation = initElevation;
                   showCaption = false;
-                  scaleAnimationController.reverse();
-                  offsetAnimationController.reverse();
+                  scaleController.reverse();
+                  offsetController.reverse();
+                  captionController.reverse();
                 }
 
                 setState(() {});
@@ -160,46 +153,49 @@ class _ImageItemState extends State<ImageItem> with TickerProviderStateMixin {
       alignment: Alignment.bottomCenter,
       child: SlideTransition(
         position: offsetAnimation,
-        child: Container(
-          color: Colors.black26,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    illustration.name,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                PopupMenuButton(
-                  child: Icon(
-                    Icons.more_vert,
-                    color: Colors.white,
-                  ),
-                  onSelected: (value) {
-                    switch (value) {
-                      case "delete":
-                        confirmDeletion();
-                        break;
-                      default:
-                    }
-                  },
-                  itemBuilder: (_) => <PopupMenuEntry<String>>[
-                    PopupMenuItem(
-                      child: ListTile(
-                        leading: Icon(Icons.delete_outline),
-                        title: Text('Delete'),
+        child: Opacity(
+          opacity: opacity.value,
+          child: Container(
+            color: Colors.black26,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      illustration.name,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w500,
                       ),
-                      value: "delete",
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  PopupMenuButton(
+                    child: Icon(
+                      Icons.more_vert,
+                      color: Colors.white,
+                    ),
+                    onSelected: (value) {
+                      switch (value) {
+                        case "delete":
+                          confirmDeletion();
+                          break;
+                        default:
+                      }
+                    },
+                    itemBuilder: (_) => <PopupMenuEntry<String>>[
+                      PopupMenuItem(
+                        child: ListTile(
+                          leading: Icon(Icons.delete_outline),
+                          title: Text('Delete'),
+                        ),
+                        value: "delete",
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
