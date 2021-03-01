@@ -1,7 +1,9 @@
 import 'package:artbooking/actions/illustrations.dart';
+import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/create_image_doc_resp.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -16,6 +18,7 @@ class ImageItem extends StatefulWidget {
   final Function(CreateImageDocResp) onAfterDelete;
   final Function(bool) onLongPress;
   final Function onBeforePressed;
+  final double size;
 
   ImageItem({
     @required this.illustration,
@@ -25,6 +28,7 @@ class ImageItem extends StatefulWidget {
     this.onBeforeDelete,
     this.onBeforePressed,
     this.onLongPress,
+    this.size = 300.0,
   });
 
   @override
@@ -52,6 +56,8 @@ class _ImageItemState extends State<ImageItem> with AnimationMixin {
   @override
   void initState() {
     super.initState();
+
+    size = widget.size;
 
     captionController = createController();
     captionController.duration = 300.milliseconds;
@@ -101,16 +107,7 @@ class _ImageItemState extends State<ImageItem> with AnimationMixin {
             ),
             fit: BoxFit.cover,
             child: InkWell(
-              onTap: () {
-                bool handled = false;
-                if (widget.onBeforePressed != null) {
-                  handled = widget.onBeforePressed();
-                }
-
-                if (handled) {
-                  return;
-                }
-              },
+              onTap: onTap,
               onLongPress: () {
                 if (widget.onLongPress != null) {
                   widget.onLongPress(widget.selected);
@@ -326,5 +323,23 @@ class _ImageItemState extends State<ImageItem> with AnimationMixin {
     if (widget.onAfterDelete != null) {
       widget.onAfterDelete(response);
     }
+  }
+
+  void onTap() {
+    bool handled = false;
+    if (widget.onBeforePressed != null) {
+      handled = widget.onBeforePressed();
+    }
+
+    if (handled) {
+      return;
+    }
+
+    context.router.root.push(
+      IllustrationPageRoute(
+        illustrationId: widget.illustration.id,
+        illustration: widget.illustration,
+      ),
+    );
   }
 }

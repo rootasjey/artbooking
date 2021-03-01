@@ -14,20 +14,22 @@ import '../screens/changelog.dart' as _i7;
 import '../screens/contact.dart' as _i8;
 import '../screens/dashboard_page.dart' as _i9;
 import '../screens/forgot_password.dart' as _i10;
-import '../screens/settings.dart' as _i11;
-import '../screens/signin.dart' as _i12;
-import '../screens/signup.dart' as _i13;
-import '../screens/tos.dart' as _i14;
-import '../screens/undefined_page.dart' as _i15;
-import '../screens/add_illustration.dart' as _i16;
-import '../screens/my_activity.dart' as _i17;
-import '../screens/my_illustrations.dart' as _i18;
-import '../screens/my_books.dart' as _i19;
-import '../screens/my_book.dart' as _i20;
-import '../screens/delete_account.dart' as _i21;
-import '../screens/update_email.dart' as _i22;
-import '../screens/update_password.dart' as _i23;
-import '../screens/update_username.dart' as _i24;
+import '../screens/illustration_page.dart' as _i11;
+import '../screens/settings.dart' as _i12;
+import '../screens/signin.dart' as _i13;
+import '../screens/signup.dart' as _i14;
+import '../screens/tos.dart' as _i15;
+import '../screens/undefined_page.dart' as _i16;
+import '../screens/add_illustration.dart' as _i17;
+import '../screens/my_activity.dart' as _i18;
+import '../screens/my_illustrations.dart' as _i19;
+import '../screens/my_books.dart' as _i20;
+import '../screens/my_book.dart' as _i21;
+import '../screens/delete_account.dart' as _i22;
+import '../screens/update_email.dart' as _i23;
+import '../screens/update_password.dart' as _i24;
+import '../screens/update_username.dart' as _i25;
+import '../types/illustration/illustration.dart' as _i26;
 
 class AppRouter extends _i1.RootStackRouter {
   AppRouter({@_i2.required this.authGuard, @_i2.required this.noAuthGuard})
@@ -61,25 +63,34 @@ class AppRouter extends _i1.RootStackRouter {
     ForgotPasswordRoute.name: (entry) {
       return _i1.MaterialPageX(entry: entry, child: _i10.ForgotPassword());
     },
+    IllustrationPageRoute.name: (entry) {
+      var route = entry.routeData.as<IllustrationPageRoute>();
+      return _i1.MaterialPageX(
+          entry: entry,
+          child: _i11.IllustrationPage(
+              key: route.key,
+              illustrationId: route.illustrationId,
+              illustration: route.illustration));
+    },
     SettingsRoute.name: (entry) {
       var route = entry.routeData.as<SettingsRoute>();
       return _i1.MaterialPageX(
           entry: entry,
-          child: _i11.Settings(
+          child: _i12.Settings(
               key: route.key, showAppBar: route.showAppBar ?? true));
     },
     SigninRoute.name: (entry) {
       var route = entry.routeData.as<SigninRoute>();
       return _i1.MaterialPageX(
           entry: entry,
-          child: _i12.Signin(
+          child: _i13.Signin(
               key: route.key, onSigninResult: route.onSigninResult));
     },
     SignupRoute.name: (entry) {
       var route = entry.routeData.as<SignupRoute>();
       return _i1.MaterialPageX(
           entry: entry,
-          child: _i13.Signup(
+          child: _i14.Signup(
               key: route.key, onSignupResult: route.onSignupResult));
     },
     SignOutRoute.name: (entry) {
@@ -91,19 +102,19 @@ class AppRouter extends _i1.RootStackRouter {
           entry: entry, child: const _i1.EmptyRouterPage());
     },
     TosRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i14.Tos());
+      return _i1.MaterialPageX(entry: entry, child: _i15.Tos());
     },
     UndefinedPageRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i15.UndefinedPage());
+      return _i1.MaterialPageX(entry: entry, child: _i16.UndefinedPage());
     },
     AddIllustrationRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i16.AddIllustration());
+      return _i1.MaterialPageX(entry: entry, child: _i17.AddIllustration());
     },
     MyActivityRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i17.MyActivity());
+      return _i1.MaterialPageX(entry: entry, child: _i18.MyActivity());
     },
     MyIllustrationsRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i18.MyIllustrations());
+      return _i1.MaterialPageX(entry: entry, child: _i19.MyIllustrations());
     },
     MyBooksDeepRoute.name: (entry) {
       return _i1.MaterialPageX(
@@ -114,36 +125,36 @@ class AppRouter extends _i1.RootStackRouter {
           entry: entry, child: const _i1.EmptyRouterPage());
     },
     MyBooksRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i19.MyBooks());
+      return _i1.MaterialPageX(entry: entry, child: _i20.MyBooks());
     },
     MyBookRoute.name: (entry) {
       var route = entry.routeData.as<MyBookRoute>();
       return _i1.MaterialPageX(
           entry: entry,
-          child: _i20.MyBook(key: route.key, bookId: route.bookId));
+          child: _i21.MyBook(key: route.key, bookId: route.bookId));
     },
     DashboardSettingsRoute.name: (entry) {
       var route = entry.routeData.as<DashboardSettingsRoute>();
       return _i1.MaterialPageX(
           entry: entry,
-          child: _i11.Settings(
+          child: _i12.Settings(
               key: route.key, showAppBar: route.showAppBar ?? true));
     },
     DeleteAccountRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i21.DeleteAccount());
+      return _i1.MaterialPageX(entry: entry, child: _i22.DeleteAccount());
     },
     AccountUpdateDeepRoute.name: (entry) {
       return _i1.MaterialPageX(
           entry: entry, child: const _i1.EmptyRouterPage());
     },
     UpdateEmailRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i22.UpdateEmail());
+      return _i1.MaterialPageX(entry: entry, child: _i23.UpdateEmail());
     },
     UpdatePasswordRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i23.UpdatePassword());
+      return _i1.MaterialPageX(entry: entry, child: _i24.UpdatePassword());
     },
     UpdateUsernameRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i24.UpdateUsername());
+      return _i1.MaterialPageX(entry: entry, child: _i25.UpdateUsername());
     },
     GitHubRoute.name: (entry) {
       return _i1.MaterialPageX(
@@ -237,6 +248,9 @@ class AppRouter extends _i1.RootStackRouter {
         _i1.RouteConfig<ForgotPasswordRoute>(ForgotPasswordRoute.name,
             path: '/forgotpassword',
             routeBuilder: (match) => ForgotPasswordRoute.fromMatch(match)),
+        _i1.RouteConfig<IllustrationPageRoute>(IllustrationPageRoute.name,
+            path: '/illustration/:illustrationId',
+            routeBuilder: (match) => IllustrationPageRoute.fromMatch(match)),
         _i1.RouteConfig<SettingsRoute>(SettingsRoute.name,
             path: '/settings',
             routeBuilder: (match) => SettingsRoute.fromMatch(match)),
@@ -318,6 +332,27 @@ class ForgotPasswordRoute extends _i1.PageRouteInfo {
   ForgotPasswordRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
 
   static const String name = 'ForgotPasswordRoute';
+}
+
+class IllustrationPageRoute extends _i1.PageRouteInfo {
+  IllustrationPageRoute({this.key, this.illustrationId, this.illustration})
+      : super(name,
+            path: '/illustration/:illustrationId',
+            params: {'illustrationId': illustrationId});
+
+  IllustrationPageRoute.fromMatch(_i1.RouteMatch match)
+      : key = null,
+        illustrationId = match.pathParams.getString('illustrationId'),
+        illustration = null,
+        super.fromMatch(match);
+
+  final _i2.Key key;
+
+  final String illustrationId;
+
+  final _i26.Illustration illustration;
+
+  static const String name = 'IllustrationPageRoute';
 }
 
 class SettingsRoute extends _i1.PageRouteInfo {

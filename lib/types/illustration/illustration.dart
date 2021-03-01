@@ -88,6 +88,20 @@ class Illustration {
     );
   }
 
+  String getHDThumbnail() {
+    final t720 = urls.thumbnails.t720;
+    if (t720 != null && t720.isNotEmpty) {
+      return t720;
+    }
+
+    final t1080 = urls.thumbnails.t1080;
+    if (t1080 != null && t1080.isNotEmpty) {
+      return t1080;
+    }
+
+    return urls.original;
+  }
+
   String getThumbnail() {
     final t360 = urls.thumbnails.t360;
     if (t360 != null && t360.isNotEmpty) {

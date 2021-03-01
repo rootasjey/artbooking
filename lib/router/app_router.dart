@@ -7,6 +7,7 @@ import 'package:artbooking/screens/dashboard_page.dart';
 import 'package:artbooking/screens/delete_account.dart';
 import 'package:artbooking/screens/forgot_password.dart';
 import 'package:artbooking/screens/home/home.dart';
+import 'package:artbooking/screens/illustration_page.dart';
 import 'package:artbooking/screens/my_book.dart';
 import 'package:artbooking/screens/my_books.dart';
 import 'package:artbooking/screens/my_illustrations.dart';
@@ -75,6 +76,8 @@ export 'app_router.gr.dart';
       ],
     ),
     MaterialRoute(path: '/forgotpassword', page: ForgotPassword),
+    MaterialRoute(
+        path: '/illustration/:illustrationId', page: IllustrationPage),
     MaterialRoute(path: '/settings', page: Settings),
     // MaterialRoute(path: '/search', page: Search),
     MaterialRoute(path: '/signin', page: Signin, guards: [NoAuthGuard]),
