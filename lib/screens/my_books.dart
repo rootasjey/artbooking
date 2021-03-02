@@ -469,7 +469,7 @@ class _MyBooksState extends State<MyBooks> {
       forceMultiSelect = false;
     });
 
-    final response = await deleteIllustrationsDocuments(
+    final response = await IllustrationsActions.deleteDocs(
       imagesIds: booksIds,
     );
 

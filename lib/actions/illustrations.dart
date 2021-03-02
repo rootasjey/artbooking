@@ -7,118 +7,123 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-Future<CreateImageDocResp> createIllustrationDocument({
-  @required String name,
-  ContentVisibility visibility = ContentVisibility.private,
-}) async {
-  try {
-    final callable = FirebaseFunctions.instanceFor(
-      app: Firebase.app(),
-      region: 'europe-west3',
-    ).httpsCallable(
-      'illustrations-createDocument',
-    );
+class IllustrationsActions {
+  static Future<CreateImageDocResp> createDoc({
+    @required String name,
+    ContentVisibility visibility = ContentVisibility.private,
+  }) async {
+    try {
+      final callable = FirebaseFunctions.instanceFor(
+        app: Firebase.app(),
+        region: 'europe-west3',
+      ).httpsCallable(
+        'illustrations-createDocument',
+      );
 
-    final response = await callable.call({
-      'name': name,
-      'visibility': imageVisibilityToString(visibility),
-    });
+      final response = await callable.call({
+        'name': name,
+        'visibility': imageVisibilityToString(visibility),
+      });
 
-    return CreateImageDocResp.fromJSON(response.data);
-  } on FirebaseFunctionsException catch (exception) {
-    appLogger.e(exception);
-    return CreateImageDocResp(
-      success: false,
-      error: CloudFuncError(
-        code: exception.details != null ? exception.details['code'] : '',
-        message: exception.details != null ? exception.details['message'] : '',
-      ),
-    );
-  } catch (error) {
-    appLogger.e(error);
+      return CreateImageDocResp.fromJSON(response.data);
+    } on FirebaseFunctionsException catch (exception) {
+      appLogger.e(exception);
+      return CreateImageDocResp(
+        success: false,
+        error: CloudFuncError(
+          code: exception.details != null ? exception.details['code'] : '',
+          message:
+              exception.details != null ? exception.details['message'] : '',
+        ),
+      );
+    } catch (error) {
+      appLogger.e(error);
 
-    return CreateImageDocResp(
-      success: false,
-      error: CloudFuncError(
-        code: '',
-        message: error.toString(),
-      ),
-    );
+      return CreateImageDocResp(
+        success: false,
+        error: CloudFuncError(
+          code: '',
+          message: error.toString(),
+        ),
+      );
+    }
   }
-}
 
-Future<CreateImageDocResp> deleteIllustrationDocument({
-  @required String imageId,
-}) async {
-  try {
-    final callable = FirebaseFunctions.instanceFor(
-      app: Firebase.app(),
-      region: 'europe-west3',
-    ).httpsCallable(
-      'illustrations-deleteDocument',
-    );
+  static Future<CreateImageDocResp> deleteDoc({
+    @required String imageId,
+  }) async {
+    try {
+      final callable = FirebaseFunctions.instanceFor(
+        app: Firebase.app(),
+        region: 'europe-west3',
+      ).httpsCallable(
+        'illustrations-deleteDocument',
+      );
 
-    final response = await callable.call({
-      'id': imageId,
-    });
+      final response = await callable.call({
+        'id': imageId,
+      });
 
-    return CreateImageDocResp.fromJSON(response.data);
-  } on FirebaseFunctionsException catch (exception) {
-    appLogger.e(exception);
-    return CreateImageDocResp(
-      success: false,
-      error: CloudFuncError(
-        code: exception.details != null ? exception.details['code'] : '',
-        message: exception.details != null ? exception.details['message'] : '',
-      ),
-    );
-  } catch (error) {
-    appLogger.e(error);
+      return CreateImageDocResp.fromJSON(response.data);
+    } on FirebaseFunctionsException catch (exception) {
+      appLogger.e(exception);
+      return CreateImageDocResp(
+        success: false,
+        error: CloudFuncError(
+          code: exception.details != null ? exception.details['code'] : '',
+          message:
+              exception.details != null ? exception.details['message'] : '',
+        ),
+      );
+    } catch (error) {
+      appLogger.e(error);
 
-    return CreateImageDocResp(
-      success: false,
-      error: CloudFuncError(
-        code: '',
-        message: error.toString(),
-      ),
-    );
+      return CreateImageDocResp(
+        success: false,
+        error: CloudFuncError(
+          code: '',
+          message: error.toString(),
+        ),
+      );
+    }
   }
-}
 
-Future<CreateImageDocResp> deleteIllustrationsDocuments({
-  @required List<String> imagesIds,
-}) async {
-  try {
-    final callable = FirebaseFunctions.instanceFor(
-      app: Firebase.app(),
-      region: 'europe-west3',
-    ).httpsCallable(
-      'illustrations-deleteDocuments',
-    );
+  static Future<CreateImageDocResp> deleteDocs({
+    @required List<String> imagesIds,
+  }) async {
+    try {
+      final callable = FirebaseFunctions.instanceFor(
+        app: Firebase.app(),
+        region: 'europe-west3',
+      ).httpsCallable(
+        'illustrations-deleteDocuments',
+      );
 
-    final response = await callable.call({
-      'ids': imagesIds,
-    });
+      final response = await callable.call({
+        'ids': imagesIds,
+      });
 
-    return CreateImageDocResp.fromJSON(response.data);
-  } on FirebaseFunctionsException catch (exception) {
-    appLogger.e(exception);
-    return CreateImageDocResp(
-      success: false,
-      error: CloudFuncError(
-        code: exception.details != null ? exception.details['code'] : '',
-        message: exception.details != null ? exception.details['message'] : '',
-      ),
-    );
-  } catch (error) {
-    appLogger.e(error);
+      return CreateImageDocResp.fromJSON(response.data);
+    } on FirebaseFunctionsException catch (exception) {
+      appLogger.e(exception);
+      return CreateImageDocResp(
+        success: false,
+        error: CloudFuncError(
+          code: exception.details != null ? exception.details['code'] : '',
+          message:
+              exception.details != null ? exception.details['message'] : '',
+        ),
+      );
+    } catch (error) {
+      appLogger.e(error);
 
-    return CreateImageDocResp(
-      success: false,
-      error: CloudFuncError(
-        code: '',
-        message: error.toString(),
-      ),
-    );
+      return CreateImageDocResp(
+        success: false,
+        error: CloudFuncError(
+          code: '',
+          message: error.toString(),
+        ),
+      );
+    }
   }
 }

@@ -318,7 +318,9 @@ class _ImageItemState extends State<ImageItem> with AnimationMixin {
       widget.onBeforeDelete();
     }
 
-    final response = await deleteIllustrationDocument(imageId: illu.id);
+    final response = await IllustrationsActions.deleteDoc(
+      imageId: illu.id,
+    );
 
     if (widget.onAfterDelete != null) {
       widget.onAfterDelete(response);

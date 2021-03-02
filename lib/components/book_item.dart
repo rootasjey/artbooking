@@ -325,7 +325,9 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
       widget.onBeforeDelete();
     }
 
-    final response = await deleteIllustrationDocument(imageId: illu.id);
+    final response = await IllustrationsActions.deleteDoc(
+      imageId: illu.id,
+    );
 
     if (widget.onAfterDelete != null) {
       widget.onAfterDelete(response);
