@@ -3,6 +3,7 @@ import * as functions from 'firebase-functions';
 import { adminApp } from './adminApp';
 import { checkUserIsSignedIn } from './utils';
 
+const firebaseTools = require('firebase-tools');
 const firestore = adminApp.firestore();
 
 /**
@@ -12,7 +13,7 @@ const firestore = adminApp.firestore();
 export const updateUserLists = functions
   .region('europe-west3')
   .https
-  .onRequest(async (req, res) => {
+  .onRequest(async ({}, res) => {
     // The app has very few users right now (less than 20).
     const userSnapshot = firestore
       .collection('users')
@@ -63,14 +64,19 @@ export const checkEmailAvailability = functions
   .onCall(async (data) => {
     const email: string = data.email;
 
-    if (!(typeof email === 'string') || email.length === 0) {
-      throw new functions.https.HttpsError('invalid-argument', 'The function must be called with ' +
-        'one (string) argument "email" which is the email to check.');
+    if (typeof email !== 'string' || email.length === 0) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called with one (string)
+         argument [email] which is the email to check.`,
+      );
     }
 
     if (!validateEmailFormat(email)) {
-      throw new functions.https.HttpsError('invalid-argument', 'The function must be called with ' +
-        'a valid email address.');
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called with a valid email address.`,
+      );
     }
 
     const exists = await isUserExistsByEmail(email);
@@ -88,14 +94,20 @@ export const checkUsernameAvailability = functions
   .onCall(async (data) => {
     const name: string = data.name;
 
-    if (!(typeof name === 'string') || name.length === 0) {
-      throw new functions.https.HttpsError('invalid-argument', 'The function must be called with ' +
-        'one (string) argument "name" which is the name to check.');
+    if (typeof name !== 'string' || name.length === 0) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called with one (string)
+         argument "name" which is the name to check.`,
+      );
     }
 
     if (!validateNameFormat(name)) {
-      throw new functions.https.HttpsError('invalid-argument', 'The function must be called with ' +
-        'a valid name with at least 3 alpha-numeric characters (underscore is allowed) (A-Z, 0-9, _).');
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called with a valid [name]
+         with at least 3 alpha-numeric characters (underscore is allowed) (A-Z, 0-9, _).`,
+      );
     }
 
     const nameSnap = await firestore
@@ -119,132 +131,129 @@ export const createAccount = functions
   .https
   .onCall(async (data: CreateUserAccountParams) => {
     if (!checkCreateAccountData(data)) {
-      throw new functions.https.HttpsError('invalid-argument', 'The function must be called with ' +
-        '3 string arguments "username", "email" and "password".');
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called with 3 string 
+        arguments [username], [email] and [password].`,
+      );
     }
 
     const { username, password, email } = data;
 
-    try {
-      const userRecord = await adminApp
-        .auth()
-        .createUser({
-          displayName: username,
-          password: password,
-          email: email,
-          emailVerified: false,
-        });
+    const userRecord = await adminApp
+      .auth()
+      .createUser({
+        displayName: username,
+        password: password,
+        email: email,
+        emailVerified: false,
+      });
 
-      await adminApp.firestore()
-        .collection('users')
-        .doc(userRecord.uid)
-        .set({
-          createdAt: adminApp.firestore.Timestamp.now(),
-          email: email,
-          lang: 'en',
-          name: username,
-          nameLowerCase: username.toLowerCase(),
-          pricing: 'free',
-          rights: {
-            'user:managedata': false,
-          },
-          settings: {
-            notifications: {
-              email: {
-                tempQuotes: true,
-                quotidians: false,
-              },
-              push: {
-                quotidians: true,
-                tempQuotes: true,
-              }
-            },
-          },
-          stats: {
-            books: {
-              created: 0,
-              deleted: 0,
-              fav: 0,
-              own: 0,
-            },
-            challenges: {
-              created: 0,
-              deleted: 0,
-              entered: 0,
-              own: 0,
-              participating: 0,
-              won: 0,
-            },
-            contests: {
-              created: 0,
-              deleted: 0,
-              entered: 0,
-              own: 0,
-              participating: 0,
-              won: 0,
-            },
-            galleries: {
-              created: 0,
-              deleted: 0,
-              entered: 0,
-              opened: 0,
-              own: 0,
-            },
-            illustrations: {
-              added: 0,
-              deleted: 0,
-              fav: 0,
-              own: 0,
-              updated: 0,
-            },
-            notifications: {
-              total: 0,
-              unread: 0,
-            },
-            storage: { // all number values are in bytes
-              illustrations: {
-                total: 0,
-                used: 0,
-              },
-              videos: {
-                total: 0,
-                used: 0,
-              },
-            },
-          },
-          updatedAt: adminApp.firestore.Timestamp.now(),
-          urls: {
-            artstation: '',
-            devianart: '',
-            discord: '',
-            dribbble: '',
-            facebook: '',
-            instagram: '',
-            patreon: '',
-            pp: '',
-            tumblr: '',
-            tiktok: '',
-            tipeee: '',
-            twitch: '',
-            twitter: '',
-            website: '',
-            wikipedia: '',
-            youtube: '',
-          },
-          uid: userRecord.uid,
-        });
-
-      return {
-        user: {
-          id: userRecord.uid,
-          email,
+    await adminApp.firestore()
+      .collection('users')
+      .doc(userRecord.uid)
+      .set({
+        createdAt: adminApp.firestore.Timestamp.now(),
+        email: email,
+        lang: 'en',
+        name: username,
+        nameLowerCase: username.toLowerCase(),
+        pricing: 'free',
+        rights: {
+          'user:managedata': false,
         },
-      };
+        settings: {
+          notifications: {
+            email: {
+              tempQuotes: true,
+              quotidians: false,
+            },
+            push: {
+              quotidians: true,
+              tempQuotes: true,
+            }
+          },
+        },
+        stats: {
+          books: {
+            created: 0,
+            deleted: 0,
+            fav: 0,
+            own: 0,
+          },
+          challenges: {
+            created: 0,
+            deleted: 0,
+            entered: 0,
+            own: 0,
+            participating: 0,
+            won: 0,
+          },
+          contests: {
+            created: 0,
+            deleted: 0,
+            entered: 0,
+            own: 0,
+            participating: 0,
+            won: 0,
+          },
+          galleries: {
+            created: 0,
+            deleted: 0,
+            entered: 0,
+            opened: 0,
+            own: 0,
+          },
+          illustrations: {
+            added: 0,
+            deleted: 0,
+            fav: 0,
+            own: 0,
+            updated: 0,
+          },
+          notifications: {
+            total: 0,
+            unread: 0,
+          },
+          storage: { // all number values are in bytes
+            illustrations: {
+              total: 0,
+              used: 0,
+            },
+            videos: {
+              total: 0,
+              used: 0,
+            },
+          },
+        },
+        updatedAt: adminApp.firestore.Timestamp.now(),
+        urls: {
+          artstation: '',
+          devianart: '',
+          discord: '',
+          dribbble: '',
+          facebook: '',
+          instagram: '',
+          patreon: '',
+          pp: '',
+          tumblr: '',
+          tiktok: '',
+          tipeee: '',
+          twitch: '',
+          twitter: '',
+          website: '',
+          wikipedia: '',
+          youtube: '',
+        },
+        uid: userRecord.uid,
+      });
 
-    } catch (error) {
-      throw new functions.https.HttpsError('internal', 'There was an internal error ' +
-        'while creating your account. Please try again or contact us if the problem persists".');
-    }
+    return {
+      user: {
+        id: userRecord.uid,
+        email,
+      },
+    };
   });
 
 function checkCreateAccountData(data: any) {
@@ -254,13 +263,15 @@ function checkCreateAccountData(data: any) {
 
   const keys = Object.keys(data);
 
-  if (keys.indexOf('username') < 0
-    || keys.indexOf('email') < 0
-    || keys.indexOf('password') < 0) {
+  if (!keys.includes('username')
+    || !keys.includes('email')
+    || !keys.includes('password')) {
     return false;
   }
 
-  if (!data['username'] || !data['email'] || !data['password']) {
+  if (typeof data['username'] !== 'string' ||
+    typeof data['email'] !== 'string' ||
+    typeof data['password'] !== 'string') {
     return false;
   }
 
@@ -268,9 +279,7 @@ function checkCreateAccountData(data: any) {
 }
 
 /**
- * Delete user's entry from Firebase auth and from Firestore.
- * Add a new document to the `todelete` collection to clear user's data
- * as `notifications`, `drafts`, `lists`, `favourites` sub-collection.
+ * Delete user's entry from Firebase auth and from Firestore. 
  */
 export const deleteAccount = functions
   .region('europe-west3')
@@ -280,136 +289,45 @@ export const deleteAccount = functions
     const { idToken } = data;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user.');
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
     }
 
     await checkUserIsSignedIn(context, idToken);
 
-    try {
-      const userSnapshot = await firestore
-        .collection('users')
-        .doc(userAuth.uid)
-        .get();
-
-
-      const userData = userSnapshot.data();
-
-      if (!userSnapshot.exists || !userData) {
-        return {
-          success: false,
-          error: {
-            message: "This user document doesn't exist anymore.",
-          },
-          uid: userAuth.uid,
-        };
-      }
-
-      const stats = userData.stats;
-      const totalItemsCount = (stats.illustrations.created - stats.illustrations.deleted) +
-        stats.illustrations.fav + stats.illustrations.lists + stats.notifications.total +
-        (stats.boards.created - stats.boards.deleted) + stats.boards.fav;
-
-      // Add delete entry.
-      // Eventually set the [illustrations.author.id] field to an anonymous's id.
-      await firestore
-        .collection('todelete')
-        .doc(userAuth.uid)
-        .set({
-          doc: {
-            id: userAuth.uid,
-            conceptualType: 'user',
-            dataType: 'document',
-            hasChildren: true,
-          },
-          path: `users/${userAuth.uid}`,
-          task: {
-            createdAt: Date.now(),
-            done: false,
-            items: {
-              deleted: 0,
-              total: totalItemsCount ?? 0,
-            },
-            updatedAt: Date.now(),
-          },
-          user: {
-            id: userAuth.uid,
-          },
-        });
-
-      // Delete user auth
-      await adminApp
-        .auth()
-        .deleteUser(userAuth.uid);
-
-      // Delete Firestore document
-      await firestore
-        .collection('users')
-        .doc(userAuth.uid)
-        .delete();
-
-      return {
-        user: {
-          id: userAuth.uid,
-        },
-      };
-
-    } catch (error) {
-      throw new functions.https.HttpsError('internal', 'There was an internal error ' +
-        'while creating your account. Please try again or contact us if the problem persists".');
-    }
-  });
-
-/**
- * Increment user's quote proposition quota.
- * All users have a daily quota limit except moderators or special users.
- * The quota resets everyday at midnight +1 second.
- */
-export const incrementQuota = functions
-  .region('europe-west3')
-  .firestore
-  .document('tempquotes/{tempquoteId}')
-  .onCreate(async (snapshot, context) => {
-    const snapshotData = snapshot.data();
-    if (!snapshotData) { return; }
-
-    const userUid = snapshotData.user.id;
-    if (!userUid) { return; }
-
-    const userDoc = await firestore
+    const userSnap = await firestore
       .collection('users')
-      .doc(userUid)
+      .doc(userAuth.uid)
       .get();
 
-    if (!userDoc.exists) { return; }
+    const userData = userSnap.data();
 
-    const data = userDoc.data();
-    if (!data) { return; }
-
-    const serverDate = new Date(context.timestamp);
-    const quota = data.quota;
-
-    let date = quota.date !== null && typeof quota.date !== 'undefined' ?
-      quota.date.toDate() :
-      new Date('January 1');
-
-    let current: number = quota['current'];
-
-    if (date.getDate() !== serverDate.getDate() ||
-      date.getMonth() !== serverDate.getMonth() ||
-      date.getFullYear() !== serverDate.getFullYear()) {
-
-      current = 0;
-      date = serverDate;
+    if (!userSnap.exists || !userData) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        `This user document doesn't exist. It may have been deleted.`,
+      );
     }
 
-    current += 1;
+    await adminApp
+      .auth()
+      .deleteUser(userAuth.uid);
 
-    return await userDoc.ref
-      .update({
-        'quota.date': adminApp.firestore.Timestamp.fromDate(date),
-        'quota.current': current,
+    await firebaseTools.firestore
+      .delete(userSnap.ref.path, {
+        project: process.env.GCLOUD_PROJECT,
+        recursive: true,
+        yes: true,
       });
+
+    return {
+      success: true,
+      user: {
+        id: userAuth.uid,
+      },
+    };
   });
 
 async function isUserExistsByEmail(email: string) {
@@ -466,51 +384,51 @@ export const updateEmail = functions
     const { idToken, newEmail } = data;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user (1).');
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user (1).`,
+      );
     }
 
     await checkUserIsSignedIn(context, idToken);
-
     const isFormatOk = validateEmailFormat(newEmail);
 
     if (!newEmail || !isFormatOk) {
-      throw new functions.https.HttpsError('invalid-argument', 'The function must be called with ' +
-        'a valid "newEmail" argument. The value you specified is not in a correct email format.');
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called with a valid [newEmail] argument. 
+        The value you specified is not in a correct email format.`,
+      );
     }
 
     const isEmailTaken = await isUserExistsByEmail(newEmail);
 
     if (isEmailTaken) {
-      throw new functions.https.HttpsError('invalid-argument', 'The email specified ' +
-        'is not available. Try specify a new one in the "newEmail" argument.');
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The email specified is not available.
+         Try specify a new one in the "newEmail" argument.`,
+      );
     }
 
-    try {
-      await adminApp
-        .auth()
-        .updateUser(userAuth.uid, {
-          email: newEmail,
-          emailVerified: false,
-        });
+    await adminApp
+      .auth()
+      .updateUser(userAuth.uid, {
+        email: newEmail,
+        emailVerified: false,
+      });
 
-      await firestore
-        .collection('users')
-        .doc(userAuth.uid)
-        .update({
-          email: newEmail,
-          updatedAt: adminApp.firestore.Timestamp.now(),
-        });
+    await firestore
+      .collection('users')
+      .doc(userAuth.uid)
+      .update({
+        email: newEmail,
+      });
 
-      return {
-        success: true,
-        user: { id: userAuth.uid },
-      };
-
-    } catch (error) {
-      throw new functions.https.HttpsError('internal', 'There was an internal error ' +
-        'while creating your account. Please try again or contact us if the problem persists".');
-    }
+    return {
+      success: true,
+      user: { id: userAuth.uid },
+    };
   });
 
 /**
@@ -525,49 +443,51 @@ export const updateUsername = functions
     const userAuth = context.auth;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user.');
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
     }
 
     const { newUsername } = data;
     const isFormatOk = validateNameFormat(newUsername);
 
     if (!newUsername || !isFormatOk) {
-      throw new functions.https.HttpsError('invalid-argument', 'The function must be called with ' +
-        'a valid "newUsername". The value you specified is not in a correct format.');
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called with a valid [newUsername].
+         The value you specified is not in a correct format.`,
+      );
     }
 
     const isUsernameTaken = await isUserExistsByUsername(newUsername.toLowerCase());
 
     if (isUsernameTaken) {
-      throw new functions.https.HttpsError('invalid-argument', 'The name specified ' +
-        'is not available. Please try with a new one.');
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The name specified is not available.
+         Please try with a new one.`,
+      );
     }
 
-    try {
-      await adminApp
-        .auth()
-        .updateUser(userAuth.uid, {
-          displayName: newUsername,
-        });
+    await adminApp
+      .auth()
+      .updateUser(userAuth.uid, {
+        displayName: newUsername,
+      });
 
-      await firestore
-        .collection('users')
-        .doc(userAuth.uid)
-        .update({
-          name: newUsername,
-          nameLowerCase: newUsername.toLowerCase(),
-          updatedAt: adminApp.firestore.Timestamp.now(),
-        });
+    await firestore
+      .collection('users')
+      .doc(userAuth.uid)
+      .update({
+        name: newUsername,
+        nameLowerCase: newUsername.toLowerCase(),
+      });
 
-      return {
-        success: true,
-        user: { id: userAuth.uid },
-      };
-    } catch (error) {
-      throw new functions.https.HttpsError('internal', 'There was an internal error ' +
-        'while creating your account. Please try again or contact us if the problem persists".');
-    }
+    return {
+      success: true,
+      user: { id: userAuth.uid },
+    };
   });
 
 function validateEmailFormat(email: string) {
