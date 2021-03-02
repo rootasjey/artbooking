@@ -10,6 +10,7 @@ import * as sharp from 'sharp';
 import { adminApp } from './adminApp';
 import { checkOrGetDefaultVisibility } from './utils';
 
+const firestore = adminApp.firestore();
 const gcs = new Storage();
 
 interface GenerateImageThumbsParams {
@@ -52,7 +53,7 @@ export const createDocument = functions
     }
 
     try {
-      const addedDoc = await adminApp.firestore()
+      const addedDoc = await firestore
         .collection('illustrations')
         .add({
           author,
@@ -124,7 +125,7 @@ export const createDocument = functions
         });
 
       // Update user's stats
-      const userDoc = await adminApp.firestore()
+      const userDoc = await firestore
         .collection('users')
         .doc(userAuth.uid)
         .get();
@@ -194,7 +195,7 @@ export const deleteDocument = functions
         );
     }
 
-    const docSnap = await adminApp.firestore()
+    const docSnap = await firestore
       .collection('illustrations')
       .doc(id)
       .get();
@@ -237,7 +238,7 @@ export const deleteDocument = functions
     await docSnap.ref.delete();
 
     // Update user's stats
-    const userDoc = await adminApp.firestore()
+    const userDoc = await firestore
       .collection('users')
       .doc(userAuth.uid)
       .get();
@@ -307,7 +308,7 @@ export const deleteDocuments = functions
     
     for await (const id of ids) {
       try {
-        const illusSnap = await adminApp.firestore()
+        const illusSnap = await firestore
           .collection('illustrations')
           .doc(id)
           .get();
@@ -354,7 +355,7 @@ export const deleteDocuments = functions
     }
 
     // Update user's stats
-    const userDoc = await adminApp.firestore()
+    const userDoc = await firestore
       .collection('users')
       .doc(userAuth.uid)
       .get();
@@ -459,7 +460,7 @@ export const onStorageUpload = functions
     const { height, width } = dimensions;
 
     // Save new properties to Firestore.
-    await adminApp.firestore()
+    await firestore
       .collection('illustrations')
       .doc(firestoreId)
       .set({
@@ -479,7 +480,7 @@ export const onStorageUpload = functions
       });
 
     // Update used storage.
-    const userDoc = await adminApp.firestore()
+    const userDoc = await firestore
       .collection('users')
       .doc(userId)
       .get();
@@ -515,7 +516,7 @@ export const setUserAuthor = functions
     const { imageId } = data;
 
     try {
-      const doc = await adminApp.firestore()
+      const doc = await firestore
         .collection('illustrations')
         .doc(imageId)
         .get();
@@ -569,7 +570,7 @@ export const unsetUserAuthor = functions
     const { imageId } = data;
 
     try {
-      const doc = await adminApp.firestore()
+      const doc = await firestore
         .collection('illustrations')
         .doc(imageId)
         .get();
@@ -632,7 +633,7 @@ export const updateDocumentProperties = functions
       visibility, 
     } = data;
 
-    const docSnap = await adminApp.firestore()
+    const docSnap = await firestore
       .collection('illustrations')
       .doc(id)
       .get();
@@ -699,7 +700,7 @@ export const updateDocumentCategories = functions
       );
     }
 
-    const docSnap = await adminApp.firestore()
+    const docSnap = await firestore
       .collection('illustrations')
       .doc(id)
       .get();
@@ -760,7 +761,7 @@ export const updateDocumentTopics = functions
       );
     }
     
-    const docSnap = await adminApp.firestore()
+    const docSnap = await firestore
       .collection('illustrations')
       .doc(id)
       .get();

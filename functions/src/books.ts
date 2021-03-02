@@ -2,6 +2,8 @@ import * as functions from 'firebase-functions';
 import { adminApp } from './adminApp';
 import { checkOrGetDefaultVisibility } from './utils';
 
+const firestore = adminApp.firestore();
+
 /**
  * Add illustrations to an existing book.
  */
@@ -31,7 +33,7 @@ export const addIllustrations = functions
 
     const minimalIllustrations = await createBookIllustrations(illustrationsIds);
 
-    const bookDoc = await adminApp.firestore()
+    const bookDoc = await firestore
       .collection('books')
       .doc(bookId)
       .get();
@@ -48,7 +50,7 @@ export const addIllustrations = functions
     const bookIllustrations: BookIllustration[] = bookData.illustrations;
     const newBookIllustrations = bookIllustrations.concat(minimalIllustrations);
 
-    await adminApp.firestore()
+    await firestore
       .collection('books')
       .doc(bookId)
       .update({
@@ -89,7 +91,7 @@ export const createDocument = functions
     const bookIllustrations = await createBookIllustrations(params.illustrations);
 
     try {
-      const addedBook = await adminApp.firestore()
+      const addedBook = await firestore
         .collection('books')
         .add({
           createdAt: adminApp.firestore.FieldValue.serverTimestamp,
@@ -113,7 +115,7 @@ export const createDocument = functions
         });
 
       // Update user's stats
-      const userDoc = await adminApp.firestore()
+      const userDoc = await firestore
         .collection('users')
         .doc(userAuth.uid)
         .get();
@@ -183,14 +185,14 @@ export const deleteDocument = functions
     }
 
     try {
-      await adminApp.firestore()
+      await firestore
         .collection('books')
         .doc(id)
         .delete();
 
       // Update user's stats
       // -------------------
-      const userDoc = await adminApp.firestore()
+      const userDoc = await firestore
         .collection('users')
         .doc(userAuth.uid)
         .get();
@@ -262,7 +264,7 @@ export const deleteDocuments = functions
 
     for await (const id of ids) {
       try {
-        await adminApp.firestore()
+        await firestore
           .collection('books')
           .doc(id)
           .delete();
@@ -275,7 +277,7 @@ export const deleteDocuments = functions
     }
 
     try { // Update user's stats
-      const userDoc = await adminApp.firestore()
+      const userDoc = await firestore
         .collection('users')
         .doc(userAuth.uid)
         .get();
@@ -350,7 +352,7 @@ export const removeIllustrations = functions
       );
     }
 
-    const bookDoc = await adminApp.firestore()
+    const bookDoc = await firestore
       .collection('books')
       .doc(bookId)
       .get();
@@ -408,7 +410,7 @@ export const updateBookProperties = functions
       visibility, 
     } = params;
 
-    await adminApp.firestore()
+    await firestore
       .collection('books')
       .doc(bookId)
       .update({
@@ -467,7 +469,7 @@ export const updateIllusPosition = functions
       );
     }
 
-    const bookDoc = await adminApp.firestore()
+    const bookDoc = await firestore
       .collection('books')
       .doc(bookId)
       .get();
@@ -494,7 +496,7 @@ export const updateIllusPosition = functions
     const illusToMove = deletedItems[0];
     illustrations.splice(afterPosition, 0, illusToMove);
 
-    await adminApp.firestore()
+    await firestore
       .collection('books')
       .doc(bookId)
       .update({
