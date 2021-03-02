@@ -162,8 +162,10 @@ export const createDocument = functions
 
     } catch (error) {
       console.error(error);
-      throw new functions.https.HttpsError('internal', "There was an internal error. " +
-        "Please try again later or contact us.");
+      throw new functions.https.HttpsError(
+        'internal', 
+        `There was an internal error. Please try again later or contact us.`,
+      );
     }
   });
 

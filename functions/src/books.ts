@@ -12,17 +12,22 @@ export const addIllustrations = functions
     const userAuth = context.auth;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user.');
-    }
-
-    if (!params || !params.bookId || !params.illustrationsIds || params.illustrationsIds.length === 0) {
-      throw new functions.https.HttpsError('invalid-argument',
-        "The function must be called with a valid [id] and [illustrationsIds] parameters " +
-        "which are respectively the book's id and the illustrations' ids array to add.");
+      throw new functions.https.HttpsError(
+        'unauthenticated', 
+        `The function must be called from an authenticated user.`,
+      );
     }
 
     const { bookId, illustrationsIds } = params;
+
+    if (typeof bookId !== 'string' 
+      || !Array.isArray(illustrationsIds) || illustrationsIds.length === 0) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called with a valid [id] and [illustrationsIds] parameters 
+        which are respectively the book's id and the illustrations' ids array to add.`,
+      );
+    }
 
     try {
       const minimalIllustrations = await createBookIllustrations(illustrationsIds);
@@ -69,8 +74,10 @@ export const createDocument = functions
     const userAuth = context.auth;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user.');
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
     }
 
     if (!params || !params.name) {
@@ -158,8 +165,10 @@ export const deleteDocument = functions
     const { id } = params;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user.');
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
     }
 
     if (!params || !id) {
@@ -226,8 +235,10 @@ export const deleteDocuments = functions
     const { ids } = params;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user.');
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
     }
 
     if (!params || !ids || ids.length === 0) {
@@ -305,8 +316,10 @@ export const removeIllustrations = functions
     const userAuth = context.auth;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user.');
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
     }
 
     if (!params || !params.bookId || !params.illustrationsIds || params.illustrationsIds.length === 0) {
@@ -362,8 +375,10 @@ export const updateBookProperties = functions
     const userAuth = context.auth;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user.');
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
     }
 
     checkUpdateBookPropsParam(params);
@@ -417,8 +432,10 @@ export const updateIllusPosition = functions
     const userAuth = context.auth;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user.');
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
     }
 
     if (!params || !params.bookId || !params.beforePosition || 
