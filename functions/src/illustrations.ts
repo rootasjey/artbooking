@@ -28,15 +28,21 @@ export const createDocument = functions
   .https
   .onCall(async (params: CreateIllustrationParams, context) => {
     const userAuth = context.auth;
+    const { name } = params;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user.');
+      throw new functions.https.HttpsError(
+        'unauthenticated', 
+        `The function must be called from an authenticated user.`,
+      );
     }
       
-    if (!params || !params.name) {
-      throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
-        "a valid [name] parameter which is the image's name.");
+    if (typeof name !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument', 
+        `The function must be called with a valid [name] parameter 
+        which is the illustration's name to create.`,
+      );
     }
 
     const author: any = {};
@@ -172,89 +178,102 @@ export const deleteDocument = functions
     const { id } = params;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user.');
+      throw new functions.https.HttpsError(
+        'unauthenticated', 
+        `The function must be called from an authenticated user.`,
+      );
     }
 
-    if (!params || !id) {
-      throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
-        "a valid [id] argument which is the image's id to delete.");
+    if (typeof id !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument', 
+        `The function must be called with a valid [id] argument (string)
+         which is the illustration's id to delete.`,
+        );
     }
 
-    try {
-      // Delete files from Cloud Storage
-      const dir = await adminApp.storage()
-        .bucket()
-        .getFiles({
-          directory: `users/${userAuth.uid}/illustrations/${id}`
+    const docSnap = await adminApp.firestore()
+      .collection('illustrations')
+      .doc(id)
+      .get();
+
+    const docData = docSnap.data();
+
+    if (!docSnap.exists || !docData) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        `The illustration id [${id}] doesn't exist.`,
+      );
+    }
+
+    if (docData.user.id !== userAuth.uid) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        `You don't have the permission to edit this illustration.`,
+      );
+    }
+
+    // Delete files from Cloud Storage
+    const dir = await adminApp.storage()
+      .bucket()
+      .getFiles({
+        directory: `users/${userAuth.uid}/illustrations/${id}`
+      });
+
+    const files = dir[0];
+
+    for await (const file of files) {
+      await file.delete();
+    }
+
+    let imageBytesToRemove = 0;
+
+    if (docData) {
+      imageBytesToRemove = docData.size ?? 0;
+    }
+
+    await docSnap.ref.delete();
+
+    // Update user's stats
+    const userDoc = await adminApp.firestore()
+      .collection('users')
+      .doc(userAuth.uid)
+      .get();
+
+    const userData = userDoc.data();
+
+    if (userData) {
+      let deleted: number = userData.stats?.illustrations?.deleted;
+      let own: number = userData.stats?.illustrations?.own;
+
+      if (typeof deleted !== 'number') {
+        deleted = 0;
+      }
+
+      if (typeof own !== 'number') {
+        own = 0;
+      }
+
+      own = own > 0 ? own - 1 : 0;
+      deleted++
+
+      // Update used storage.
+      let storageIllustrationsUsed: number = userData.stats.storage.illustrations.used;
+      storageIllustrationsUsed -= imageBytesToRemove;
+
+      await userDoc.ref
+        .update({
+          'stats.illustrations.own': own,
+          'stats.illustrations.deleted': deleted,
+          'stats.storage.illustrations.used': storageIllustrationsUsed,
+          updatedAt: adminApp.firestore.Timestamp.now(),
         });
-        
-      const files = dir[0];
-
-      for await (const file of files) {
-        await file.delete();
-      }
-
-      // Delete Firestore document
-      const imageDoc = await adminApp.firestore()
-        .collection('illustrations')
-        .doc(id)
-        .get();
-
-      let imageBytesToRemove = 0;
-      const imageData = imageDoc.data();
-      
-      if (imageData) {
-        imageBytesToRemove = imageData.size ?? 0;
-      }
-
-      await imageDoc.ref.delete();
-
-      // Update user's stats
-      const userDoc = await adminApp.firestore()
-        .collection('users')
-        .doc(userAuth.uid)
-        .get();
-
-      const userData = userDoc.data();
-
-      if (userData) {
-        let deleted: number = userData.stats?.illustrations?.deleted;
-        let own: number = userData.stats?.illustrations?.own;
-
-        if (typeof deleted !== 'number') {
-          deleted = 0;
-        }
-
-        if (typeof own !== 'number') {
-          own = 0;
-        }
-
-        own = own > 0 ? own - 1 : 0;
-        deleted++
-
-        // Update used storage.
-        let storageIllustrationsUsed: number = userData.stats.storage.illustrations.used;
-        storageIllustrationsUsed -= imageBytesToRemove;
-
-        await userDoc.ref
-          .update({
-            'stats.illustrations.own': own,
-            'stats.illustrations.deleted': deleted,
-            'stats.storage.illustrations.used': storageIllustrationsUsed,
-            updatedAt: adminApp.firestore.Timestamp.now(),
-          });
-      }
-
-      return {
-        id,
-        success: true,
-      };
-
-    } catch (error) {
-      throw new functions.https.HttpsError('internal', "There was an internal error. " +
-        "Please try again later or contact us.");
     }
+
+    return {
+      id,
+      success: true,
+    };
   });
 
 /**
@@ -268,19 +287,45 @@ export const deleteDocuments = functions
     const { ids } = params;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user.');
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
     }
 
-    if (!params || !ids || ids.length === 0) {
-      throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
-        "a valid [ids] argument which is an array of illustrations ids to delete.");
+    if (!Array.isArray(ids) || ids.length === 0) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called  with a valid [ids]
+         which is an array of illustrations string id to delete.`,
+      );
     }
 
     let illustrationsBytesToRemove: number = 0;
     
     for await (const id of ids) {
       try {
+        const illusSnap = await adminApp.firestore()
+          .collection('illustrations')
+          .doc(id)
+          .get();
+
+        const illusData = illusSnap.data();
+
+        if (!illusSnap.exists || !illusData) {
+          throw new functions.https.HttpsError(
+            'not-found',
+            `The illustration to delete doesn't exist.`,
+          )
+        }
+
+        if (illusData.user.id !== userAuth.uid) {
+          throw new functions.https.HttpsError(
+            'permission-denied',
+            `You don't the permission to delete this illustration [${id}].`,
+          )
+        }
+
         // Delete files from Cloud Storage
         const dir = await adminApp.storage()
           .bucket()
@@ -294,18 +339,11 @@ export const deleteDocuments = functions
           await file.delete();
         }
 
-        // Delete Firestore document
-        const imageDoc = await adminApp.firestore()
-          .collection('illustrations')
-          .doc(id)
-          .get();
-
-        const imageData = imageDoc.data();
-        if (imageData) {
-          illustrationsBytesToRemove += imageData.size as number;
+        if (illusData) {
+          illustrationsBytesToRemove += illusData.size as number;
         }
 
-        await imageDoc.ref.delete();
+        await illusSnap.ref.delete();
 
       } catch (error) {
         throw new functions.https.HttpsError('internal', "There was an internal error. " +
@@ -592,27 +630,39 @@ export const updateDocumentProperties = functions
       visibility, 
     } = data;
 
-    try {
-      await adminApp.firestore()
-        .collection('illustrations')
-        .doc(id)
-        .update({
-          description,
-          name,
-          license,
-          summary,
-          visibility,
-        });
+    const docSnap = await adminApp.firestore()
+      .collection('illustrations')
+      .doc(id)
+      .get();
 
-      return {
-        id,
-        success: true,
-      }
-    } catch (error) {
+    const docData = docSnap.data();
+
+    if (!docSnap.exists || !docData) {
       throw new functions.https.HttpsError(
-        'internal', 
-        `There was an internal error. Please try again later or contact us.`,
+        'not-found',
+        `The illustration id [${id}] doesn't exist.`,
       );
+    }
+
+    if (docData.user.id !== userAuth.uid) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        `You don't have the permission to edit this illustration.`,
+      );
+    }
+
+    await docSnap.ref
+      .update({
+        description,
+        name,
+        license,
+        summary,
+        visibility,
+      });
+
+    return {
+      id,
+      success: true,
     }
   });
 
@@ -623,31 +673,57 @@ export const updateDocumentCategories = functions
     const userAuth = context.auth;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user.');
+      throw new functions.https.HttpsError(
+        'unauthenticated', 
+        `The function must be called from an authenticated user.`,
+      );
     }
     
     const { categories, id } = data;
     
-    if (!categories) {
-      throw new functions.https.HttpsError('invalid-argument', 'The function must be called  ' +
-        "with [categories] argument which is the image's categories.");
+    if (typeof id !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument', 
+        `The function must be called  with a valid [id] 
+        argument which is the illustration's id.`,
+      );
+    }
+    
+    if (!Array.isArray(categories)) {
+      throw new functions.https.HttpsError(
+        'invalid-argument', 
+        `The function must be called  with a valid [categories] 
+        argument which is an array of string.`,
+      );
     }
 
-    try {
-      await adminApp.firestore()
-        .collection('illustrations')
-        .doc(id)
-        .set({categories}, {merge: true});
+    const docSnap = await adminApp.firestore()
+      .collection('illustrations')
+      .doc(id)
+      .get();
 
-      return { 
-        id, 
-        success: true, 
-      };
-    } catch (error) {
-      throw new functions.https.HttpsError('internal', "There was an internal error. " +
-        "Please try again later or contact us.");
+    const docData = docSnap.data();
+
+    if (!docSnap.exists || !docData) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        `The illustration id [${id}] doesn't exist.`,
+      );
     }
+
+    if (docData.user.id !== userAuth.uid) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        `You don't have the permission to edit this illustration.`,
+      );
+    }
+
+    await docSnap.ref.update({categories});
+
+    return { 
+      id, 
+      success: true, 
+    };
   });
 
 export const updateDocumentTopics = functions
@@ -657,30 +733,57 @@ export const updateDocumentTopics = functions
     const userAuth = context.auth;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user.');
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
     }
 
     const { topics, id } = data;
 
-    if (!topics) {
-      throw new functions.https.HttpsError('invalid-argument', 'The function must be called  ' +
-        "with [topics] argument which is the image's topics.");
+
+    if (typeof id !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called  with a valid [id] 
+        argument which is the illustration's id.`,
+      );
     }
 
-    try {
-      await adminApp.firestore()
-        .collection('illustrations')
-        .doc(id)
-        .set({ topics }, { merge: true });
+    if (!Array.isArray(topics)) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called  with a valid [topics] 
+        argument which is an array of string.`,
+      );
+    }
+    
+    const docSnap = await adminApp.firestore()
+      .collection('illustrations')
+      .doc(id)
+      .get();
 
-      return {
-        id,
-        success: true,
-      }
-    } catch (error) {
-      throw new functions.https.HttpsError('internal', "There was an internal error. " +
-        "Please try again later or contact us.");
+    const docData = docSnap.data();
+
+    if (!docSnap.exists || !docData) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        `The illustration id [${id}] doesn't exist.`,
+      );
+    }
+
+    if (docData.user.id !== userAuth.uid) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        `You don't have the permission to edit this illustration.`,
+      );
+    }
+
+    await docSnap.ref.update({ topics });
+
+    return {
+      id,
+      success: true,
     }
   });
 
