@@ -242,17 +242,20 @@ interface UpdateIllusPositionParams {
 }
 
 interface UpdateImagePropsParams {
-  /** Image's description. */
+  /** Illustration's description. */
   description: string,
   
-  /** Image's id. */
+  /** Illustration's id. */
   id: string;
   
-  /** Image's name. */
+  /** Illustration's name. */
   name: string;
   
-  /** Image's license. */
+  /** Illustration's license. */
   license: string;
+  
+  /** Detailed text explaining more about this illustration. */
+  summary: string;
 
   /** Image's visibility. */
   visibility: Visibility;

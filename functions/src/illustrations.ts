@@ -83,6 +83,7 @@ export const createDocument = functions
             shares: 0,
             views: 0,
           },
+          summary: '',
           timelapse: {
             createdAt: null,
             description: '',
@@ -566,7 +567,7 @@ export const unsetUserAuthor = functions
   });
 
 /**
- * Update description, name, license, visibility if specified.
+ * Update description, name, license, summary, & visibility if specified.
  */
 export const updateDocumentProperties = functions
   .region('europe-west3')
@@ -575,35 +576,43 @@ export const updateDocumentProperties = functions
     const userAuth = context.auth;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user.');
+      throw new functions.https.HttpsError(
+        'unauthenticated', 
+        `The function must be called from an authenticated user.`,
+      );
     }
 
     checkUpdateParams(data);
-    const { description, id, name, license, visibility } = data;
+
+    const { description, 
+      id, 
+      name, 
+      license, 
+      summary, 
+      visibility, 
+    } = data;
 
     try {
       await adminApp.firestore()
         .collection('illustrations')
         .doc(id)
-        .set({
+        .update({
           description,
           name,
           license,
+          summary,
           visibility,
-        },
-          {
-            merge: true,
-          }
-        );
+        });
 
       return {
         id,
         success: true,
       }
     } catch (error) {
-      throw new functions.https.HttpsError('internal', "There was an internal error. " +
-        "Please try again later or contact us.");
+      throw new functions.https.HttpsError(
+        'internal', 
+        `There was an internal error. Please try again later or contact us.`,
+      );
     }
   });
 
@@ -689,31 +698,51 @@ function checkUpdateParams(data: UpdateImagePropsParams) {
       "a valid [description], [id], [name], [license] and [visibility] parameters..");
   }
 
-  const { description, id, name, license, visibility } = data;
+  const { description, id, name, license, summary, visibility } = data;
 
   if (typeof description === 'undefined') {
     throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
       "a valid [description] parameter which is the image's description.");
   }
 
-  if (typeof id === 'undefined') {
-    throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
-      "a valid [id] parameter which is the image's id.");
+  if (typeof id !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument', 
+      `The function must be called with a valid [id] 
+      parameter which is the image's id.`,
+    );
   }
 
-  if (typeof name === 'undefined') {
-    throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
-      "a valid [name] parameter which is the image's name.");
+  if (typeof name !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument', 
+      `The function must be called with a valid [name] 
+      parameter which is the image's name.`,
+    );
   }
 
-  if (typeof license === 'undefined') {
-    throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
-      "a valid [license] parameter which is the image's license.");
+  if (typeof license !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument', 
+      `The function must be called with a valid [license] 
+      parameter which is the image's license.`,
+    );
   }
 
-  if (typeof visibility === 'undefined') {
-    throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
-      "a valid [visibility] parameter which is the image's visibility.");
+  if (typeof summary !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument', 
+      `The function must be called with a valid [license] 
+      parameter which is the image's license.`,
+      );
+  }
+
+  if (typeof visibility !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument', 
+      `The function must be called with a valid [visibility] 
+      parameter which is the image's visibility.`,
+    );
   }
 }
 
