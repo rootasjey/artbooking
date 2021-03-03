@@ -11,18 +11,7 @@ class FontsUtils {
     FontWeight fontWeight = FontWeight.w400,
     double fontSize = 16.0,
     Color color,
-    // BuildContext context,
   }) {
-    // if (context != null) {
-    //   final textTheme = Theme.of(context).textTheme;
-
-    //   return GoogleFonts.raleway(
-    //     textStyle: textTheme.bodyText1,
-    //     fontSize: fontSize,
-    //     fontWeight: fontWeight,
-    //   );
-    // }
-
     if (color == null) {
       return GoogleFonts.raleway(
         fontSize: fontSize,
