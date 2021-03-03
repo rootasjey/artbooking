@@ -72,7 +72,7 @@ export function sendNotification(notificationData: any) {
  * @param visibilityParam - Visibility value. Accepted values: acl, challenge, contest, gallery, private, public.
  */
 export function checkOrGetDefaultVisibility(visibilityParam: string) {
-  let defaultVisibility = 'private';
+  const defaultVisibility = 'private';
 
   const allowedVisibility = ['acl', 'challenge', 'contest', 'gallery', 'private', 'public'];
 

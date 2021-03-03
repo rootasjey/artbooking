@@ -24,7 +24,7 @@ interface GenerateImageThumbsParams {
 /**
  * Create a new document with predefined values.
  */
-export const createDocument = functions
+export const createOne = functions
   .region('europe-west3')
   .https
   .onCall(async (params: CreateIllustrationParams, context) => {
@@ -173,7 +173,7 @@ export const createDocument = functions
 /**
  * Delete an image document from Firestore and from Cloud Storage.
  */
-export const deleteDocument = functions
+export const deleteOne = functions
   .region('europe-west3')
   .https
   .onCall(async (params: DeleteIllustrationParams, context) => {
@@ -282,7 +282,7 @@ export const deleteDocument = functions
 /**
  * Delete multiple illustrations documents from Firestore and from Cloud Storage.
  */
-export const deleteDocuments = functions
+export const deleteMany = functions
   .region('europe-west3')
   .https
   .onCall(async (params: DeleteMultipleIllustrationsParams, context) => {
@@ -610,7 +610,7 @@ export const unsetUserAuthor = functions
 /**
  * Update description, name, license, summary, & visibility if specified.
  */
-export const updateDocumentProperties = functions
+export const updateMetadata = functions
   .region('europe-west3')
   .https
   .onCall(async (data: UpdateImagePropsParams, context) => {
@@ -671,7 +671,7 @@ export const updateDocumentProperties = functions
     }
   });
 
-export const updateDocumentCategories = functions
+export const updateCategories = functions
   .region('europe-west3')
   .https
   .onCall(async (data: UpdateImageCategoriesParams, context) => {
@@ -731,7 +731,7 @@ export const updateDocumentCategories = functions
     };
   });
 
-export const updateDocumentTopics = functions
+export const updateTopics = functions
   .region('europe-west3')
   .https
   .onCall(async (data: UpdateImageTopicsParams, context) => {
