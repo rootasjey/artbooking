@@ -11,7 +11,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
 
-class ImageItem extends StatefulWidget {
+class ImageCard extends StatefulWidget {
   final bool selected;
   final bool selectionMode;
   final Illustration illustration;
@@ -21,7 +21,7 @@ class ImageItem extends StatefulWidget {
   final Function onBeforePressed;
   final double size;
 
-  ImageItem({
+  ImageCard({
     @required this.illustration,
     this.selected = false,
     this.selectionMode = false,
@@ -33,10 +33,10 @@ class ImageItem extends StatefulWidget {
   });
 
   @override
-  _ImageItemState createState() => _ImageItemState();
+  _ImageCardState createState() => _ImageCardState();
 }
 
-class _ImageItemState extends State<ImageItem> with AnimationMixin {
+class _ImageCardState extends State<ImageCard> with AnimationMixin {
   Animation<double> scaleAnimation;
   Animation<Offset> offsetAnimation;
   Animation<double> opacity;

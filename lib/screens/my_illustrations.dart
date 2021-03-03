@@ -1,7 +1,7 @@
 import 'package:artbooking/actions/illustrations.dart';
+import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/default_app_bar.dart';
-import 'package:artbooking/components/image_item.dart';
-import 'package:artbooking/components/full_page_loading.dart';
+import 'package:artbooking/components/image_card.dart';
 import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/screens/signin.dart';
 import 'package:artbooking/state/colors.dart';
@@ -94,7 +94,9 @@ class _MyIllustrationsState extends State<MyIllustrations> {
             header(),
             body(),
             SliverPadding(
-              padding: const EdgeInsets.only(bottom: 100.0),
+              padding: const EdgeInsets.only(
+                bottom: 100.0,
+              ),
             ),
           ],
         ),
@@ -126,7 +128,9 @@ class _MyIllustrationsState extends State<MyIllustrations> {
         delegate: SliverChildListDelegate.fixed([
           Padding(
             padding: const EdgeInsets.only(top: 100.0),
-            child: FullPageLoading(),
+            child: AnimatedAppIcon(
+              textTitle: "Loading illustrations...",
+            ),
           ),
         ]),
       );
@@ -261,7 +265,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
             final illustration = illustrationsList.elementAt(index);
             final selected = multiSelectedItems.containsKey(illustration.id);
 
-            return ImageItem(
+            return ImageCard(
               illustration: illustration,
               selected: selected,
               selectionMode: selectionMode,
