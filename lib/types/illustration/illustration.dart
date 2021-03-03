@@ -39,6 +39,9 @@ class Illustration {
   /// This illustration's name.
   String name;
 
+  /// Detailed text explaining more about this illustration.
+  String summary;
+
   /// Cloud Storage file's size in bytes.
   final int size;
 
@@ -62,6 +65,7 @@ class Illustration {
     this.name = '',
     this.stats,
     this.size = 0,
+    this.summary = '',
     this.updatedAt,
     this.urls,
     this.versions = const [],
@@ -81,6 +85,7 @@ class Illustration {
       name: data['name'],
       stats: IllustrationStats.fromJSON(data['stats']),
       size: data['size'],
+      summary: data['summary'] ?? '',
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
       urls: Urls.fromJSON(data['urls']),
       versions: [],
@@ -172,6 +177,27 @@ class Illustration {
         return 'challenge';
       case ContentVisibility.contest:
         return 'contest';
+      case ContentVisibility.gallery:
+        return 'gallery';
+      case ContentVisibility.private:
+        return 'private';
+      case ContentVisibility.public:
+        return 'public';
+      default:
+        return 'private';
+    }
+  }
+
+  static String visibilityPropToString(ContentVisibility visibility) {
+    switch (visibility) {
+      case ContentVisibility.acl:
+        return 'acl';
+      case ContentVisibility.challenge:
+        return 'challenge';
+      case ContentVisibility.contest:
+        return 'contest';
+      case ContentVisibility.gallery:
+        return 'gallery';
       case ContentVisibility.private:
         return 'private';
       case ContentVisibility.public:

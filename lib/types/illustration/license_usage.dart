@@ -51,4 +51,19 @@ class LicenseUsage {
       view: data['view'],
     );
   }
+
+  Map<String, bool> toJSON() {
+    final data = Map<String, bool>();
+
+    data['edit'] = edit;
+    data['print'] = print;
+    data['sell'] = sell;
+    data['share'] = share;
+    data['showAttribution'] = showAttribution;
+    data['useInOtherFree'] = useInOtherFree;
+    data['useInOtherPaid'] = useInOtherPaid;
+    data['view'] = view;
+
+    return data;
+  }
 }

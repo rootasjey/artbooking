@@ -7,7 +7,6 @@ import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/upload_task.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/converters.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
@@ -432,7 +431,7 @@ class _AddIllustrationState extends State<AddIllustration> {
             'extension': imageFile.extension,
             'firestoreId': result.id,
             'userId': userAuth.uid,
-            'visibility': imageVisibilityToString(imageVisibility),
+            'visibility': Illustration.visibilityPropToString(imageVisibility),
           },
         ),
       );

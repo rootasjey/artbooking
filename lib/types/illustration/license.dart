@@ -33,4 +33,16 @@ class IllustrationLicense {
       usage: LicenseUsage.fromJSON(data['usage']),
     );
   }
+
+  Map<String, dynamic> toJSON() {
+    final data = Map<String, dynamic>();
+
+    data['custom'] = custom;
+    data['description'] = description;
+    data['name'] = name;
+    data['refId'] = existingLicenseId;
+    data['usage'] = usage.toJSON();
+
+    return data;
+  }
 }
