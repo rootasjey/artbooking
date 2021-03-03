@@ -66,7 +66,7 @@ export const addIllustrations = functions
 /**
  * Create a book document in Firestore.
  */
-export const createDocument = functions
+export const createOne = functions
   .region('europe-west3')
   .https
   .onCall(async (params: CreateBookParams, context) => {
@@ -162,7 +162,7 @@ export const createDocument = functions
 /**
  * Delete a book document from Firestore.
  */
-export const deleteDocument = functions
+export const deleteOne = functions
   .region('europe-west3')
   .https
   .onCall(async (params: DeleteBookParams, context) => {
@@ -237,7 +237,7 @@ export const deleteDocument = functions
 /**
  * Delete multiple books documents from Firestore.
  */
-export const deleteDocuments = functions
+export const deleteMany = functions
   .region('europe-west3')
   .https
   .onCall(async (params: DeleteBooksParams, context) => {
@@ -383,7 +383,7 @@ export const removeIllustrations = functions
 /**
  * Update book's properties.
  */
-export const updateBookProperties = functions
+export const updateMetadata = functions
   .region('europe-west3')
   .https
   .onCall(async (params: UpdateBookPropertiesParams, context) => {
