@@ -625,13 +625,15 @@ export const updateDocumentProperties = functions
 
     checkUpdateParams(data);
 
-    const { description, 
+    const { 
+      description, 
       id, 
       name, 
       license, 
       summary, 
-      visibility, 
     } = data;
+
+    const visibility = checkLicenseFormat(data.visibility);
 
     const docSnap = await firestore
       .collection('illustrations')
@@ -827,7 +829,7 @@ function checkUpdateParams(data: UpdateImagePropsParams) {
     );
   }
 
-  if (typeof license !== 'string') {
+  if (typeof license !== 'object') {
     throw new functions.https.HttpsError(
       'invalid-argument', 
       `The function must be called with a valid [license] 
@@ -850,6 +852,89 @@ function checkUpdateParams(data: UpdateImagePropsParams) {
       parameter which is the image's visibility.`,
     );
   }
+}
+
+function checkLicenseFormat(data: any) {
+  const defaultLicense = {
+    custom: false,
+    description: '',
+    name: '',
+    existingLicenseId: '',
+    usage: {
+      edit: false,
+      print: false,
+      sell: false,
+      share: false,
+      showAttribution: true,
+      useInOtherFree: false,
+      useInOtherOss: false,
+      useInOtherPaid: false,
+      view: false,
+    },
+  };
+
+  if (!data) {
+    return defaultLicense;
+  }
+
+  if (typeof data.custom === 'boolean') {
+    defaultLicense.custom = data.custom;
+  }
+
+  if (typeof data.description === 'string') {
+    defaultLicense.description = data.description;
+  }
+
+  if (typeof data.name === 'string') {
+    defaultLicense.name = data.name;
+  }
+
+  if (typeof data.existingLicenseId === 'string') {
+    defaultLicense.existingLicenseId = data.existingLicenseId;
+  }
+
+  if (!data.usage) {
+    return data;
+  }
+
+  if (typeof data.usage.edit === 'boolean') {
+    defaultLicense.usage.edit = data.usage.edit;
+  }
+
+  if (typeof data.usage.print === 'boolean') {
+    defaultLicense.usage.print = data.usage.print;
+  }
+
+  if (typeof data.usage.sell === 'boolean') {
+    defaultLicense.usage.sell = data.usage.sell;
+  }
+
+  if (typeof data.usage.share === 'boolean') {
+    defaultLicense.usage.share = data.usage.share;
+  }
+
+  if (typeof data.usage.showAttribution === 'boolean') {
+    defaultLicense.usage.showAttribution = data.usage.showAttribution;
+  }
+
+  if (typeof data.usage.useInOtherFree === 'boolean') {
+    defaultLicense.usage.useInOtherFree = data.usage.useInOtherFree;
+  }
+
+
+  if (typeof data.usage.useInOtherOss === 'boolean') {
+    defaultLicense.usage.useInOtherOss = data.usage.useInOtherOss;
+  }
+    
+  if (typeof data.usage.useInOtherPaid === 'boolean') {
+    defaultLicense.usage.useInOtherPaid = data.usage.useInOtherPaid;
+  }
+
+  if (typeof data.usage.view === 'boolean') {
+    defaultLicense.usage.view = data.usage.view;
+  }
+
+  return data;
 }
 
 /**
