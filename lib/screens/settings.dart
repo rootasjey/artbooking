@@ -10,6 +10,7 @@ import 'package:artbooking/state/user.dart';
 import 'package:artbooking/utils/app_storage.dart';
 import 'package:artbooking/utils/brightness.dart';
 import 'package:artbooking/utils/constants.dart';
+import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/language.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:auto_route/annotations.dart';
@@ -237,30 +238,7 @@ class _SettingsState extends State<Settings> {
       padding: EdgeInsets.only(top: paddingTop),
       sliver: SliverList(
         delegate: SliverChildListDelegate([
-          if (showBigTitle)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 80.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (context.router.root.stack.length > 1)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 16.0),
-                      child: IconButton(
-                        onPressed: context.router.pop,
-                        icon: Icon(Icons.arrow_back),
-                      ),
-                    ),
-                  Text(
-                    'Settings',
-                    style: TextStyle(
-                      fontSize: 80.0,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          if (showBigTitle) header(),
           accountSettings(),
           appSettings(),
         ]),
@@ -298,6 +276,29 @@ class _SettingsState extends State<Settings> {
           ),
         )
       ],
+    );
+  }
+
+  Widget header() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 80.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (context.router.root.stack.length > 1)
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: IconButton(
+                onPressed: context.router.pop,
+                icon: Icon(Icons.arrow_back),
+              ),
+            ),
+          Text(
+            'Settings',
+            style: FontsUtils.boldTitleStyle(),
+          ),
+        ],
+      ),
     );
   }
 

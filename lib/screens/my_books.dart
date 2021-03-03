@@ -6,6 +6,7 @@ import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/screens/signin.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/book.dart';
+import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -111,10 +112,7 @@ class _MyBooksState extends State<MyBooks> {
         delegate: SliverChildListDelegate.fixed([
           Text(
             'Books',
-            style: TextStyle(
-              fontSize: 80.0,
-              fontWeight: FontWeight.w900,
-            ),
+            style: FontsUtils.boldTitleStyle(),
           ),
           defaultActionsToolbar(),
           multiSelectToolbar(),

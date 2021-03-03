@@ -3,6 +3,7 @@ import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/create_image_doc_resp.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/utils/fonts.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -161,10 +162,10 @@ class _ImageItemState extends State<ImageItem> with AnimationMixin {
                   Expanded(
                     child: Text(
                       illustration.name,
-                      style: TextStyle(
-                        color: Colors.white,
+                      style: FontsUtils.mainStyle(
                         fontSize: 16.0,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
                     ),
                   ),

@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// Fonts utilities.
@@ -10,10 +10,38 @@ class FontsUtils {
   static TextStyle mainStyle({
     FontWeight fontWeight = FontWeight.w400,
     double fontSize = 16.0,
+    Color color,
+    // BuildContext context,
   }) {
+    // if (context != null) {
+    //   final textTheme = Theme.of(context).textTheme;
+
+    //   return GoogleFonts.raleway(
+    //     textStyle: textTheme.bodyText1,
+    //     fontSize: fontSize,
+    //     fontWeight: fontWeight,
+    //   );
+    // }
+
+    if (color == null) {
+      return GoogleFonts.raleway(
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+      );
+    }
+
     return GoogleFonts.raleway(
+      color: color,
       fontSize: fontSize,
       fontWeight: fontWeight,
+    );
+  }
+
+  /// Return main text style for this app.
+  static TextStyle boldTitleStyle() {
+    return GoogleFonts.raleway(
+      fontSize: 80.0,
+      fontWeight: FontWeight.w700,
     );
   }
 }

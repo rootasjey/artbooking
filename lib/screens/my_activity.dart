@@ -4,6 +4,7 @@ import 'package:artbooking/screens/dashboard.dart';
 import 'package:artbooking/screens/signin.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
+import 'package:artbooking/utils/fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
@@ -33,7 +34,7 @@ class _MyActivityState extends State<MyActivity> {
           DefaultAppBar(),
           SliverList(
             delegate: SliverChildListDelegate([
-              mainContentTitle(),
+              header(),
               body(),
               Padding(padding: const EdgeInsets.only(bottom: 200.0)),
             ]),
@@ -59,7 +60,7 @@ class _MyActivityState extends State<MyActivity> {
     );
   }
 
-  Widget mainContentTitle() {
+  Widget header() {
     return Padding(
       padding: const EdgeInsets.only(
         top: 20.0,
@@ -71,10 +72,7 @@ class _MyActivityState extends State<MyActivity> {
         children: [
           Text(
             'Activity',
-            style: TextStyle(
-              fontSize: 90.0,
-              fontWeight: FontWeight.w600,
-            ),
+            style: FontsUtils.boldTitleStyle(),
           ),
         ],
       ),
