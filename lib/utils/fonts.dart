@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 /// See https://github.com/material-foundation/google-fonts-flutter/issues/35
 class FontsUtils {
   /// Return main text style for this app.
-  static TextStyle getMainStyle({
+  static TextStyle mainStyle({
     FontWeight fontWeight = FontWeight.w400,
     double fontSize = 16.0,
   }) {

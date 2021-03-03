@@ -168,7 +168,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
             opacity: 0.8,
             child: Text(
               illustration.name ?? '',
-              style: FontsUtils.getMainStyle(
+              style: FontsUtils.mainStyle(
                 fontSize: 56.0,
                 fontWeight: FontWeight.w700,
               ),
@@ -192,7 +192,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
                 opacity: 0.6,
                 child: Text(
                   illustration.summary ?? '',
-                  style: FontsUtils.getMainStyle(
+                  style: FontsUtils.mainStyle(
                     fontSize: 24.0,
                     fontWeight: FontWeight.w200,
                   ),
