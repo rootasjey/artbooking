@@ -13,7 +13,7 @@ class FontsUtils {
   }) {
     return GoogleFonts.raleway(
       fontSize: fontSize,
-      fontWeight: FontWeight.w700,
+      fontWeight: fontWeight,
     );
   }
 }
