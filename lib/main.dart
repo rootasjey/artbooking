@@ -61,11 +61,15 @@ class AppState extends State<App> {
     return AdaptiveTheme(
       light: ThemeData(
         brightness: Brightness.light,
-        fontFamily: GoogleFonts.raleway().fontFamily,
+        textTheme: GoogleFonts.ralewayTextTheme(
+          Theme.of(context).textTheme,
+        ),
       ),
       dark: ThemeData(
         brightness: Brightness.dark,
-        fontFamily: GoogleFonts.raleway().fontFamily,
+        textTheme: GoogleFonts.ralewayTextTheme(
+          Theme.of(context).textTheme,
+        ),
       ),
       initial: widget.brightness == Brightness.light
           ? AdaptiveThemeMode.light
