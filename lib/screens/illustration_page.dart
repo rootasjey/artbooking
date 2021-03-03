@@ -110,7 +110,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
         delegate: SliverChildListDelegate.fixed([
           illustrationCard(),
           userActions(),
-          if (isEditModeOn) editCaptions() else metadata(),
+          if (isEditModeOn) metdataEdit() else metadata(),
         ]),
       ),
     );
@@ -137,6 +137,26 @@ class _IllustrationPageState extends State<IllustrationPage> {
     );
   }
 
+  Widget loadingView() {
+    return SliverPadding(
+      padding: const EdgeInsets.only(top: 80.0),
+      sliver: SliverList(
+        delegate: SliverChildListDelegate([
+          Padding(
+            padding: const EdgeInsets.all(40.0),
+            child: Column(
+              children: [
+                AnimatedAppIcon(
+                  textTitle: "Loading...",
+                ),
+              ],
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
   Widget metadata() {
     return Padding(
       padding: const EdgeInsets.only(
@@ -149,7 +169,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
             child: Text(
               illustration.name ?? '',
               style: FontsUtils.getMainStyle(
-                fontSize: 48.0,
+                fontSize: 56.0,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -172,8 +192,8 @@ class _IllustrationPageState extends State<IllustrationPage> {
                 opacity: 0.6,
                 child: Text(
                   illustration.summary ?? '',
-                  style: TextStyle(
-                    fontSize: 18.0,
+                  style: FontsUtils.getMainStyle(
+                    fontSize: 24.0,
                     fontWeight: FontWeight.w200,
                   ),
                 ),
@@ -184,44 +204,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
     );
   }
 
-  Widget userActions() {
-    return Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        children: [
-          IconButton(
-            icon: Icon(UniconsLine.heart),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(UniconsLine.share),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(UniconsLine.edit),
-            onPressed: () {
-              setState(() {
-                nameController.text = illustration.name;
-                descController.text = illustration.description;
-                summaryController.text = illustration.summary;
-
-                newName = illustration.name;
-                newDesc = illustration.description;
-                newSummary = illustration.summary;
-                newLicense = illustration.license;
-                newVisibility = illustration.visibility;
-
-                isEditModeOn = !isEditModeOn;
-              });
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget editCaptions() {
+  Widget metdataEdit() {
     return Padding(
       padding: const EdgeInsets.only(
         top: 24.0,
@@ -259,7 +242,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
             ),
           ),
           Container(
-            width: 250.0,
+            width: 500.0,
             padding: const EdgeInsets.only(top: 24.0),
             child: TextField(
               controller: summaryController,
@@ -274,26 +257,6 @@ class _IllustrationPageState extends State<IllustrationPage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget loadingView() {
-    return SliverPadding(
-      padding: const EdgeInsets.only(top: 80.0),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate([
-          Padding(
-            padding: const EdgeInsets.all(40.0),
-            child: Column(
-              children: [
-                AnimatedAppIcon(
-                  textTitle: "Loading...",
-                ),
-              ],
-            ),
-          ),
-        ]),
       ),
     );
   }
@@ -375,6 +338,43 @@ class _IllustrationPageState extends State<IllustrationPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget userActions() {
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        children: [
+          IconButton(
+            icon: Icon(UniconsLine.heart),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: Icon(UniconsLine.share),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: Icon(UniconsLine.edit),
+            onPressed: () {
+              setState(() {
+                nameController.text = illustration.name;
+                descController.text = illustration.description;
+                summaryController.text = illustration.summary;
+
+                newName = illustration.name;
+                newDesc = illustration.description;
+                newSummary = illustration.summary;
+                newLicense = illustration.license;
+                newVisibility = illustration.visibility;
+
+                isEditModeOn = !isEditModeOn;
+              });
+            },
+          ),
+        ],
       ),
     );
   }
