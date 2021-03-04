@@ -1,4 +1,5 @@
-import 'package:artbooking/screens/home/home_desktop.dart';
+import 'package:artbooking/router/app_router.gr.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
 class AppIcon extends StatefulWidget {
@@ -37,10 +38,6 @@ class _AppIconState extends State<AppIcon> {
   }
 
   void defaultOnTap() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => HomeDesktop(),
-      ),
-    );
+    context.router.root.navigate(HomeRoute());
   }
 }
