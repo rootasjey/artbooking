@@ -293,6 +293,37 @@ class FlashHelper {
     );
   }
 
+  static Future<T> dialogWithChild<T>(
+    BuildContext context, {
+    @required Widget child,
+  }) {
+    return showFlash<T>(
+      context: context,
+      persistent: false,
+      builder: (context, controller) {
+        return Flash.dialog(
+          controller: controller,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          enableDrag: true,
+          margin: const EdgeInsets.only(
+            left: 120.0,
+            right: 120.0,
+          ),
+          borderRadius: const BorderRadius.all(
+            Radius.circular(8.0),
+          ),
+          child: FlashBar(
+            message: Container(
+              height: MediaQuery.of(context).size.height - 100.0,
+              padding: const EdgeInsets.all(60.0),
+              child: child,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   static Future<T> simpleDialog<T>(
     BuildContext context, {
     String title,
