@@ -71,7 +71,8 @@ export const createOne = functions
   .https
   .onCall(async (params: CreateBookParams, context) => {
     const userAuth = context.auth;
-    const { name } = params;
+    const { name, illustrations } = params;
+    let { description } = params;
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -88,22 +89,24 @@ export const createOne = functions
       );
     }
 
-    const bookIllustrations = await createBookIllustrations(params.illustrations);
+    description = typeof description === 'string' ? description : '';
+
+    const bookIllustrations = await createBookIllustrations(illustrations);
 
     try {
       const addedBook = await firestore
         .collection('books')
         .add({
-          createdAt: adminApp.firestore.FieldValue.serverTimestamp,
-          description: params.description,
+          createdAt: adminApp.firestore.FieldValue.serverTimestamp(),
+          description,
           illustrations: bookIllustrations,
           layout: 'grid',
           layoutMobile: 'grid',
           layoutOrientation: 'vertical',
           layoutOrientationMobile: 'vertical',
           matrice: [],
-          name: params.name,
-          updatedAt: adminApp.firestore.FieldValue.serverTimestamp,
+          name,
+          updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
           urls: {
             cover: '',
             icon: '',
@@ -659,7 +662,7 @@ function checkUpdateBookPropsParam(params: UpdateBookPropertiesParams) {
  * @param ids - Illustrations' ids to create.
  */
 async function createBookIllustrations(ids: string[]) {
-  if (!ids || ids.length === 0) {
+  if (!ids || !Array.isArray(ids) || ids.length === 0) {
     return [];
   }
 
@@ -667,9 +670,9 @@ async function createBookIllustrations(ids: string[]) {
 
   for (const id of ids) {
     arrayResult.push({
-      createdAt: adminApp.firestore.FieldValue.serverTimestamp,
+      createdAt: adminApp.firestore.FieldValue.serverTimestamp(),
       id,
-      updatedAt: adminApp.firestore.FieldValue.serverTimestamp,
+      updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
       vScaleFactor: {
         height: 1,
         width: 1,
