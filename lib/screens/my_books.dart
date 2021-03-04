@@ -1,13 +1,14 @@
+import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/actions/illustrations.dart';
+import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/book_item.dart';
 import 'package:artbooking/components/default_app_bar.dart';
-import 'package:artbooking/components/full_page_loading.dart';
-import 'package:artbooking/state/upload_manager.dart';
-import 'package:artbooking/screens/signin.dart';
 import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,7 @@ class _MyBooksState extends State<MyBooks> {
   bool isFabVisible = false;
   bool isLoadingMore = false;
   bool forceMultiSelect = false;
+  bool isCreating = false;
 
   DocumentSnapshot lastDoc;
 
@@ -40,10 +42,21 @@ class _MyBooksState extends State<MyBooks> {
 
   ScrollController scrollController = ScrollController();
 
+  TextEditingController newBookNameController;
+  String newBookName = '';
+  String newBookDescription = '';
+
   @override
   initState() {
     super.initState();
+    newBookNameController = TextEditingController();
     fetch();
+  }
+
+  @override
+  void dispose() {
+    newBookNameController?.dispose();
+    super.dispose();
   }
 
   @override
@@ -110,9 +123,21 @@ class _MyBooksState extends State<MyBooks> {
       ),
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
-          Text(
-            'Books',
-            style: FontsUtils.boldTitleStyle(),
+          Row(
+            children: [
+              Text(
+                'Books',
+                style: FontsUtils.boldTitleStyle(),
+              ),
+              if (isCreating)
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 24.0,
+                    top: 12.0,
+                  ),
+                  child: CircularProgressIndicator(),
+                ),
+            ],
           ),
           defaultActionsToolbar(),
           multiSelectToolbar(),
@@ -127,7 +152,9 @@ class _MyBooksState extends State<MyBooks> {
         delegate: SliverChildListDelegate.fixed([
           Padding(
             padding: const EdgeInsets.only(top: 100.0),
-            child: FullPageLoading(),
+            child: AnimatedAppIcon(
+              textTitle: "Loading your books...",
+            ),
           ),
         ]),
       );
@@ -224,9 +251,7 @@ class _MyBooksState extends State<MyBooks> {
                 ),
               ),
               ElevatedButton.icon(
-                onPressed: () {
-                  appUploadManager.pickImage(context);
-                },
+                onPressed: showBookCreationDialog,
                 icon: Icon(UniconsLine.book_medical),
                 label: Padding(
                   padding: const EdgeInsets.all(12.0),
@@ -485,28 +510,13 @@ class _MyBooksState extends State<MyBooks> {
   void fetch() async {
     setState(() {
       isLoading = true;
+      hasNext = true;
     });
 
     try {
-      final userAuth = FirebaseAuth.instance.currentUser;
-
-      if (userAuth == null) {
-        debugPrint("User is not authenticated.");
-
-        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => Signin()),
-          );
-        });
-
-        setState(() {
-          isLoading = false;
-        });
-      }
-
       final snapshot = await FirebaseFirestore.instance
           .collection('books')
-          .where('user.id', isEqualTo: userAuth.uid)
+          .where('user.id', isEqualTo: stateUser.userAuth.uid)
           .orderBy('createdAt', descending: descending)
           .limit(limit)
           .get();
@@ -588,5 +598,156 @@ class _MyBooksState extends State<MyBooks> {
     } catch (error) {
       debugPrint(error.toString());
     }
+  }
+
+  void createBook() async {
+    setState(() {
+      isCreating = true;
+    });
+
+    final result = await BooksActions.create(
+      name: newBookName,
+      description: newBookDescription,
+    );
+
+    setState(() {
+      isCreating = true;
+    });
+
+    if (!result.success) {
+      Snack.e(
+        context: context,
+        message: "Sorry, there wasan error while creating your book."
+            " Please try again later.",
+      );
+
+      return;
+    }
+
+    Snack.s(
+      context: context,
+      message: "Your book has been successfully created!",
+    );
+
+    fetch();
+  }
+
+  void showBookCreationDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => SimpleDialog(
+        title: Text("Create book"),
+        children: [
+          Padding(
+            padding: EdgeInsets.only(
+              left: 25.0,
+              right: 25.0,
+              top: 32.0,
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints.tight(Size(250.0, 80)),
+              child: TextField(
+                autofocus: true,
+                controller: newBookNameController,
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  labelStyle: TextStyle(color: stateColors.primary),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: stateColors.primary,
+                      width: 2.0,
+                    ),
+                  ),
+                ),
+                onChanged: (newValue) {
+                  newBookName = newValue;
+                },
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 25.0,
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints.tight(Size(250.0, 80)),
+              child: TextField(
+                decoration: InputDecoration(
+                  labelText: 'Description',
+                  labelStyle: TextStyle(color: stateColors.primary),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: stateColors.primary,
+                      width: 2.0,
+                    ),
+                  ),
+                ),
+                onChanged: (newValue) {
+                  newBookDescription = newValue;
+                },
+                onSubmitted: (value) {
+                  context.router.pop();
+                  createBook();
+                },
+              ),
+            ),
+          ),
+          Container(
+            height: 80.0,
+            padding: EdgeInsets.only(
+              top: 28.0,
+              left: 24.0,
+              right: 24.0,
+            ),
+            child: Wrap(
+              spacing: 10.0,
+              runSpacing: 10.0,
+              alignment: WrapAlignment.end,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: context.router.pop,
+                  icon: Icon(UniconsLine.times),
+                  label: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12.0,
+                      horizontal: 12.0,
+                    ),
+                    child: Opacity(
+                      opacity: 1.0,
+                      child: Text(
+                        'Cancel',
+                      ),
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    primary: stateColors.foreground,
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    context.router.pop();
+                    createBook();
+                  },
+                  icon: Icon(UniconsLine.plus),
+                  label: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12.0,
+                      horizontal: 12.0,
+                    ),
+                    child: Text(
+                      "Create",
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    primary: stateColors.validation,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
