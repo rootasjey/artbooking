@@ -176,6 +176,19 @@ class _MyBooksState extends State<MyBooks> {
       runSpacing: 12.0,
       children: [
         OutlinedButton.icon(
+          onPressed: showBookCreationDialog,
+          icon: Padding(
+            padding: const EdgeInsets.only(bottom: 6.0),
+            child: Icon(UniconsLine.plus),
+          ),
+          label: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Text(
+              'Create',
+            ),
+          ),
+        ),
+        OutlinedButton.icon(
           onPressed: () {
             setState(() {
               forceMultiSelect = !forceMultiSelect;
