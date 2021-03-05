@@ -662,9 +662,7 @@ async function createBookIllustrations(ids: string[]) {
 
   for (const id of ids) {
     arrayResult.push({
-      createdAt: adminApp.firestore.FieldValue.serverTimestamp(),
       id,
-      updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
       vScaleFactor: {
         height: 1,
         width: 1,

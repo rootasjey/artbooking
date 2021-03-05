@@ -158,9 +158,7 @@ interface SetUserAuthorParams {
 }
 
 interface BookIllustration {
-  createdAt: any;
   id: string;
-  updatedAt: any;
   vScaleFactor: {
     height: number;
     mobileHeight: number;
