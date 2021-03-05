@@ -84,7 +84,7 @@ export const createOne = functions
   .https
   .onCall(async (params: CreateBookParams, context) => {
     const userAuth = context.auth;
-    const { name, illustrations } = params;
+    const { name, illustrationsIds, visibility } = params;
     let { description } = params;
 
     if (!userAuth) {
@@ -104,7 +104,7 @@ export const createOne = functions
 
     description = typeof description === 'string' ? description : '';
 
-    const bookIllustrations = await createBookIllustrations(illustrations);
+    const bookIllustrations = await createBookIllustrations(illustrationsIds);
 
     const addedBook = await firestore
       .collection('books')
@@ -126,7 +126,7 @@ export const createOne = functions
         user: {
           id: userAuth.uid,
         },
-        visibility: checkOrGetDefaultVisibility(params.visibility),
+        visibility: checkOrGetDefaultVisibility(visibility),
       });
 
     return {

@@ -76,7 +76,7 @@ export function checkOrGetDefaultVisibility(visibilityParam: string) {
 
   const allowedVisibility = ['acl', 'challenge', 'contest', 'gallery', 'private', 'public'];
 
-  if (allowedVisibility.indexOf(visibilityParam) > -1) {
+  if (allowedVisibility.includes(visibilityParam)) {
     return visibilityParam;
   }
 
