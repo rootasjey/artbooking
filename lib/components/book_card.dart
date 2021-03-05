@@ -81,14 +81,6 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   }
 
   @override
-  dispose() {
-    captionController.dispose();
-    scaleController.dispose();
-    offsetController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: size,
