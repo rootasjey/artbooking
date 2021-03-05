@@ -2,6 +2,7 @@ import * as functions from 'firebase-functions';
 import { adminApp } from './adminApp';
 import { checkOrGetDefaultVisibility } from './utils';
 
+const firebaseTools = require('firebase-tools');
 const firestore = adminApp.firestore();
 
 /**
@@ -22,12 +23,19 @@ export const addIllustrations = functions
 
     const { bookId, illustrationsIds } = params;
 
-    if (typeof bookId !== 'string' 
-      || !Array.isArray(illustrationsIds) || illustrationsIds.length === 0) {
+    if (typeof bookId !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called with a valid [id] and [illustrationsIds] parameters 
-        which are respectively the book's id and the illustrations' ids array to add.`,
+        `The function must be called with a valid [id] parameter
+         which is the book's id to update.`,
+      );
+    }
+
+    if (!Array.isArray(illustrationsIds) || illustrationsIds.length === 0) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called with a valid [illustrationsIds] parameter
+         which is an array of illustrations' ids to add.`,
       );
     }
 
@@ -45,6 +53,13 @@ export const addIllustrations = functions
         'not-found', 
         `The book to update doesn't exist anymore.`,
       );
+    }
+
+    if (bookData.user.id !== userAuth.uid) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        `You don't have the permission to update this book.`,
+      )
     }
 
     const bookIllustrations: BookIllustration[] = bookData.illustrations;
@@ -93,73 +108,33 @@ export const createOne = functions
 
     const bookIllustrations = await createBookIllustrations(illustrations);
 
-    try {
-      const addedBook = await firestore
-        .collection('books')
-        .add({
-          createdAt: adminApp.firestore.FieldValue.serverTimestamp(),
-          description,
-          illustrations: bookIllustrations,
-          layout: 'grid',
-          layoutMobile: 'grid',
-          layoutOrientation: 'vertical',
-          layoutOrientationMobile: 'vertical',
-          matrice: [],
-          name,
-          updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
-          urls: {
-            cover: '',
-            icon: '',
-          },
-          user: {
-            id: userAuth.uid,
-          },
-          visibility: checkOrGetDefaultVisibility(params.visibility),
-        });
+    const addedBook = await firestore
+      .collection('books')
+      .add({
+        createdAt: adminApp.firestore.FieldValue.serverTimestamp(),
+        description,
+        illustrations: bookIllustrations,
+        layout: 'grid',
+        layoutMobile: 'grid',
+        layoutOrientation: 'vertical',
+        layoutOrientationMobile: 'vertical',
+        matrice: [],
+        name,
+        updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
+        urls: {
+          cover: '',
+          icon: '',
+        },
+        user: {
+          id: userAuth.uid,
+        },
+        visibility: checkOrGetDefaultVisibility(params.visibility),
+      });
 
-      // Update user's stats
-      const userDoc = await firestore
-        .collection('users')
-        .doc(userAuth.uid)
-        .get();
-
-      const userData = userDoc.data();
-
-      if (userData) {
-        let added: number = userData.stats?.books?.added;
-        let own: number = userData.stats?.books?.own;
-
-        if (typeof added !== 'number') {
-          added = 0;
-        }
-
-        if (typeof own !== 'number') {
-          own = 0;
-        }
-
-        added++;
-        own++;
-
-        await userDoc
-          .ref
-          .update({
-            'stats.books.added': added,
-            'stats.books.own': own,
-            updatedAt: adminApp.firestore.Timestamp.now(),
-          });
-      }
-
-      return {
-        id: addedBook.id,
-        success: true,
-      };
-    } catch (error) {
-      console.error(error);
-      throw new functions.https.HttpsError(
-        'internal', 
-        `There was an internal error. Please try again later or contact us.`,
-      );
-    }
+    return {
+      id: addedBook.id,
+      success: true,
+    };
   });
 
 /**
@@ -170,7 +145,7 @@ export const deleteOne = functions
   .https
   .onCall(async (params: DeleteBookParams, context) => {
     const userAuth = context.auth;
-    const { id } = params;
+    const { bookId } = params;
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -179,62 +154,39 @@ export const deleteOne = functions
       );
     }
 
-    if (typeof id !== 'string') {
+    if (typeof bookId !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument', 
-        `The function must be called with a valid [id] argument
+        `The function must be called with a valid [bookId] argument
          which is the illustration's id to delete.`,
       );
     }
 
-    try {
-      await firestore
-        .collection('books')
-        .doc(id)
-        .delete();
+    const bookSnap = await firestore
+      .collection('books')
+      .doc(bookId)
+      .get();
 
-      // Update user's stats
-      // -------------------
-      const userDoc = await firestore
-        .collection('users')
-        .doc(userAuth.uid)
-        .get();
+    const bookData = bookSnap.data();
 
-      const userData = userDoc.data();
-
-      if (userData) {
-        let deleted: number = userData.stats?.books?.deleted;
-        let own: number = userData.stats?.books?.own;
-
-        if (typeof deleted !== 'number') {
-          deleted = 0;
-        }
-
-        if (typeof own !== 'number') {
-          own = 0;
-        }
-
-        own = own > 0 ? own - 1 : 0;
-        deleted++
-
-        await userDoc.ref
-          .update({
-            'stats.books.own': own,
-            'stats.books.deleted': deleted,
-            updatedAt: adminApp.firestore.Timestamp.now(),
-          });
-      }
-
-      return {
-        id,
-        success: true,
-      };
-    } catch (error) {
+    if (!bookSnap.exists || !bookData) {
       throw new functions.https.HttpsError(
-        'internal', 
-        `There was an internal error. Please try again later or contact us.`,
-      );
+        'permission-denied',
+        `You don't have the permission to delete this book.`,
+      )
     }
+
+    await firebaseTools.firestore
+      .delete(bookSnap.ref.path, {
+        project: process.env.GCLOUD_PROJECT,
+        recursive: true,
+        yes: true,
+      });
+
+    return {
+      bookId,
+      success: true,
+    };
   });
 
 /**
@@ -245,7 +197,7 @@ export const deleteMany = functions
   .https
   .onCall(async (params: DeleteBooksParams, context) => {
     const userAuth = context.auth;
-    const { ids } = params;
+    const { bookIds } = params;
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -254,74 +206,82 @@ export const deleteMany = functions
       );
     }
 
-    if (!Array.isArray(ids) || ids.length === 0) {
+    if (!Array.isArray(bookIds) || bookIds.length === 0) {
       throw new functions.https.HttpsError(
         'invalid-argument', 
-        `The function must be called with a valid [ids] argument 
+        `The function must be called with a valid [bookIds] argument 
         which is an array of illustrations' ids to delete.`,
       );
     }
 
     /** How many operations succeeded. */
     let successCount = 0;
+    const itemsProcessed = [];
 
-    for await (const id of ids) {
-      try {
-        await firestore
+    for await (const bookId of bookIds) {
+      try { // Some deletion may fail.
+        const bookSnap = await firestore
           .collection('books')
-          .doc(id)
-          .delete();
+          .doc(bookId)
+          .get();
+
+        const bookData = bookSnap.data();
+        let errorMessage = `This book doesn't exist anymore.`;
+
+        if (!bookSnap.exists || !bookData) {
+          itemsProcessed.push({
+            bookId,
+            success: false,
+            errorMessage,
+          });
+
+          throw new functions.https.HttpsError(
+            'not-found',
+            errorMessage,
+          );
+        }
+
+        if (bookData.user.id !== userAuth.uid) {
+          errorMessage = `You don't have the permission 
+            to delete the book [${bookId}].`;
+
+          itemsProcessed.push({
+            bookId,
+            success: false,
+            errorMessage,
+          });
+
+          throw new functions.https.HttpsError(
+            'permission-denied',
+            errorMessage,
+          );
+        }
+
+        await firebaseTools.firestore
+          .delete(bookSnap.ref.path, {
+            project: process.env.GCLOUD_PROJECT,
+            recursive: true,
+            yes: true,
+          });
+
+        itemsProcessed.push({
+          bookId,
+          success: true,
+        });
 
         successCount++;
 
       } catch (error) {
+        console.error(`Error while deleting book [${bookId}]`);
         console.error(error);
       }
     }
 
-    try { // Update user's stats
-      const userDoc = await firestore
-        .collection('users')
-        .doc(userAuth.uid)
-        .get();
-
-      const userData = userDoc.data();
-
-      if (userData) {
-        let deleted: number = userData.stats?.books?.deleted;
-        let own: number = userData.stats?.books?.own;
-
-        if (typeof deleted !== 'number') {
-          deleted = 0;
-        }
-
-        if (typeof own !== 'number') {
-          own = 0;
-        }
-
-        own = own > 0 ? own - successCount : 0;
-        deleted += successCount;
-
-        await userDoc.ref
-          .update({
-            'stats.books.own': own,
-            'stats.books.deleted': deleted,
-            updatedAt: adminApp.firestore.Timestamp.now(),
-          });
-      }
-
-      return {
-        ids,
-        successCount,
-        success: successCount === ids.length,
-      };
-    } catch (error) {
-      console.error(error);
-      throw new functions.https.HttpsError(
-        'internal', 
-        `There was an internal error. Please try again later or contact us.`,
-      );
-    }
+    return {
+      items: itemsProcessed,
+      successCount,
+      hasErrors: successCount === bookIds.length,
+    };
   });
 
 /**
@@ -342,30 +302,39 @@ export const removeIllustrations = functions
     }
 
     if (typeof bookId !== 'string') {
-      throw new functions.https.HttpsError('invalid-argument',
-        `The function must be called with a valid [bookId] parameter
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called with a valid [bookId] (string) parameter
          which is the book to update.`,
       );
     }
 
     if (!Array.isArray(illustrationsIds) || illustrationsIds.length === 0) {
-      throw new functions.https.HttpsError('invalid-argument',
+      throw new functions.https.HttpsError(
+        'invalid-argument',
         `The function must be called with a valid [illustrationsIds] parameter
-         which is the array of illustrations to remove from the book.`,
+         which is the array of (string) illustrations to remove from the book.`,
       );
     }
 
-    const bookDoc = await firestore
+    const bookSnap = await firestore
       .collection('books')
       .doc(bookId)
       .get();
       
-    const bookData = bookDoc.data();
+    const bookData = bookSnap.data();
     
-    if (!bookDoc.exists || !bookData){
+    if (!bookSnap.exists || !bookData){
       throw new functions.https.HttpsError(
         'not-found', 
         `The book to update doesn't exist anymore.`,
+      );
+    }
+    
+    if (bookData.user.id !== userAuth.uid){
+      throw new functions.https.HttpsError(
+        'permission-denied', 
+        `You don't have the permission to update this book.`,
       );
     }
 
@@ -373,7 +342,7 @@ export const removeIllustrations = functions
     const newBookIllustrations = bookIllustrations
       .filter(illus => !illustrationsIds.includes(illus.id));
 
-    await bookDoc.ref.update({
+    await bookSnap.ref.update({
       illustrations: newBookIllustrations,
     });
 
@@ -413,19 +382,37 @@ export const updateMetadata = functions
       visibility, 
     } = params;
 
-    await firestore
+    const bookSnap = await firestore
       .collection('books')
       .doc(bookId)
-      .update({
-        description,
-        layout,
-        layoutMobile,
-        layoutOrientation,
-        layoutOrientationMobile,
-        name,
-        urls,
-        visibility,
-      });
+      .get();
+
+    const bookData = bookSnap.data();
+
+    if (!bookSnap.exists || !bookData) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        `The book [${bookId}] doesn't exist anymore.`,
+      )
+    }
+
+    if (bookData.user.id !== userAuth.uid) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        `You don't have the permission to update this book.`,
+      )
+    }
+
+    await bookSnap.ref.update({
+      description,
+      layout,
+      layoutMobile,
+      layoutOrientation,
+      layoutOrientationMobile,
+      name,
+      urls,
+      visibility,
+    });
 
     return {
       bookId,
@@ -442,10 +429,12 @@ export const updateIllusPosition = functions
   .https
   .onCall(async (params: UpdateIllusPositionParams, context) => {
     const userAuth = context.auth;
-    const { bookId,
-       beforePosition,
-       afterPosition,
-       illustrationId,
+
+    const { 
+      bookId,
+      beforePosition,
+      afterPosition,
+      illustrationId,
     } = params;
 
     if (!userAuth) {
@@ -472,17 +461,24 @@ export const updateIllusPosition = functions
       );
     }
 
-    const bookDoc = await firestore
+    const bookSnap = await firestore
       .collection('books')
       .doc(bookId)
       .get();
       
-    const bookData = bookDoc.data();
+    const bookData = bookSnap.data();
 
-    if (!bookDoc.exists || !bookData){
+    if (!bookSnap.exists || !bookData){
       throw new functions.https.HttpsError(
         'not-found', 
         `The book to update doesn't exist anymore.`,
+      );
+    }
+
+    if (bookData.user.id !== userAuth.uid) {
+      throw new functions.https.HttpsError(
+        'permission-denied', 
+        `You don't have the permission to delete update book.`,
       );
     }
 
@@ -499,12 +495,9 @@ export const updateIllusPosition = functions
     const illusToMove = deletedItems[0];
     illustrations.splice(afterPosition, 0, illusToMove);
 
-    await firestore
-      .collection('books')
-      .doc(bookId)
-      .update({
-        illustrations,
-      });
+    await bookSnap.ref.update({
+      illustrations,
+    });
 
     return {
       illustrationId,

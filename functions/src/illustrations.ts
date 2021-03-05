@@ -52,122 +52,81 @@ export const createOne = functions
       author.id = userAuth.token.uid;
     }
 
-    try {
-      const addedDoc = await firestore
-        .collection('illustrations')
-        .add({
-          author,
-          categories: {},
-          createdAt: adminApp.firestore.Timestamp.now(),
+    const illustrationSnap = await firestore
+      .collection('illustrations')
+      .add({
+        author,
+        categories: {},
+        createdAt: adminApp.firestore.Timestamp.now(),
+        description: '',
+        dimensions: {
+          height: 0,
+          width: 0,
+        },
+        extension: '',
+        license: {
+          custom: false,
           description: '',
-          dimensions: {
-            height: 0,
-            width: 0,
+          name: '',
+          existingLicenseId: '',
+          usage: {
+            edit: false,
+            print: false,
+            sell: false,
+            share: false,
+            showAttribution: true,
+            useInOtherFree: false,
+            useInOtherOss: false,
+            useInOtherPaid: false,
+            view: false,
           },
-          extension: '',
-          license: {
-            custom: false,
-            description: '',
-            name: '',
-            existingLicenseId: '',
-            usage: {
-              edit: false,
-              print: false,
-              sell: false,
-              share: false,
-              showAttribution: true,
-              useInOtherFree: false,
-              useInOtherOss: false,
-              useInOtherPaid: false,
-              view: false,
-            },
-          },
-          name: params.name,
-          size: 0, // File's ize in bytes
-          stats: {
-            downloads: 0,
-            fav: 0,
-            shares: 0,
-            views: 0,
-          },
-          summary: '',
-          timelapse: {
-            createdAt: null,
-            description: '',
-            name: '',
-            updatedAt: null,
-            urls: {
-              original: '', // video or gif format
-            },
-          },
-          topics: {},
-          updatedAt: adminApp.firestore.Timestamp.now(),
+        },
+        name: params.name,
+        size: 0, // File's ize in bytes
+        stats: {
+          downloads: 0,
+          fav: 0,
+          shares: 0,
+          views: 0,
+        },
+        summary: '',
+        timelapse: {
+          createdAt: null,
+          description: '',
+          name: '',
+          updatedAt: null,
           urls: {
-            original: '',
-            share: {
-              read: '',
-              write: '',
-            },
-            storage: '',
-            thumbnails: {
-              t360: '',
-              t480: '',
-              t720: '',
-              t1080: '',
-              t1920: '',
-              t2400: '',
-            },
+            original: '', // video or gif format
           },
-          user: {
-            id: userAuth.token.uid,
+        },
+        topics: {},
+        updatedAt: adminApp.firestore.Timestamp.now(),
+        urls: {
+          original: '',
+          share: {
+            read: '',
+            write: '',
           },
-          visibility: checkOrGetDefaultVisibility(params.visibility),
-        });
+          storage: '',
+          thumbnails: {
+            t360: '',
+            t480: '',
+            t720: '',
+            t1080: '',
+            t1920: '',
+            t2400: '',
+          },
+        },
+        user: {
+          id: userAuth.token.uid,
+        },
+        visibility: checkOrGetDefaultVisibility(params.visibility),
+      });
 
-      // Update user's stats
-      const userDoc = await firestore
-        .collection('users')
-        .doc(userAuth.uid)
-        .get();
-
-      const userData = userDoc.data();
-      
-      if (userData) {
-        let added: number = userData.stats?.illustrations?.added;
-        let own: number = userData.stats?.illustrations?.own;
-        
-        if (typeof added !== 'number') {
-          added = 0;
-        }
-        
-        if (typeof own !== 'number') {
-          own = 0;
-        }
-
-        added++;
-        own++;
-
-        await userDoc
-          .ref
-          .update({
-            'stats.illustrations.added': added,
-            'stats.illustrations.own': own,
-            updatedAt: adminApp.firestore.Timestamp.now(),
-          });
-      }
-
-      return {
-        id: addedDoc.id,
-        success: true,
-      };
-
-    } catch (error) {
-      console.error(error);
-      throw new functions.https.HttpsError(
-        'internal', 
-        `There was an internal error. Please try again later or contact us.`,
-      );
-    }
+    return {
+      illustrationId: illustrationSnap.id,
+      success: true,
+    };
   });
 
 /**
@@ -178,7 +137,7 @@ export const deleteOne = functions
   .https
   .onCall(async (params: DeleteIllustrationParams, context) => {
     const userAuth = context.auth;
-    const { id } = params;
+    const { illustrationId } = params;
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -187,29 +146,29 @@ export const deleteOne = functions
       );
     }
 
-    if (typeof id !== 'string') {
+    if (typeof illustrationId !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument', 
-        `The function must be called with a valid [id] argument (string)
+        `The function must be called with a valid [illustrationId] argument (string)
          which is the illustration's id to delete.`,
         );
     }
 
-    const docSnap = await firestore
+    const illustrationSnap = await firestore
       .collection('illustrations')
-      .doc(id)
+      .doc(illustrationId)
       .get();
 
-    const docData = docSnap.data();
+    const illustrationData = illustrationSnap.data();
 
-    if (!docSnap.exists || !docData) {
+    if (!illustrationSnap.exists || !illustrationData) {
       throw new functions.https.HttpsError(
         'not-found',
-        `The illustration id [${id}] doesn't exist.`,
+        `The illustration id [${illustrationId}] doesn't exist.`,
       );
     }
 
-    if (docData.user.id !== userAuth.uid) {
+    if (illustrationData.user.id !== userAuth.uid) {
       throw new functions.https.HttpsError(
         'permission-denied',
         `You don't have the permission to edit this illustration.`,
@@ -220,7 +179,7 @@ export const deleteOne = functions
     const dir = await adminApp.storage()
       .bucket()
       .getFiles({
-        directory: `users/${userAuth.uid}/illustrations/${id}`
+        directory: `users/${userAuth.uid}/illustrations/${illustrationId}`
       });
 
     const files = dir[0];
@@ -229,52 +188,10 @@ export const deleteOne = functions
       await file.delete();
     }
 
-    let imageBytesToRemove = 0;
-
-    if (docData) {
-      imageBytesToRemove = docData.size ?? 0;
-    }
-
-    await docSnap.ref.delete();
-
-    // Update user's stats
-    const userDoc = await firestore
-      .collection('users')
-      .doc(userAuth.uid)
-      .get();
-
-    const userData = userDoc.data();
-
-    if (userData) {
-      let deleted: number = userData.stats?.illustrations?.deleted;
-      let own: number = userData.stats?.illustrations?.own;
-
-      if (typeof deleted !== 'number') {
-        deleted = 0;
-      }
-
-      if (typeof own !== 'number') {
-        own = 0;
-      }
-
-      own = own > 0 ? own - 1 : 0;
-      deleted++
-
-      // Update used storage.
-      let storageIllustrationsUsed: number = userData.stats.storage.illustrations.used;
-      storageIllustrationsUsed -= imageBytesToRemove;
-
-      await userDoc.ref
-        .update({
-          'stats.illustrations.own': own,
-          'stats.illustrations.deleted': deleted,
-          'stats.storage.illustrations.used': storageIllustrationsUsed,
-          updatedAt: adminApp.firestore.Timestamp.now(),
-        });
-    }
+    await illustrationSnap.ref.delete();
 
     return {
-      id,
+      illustrationId,
       success: true,
     };
   });
@@ -287,7 +204,7 @@ export const deleteMany = functions
   .https
   .onCall(async (params: DeleteMultipleIllustrationsParams, context) => {
     const userAuth = context.auth;
-    const { ids } = params;
+    const { illustrationIds } = params;
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -296,44 +213,62 @@ export const deleteMany = functions
       );
     }
 
-    if (!Array.isArray(ids) || ids.length === 0) {
+    if (!Array.isArray(illustrationIds) || illustrationIds.length === 0) {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called  with a valid [ids]
+        `The function must be called  with a valid [illustrationIds]
          which is an array of illustrations string id to delete.`,
       );
     }
 
-    let illustrationsBytesToRemove: number = 0;
+    /** How many operations succeeded. */
+    let successCount = 0;
+    const itemsProcessed = [];
     
-    for await (const id of ids) {
+    for await (const illustrationId of illustrationIds) {
       try {
-        const illusSnap = await firestore
+        const illustrationSnap = await firestore
           .collection('illustrations')
-          .doc(id)
+          .doc(illustrationId)
           .get();
 
-        const illusData = illusSnap.data();
+        const illustrationData = illustrationSnap.data();
+        let errorMessage = `The illustration [${illustrationIds}] doesn't exist.`;
 
-        if (!illusSnap.exists || !illusData) {
+        if (!illustrationSnap.exists || !illustrationData) {
+          itemsProcessed.push({
+            illustrationId,
+            success: false,
+            errorMessage,
+          });
+
           throw new functions.https.HttpsError(
             'not-found',
-            `The illustration to delete doesn't exist.`,
+            errorMessage,
           )
         }
 
-        if (illusData.user.id !== userAuth.uid) {
+        if (illustrationData.user.id !== userAuth.uid) {
+          errorMessage = `You don't have the permission 
+            to delete the illustration [${illustrationId}].`;
+
+          itemsProcessed.push({
+            illustrationId,
+            success: false,
+            errorMessage,
+          });
+
           throw new functions.https.HttpsError(
             'permission-denied',
-            `You don't the permission to delete this illustration [${id}].`,
-          )
+            errorMessage,
+          );
         }
 
         // Delete files from Cloud Storage
         const dir = await adminApp.storage()
           .bucket()
           .getFiles({
-            directory: `users/${userAuth.uid}/illustrations/${id}`
+            directory: `users/${userAuth.uid}/illustrations/${illustrationId}`
           });
 
         const files = dir[0];
@@ -342,60 +277,25 @@ export const deleteMany = functions
           await file.delete();
         }
 
-        if (illusData) {
-          illustrationsBytesToRemove += illusData.size as number;
-        }
+        await illustrationSnap.ref.delete();
 
-        await illusSnap.ref.delete();
+        successCount++;
+
+        itemsProcessed.push({
+          illustrationId,
+          success: true,
+        });
 
       } catch (error) {
-        throw new functions.https.HttpsError('internal', "There was an internal error. " +
-          "Please try again later or contact us.");
+        console.error(`Error while deleting illustration [${illustrationId}]`);
+        console.error(error);
       }
-    }
-
-    // Update user's stats
-    const userDoc = await firestore
-      .collection('users')
-      .doc(userAuth.uid)
-      .get();
-
-    const userData = userDoc.data();
-
-    if (userData) {
-      let own: number = userData.stats?.illustrations?.own;
-      let deleted: number = userData.stats?.illustrations?.deleted;
-
-      if (typeof own !== 'number') {
-        own = 0;
-      }
-
-      if (typeof deleted !== 'number') {
-        deleted = 0;
-      }
-
-      own = own - ids.length;
-      own = own >= 0 ? own : 0;
-
-      deleted += ids.length;
-
-      // Update used storage.
-      let storageIllustrationsUsed: number = userData.stats.storage.illustrations.used;
-      storageIllustrationsUsed -= illustrationsBytesToRemove;
-
-
-      await userDoc.ref
-        .update({
-          'stats.illustrations.own': own,
-          'stats.illustrations.deleted': deleted,
-          'stats.storage.illustrations.used': storageIllustrationsUsed,
-          updatedAt: adminApp.firestore.Timestamp.now(),
-        });
     }
 
     return {
-      ids,
-      success: true,
+      items: itemsProcessed,
+      successCount,
+      hasErrors: successCount === illustrationIds.length,
     };
   });
 
@@ -500,7 +400,7 @@ export const onStorageUpload = functions
   });
 
 /**
- * Set the image's author id same as user's id.
+ * Set the illustration's author id same as user's id.
  */
 export const setUserAuthor = functions
   .region('europe-west3')
@@ -509,47 +409,52 @@ export const setUserAuthor = functions
     const userAuth = context.auth;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user.');
+      throw new functions.https.HttpsError(
+        'unauthenticated', 
+        `The function must be called from an authenticated user.`,
+      );
     }
 
-    const { imageId } = data;
+    const { illustrationId } = data;
 
-    try {
-      const doc = await firestore
-        .collection('illustrations')
-        .doc(imageId)
-        .get();
+    if (!illustrationId || typeof illustrationId !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `You must provid a valid argument for [illustrationId]
+         which is illustration to update.`,
+      )
+    }
 
-      const docData = doc.data();
+    const illustrationSnap = await firestore
+      .collection('illustrations')
+      .doc(illustrationId)
+      .get();
 
-      if (!docData) {
-        throw new functions.https.HttpsError('not-found', "The document doesn't exists anymore. " +
-          "Please try again later or contact us.");
-      }
+    const illustrationData = illustrationSnap.data();
 
-      if (docData.user.id !== userAuth.uid) {
-        throw new functions.https.HttpsError('permission-denied', "You don't have access to this document.");
-      }
+    if (!illustrationSnap.exists || !illustrationData) {
+      throw new functions.https.HttpsError(
+        'not-found', 
+        `The document doesn't exists anymore.
+         Please try again later or contact us.`,
+      );
+    }
 
-      await doc.ref
-        .set({
-          author: {
-            id: userAuth.uid,
-          },
-        },
-          {
-            merge: true,
-          }
-        );
+    if (illustrationData.user.id !== userAuth.uid) {
+      throw new functions.https.HttpsError(
+        'permission-denied', 
+        `You don't have the permission to update this illustration.`,
+      );
+    }
 
-      return {
-        imageId,
-        success: true,
-      }
-    } catch (error) {
-      throw new functions.https.HttpsError('internal', "There was an internal error. " +
-        "Please try again later or contact us.");
+    await illustrationSnap.ref.update({
+      author: {
+        id: userAuth.uid,
+      }});
+
+    return {
+      illustrationId,
+      success: true,
     }
   });
 
@@ -563,47 +468,51 @@ export const unsetUserAuthor = functions
     const userAuth = context.auth;
 
     if (!userAuth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called from ' +
-        'an authenticated user.');
+      throw new functions.https.HttpsError(
+        'unauthenticated', 
+        `The function must be called from an authenticated user.`,
+      );
     }
 
-    const { imageId } = data;
+    const { illustrationId } = data;
 
-    try {
-      const doc = await firestore
-        .collection('illustrations')
-        .doc(imageId)
-        .get();
+    if (!illustrationId || typeof illustrationId !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `You must provid a valid argument for [illustrationId]
+         which is illustration to update.`,
+      )
+    }
 
-      const docData = doc.data();
+    const illustrationSnap = await firestore
+      .collection('illustrations')
+      .doc(illustrationId)
+      .get();
 
-      if (!docData) {
-        throw new functions.https.HttpsError('not-found', "The document doesn't exists anymore. " +
-          "Please try again later or contact us.");
-      }
+    const illustrationData = illustrationSnap.data();
 
-      if (docData.user.id !== userAuth.uid) {
-        throw new functions.https.HttpsError('permission-denied', "You don't have access to this document.");
-      }
+    if (!illustrationSnap.exists || !illustrationData) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        `The document doesn't exists anymore.
+         Please try again later or contact us.`,
+      );
+    }
 
-      await doc.ref
-        .set({
-          author: {
-            id: '',
-          },
-        },
-          {
-            merge: true,
-          }
-        );
+    if (illustrationData.user.id !== userAuth.uid) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        `You don't have the permission to update this illustration.`,
+      );
+    }
 
-      return {
-        imageId,
-        success: true,
-      }
-    } catch (error) {
-      throw new functions.https.HttpsError('internal', "There was an internal error. " +
-        "Please try again later or contact us.");
+    await illustrationSnap.ref.update({
+      author: { id: '' }
+    });
+
+    return {
+      illustrationId,
+      success: true,
     }
   });
 
@@ -613,7 +522,7 @@ export const unsetUserAuthor = functions
 export const updateMetadata = functions
   .region('europe-west3')
   .https
-  .onCall(async (data: UpdateImagePropsParams, context) => {
+  .onCall(async (data: UpdateIllusMetadataParams, context) => {
     const userAuth = context.auth;
 
     if (!userAuth) {
@@ -627,7 +536,7 @@ export const updateMetadata = functions
 
     const { 
       description, 
-      id, 
+      illustrationId, 
       name, 
       license, 
       summary, 
@@ -635,38 +544,37 @@ export const updateMetadata = functions
 
     const visibility = checkLicenseFormat(data.visibility);
 
-    const docSnap = await firestore
+    const illustrationSnap = await firestore
       .collection('illustrations')
-      .doc(id)
+      .doc(illustrationId)
       .get();
 
-    const docData = docSnap.data();
+    const illustrationData = illustrationSnap.data();
 
-    if (!docSnap.exists || !docData) {
+    if (!illustrationSnap.exists || !illustrationData) {
       throw new functions.https.HttpsError(
         'not-found',
-        `The illustration id [${id}] doesn't exist.`,
+        `The illustration [${illustrationId}] doesn't exist.`,
       );
     }
 
-    if (docData.user.id !== userAuth.uid) {
+    if (illustrationData.user.id !== userAuth.uid) {
       throw new functions.https.HttpsError(
         'permission-denied',
         `You don't have the permission to edit this illustration.`,
       );
     }
 
-    await docSnap.ref
-      .update({
-        description,
-        name,
-        license,
-        summary,
-        visibility,
-      });
+    await illustrationSnap.ref.update({
+      description,
+      name,
+      license,
+      summary,
+      visibility,
+    });
 
     return {
-      id,
+      illustrationId,
       success: true,
     }
   });
@@ -674,7 +582,7 @@ export const updateMetadata = functions
 export const updateCategories = functions
   .region('europe-west3')
   .https
-  .onCall(async (data: UpdateImageCategoriesParams, context) => {
+  .onCall(async (data: UpdateIllusCategoriesParams, context) => {
     const userAuth = context.auth;
 
     if (!userAuth) {
@@ -684,49 +592,49 @@ export const updateCategories = functions
       );
     }
     
-    const { categories, id } = data;
+    const { categories, illustrationId } = data;
     
-    if (typeof id !== 'string') {
+    if (typeof illustrationId !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument', 
-        `The function must be called  with a valid [id] 
-        argument which is the illustration's id.`,
+        `The function must be called  with a valid [illustrationId]
+         argument which is the illustration's id.`,
       );
     }
     
     if (!Array.isArray(categories)) {
       throw new functions.https.HttpsError(
         'invalid-argument', 
-        `The function must be called  with a valid [categories] 
-        argument which is an array of string.`,
+        `The function must be called  with a valid [categories]
+         argument which is an array of string.`,
       );
     }
 
-    const docSnap = await firestore
+    const illustrationSnap = await firestore
       .collection('illustrations')
-      .doc(id)
+      .doc(illustrationId)
       .get();
 
-    const docData = docSnap.data();
+    const docData = illustrationSnap.data();
 
-    if (!docSnap.exists || !docData) {
+    if (!illustrationSnap.exists || !docData) {
       throw new functions.https.HttpsError(
         'not-found',
-        `The illustration id [${id}] doesn't exist.`,
+        `The illustration [${illustrationId}] doesn't exist.`,
       );
     }
 
     if (docData.user.id !== userAuth.uid) {
       throw new functions.https.HttpsError(
         'permission-denied',
-        `You don't have the permission to edit this illustration.`,
+        `You don't have the permission to update this illustration.`,
       );
     }
 
-    await docSnap.ref.update({categories});
+    await illustrationSnap.ref.update({categories});
 
     return { 
-      id, 
+      illustrationId, 
       success: true, 
     };
   });
@@ -734,7 +642,7 @@ export const updateCategories = functions
 export const updateTopics = functions
   .region('europe-west3')
   .https
-  .onCall(async (data: UpdateImageTopicsParams, context) => {
+  .onCall(async (data: UpdateIllusTopicsParams, context) => {
     const userAuth = context.auth;
 
     if (!userAuth) {
@@ -744,50 +652,50 @@ export const updateTopics = functions
       );
     }
 
-    const { topics, id } = data;
+    const { topics, illustrationId } = data;
 
 
-    if (typeof id !== 'string') {
+    if (typeof illustrationId !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called  with a valid [id] 
-        argument which is the illustration's id.`,
+        `The function must be called  with a valid [illustrationId]
+         argument which is the illustration's id.`,
       );
     }
 
     if (!Array.isArray(topics)) {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called  with a valid [topics] 
-        argument which is an array of string.`,
+        `The function must be called  with a valid [topics]
+         argument which is an array of string.`,
       );
     }
     
-    const docSnap = await firestore
+    const illustrationSnap = await firestore
       .collection('illustrations')
-      .doc(id)
+      .doc(illustrationId)
       .get();
 
-    const docData = docSnap.data();
+    const illustrationData = illustrationSnap.data();
 
-    if (!docSnap.exists || !docData) {
+    if (!illustrationSnap.exists || !illustrationData) {
       throw new functions.https.HttpsError(
         'not-found',
-        `The illustration id [${id}] doesn't exist.`,
+        `The illustration id [${illustrationId}] doesn't exist.`,
       );
     }
 
-    if (docData.user.id !== userAuth.uid) {
+    if (illustrationData.user.id !== userAuth.uid) {
       throw new functions.https.HttpsError(
         'permission-denied',
         `You don't have the permission to edit this illustration.`,
       );
     }
 
-    await docSnap.ref.update({ topics });
+    await illustrationSnap.ref.update({ topics });
 
     return {
-      id,
+      illustrationId,
       success: true,
     }
   });
@@ -800,56 +708,70 @@ export const updateTopics = functions
  * Check properties presence.
  * @param data Object containing updated properties.
  */
-function checkUpdateParams(data: UpdateImagePropsParams) {
+function checkUpdateParams(data: UpdateIllusMetadataParams) {
   if (!data) {
-    throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
-      "a valid [description], [id], [name], [license] and [visibility] parameters..");
-  }
-
-  const { description, id, name, license, summary, visibility } = data;
-
-  if (typeof description === 'undefined') {
-    throw new functions.https.HttpsError('invalid-argument', "The function must be called with " +
-      "a valid [description] parameter which is the image's description.");
-  }
-
-  if (typeof id !== 'string') {
     throw new functions.https.HttpsError(
       'invalid-argument', 
-      `The function must be called with a valid [id] 
-      parameter which is the image's id.`,
+      `The function must be called with valid
+       [description], [illustrationId], [name],
+       [license] and [visibility] parameters.`,
+    );
+  }
+
+  const { 
+    description,
+    illustrationId, 
+    name, 
+    license, 
+    summary, 
+    visibility, 
+  } = data;
+
+  if (typeof description !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument', 
+      `The function must be called with a valid
+       [description] parameter which is the image's description.`,
+      );
+  }
+
+  if (typeof illustrationId !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument', 
+      `The function must be called with a valid [iillustrationIdd]
+       parameter which is the image's id.`,
     );
   }
 
   if (typeof name !== 'string') {
     throw new functions.https.HttpsError(
       'invalid-argument', 
-      `The function must be called with a valid [name] 
-      parameter which is the image's name.`,
+      `The function must be called with a valid [name]
+       parameter which is the image's name.`,
     );
   }
 
   if (typeof license !== 'object') {
     throw new functions.https.HttpsError(
       'invalid-argument', 
-      `The function must be called with a valid [license] 
-      parameter which is the image's license.`,
+      `The function must be called with a valid [license]
+       parameter which is the image's license.`,
     );
   }
 
   if (typeof summary !== 'string') {
     throw new functions.https.HttpsError(
       'invalid-argument', 
-      `The function must be called with a valid [license] 
-      parameter which is the image's license.`,
+      `The function must be called with a valid [license]
+       parameter which is the image's license.`,
       );
   }
 
   if (typeof visibility !== 'string') {
     throw new functions.https.HttpsError(
       'invalid-argument', 
-      `The function must be called with a valid [visibility] 
-      parameter which is the image's visibility.`,
+      `The function must be called with a valid [visibility]
+       parameter which is the image's visibility.`,
     );
   }
 }
@@ -944,7 +866,13 @@ function checkLicenseFormat(data: any) {
 async function generateImageThumbs(
   params: GenerateImageThumbsParams
 ): Promise<GenerateImageThumbsResult> {
-  const { objectMeta, extension, filename, filepath, visibility } = params;
+  const { 
+    objectMeta, 
+    extension, 
+    filename, 
+    filepath, 
+    visibility, 
+  } = params;
 
   const thumbnails: ThumbnailUrls = {
     t1080: '',

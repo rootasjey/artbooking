@@ -115,22 +115,22 @@ interface DeleteAccountParams {
 
 interface DeleteBookParams {
   /** Book's id. */
-  id: string;
+  bookId: string;
 }
 
 interface DeleteBooksParams {
   /** Book's id. */
-  ids: string[];
+  bookIds: string[];
 }
 
 interface DeleteIllustrationParams {
   /** Illustration's id. */
-  id: string;
+  illustrationId: string;
 }
 
 interface DeleteMultipleIllustrationsParams {
   /// Array of illustrations ids.
-  ids: string[];
+  illustrationIds: string[];
 }
 
 interface DeleteListParams {
@@ -154,7 +154,7 @@ interface NotifFuncParams {
 }
 
 interface SetUserAuthorParams {
-  imageId: string;
+  illustrationId: string;
 }
 
 interface BookIllustration {
@@ -241,12 +241,12 @@ interface UpdateIllusPositionParams {
   illustrationId: string;
 }
 
-interface UpdateImagePropsParams {
+interface UpdateIllusMetadataParams {
   /** Illustration's description. */
   description: string,
   
   /** Illustration's id. */
-  id: string;
+  illustrationId: string;
   
   /** Illustration's name. */
   name: string;
@@ -261,20 +261,20 @@ interface UpdateImagePropsParams {
   visibility: Visibility;
 }
 
-interface UpdateImageCategoriesParams {
+interface UpdateIllusCategoriesParams {
   /** Image's categories. */
   categories: [string],
   
-  /** Image's id. */
-  id: string;
+  /** Illustration's id. */
+  illustrationId: string;
 }
 
-interface UpdateImageTopicsParams {
+interface UpdateIllusTopicsParams {
   /** Image's topics. */
   topics: [string],
   
-  /** Image's id. */
-  id: string;
+  /** Illustration's id. */
+  illustrationId: string;
 }
 
 interface UpdateUsernameParams {
