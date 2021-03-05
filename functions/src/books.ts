@@ -62,8 +62,16 @@ export const addIllustrations = functions
       )
     }
 
+    /** Indicates if an operation had issue without resulting in an error. */
+    let warning = '';
+
     const bookIllustrations: BookIllustration[] = bookData.illustrations;
-    const newBookIllustrations = bookIllustrations.concat(minimalIllustrations);
+    let newBookIllustrations = bookIllustrations.concat(minimalIllustrations);
+
+    if (newBookIllustrations.length > 100) {
+      newBookIllustrations = newBookIllustrations.slice(0, 100);
+      warning = `max_illustration_100`;
+    }
 
     await bookSnap.ref.update({
       illustrations: newBookIllustrations,
@@ -73,6 +81,7 @@ export const addIllustrations = functions
       items: illustrationsIds,
       successCount: illustrationsIds.length,
       hasErrors: false,
+      warning,
     };
   });
 
