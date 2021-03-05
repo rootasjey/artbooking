@@ -1,7 +1,7 @@
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/types/create_image_doc_resp.dart';
+import 'package:artbooking/types/single_illus_op_resp.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:auto_route/auto_route.dart';
@@ -10,13 +10,14 @@ import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
+import 'package:unicons/unicons.dart';
 
 class ImageCard extends StatefulWidget {
   final bool selected;
   final bool selectionMode;
   final Illustration illustration;
   final VoidCallback onBeforeDelete;
-  final Function(CreateImageDocResp) onAfterDelete;
+  final Function(SingleIllusOpResp) onAfterDelete;
   final Function(bool) onLongPress;
   final Function onBeforePressed;
   final double size;
@@ -77,7 +78,7 @@ class _ImageCardState extends State<ImageCard> with AnimationMixin {
         .curve(Curves.fastOutSlowIn);
 
     setState(() {
-      size = size;
+      size = widget.size;
       elevation = initElevation;
     });
   }
@@ -155,45 +156,21 @@ class _ImageCardState extends State<ImageCard> with AnimationMixin {
           opacity: opacity.value,
           child: Container(
             color: Colors.black26,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      illustration.name,
-                      style: FontsUtils.mainStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  PopupMenuButton(
-                    child: Icon(
-                      Icons.more_vert,
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    illustration.name,
+                    style: FontsUtils.mainStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
-                    onSelected: (value) {
-                      switch (value) {
-                        case "delete":
-                          confirmDeletion();
-                          break;
-                        default:
-                      }
-                    },
-                    itemBuilder: (_) => <PopupMenuEntry<String>>[
-                      PopupMenuItem(
-                        child: ListTile(
-                          leading: Icon(Icons.delete_outline),
-                          title: Text('Delete'),
-                        ),
-                        value: "delete",
-                      ),
-                    ],
                   ),
-                ],
-              ),
+                ),
+                popupMenuButton(),
+              ],
             ),
           ),
         ),
@@ -263,7 +240,7 @@ class _ImageCardState extends State<ImageCard> with AnimationMixin {
                   tileColor: Color(0xfff55c5c),
                   onTap: () {
                     Navigator.of(context).pop();
-                    deleteImageItem();
+                    deleteImage();
                   },
                 ),
                 ListTile(
@@ -283,7 +260,7 @@ class _ImageCardState extends State<ImageCard> with AnimationMixin {
           onKey: (keyEvent) {
             if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
               Navigator.of(context).pop();
-              deleteImageItem();
+              deleteImage();
             }
           },
           child: SafeArea(
@@ -312,7 +289,7 @@ class _ImageCardState extends State<ImageCard> with AnimationMixin {
     );
   }
 
-  void deleteImageItem() async {
+  void deleteImage() async {
     final illu = widget.illustration;
 
     if (widget.onBeforeDelete != null) {
@@ -343,6 +320,32 @@ class _ImageCardState extends State<ImageCard> with AnimationMixin {
         illustrationId: widget.illustration.id,
         illustration: widget.illustration,
       ),
+    );
+  }
+
+  Widget popupMenuButton() {
+    return PopupMenuButton(
+      child: Icon(
+        Icons.more_vert,
+        color: Colors.white,
+      ),
+      onSelected: (value) {
+        switch (value) {
+          case "delete":
+            confirmDeletion();
+            break;
+          default:
+        }
+      },
+      itemBuilder: (_) => <PopupMenuEntry<String>>[
+        PopupMenuItem(
+          child: ListTile(
+            leading: Icon(UniconsLine.trash),
+            title: Text('Delete'),
+          ),
+          value: "delete",
+        ),
+      ],
     );
   }
 }

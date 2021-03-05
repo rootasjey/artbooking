@@ -477,7 +477,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
       imagesIds: imagesIds,
     );
 
-    if (!response.success) {
+    if (response.hasErrors) {
       Snack.e(
         context: context,
         message: "Sorry, there was an issue while deleting your illustrations. "

@@ -496,7 +496,7 @@ class _MyBooksState extends State<MyBooks> {
       imagesIds: booksIds,
     );
 
-    if (!response.success) {
+    if (response.hasErrors) {
       Snack.e(
         context: context,
         message: "Sorry, there was an issue while deleting your illustrations. "
@@ -605,7 +605,7 @@ class _MyBooksState extends State<MyBooks> {
       isCreating = true;
     });
 
-    final result = await BooksActions.create(
+    final response = await BooksActions.create(
       name: newBookName,
       description: newBookDescription,
     );
@@ -614,7 +614,7 @@ class _MyBooksState extends State<MyBooks> {
       isCreating = true;
     });
 
-    if (!result.success) {
+    if (!response.success) {
       Snack.e(
         context: context,
         message: "Sorry, there wasan error while creating your book."

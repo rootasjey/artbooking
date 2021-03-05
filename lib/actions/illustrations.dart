@@ -1,5 +1,5 @@
-import 'package:artbooking/types/cloud_func_error.dart';
-import 'package:artbooking/types/create_image_doc_resp.dart';
+import 'package:artbooking/types/multiple_illus_op_resp.dart';
+import 'package:artbooking/types/single_illus_op_resp.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/license.dart';
@@ -9,7 +9,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class IllustrationsActions {
-  static Future<CreateImageDocResp> createDoc({
+  static Future<SingleIllusOpResp> createDoc({
     @required String name,
     ContentVisibility visibility = ContentVisibility.private,
   }) async {
@@ -26,31 +26,17 @@ class IllustrationsActions {
         'visibility': Illustration.visibilityPropToString(visibility),
       });
 
-      return CreateImageDocResp.fromJSON(response.data);
+      return SingleIllusOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       appLogger.e(exception);
-      return CreateImageDocResp(
-        success: false,
-        error: CloudFuncError(
-          code: exception.details != null ? exception.details['code'] : '',
-          message:
-              exception.details != null ? exception.details['message'] : '',
-        ),
-      );
+      return SingleIllusOpResp.fromException(exception);
     } catch (error) {
       appLogger.e(error);
-
-      return CreateImageDocResp(
-        success: false,
-        error: CloudFuncError(
-          code: '',
-          message: error.toString(),
-        ),
-      );
+      return SingleIllusOpResp.fromMessage(error.toString());
     }
   }
 
-  static Future<CreateImageDocResp> deleteDoc({
+  static Future<SingleIllusOpResp> deleteDoc({
     @required String imageId,
   }) async {
     try {
@@ -62,34 +48,20 @@ class IllustrationsActions {
       );
 
       final response = await callable.call({
-        'id': imageId,
+        'illustrationId': imageId,
       });
 
-      return CreateImageDocResp.fromJSON(response.data);
+      return SingleIllusOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       appLogger.e(exception);
-      return CreateImageDocResp(
-        success: false,
-        error: CloudFuncError(
-          code: exception.details != null ? exception.details['code'] : '',
-          message:
-              exception.details != null ? exception.details['message'] : '',
-        ),
-      );
+      return SingleIllusOpResp.fromException(exception);
     } catch (error) {
       appLogger.e(error);
-
-      return CreateImageDocResp(
-        success: false,
-        error: CloudFuncError(
-          code: '',
-          message: error.toString(),
-        ),
-      );
+      return SingleIllusOpResp.fromMessage(error.toString());
     }
   }
 
-  static Future<CreateImageDocResp> deleteDocs({
+  static Future<MultipleIllusOpResp> deleteDocs({
     @required List<String> imagesIds,
   }) async {
     try {
@@ -101,34 +73,20 @@ class IllustrationsActions {
       );
 
       final response = await callable.call({
-        'ids': imagesIds,
+        'illustrationIds': imagesIds,
       });
 
-      return CreateImageDocResp.fromJSON(response.data);
+      return MultipleIllusOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       appLogger.e(exception);
-      return CreateImageDocResp(
-        success: false,
-        error: CloudFuncError(
-          code: exception.details != null ? exception.details['code'] : '',
-          message:
-              exception.details != null ? exception.details['message'] : '',
-        ),
-      );
+      return MultipleIllusOpResp.fromException(exception);
     } catch (error) {
       appLogger.e(error);
-
-      return CreateImageDocResp(
-        success: false,
-        error: CloudFuncError(
-          code: '',
-          message: error.toString(),
-        ),
-      );
+      return MultipleIllusOpResp.fromMessage(error.toString());
     }
   }
 
-  static Future<CreateImageDocResp> updateMetadata({
+  static Future<SingleIllusOpResp> updateMetadata({
     String name,
     String description,
     String summary,
@@ -145,7 +103,7 @@ class IllustrationsActions {
       );
 
       final response = await callable.call({
-        'id': illustration.id,
+        'illustrationId': illustration.id,
         'name': name,
         'description': description,
         'summary': summary,
@@ -153,27 +111,13 @@ class IllustrationsActions {
         'visibility': Illustration.visibilityPropToString(visibility),
       });
 
-      return CreateImageDocResp.fromJSON(response.data);
+      return SingleIllusOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       appLogger.e(exception);
-      return CreateImageDocResp(
-        success: false,
-        error: CloudFuncError(
-          code: exception.details != null ? exception.details['code'] : '',
-          message:
-              exception.details != null ? exception.details['message'] : '',
-        ),
-      );
+      return SingleIllusOpResp.fromException(exception);
     } catch (error) {
       appLogger.e(error);
-
-      return CreateImageDocResp(
-        success: false,
-        error: CloudFuncError(
-          code: '',
-          message: error.toString(),
-        ),
-      );
+      return SingleIllusOpResp.fromMessage(error.toString());
     }
   }
 }

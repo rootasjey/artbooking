@@ -417,7 +417,7 @@ class _AddIllustrationState extends State<AddIllustration> {
         return;
       }
 
-      final filePath = "users/${userAuth.uid}/images/${result.id}" +
+      final filePath = "users/${userAuth.uid}/images/${result.illustrationId}" +
           "/original.${imageFile.extension}";
 
       final storage = fb.storage();
@@ -429,7 +429,7 @@ class _AddIllustrationState extends State<AddIllustration> {
           contentType: mimeFromExtension(imageFile.extension),
           customMetadata: {
             'extension': imageFile.extension,
-            'firestoreId': result.id,
+            'firestoreId': result.illustrationId,
             'userId': userAuth.uid,
             'visibility': Illustration.visibilityPropToString(imageVisibility),
           },
@@ -448,7 +448,7 @@ class _AddIllustrationState extends State<AddIllustration> {
       task.future.asStream().listen((uploadTaskSnapshot) {}, onDone: () async {
         final doc = await FirebaseFirestore.instance
             .collection('illustrations')
-            .doc(result.id)
+            .doc(result.illustrationId)
             .get();
 
         final data = doc.data();

@@ -1,12 +1,11 @@
-import 'package:artbooking/types/cloud_func_error.dart';
-import 'package:artbooking/types/create_image_doc_resp.dart';
+import 'package:artbooking/types/single_book_op_resp.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class BooksActions {
-  static Future create({
+  static Future<SingleBookOpResp> create({
     @required String name,
     String description = '',
   }) async {
@@ -23,27 +22,38 @@ class BooksActions {
         'description': description,
       });
 
-      return CreateImageDocResp.fromJSON(response.data);
+      return SingleBookOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       appLogger.e(exception);
-      return CreateImageDocResp(
-        success: false,
-        error: CloudFuncError(
-          code: exception.details != null ? exception.details['code'] : '',
-          message:
-              exception.details != null ? exception.details['message'] : '',
-        ),
-      );
+      return SingleBookOpResp.fromException(exception);
     } catch (error) {
       appLogger.e(error);
+      return SingleBookOpResp.fromMessage(error.toString());
+    }
+  }
 
-      return CreateImageDocResp(
-        success: false,
-        error: CloudFuncError(
-          code: '',
-          message: error.toString(),
-        ),
+  static Future<SingleBookOpResp> deleteOne({
+    @required String bookId,
+  }) async {
+    try {
+      final callable = FirebaseFunctions.instanceFor(
+        app: Firebase.app(),
+        region: 'europe-west3',
+      ).httpsCallable(
+        'books-deleteOne',
       );
+
+      final response = await callable.call({
+        'bookId': bookId,
+      });
+
+      return SingleBookOpResp.fromJSON(response.data);
+    } on FirebaseFunctionsException catch (exception) {
+      appLogger.e(exception);
+      return SingleBookOpResp.fromException(exception);
+    } catch (error) {
+      appLogger.e(error);
+      return SingleBookOpResp.fromMessage(error.toString());
     }
   }
 }

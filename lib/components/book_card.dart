@@ -1,7 +1,7 @@
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/book.dart';
-import 'package:artbooking/types/create_image_doc_resp.dart';
+import 'package:artbooking/types/single_book_op_resp.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,7 +15,7 @@ class BookCard extends StatefulWidget {
   final bool selectionMode;
   final Book book;
   final VoidCallback onBeforeDelete;
-  final Function(CreateImageDocResp) onAfterDelete;
+  final Function(SingleBookOpResp) onAfterDelete;
   final Function(bool) onLongPress;
   final Function onBeforePressed;
   final double size;
