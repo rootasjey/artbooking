@@ -24,65 +24,18 @@ mixin _$StateUser on StateUserBase, Store {
     });
   }
 
-  final _$canManageQuotesAtom = Atom(name: 'StateUserBase.canManageQuotes');
+  final _$canManageDataAtom = Atom(name: 'StateUserBase.canManageData');
 
   @override
-  bool get canManageQuotes {
-    _$canManageQuotesAtom.reportRead();
-    return super.canManageQuotes;
+  bool get canManageData {
+    _$canManageDataAtom.reportRead();
+    return super.canManageData;
   }
 
   @override
-  set canManageQuotes(bool value) {
-    _$canManageQuotesAtom.reportWrite(value, super.canManageQuotes, () {
-      super.canManageQuotes = value;
-    });
-  }
-
-  final _$canManageQuotidiansAtom =
-      Atom(name: 'StateUserBase.canManageQuotidians');
-
-  @override
-  bool get canManageQuotidians {
-    _$canManageQuotidiansAtom.reportRead();
-    return super.canManageQuotidians;
-  }
-
-  @override
-  set canManageQuotidians(bool value) {
-    _$canManageQuotidiansAtom.reportWrite(value, super.canManageQuotidians, () {
-      super.canManageQuotidians = value;
-    });
-  }
-
-  final _$canManageAuthorsAtom = Atom(name: 'StateUserBase.canManageAuthors');
-
-  @override
-  bool get canManageAuthors {
-    _$canManageAuthorsAtom.reportRead();
-    return super.canManageAuthors;
-  }
-
-  @override
-  set canManageAuthors(bool value) {
-    _$canManageAuthorsAtom.reportWrite(value, super.canManageAuthors, () {
-      super.canManageAuthors = value;
-    });
-  }
-
-  final _$canManageReferencesAtom =
-      Atom(name: 'StateUserBase.canManageReferences');
-
-  @override
-  bool get canManageReferences {
-    _$canManageReferencesAtom.reportRead();
-    return super.canManageReferences;
-  }
-
-  @override
-  set canManageReferences(bool value) {
-    _$canManageReferencesAtom.reportWrite(value, super.canManageReferences, () {
-      super.canManageReferences = value;
+  set canManageData(bool value) {
+    _$canManageDataAtom.reportWrite(value, super.canManageData, () {
+      super.canManageData = value;
     });
   }
 
@@ -291,10 +244,7 @@ mixin _$StateUser on StateUserBase, Store {
   String toString() {
     return '''
 avatarUrl: ${avatarUrl},
-canManageQuotes: ${canManageQuotes},
-canManageQuotidians: ${canManageQuotidians},
-canManageAuthors: ${canManageAuthors},
-canManageReferences: ${canManageReferences},
+canManageData: ${canManageData},
 email: ${email},
 lang: ${lang},
 isFirstLaunch: ${isFirstLaunch},

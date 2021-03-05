@@ -3,7 +3,6 @@ import 'package:artbooking/components/side_menu_item.dart';
 import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -196,9 +195,9 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void tryAddAdminPage() async {
-    if (!stateUser.canManageQuotes) {
-      return;
-    }
+    // if (!stateUser.canManageQuotes) {
+    //   return;
+    // }
 
     // _sideMenuItems.addAll([
     //   SideMenuItem(

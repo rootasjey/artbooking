@@ -25,16 +25,7 @@ abstract class StateUserBase with Store {
   String avatarUrl = '';
 
   @observable
-  bool canManageQuotes = false;
-
-  @observable
-  bool canManageQuotidians = false;
-
-  @observable
-  bool canManageAuthors = false;
-
-  @observable
-  bool canManageReferences = false;
+  bool canManageData = false;
 
   @observable
   String email = '';
@@ -85,10 +76,7 @@ abstract class StateUserBase with Store {
 
       final Map<String, dynamic> rights = userData['rights'];
 
-      canManageQuotes = rights['user:managequotidian'];
-      canManageQuotidians = rights['user:managequotes'];
-      canManageAuthors = rights['user:manageauthor'];
-      canManageReferences = rights['user:managereference'];
+      canManageData = rights['user:managedata'];
       setUsername(userData['name']);
     } on FirebaseFunctionsException catch (exception) {
       appLogger.e("[code: ${exception.code}] - ${exception.message}");
@@ -183,10 +171,7 @@ abstract class StateUserBase with Store {
 
   @action
   void setAllRightsToFalse() {
-    canManageQuotes = false;
-    canManageAuthors = false;
-    canManageReferences = false;
-    canManageQuotidians = false;
+    canManageData = false;
   }
 
   @action
