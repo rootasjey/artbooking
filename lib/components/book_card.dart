@@ -1,13 +1,16 @@
-import 'package:artbooking/actions/illustrations.dart';
+import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/create_image_doc_resp.dart';
+import 'package:artbooking/utils/fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
+import 'package:unicons/unicons.dart';
 
-class BookItem extends StatefulWidget {
+class BookCard extends StatefulWidget {
   final bool selected;
   final bool selectionMode;
   final Book book;
@@ -15,8 +18,9 @@ class BookItem extends StatefulWidget {
   final Function(CreateImageDocResp) onAfterDelete;
   final Function(bool) onLongPress;
   final Function onBeforePressed;
+  final double size;
 
-  BookItem({
+  BookCard({
     @required this.book,
     this.selected = false,
     this.selectionMode = false,
@@ -24,18 +28,21 @@ class BookItem extends StatefulWidget {
     this.onBeforeDelete,
     this.onBeforePressed,
     this.onLongPress,
+    this.size = 300.0,
   });
 
   @override
-  _BookItemState createState() => _BookItemState();
+  _BookCardState createState() => _BookCardState();
 }
 
-class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
+class _BookCardState extends State<BookCard> with AnimationMixin {
   Animation<double> scaleAnimation;
-  AnimationController scaleAnimationController;
-
   Animation<Offset> offsetAnimation;
-  AnimationController offsetAnimationController;
+  Animation<double> opacity;
+
+  AnimationController captionController;
+  AnimationController scaleController;
+  AnimationController offsetController;
 
   bool showCaption = false;
 
@@ -51,50 +58,38 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    scaleAnimationController = AnimationController(
-      lowerBound: 0.8,
-      upperBound: 1.0,
-      duration: 500.milliseconds,
-      vsync: this,
-    );
+    captionController = createController();
+    captionController.duration = 300.milliseconds;
+    opacity = 0.0.tweenTo(1.0).animatedBy(captionController);
 
-    scaleAnimation = CurvedAnimation(
-      parent: scaleAnimationController,
-      curve: Curves.fastOutSlowIn,
-    );
+    offsetController = createController()..duration = 250.milliseconds;
 
-    offsetAnimationController = AnimationController(
-      duration: 500.milliseconds,
-      vsync: this,
-    );
+    offsetAnimation =
+        Offset(0, 0.25).tweenTo(Offset.zero).animatedBy(offsetController);
 
-    offsetAnimation = Tween<Offset>(
-      begin: Offset(0, 20.0),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: offsetAnimationController,
-        curve: Curves.ease,
-      ),
-    );
+    scaleController = createController()..duration = 500.milliseconds;
+
+    scaleAnimation = 0.8
+        .tweenTo(1.0)
+        .animatedBy(scaleController)
+        .curve(Curves.fastOutSlowIn);
 
     setState(() {
-      size = size;
+      size = widget.size;
       elevation = initElevation;
     });
   }
 
   @override
   dispose() {
-    scaleAnimationController.dispose();
-    offsetAnimationController.dispose();
+    captionController.dispose();
+    scaleController.dispose();
+    offsetController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // final book = widget.book;
-
     return SizedBox(
       width: size,
       height: size,
@@ -119,7 +114,6 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
                   return;
                 }
               },
-              // onLongPress: widget.onLongPress,
               onLongPress: () {
                 if (widget.onLongPress != null) {
                   widget.onLongPress(widget.selected);
@@ -129,13 +123,17 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
                 if (isHover) {
                   elevation = 8.0;
                   showCaption = true;
-                  scaleAnimationController.forward();
-                  offsetAnimationController.forward();
+
+                  captionController.forward();
+                  offsetController.forward();
+                  scaleController.forward();
                 } else {
                   elevation = initElevation;
                   showCaption = false;
-                  scaleAnimationController.reverse();
-                  offsetAnimationController.reverse();
+
+                  captionController.reverse();
+                  offsetController.reverse();
+                  scaleController.reverse();
                 }
 
                 setState(() {});
@@ -160,46 +158,27 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
       alignment: Alignment.bottomCenter,
       child: SlideTransition(
         position: offsetAnimation,
-        child: Container(
-          color: Colors.black26,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    illustration.name,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                PopupMenuButton(
-                  child: Icon(
-                    Icons.more_vert,
-                    color: Colors.white,
-                  ),
-                  onSelected: (value) {
-                    switch (value) {
-                      case "delete":
-                        confirmDeletion();
-                        break;
-                      default:
-                    }
-                  },
-                  itemBuilder: (_) => <PopupMenuEntry<String>>[
-                    PopupMenuItem(
-                      child: ListTile(
-                        leading: Icon(Icons.delete_outline),
-                        title: Text('Delete'),
+        child: Opacity(
+          opacity: opacity.value,
+          child: Container(
+            color: Colors.black26,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      illustration.name,
+                      style: FontsUtils.mainStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
-                      value: "delete",
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  popupMenuButton(),
+                ],
+              ),
             ),
           ),
         ),
@@ -269,7 +248,7 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
                   tileColor: Color(0xfff55c5c),
                   onTap: () {
                     Navigator.of(context).pop();
-                    deleteImageItem();
+                    deleteBook();
                   },
                 ),
                 ListTile(
@@ -289,7 +268,7 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
           onKey: (keyEvent) {
             if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
               Navigator.of(context).pop();
-              deleteImageItem();
+              deleteBook();
             }
           },
           child: SafeArea(
@@ -318,19 +297,45 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
     );
   }
 
-  void deleteImageItem() async {
-    final illu = widget.book;
+  void deleteBook() async {
+    final book = widget.book;
 
     if (widget.onBeforeDelete != null) {
       widget.onBeforeDelete();
     }
 
-    final response = await IllustrationsActions.deleteDoc(
-      imageId: illu.id,
+    final response = await BooksActions.deleteOne(
+      bookId: book.id,
     );
 
     if (widget.onAfterDelete != null) {
       widget.onAfterDelete(response);
     }
+  }
+
+  Widget popupMenuButton() {
+    return PopupMenuButton(
+      child: Icon(
+        Icons.more_vert,
+        color: Colors.white,
+      ),
+      onSelected: (value) {
+        switch (value) {
+          case "delete":
+            confirmDeletion();
+            break;
+          default:
+        }
+      },
+      itemBuilder: (_) => <PopupMenuEntry<String>>[
+        PopupMenuItem(
+          child: ListTile(
+            leading: Icon(UniconsLine.trash),
+            title: Text('Delete'),
+          ),
+          value: "delete",
+        ),
+      ],
+    );
   }
 }

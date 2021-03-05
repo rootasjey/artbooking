@@ -1,7 +1,7 @@
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
-import 'package:artbooking/components/book_item.dart';
+import 'package:artbooking/components/book_card.dart';
 import 'package:artbooking/components/default_app_bar.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
@@ -286,7 +286,7 @@ class _MyBooksState extends State<MyBooks> {
             final book = booksList.elementAt(index);
             final selected = multiSelectedItems.containsKey(book.id);
 
-            return BookItem(
+            return BookCard(
               book: book,
               selected: selected,
               selectionMode: selectionMode,
