@@ -2,7 +2,7 @@ import 'package:artbooking/types/user/book_stats.dart';
 import 'package:artbooking/types/user/challenges_stats.dart';
 import 'package:artbooking/types/user/contests_stats.dart';
 import 'package:artbooking/types/user/galleries_stats.dart';
-import 'package:artbooking/types/user/images_stats.dart';
+import 'package:artbooking/types/user/illustrations_stats.dart';
 import 'package:artbooking/types/user/notifications_stats.dart';
 import 'package:artbooking/types/user/storage_stats.dart';
 
@@ -11,7 +11,7 @@ class UserStats {
   UserChallengesStats challenges;
   UserContestsStats constests;
   UserGalleriesStats galleries;
-  UserImagesStats images;
+  UserIllustrationsStats illustrations;
   UserNotificationsStats notifications;
   UserStorageStats storage;
 
@@ -20,7 +20,7 @@ class UserStats {
     this.challenges,
     this.constests,
     this.galleries,
-    this.images,
+    this.illustrations,
     this.notifications,
     this.storage,
   });
@@ -31,7 +31,7 @@ class UserStats {
       challenges: UserChallengesStats.fromJSON(data['challenges']),
       constests: UserContestsStats.fromJSON(data['contests']),
       galleries: UserGalleriesStats.fromJSON(data['galleries']),
-      images: UserImagesStats.fromJSON(data['images']),
+      illustrations: UserIllustrationsStats.fromJSON(data['illustrations']),
       notifications: UserNotificationsStats.fromJSON(data['notifications']),
       storage: UserStorageStats.fromJSON(data['storage']),
     );

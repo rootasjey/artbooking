@@ -12,14 +12,14 @@ class UserGalleriesStats {
   int opened;
 
   /// Number of existing virtual galleries this user own.
-  int own;
+  int owned;
 
   UserGalleriesStats({
     this.created = 0,
     this.deleted = 0,
     this.entered = 0,
     this.opened = 0,
-    this.own = 0,
+    this.owned = 0,
   });
 
   factory UserGalleriesStats.fromJSON(Map<String, dynamic> data) {
@@ -28,7 +28,7 @@ class UserGalleriesStats {
       deleted: data['deleted'],
       entered: data['entered'],
       opened: data['opened'],
-      own: data['own'],
+      owned: data['owned'],
     );
   }
 }

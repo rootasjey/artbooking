@@ -9,13 +9,13 @@ class UserBooksStats {
   int fav;
 
   /// Number of existing books this user own.
-  int own;
+  int owned;
 
   UserBooksStats({
     this.created = 0,
     this.deleted = 0,
     this.fav = 0,
-    this.own = 0,
+    this.owned = 0,
   });
 
   factory UserBooksStats.fromJSON(Map<String, dynamic> data) {
@@ -23,7 +23,7 @@ class UserBooksStats {
       created: data['created'],
       deleted: data['deleted'],
       fav: data['fav'],
-      own: data['own'],
+      owned: data['owned'],
     );
   }
 }

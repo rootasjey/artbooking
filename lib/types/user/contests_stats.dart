@@ -9,7 +9,7 @@ class UserContestsStats {
   int entered;
 
   /// Number of existing contests this user own.
-  int own;
+  int owned;
 
   /// Number of existing contests this user is doing.
   int participating;
@@ -21,7 +21,7 @@ class UserContestsStats {
     this.created = 0,
     this.deleted = 0,
     this.entered = 0,
-    this.own = 0,
+    this.owned = 0,
     this.participating = 0,
     this.won = 0,
   });
@@ -31,7 +31,7 @@ class UserContestsStats {
       created: data['created'],
       deleted: data['deleted'],
       entered: data['entered'],
-      own: data['own'],
+      owned: data['owned'],
       participating: data['participating'],
       won: data['won'],
     );

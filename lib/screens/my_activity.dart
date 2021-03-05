@@ -94,7 +94,7 @@ class _MyActivityState extends State<MyActivity> {
         children: <Widget>[
           squareStats(
             title: 'Illustrations',
-            count: stats.images.own,
+            count: stats.illustrations.owned,
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -107,12 +107,12 @@ class _MyActivityState extends State<MyActivity> {
           ),
           squareStats(
             title: 'Books',
-            count: stats.books.own,
+            count: stats.books.owned,
             onTap: () {},
           ),
           squareStats(
             title: 'Galleries',
-            count: stats.galleries.own,
+            count: stats.galleries.owned,
             onTap: () {},
           ),
           squareStats(
@@ -254,7 +254,7 @@ class _MyActivityState extends State<MyActivity> {
   }
 
   String getUsedSpace() {
-    final usedBytes = stateUser.userFirestore.stats.storage.images.used;
+    final usedBytes = stateUser.userFirestore.stats.storage.illustrations.used;
     var units = 'bytes';
 
     if (usedBytes < 1000) {
