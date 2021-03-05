@@ -5,7 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class BooksActions {
-  static Future<SingleBookOpResp> create({
+  static Future<SingleBookOpResp> createOne({
     @required String name,
     String description = '',
   }) async {

@@ -492,7 +492,7 @@ class _MyBooksState extends State<MyBooks> {
       forceMultiSelect = false;
     });
 
-    final response = await IllustrationsActions.deleteDocs(
+    final response = await IllustrationsActions.deleteMany(
       imagesIds: booksIds,
     );
 
@@ -605,7 +605,7 @@ class _MyBooksState extends State<MyBooks> {
       isCreating = true;
     });
 
-    final response = await BooksActions.create(
+    final response = await BooksActions.createOne(
       name: newBookName,
       description: newBookDescription,
     );

@@ -9,7 +9,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class IllustrationsActions {
-  static Future<SingleIllusOpResp> createDoc({
+  static Future<SingleIllusOpResp> createOne({
     @required String name,
     ContentVisibility visibility = ContentVisibility.private,
   }) async {
@@ -36,7 +36,7 @@ class IllustrationsActions {
     }
   }
 
-  static Future<SingleIllusOpResp> deleteDoc({
+  static Future<SingleIllusOpResp> deleteOne({
     @required String imageId,
   }) async {
     try {
@@ -61,7 +61,7 @@ class IllustrationsActions {
     }
   }
 
-  static Future<MultipleIllusOpResp> deleteDocs({
+  static Future<MultipleIllusOpResp> deleteMany({
     @required List<String> imagesIds,
   }) async {
     try {

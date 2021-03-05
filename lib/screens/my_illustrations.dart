@@ -473,7 +473,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
       forceMultiSelect = false;
     });
 
-    final response = await IllustrationsActions.deleteDocs(
+    final response = await IllustrationsActions.deleteMany(
       imagesIds: imagesIds,
     );
 

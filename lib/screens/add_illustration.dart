@@ -399,7 +399,7 @@ class _AddIllustrationState extends State<AddIllustration> {
         isLoading = true;
       });
 
-      final result = await IllustrationsActions.createDoc(
+      final result = await IllustrationsActions.createOne(
         name: imageFile.name,
         visibility: imageVisibility,
       );

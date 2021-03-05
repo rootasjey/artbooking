@@ -298,7 +298,7 @@ class _IllustrationCardState extends State<IllustrationCard>
       widget.onBeforeDelete();
     }
 
-    final response = await IllustrationsActions.deleteDoc(
+    final response = await IllustrationsActions.deleteOne(
       imageId: illus.id,
     );
 
