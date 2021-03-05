@@ -1,13 +1,15 @@
 import 'package:artbooking/components/default_app_bar.dart';
 import 'package:artbooking/components/full_page_loading.dart';
-import 'package:artbooking/screens/dashboard.dart';
+import 'package:artbooking/router/app_router.dart';
 import 'package:artbooking/screens/signin.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/utils/fonts.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:unicons/unicons.dart';
 
 class MyActivity extends StatefulWidget {
   @override
@@ -94,21 +96,21 @@ class _MyActivityState extends State<MyActivity> {
         children: <Widget>[
           squareStats(
             title: 'Illustrations',
+            icon: Icon(
+              UniconsLine.picture,
+              size: 48.0,
+            ),
             count: stats.illustrations.owned,
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => Dashboard(
-                    initialIndex: 1,
-                  ),
-                ),
-              );
-            },
+            onTap: () => context.router.navigate(MyIllustrationsRoute()),
           ),
           squareStats(
             title: 'Books',
+            icon: Icon(
+              UniconsLine.book_alt,
+              size: 48.0,
+            ),
             count: stats.books.owned,
-            onTap: () {},
+            onTap: () => context.router.navigate(MyBooksDeepRoute()),
           ),
           squareStats(
             title: 'Galleries',
@@ -134,6 +136,7 @@ class _MyActivityState extends State<MyActivity> {
     @required String title,
     @required int count,
     @required VoidCallback onTap,
+    Widget icon,
   }) {
     return SizedBox(
       width: 200.0,
@@ -144,24 +147,43 @@ class _MyActivityState extends State<MyActivity> {
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Stack(
               children: [
-                Text(
-                  count.toString(),
-                  style: TextStyle(
-                    fontSize: 32.0,
-                    fontWeight: FontWeight.w200,
-                  ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Opacity(
+                      opacity: 0.9,
+                      child: Text(
+                        count.toString(),
+                        style: FontsUtils.mainStyle(
+                          fontSize: 32.0,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    Opacity(
+                      opacity: 0.7,
+                      child: Text(
+                        title,
+                        style: FontsUtils.mainStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.w600,
+                if (icon != null)
+                  Positioned(
+                    top: 0.0,
+                    left: 0.0,
+                    child: Opacity(
+                      opacity: 0.6,
+                      child: icon,
+                    ),
                   ),
-                ),
               ],
             ),
           ),
