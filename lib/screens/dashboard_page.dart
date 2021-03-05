@@ -4,6 +4,7 @@ import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/utils/constants.dart';
+import 'package:artbooking/utils/fonts.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -119,11 +120,13 @@ class _DashboardPageState extends State<DashboardPage> {
                   _sideMenuItems.map((item) {
                     Color color = stateColors.foreground.withOpacity(0.6);
                     Color textColor = stateColors.foreground.withOpacity(0.6);
+                    FontWeight fontWeight = FontWeight.w400;
 
                     if (item.destination.fullPath ==
                         router.current?.route?.fullPath) {
                       color = item.hoverColor;
                       textColor = stateColors.foreground;
+                      fontWeight = FontWeight.w600;
                     }
 
                     return ListTile(
@@ -133,8 +136,9 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                       title: Text(
                         item.label,
-                        style: TextStyle(
+                        style: FontsUtils.mainStyle(
                           color: textColor,
+                          fontWeight: fontWeight,
                         ),
                       ),
                       onTap: () {
