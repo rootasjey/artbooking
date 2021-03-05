@@ -41,14 +41,14 @@ export const addIllustrations = functions
 
     const minimalIllustrations = await createBookIllustrations(illustrationsIds);
 
-    const bookDoc = await firestore
+    const bookSnap = await firestore
       .collection('books')
       .doc(bookId)
       .get();
 
-    const bookData = bookDoc.data();
+    const bookData = bookSnap.data();
     
-    if (!bookDoc.exists || !bookData) {
+    if (!bookSnap.exists || !bookData) {
       throw new functions.https.HttpsError(
         'not-found', 
         `The book to update doesn't exist anymore.`,
@@ -65,16 +65,14 @@ export const addIllustrations = functions
     const bookIllustrations: BookIllustration[] = bookData.illustrations;
     const newBookIllustrations = bookIllustrations.concat(minimalIllustrations);
 
-    await firestore
-      .collection('books')
-      .doc(bookId)
-      .update({
-        illustrations: newBookIllustrations,
-      });
+    await bookSnap.ref.update({
+      illustrations: newBookIllustrations,
+    });
 
     return {
-      illustrationsIds,
-      success: true,
+      items: illustrationsIds,
+      successCount: illustrationsIds.length,
+      hasErrors: false,
     };
   });
 
@@ -347,8 +345,9 @@ export const removeIllustrations = functions
     });
 
     return {
-      illustrationsIds,
-      success: true,
+      items: illustrationsIds,
+      successCount: illustrationsIds.length,
+      hasErrors: false,
     };
   });
 

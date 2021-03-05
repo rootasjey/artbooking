@@ -211,7 +211,7 @@ export const onDeleteIllustration = functions
     total = Math.max(0, statsData.total - 1);
     deleted++;
 
-    let payload: Record<string, number> = { total, deleted };
+    const payload: Record<string, number> = { total, deleted };
     await statsSnap.ref.update(payload);
 
     // Update user's stats.
