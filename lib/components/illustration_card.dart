@@ -86,14 +86,6 @@ class _IllustrationCardState extends State<IllustrationCard>
   }
 
   @override
-  dispose() {
-    scaleController.dispose();
-    offsetController.dispose();
-    captionController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final illustration = widget.illustration;
 
