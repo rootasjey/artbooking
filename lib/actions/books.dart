@@ -1,3 +1,4 @@
+import 'package:artbooking/types/multiple_books_op_resp.dart';
 import 'package:artbooking/types/single_book_op_resp.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -54,6 +55,31 @@ class BooksActions {
     } catch (error) {
       appLogger.e(error);
       return SingleBookOpResp.fromMessage(error.toString());
+    }
+  }
+
+  static Future<MultipleBooksOpResp> deleteMany({
+    @required List<String> bookIds,
+  }) async {
+    try {
+      final callable = FirebaseFunctions.instanceFor(
+        app: Firebase.app(),
+        region: 'europe-west3',
+      ).httpsCallable(
+        'books-deleteMany',
+      );
+
+      final response = await callable.call({
+        'bookIds': bookIds,
+      });
+
+      return MultipleBooksOpResp.fromJSON(response.data);
+    } on FirebaseFunctionsException catch (exception) {
+      appLogger.e(exception);
+      return MultipleBooksOpResp.fromException(exception);
+    } catch (error) {
+      appLogger.e(error);
+      return MultipleBooksOpResp.fromMessage(error.toString());
     }
   }
 }

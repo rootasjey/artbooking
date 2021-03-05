@@ -1,5 +1,4 @@
 import 'package:artbooking/actions/books.dart';
-import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/book_card.dart';
 import 'package:artbooking/components/default_app_bar.dart';
@@ -492,8 +491,8 @@ class _MyBooksState extends State<MyBooks> {
       forceMultiSelect = false;
     });
 
-    final response = await IllustrationsActions.deleteMany(
-      imagesIds: booksIds,
+    final response = await BooksActions.deleteMany(
+      bookIds: booksIds,
     );
 
     if (response.hasErrors) {
