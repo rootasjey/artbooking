@@ -1,8 +1,8 @@
 import 'package:artbooking/types/multiple_books_op_resp.dart';
 import 'package:artbooking/types/single_book_op_resp.dart';
 import 'package:artbooking/utils/app_logger.dart';
+import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class BooksActions {
@@ -11,14 +11,7 @@ class BooksActions {
     String description = '',
   }) async {
     try {
-      final callable = FirebaseFunctions.instanceFor(
-        app: Firebase.app(),
-        region: 'europe-west3',
-      ).httpsCallable(
-        'books-createOne',
-      );
-
-      final response = await callable.call({
+      final response = await CloudHelper.fun('books-createOne').call({
         'name': name,
         'description': description,
       });
@@ -37,14 +30,7 @@ class BooksActions {
     @required String bookId,
   }) async {
     try {
-      final callable = FirebaseFunctions.instanceFor(
-        app: Firebase.app(),
-        region: 'europe-west3',
-      ).httpsCallable(
-        'books-deleteOne',
-      );
-
-      final response = await callable.call({
+      final response = await CloudHelper.fun('books-deleteOne').call({
         'bookId': bookId,
       });
 
@@ -62,14 +48,7 @@ class BooksActions {
     @required List<String> bookIds,
   }) async {
     try {
-      final callable = FirebaseFunctions.instanceFor(
-        app: Firebase.app(),
-        region: 'europe-west3',
-      ).httpsCallable(
-        'books-deleteMany',
-      );
-
-      final response = await callable.call({
+      final response = await CloudHelper.fun('books-deleteMany').call({
         'bookIds': bookIds,
       });
 

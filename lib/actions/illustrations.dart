@@ -4,8 +4,8 @@ import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/utils/app_logger.dart';
+import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class IllustrationsActions {
@@ -14,14 +14,7 @@ class IllustrationsActions {
     ContentVisibility visibility = ContentVisibility.private,
   }) async {
     try {
-      final callable = FirebaseFunctions.instanceFor(
-        app: Firebase.app(),
-        region: 'europe-west3',
-      ).httpsCallable(
-        'illustrations-createOne',
-      );
-
-      final response = await callable.call({
+      final response = await CloudHelper.fun('illustrations-createOne').call({
         'name': name,
         'visibility': Illustration.visibilityPropToString(visibility),
       });
@@ -40,14 +33,7 @@ class IllustrationsActions {
     @required String imageId,
   }) async {
     try {
-      final callable = FirebaseFunctions.instanceFor(
-        app: Firebase.app(),
-        region: 'europe-west3',
-      ).httpsCallable(
-        'illustrations-deleteOne',
-      );
-
-      final response = await callable.call({
+      final response = await CloudHelper.fun('illustrations-deleteOne').call({
         'illustrationId': imageId,
       });
 
@@ -65,14 +51,7 @@ class IllustrationsActions {
     @required List<String> imagesIds,
   }) async {
     try {
-      final callable = FirebaseFunctions.instanceFor(
-        app: Firebase.app(),
-        region: 'europe-west3',
-      ).httpsCallable(
-        'illustrations-deleteMany',
-      );
-
-      final response = await callable.call({
+      final response = await CloudHelper.fun('illustrations-deleteMany').call({
         'illustrationIds': imagesIds,
       });
 
@@ -95,14 +74,8 @@ class IllustrationsActions {
     @required Illustration illustration,
   }) async {
     try {
-      final callable = FirebaseFunctions.instanceFor(
-        app: Firebase.app(),
-        region: 'europe-west3',
-      ).httpsCallable(
-        'illustrations-updateMetadata',
-      );
-
-      final response = await callable.call({
+      final response =
+          await CloudHelper.fun('illustrations-updateMetadata').call({
         'illustrationId': illustration.id,
         'name': name,
         'description': description,
