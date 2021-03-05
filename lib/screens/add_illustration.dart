@@ -1,6 +1,6 @@
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/default_app_bar.dart';
-import 'package:artbooking/components/image_card.dart';
+import 'package:artbooking/components/illustration_card.dart';
 import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/enums.dart';
@@ -250,7 +250,7 @@ class _AddIllustrationState extends State<AddIllustration> {
             final doneTask = doneTasks.elementAt(index);
             final illustration = doneTask.illustration;
 
-            return ImageCard(
+            return IllustrationCard(
               illustration: illustration,
               onBeforeDelete: () {
                 setState(() {

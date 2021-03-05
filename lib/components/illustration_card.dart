@@ -12,7 +12,8 @@ import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
-class ImageCard extends StatefulWidget {
+/// A component representing an illustration with its main content (an image).
+class IllustrationCard extends StatefulWidget {
   final bool selected;
   final bool selectionMode;
   final Illustration illustration;
@@ -22,7 +23,7 @@ class ImageCard extends StatefulWidget {
   final Function onBeforePressed;
   final double size;
 
-  ImageCard({
+  IllustrationCard({
     @required this.illustration,
     this.selected = false,
     this.selectionMode = false,
@@ -34,10 +35,11 @@ class ImageCard extends StatefulWidget {
   });
 
   @override
-  _ImageCardState createState() => _ImageCardState();
+  _IllustrationCardState createState() => _IllustrationCardState();
 }
 
-class _ImageCardState extends State<ImageCard> with AnimationMixin {
+class _IllustrationCardState extends State<IllustrationCard>
+    with AnimationMixin {
   Animation<double> scaleAnimation;
   Animation<Offset> offsetAnimation;
   Animation<double> opacity;
@@ -240,7 +242,7 @@ class _ImageCardState extends State<ImageCard> with AnimationMixin {
                   tileColor: Color(0xfff55c5c),
                   onTap: () {
                     Navigator.of(context).pop();
-                    deleteImage();
+                    deleteIllustration();
                   },
                 ),
                 ListTile(
@@ -260,7 +262,7 @@ class _ImageCardState extends State<ImageCard> with AnimationMixin {
           onKey: (keyEvent) {
             if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
               Navigator.of(context).pop();
-              deleteImage();
+              deleteIllustration();
             }
           },
           child: SafeArea(
@@ -289,15 +291,15 @@ class _ImageCardState extends State<ImageCard> with AnimationMixin {
     );
   }
 
-  void deleteImage() async {
-    final illu = widget.illustration;
+  void deleteIllustration() async {
+    final illus = widget.illustration;
 
     if (widget.onBeforeDelete != null) {
       widget.onBeforeDelete();
     }
 
     final response = await IllustrationsActions.deleteDoc(
-      imageId: illu.id,
+      imageId: illus.id,
     );
 
     if (widget.onAfterDelete != null) {
