@@ -1,12 +1,12 @@
-import 'package:artbooking/types/multiple_books_op_resp.dart';
-import 'package:artbooking/types/single_book_op_resp.dart';
+import 'package:artbooking/types/many_books_op_resp.dart';
+import 'package:artbooking/types/one_book_op_resp.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 
 class BooksActions {
-  static Future<SingleBookOpResp> createOne({
+  static Future<OneBookOpResp> createOne({
     @required String name,
     String description = '',
   }) async {
@@ -16,17 +16,17 @@ class BooksActions {
         'description': description,
       });
 
-      return SingleBookOpResp.fromJSON(response.data);
+      return OneBookOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       appLogger.e(exception);
-      return SingleBookOpResp.fromException(exception);
+      return OneBookOpResp.fromException(exception);
     } catch (error) {
       appLogger.e(error);
-      return SingleBookOpResp.fromMessage(error.toString());
+      return OneBookOpResp.fromMessage(error.toString());
     }
   }
 
-  static Future<SingleBookOpResp> deleteOne({
+  static Future<OneBookOpResp> deleteOne({
     @required String bookId,
   }) async {
     try {
@@ -34,17 +34,17 @@ class BooksActions {
         'bookId': bookId,
       });
 
-      return SingleBookOpResp.fromJSON(response.data);
+      return OneBookOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       appLogger.e(exception);
-      return SingleBookOpResp.fromException(exception);
+      return OneBookOpResp.fromException(exception);
     } catch (error) {
       appLogger.e(error);
-      return SingleBookOpResp.fromMessage(error.toString());
+      return OneBookOpResp.fromMessage(error.toString());
     }
   }
 
-  static Future<MultipleBooksOpResp> deleteMany({
+  static Future<ManyBooksOpResp> deleteMany({
     @required List<String> bookIds,
   }) async {
     try {
@@ -52,13 +52,13 @@ class BooksActions {
         'bookIds': bookIds,
       });
 
-      return MultipleBooksOpResp.fromJSON(response.data);
+      return ManyBooksOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       appLogger.e(exception);
-      return MultipleBooksOpResp.fromException(exception);
+      return ManyBooksOpResp.fromException(exception);
     } catch (error) {
       appLogger.e(error);
-      return MultipleBooksOpResp.fromMessage(error.toString());
+      return ManyBooksOpResp.fromMessage(error.toString());
     }
   }
 }

@@ -3,7 +3,7 @@ import 'package:artbooking/types/processed_illus.dart';
 import 'package:artbooking/types/user/partial_user.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
-class MultipleIllusOpResp {
+class ManyIllusOpResp {
   bool hasErrors;
   final int successCount;
   final List<ProcessedIllustration> illustrations;
@@ -11,7 +11,7 @@ class MultipleIllusOpResp {
   final CloudFuncError error;
   final PartialUser user;
 
-  MultipleIllusOpResp({
+  ManyIllusOpResp({
     this.illustrations = const [],
     this.hasErrors = false,
     this.message = '',
@@ -20,9 +20,8 @@ class MultipleIllusOpResp {
     this.user,
   });
 
-  factory MultipleIllusOpResp.fromException(
-      FirebaseFunctionsException exception) {
-    return MultipleIllusOpResp(
+  factory ManyIllusOpResp.fromException(FirebaseFunctionsException exception) {
+    return ManyIllusOpResp(
       hasErrors: true,
       illustrations: [],
       error: CloudFuncError.fromException(exception),
@@ -30,7 +29,7 @@ class MultipleIllusOpResp {
     );
   }
 
-  factory MultipleIllusOpResp.fromJSON(Map<dynamic, dynamic> data) {
+  factory ManyIllusOpResp.fromJSON(Map<dynamic, dynamic> data) {
     final _user = data['user'] != null
         ? PartialUser.fromJSON(data['user'])
         : PartialUser();
@@ -47,7 +46,7 @@ class MultipleIllusOpResp {
       }
     }
 
-    return MultipleIllusOpResp(
+    return ManyIllusOpResp(
       illustrations: _illustrations,
       successCount: data['successCount'],
       hasErrors: data['hasErrors'] ?? true,
@@ -56,8 +55,8 @@ class MultipleIllusOpResp {
     );
   }
 
-  factory MultipleIllusOpResp.fromMessage(String message) {
-    return MultipleIllusOpResp(
+  factory ManyIllusOpResp.fromMessage(String message) {
+    return ManyIllusOpResp(
       hasErrors: true,
       illustrations: [],
       error: CloudFuncError.fromMessage(message),

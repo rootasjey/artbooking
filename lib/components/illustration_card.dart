@@ -1,7 +1,7 @@
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/types/single_illus_op_resp.dart';
+import 'package:artbooking/types/one_illus_op_resp.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:auto_route/auto_route.dart';
@@ -18,7 +18,7 @@ class IllustrationCard extends StatefulWidget {
   final bool selectionMode;
   final Illustration illustration;
   final VoidCallback onBeforeDelete;
-  final Function(SingleIllusOpResp) onAfterDelete;
+  final Function(OneIllusOpResp) onAfterDelete;
   final Function(bool) onLongPress;
   final Function onBeforePressed;
   final double size;

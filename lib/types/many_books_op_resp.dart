@@ -3,7 +3,7 @@ import 'package:artbooking/types/processed_book.dart';
 import 'package:artbooking/types/user/partial_user.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
-class MultipleBooksOpResp {
+class ManyBooksOpResp {
   bool hasErrors;
   final int successCount;
   final List<ProcessedBook> books;
@@ -11,7 +11,7 @@ class MultipleBooksOpResp {
   final CloudFuncError error;
   final PartialUser user;
 
-  MultipleBooksOpResp({
+  ManyBooksOpResp({
     this.books = const [],
     this.hasErrors = false,
     this.message = '',
@@ -20,9 +20,8 @@ class MultipleBooksOpResp {
     this.user,
   });
 
-  factory MultipleBooksOpResp.fromException(
-      FirebaseFunctionsException exception) {
-    return MultipleBooksOpResp(
+  factory ManyBooksOpResp.fromException(FirebaseFunctionsException exception) {
+    return ManyBooksOpResp(
       hasErrors: true,
       books: [],
       error: CloudFuncError.fromException(exception),
@@ -30,7 +29,7 @@ class MultipleBooksOpResp {
     );
   }
 
-  factory MultipleBooksOpResp.fromJSON(Map<dynamic, dynamic> data) {
+  factory ManyBooksOpResp.fromJSON(Map<dynamic, dynamic> data) {
     final _user = data['user'] != null
         ? PartialUser.fromJSON(data['user'])
         : PartialUser();
@@ -47,7 +46,7 @@ class MultipleBooksOpResp {
       }
     }
 
-    return MultipleBooksOpResp(
+    return ManyBooksOpResp(
       books: _books,
       hasErrors: data['hasErrors'] ?? true,
       successCount: data['successCount'],
@@ -56,8 +55,8 @@ class MultipleBooksOpResp {
     );
   }
 
-  factory MultipleBooksOpResp.fromMessage(String message) {
-    return MultipleBooksOpResp(
+  factory ManyBooksOpResp.fromMessage(String message) {
+    return ManyBooksOpResp(
       hasErrors: true,
       books: [],
       error: CloudFuncError.fromMessage(message),

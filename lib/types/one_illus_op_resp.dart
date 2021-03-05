@@ -2,40 +2,40 @@ import 'package:artbooking/types/cloud_func_error.dart';
 import 'package:artbooking/types/user/partial_user.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
-class SingleBookOpResp {
+class OneIllusOpResp {
   bool success;
-  final String bookId;
+  final String illustrationId;
   final String message;
   final CloudFuncError error;
   final PartialUser user;
 
-  SingleBookOpResp({
-    this.bookId = '',
+  OneIllusOpResp({
+    this.illustrationId = '',
     this.success = true,
     this.message = '',
     this.error,
     this.user,
   });
 
-  factory SingleBookOpResp.empty({bool success = false}) {
-    return SingleBookOpResp(
+  factory OneIllusOpResp.empty({bool success = false}) {
+    return OneIllusOpResp(
       success: success,
-      bookId: '',
+      illustrationId: '',
       error: CloudFuncError(),
       user: PartialUser(),
     );
   }
 
-  factory SingleBookOpResp.fromException(FirebaseFunctionsException exception) {
-    return SingleBookOpResp(
+  factory OneIllusOpResp.fromException(FirebaseFunctionsException exception) {
+    return OneIllusOpResp(
       success: false,
-      bookId: '',
+      illustrationId: '',
       error: CloudFuncError.fromException(exception),
       user: PartialUser(),
     );
   }
 
-  factory SingleBookOpResp.fromJSON(Map<dynamic, dynamic> data) {
+  factory OneIllusOpResp.fromJSON(Map<dynamic, dynamic> data) {
     final _user = data['user'] != null
         ? PartialUser.fromJSON(data['user'])
         : PartialUser();
@@ -44,18 +44,18 @@ class SingleBookOpResp {
         ? CloudFuncError.fromJSON(data['error'])
         : CloudFuncError();
 
-    return SingleBookOpResp(
-      bookId: data['bookId'],
+    return OneIllusOpResp(
+      illustrationId: data['illustrationId'],
       success: data['success'] ?? true,
       user: _user,
       error: _error,
     );
   }
 
-  factory SingleBookOpResp.fromMessage(String message) {
-    return SingleBookOpResp(
+  factory OneIllusOpResp.fromMessage(String message) {
+    return OneIllusOpResp(
       success: false,
-      bookId: '',
+      illustrationId: '',
       error: CloudFuncError.fromMessage(message),
       user: PartialUser(),
     );

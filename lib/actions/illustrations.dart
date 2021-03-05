@@ -1,5 +1,5 @@
-import 'package:artbooking/types/multiple_illus_op_resp.dart';
-import 'package:artbooking/types/single_illus_op_resp.dart';
+import 'package:artbooking/types/many_illus_op_resp.dart';
+import 'package:artbooking/types/one_illus_op_resp.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/license.dart';
@@ -9,7 +9,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 
 class IllustrationsActions {
-  static Future<SingleIllusOpResp> createOne({
+  static Future<OneIllusOpResp> createOne({
     @required String name,
     ContentVisibility visibility = ContentVisibility.private,
   }) async {
@@ -19,17 +19,17 @@ class IllustrationsActions {
         'visibility': Illustration.visibilityPropToString(visibility),
       });
 
-      return SingleIllusOpResp.fromJSON(response.data);
+      return OneIllusOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       appLogger.e(exception);
-      return SingleIllusOpResp.fromException(exception);
+      return OneIllusOpResp.fromException(exception);
     } catch (error) {
       appLogger.e(error);
-      return SingleIllusOpResp.fromMessage(error.toString());
+      return OneIllusOpResp.fromMessage(error.toString());
     }
   }
 
-  static Future<SingleIllusOpResp> deleteOne({
+  static Future<OneIllusOpResp> deleteOne({
     @required String illustrationId,
   }) async {
     try {
@@ -37,17 +37,17 @@ class IllustrationsActions {
         'illustrationId': illustrationId,
       });
 
-      return SingleIllusOpResp.fromJSON(response.data);
+      return OneIllusOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       appLogger.e(exception);
-      return SingleIllusOpResp.fromException(exception);
+      return OneIllusOpResp.fromException(exception);
     } catch (error) {
       appLogger.e(error);
-      return SingleIllusOpResp.fromMessage(error.toString());
+      return OneIllusOpResp.fromMessage(error.toString());
     }
   }
 
-  static Future<MultipleIllusOpResp> deleteMany({
+  static Future<ManyIllusOpResp> deleteMany({
     @required List<String> illustrationsIds,
   }) async {
     try {
@@ -55,17 +55,17 @@ class IllustrationsActions {
         'illustrationIds': illustrationsIds,
       });
 
-      return MultipleIllusOpResp.fromJSON(response.data);
+      return ManyIllusOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       appLogger.e(exception);
-      return MultipleIllusOpResp.fromException(exception);
+      return ManyIllusOpResp.fromException(exception);
     } catch (error) {
       appLogger.e(error);
-      return MultipleIllusOpResp.fromMessage(error.toString());
+      return ManyIllusOpResp.fromMessage(error.toString());
     }
   }
 
-  static Future<SingleIllusOpResp> updateMetadata({
+  static Future<OneIllusOpResp> updateMetadata({
     String name,
     String description,
     String summary,
@@ -84,13 +84,13 @@ class IllustrationsActions {
         'visibility': Illustration.visibilityPropToString(visibility),
       });
 
-      return SingleIllusOpResp.fromJSON(response.data);
+      return OneIllusOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       appLogger.e(exception);
-      return SingleIllusOpResp.fromException(exception);
+      return OneIllusOpResp.fromException(exception);
     } catch (error) {
       appLogger.e(error);
-      return SingleIllusOpResp.fromMessage(error.toString());
+      return OneIllusOpResp.fromMessage(error.toString());
     }
   }
 }
