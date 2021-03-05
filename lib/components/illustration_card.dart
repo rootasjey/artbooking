@@ -335,7 +335,15 @@ class _IllustrationCardState extends State<IllustrationCard>
         PopupMenuItem(
           child: ListTile(
             leading: Icon(UniconsLine.trash),
-            title: Text('Delete'),
+            title: Opacity(
+              opacity: 0.6,
+              child: Text(
+                'Delete',
+                style: FontsUtils.mainStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
           ),
           value: "delete",
         ),
