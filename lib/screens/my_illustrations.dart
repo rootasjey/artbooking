@@ -474,7 +474,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
     });
 
     final response = await IllustrationsActions.deleteMany(
-      imagesIds: imagesIds,
+      illustrationsIds: imagesIds,
     );
 
     if (response.hasErrors) {

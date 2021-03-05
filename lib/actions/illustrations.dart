@@ -30,11 +30,11 @@ class IllustrationsActions {
   }
 
   static Future<SingleIllusOpResp> deleteOne({
-    @required String imageId,
+    @required String illustrationId,
   }) async {
     try {
       final response = await CloudHelper.fun('illustrations-deleteOne').call({
-        'illustrationId': imageId,
+        'illustrationId': illustrationId,
       });
 
       return SingleIllusOpResp.fromJSON(response.data);
@@ -48,11 +48,11 @@ class IllustrationsActions {
   }
 
   static Future<MultipleIllusOpResp> deleteMany({
-    @required List<String> imagesIds,
+    @required List<String> illustrationsIds,
   }) async {
     try {
       final response = await CloudHelper.fun('illustrations-deleteMany').call({
-        'illustrationIds': imagesIds,
+        'illustrationIds': illustrationsIds,
       });
 
       return MultipleIllusOpResp.fromJSON(response.data);

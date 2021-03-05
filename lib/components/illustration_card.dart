@@ -299,7 +299,7 @@ class _IllustrationCardState extends State<IllustrationCard>
     }
 
     final response = await IllustrationsActions.deleteOne(
-      imageId: illus.id,
+      illustrationId: illus.id,
     );
 
     if (widget.onAfterDelete != null) {
