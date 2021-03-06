@@ -149,7 +149,7 @@ export const createOne = functions
       });
 
     return {
-      id: addedBook.id,
+      bookId: addedBook.id,
       success: true,
     };
   });
