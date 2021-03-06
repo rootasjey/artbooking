@@ -313,9 +313,10 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
       ),
       onSelected: (value) {
         switch (value) {
-          case "delete":
+          case 'delete':
             confirmDeletion();
             break;
+
           default:
         }
       },
@@ -333,7 +334,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
               ),
             ),
           ),
-          value: "delete",
+          value: 'delete',
         ),
       ],
     );
