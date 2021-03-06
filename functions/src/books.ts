@@ -74,7 +74,9 @@ export const addIllustrations = functions
     }
 
     await bookSnap.ref.update({
+      count: newBookIllustrations.length,
       illustrations: newBookIllustrations,
+      updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
     });
 
     return {
@@ -119,6 +121,7 @@ export const createOne = functions
       .collection('books')
       .add({
         createdAt: adminApp.firestore.FieldValue.serverTimestamp(),
+        count: 0,
         description,
         illustrations: bookIllustrations,
         layout: 'grid',
@@ -350,7 +353,9 @@ export const removeIllustrations = functions
       .filter(illus => !illustrationsIds.includes(illus.id));
 
     await bookSnap.ref.update({
+      count: newBookIllustrations.length,
       illustrations: newBookIllustrations,
+      updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
     });
 
     return {
@@ -419,6 +424,7 @@ export const updateMetadata = functions
       layoutOrientationMobile,
       name,
       urls,
+      updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
       visibility,
     });
 
@@ -505,6 +511,7 @@ export const updateIllusPosition = functions
 
     await bookSnap.ref.update({
       illustrations,
+      updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
     });
 
     return {
