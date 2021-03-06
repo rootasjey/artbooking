@@ -1,9 +1,13 @@
 import 'package:artbooking/actions/illustrations.dart';
+import 'package:artbooking/components/user_books.dart';
 import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/one_illus_op_resp.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/utils/snack.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -325,13 +329,31 @@ class _IllustrationCardState extends State<IllustrationCard>
       ),
       onSelected: (value) {
         switch (value) {
-          case "delete":
+          case 'delete':
             confirmDeletion();
+            break;
+          case 'addtobook':
+            showAddToBook();
             break;
           default:
         }
       },
       itemBuilder: (_) => <PopupMenuEntry<String>>[
+        PopupMenuItem(
+          child: ListTile(
+            leading: Icon(UniconsLine.book_medical),
+            title: Opacity(
+              opacity: 0.6,
+              child: Text(
+                'Add to book',
+                style: FontsUtils.mainStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          value: 'addtobook',
+        ),
         PopupMenuItem(
           child: ListTile(
             leading: Icon(UniconsLine.trash),
@@ -345,9 +367,52 @@ class _IllustrationCardState extends State<IllustrationCard>
               ),
             ),
           ),
-          value: "delete",
+          value: 'delete',
         ),
       ],
+    );
+  }
+
+  void showAddToBook() {
+    if (!stateUser.isUserConnected) {
+      Snack.e(
+        context: context,
+        message: "You must sign in to add this quote to a list.",
+      );
+
+      return;
+    }
+
+    int flex =
+        MediaQuery.of(context).size.width < Constants.maxMobileWidth ? 5 : 3;
+
+    showCustomModalBottomSheet(
+      context: context,
+      builder: (context) => UserBooks(
+        scrollController: ModalScrollController.of(context),
+        illustration: widget.illustration,
+      ),
+      containerWidget: (context, animation, child) {
+        return SafeArea(
+          child: Row(
+            children: [
+              Spacer(),
+              Expanded(
+                flex: flex,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Material(
+                    clipBehavior: Clip.antiAlias,
+                    borderRadius: BorderRadius.circular(12.0),
+                    child: child,
+                  ),
+                ),
+              ),
+              Spacer(),
+            ],
+          ),
+        );
+      },
     );
   }
 }

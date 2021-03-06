@@ -478,6 +478,72 @@ class FlashHelper {
       },
     );
   }
+
+  static Future<T> showProgress<T>(
+    BuildContext context, {
+    String title,
+    String progressId = '',
+    @required String message,
+    Widget icon = const Icon(UniconsLine.chat_info),
+    Duration duration = const Duration(seconds: 10),
+  }) {
+    if (progressId.isNotEmpty) {
+      _currentProgressId = progressId;
+    }
+
+    return showFlash<T>(
+      context: context,
+      duration: duration,
+      persistent: true,
+      builder: (_, controller) {
+        _previousController = controller;
+
+        return Flash(
+          controller: controller,
+          backgroundColor: stateColors.background,
+          boxShadows: [BoxShadow(blurRadius: 4)],
+          barrierBlur: 3.0,
+          barrierColor: Colors.black38,
+          barrierDismissible: true,
+          style: FlashStyle.grounded,
+          position: FlashPosition.top,
+          child: FlashBar(
+            icon: icon,
+            title: title != null && title.length > 0
+                ? Text(
+                    title,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  )
+                : null,
+            message: Opacity(
+              opacity: 0.5,
+              child: Text(
+                message,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            showProgressIndicator: true,
+            primaryAction: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: Icon(
+                    UniconsLine.times,
+                    color: stateColors.secondary,
+                  ),
+                  onPressed: () => controller.dismiss(),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
 typedef ChildBuilder<T> = Widget Function(

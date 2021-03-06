@@ -1,4 +1,5 @@
 import 'package:artbooking/types/many_books_op_resp.dart';
+import 'package:artbooking/types/many_illus_op_resp.dart';
 import 'package:artbooking/types/one_book_op_resp.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
@@ -6,14 +7,36 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 
 class BooksActions {
+  static Future<ManyIllusOpResp> addIllustrations({
+    @required String bookId,
+    @required List<String> illustrationsIds,
+  }) async {
+    try {
+      final response = await CloudHelper.fun('books-addIllustrations').call({
+        'bookId': bookId,
+        'illustrationsIds': illustrationsIds,
+      });
+
+      return ManyIllusOpResp.fromJSON(response.data);
+    } on FirebaseFunctionsException catch (exception) {
+      appLogger.e(exception);
+      return ManyIllusOpResp.fromException(exception);
+    } catch (error) {
+      appLogger.e(error);
+      return ManyIllusOpResp.fromMessage(error.toString());
+    }
+  }
+
   static Future<OneBookOpResp> createOne({
     @required String name,
     String description = '',
+    List<String> illustrationsIds = const [],
   }) async {
     try {
       final response = await CloudHelper.fun('books-createOne').call({
         'name': name,
         'description': description,
+        'illustrationsIds': illustrationsIds,
       });
 
       return OneBookOpResp.fromJSON(response.data);
