@@ -79,8 +79,15 @@ export const addIllustrations = functions
       updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
     });
 
+    const items = illustrationsIds.map((id) => { 
+      return { 
+        illustrationId: id, 
+        success: true, 
+      };
+    });
+
     return {
-      items: illustrationsIds,
+      items,
       successCount: illustrationsIds.length,
       hasErrors: false,
       warning,
