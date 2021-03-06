@@ -5,6 +5,7 @@ import 'package:artbooking/components/default_app_bar.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/book.dart';
+import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:auto_route/auto_route.dart';
@@ -32,7 +33,7 @@ class _MyBooksState extends State<MyBooks> {
 
   DocumentSnapshot lastDoc;
 
-  final booksList = <Book>[];
+  final books = <Book>[];
   final keyboardFocusNode = FocusNode();
 
   int limit = 20;
@@ -49,7 +50,7 @@ class _MyBooksState extends State<MyBooks> {
   initState() {
     super.initState();
     newBookNameController = TextEditingController();
-    fetch();
+    fetchMany();
   }
 
   @override
@@ -94,7 +95,7 @@ class _MyBooksState extends State<MyBooks> {
           }
 
           if (hasNext && !isLoadingMore) {
-            fetchMore();
+            fetchManyMore();
           }
 
           return false;
@@ -159,7 +160,7 @@ class _MyBooksState extends State<MyBooks> {
       );
     }
 
-    if (booksList.isEmpty) {
+    if (books.isEmpty) {
       return emptyView();
     }
 
@@ -295,7 +296,7 @@ class _MyBooksState extends State<MyBooks> {
         ),
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            final book = booksList.elementAt(index);
+            final book = books.elementAt(index);
             final selected = multiSelectedItems.containsKey(book.id);
 
             return BookCard(
@@ -304,7 +305,7 @@ class _MyBooksState extends State<MyBooks> {
               selectionMode: selectionMode,
               onBeforeDelete: () {
                 setState(() {
-                  booksList.removeAt(index);
+                  books.removeAt(index);
                 });
               },
               onAfterDelete: (response) {
@@ -313,7 +314,7 @@ class _MyBooksState extends State<MyBooks> {
                 }
 
                 setState(() {
-                  booksList.insert(index, book);
+                  books.insert(index, book);
                 });
               },
               onBeforePressed: () {
@@ -348,7 +349,7 @@ class _MyBooksState extends State<MyBooks> {
               },
             );
           },
-          childCount: booksList.length,
+          childCount: books.length,
         ),
       ),
     );
@@ -392,7 +393,7 @@ class _MyBooksState extends State<MyBooks> {
         ),
         TextButton.icon(
           onPressed: () {
-            booksList.forEach((illustration) {
+            books.forEach((illustration) {
               multiSelectedItems.putIfAbsent(
                   illustration.id, () => illustration);
             });
@@ -493,7 +494,7 @@ class _MyBooksState extends State<MyBooks> {
 
   void deleteSelection() async {
     multiSelectedItems.entries.forEach((multiSelectItem) {
-      booksList.removeWhere((item) => item.id == multiSelectItem.key);
+      books.removeWhere((item) => item.id == multiSelectItem.key);
     });
 
     final copyItems = multiSelectedItems.values.toList();
@@ -515,14 +516,15 @@ class _MyBooksState extends State<MyBooks> {
             "Try again or contact us if the issue persists.",
       );
 
-      booksList.addAll(copyItems);
+      books.addAll(copyItems);
     }
   }
 
-  void fetch() async {
+  void fetchMany() async {
     setState(() {
       isLoading = true;
       hasNext = true;
+      books.clear();
     });
 
     try {
@@ -546,7 +548,7 @@ class _MyBooksState extends State<MyBooks> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        booksList.add(Book.fromJSON(data));
+        books.add(Book.fromJSON(data));
       });
 
       setState(() {
@@ -555,7 +557,7 @@ class _MyBooksState extends State<MyBooks> {
         hasNext = snapshot.docs.length == limit;
       });
     } catch (error) {
-      debugPrint(error.toString());
+      appLogger.e(error);
 
       setState(() {
         isLoading = false;
@@ -563,7 +565,7 @@ class _MyBooksState extends State<MyBooks> {
     }
   }
 
-  void fetchMore() async {
+  void fetchManyMore() async {
     if (!hasNext || lastDoc == null) {
       return;
     }
@@ -598,17 +600,36 @@ class _MyBooksState extends State<MyBooks> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        booksList.add(Book.fromJSON(data));
+        books.add(Book.fromJSON(data));
       });
 
       setState(() {
-        isLoading = false;
+        isLoadingMore = false;
         lastDoc = snapshot.docs.last;
         hasNext = snapshot.docs.length == limit;
-        isLoadingMore = false;
       });
     } catch (error) {
-      debugPrint(error.toString());
+      appLogger.e(error);
+    }
+  }
+
+  void fetchOne(String bookId) async {
+    try {
+      final bookSnap = await FirebaseFirestore.instance
+          .collection('books')
+          .doc(bookId)
+          .get();
+
+      final bookData = bookSnap.data();
+      bookData['id'] = bookSnap.id;
+
+      final book = Book.fromJSON(bookData);
+
+      setState(() {
+        books.add(book);
+      });
+    } catch (error) {
+      appLogger.e(error);
     }
   }
 
@@ -622,9 +643,7 @@ class _MyBooksState extends State<MyBooks> {
       description: newBookDescription,
     );
 
-    setState(() {
-      isCreating = true;
-    });
+    setState(() => isCreating = false);
 
     if (!response.success) {
       Snack.e(
@@ -641,7 +660,7 @@ class _MyBooksState extends State<MyBooks> {
       message: "Your book has been successfully created!",
     );
 
-    fetch();
+    fetchOne(response.bookId);
   }
 
   void showBookCreationDialog() {
@@ -699,8 +718,8 @@ class _MyBooksState extends State<MyBooks> {
                   newBookDescription = newValue;
                 },
                 onSubmitted: (value) {
-                  context.router.pop();
                   createBook();
+                  context.router.pop();
                 },
               ),
             ),
@@ -738,8 +757,8 @@ class _MyBooksState extends State<MyBooks> {
                 ),
                 ElevatedButton.icon(
                   onPressed: () {
-                    context.router.pop();
                     createBook();
+                    context.router.pop();
                   },
                   icon: Icon(UniconsLine.plus),
                   label: Padding(
