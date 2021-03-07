@@ -214,6 +214,58 @@ class _IllustrationCardState extends State<IllustrationCard>
     );
   }
 
+  Widget popupMenuButton() {
+    return PopupMenuButton(
+      child: Icon(
+        Icons.more_vert,
+        color: Colors.white,
+      ),
+      onSelected: (value) {
+        switch (value) {
+          case 'delete':
+            confirmDeletion();
+            break;
+          case 'addtobook':
+            showAddToBook();
+            break;
+          default:
+        }
+      },
+      itemBuilder: (_) => <PopupMenuEntry<String>>[
+        PopupMenuItem(
+          child: ListTile(
+            leading: Icon(UniconsLine.book_medical),
+            title: Opacity(
+              opacity: 0.6,
+              child: Text(
+                'Add to book',
+                style: FontsUtils.mainStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          value: 'addtobook',
+        ),
+        PopupMenuItem(
+          child: ListTile(
+            leading: Icon(UniconsLine.trash),
+            title: Opacity(
+              opacity: 0.6,
+              child: Text(
+                'Delete',
+                style: FontsUtils.mainStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          value: 'delete',
+        ),
+      ],
+    );
+  }
+
   void confirmDeletion() async {
     showCustomModalBottomSheet(
       context: context,
@@ -318,58 +370,6 @@ class _IllustrationCardState extends State<IllustrationCard>
         illustrationId: widget.illustration.id,
         illustration: widget.illustration,
       ),
-    );
-  }
-
-  Widget popupMenuButton() {
-    return PopupMenuButton(
-      child: Icon(
-        Icons.more_vert,
-        color: Colors.white,
-      ),
-      onSelected: (value) {
-        switch (value) {
-          case 'delete':
-            confirmDeletion();
-            break;
-          case 'addtobook':
-            showAddToBook();
-            break;
-          default:
-        }
-      },
-      itemBuilder: (_) => <PopupMenuEntry<String>>[
-        PopupMenuItem(
-          child: ListTile(
-            leading: Icon(UniconsLine.book_medical),
-            title: Opacity(
-              opacity: 0.6,
-              child: Text(
-                'Add to book',
-                style: FontsUtils.mainStyle(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-          value: 'addtobook',
-        ),
-        PopupMenuItem(
-          child: ListTile(
-            leading: Icon(UniconsLine.trash),
-            title: Opacity(
-              opacity: 0.6,
-              child: Text(
-                'Delete',
-                style: FontsUtils.mainStyle(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-          value: 'delete',
-        ),
-      ],
     );
   }
 

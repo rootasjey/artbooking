@@ -216,6 +216,41 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     );
   }
 
+  Widget popupMenuButton() {
+    return PopupMenuButton(
+      child: Icon(
+        Icons.more_vert,
+        color: Colors.white,
+      ),
+      onSelected: (value) {
+        switch (value) {
+          case 'delete':
+            confirmDeletion();
+            break;
+
+          default:
+        }
+      },
+      itemBuilder: (_) => <PopupMenuEntry<String>>[
+        PopupMenuItem(
+          child: ListTile(
+            leading: Icon(UniconsLine.trash),
+            title: Opacity(
+              opacity: 0.6,
+              child: Text(
+                'Delete',
+                style: FontsUtils.mainStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          value: 'delete',
+        ),
+      ],
+    );
+  }
+
   void confirmDeletion() async {
     showCustomModalBottomSheet(
       context: context,
@@ -303,40 +338,5 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     if (widget.onAfterDelete != null) {
       widget.onAfterDelete(response);
     }
-  }
-
-  Widget popupMenuButton() {
-    return PopupMenuButton(
-      child: Icon(
-        Icons.more_vert,
-        color: Colors.white,
-      ),
-      onSelected: (value) {
-        switch (value) {
-          case 'delete':
-            confirmDeletion();
-            break;
-
-          default:
-        }
-      },
-      itemBuilder: (_) => <PopupMenuEntry<String>>[
-        PopupMenuItem(
-          child: ListTile(
-            leading: Icon(UniconsLine.trash),
-            title: Opacity(
-              opacity: 0.6,
-              child: Text(
-                'Delete',
-                style: FontsUtils.mainStyle(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-          value: 'delete',
-        ),
-      ],
-    );
   }
 }
