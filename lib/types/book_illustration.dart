@@ -1,27 +1,20 @@
-import 'package:artbooking/types/author.dart';
-import 'package:artbooking/types/illustration/license.dart';
+import 'package:artbooking/types/v_scale_factor.dart';
 
 class BookIllustration {
-  /// Image's author.
-  final Author author;
-
-  /// Illustration's style (e.g. pointillism, realism) — Limited to 5.
-  final List<String> categories;
-
-  /// When this specific document (illustration inside this book) was created.
-  final DateTime createdAt;
-
   /// Firesotre id.
   final String id;
 
-  /// Specifies how this illustration can be used.
-  final IllustrationLicense license;
+  VScaleFactor vScaleFactor;
 
-  BookIllustration(
-    this.author,
-    this.categories,
-    this.createdAt,
+  BookIllustration({
     this.id,
-    this.license,
-  );
+    this.vScaleFactor,
+  });
+
+  factory BookIllustration.fromJSON(Map<String, dynamic> data) {
+    return BookIllustration(
+      id: data['id'],
+      vScaleFactor: VScaleFactor.fromJSON(data['vScaleFactor']),
+    );
+  }
 }

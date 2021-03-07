@@ -4,6 +4,9 @@ import 'package:artbooking/types/enums.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Book {
+  /// Number of illustrations in this book.
+  final int count;
+
   /// When this book was created.
   final DateTime createdAt;
 
@@ -56,6 +59,7 @@ class Book {
   final ContentVisibility visibility;
 
   Book({
+    this.count = 0,
     this.createdAt,
     this.description = '',
     this.id = '',
@@ -72,16 +76,34 @@ class Book {
   });
 
   factory Book.fromJSON(Map<String, dynamic> data) {
+    final _illustrations = <BookIllustration>[];
+
+    if (data['illustrations'] != null) {
+      for (var bookIllusData in data['illustrations']) {
+        _illustrations.add(BookIllustration.fromJSON(bookIllusData));
+      }
+    }
+
+    final _layout = parseStringLayout(data['layout']);
+
+    final _layoutMobile = parseStringLayout(data['layoutMobile']);
+
+    final _layputOrientation =
+        parseStringLayoutOrientation(data['layoutOrientation']);
+
+    final _layoutOrientationMobile =
+        parseStringLayoutOrientation(data['layoutOrientationMobile']);
+
     return Book(
+      count: data['count'] ?? 0,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       description: data['description'],
       id: data['id'],
-      layout: parseStringLayout(data['layout']),
-      layoutMobile: parseStringLayout(data['layoutMobile']),
-      layoutOrientation:
-          parseStringLayoutOrientation(data['layoutOrientation']),
-      layoutOrientationMobile:
-          parseStringLayoutOrientation(data['layoutOrientationMobile']),
+      illustrations: _illustrations,
+      layout: _layout,
+      layoutMobile: _layoutMobile,
+      layoutOrientation: _layputOrientation,
+      layoutOrientationMobile: _layoutOrientationMobile,
       name: data['name'],
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
       urls: BookUrls.fromJSON(data['urls']),
