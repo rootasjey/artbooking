@@ -84,6 +84,17 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
 
   @override
   Widget build(BuildContext context) {
+    final book = widget.book;
+    ImageProvider imageProvider;
+
+    if (book.cover.custom.url.isNotEmpty) {
+      imageProvider = NetworkImage(book.cover.custom.url);
+    } else if (book.cover.auto.url.isNotEmpty) {
+      imageProvider = NetworkImage(book.cover.auto.url);
+    } else {
+      imageProvider = AssetImage('assets/images/gummy-canvas.png');
+    }
+
     return SizedBox(
       width: size,
       height: size,
@@ -93,9 +104,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
         child: ScaleTransition(
           scale: scaleAnimation,
           child: Ink.image(
-            image: AssetImage(
-              'assets/images/gummy-canvas.png',
-            ),
+            image: imageProvider,
             fit: BoxFit.cover,
             child: InkWell(
               onTap: onTap,
