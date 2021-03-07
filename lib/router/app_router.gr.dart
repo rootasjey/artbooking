@@ -30,6 +30,7 @@ import '../screens/update_email.dart' as _i23;
 import '../screens/update_password.dart' as _i24;
 import '../screens/update_username.dart' as _i25;
 import '../types/illustration/illustration.dart' as _i26;
+import '../types/book.dart' as _i27;
 
 class AppRouter extends _i1.RootStackRouter {
   AppRouter({@_i2.required this.authGuard, @_i2.required this.noAuthGuard})
@@ -131,7 +132,8 @@ class AppRouter extends _i1.RootStackRouter {
       var route = entry.routeData.as<MyBookRoute>();
       return _i1.MaterialPageX(
           entry: entry,
-          child: _i21.MyBook(key: route.key, bookId: route.bookId));
+          child: _i21.MyBook(
+              key: route.key, bookId: route.bookId, book: route.book));
     },
     DashboardSettingsRoute.name: (entry) {
       var route = entry.routeData.as<DashboardSettingsRoute>();
@@ -486,17 +488,20 @@ class MyBooksRoute extends _i1.PageRouteInfo {
 }
 
 class MyBookRoute extends _i1.PageRouteInfo {
-  MyBookRoute({this.key, @_i2.required this.bookId})
+  MyBookRoute({this.key, @_i2.required this.bookId, this.book})
       : super(name, path: ':bookId', params: {'bookId': bookId});
 
   MyBookRoute.fromMatch(_i1.RouteMatch match)
       : key = null,
         bookId = match.pathParams.getString('bookId'),
+        book = null,
         super.fromMatch(match);
 
   final _i2.Key key;
 
   final String bookId;
+
+  final _i27.Book book;
 
   static const String name = 'MyBookRoute';
 }

@@ -1,8 +1,10 @@
 import 'package:artbooking/actions/books.dart';
+import 'package:artbooking/router/app_router.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/one_book_op_resp.dart';
 import 'package:artbooking/utils/fonts.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -96,16 +98,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
             ),
             fit: BoxFit.cover,
             child: InkWell(
-              onTap: () {
-                bool handled = false;
-                if (widget.onBeforePressed != null) {
-                  handled = widget.onBeforePressed();
-                }
-
-                if (handled) {
-                  return;
-                }
-              },
+              onTap: onTap,
               onLongPress: () {
                 if (widget.onLongPress != null) {
                   widget.onLongPress(widget.selected);
@@ -338,5 +331,23 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     if (widget.onAfterDelete != null) {
       widget.onAfterDelete(response);
     }
+  }
+
+  void onTap() {
+    bool handled = false;
+    if (widget.onBeforePressed != null) {
+      handled = widget.onBeforePressed();
+    }
+
+    if (handled) {
+      return;
+    }
+
+    context.router.push(
+      MyBookRoute(
+        bookId: widget.book.id,
+        book: widget.book,
+      ),
+    );
   }
 }
