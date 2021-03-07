@@ -9,12 +9,12 @@ import 'package:flutter/material.dart';
 class BooksActions {
   static Future<ManyIllusOpResp> addIllustrations({
     @required String bookId,
-    @required List<String> illustrationsIds,
+    @required List<String> illustrationIds,
   }) async {
     try {
       final response = await CloudHelper.fun('books-addIllustrations').call({
         'bookId': bookId,
-        'illustrationsIds': illustrationsIds,
+        'illustrationIds': illustrationIds,
       });
 
       return ManyIllusOpResp.fromJSON(response.data);
@@ -30,13 +30,13 @@ class BooksActions {
   static Future<OneBookOpResp> createOne({
     @required String name,
     String description = '',
-    List<String> illustrationsIds = const [],
+    List<String> illustrationIds = const [],
   }) async {
     try {
       final response = await CloudHelper.fun('books-createOne').call({
         'name': name,
         'description': description,
-        'illustrationsIds': illustrationsIds,
+        'illustrationIds': illustrationIds,
       });
 
       return OneBookOpResp.fromJSON(response.data);
