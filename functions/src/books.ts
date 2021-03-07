@@ -67,6 +67,7 @@ export const addIllustrations = functions
 
     const bookIllustrations: BookIllustration[] = bookData.illustrations;
     let newBookIllustrations = bookIllustrations.concat(minimalIllustrations);
+    const autoCover = await getAutoCover(newBookIllustrations);
 
     if (newBookIllustrations.length > 100) {
       newBookIllustrations = newBookIllustrations.slice(0, 100);
@@ -75,6 +76,7 @@ export const addIllustrations = functions
 
     await bookSnap.ref.update({
       count: newBookIllustrations.length,
+      cover: { auto: autoCover },
       illustrations: newBookIllustrations,
       updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
     });
@@ -123,12 +125,20 @@ export const createOne = functions
     description = typeof description === 'string' ? description : '';
 
     const bookIllustrations = await createBookIllustrations(illustrationIds);
+    const autoCover = await getAutoCover(bookIllustrations);
 
     const addedBook = await firestore
       .collection('books')
       .add({
         createdAt: adminApp.firestore.FieldValue.serverTimestamp(),
         count: 0,
+        cover: {
+          auto: autoCover,
+          custom: {
+            url: '',
+            updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
+          },
+        },
         description,
         illustrations: bookIllustrations,
         layout: 'grid',
@@ -359,8 +369,11 @@ export const removeIllustrations = functions
     const newBookIllustrations = bookIllustrations
       .filter(illus => !illustrationIds.includes(illus.id));
 
+    const autoCover = await getAutoCover(newBookIllustrations);
+
     await bookSnap.ref.update({
       count: newBookIllustrations.length,
+      cover: { auto: autoCover },
       illustrations: newBookIllustrations,
       updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
     });
@@ -704,3 +717,37 @@ async function createBookIllustrations(ids: string[]) {
 
   return arrayResult;
 }
+async function getAutoCover(bookIllustrations: BookIllustration[]) {
+  const autoCover = {
+    updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
+    id: '',
+    url: '',
+  };
+
+  if (bookIllustrations.length === 0) {
+    return autoCover;
+  }
+
+  const lastAddedIllus = bookIllustrations[bookIllustrations.length - 1];
+
+  if (!lastAddedIllus.id) {
+    return autoCover;
+  }
+
+  const illusSnap = await firestore
+    .collection('illustrations')
+    .doc(lastAddedIllus.id)
+    .get();
+
+  const illusData = illusSnap.data();
+
+  if (!illusSnap.exists || !illusData) {
+    return autoCover;
+  }
+
+  autoCover.id = illusSnap.id;
+  autoCover.url = illusData.urls.thumbnails.t480;
+
+  return autoCover;
+}
+
