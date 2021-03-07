@@ -3,9 +3,10 @@ import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/default_app_bar.dart';
 import 'package:artbooking/components/illustration_card.dart';
 import 'package:artbooking/state/upload_manager.dart';
-import 'package:artbooking/screens/signin.dart';
 import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -465,8 +466,8 @@ class _MyIllustrationsState extends State<MyIllustrations> {
       illustrationsList.removeWhere((item) => item.id == multiSelectItem.key);
     });
 
-    final copyItems = multiSelectedItems.values.toList();
-    final imagesIds = multiSelectedItems.keys.toList();
+    final duplicatedItems = multiSelectedItems.values.toList();
+    final illustrationIds = multiSelectedItems.keys.toList();
 
     setState(() {
       multiSelectedItems.clear();
@@ -474,7 +475,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
     });
 
     final response = await IllustrationsActions.deleteMany(
-      illustrationsIds: imagesIds,
+      illustrationIds: illustrationIds,
     );
 
     if (response.hasErrors) {
@@ -484,7 +485,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
             "Try again or contact us if the issue persists.",
       );
 
-      illustrationsList.addAll(copyItems);
+      illustrationsList.addAll(duplicatedItems);
     }
   }
 
@@ -494,25 +495,9 @@ class _MyIllustrationsState extends State<MyIllustrations> {
     });
 
     try {
-      final userAuth = FirebaseAuth.instance.currentUser;
-
-      if (userAuth == null) {
-        debugPrint("User is not authenticated.");
-
-        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => Signin()),
-          );
-        });
-
-        setState(() {
-          isLoading = false;
-        });
-      }
-
       final snapshot = await FirebaseFirestore.instance
           .collection('illustrations')
-          .where('user.id', isEqualTo: userAuth.uid)
+          .where('user.id', isEqualTo: stateUser.userAuth.uid)
           .orderBy('createdAt', descending: descending)
           .limit(limit)
           .get();
@@ -539,7 +524,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
         hasNext = snapshot.docs.length == limit;
       });
     } catch (error) {
-      debugPrint(error.toString());
+      appLogger.e(error);
 
       setState(() {
         isLoading = false;
@@ -592,7 +577,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
         isLoadingMore = false;
       });
     } catch (error) {
-      debugPrint(error.toString());
+      appLogger.e(error);
     }
   }
 }

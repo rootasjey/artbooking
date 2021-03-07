@@ -182,7 +182,7 @@ class _UserBooksState extends State<UserBooks> {
 
     final response = await BooksActions.addIllustrations(
       bookId: bookId,
-      illustrationsIds: [widget.illustration.id],
+      illustrationIds: [widget.illustration.id],
     );
 
     if (response.hasErrors) {
@@ -209,7 +209,7 @@ class _UserBooksState extends State<UserBooks> {
     final createdList = await BooksActions.createOne(
       name: newBookName,
       description: newBookDescription,
-      illustrationsIds: [widget.illustration.id],
+      illustrationIds: [widget.illustration.id],
     );
 
     FlashHelper.dismissProgress(id: 'create_book');
