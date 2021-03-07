@@ -21,7 +21,7 @@ export const addIllustrations = functions
       );
     }
 
-    const { bookId, illustrationsIds } = params;
+    const { bookId, illustrationIds } = params;
 
     if (typeof bookId !== 'string') {
       throw new functions.https.HttpsError(
@@ -31,15 +31,15 @@ export const addIllustrations = functions
       );
     }
 
-    if (!Array.isArray(illustrationsIds) || illustrationsIds.length === 0) {
+    if (!Array.isArray(illustrationIds) || illustrationIds.length === 0) {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called with a valid [illustrationsIds] parameter
+        `The function must be called with a valid [illustrationIds] parameter
          which is an array of illustrations' ids to add.`,
       );
     }
 
-    const minimalIllustrations = await createBookIllustrations(illustrationsIds);
+    const minimalIllustrations = await createBookIllustrations(illustrationIds);
 
     const bookSnap = await firestore
       .collection('books')
@@ -79,7 +79,7 @@ export const addIllustrations = functions
       updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
     });
 
-    const items = illustrationsIds.map((id) => { 
+    const items = illustrationIds.map((id) => { 
       return { 
         illustrationId: id, 
         success: true, 
@@ -88,7 +88,7 @@ export const addIllustrations = functions
 
     return {
       items,
-      successCount: illustrationsIds.length,
+      successCount: illustrationIds.length,
       hasErrors: false,
       warning,
     };
@@ -102,7 +102,7 @@ export const createOne = functions
   .https
   .onCall(async (params: CreateBookParams, context) => {
     const userAuth = context.auth;
-    const { name, illustrationsIds, visibility } = params;
+    const { name, illustrationIds, visibility } = params;
     let { description } = params;
 
     if (!userAuth) {
@@ -122,7 +122,7 @@ export const createOne = functions
 
     description = typeof description === 'string' ? description : '';
 
-    const bookIllustrations = await createBookIllustrations(illustrationsIds);
+    const bookIllustrations = await createBookIllustrations(illustrationIds);
 
     const addedBook = await firestore
       .collection('books')
@@ -309,7 +309,7 @@ export const removeIllustrations = functions
   .https
   .onCall(async (params: UpdateBookIllustrationsParams, context) => {
     const userAuth = context.auth;
-    const { bookId, illustrationsIds } = params;
+    const { bookId, illustrationIds } = params;
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -326,10 +326,10 @@ export const removeIllustrations = functions
       );
     }
 
-    if (!Array.isArray(illustrationsIds) || illustrationsIds.length === 0) {
+    if (!Array.isArray(illustrationIds) || illustrationIds.length === 0) {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called with a valid [illustrationsIds] parameter
+        `The function must be called with a valid [illustrationIds] parameter
          which is the array of (string) illustrations to remove from the book.`,
       );
     }
@@ -357,7 +357,7 @@ export const removeIllustrations = functions
 
     const bookIllustrations: BookIllustration[] = bookData.illustrations;
     const newBookIllustrations = bookIllustrations
-      .filter(illus => !illustrationsIds.includes(illus.id));
+      .filter(illus => !illustrationIds.includes(illus.id));
 
     await bookSnap.ref.update({
       count: newBookIllustrations.length,
@@ -365,9 +365,16 @@ export const removeIllustrations = functions
       updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
     });
 
+    const items = illustrationIds.map((id) => {
+      return {
+        illustrationId: id,
+        success: true,
+      };
+    });
+
     return {
-      items: illustrationsIds,
-      successCount: illustrationsIds.length,
+      items,
+      successCount: illustrationIds.length,
       hasErrors: false,
     };
   });
@@ -445,7 +452,7 @@ export const updateMetadata = functions
  * Update illustrations' position in an existing book.
  * For all [layout] except {extendedGrid} with the [matrice] property.
  */
-export const updateIllusPosition = functions
+export const updateIllustrationPosition = functions
   .region('europe-west3')
   .https
   .onCall(async (params: UpdateIllusPositionParams, context) => {

@@ -90,7 +90,7 @@ interface CreateUserAccountParams {
 
 interface CreateBookParams {
   description: string;
-  illustrationsIds: string[];
+  illustrationIds: string[];
   name: string;
   visibility: Visibility;
 }
@@ -180,7 +180,7 @@ interface UpdateBookIllustrationsParams {
   bookId: string;
 
   /** illustrations' ids. */
-  illustrationsIds: string[];
+  illustrationIds: string[];
 }
 
 interface UpdateBookPropertiesParams {
