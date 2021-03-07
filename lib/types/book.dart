@@ -1,3 +1,4 @@
+import 'package:artbooking/types/book_cover.dart';
 import 'package:artbooking/types/book_illustration.dart';
 import 'package:artbooking/types/book_urls.dart';
 import 'package:artbooking/types/enums.dart';
@@ -6,6 +7,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Book {
   /// Number of illustrations in this book.
   final int count;
+
+  /// Book's thumbnail.
+  final BookCover cover;
 
   /// When this book was created.
   final DateTime createdAt;
@@ -60,6 +64,7 @@ class Book {
 
   Book({
     this.count = 0,
+    this.cover,
     this.createdAt,
     this.description = '',
     this.id = '',
@@ -96,6 +101,7 @@ class Book {
 
     return Book(
       count: data['count'] ?? 0,
+      cover: BookCover.fromJSON(data['cover']),
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       description: data['description'],
       id: data['id'],
