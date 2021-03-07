@@ -393,6 +393,83 @@ export const removeIllustrations = functions
   });
 
 /**
+ * Set a new cover to an existing book.
+ * The cover is from an existing illustration in the current book.
+ */
+export const setCover = functions
+  .region('europe-west3')
+  .https
+  .onCall(async (params: any, context) => {
+    const userAuth = context.auth;
+    const { bookId, illustrationId } = params;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
+    }
+
+    if (typeof bookId !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called with a valid [bookId] (string) parameter
+         which is the book to update.`,
+      );
+    }
+
+    if (typeof illustrationId !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called with a valid [illustrationId] (string) parameter
+         which is the book to update.`,
+      );
+    }
+
+    const bookSnap = await firestore
+      .collection('books')
+      .doc(bookId)
+      .get();
+
+    if (!bookSnap.exists) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        `The book [${bookId}] doesn't exist.`,
+      )
+    }
+
+    const illusSnap = await firestore
+      .collection('illustrations')
+      .doc(illustrationId)
+      .get();
+
+    const illusData = illusSnap.data();
+
+    if (!illusSnap.exists ||!illusData) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        `The illustration [${illustrationId}] doesn't exist.`,
+      )
+    }
+
+    const autoCover = {
+      id: illusSnap.id,
+      url: illusData.urls.thumbnails.t480,
+      updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
+    };
+
+    await bookSnap.ref.update({
+      cover: { auto: autoCover },
+      updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
+    });
+
+    return {
+      bookId,
+      success: true,
+    };
+  });
+
+/**
  * Update book's properties.
  */
 export const updateMetadata = functions
