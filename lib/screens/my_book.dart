@@ -49,6 +49,7 @@ class _MyBookState extends State<MyBook> {
   int endIndex = 0;
 
   Map<String, Illustration> multiSelectedItems = Map();
+  Map<int, Illustration> processingIllus = Map();
 
   ScrollController scrollController = ScrollController();
 
@@ -352,6 +353,7 @@ class _MyBookState extends State<MyBook> {
               illustration: illustration,
               selected: selected,
               selectionMode: selectionMode,
+              type: IllustrationCardType.book,
               onBeforeDelete: () {
                 setState(() {
                   illustrations.removeAt(index);
@@ -397,6 +399,12 @@ class _MyBookState extends State<MyBook> {
                   multiSelectedItems.putIfAbsent(
                       illustration.id, () => illustration);
                 });
+              },
+              onRemove: (_) {
+                onRemoveFromBook(
+                  index: index,
+                  illustration: illustration,
+                );
               },
             );
           },
@@ -710,5 +718,42 @@ class _MyBookState extends State<MyBook> {
         isLoadingMore = false;
       });
     }
+  }
+
+  void onRemoveFromBook({int index, Illustration illustration}) async {
+    processingIllus.putIfAbsent(index, () => illustration);
+    illustrations.removeAt(index);
+
+    final response = await BooksActions.removeIllustrations(
+      bookId: bookPage.id,
+      illustrationIds: [illustration.id],
+    );
+
+    if (response.hasErrors) {
+      Snack.e(
+        context: context,
+        message: "Sorry, there was an error while removing the illustration."
+            " Please try again.",
+      );
+
+      processingIllus.forEach((pIndex, pIllus) {
+        illustrations.insert(index, pIllus);
+      });
+
+      setState(() {
+        processingIllus.clear();
+      });
+
+      return;
+    }
+
+    Snack.s(
+      context: context,
+      message: "The illustration has been successfully removed.",
+    );
+
+    setState(() {
+      processingIllus.clear();
+    });
   }
 }

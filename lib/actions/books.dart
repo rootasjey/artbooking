@@ -84,4 +84,24 @@ class BooksActions {
       return ManyBooksOpResp.fromMessage(error.toString());
     }
   }
+
+  static Future<ManyIllusOpResp> removeIllustrations({
+    @required String bookId,
+    @required List<String> illustrationIds,
+  }) async {
+    try {
+      final response = await CloudHelper.fun('books-removeIllustrations').call({
+        'bookId': bookId,
+        'illustrationIds': illustrationIds,
+      });
+
+      return ManyIllusOpResp.fromJSON(response.data);
+    } on FirebaseFunctionsException catch (exception) {
+      appLogger.e(exception);
+      return ManyIllusOpResp.fromException(exception);
+    } catch (error) {
+      appLogger.e(error);
+      return ManyIllusOpResp.fromMessage(error.toString());
+    }
+  }
 }

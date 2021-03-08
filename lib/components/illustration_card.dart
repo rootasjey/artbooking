@@ -2,12 +2,10 @@ import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/user_books.dart';
 import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/one_illus_op_resp.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
-import 'package:artbooking/utils/snack.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +13,15 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
+
+/// Determines which actions will be displayed on the card.
+enum IllustrationCardType {
+  /// When the illustration is viewed inside a book.
+  book,
+
+  /// When the illustration is displayed on an illustrations page.
+  illustration,
+}
 
 /// A component representing an illustration with its main content (an image).
 class IllustrationCard extends StatefulWidget {
@@ -25,7 +32,9 @@ class IllustrationCard extends StatefulWidget {
   final Function(OneIllusOpResp) onAfterDelete;
   final Function(bool) onLongPress;
   final Function onBeforePressed;
+  final Function(Illustration) onRemove;
   final double size;
+  final IllustrationCardType type;
 
   IllustrationCard({
     @required this.illustration,
@@ -35,7 +44,9 @@ class IllustrationCard extends StatefulWidget {
     this.onBeforeDelete,
     this.onBeforePressed,
     this.onLongPress,
+    this.onRemove,
     this.size = 300.0,
+    this.type = IllustrationCardType.illustration,
   });
 
   @override
@@ -215,38 +226,26 @@ class _IllustrationCardState extends State<IllustrationCard>
   }
 
   Widget popupMenuButton() {
-    return PopupMenuButton(
-      child: Icon(
-        Icons.more_vert,
-        color: Colors.white,
-      ),
-      onSelected: (value) {
-        switch (value) {
-          case 'delete':
-            confirmDeletion();
-            break;
-          case 'addtobook':
-            showAddToBook();
-            break;
-          default:
-        }
-      },
-      itemBuilder: (_) => <PopupMenuEntry<String>>[
-        PopupMenuItem(
-          child: ListTile(
-            leading: Icon(UniconsLine.book_medical),
-            title: Opacity(
-              opacity: 0.6,
-              child: Text(
-                'Add to book',
-                style: FontsUtils.mainStyle(
-                  fontWeight: FontWeight.w600,
-                ),
+    final entries = <PopupMenuEntry<String>>[
+      PopupMenuItem(
+        child: ListTile(
+          leading: Icon(UniconsLine.book_medical),
+          title: Opacity(
+            opacity: 0.6,
+            child: Text(
+              'Add to book',
+              style: FontsUtils.mainStyle(
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
-          value: 'addtobook',
         ),
+        value: 'add_to_book',
+      ),
+    ];
+
+    if (widget.type == IllustrationCardType.illustration) {
+      entries.addAll([
         PopupMenuItem(
           child: ListTile(
             leading: Icon(UniconsLine.trash),
@@ -262,7 +261,49 @@ class _IllustrationCardState extends State<IllustrationCard>
           ),
           value: 'delete',
         ),
-      ],
+      ]);
+    }
+
+    if (widget.type == IllustrationCardType.book) {
+      entries.addAll([
+        PopupMenuItem(
+          child: ListTile(
+            leading: Icon(UniconsLine.image_minus),
+            title: Opacity(
+              opacity: 0.6,
+              child: Text(
+                'Remove',
+                style: FontsUtils.mainStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          value: 'remove_from_book',
+        ),
+      ]);
+    }
+
+    return PopupMenuButton(
+      child: Icon(
+        Icons.more_vert,
+        color: Colors.white,
+      ),
+      onSelected: (value) {
+        switch (value) {
+          case 'delete':
+            confirmDeletion();
+            break;
+          case 'add_to_book':
+            showAddToBook();
+            break;
+          case 'remove_from_book':
+            removeFromBook();
+            break;
+          default:
+        }
+      },
+      itemBuilder: (_) => entries,
     );
   }
 
@@ -374,15 +415,6 @@ class _IllustrationCardState extends State<IllustrationCard>
   }
 
   void showAddToBook() {
-    if (!stateUser.isUserConnected) {
-      Snack.e(
-        context: context,
-        message: "You must sign in to add this quote to a list.",
-      );
-
-      return;
-    }
-
     int flex =
         MediaQuery.of(context).size.width < Constants.maxMobileWidth ? 5 : 3;
 
@@ -414,5 +446,11 @@ class _IllustrationCardState extends State<IllustrationCard>
         );
       },
     );
+  }
+
+  void removeFromBook() {
+    if (widget.onRemove != null) {
+      widget.onRemove(widget.illustration);
+    }
   }
 }
