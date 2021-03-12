@@ -399,8 +399,10 @@ class _UserBooksState extends State<UserBooks> {
                     'Cancel',
                   ),
                 ),
-                RaisedButton(
-                  color: Colors.green,
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green,
+                  ),
                   onPressed: () {
                     createBookAndAddIllustration(context);
                     return Navigator.of(context).pop(true);

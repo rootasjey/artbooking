@@ -156,7 +156,7 @@ class _AboutState extends State<About> {
             ),
           ),
           Center(
-            child: FlatButton(
+            child: TextButton(
               onPressed: null,
               child: Opacity(
                 opacity: captionOpacity,
@@ -584,7 +584,7 @@ class _AboutState extends State<About> {
                       );
                     },
                   ),
-                  FlatButton(
+                  TextButton(
                     onPressed: () async {
                       await launch(
                           'https://raw.githubusercontent.com/rootasjey/citations365/master/lockscreen.png');
@@ -612,7 +612,7 @@ class _AboutState extends State<About> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 30.0),
-                      child: FlatButton(
+                      child: TextButton(
                         onPressed: () async {
                           await launch(
                               'https://github.com/rootasjey/citations365');
@@ -662,7 +662,7 @@ class _AboutState extends State<About> {
                   ),
                 ),
                 Center(
-                  child: FlatButton(
+                  child: TextButton(
                     onPressed: () async {
                       await launch(
                           'https://raw.githubusercontent.com/rootasjey/citations365-8/master/citations.windows.jpg');
@@ -709,7 +709,7 @@ class _AboutState extends State<About> {
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 70.0),
-              child: FlatButton(
+              child: TextButton(
                   onPressed: () async {
                     await launch('https://github.com/outofcontextapp/app');
                   },

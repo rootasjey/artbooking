@@ -201,7 +201,7 @@ class _MyActivityState extends State<MyActivity> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          FlatButton.icon(
+          TextButton.icon(
             onPressed: () {},
             icon: Icon(Icons.storage),
             label: RichText(
@@ -220,7 +220,7 @@ class _MyActivityState extends State<MyActivity> {
               ),
             ),
           ),
-          FlatButton.icon(
+          TextButton.icon(
             onPressed: () {},
             icon: Icon(Icons.timelapse),
             label: RichText(

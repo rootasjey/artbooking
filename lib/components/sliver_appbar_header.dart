@@ -75,7 +75,7 @@ class _SliverAppHeaderState extends State<SliverAppHeader> {
   }) {
     return Opacity(
       opacity: 0.6,
-      child: FlatButton(
+      child: TextButton(
         onPressed: onPressed,
         child: Text(
           title,
