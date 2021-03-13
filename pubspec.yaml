@@ -83,16 +83,15 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
-    - assets/images/app-icon-32.png
-    - assets/images/app-icon-64.png
-    - assets/images/app-icon-96.png
-    - assets/images/app-icon-128.png
-    - assets/images/app-icon-512.png
-    - assets/images/app-icon-1080.png
+    - assets/images/app_icon/32.png
+    - assets/images/app_icon/64.png
+    - assets/images/app_icon/96.png
+    - assets/images/app_icon/128.png
+    - assets/images/app_icon/512.png
+    - assets/images/app_icon/1080.png
+    - assets/images/app_icon/animation.gif
     - assets/images/default-avatar.png
     - assets/images/gummy-canvas.png
-    - assets/images/user-dark.png
-    - assets/images/user-light.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
