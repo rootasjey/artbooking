@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supercharged/supercharged.dart';
+import 'package:url_strategy/url_strategy.dart';
 
 void main() async {
   LicenseRegistry.addLicense(() async* {
@@ -30,6 +31,8 @@ void main() async {
   final savedThemeMode = brightness == Brightness.dark
       ? AdaptiveThemeMode.dark
       : AdaptiveThemeMode.light;
+
+  setPathUrlStrategy();
 
   return runApp(App(
     savedThemeMode: savedThemeMode,
