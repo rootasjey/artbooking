@@ -24,7 +24,19 @@ class CloudFuncError {
     );
   }
 
+  factory CloudFuncError.empty() {
+    return CloudFuncError(
+      message: '',
+      code: '',
+      details: '',
+    );
+  }
+
   factory CloudFuncError.fromJSON(Map<dynamic, dynamic> data) {
+    if (data == null) {
+      return CloudFuncError.empty();
+    }
+
     return CloudFuncError(
       message: data['message'],
       code: data['code'],

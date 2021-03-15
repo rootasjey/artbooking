@@ -14,15 +14,23 @@ class CreateAccountResp {
     this.user,
   });
 
+  factory CreateAccountResp.empty() {
+    return CreateAccountResp(
+      success: false,
+      user: PartialUser.empty(),
+      error: CloudFuncError.empty(),
+    );
+  }
+
   factory CreateAccountResp.fromJSON(Map<dynamic, dynamic> data) {
+    if (data == null) {
+      return CreateAccountResp.empty();
+    }
+
     return CreateAccountResp(
       success: data['success'] ?? true,
-      user: data['user'] != null
-          ? PartialUser.fromJSON(data['user'])
-          : PartialUser(),
-      error: data['error'] != null
-          ? CloudFuncError.fromJSON(data['error'])
-          : CloudFuncError(),
+      user: PartialUser.fromJSON(data['user']),
+      error: CloudFuncError.fromJSON(data['error']),
     );
   }
 }
