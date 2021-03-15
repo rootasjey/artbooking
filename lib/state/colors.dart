@@ -21,6 +21,9 @@ abstract class StateColorsBase with Store {
   Color foreground = Colors.black;
 
   @observable
+  Color tileBackground = Colors.white;
+
+  @observable
   String iconExt = 'light';
 
   /// Primary application's color.
@@ -52,6 +55,7 @@ abstract class StateColorsBase with Store {
       background = Colors.black;
       appBackground = Color(0xFF303030);
       softBackground = Color(0xFF303030);
+      tileBackground = Color(0xFF303030);
       iconExt = 'light';
       return;
     }
@@ -60,6 +64,7 @@ abstract class StateColorsBase with Store {
     background = Colors.white;
     appBackground = Color(0xFAFAFA);
     softBackground = Color(0xFFEEEEEE);
+    tileBackground = Color(0xFFFAFAFA);
     iconExt = 'dark';
   }
 }
