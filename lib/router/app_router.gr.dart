@@ -364,7 +364,7 @@ class SettingsRoute extends _i1.PageRouteInfo {
 
   SettingsRoute.fromMatch(_i1.RouteMatch match)
       : key = null,
-        showAppBar = match.pathParams.getBool('showAppBar', true),
+        showAppBar = match.pathParams.getBool('showAppBar'),
         super.fromMatch(match);
 
   final _i2.Key key;
@@ -513,7 +513,7 @@ class DashboardSettingsRoute extends _i1.PageRouteInfo {
 
   DashboardSettingsRoute.fromMatch(_i1.RouteMatch match)
       : key = null,
-        showAppBar = match.pathParams.getBool('showAppBar', true),
+        showAppBar = match.pathParams.getBool('showAppBar'),
         super.fromMatch(match);
 
   final _i2.Key key;
