@@ -11,6 +11,7 @@ import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -150,7 +151,7 @@ class _MyBookState extends State<MyBook> {
           Padding(
             padding: const EdgeInsets.only(top: 100.0),
             child: AnimatedAppIcon(
-              textTitle: "Loading illustrations...",
+              textTitle: "loading_illustrations".tr(),
             ),
           ),
         ]),
@@ -190,7 +191,7 @@ class _MyBookState extends State<MyBook> {
           label: Padding(
             padding: const EdgeInsets.all(12.0),
             child: Text(
-              'Multi-select',
+              'multi_select'.tr(),
             ),
           ),
           style: forceMultiSelect
@@ -205,9 +206,7 @@ class _MyBookState extends State<MyBook> {
           ),
           label: Padding(
             padding: const EdgeInsets.all(12.0),
-            child: Text(
-              'Sort',
-            ),
+            child: Text('sort'.tr()),
           ),
         ),
       ],
@@ -230,7 +229,7 @@ class _MyBookState extends State<MyBook> {
                   bottom: 12.0,
                 ),
                 child: Text(
-                  "It's lonely there",
+                  "lonely_there".tr(),
                   style: TextStyle(
                     fontSize: 32.0,
                     color: stateColors.primary,
@@ -245,7 +244,7 @@ class _MyBookState extends State<MyBook> {
                 child: Opacity(
                   opacity: 0.4,
                   child: Text(
-                    "You haven't added any illustration to this book yet.",
+                    "book_no_illustrations".tr(),
                     style: TextStyle(
                       fontSize: 16.0,
                     ),
@@ -260,7 +259,7 @@ class _MyBookState extends State<MyBook> {
                 label: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Text(
-                    "Upload",
+                    "upload".tr(),
                     style: TextStyle(
                       fontSize: 16.0,
                     ),
@@ -290,7 +289,7 @@ class _MyBookState extends State<MyBook> {
                   bottom: 12.0,
                 ),
                 child: Text(
-                  "Unexpected issue",
+                  "issue_unexpected".tr(),
                   style: TextStyle(
                     fontSize: 32.0,
                     color: stateColors.primary,
@@ -305,8 +304,7 @@ class _MyBookState extends State<MyBook> {
                 child: Opacity(
                   opacity: 0.4,
                   child: Text(
-                    "Sorry, there was an error while loading your data."
-                    " Please try again.",
+                    "issue_data_retry".tr(),
                     style: TextStyle(
                       fontSize: 16.0,
                     ),
@@ -319,7 +317,7 @@ class _MyBookState extends State<MyBook> {
                 label: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Text(
-                    "Retry",
+                    "retry".tr(),
                     style: TextStyle(
                       fontSize: 16.0,
                     ),
@@ -425,7 +423,8 @@ class _MyBookState extends State<MyBook> {
         Opacity(
           opacity: 0.6,
           child: Text(
-            "${multiSelectedItems.length} selected",
+            "multi_items_selected"
+                .tr(args: [multiSelectedItems.length.toString()]),
             style: TextStyle(
               fontSize: 30.0,
             ),
@@ -446,9 +445,7 @@ class _MyBookState extends State<MyBook> {
             });
           },
           icon: Icon(Icons.border_clear),
-          label: Text(
-            'Clear selection',
-          ),
+          label: Text('clear_selection'.tr()),
         ),
         TextButton.icon(
           onPressed: () {
@@ -460,9 +457,7 @@ class _MyBookState extends State<MyBook> {
             setState(() {});
           },
           icon: Icon(Icons.select_all),
-          label: Text(
-            'Select all',
-          ),
+          label: Text('select_all'.tr()),
         ),
         TextButton.icon(
           onPressed: confirmDeletion,
@@ -470,9 +465,7 @@ class _MyBookState extends State<MyBook> {
             primary: Colors.red,
           ),
           icon: Icon(Icons.delete_outline),
-          label: Text(
-            'Delete',
-          ),
+          label: Text('delete'.tr()),
         ),
       ],
     );
@@ -490,7 +483,7 @@ class _MyBookState extends State<MyBook> {
               children: [
                 ListTile(
                   title: Text(
-                    'Confirm',
+                    'confirm'.tr(),
                     style: TextStyle(
                       color: Colors.white,
                     ),
@@ -506,7 +499,7 @@ class _MyBookState extends State<MyBook> {
                   },
                 ),
                 ListTile(
-                  title: Text('Cancel'),
+                  title: Text('Cancel'.tr()),
                   trailing: Icon(Icons.close),
                   onTap: () => Navigator.of(context).pop(),
                 ),
@@ -572,8 +565,7 @@ class _MyBookState extends State<MyBook> {
     if (response.hasErrors) {
       Snack.e(
         context: context,
-        message: "Sorry, there was an issue while deleting your illustrations. "
-            "Try again or contact us if the issue persists.",
+        message: "illustrations_delete_error".tr(),
       );
 
       illustrations.addAll(duplicatedItems);
@@ -732,8 +724,7 @@ class _MyBookState extends State<MyBook> {
     if (response.hasErrors) {
       Snack.e(
         context: context,
-        message: "Sorry, there was an error while removing the illustration."
-            " Please try again.",
+        message: "illustrations_remove_error".tr(),
       );
 
       processingIllus.forEach((pIndex, pIllus) {
@@ -749,7 +740,7 @@ class _MyBookState extends State<MyBook> {
 
     Snack.s(
       context: context,
-      message: "The illustration has been successfully removed.",
+      message: "illustrations_remove_success".tr(),
     );
 
     setState(() {

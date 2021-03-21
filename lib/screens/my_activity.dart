@@ -6,6 +6,7 @@ import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
@@ -73,7 +74,7 @@ class _MyActivityState extends State<MyActivity> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Activity',
+            "activity".tr(),
             style: FontsUtils.boldTitleStyle(),
           ),
         ],
@@ -95,7 +96,7 @@ class _MyActivityState extends State<MyActivity> {
         alignment: WrapAlignment.start,
         children: <Widget>[
           squareStats(
-            title: 'Illustrations',
+            title: "illustrations".tr(),
             icon: Icon(
               UniconsLine.picture,
               size: 48.0,
@@ -104,7 +105,7 @@ class _MyActivityState extends State<MyActivity> {
             onTap: () => context.router.navigate(MyIllustrationsRoute()),
           ),
           squareStats(
-            title: 'Books',
+            title: "books".tr(),
             icon: Icon(
               UniconsLine.book_alt,
               size: 48.0,
@@ -113,17 +114,17 @@ class _MyActivityState extends State<MyActivity> {
             onTap: () => context.router.navigate(MyBooksDeepRoute()),
           ),
           squareStats(
-            title: 'Galleries',
+            title: "galleries".tr(),
             count: stats.galleries.owned,
             onTap: () {},
           ),
           squareStats(
-            title: 'Challenges',
+            title: "challenges".tr(),
             count: stats.challenges.participating,
             onTap: () {},
           ),
           squareStats(
-            title: 'Contests',
+            title: "contests".tr(),
             count: stats.constests.participating,
             onTap: () {},
           ),
@@ -211,7 +212,7 @@ class _MyActivityState extends State<MyActivity> {
                   fontSize: 20.0,
                 ),
                 children: [
-                  TextSpan(text: "Your total used space is "),
+                  TextSpan(text: "space_total_used".tr()),
                   TextSpan(
                     text: "${getUsedSpace()}",
                     style: TextStyle(color: stateColors.accent),
@@ -230,7 +231,7 @@ class _MyActivityState extends State<MyActivity> {
                   fontSize: 20.0,
                 ),
                 children: [
-                  TextSpan(text: "You're a member since "),
+                  TextSpan(text: "member_since".tr()),
                   TextSpan(
                     text:
                         '${Jiffy(stateUser.userFirestore.createdAt).format('MMMM yyyy')}',

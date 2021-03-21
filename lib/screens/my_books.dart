@@ -9,6 +9,7 @@ import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -126,7 +127,7 @@ class _MyBooksState extends State<MyBooks> {
           Row(
             children: [
               Text(
-                'Books',
+                "books".tr(),
                 style: FontsUtils.boldTitleStyle(),
               ),
               if (isCreating)
@@ -152,9 +153,7 @@ class _MyBooksState extends State<MyBooks> {
         delegate: SliverChildListDelegate.fixed([
           Padding(
             padding: const EdgeInsets.only(top: 100.0),
-            child: AnimatedAppIcon(
-              textTitle: "Loading your books...",
-            ),
+            child: AnimatedAppIcon(textTitle: "loading_books".tr()),
           ),
         ]),
       );
@@ -184,9 +183,7 @@ class _MyBooksState extends State<MyBooks> {
           ),
           label: Padding(
             padding: const EdgeInsets.all(12.0),
-            child: Text(
-              'Create',
-            ),
+            child: Text('create'.tr()),
           ),
         ),
         OutlinedButton.icon(
@@ -201,9 +198,7 @@ class _MyBooksState extends State<MyBooks> {
           ),
           label: Padding(
             padding: const EdgeInsets.all(12.0),
-            child: Text(
-              'Multi-select',
-            ),
+            child: Text('multi_select'.tr()),
           ),
           style: forceMultiSelect
               ? TextButton.styleFrom(primary: Colors.lightGreen)
@@ -217,9 +212,7 @@ class _MyBooksState extends State<MyBooks> {
           ),
           label: Padding(
             padding: const EdgeInsets.all(12.0),
-            child: Text(
-              'Sort',
-            ),
+            child: Text('sort'.tr()),
           ),
         ),
       ],
@@ -242,7 +235,7 @@ class _MyBooksState extends State<MyBooks> {
                   bottom: 12.0,
                 ),
                 child: Text(
-                  "It's lonely there",
+                  "lonely_there".tr(),
                   style: TextStyle(
                     fontSize: 32.0,
                     color: stateColors.primary,
@@ -256,7 +249,7 @@ class _MyBooksState extends State<MyBooks> {
                 child: Opacity(
                   opacity: 0.6,
                   child: Text(
-                    "You haven't created any book yet.",
+                    "books_none_created".tr(),
                     style: TextStyle(
                       fontSize: 16.0,
                     ),
@@ -269,7 +262,7 @@ class _MyBooksState extends State<MyBooks> {
                 label: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Text(
-                    "create",
+                    "create".tr(),
                     style: TextStyle(
                       fontSize: 16.0,
                     ),
@@ -366,7 +359,8 @@ class _MyBooksState extends State<MyBooks> {
         Opacity(
           opacity: 0.6,
           child: Text(
-            "${multiSelectedItems.length} selected",
+            "multi_items_selected"
+                .tr(args: [multiSelectedItems.length.toString()]),
             style: TextStyle(
               fontSize: 30.0,
             ),
@@ -388,7 +382,7 @@ class _MyBooksState extends State<MyBooks> {
           },
           icon: Icon(Icons.border_clear),
           label: Text(
-            'Clear selection',
+            "clear_selection".tr(),
           ),
         ),
         TextButton.icon(
@@ -401,9 +395,7 @@ class _MyBooksState extends State<MyBooks> {
             setState(() {});
           },
           icon: Icon(Icons.select_all),
-          label: Text(
-            'Select all',
-          ),
+          label: Text("select_all".tr()),
         ),
         TextButton.icon(
           onPressed: confirmDeletion,
@@ -411,9 +403,7 @@ class _MyBooksState extends State<MyBooks> {
             primary: Colors.red,
           ),
           icon: Icon(Icons.delete_outline),
-          label: Text(
-            'Delete',
-          ),
+          label: Text("delete".tr()),
         ),
       ],
     );
@@ -431,7 +421,7 @@ class _MyBooksState extends State<MyBooks> {
               children: [
                 ListTile(
                   title: Text(
-                    'Confirm',
+                    "confirm".tr(),
                     style: TextStyle(
                       color: Colors.white,
                     ),
@@ -447,7 +437,7 @@ class _MyBooksState extends State<MyBooks> {
                   },
                 ),
                 ListTile(
-                  title: Text('Cancel'),
+                  title: Text("cancel".tr()),
                   trailing: Icon(Icons.close),
                   onTap: () => Navigator.of(context).pop(),
                 ),
@@ -512,8 +502,7 @@ class _MyBooksState extends State<MyBooks> {
     if (response.hasErrors) {
       Snack.e(
         context: context,
-        message: "Sorry, there was an issue while deleting your illustrations. "
-            "Try again or contact us if the issue persists.",
+        message: "illustrations_delete_error".tr(),
       );
 
       books.addAll(copyItems);
@@ -648,8 +637,7 @@ class _MyBooksState extends State<MyBooks> {
     if (!response.success) {
       Snack.e(
         context: context,
-        message: "Sorry, there wasan error while creating your book."
-            " Please try again later.",
+        message: "book_creation_error".tr(),
       );
 
       return;
@@ -657,7 +645,7 @@ class _MyBooksState extends State<MyBooks> {
 
     Snack.s(
       context: context,
-      message: "Your book has been successfully created!",
+      message: "book_creation_success".tr(),
     );
 
     fetchOne(response.bookId);
@@ -667,7 +655,7 @@ class _MyBooksState extends State<MyBooks> {
     showDialog(
       context: context,
       builder: (_) => SimpleDialog(
-        title: Text("Create book"),
+        title: Text("book_create".tr()),
         children: [
           Padding(
             padding: EdgeInsets.only(
@@ -682,7 +670,7 @@ class _MyBooksState extends State<MyBooks> {
                 controller: newBookNameController,
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
-                  labelText: 'Name',
+                  labelText: "title".tr(),
                   labelStyle: TextStyle(color: stateColors.primary),
                   focusedBorder: UnderlineInputBorder(
                     borderSide: BorderSide(
@@ -705,7 +693,7 @@ class _MyBooksState extends State<MyBooks> {
               constraints: BoxConstraints.tight(Size(250.0, 80)),
               child: TextField(
                 decoration: InputDecoration(
-                  labelText: 'Description',
+                  labelText: "description".tr(),
                   labelStyle: TextStyle(color: stateColors.primary),
                   focusedBorder: UnderlineInputBorder(
                     borderSide: BorderSide(
@@ -746,9 +734,7 @@ class _MyBooksState extends State<MyBooks> {
                     ),
                     child: Opacity(
                       opacity: 1.0,
-                      child: Text(
-                        'Cancel',
-                      ),
+                      child: Text('cancel'.tr()),
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
@@ -767,7 +753,7 @@ class _MyBooksState extends State<MyBooks> {
                       horizontal: 12.0,
                     ),
                     child: Text(
-                      "Create",
+                      "create".tr(),
                     ),
                   ),
                   style: ElevatedButton.styleFrom(

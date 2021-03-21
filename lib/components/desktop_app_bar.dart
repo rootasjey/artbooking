@@ -10,6 +10,7 @@ import 'package:artbooking/utils/language.dart';
 import 'package:artbooking/utils/navigation_helper.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:unicons/unicons.dart';
@@ -158,7 +159,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
           iconBrightness,
           color: stateColors.foreground.withOpacity(0.6),
         ),
-        tooltip: 'Brightness',
+        tooltip: "brightness".tr(),
         onSelected: (value) {
           if (value == 'auto') {
             BrightnessUtils.setAutoBrightness(context);
@@ -183,7 +184,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
               child: ListTile(
                 leading: Icon(Icons.brightness_auto),
                 title: Text(
-                  'Auto',
+                  "auto".tr(),
                   style: TextStyle(
                     color: autoBrightness ? primary : basic,
                   ),
@@ -201,7 +202,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
               child: ListTile(
                 leading: Icon(Icons.brightness_2),
                 title: Text(
-                  'Dark',
+                  "dark".tr(),
                   style: TextStyle(
                     color: brightness == Brightness.dark ? primary : basic,
                   ),
@@ -219,7 +220,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
               child: ListTile(
                 leading: Icon(Icons.brightness_5),
                 title: Text(
-                  'Light',
+                  "light".tr(),
                   style: TextStyle(
                     color: brightness == Brightness.light ? primary : basic,
                   ),
@@ -248,7 +249,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
 
   Widget developersDropdown() {
     return PopupMenuButton(
-      tooltip: 'Developers',
+      tooltip: "developers".tr(),
       child: Opacity(
         opacity: 0.6,
         child: Container(
@@ -262,7 +263,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
               useIconButton
                   ? Icon(UniconsLine.processor, color: stateColors.foreground)
                   : Text(
-                      'developers',
+                      "developers".tr(),
                       style: TextStyle(
                         color: stateColors.foreground,
                         fontSize: 16.0,
@@ -316,7 +317,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
 
   Widget discoverDropdown() {
     return PopupMenuButton(
-      tooltip: 'Discover',
+      tooltip: "discover".tr(),
       child: Opacity(
         opacity: 0.6,
         child: Container(
@@ -333,7 +334,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
                       color: stateColors.foreground,
                     )
                   : Text(
-                      'discover',
+                      "discover".tr(),
                       style: TextStyle(
                         color: stateColors.foreground,
                         fontSize: 16.0,
@@ -413,7 +414,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
               child: Row(
                 children: [
                   Text(
-                    'Sign in',
+                    "signin",
                     style: TextStyle(
                       fontSize: 16.0,
                     ),
@@ -453,7 +454,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
 
   Widget groupedDropdown() {
     return PopupMenuButton(
-      tooltip: 'More',
+      tooltip: "more".tr(),
       child: Opacity(
         opacity: 0.6,
         child: Container(
@@ -474,7 +475,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
             UniconsLine.home,
             color: stateColors.foreground.withOpacity(0.6),
           ),
-          textData: 'home',
+          textData: "home".tr(),
         ),
         PopupMenuDivider(),
         groupedSectionEntry(
@@ -492,7 +493,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
             UniconsLine.question,
             color: stateColors.foreground.withOpacity(0.6),
           ),
-          textData: 'about',
+          textData: "about".tr(),
         ),
         groupedSectionEntry(
           value: ContactRoute(),
@@ -500,7 +501,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
             UniconsLine.envelope,
             color: stateColors.foreground.withOpacity(0.6),
           ),
-          textData: 'contact',
+          textData: "contact".tr(),
         ),
         groupedSectionEntry(
           value: TosRoute(),
@@ -508,7 +509,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
             UniconsLine.keyhole_square,
             color: stateColors.foreground.withOpacity(0.6),
           ),
-          textData: 'Privacy Terms',
+          textData: "privacy".tr(),
         ),
       ],
       onSelected: (PageRouteInfo pageRouteInfo) {
@@ -526,7 +527,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
     return Padding(
       padding: const EdgeInsets.only(right: 20.0),
       child: PopupMenuButton<String>(
-        tooltip: "Change language",
+        tooltip: "language_change".tr(),
         icon: Icon(
           UniconsLine.language,
           color: stateColors.foreground.withOpacity(0.6),
@@ -536,8 +537,8 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
 
           Snack.s(
             context: context,
-            message: "Your language has been successfully updated"
-                " to ${Language.frontend(newValue)}",
+            message: "language_changed_success"
+                .tr(args: [Language.frontend(newValue)]),
           );
         },
         itemBuilder: (context) => Language.available().map((value) {
@@ -585,7 +586,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
               useIconButton
                   ? Icon(UniconsLine.books, color: stateColors.foreground)
                   : Text(
-                      'resources',
+                      'resources'.tr(),
                       style: TextStyle(
                         color: stateColors.foreground,
                         fontSize: 16.0,
@@ -606,7 +607,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
             UniconsLine.question,
             color: stateColors.foreground.withOpacity(0.6),
           ),
-          textData: 'about',
+          textData: "about".tr(),
         ),
         resourcesEntry(
           value: ContactRoute(),
@@ -614,7 +615,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
             UniconsLine.envelope,
             color: stateColors.foreground.withOpacity(0.6),
           ),
-          textData: 'contact',
+          textData: "contact".tr(),
         ),
         resourcesEntry(
           value: TosRoute(),
@@ -622,7 +623,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
             UniconsLine.keyhole_square,
             color: stateColors.foreground.withOpacity(0.6),
           ),
-          textData: 'Privacy Terms',
+          textData: "privacy".tr(),
         ),
         // PopupMenuDivider(),
         // resourcesEntry(
@@ -680,7 +681,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),
       child: IconButton(
-        tooltip: 'Search',
+        tooltip: "search".tr(),
         onPressed: () {
           // context.router.root.push(SearchRoute());
         },
@@ -710,7 +711,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
     return Padding(
       padding: const EdgeInsets.only(right: 60.0),
       child: PopupMenuButton(
-        tooltip: 'Settings',
+        tooltip: "settings".tr(),
         icon: Icon(
           UniconsLine.setting,
           color: stateColors.foreground,
@@ -718,7 +719,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
         itemBuilder: (_) => <PopupMenuEntry<AppBarSettings>>[
           PopupMenuItem(
             value: AppBarSettings.allSettings,
-            child: Text('All settings'),
+            child: Text("settings_all".tr()),
           ),
           PopupMenuDivider(),
           PopupMenuItem(
@@ -733,7 +734,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                 ),
-                Text('Language'),
+                Text("language".tr()),
               ],
             ),
           ),
@@ -756,8 +757,8 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
 
               Snack.s(
                 context: context,
-                message: "Your language has been successfully updated"
-                    " to ${Language.frontend('en')}",
+                message: "language_changed_success"
+                    .tr(args: [Language.frontend('en')]),
               );
 
               break;
@@ -766,8 +767,8 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
 
               Snack.s(
                 context: context,
-                message: "Your language has been successfully updated"
-                    " to ${Language.frontend('fr')}",
+                message: "language_changed_success"
+                    .tr(args: [Language.frontend('fr')]),
               );
 
               break;
@@ -795,7 +796,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'SIGN IN',
+              "signin".tr().toUpperCase(),
               style: TextStyle(
                 color: Colors.white,
                 // fontSize: 13.0,
@@ -817,7 +818,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
             horizontal: 8.0,
           ),
           child: Text(
-            'SIGN UP',
+            "signup".tr().toUpperCase(),
           ),
         ),
       ),
@@ -835,7 +836,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
           UniconsLine.user_circle,
           color: stateColors.primary,
         ),
-        tooltip: 'Show user menu',
+        tooltip: "user_menu_show".tr(),
         onSelected: (pageRouteInfo) {
           if (pageRouteInfo.routeName == SignOutRoute.name) {
             stateUser.signOut(
@@ -854,7 +855,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
               child: ListTile(
                 leading: Icon(UniconsLine.upload),
                 title: Text(
-                  'Upload',
+                  "upload".tr(),
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -869,34 +870,34 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
           //     ),
           //   ),
           // ),
-          const PopupMenuItem(
+          PopupMenuItem(
             value: DashboardPageRoute(children: [MyActivityRoute()]),
             child: ListTile(
               leading: Icon(UniconsLine.chart_pie),
               title: Text(
-                'My Activity',
+                "my_activity".tr(),
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ),
-          const PopupMenuItem(
+          PopupMenuItem(
             value: DashboardPageRoute(
               children: [MyIllustrationsRoute()],
             ),
             child: ListTile(
               leading: Icon(UniconsLine.picture),
               title: Text(
-                'My Illustrations',
+                "my_illustrations".tr(),
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ),
-          const PopupMenuItem(
+          PopupMenuItem(
             value: DashboardPageRoute(children: [MyBooksDeepRoute()]),
             child: ListTile(
               leading: Icon(UniconsLine.books),
               title: Text(
-                'My Books',
+                "my_books".tr(),
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -906,17 +907,17 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
             child: ListTile(
               leading: Icon(UniconsLine.setting),
               title: Text(
-                'Settings',
+                "settings".tr(),
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ),
-          const PopupMenuItem(
+          PopupMenuItem(
             value: SignOutRoute(),
             child: ListTile(
               leading: Icon(UniconsLine.ship),
               title: Text(
-                'Sign out',
+                "signout".tr(),
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -934,14 +935,14 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
           value: SigninRoute(),
           child: ListTile(
             leading: Icon(UniconsLine.signout),
-            title: Text('Sign in'),
+            title: Text("signin".tr()),
           ),
         ),
         PopupMenuItem(
           value: SignupRoute(),
           child: ListTile(
             leading: Icon(UniconsLine.user_plus),
-            title: Text('Sign up'),
+            title: Text("signup".tr()),
           ),
         ),
         // PopupMenuItem(

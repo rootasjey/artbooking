@@ -9,6 +9,7 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -113,7 +114,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
           Text(
-            'Illustrations',
+            'illustrations'.tr(),
             style: FontsUtils.boldTitleStyle(),
           ),
           defaultActionsToolbar(),
@@ -130,7 +131,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
           Padding(
             padding: const EdgeInsets.only(top: 100.0),
             child: AnimatedAppIcon(
-              textTitle: "Loading illustrations...",
+              textTitle: "loading_illustrations".tr(),
             ),
           ),
         ]),
@@ -165,9 +166,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
           ),
           label: Padding(
             padding: const EdgeInsets.all(12.0),
-            child: Text(
-              'Multi-select',
-            ),
+            child: Text("multi_select".tr()),
           ),
           style: forceMultiSelect
               ? TextButton.styleFrom(primary: Colors.lightGreen)
@@ -181,9 +180,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
           ),
           label: Padding(
             padding: const EdgeInsets.all(12.0),
-            child: Text(
-              'Sort',
-            ),
+            child: Text("sort".tr()),
           ),
         ),
       ],
@@ -206,7 +203,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
                   bottom: 12.0,
                 ),
                 child: Text(
-                  "It's lonely there",
+                  "lonely_there".tr(),
                   style: TextStyle(
                     fontSize: 32.0,
                     color: stateColors.primary,
@@ -221,7 +218,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
                 child: Opacity(
                   opacity: 0.4,
                   child: Text(
-                    "You haven't upload any illustration yet.",
+                    "illustrations_no_upload".tr(),
                     style: TextStyle(
                       fontSize: 16.0,
                     ),
@@ -236,7 +233,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
                 label: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Text(
-                    "Upload",
+                    "upload".tr(),
                     style: TextStyle(
                       fontSize: 16.0,
                     ),
@@ -335,7 +332,8 @@ class _MyIllustrationsState extends State<MyIllustrations> {
         Opacity(
           opacity: 0.6,
           child: Text(
-            "${multiSelectedItems.length} selected",
+            "multi_items_selected"
+                .tr(args: [multiSelectedItems.length.toString()]),
             style: TextStyle(
               fontSize: 30.0,
             ),
@@ -356,9 +354,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
             });
           },
           icon: Icon(Icons.border_clear),
-          label: Text(
-            'Clear selection',
-          ),
+          label: Text("clear_selection".tr()),
         ),
         TextButton.icon(
           onPressed: () {
@@ -370,9 +366,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
             setState(() {});
           },
           icon: Icon(Icons.select_all),
-          label: Text(
-            'Select all',
-          ),
+          label: Text("select_all".tr()),
         ),
         TextButton.icon(
           onPressed: confirmDeletion,
@@ -380,9 +374,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
             primary: Colors.red,
           ),
           icon: Icon(Icons.delete_outline),
-          label: Text(
-            'Delete',
-          ),
+          label: Text("delete".tr()),
         ),
       ],
     );
@@ -400,7 +392,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
               children: [
                 ListTile(
                   title: Text(
-                    'Confirm',
+                    "confirm".tr(),
                     style: TextStyle(
                       color: Colors.white,
                     ),
@@ -416,7 +408,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
                   },
                 ),
                 ListTile(
-                  title: Text('Cancel'),
+                  title: Text("cancel".tr()),
                   trailing: Icon(Icons.close),
                   onTap: () => Navigator.of(context).pop(),
                 ),
@@ -481,8 +473,7 @@ class _MyIllustrationsState extends State<MyIllustrations> {
     if (response.hasErrors) {
       Snack.e(
         context: context,
-        message: "Sorry, there was an issue while deleting your illustrations. "
-            "Try again or contact us if the issue persists.",
+        message: "illustrations_delete_error".tr(),
       );
 
       illustrationsList.addAll(duplicatedItems);

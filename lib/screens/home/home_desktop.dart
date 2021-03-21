@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:artbooking/components/desktop_app_bar.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -39,7 +40,7 @@ class _HomeDesktopState extends State<HomeDesktop>
               Opacity(
                 opacity: 0.6,
                 child: Text(
-                  "Your personal inspirations",
+                  "app_caption".tr(),
                   style: TextStyle(
                     fontSize: 26.0,
                   ),
