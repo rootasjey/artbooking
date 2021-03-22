@@ -15,12 +15,8 @@ class UpdateEmailResp {
   factory UpdateEmailResp.fromJSON(Map<dynamic, dynamic> data) {
     return UpdateEmailResp(
       success: data['success'] ?? true,
-      user: data['user'] != null
-          ? PartialUser.fromJSON(data['user'])
-          : PartialUser(),
-      error: data['error'] != null
-          ? CloudFuncError.fromJSON(data['error'])
-          : CloudFuncError(),
+      user: PartialUser.fromJSON(data['user']),
+      error: CloudFuncError.fromJSON(data['error']),
     );
   }
 }
