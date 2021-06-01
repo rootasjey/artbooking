@@ -5,6 +5,7 @@
 // **************************************************************************
 
 import 'package:auto_route/auto_route.dart' as _i1;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' as _i2;
 
 import '../screens/about.dart' as _i6;
@@ -34,9 +35,11 @@ import 'auth_guard.dart' as _i3;
 import 'no_auth_guard.dart' as _i4;
 
 class AppRouter extends _i1.RootStackRouter {
-  AppRouter({@_i2.required this.authGuard, @_i2.required this.noAuthGuard})
-      : assert(authGuard != null),
-        assert(noAuthGuard != null);
+  AppRouter(
+      {_i2.GlobalKey<_i2.NavigatorState> navigatorKey,
+      @required this.authGuard,
+      @required this.noAuthGuard})
+      : super(navigatorKey);
 
   final _i3.AuthGuard authGuard;
 
@@ -44,262 +47,245 @@ class AppRouter extends _i1.RootStackRouter {
 
   @override
   final Map<String, _i1.PageFactory> pagesMap = {
-    HomeRoute.name: (entry) {
-      var route = entry.routeData.as<HomeRoute>();
-      return _i1.MaterialPageX(
-          entry: entry,
-          child: _i5.Home(mobileInitialIndex: route.mobileInitialIndex ?? 0));
-    },
-    AboutRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i6.About());
-    },
-    ChangelogRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i7.Changelog());
-    },
-    ContactRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i8.Contact());
-    },
-    DashboardPageRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i9.DashboardPage());
-    },
-    ForgotPasswordRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i10.ForgotPassword());
-    },
-    IllustrationPageRoute.name: (entry) {
-      var route = entry.routeData.as<IllustrationPageRoute>();
-      return _i1.MaterialPageX(
-          entry: entry,
-          child: _i11.IllustrationPage(
-              key: route.key,
-              illustrationId: route.illustrationId,
-              illustration: route.illustration));
-    },
-    SettingsRoute.name: (entry) {
-      var route = entry.routeData.as<SettingsRoute>();
-      return _i1.MaterialPageX(
-          entry: entry,
-          child: _i12.Settings(
-              key: route.key, showAppBar: route.showAppBar ?? true));
-    },
-    SigninRoute.name: (entry) {
-      var route = entry.routeData.as<SigninRoute>();
-      return _i1.MaterialPageX(
-          entry: entry,
-          child: _i13.Signin(
-              key: route.key, onSigninResult: route.onSigninResult));
-    },
-    SignupRoute.name: (entry) {
-      var route = entry.routeData.as<SignupRoute>();
-      return _i1.MaterialPageX(
-          entry: entry,
-          child: _i14.Signup(
-              key: route.key, onSignupResult: route.onSignupResult));
-    },
-    SignOutRoute.name: (entry) {
-      return _i1.MaterialPageX(
-          entry: entry, child: const _i1.EmptyRouterPage());
-    },
-    ExtDeepRoute.name: (entry) {
-      return _i1.MaterialPageX(
-          entry: entry, child: const _i1.EmptyRouterPage());
-    },
-    TosRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i15.Tos());
-    },
-    UndefinedPageRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i16.UndefinedPage());
-    },
-    AddIllustrationRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i17.AddIllustration());
-    },
-    MyActivityRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i18.MyActivity());
-    },
-    MyIllustrationsRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i19.MyIllustrations());
-    },
-    MyBooksDeepRoute.name: (entry) {
-      return _i1.MaterialPageX(
-          entry: entry, child: const _i1.EmptyRouterPage());
-    },
-    DashboardSettingsDeepRoute.name: (entry) {
-      return _i1.MaterialPageX(
-          entry: entry, child: const _i1.EmptyRouterPage());
-    },
-    MyBooksRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i20.MyBooks());
-    },
-    MyBookRoute.name: (entry) {
-      var route = entry.routeData.as<MyBookRoute>();
-      return _i1.MaterialPageX(
-          entry: entry,
-          child: _i21.MyBook(
-              key: route.key, bookId: route.bookId, book: route.book));
-    },
-    DashboardSettingsRoute.name: (entry) {
-      var route = entry.routeData.as<DashboardSettingsRoute>();
-      return _i1.MaterialPageX(
-          entry: entry,
-          child: _i12.Settings(
-              key: route.key, showAppBar: route.showAppBar ?? true));
-    },
-    DeleteAccountRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i22.DeleteAccount());
-    },
-    AccountUpdateDeepRoute.name: (entry) {
-      return _i1.MaterialPageX(
-          entry: entry, child: const _i1.EmptyRouterPage());
-    },
-    UpdateEmailRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i23.UpdateEmail());
-    },
-    UpdatePasswordRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i24.UpdatePassword());
-    },
-    UpdateUsernameRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i25.UpdateUsername());
-    },
-    GitHubRoute.name: (entry) {
-      return _i1.MaterialPageX(
-          entry: entry, child: const _i1.EmptyRouterPage());
-    }
+    HomeRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (data) {
+          final args =
+              data.argsAs<HomeRouteArgs>(orElse: () => const HomeRouteArgs());
+          return _i5.Home(mobileInitialIndex: args.mobileInitialIndex);
+        }),
+    AboutRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return _i6.About();
+        }),
+    ChangelogRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return _i7.Changelog();
+        }),
+    ContactRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return _i8.Contact();
+        }),
+    DashboardPageRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return _i9.DashboardPage();
+        }),
+    ForgotPasswordRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return _i10.ForgotPassword();
+        }),
+    IllustrationPageRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (data) {
+          final pathParams = data.pathParams;
+          final args = data.argsAs<IllustrationPageRouteArgs>(
+              orElse: () => IllustrationPageRouteArgs(
+                  illustrationId: pathParams.getString('illustrationId')));
+          return _i11.IllustrationPage(
+              key: args.key,
+              illustrationId: args.illustrationId,
+              illustration: args.illustration);
+        }),
+    SettingsRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (data) {
+          final pathParams = data.pathParams;
+          final args = data.argsAs<SettingsRouteArgs>(
+              orElse: () => SettingsRouteArgs(
+                  showAppBar: pathParams.getBool('showAppBar')));
+          return _i12.Settings(key: args.key, showAppBar: args.showAppBar);
+        }),
+    SigninRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (data) {
+          final args = data.argsAs<SigninRouteArgs>(
+              orElse: () => const SigninRouteArgs());
+          return _i13.Signin(
+              key: args.key, onSigninResult: args.onSigninResult);
+        }),
+    SignupRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (data) {
+          final args = data.argsAs<SignupRouteArgs>(
+              orElse: () => const SignupRouteArgs());
+          return _i14.Signup(
+              key: args.key, onSignupResult: args.onSignupResult);
+        }),
+    SignOutRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return const _i1.EmptyRouterPage();
+        }),
+    ExtDeepRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return const _i1.EmptyRouterPage();
+        }),
+    TosRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return _i15.Tos();
+        }),
+    UndefinedPageRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return _i16.UndefinedPage();
+        }),
+    AddIllustrationRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return _i17.AddIllustration();
+        }),
+    MyActivityRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return _i18.MyActivity();
+        }),
+    MyIllustrationsRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return _i19.MyIllustrations();
+        }),
+    MyBooksDeepRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return const _i1.EmptyRouterPage();
+        }),
+    DashboardSettingsDeepRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return const _i1.EmptyRouterPage();
+        }),
+    MyBooksRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return _i20.MyBooks();
+        }),
+    MyBookRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (data) {
+          final pathParams = data.pathParams;
+          final args = data.argsAs<MyBookRouteArgs>(
+              orElse: () =>
+                  MyBookRouteArgs(bookId: pathParams.getString('bookId')));
+          return _i21.MyBook(
+              key: args.key, bookId: args.bookId, book: args.book);
+        }),
+    DashboardSettingsRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (data) {
+          final pathParams = data.pathParams;
+          final args = data.argsAs<DashboardSettingsRouteArgs>(
+              orElse: () => DashboardSettingsRouteArgs(
+                  showAppBar: pathParams.getBool('showAppBar')));
+          return _i12.Settings(key: args.key, showAppBar: args.showAppBar);
+        }),
+    DeleteAccountRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return _i22.DeleteAccount();
+        }),
+    AccountUpdateDeepRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return const _i1.EmptyRouterPage();
+        }),
+    UpdateEmailRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return _i23.UpdateEmail();
+        }),
+    UpdatePasswordRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return _i24.UpdatePassword();
+        }),
+    UpdateUsernameRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return _i25.UpdateUsername();
+        }),
+    GitHubRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
+        routeData: routeData,
+        builder: (_) {
+          return const _i1.EmptyRouterPage();
+        })
   };
 
   @override
   List<_i1.RouteConfig> get routes => [
-        _i1.RouteConfig<HomeRoute>(HomeRoute.name,
-            path: '/', routeBuilder: (match) => HomeRoute.fromMatch(match)),
-        _i1.RouteConfig<AboutRoute>(AboutRoute.name,
-            path: '/about',
-            routeBuilder: (match) => AboutRoute.fromMatch(match)),
-        _i1.RouteConfig<ChangelogRoute>(ChangelogRoute.name,
-            path: '/changelog',
-            routeBuilder: (match) => ChangelogRoute.fromMatch(match)),
-        _i1.RouteConfig<ContactRoute>(ContactRoute.name,
-            path: '/contact',
-            routeBuilder: (match) => ContactRoute.fromMatch(match)),
-        _i1.RouteConfig<DashboardPageRoute>(DashboardPageRoute.name,
-            path: '/dashboard',
-            routeBuilder: (match) => DashboardPageRoute.fromMatch(match),
-            guards: [
-              authGuard
-            ],
-            children: [
-              _i1.RouteConfig('#redirect',
-                  path: '', redirectTo: 'activity', fullMatch: true),
-              _i1.RouteConfig<AddIllustrationRoute>(AddIllustrationRoute.name,
-                  path: 'add/illustration',
-                  routeBuilder: (match) =>
-                      AddIllustrationRoute.fromMatch(match)),
-              _i1.RouteConfig<MyActivityRoute>(MyActivityRoute.name,
-                  path: 'activity',
-                  routeBuilder: (match) => MyActivityRoute.fromMatch(match)),
-              _i1.RouteConfig<MyIllustrationsRoute>(MyIllustrationsRoute.name,
-                  path: 'illustrations',
-                  routeBuilder: (match) =>
-                      MyIllustrationsRoute.fromMatch(match)),
-              _i1.RouteConfig<MyBooksDeepRoute>(MyBooksDeepRoute.name,
-                  path: 'books',
-                  routeBuilder: (match) => MyBooksDeepRoute.fromMatch(match),
-                  children: [
-                    _i1.RouteConfig<MyBooksRoute>(MyBooksRoute.name,
-                        path: '',
-                        routeBuilder: (match) => MyBooksRoute.fromMatch(match)),
-                    _i1.RouteConfig<MyBookRoute>(MyBookRoute.name,
-                        path: ':bookId',
-                        routeBuilder: (match) => MyBookRoute.fromMatch(match))
-                  ]),
-              _i1.RouteConfig<DashboardSettingsDeepRoute>(
-                  DashboardSettingsDeepRoute.name,
-                  path: 'settings',
-                  routeBuilder: (match) =>
-                      DashboardSettingsDeepRoute.fromMatch(match),
-                  children: [
-                    _i1.RouteConfig<DashboardSettingsRoute>(
-                        DashboardSettingsRoute.name,
-                        path: '',
-                        routeBuilder: (match) =>
-                            DashboardSettingsRoute.fromMatch(match)),
-                    _i1.RouteConfig<DeleteAccountRoute>(DeleteAccountRoute.name,
-                        path: 'delete/account',
-                        routeBuilder: (match) =>
-                            DeleteAccountRoute.fromMatch(match)),
-                    _i1.RouteConfig<AccountUpdateDeepRoute>(
-                        AccountUpdateDeepRoute.name,
-                        path: 'update',
-                        routeBuilder: (match) =>
-                            AccountUpdateDeepRoute.fromMatch(match),
-                        children: [
-                          _i1.RouteConfig<UpdateEmailRoute>(
-                              UpdateEmailRoute.name,
-                              path: 'email',
-                              routeBuilder: (match) =>
-                                  UpdateEmailRoute.fromMatch(match)),
-                          _i1.RouteConfig<UpdatePasswordRoute>(
-                              UpdatePasswordRoute.name,
-                              path: 'password',
-                              routeBuilder: (match) =>
-                                  UpdatePasswordRoute.fromMatch(match)),
-                          _i1.RouteConfig<UpdateUsernameRoute>(
-                              UpdateUsernameRoute.name,
-                              path: 'username',
-                              routeBuilder: (match) =>
-                                  UpdateUsernameRoute.fromMatch(match))
-                        ])
-                  ])
-            ]),
-        _i1.RouteConfig<ForgotPasswordRoute>(ForgotPasswordRoute.name,
-            path: '/forgotpassword',
-            routeBuilder: (match) => ForgotPasswordRoute.fromMatch(match)),
-        _i1.RouteConfig<IllustrationPageRoute>(IllustrationPageRoute.name,
-            path: '/illustration/:illustrationId',
-            routeBuilder: (match) => IllustrationPageRoute.fromMatch(match)),
-        _i1.RouteConfig<SettingsRoute>(SettingsRoute.name,
-            path: '/settings',
-            routeBuilder: (match) => SettingsRoute.fromMatch(match)),
-        _i1.RouteConfig<SigninRoute>(SigninRoute.name,
-            path: '/signin',
-            routeBuilder: (match) => SigninRoute.fromMatch(match),
-            guards: [noAuthGuard]),
-        _i1.RouteConfig<SignupRoute>(SignupRoute.name,
-            path: '/signup',
-            routeBuilder: (match) => SignupRoute.fromMatch(match),
-            guards: [noAuthGuard]),
-        _i1.RouteConfig<SignOutRoute>(SignOutRoute.name,
-            path: '/signout',
-            routeBuilder: (match) => SignOutRoute.fromMatch(match)),
-        _i1.RouteConfig<ExtDeepRoute>(ExtDeepRoute.name,
+        _i1.RouteConfig(HomeRoute.name, path: '/'),
+        _i1.RouteConfig(AboutRoute.name, path: '/about'),
+        _i1.RouteConfig(ChangelogRoute.name, path: '/changelog'),
+        _i1.RouteConfig(ContactRoute.name, path: '/contact'),
+        _i1.RouteConfig(DashboardPageRoute.name, path: '/dashboard', guards: [
+          authGuard
+        ], children: [
+          _i1.RouteConfig('#redirect',
+              path: '', redirectTo: 'activity', fullMatch: true),
+          _i1.RouteConfig(AddIllustrationRoute.name, path: 'add/illustration'),
+          _i1.RouteConfig(MyActivityRoute.name, path: 'activity'),
+          _i1.RouteConfig(MyIllustrationsRoute.name, path: 'illustrations'),
+          _i1.RouteConfig(MyBooksDeepRoute.name, path: 'books', children: [
+            _i1.RouteConfig(MyBooksRoute.name, path: ''),
+            _i1.RouteConfig(MyBookRoute.name, path: ':bookId')
+          ]),
+          _i1.RouteConfig(DashboardSettingsDeepRoute.name,
+              path: 'settings',
+              children: [
+                _i1.RouteConfig(DashboardSettingsRoute.name, path: ''),
+                _i1.RouteConfig(DeleteAccountRoute.name,
+                    path: 'delete/account'),
+                _i1.RouteConfig(AccountUpdateDeepRoute.name,
+                    path: 'update',
+                    children: [
+                      _i1.RouteConfig(UpdateEmailRoute.name, path: 'email'),
+                      _i1.RouteConfig(UpdatePasswordRoute.name,
+                          path: 'password'),
+                      _i1.RouteConfig(UpdateUsernameRoute.name,
+                          path: 'username')
+                    ])
+              ])
+        ]),
+        _i1.RouteConfig(ForgotPasswordRoute.name, path: '/forgotpassword'),
+        _i1.RouteConfig(IllustrationPageRoute.name,
+            path: '/illustration/:illustrationId'),
+        _i1.RouteConfig(SettingsRoute.name, path: '/settings'),
+        _i1.RouteConfig(SigninRoute.name,
+            path: '/signin', guards: [noAuthGuard]),
+        _i1.RouteConfig(SignupRoute.name,
+            path: '/signup', guards: [noAuthGuard]),
+        _i1.RouteConfig(SignOutRoute.name, path: '/signout'),
+        _i1.RouteConfig(ExtDeepRoute.name,
             path: '/ext',
-            routeBuilder: (match) => ExtDeepRoute.fromMatch(match),
-            children: [
-              _i1.RouteConfig<GitHubRoute>(GitHubRoute.name,
-                  path: 'github',
-                  routeBuilder: (match) => GitHubRoute.fromMatch(match))
-            ]),
-        _i1.RouteConfig<TosRoute>(TosRoute.name,
-            path: '/tos', routeBuilder: (match) => TosRoute.fromMatch(match)),
-        _i1.RouteConfig<UndefinedPageRoute>(UndefinedPageRoute.name,
-            path: '*',
-            routeBuilder: (match) => UndefinedPageRoute.fromMatch(match))
+            children: [_i1.RouteConfig(GitHubRoute.name, path: 'github')]),
+        _i1.RouteConfig(TosRoute.name, path: '/tos'),
+        _i1.RouteConfig(UndefinedPageRoute.name, path: '*')
       ];
 }
 
-class HomeRoute extends _i1.PageRouteInfo {
-  HomeRoute({this.mobileInitialIndex = 0}) : super(name, path: '/');
-
-  HomeRoute.fromMatch(_i1.RouteMatch match)
-      : mobileInitialIndex = 0,
-        super.fromMatch(match);
-
-  final int mobileInitialIndex;
+class HomeRoute extends _i1.PageRouteInfo<HomeRouteArgs> {
+  HomeRoute({int mobileInitialIndex})
+      : super(name,
+            path: '/',
+            args: HomeRouteArgs(mobileInitialIndex: mobileInitialIndex));
 
   static const String name = 'HomeRoute';
 }
 
+class HomeRouteArgs {
+  const HomeRouteArgs({this.mobileInitialIndex});
+
+  final int mobileInitialIndex;
+}
+
 class AboutRoute extends _i1.PageRouteInfo {
   const AboutRoute() : super(name, path: '/about');
-
-  AboutRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
 
   static const String name = 'AboutRoute';
 }
@@ -307,15 +293,11 @@ class AboutRoute extends _i1.PageRouteInfo {
 class ChangelogRoute extends _i1.PageRouteInfo {
   const ChangelogRoute() : super(name, path: '/changelog');
 
-  ChangelogRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
-
   static const String name = 'ChangelogRoute';
 }
 
 class ContactRoute extends _i1.PageRouteInfo {
   const ContactRoute() : super(name, path: '/contact');
-
-  ContactRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
 
   static const String name = 'ContactRoute';
 }
@@ -324,90 +306,94 @@ class DashboardPageRoute extends _i1.PageRouteInfo {
   const DashboardPageRoute({List<_i1.PageRouteInfo> children})
       : super(name, path: '/dashboard', initialChildren: children);
 
-  DashboardPageRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
-
   static const String name = 'DashboardPageRoute';
 }
 
 class ForgotPasswordRoute extends _i1.PageRouteInfo {
   const ForgotPasswordRoute() : super(name, path: '/forgotpassword');
 
-  ForgotPasswordRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
-
   static const String name = 'ForgotPasswordRoute';
 }
 
-class IllustrationPageRoute extends _i1.PageRouteInfo {
-  IllustrationPageRoute({this.key, this.illustrationId, this.illustration})
+class IllustrationPageRoute
+    extends _i1.PageRouteInfo<IllustrationPageRouteArgs> {
+  IllustrationPageRoute(
+      {_i2.Key key, String illustrationId, _i26.Illustration illustration})
       : super(name,
             path: '/illustration/:illustrationId',
-            params: {'illustrationId': illustrationId});
+            args: IllustrationPageRouteArgs(
+                key: key,
+                illustrationId: illustrationId,
+                illustration: illustration),
+            rawPathParams: {'illustrationId': illustrationId});
 
-  IllustrationPageRoute.fromMatch(_i1.RouteMatch match)
-      : key = null,
-        illustrationId = match.pathParams.getString('illustrationId'),
-        illustration = null,
-        super.fromMatch(match);
+  static const String name = 'IllustrationPageRoute';
+}
+
+class IllustrationPageRouteArgs {
+  const IllustrationPageRouteArgs(
+      {this.key, this.illustrationId, this.illustration});
 
   final _i2.Key key;
 
   final String illustrationId;
 
   final _i26.Illustration illustration;
-
-  static const String name = 'IllustrationPageRoute';
 }
 
-class SettingsRoute extends _i1.PageRouteInfo {
-  SettingsRoute({this.key, this.showAppBar = true})
-      : super(name, path: '/settings');
-
-  SettingsRoute.fromMatch(_i1.RouteMatch match)
-      : key = null,
-        showAppBar = match.pathParams.getBool('showAppBar'),
-        super.fromMatch(match);
-
-  final _i2.Key key;
-
-  final bool showAppBar;
+class SettingsRoute extends _i1.PageRouteInfo<SettingsRouteArgs> {
+  SettingsRoute({_i2.Key key, bool showAppBar})
+      : super(name,
+            path: '/settings',
+            args: SettingsRouteArgs(key: key, showAppBar: showAppBar));
 
   static const String name = 'SettingsRoute';
 }
 
-class SigninRoute extends _i1.PageRouteInfo {
-  SigninRoute({this.key, this.onSigninResult}) : super(name, path: '/signin');
-
-  SigninRoute.fromMatch(_i1.RouteMatch match)
-      : key = null,
-        onSigninResult = null,
-        super.fromMatch(match);
+class SettingsRouteArgs {
+  const SettingsRouteArgs({this.key, this.showAppBar});
 
   final _i2.Key key;
 
-  final void Function(bool) onSigninResult;
+  final bool showAppBar;
+}
+
+class SigninRoute extends _i1.PageRouteInfo<SigninRouteArgs> {
+  SigninRoute({_i2.Key key, void Function(bool) onSigninResult})
+      : super(name,
+            path: '/signin',
+            args: SigninRouteArgs(key: key, onSigninResult: onSigninResult));
 
   static const String name = 'SigninRoute';
 }
 
-class SignupRoute extends _i1.PageRouteInfo {
-  SignupRoute({this.key, this.onSignupResult}) : super(name, path: '/signup');
-
-  SignupRoute.fromMatch(_i1.RouteMatch match)
-      : key = null,
-        onSignupResult = null,
-        super.fromMatch(match);
+class SigninRouteArgs {
+  const SigninRouteArgs({this.key, this.onSigninResult});
 
   final _i2.Key key;
 
-  final void Function(bool) onSignupResult;
+  final void Function(bool) onSigninResult;
+}
+
+class SignupRoute extends _i1.PageRouteInfo<SignupRouteArgs> {
+  SignupRoute({_i2.Key key, void Function(bool) onSignupResult})
+      : super(name,
+            path: '/signup',
+            args: SignupRouteArgs(key: key, onSignupResult: onSignupResult));
 
   static const String name = 'SignupRoute';
 }
 
+class SignupRouteArgs {
+  const SignupRouteArgs({this.key, this.onSignupResult});
+
+  final _i2.Key key;
+
+  final void Function(bool) onSignupResult;
+}
+
 class SignOutRoute extends _i1.PageRouteInfo {
   const SignOutRoute() : super(name, path: '/signout');
-
-  SignOutRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
 
   static const String name = 'SignOutRoute';
 }
@@ -416,15 +402,11 @@ class ExtDeepRoute extends _i1.PageRouteInfo {
   const ExtDeepRoute({List<_i1.PageRouteInfo> children})
       : super(name, path: '/ext', initialChildren: children);
 
-  ExtDeepRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
-
   static const String name = 'ExtDeepRoute';
 }
 
 class TosRoute extends _i1.PageRouteInfo {
   const TosRoute() : super(name, path: '/tos');
-
-  TosRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
 
   static const String name = 'TosRoute';
 }
@@ -432,15 +414,11 @@ class TosRoute extends _i1.PageRouteInfo {
 class UndefinedPageRoute extends _i1.PageRouteInfo {
   const UndefinedPageRoute() : super(name, path: '*');
 
-  UndefinedPageRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
-
   static const String name = 'UndefinedPageRoute';
 }
 
 class AddIllustrationRoute extends _i1.PageRouteInfo {
   const AddIllustrationRoute() : super(name, path: 'add/illustration');
-
-  AddIllustrationRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
 
   static const String name = 'AddIllustrationRoute';
 }
@@ -448,15 +426,11 @@ class AddIllustrationRoute extends _i1.PageRouteInfo {
 class MyActivityRoute extends _i1.PageRouteInfo {
   const MyActivityRoute() : super(name, path: 'activity');
 
-  MyActivityRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
-
   static const String name = 'MyActivityRoute';
 }
 
 class MyIllustrationsRoute extends _i1.PageRouteInfo {
   const MyIllustrationsRoute() : super(name, path: 'illustrations');
-
-  MyIllustrationsRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
 
   static const String name = 'MyIllustrationsRoute';
 }
@@ -465,8 +439,6 @@ class MyBooksDeepRoute extends _i1.PageRouteInfo {
   const MyBooksDeepRoute({List<_i1.PageRouteInfo> children})
       : super(name, path: 'books', initialChildren: children);
 
-  MyBooksDeepRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
-
   static const String name = 'MyBooksDeepRoute';
 }
 
@@ -474,59 +446,55 @@ class DashboardSettingsDeepRoute extends _i1.PageRouteInfo {
   const DashboardSettingsDeepRoute({List<_i1.PageRouteInfo> children})
       : super(name, path: 'settings', initialChildren: children);
 
-  DashboardSettingsDeepRoute.fromMatch(_i1.RouteMatch match)
-      : super.fromMatch(match);
-
   static const String name = 'DashboardSettingsDeepRoute';
 }
 
 class MyBooksRoute extends _i1.PageRouteInfo {
   const MyBooksRoute() : super(name, path: '');
 
-  MyBooksRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
-
   static const String name = 'MyBooksRoute';
 }
 
-class MyBookRoute extends _i1.PageRouteInfo {
-  MyBookRoute({this.key, @_i2.required this.bookId, this.book})
-      : super(name, path: ':bookId', params: {'bookId': bookId});
+class MyBookRoute extends _i1.PageRouteInfo<MyBookRouteArgs> {
+  MyBookRoute({_i2.Key key, String bookId, _i27.Book book})
+      : super(name,
+            path: ':bookId',
+            args: MyBookRouteArgs(key: key, bookId: bookId, book: book),
+            rawPathParams: {'bookId': bookId});
 
-  MyBookRoute.fromMatch(_i1.RouteMatch match)
-      : key = null,
-        bookId = match.pathParams.getString('bookId'),
-        book = null,
-        super.fromMatch(match);
+  static const String name = 'MyBookRoute';
+}
+
+class MyBookRouteArgs {
+  const MyBookRouteArgs({this.key, this.bookId, this.book});
 
   final _i2.Key key;
 
   final String bookId;
 
   final _i27.Book book;
-
-  static const String name = 'MyBookRoute';
 }
 
-class DashboardSettingsRoute extends _i1.PageRouteInfo {
-  DashboardSettingsRoute({this.key, this.showAppBar = true})
-      : super(name, path: '');
-
-  DashboardSettingsRoute.fromMatch(_i1.RouteMatch match)
-      : key = null,
-        showAppBar = match.pathParams.getBool('showAppBar'),
-        super.fromMatch(match);
-
-  final _i2.Key key;
-
-  final bool showAppBar;
+class DashboardSettingsRoute
+    extends _i1.PageRouteInfo<DashboardSettingsRouteArgs> {
+  DashboardSettingsRoute({_i2.Key key, bool showAppBar})
+      : super(name,
+            path: '',
+            args: DashboardSettingsRouteArgs(key: key, showAppBar: showAppBar));
 
   static const String name = 'DashboardSettingsRoute';
 }
 
+class DashboardSettingsRouteArgs {
+  const DashboardSettingsRouteArgs({this.key, this.showAppBar});
+
+  final _i2.Key key;
+
+  final bool showAppBar;
+}
+
 class DeleteAccountRoute extends _i1.PageRouteInfo {
   const DeleteAccountRoute() : super(name, path: 'delete/account');
-
-  DeleteAccountRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
 
   static const String name = 'DeleteAccountRoute';
 }
@@ -535,16 +503,11 @@ class AccountUpdateDeepRoute extends _i1.PageRouteInfo {
   const AccountUpdateDeepRoute({List<_i1.PageRouteInfo> children})
       : super(name, path: 'update', initialChildren: children);
 
-  AccountUpdateDeepRoute.fromMatch(_i1.RouteMatch match)
-      : super.fromMatch(match);
-
   static const String name = 'AccountUpdateDeepRoute';
 }
 
 class UpdateEmailRoute extends _i1.PageRouteInfo {
   const UpdateEmailRoute() : super(name, path: 'email');
-
-  UpdateEmailRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
 
   static const String name = 'UpdateEmailRoute';
 }
@@ -552,23 +515,17 @@ class UpdateEmailRoute extends _i1.PageRouteInfo {
 class UpdatePasswordRoute extends _i1.PageRouteInfo {
   const UpdatePasswordRoute() : super(name, path: 'password');
 
-  UpdatePasswordRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
-
   static const String name = 'UpdatePasswordRoute';
 }
 
 class UpdateUsernameRoute extends _i1.PageRouteInfo {
   const UpdateUsernameRoute() : super(name, path: 'username');
 
-  UpdateUsernameRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
-
   static const String name = 'UpdateUsernameRoute';
 }
 
 class GitHubRoute extends _i1.PageRouteInfo {
   const GitHubRoute() : super(name, path: 'github');
-
-  GitHubRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
 
   static const String name = 'GitHubRoute';
 }

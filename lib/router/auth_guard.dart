@@ -4,22 +4,20 @@ import 'package:auto_route/auto_route.dart';
 
 class AuthGuard extends AutoRouteGuard {
   @override
-  Future<bool> canNavigate(
-    List<PageRouteInfo> pendingRoutes,
-    StackRouter router,
-  ) async {
+  void onNavigation(NavigationResolver resolver, StackRouter router) async {
     if (stateUser.isUserConnected) {
-      return true;
+      resolver.next(true);
+      return;
     }
 
     router.root.push(
       SigninRoute(onSigninResult: (isAuthenticated) {
         if (isAuthenticated) {
-          router.replaceAll(pendingRoutes);
+          router.replaceAll(
+            resolver.pendingRoutes.map((route) => route.toRoute()).toList(),
+          );
         }
       }),
     );
-
-    return false;
   }
 }

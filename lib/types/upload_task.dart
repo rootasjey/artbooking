@@ -1,10 +1,10 @@
 import 'package:artbooking/types/illustration/illustration.dart';
-import 'package:firebase/firebase.dart' as fb;
 
 class UploadTask {
   Uri imageUrl;
   bool isExpanded;
-  fb.UploadTask task;
+  // fb.UploadTask task;
+  Object task;
   String filename;
   Illustration illustration;
 

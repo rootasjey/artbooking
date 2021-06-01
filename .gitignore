@@ -120,3 +120,4 @@ android/.idea
 firebase.json
 ios/Runner/GoogleService-Info.plist
 .firebase/
+macos/Runner/GoogleService-Info.plist

@@ -123,7 +123,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     FontWeight fontWeight = FontWeight.w400;
 
                     if (item.destination.fullPath ==
-                        router.current?.route?.fullPath) {
+                        router.current?.route?.path) {
                       color = item.hoverColor;
                       textColor = stateColors.foreground;
                       fontWeight = FontWeight.w600;

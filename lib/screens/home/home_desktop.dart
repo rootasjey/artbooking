@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:artbooking/components/desktop_app_bar.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';

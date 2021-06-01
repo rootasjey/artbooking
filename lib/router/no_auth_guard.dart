@@ -4,15 +4,12 @@ import 'package:auto_route/auto_route.dart';
 
 class NoAuthGuard extends AutoRouteGuard {
   @override
-  Future<bool> canNavigate(
-    List<PageRouteInfo> pendingRoutes,
-    StackRouter router,
-  ) async {
+  void onNavigation(NavigationResolver resolver, StackRouter router) async {
     if (!stateUser.isUserConnected) {
-      return true;
+      resolver.next(true);
+      return;
     }
 
     router.root.replace(HomeRoute());
-    return false;
   }
 }

@@ -1,19 +1,11 @@
-import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/default_app_bar.dart';
 import 'package:artbooking/components/illustration_card.dart';
 import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/enums.dart';
-import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/upload_task.dart';
-import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/snack.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase/firebase.dart' as fb;
-import 'package:mime_type/mime_type.dart';
 import 'package:mobx/mobx.dart';
 import 'package:unicons/unicons.dart';
 
@@ -203,34 +195,35 @@ class _AddIllustrationState extends State<AddIllustration> {
   }
 
   Widget uploadProgress(uploadTask) {
-    return StreamBuilder<fb.UploadTaskSnapshot>(
-      stream: uploadTask.task.future.asStream(),
-      builder: (context, snapshot) {
-        Widget progressBar = Padding(padding: EdgeInsets.zero);
-        final event = snapshot?.data;
+    return Container();
+    // return StreamBuilder<fb.UploadTaskSnapshot>(
+    //   stream: uploadTask.task.future.asStream(),
+    //   builder: (context, snapshot) {
+    //     Widget progressBar = Padding(padding: EdgeInsets.zero);
+    //     final event = snapshot?.data;
 
-        double progressPercent =
-            event != null ? event.bytesTransferred / event.totalBytes * 100 : 0;
+    //     double progressPercent =
+    //         event != null ? event.bytesTransferred / event.totalBytes * 100 : 0;
 
-        if (snapshot.connectionState == ConnectionState.none) {
-          progressPercent = 0;
-        }
+    //     if (snapshot.connectionState == ConnectionState.none) {
+    //       progressPercent = 0;
+    //     }
 
-        if (progressPercent == 100) {
-        } else if (progressPercent > 0) {
-          progressBar = LinearProgressIndicator(
-            value: progressPercent,
-          );
-        }
+    //     if (progressPercent == 100) {
+    //     } else if (progressPercent > 0) {
+    //       progressBar = LinearProgressIndicator(
+    //         value: progressPercent,
+    //       );
+    //     }
 
-        return Stack(
-          children: <Widget>[
-            // uploadText(progressPercent),
-            progressBar,
-          ],
-        );
-      },
-    );
+    //     return Stack(
+    //       children: <Widget>[
+    //         // uploadText(progressPercent),
+    //         progressBar,
+    //       ],
+    //     );
+    //   },
+    // );
   }
 
   Widget successImagesGrid() {
@@ -388,92 +381,92 @@ class _AddIllustrationState extends State<AddIllustration> {
   /// Upload file to firebase storage
   /// and updates [_uploadTask] to the latest file upload
   void uploadImage(PlatformFile imageFile) async {
-    try {
-      final userAuth = FirebaseAuth.instance.currentUser;
+    // try {
+    //   final userAuth = FirebaseAuth.instance.currentUser;
 
-      if (userAuth == null) {
-        throw Exception("User is not authenticated.");
-      }
+    //   if (userAuth == null) {
+    //     throw Exception("User is not authenticated.");
+    //   }
 
-      setState(() {
-        isLoading = true;
-      });
+    //   setState(() {
+    //     isLoading = true;
+    //   });
 
-      final result = await IllustrationsActions.createOne(
-        name: imageFile.name,
-        visibility: imageVisibility,
-      );
+    //   final result = await IllustrationsActions.createOne(
+    //     name: imageFile.name,
+    //     visibility: imageVisibility,
+    //   );
 
-      if (!result.success) {
-        Snack.e(
-          context: context,
-          message: "There was an issue while uploading your image.",
-        );
+    //   if (!result.success) {
+    //     Snack.e(
+    //       context: context,
+    //       message: "There was an issue while uploading your image.",
+    //     );
 
-        setState(() {
-          isLoading = false;
-        });
+    //     setState(() {
+    //       isLoading = false;
+    //     });
 
-        return;
-      }
+    //     return;
+    //   }
 
-      final filePath = "users/${userAuth.uid}/images/${result.illustrationId}" +
-          "/original.${imageFile.extension}";
+    //   final filePath = "users/${userAuth.uid}/images/${result.illustrationId}" +
+    //       "/original.${imageFile.extension}";
 
-      final storage = fb.storage();
-      final fileRef = storage.ref(filePath);
+    //   // final storage = fb.storage();
+    //   // final fileRef = storage.ref(filePath);
 
-      final task = fileRef.put(
-        imageFile.bytes,
-        fb.UploadMetadata(
-          contentType: mimeFromExtension(imageFile.extension),
-          customMetadata: {
-            'extension': imageFile.extension,
-            'firestoreId': result.illustrationId,
-            'userId': userAuth.uid,
-            'visibility': Illustration.visibilityPropToString(imageVisibility),
-          },
-        ),
-      );
+    //   // final task = fileRef.put(
+    //   //   imageFile.bytes,
+    //   //   fb.UploadMetadata(
+    //   //     contentType: mimeFromExtension(imageFile.extension),
+    //   //     customMetadata: {
+    //   //       'extension': imageFile.extension,
+    //   //       'firestoreId': result.illustrationId,
+    //   //       'userId': userAuth.uid,
+    //   //       'visibility': Illustration.visibilityPropToString(imageVisibility),
+    //   //     },
+    //   //   ),
+    //   // );
 
-      final uploadTask = UploadTask(
-        filename: imageFile.name,
-        task: task,
-      );
+    //   // final uploadTask = UploadTask(
+    //   //   filename: imageFile.name,
+    //   //   task: task,
+    //   // );
 
-      setState(() {
-        uploadTasks.add(uploadTask);
-      });
+    //   // setState(() {
+    //   //   uploadTasks.add(uploadTask);
+    //   // });
 
-      task.future.asStream().listen((uploadTaskSnapshot) {}, onDone: () async {
-        final doc = await FirebaseFirestore.instance
-            .collection('illustrations')
-            .doc(result.illustrationId)
-            .get();
+    //   task.future.asStream().listen((uploadTaskSnapshot) {}, onDone: () async {
+    //     final doc = await FirebaseFirestore.instance
+    //         .collection('illustrations')
+    //         .doc(result.illustrationId)
+    //         .get();
 
-        final data = doc.data();
-        if (data == null) {
-          return;
-        }
+    //     final data = doc.data();
+    //     if (data == null) {
+    //       return;
+    //     }
 
-        data['id'] = doc.id;
-        uploadTask.illustration = Illustration.fromJSON(data);
+    //     data['id'] = doc.id;
+    //     uploadTask.illustration = Illustration.fromJSON(data);
 
-        final uri = await task.snapshot.ref.getDownloadURL();
-        uploadTask.illustration.urls.original = uri.toString();
+    //     final uri = await task.snapshot.ref.getDownloadURL();
+    //     uploadTask.illustration.urls.original = uri.toString();
 
-        setState(() {
-          uploadTasks.remove(uploadTask);
-          doneTasks.add(uploadTask);
-          isLoading = uploadTasks.isNotEmpty;
-        });
-      }, onError: (error) {
-        appLogger.e(error);
-      });
-    } catch (error) {
-      appLogger.e(error);
-      setState(() => isLoading = false);
-    }
+    //     setState(() {
+    //       uploadTasks.remove(uploadTask);
+    //       doneTasks.add(uploadTask);
+    //       isLoading = uploadTasks.isNotEmpty;
+    //     });
+    //   }, onError: (error) {
+    //     appLogger.e(error);
+    //   });
+    // } catch (error) {
+    //   appLogger.e(error);
+    //   setState(() => isLoading = false);
+    // }
   }
 
   void checkUploadQueue() {

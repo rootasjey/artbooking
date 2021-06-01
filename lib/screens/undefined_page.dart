@@ -117,7 +117,7 @@ class _UndefinedPageState extends State<UndefinedPage> {
             ),
             children: [
               TextSpan(
-                text: '${context.route.match}',
+                text: '${context.router.current.path}',
                 style: TextStyle(
                   color: stateColors.secondary,
                   fontWeight: FontWeight.w700,
