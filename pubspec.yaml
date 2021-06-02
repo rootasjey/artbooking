@@ -33,6 +33,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: 1.0.2
   easy_localization: 3.0.0
+  extended_image: 4.1.0
   file_picker: 3.0.1
   file_picker_cross: 4.3.2
   firebase_analytics: 7.1.1
@@ -45,6 +46,8 @@ dependencies:
   flutter_mobx: 2.0.0-nullsafety.3
   font_awesome_flutter: 9.0.0
   google_fonts: 2.0.0
+  image: 3.0.2
+  image_editor: 1.0.0
   logger: 1.0.0
   introduction_screen: 2.0.0
   jiffy: 4.0.0
