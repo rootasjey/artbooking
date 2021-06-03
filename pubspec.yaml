@@ -23,6 +23,7 @@ environment:
 
 dependencies:
   adaptive_theme: 2.0.0
+  algolia: 1.0.1
   animations: 2.0.0
   auto_route:  2.2.0
   cloud_firestore: 2.0.0
