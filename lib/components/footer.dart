@@ -1,9 +1,15 @@
+import 'package:artbooking/components/app_icon.dart';
 import 'package:artbooking/router/app_router.gr.dart';
+import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
-import 'package:artbooking/utils/language.dart';
+import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Footer extends StatefulWidget {
@@ -24,62 +30,131 @@ class Footer extends StatefulWidget {
 class _FooterState extends State<Footer> {
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final width = MediaQuery.of(context).size.width;
+
+    final WrapAlignment alignment =
+        width < 700.0 ? WrapAlignment.spaceBetween : WrapAlignment.spaceAround;
+
+    return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 60.0,
         vertical: 90.0,
       ),
-      foregroundDecoration: BoxDecoration(
-        color: Color.fromRGBO(0, 0, 0, 0.1),
-      ),
       child: Wrap(
         runSpacing: 80.0,
-        alignment: WrapAlignment.spaceAround,
+        alignment: alignment,
         children: <Widget>[
-          languages(),
-          developers(),
-          resourcesLinks(),
+          Divider(
+            height: 20.0,
+            thickness: 1.0,
+            color: Colors.black38,
+          ),
+          copyright(),
+          editorial(),
+          user(),
+          aboutUs(),
         ],
       ),
     );
   }
 
-  Widget developers() {
+  Widget copyright() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(
-            bottom: 30.0,
-            left: 10.0,
-          ),
-          child: Opacity(
-            opacity: 0.5,
-            child: Text(
-              'DEVELOPERS',
-              style: TextStyle(
-                fontSize: 18.0,
-              ),
-            ),
-          ),
+      children: [
+        AppIcon(),
+        companyName(),
+        tos(),
+        privacyPolicy(),
+      ],
+    );
+  }
+
+  Widget aboutUs() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        titleSection(title: "about".tr().toUpperCase()),
+        textLink(
+          label: "about_us".tr(),
+          onPressed: () {
+            context.router.push(AboutPageRoute());
+          },
         ),
-        basicButtonLink(
-          textValue: 'Documentation',
+        textLink(
+          label: "contact_us".tr(),
+          onPressed: () {
+            context.router.push(ContactPageRoute());
+          },
         ),
-        basicButtonLink(
-          textValue: 'API References',
-        ),
-        basicButtonLink(
-          textValue: 'API Status',
-        ),
-        basicButtonLink(
-          textValue: 'GitHub',
-          onTap: () async {
-            onBeforeNav();
-            await launch('https://github.com/rootasjey/artbooking');
+        textLink(
+          label: "GitHub",
+          onPressed: () {
+            launch('https://github.com/rootasjey/rootasjey.dev');
           },
         ),
       ],
+    );
+  }
+
+  Widget editorial() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        titleSection(title: "editorial".tr().toUpperCase()),
+        textLink(
+          label: "illustrations".tr(),
+          onPressed: () {
+            context.router.push(IllustrationsPageRoute());
+          },
+        ),
+        // textLink(
+        //   label: "books".tr(),
+        //   onPressed: () {
+        //     context.router.push(BooksPageRoute());
+        //   },
+        // ),
+        // textLink(
+        //   label: "challenges".tr(),
+        //   onPressed: () {
+        //     context.router.push(ChallengesPageRoute());
+        //   },
+        // ),
+      ],
+    );
+  }
+
+  Widget companyName() {
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 8.0,
+        bottom: 8.0,
+      ),
+      child: Text.rich(TextSpan(
+        children: [
+          TextSpan(
+            text: "rootasjey ${DateTime.now().year}",
+            style: FontsUtils.mainStyle(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          WidgetSpan(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 4.0),
+              child: Opacity(
+                opacity: 0.6,
+                child: Icon(
+                  UniconsLine.copyright,
+                  size: 18.0,
+                ),
+              ),
+            ),
+          ),
+          TextSpan(
+            text: "\nby Jeremie Codes, SASU",
+          ),
+        ],
+      )),
     );
   }
 
@@ -87,34 +162,16 @@ class _FooterState extends State<Footer> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(
-            bottom: 30.0,
-            left: 10.0,
-          ),
-          child: Opacity(
-            opacity: 0.5,
-            child: Text(
-              'LANGUAGE',
-              style: TextStyle(
-                fontSize: 18.0,
-              ),
-            ),
-          ),
-        ),
-        basicButtonLink(
-          textValue: 'English',
-          onTap: () {
-            onBeforeNav();
-            Language.setLang(Language.en);
+        titleSection(title: "language".tr().toUpperCase()),
+        textLink(
+          label: 'English',
+          onPressed: () async {
             updateUserAccountLang();
           },
         ),
-        basicButtonLink(
-          textValue: 'Français',
-          onTap: () {
-            onBeforeNav();
-            Language.setLang(Language.fr);
+        textLink(
+          label: 'Français',
+          onPressed: () async {
             updateUserAccountLang();
           },
         ),
@@ -122,74 +179,110 @@ class _FooterState extends State<Footer> {
     );
   }
 
-  Widget basicButtonLink({Function onTap, @required String textValue}) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 10.0,
-          vertical: 6.0,
-        ),
-        decoration: ShapeDecoration(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(8.0),
-            ),
-            // side: BorderSide(),
-          ),
-        ),
-        child: Opacity(
-          opacity: onTap != null ? 0.7 : 0.3,
-          child: Text(
-            textValue,
-            style: TextStyle(
-              fontSize: 15.0,
-              fontWeight: FontWeight.w600,
-            ),
+  Widget privacyPolicy() {
+    return textLink(
+      label: "privacy".tr(),
+      onPressed: () {
+        context.router.push(TosPageRoute());
+      },
+    );
+  }
+
+  Widget titleSection({@required title}) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 8.0,
+        bottom: 8.0,
+      ),
+      child: Opacity(
+        opacity: 0.8,
+        child: Text(
+          title,
+          style: FontsUtils.mainStyle(
+            fontSize: 18.0,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),
     );
   }
 
-  Widget resourcesLinks() {
+  Widget textLink({
+    VoidCallback onPressed,
+    String heroTag,
+    @required String label,
+  }) {
+    final Widget text = Text(
+      label,
+      style: FontsUtils.mainStyle(
+        fontSize: 16.0,
+        fontWeight: FontWeight.w400,
+      ),
+    );
+
+    final Widget textContainer = heroTag != null
+        ? Hero(
+            tag: label,
+            child: text,
+          )
+        : text;
+
+    return TextButton(
+      onPressed: onPressed,
+      child: Opacity(
+        opacity: 0.5,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: textContainer,
+        ),
+      ),
+      style: TextButton.styleFrom(
+        primary: stateColors.foreground,
+      ),
+    );
+  }
+
+  Widget tos() {
+    return textLink(
+      label: "tos".tr(),
+      heroTag: "tos_hero",
+      onPressed: () {
+        context.router.push(TosPageRoute());
+      },
+    );
+  }
+
+  Widget user() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(
-            bottom: 30.0,
-            left: 10.0,
-          ),
-          child: Opacity(
-            opacity: 0.5,
-            child: Text(
-              'RESOURCES',
-              style: TextStyle(
-                fontSize: 18.0,
-              ),
-            ),
-          ),
-        ),
-        basicButtonLink(
-          textValue: 'About',
-          onTap: () {
-            onBeforeNav();
-            context.router.root.push(AboutRoute());
+      children: [
+        titleSection(title: "user".tr().toUpperCase()),
+        textLink(
+            label: "signin".tr(),
+            onPressed: () {
+              context.router.push(SigninPageRoute());
+            }),
+        textLink(
+          label: "signup".tr(),
+          onPressed: () {
+            context.router.push(SignupPageRoute());
           },
         ),
-        basicButtonLink(
-          textValue: 'Contact',
-          onTap: () {
-            onBeforeNav();
-            context.router.root.push(ContactRoute());
-          },
-        ),
-        basicButtonLink(
-          textValue: 'Privacy & Terms',
-          onTap: () {
-            onBeforeNav();
-            context.router.root.push(TosRoute());
+        textLink(
+          label: "settings".tr(),
+          onPressed: () {
+            if (stateUser.isUserConnected) {
+              context.router.push(
+                DashboardPageRoute(
+                  children: [DashSettingsRoute()],
+                ),
+              );
+              return;
+            }
+
+            context.router.push(
+              SettingsPageRoute(),
+            );
           },
         ),
       ],
@@ -204,27 +297,39 @@ class _FooterState extends State<Footer> {
         curve: Curves.easeOut,
       );
     } else if (widget.autoNavToHome) {
-      context.router.root.navigate(HomeRoute());
+      context.router.push(HomePageRoute());
     }
 
     Snack.s(
       context: context,
-      message: 'Your language has been successfully updated.',
+      message: "language_update_success".tr(),
     );
   }
 
-  void onBeforeNav() {
-    if (widget.closeModalOnNav) {
-      context.router.pop();
-    }
-  }
-
   void updateUserAccountLang() async {
-    final userAuth = stateUser.userAuth;
+    final userAuth = FirebaseAuth.instance.currentUser;
 
     if (userAuth == null) {
       notifyLangSuccess();
       return;
+    }
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userAuth.uid)
+          .update({
+        'lang': stateUser.lang,
+      });
+
+      notifyLangSuccess();
+    } catch (error) {
+      debugPrint(error.toString());
+
+      Snack.e(
+        context: context,
+        message: "language_update_error".tr(),
+      );
     }
   }
 }

@@ -18,6 +18,15 @@ class UserBooksStats {
     this.owned = 0,
   });
 
+  factory UserBooksStats.empty() {
+    return UserBooksStats(
+      created: 0,
+      deleted: 0,
+      fav: 0,
+      owned: 0,
+    );
+  }
+
   factory UserBooksStats.fromJSON(Map<String, dynamic> data) {
     return UserBooksStats(
       created: data['created'],

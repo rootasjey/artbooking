@@ -1,4 +1,4 @@
-import 'package:artbooking/components/desktop_app_bar.dart';
+import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/components/side_menu_item.dart';
 import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/router/app_router.gr.dart';
@@ -17,19 +17,19 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   final _sideMenuItems = <SideMenuItem>[
     SideMenuItem(
-      destination: MyActivityRoute(),
+      destination: MyActivityPageRoute(),
       iconData: UniconsLine.chart_pie,
       label: 'Activity',
       hoverColor: Colors.red,
     ),
     SideMenuItem(
-      destination: MyIllustrationsRoute(),
+      destination: MyIllustrationsPageRoute(),
       iconData: UniconsLine.picture,
       label: 'Illustrations',
       hoverColor: Colors.red,
     ),
     SideMenuItem(
-      destination: MyBooksDeepRoute(),
+      destination: MyBooksPageRoute(),
       iconData: UniconsLine.book_alt,
       label: 'Books',
       hoverColor: Colors.blue.shade700,
@@ -53,9 +53,7 @@ class _DashboardPageState extends State<DashboardPage> {
     //   hoverColor: Colors.yellow.shade800,
     // ),
     SideMenuItem(
-      destination: DashboardSettingsDeepRoute(
-        children: [DashboardSettingsRoute()],
-      ),
+      destination: DashSettingsRouter(),
       iconData: UniconsLine.setting,
       label: 'Settings',
       hoverColor: Colors.blueGrey,
@@ -105,11 +103,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   top: 20.0,
                   bottom: 50.0,
                 ),
-                sliver: DesktopAppBar(
-                  showAppIcon: false,
-                  automaticallyImplyLeading: false,
-                  leftPaddingFirstDropdown: 0,
-                ),
+                sliver: MainAppBar(),
               ),
               SliverPadding(
                 padding: const EdgeInsets.symmetric(
@@ -163,7 +157,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 appUploadManager.pickImage(context);
               },
               style: ElevatedButton.styleFrom(
-                primary: stateColors.accent,
+                primary: stateColors.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(
                     Radius.circular(30.0),

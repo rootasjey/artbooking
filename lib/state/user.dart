@@ -246,7 +246,7 @@ abstract class StateUserBase with Store {
         return;
       }
 
-      context.router.root.navigate(HomeRoute());
+      context.router.root.navigate(HomePageRoute());
     }
   }
 

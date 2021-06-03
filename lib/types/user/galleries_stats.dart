@@ -22,6 +22,16 @@ class UserGalleriesStats {
     this.owned = 0,
   });
 
+  factory UserGalleriesStats.empty() {
+    return UserGalleriesStats(
+      created: 0,
+      deleted: 0,
+      entered: 0,
+      opened: 0,
+      owned: 0,
+    );
+  }
+
   factory UserGalleriesStats.fromJSON(Map<String, dynamic> data) {
     return UserGalleriesStats(
       created: data['created'],

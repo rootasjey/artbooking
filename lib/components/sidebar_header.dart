@@ -1,5 +1,5 @@
 import 'package:artbooking/router/route_names.dart';
-import 'package:artbooking/screens/signin.dart';
+import 'package:artbooking/screens/signin_page.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -36,7 +36,7 @@ class _SideBarHeaderState extends State<SideBarHeader> {
         ElevatedButton(
           onPressed: () {
             Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => Signin()));
+                .push(MaterialPageRoute(builder: (_) => SigninPage()));
           },
           style: ElevatedButton.styleFrom(
             primary: Colors.black12,

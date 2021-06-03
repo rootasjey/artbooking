@@ -1,4 +1,4 @@
-import 'package:artbooking/components/desktop_app_bar.dart';
+import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:auto_route/auto_route.dart';
@@ -15,7 +15,7 @@ class _UndefinedPageState extends State<UndefinedPage> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          DesktopAppBar(),
+          MainAppBar(),
           SliverPadding(
             padding: const EdgeInsets.only(top: 60.0),
             sliver: SliverList(
@@ -94,7 +94,7 @@ class _UndefinedPageState extends State<UndefinedPage> {
 
   Widget navButton() {
     return TextButton.icon(
-      onPressed: () => context.router.navigate(HomeRoute()),
+      onPressed: () => context.router.navigate(HomePageRoute()),
       icon: Icon(Icons.arrow_back),
       label: Padding(
         padding: const EdgeInsets.all(8.0),

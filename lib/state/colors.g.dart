@@ -9,36 +9,6 @@ part of 'colors.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$StateColors on StateColorsBase, Store {
-  final _$accentAtom = Atom(name: 'StateColorsBase.accent');
-
-  @override
-  Color get accent {
-    _$accentAtom.reportRead();
-    return super.accent;
-  }
-
-  @override
-  set accent(Color value) {
-    _$accentAtom.reportWrite(value, super.accent, () {
-      super.accent = value;
-    });
-  }
-
-  final _$appBackgroundAtom = Atom(name: 'StateColorsBase.appBackground');
-
-  @override
-  Color get appBackground {
-    _$appBackgroundAtom.reportRead();
-    return super.appBackground;
-  }
-
-  @override
-  set appBackground(Color value) {
-    _$appBackgroundAtom.reportWrite(value, super.appBackground, () {
-      super.appBackground = value;
-    });
-  }
-
   final _$backgroundAtom = Atom(name: 'StateColorsBase.background');
 
   @override
@@ -69,64 +39,38 @@ mixin _$StateColors on StateColorsBase, Store {
     });
   }
 
-  final _$tileBackgroundAtom = Atom(name: 'StateColorsBase.tileBackground');
+  final _$primaryAtom = Atom(name: 'StateColorsBase.primary');
 
   @override
-  Color get tileBackground {
-    _$tileBackgroundAtom.reportRead();
-    return super.tileBackground;
+  Color get primary {
+    _$primaryAtom.reportRead();
+    return super.primary;
   }
 
   @override
-  set tileBackground(Color value) {
-    _$tileBackgroundAtom.reportWrite(value, super.tileBackground, () {
-      super.tileBackground = value;
+  set primary(Color value) {
+    _$primaryAtom.reportWrite(value, super.primary, () {
+      super.primary = value;
     });
   }
 
-  final _$iconExtAtom = Atom(name: 'StateColorsBase.iconExt');
+  final _$secondaryAtom = Atom(name: 'StateColorsBase.secondary');
 
   @override
-  String get iconExt {
-    _$iconExtAtom.reportRead();
-    return super.iconExt;
+  Color get secondary {
+    _$secondaryAtom.reportRead();
+    return super.secondary;
   }
 
   @override
-  set iconExt(String value) {
-    _$iconExtAtom.reportWrite(value, super.iconExt, () {
-      super.iconExt = value;
-    });
-  }
-
-  final _$softBackgroundAtom = Atom(name: 'StateColorsBase.softBackground');
-
-  @override
-  Color get softBackground {
-    _$softBackgroundAtom.reportRead();
-    return super.softBackground;
-  }
-
-  @override
-  set softBackground(Color value) {
-    _$softBackgroundAtom.reportWrite(value, super.softBackground, () {
-      super.softBackground = value;
+  set secondary(Color value) {
+    _$secondaryAtom.reportWrite(value, super.secondary, () {
+      super.secondary = value;
     });
   }
 
   final _$StateColorsBaseActionController =
       ActionController(name: 'StateColorsBase');
-
-  @override
-  void setAccentColor(Color color) {
-    final _$actionInfo = _$StateColorsBaseActionController.startAction(
-        name: 'StateColorsBase.setAccentColor');
-    try {
-      return super.setAccentColor(color);
-    } finally {
-      _$StateColorsBaseActionController.endAction(_$actionInfo);
-    }
-  }
 
   @override
   void refreshTheme(Brightness brightness) {
@@ -140,15 +84,34 @@ mixin _$StateColors on StateColorsBase, Store {
   }
 
   @override
+  void setPrimaryColor(Color color) {
+    final _$actionInfo = _$StateColorsBaseActionController.startAction(
+        name: 'StateColorsBase.setPrimaryColor');
+    try {
+      return super.setPrimaryColor(color);
+    } finally {
+      _$StateColorsBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setSecondaryColor(Color color) {
+    final _$actionInfo = _$StateColorsBaseActionController.startAction(
+        name: 'StateColorsBase.setSecondaryColor');
+    try {
+      return super.setSecondaryColor(color);
+    } finally {
+      _$StateColorsBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
-accent: ${accent},
-appBackground: ${appBackground},
 background: ${background},
 foreground: ${foreground},
-tileBackground: ${tileBackground},
-iconExt: ${iconExt},
-softBackground: ${softBackground}
+primary: ${primary},
+secondary: ${secondary}
     ''';
   }
 }

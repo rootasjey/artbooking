@@ -22,6 +22,16 @@ class UserIllustrationsStats {
     this.updated = 0,
   });
 
+  factory UserIllustrationsStats.empty() {
+    return UserIllustrationsStats(
+      created: 0,
+      deleted: 0,
+      fav: 0,
+      owned: 0,
+      updated: 0,
+    );
+  }
+
   factory UserIllustrationsStats.fromJSON(Map<String, dynamic> data) {
     return UserIllustrationsStats(
       created: data['created'],

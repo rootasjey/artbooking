@@ -12,7 +12,7 @@ class BooksActions {
     @required List<String> illustrationIds,
   }) async {
     try {
-      final response = await CloudHelper.fun('books-addIllustrations').call({
+      final response = await Cloud.fun('books-addIllustrations').call({
         'bookId': bookId,
         'illustrationIds': illustrationIds,
       });
@@ -33,7 +33,7 @@ class BooksActions {
     List<String> illustrationIds = const [],
   }) async {
     try {
-      final response = await CloudHelper.fun('books-createOne').call({
+      final response = await Cloud.fun('books-createOne').call({
         'name': name,
         'description': description,
         'illustrationIds': illustrationIds,
@@ -53,7 +53,7 @@ class BooksActions {
     @required String bookId,
   }) async {
     try {
-      final response = await CloudHelper.fun('books-deleteOne').call({
+      final response = await Cloud.fun('books-deleteOne').call({
         'bookId': bookId,
       });
 
@@ -71,7 +71,7 @@ class BooksActions {
     @required List<String> bookIds,
   }) async {
     try {
-      final response = await CloudHelper.fun('books-deleteMany').call({
+      final response = await Cloud.fun('books-deleteMany').call({
         'bookIds': bookIds,
       });
 
@@ -90,7 +90,7 @@ class BooksActions {
     @required List<String> illustrationIds,
   }) async {
     try {
-      final response = await CloudHelper.fun('books-removeIllustrations').call({
+      final response = await Cloud.fun('books-removeIllustrations').call({
         'bookId': bookId,
         'illustrationIds': illustrationIds,
       });

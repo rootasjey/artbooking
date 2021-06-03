@@ -9,6 +9,13 @@ class UserStorageStats {
 
   UserStorageStats({this.illustrations, this.videos});
 
+  factory UserStorageStats.empty() {
+    return UserStorageStats(
+      illustrations: StorageStatsItem.empty(),
+      videos: StorageStatsItem.empty(),
+    );
+  }
+
   factory UserStorageStats.fromJSON(Map<String, dynamic> data) {
     return UserStorageStats(
       illustrations: StorageStatsItem.fromJSON(data['illustrations']),

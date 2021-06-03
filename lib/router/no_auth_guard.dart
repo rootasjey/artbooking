@@ -10,6 +10,6 @@ class NoAuthGuard extends AutoRouteGuard {
       return;
     }
 
-    router.root.replace(HomeRoute());
+    router.root.replace(HomePageRoute());
   }
 }

@@ -26,6 +26,17 @@ class UserChallengesStats {
     this.won = 0,
   });
 
+  factory UserChallengesStats.empty() {
+    return UserChallengesStats(
+      created: 0,
+      deleted: 0,
+      entered: 0,
+      owned: 0,
+      participating: 0,
+      won: 0,
+    );
+  }
+
   factory UserChallengesStats.fromJSON(Map<String, dynamic> data) {
     return UserChallengesStats(
       created: data['created'],

@@ -353,7 +353,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     }
 
     context.router.push(
-      MyBookRoute(
+      DashBookPage(
         bookId: widget.book.id,
         book: widget.book,
       ),

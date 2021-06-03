@@ -38,6 +38,6 @@ class _AppIconState extends State<AppIcon> {
   }
 
   void defaultOnTap() {
-    context.router.root.navigate(HomeRoute());
+    context.router.root.navigate(HomePageRoute());
   }
 }

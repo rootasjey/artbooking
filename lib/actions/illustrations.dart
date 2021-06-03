@@ -14,7 +14,7 @@ class IllustrationsActions {
     ContentVisibility visibility = ContentVisibility.private,
   }) async {
     try {
-      final response = await CloudHelper.fun('illustrations-createOne').call({
+      final response = await Cloud.fun('illustrations-createOne').call({
         'name': name,
         'visibility': Illustration.visibilityPropToString(visibility),
       });
@@ -33,7 +33,7 @@ class IllustrationsActions {
     @required String illustrationId,
   }) async {
     try {
-      final response = await CloudHelper.fun('illustrations-deleteOne').call({
+      final response = await Cloud.fun('illustrations-deleteOne').call({
         'illustrationId': illustrationId,
       });
 
@@ -51,7 +51,7 @@ class IllustrationsActions {
     @required List<String> illustrationIds,
   }) async {
     try {
-      final response = await CloudHelper.fun('illustrations-deleteMany').call({
+      final response = await Cloud.fun('illustrations-deleteMany').call({
         'illustrationIds': illustrationIds,
       });
 
@@ -74,8 +74,7 @@ class IllustrationsActions {
     @required Illustration illustration,
   }) async {
     try {
-      final response =
-          await CloudHelper.fun('illustrations-updateMetadata').call({
+      final response = await Cloud.fun('illustrations-updateMetadata').call({
         'illustrationId': illustration.id,
         'name': name,
         'description': description,

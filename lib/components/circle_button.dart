@@ -5,6 +5,8 @@ class CircleButton extends StatelessWidget {
   /// Tap callback.
   final VoidCallback onTap;
 
+  final String tooltip;
+
   /// Typically an Icon.
   final Widget icon;
 
@@ -22,6 +24,7 @@ class CircleButton extends StatelessWidget {
     this.radius = 20.0,
     this.elevation = 0.0,
     this.backgroundColor = Colors.black12,
+    this.tooltip = "Close",
   });
 
   @override
@@ -31,13 +34,16 @@ class CircleButton extends StatelessWidget {
       clipBehavior: Clip.hardEdge,
       color: Colors.transparent,
       elevation: elevation,
-      child: Ink(
-        child: InkWell(
-          onTap: onTap,
-          child: CircleAvatar(
-            child: icon,
-            backgroundColor: backgroundColor,
-            radius: radius,
+      child: Tooltip(
+        message: tooltip,
+        child: Ink(
+          child: InkWell(
+            onTap: onTap,
+            child: CircleAvatar(
+              child: icon,
+              backgroundColor: backgroundColor,
+              radius: radius,
+            ),
           ),
         ),
       ),

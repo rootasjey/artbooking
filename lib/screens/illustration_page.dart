@@ -1,8 +1,7 @@
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
-import 'package:artbooking/components/desktop_app_bar.dart';
 import 'package:artbooking/components/fade_in_y.dart';
-import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/license.dart';
@@ -79,7 +78,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
           NotificationListener(
             child: CustomScrollView(
               slivers: [
-                DesktopAppBar(),
+                MainAppBar(),
                 body(),
                 SliverPadding(
                   padding: const EdgeInsets.only(
@@ -275,7 +274,6 @@ class _IllustrationPageState extends State<IllustrationPage> {
         beginY: 12.0,
         child: Material(
           elevation: 4.0,
-          color: stateColors.softBackground,
           child: Container(
             color: Color.fromRGBO(0, 0, 0, 0.2),
             padding: const EdgeInsets.all(16.0),

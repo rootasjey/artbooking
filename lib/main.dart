@@ -6,7 +6,6 @@ import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/app_storage.dart';
-import 'package:artbooking/utils/brightness.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -28,11 +27,11 @@ void main() async {
   await Future.wait([_autoLogin(), _initLang()]);
   await EasyLocalization.ensureInitialized();
 
-  final brightness = BrightnessUtils.getCurrent();
+  // final brightness = BrightnessUtils.getCurrent();
 
-  final savedThemeMode = brightness == Brightness.dark
-      ? AdaptiveThemeMode.dark
-      : AdaptiveThemeMode.light;
+  // final savedThemeMode = brightness == Brightness.dark
+  //     ? AdaptiveThemeMode.dark
+  //     : AdaptiveThemeMode.light;
 
   setPathUrlStrategy();
 
@@ -42,8 +41,10 @@ void main() async {
       supportedLocales: [Locale('en'), Locale('fr')],
       fallbackLocale: Locale('en'),
       child: App(
-        savedThemeMode: savedThemeMode,
-        brightness: brightness,
+        // savedThemeMode: savedThemeMode,
+        savedThemeMode: AdaptiveThemeMode.light,
+        // brightness: brightness
+        brightness: Brightness.light,
       ),
     ),
   );
@@ -73,15 +74,18 @@ class AppState extends State<App> {
     return AdaptiveTheme(
       light: ThemeData(
         brightness: Brightness.light,
+        backgroundColor: stateColors.lightBackground,
+        scaffoldBackgroundColor: stateColors.lightBackground,
         fontFamily: GoogleFonts.raleway().fontFamily,
       ),
       dark: ThemeData(
         brightness: Brightness.dark,
         fontFamily: GoogleFonts.raleway().fontFamily,
       ),
-      initial: widget.brightness == Brightness.light
-          ? AdaptiveThemeMode.light
-          : AdaptiveThemeMode.dark,
+      initial: AdaptiveThemeMode.light,
+      // initial: widget.brightness == Brightness.light
+      //     ? AdaptiveThemeMode.light
+      //     : AdaptiveThemeMode.dark,
       builder: (theme, darkTheme) {
         stateColors.themeData = theme;
 
@@ -123,12 +127,13 @@ class _AppWithThemeState extends State<AppWithTheme> {
   initState() {
     super.initState();
     Future.delayed(250.milliseconds, () {
-      if (widget.brightness == Brightness.dark) {
-        AdaptiveTheme.of(context).setDark();
-        return;
-      }
-
       AdaptiveTheme.of(context).setLight();
+      // if (widget.brightness == Brightness.dark) {
+      //   // AdaptiveTheme.of(context).setDark();
+      //   return;
+      // }
+
+      // AdaptiveTheme.of(context).setLight();
     });
   }
 

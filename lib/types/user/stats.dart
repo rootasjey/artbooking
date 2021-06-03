@@ -25,6 +25,18 @@ class UserStats {
     this.storage,
   });
 
+  factory UserStats.empty() {
+    return UserStats(
+      books: UserBooksStats.empty(),
+      challenges: UserChallengesStats.empty(),
+      constests: UserContestsStats.empty(),
+      galleries: UserGalleriesStats.empty(),
+      illustrations: UserIllustrationsStats.empty(),
+      notifications: UserNotificationsStats.empty(),
+      storage: UserStorageStats.empty(),
+    );
+  }
+
   factory UserStats.fromJSON(Map<String, dynamic> data) {
     return UserStats(
       books: UserBooksStats.fromJSON(data['books']),

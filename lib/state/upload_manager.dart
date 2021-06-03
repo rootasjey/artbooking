@@ -1,5 +1,3 @@
-import 'package:artbooking/router/app_router.gr.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
@@ -27,15 +25,15 @@ abstract class UploadManagerBase with Store {
     // selectedFiles = pickerResult.files;
     setSelectedFiles(pickerResult.files);
 
-    if (context.router.current.name == AddIllustrationRoute.name) {
-      return;
-    }
+    // if (context.router.current.name == AddIllustrationRoute.name) {
+    //   return;
+    // }
 
-    context.router.root.push(
-      DashboardPageRoute(
-        children: [AddIllustrationRoute()],
-      ),
-    );
+    // context.router.root.push(
+    //   DashboardPageRoute(
+    //     children: [AddIllustrationRoute()],
+    //   ),
+    // );
   }
 
   @action
