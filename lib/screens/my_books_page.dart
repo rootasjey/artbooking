@@ -128,7 +128,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
             children: [
               Text(
                 "books".tr(),
-                style: FontsUtils.boldTitleStyle(),
+                style: FontsUtils.title(),
               ),
               if (isCreating)
                 Padding(

@@ -135,7 +135,7 @@ class _MyBookPageState extends State<MyBookPage> {
         delegate: SliverChildListDelegate.fixed([
           Text(
             bookName,
-            style: FontsUtils.boldTitleStyle(),
+            style: FontsUtils.title(),
           ),
           defaultActionsToolbar(),
           multiSelectToolbar(),

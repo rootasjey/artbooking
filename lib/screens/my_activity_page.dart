@@ -75,7 +75,7 @@ class _MyActivityPageState extends State<MyActivityPage> {
         children: [
           Text(
             "activity".tr(),
-            style: FontsUtils.boldTitleStyle(),
+            style: FontsUtils.title(),
           ),
         ],
       ),

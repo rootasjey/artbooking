@@ -41,19 +41,11 @@ class FontsUtils {
     Color color,
     TextDecoration decoration,
   }) {
-    return GoogleFonts.yellowtail(
+    return GoogleFonts.pacifico(
       fontSize: fontSize,
       fontWeight: fontWeight,
       height: height,
       decoration: decoration,
-    );
-  }
-
-  /// Return main text style for this app.
-  static TextStyle boldTitleStyle() {
-    return GoogleFonts.nunito(
-      fontSize: 80.0,
-      fontWeight: FontWeight.w700,
     );
   }
 }

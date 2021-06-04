@@ -115,7 +115,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
         delegate: SliverChildListDelegate.fixed([
           Text(
             'illustrations'.tr(),
-            style: FontsUtils.boldTitleStyle(),
+            style: FontsUtils.title(),
           ),
           defaultActionsToolbar(),
           multiSelectToolbar(),
