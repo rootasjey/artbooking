@@ -189,26 +189,15 @@ class _MainAppBarState extends State<MainAppBar> {
       children: [
         sectionButton(
           onPressed: () => context.router.root.push(IllustrationsRouter()),
-          text: "illustrations".tr().toUpperCase(),
+          text: "illustrations".tr(),
         ),
         sectionButton(
           onPressed: () => context.router.root.push(IllustrationsRouter()),
-          text: "contests".tr().toUpperCase(),
+          text: "books".tr(),
         ),
         sectionButton(
-          onPressed: () {
-            if (stateUser.isUserConnected) {
-              context.router.root.push(
-                DashboardPageRoute(
-                  children: [DashSettingsRouter()],
-                ),
-              );
-              return;
-            }
-
-            context.router.root.push(SettingsPageRoute());
-          },
-          text: "settings".tr().toUpperCase(),
+          onPressed: () => context.router.root.push(IllustrationsRouter()),
+          text: "contests".tr(),
         ),
         IconButton(
           onPressed: () {
@@ -230,16 +219,37 @@ class _MainAppBarState extends State<MainAppBar> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          TextButton(
-            onPressed: () {},
-            child: Text("Login"),
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: TextButton(
+              onPressed: () {},
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("signin".tr()),
+              ),
+              style: TextButton.styleFrom(
+                primary: stateColors.foreground,
+                textStyle: FontsUtils.mainStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {},
-            child: Text("Register"),
-            style: TextButton.styleFrom(
-              primary: Colors.white,
-              backgroundColor: Colors.deepPurple.shade900,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 10.0,
+              ),
+              child: Text("signup".tr()),
+            ),
+            style: ElevatedButton.styleFrom(
+              primary: Colors.black,
+              shape: RoundedRectangleBorder(),
+              textStyle: FontsUtils.mainStyle(
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -357,7 +367,7 @@ class _MainAppBarState extends State<MainAppBar> {
         child: Opacity(
           opacity: 0.8,
           child: Text(
-            text,
+            text.toUpperCase(),
             style: FontsUtils.mainStyle(
               color: stateColors.foreground,
               fontWeight: FontWeight.w600,
