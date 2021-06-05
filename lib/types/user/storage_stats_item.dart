@@ -1,6 +1,6 @@
 class StorageStatsItem {
-  double total;
-  double used;
+  int total;
+  int used;
 
   StorageStatsItem({
     this.total = 0,
