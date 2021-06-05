@@ -67,6 +67,7 @@ class _MainAppBarState extends State<MainAppBar> {
         right: 10.0,
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           addButton(),
@@ -74,7 +75,7 @@ class _MainAppBarState extends State<MainAppBar> {
             isSmall: isSmall,
             padding: const EdgeInsets.only(
               left: 12.0,
-              right: 20.0,
+              right: 12.0,
             ),
           ),
         ],
@@ -222,7 +223,7 @@ class _MainAppBarState extends State<MainAppBar> {
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
             child: TextButton(
-              onPressed: () {},
+              onPressed: () => context.router.push(SigninPageRoute()),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text("signin".tr()),
