@@ -328,7 +328,7 @@ class _MainAppBarState extends State<MainAppBar> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
-            AppIcon(),
+            AppIcon(size: 32.0),
             sectionsRow(isNarrow),
             userSpace(isNarrow),
           ],
