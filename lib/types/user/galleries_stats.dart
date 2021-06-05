@@ -33,6 +33,10 @@ class UserGalleriesStats {
   }
 
   factory UserGalleriesStats.fromJSON(Map<String, dynamic> data) {
+    if (data == null) {
+      return UserGalleriesStats.empty();
+    }
+
     return UserGalleriesStats(
       created: data['created'],
       deleted: data['deleted'],

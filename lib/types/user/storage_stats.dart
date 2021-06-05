@@ -17,6 +17,10 @@ class UserStorageStats {
   }
 
   factory UserStorageStats.fromJSON(Map<String, dynamic> data) {
+    if (data == null) {
+      return UserStorageStats.empty();
+    }
+
     return UserStorageStats(
       illustrations: StorageStatsItem.fromJSON(data['illustrations']),
       videos: StorageStatsItem.fromJSON(data['videos']),

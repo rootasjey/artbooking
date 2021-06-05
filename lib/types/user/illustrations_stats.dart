@@ -33,6 +33,10 @@ class UserIllustrationsStats {
   }
 
   factory UserIllustrationsStats.fromJSON(Map<String, dynamic> data) {
+    if (data == null) {
+      return UserIllustrationsStats.empty();
+    }
+
     return UserIllustrationsStats(
       created: data['created'],
       deleted: data['deleted'],

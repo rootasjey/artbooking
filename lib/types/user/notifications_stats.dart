@@ -18,6 +18,10 @@ class UserNotificationsStats {
   }
 
   factory UserNotificationsStats.fromJSON(Map<String, dynamic> data) {
+    if (data == null) {
+      return UserNotificationsStats.empty();
+    }
+
     return UserNotificationsStats(
       total: data['total'],
       unread: data['unread'],

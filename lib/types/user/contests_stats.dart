@@ -38,6 +38,10 @@ class UserContestsStats {
   }
 
   factory UserContestsStats.fromJSON(Map<String, dynamic> data) {
+    if (data == null) {
+      return UserContestsStats.empty();
+    }
+
     return UserContestsStats(
       created: data['created'],
       deleted: data['deleted'],

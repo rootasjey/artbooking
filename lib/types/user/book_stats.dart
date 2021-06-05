@@ -28,6 +28,10 @@ class UserBooksStats {
   }
 
   factory UserBooksStats.fromJSON(Map<String, dynamic> data) {
+    if (data == null) {
+      return UserBooksStats.empty();
+    }
+
     return UserBooksStats(
       created: data['created'],
       deleted: data['deleted'],
