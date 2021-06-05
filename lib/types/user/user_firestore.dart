@@ -104,4 +104,24 @@ class UserFirestore {
 
     return data;
   }
+
+  /// Return user's profile picture if any.
+  /// If [placeholder] is `true`, the method will return
+  /// a default picture if the user hasn't set one.
+  String getPP() {
+    final edited = pp.url.edited;
+    final original = pp.url.original;
+    final defaultUrl =
+        "https://img.icons8.com/plasticine/100/000000/flower.png";
+
+    if (edited != null && edited.isNotEmpty) {
+      return edited;
+    }
+
+    if (original != null && original.isNotEmpty) {
+      return original;
+    }
+
+    return defaultUrl;
+  }
 }
