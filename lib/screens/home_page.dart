@@ -3,6 +3,7 @@ import 'package:artbooking/components/landing_contact.dart';
 import 'package:artbooking/components/landing_curated.dart';
 import 'package:artbooking/components/landing_hero.dart';
 import 'package:artbooking/components/landing_quote.dart';
+import 'package:artbooking/components/landing_roadmap.dart';
 import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/state/colors.dart';
@@ -34,28 +35,33 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: floattingActionButton(),
-      body: NotificationListener<ScrollNotification>(
-        onNotification: onNotification,
-        child: CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            SliverEdgePadding(
-              padding: const EdgeInsets.only(top: 30.0),
-            ),
-            MainAppBar(),
-            SliverList(
-              delegate: SliverChildListDelegate.fixed([
-                LandingHero(),
-                LandingCurated(),
-                LandingQuote(),
-                // LandingInside(),
-                // LandingWorkUs(),
-                LandingContact(),
-                Footer(pageScrollController: _scrollController),
-              ]),
-            ),
-          ],
-        ),
+      body: Overlay(
+        initialEntries: [
+          OverlayEntry(builder: (context) {
+            return NotificationListener<ScrollNotification>(
+              onNotification: onNotification,
+              child: CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  SliverEdgePadding(
+                    padding: const EdgeInsets.only(top: 30.0),
+                  ),
+                  MainAppBar(),
+                  SliverList(
+                    delegate: SliverChildListDelegate.fixed([
+                      LandingHero(),
+                      LandingCurated(),
+                      LandingQuote(),
+                      LandingRoadmap(),
+                      LandingContact(),
+                      Footer(pageScrollController: _scrollController),
+                    ]),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
       ),
     );
   }
