@@ -441,6 +441,8 @@
   "responsive_layout_description": "Votre site web sera adapté pour les ordinateurs, tablettes et mobiles. Nous nous assurerons que la présentation soit parfaite.",
   "resources": "Ressources",
   "retry": "Réessayer",
+  "roadmap": "Roadmap",
+  "roadmap_description": "Vous pouvez suivre les fonctionnalités plannifiées pour les apps et services.",
   "route_undefined": "Le chemin {} est non-définie.",
   "route_undefined_quote": "Quand nous nous perdons, ce qui compte est de se retrouver.",
   "save": "Enregistrer",
