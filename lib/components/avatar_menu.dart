@@ -117,7 +117,7 @@ class AvatarMenu extends StatelessWidget {
         child: ListTile(
           leading: Icon(UniconsLine.books),
           title: Text(
-            "projects_my".tr(),
+            "books_my".tr(),
             style: FontsUtils.mainStyle(
               fontWeight: FontWeight.w400,
             ),
