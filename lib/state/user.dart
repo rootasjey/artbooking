@@ -207,6 +207,7 @@ abstract class StateUserBase with Store {
         _userAuth = null;
       });
 
+      await refreshUserRights();
       setUserConnected();
 
       appStorage.setCredentials(
@@ -217,8 +218,6 @@ abstract class StateUserBase with Store {
       appStorage.setUserName(_userAuth.displayName);
       // PushNotifications.linkAuthUser(_userAuth.uid);
       setEmail(email);
-
-      await refreshUserRights();
 
       return _userAuth;
     } catch (error) {
