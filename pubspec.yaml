@@ -60,6 +60,7 @@ dependencies:
   simple_animations: 3.0.3
   sticky_headers: 0.1.8+1
   supercharged: 2.0.0
+  timelines: 0.1.0
   unicons: 1.0.1
   url_launcher: 6.0.2
   url_strategy: 0.2.0
