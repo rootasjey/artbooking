@@ -89,6 +89,20 @@ class AvatarMenu extends StatelessWidget {
         ),
       ],
       PopupMenuItem(
+        value: DashboardPageRoute(
+          children: [MyActivityPageRoute()],
+        ),
+        child: ListTile(
+          leading: Icon(UniconsLine.chart_pie),
+          title: Text(
+            "activity_my".tr(),
+            style: FontsUtils.mainStyle(
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+      ),
+      PopupMenuItem(
         value: DashboardPageRoute(children: [
           DashIllustrationsRouter(
             children: [
