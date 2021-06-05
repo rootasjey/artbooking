@@ -27,7 +27,7 @@ class _AppIconState extends State<AppIcon> {
         hoverColor: Colors.transparent,
         onTap: widget.onTap ?? defaultOnTap,
         child: Image.asset(
-          'assets/images/app_icon/96.png',
+          'assets/images/app_icon/64.png',
           fit: BoxFit.cover,
           width: widget.size,
           height: widget.size,
