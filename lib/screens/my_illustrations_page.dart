@@ -2,6 +2,7 @@ import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/illustration_card.dart';
 import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
@@ -92,6 +93,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
         child: CustomScrollView(
           controller: scrollController,
           slivers: <Widget>[
+            SliverEdgePadding(),
             MainAppBar(),
             header(),
             body(),
@@ -109,13 +111,23 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   Widget header() {
     return SliverPadding(
       padding: const EdgeInsets.only(
+        top: 60.0,
         left: 50.0,
       ),
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
-          Text(
-            'illustrations'.tr(),
-            style: FontsUtils.title(),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Opacity(
+              opacity: 0.8,
+              child: Text(
+                'illustrations'.tr().toUpperCase(),
+                style: FontsUtils.mainStyle(
+                  fontSize: 30.0,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
           ),
           defaultActionsToolbar(),
           multiSelectToolbar(),
@@ -131,7 +143,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
           Padding(
             padding: const EdgeInsets.only(top: 100.0),
             child: AnimatedAppIcon(
-              textTitle: "loading_illustrations".tr(),
+              textTitle: "illustrations_loading".tr(),
             ),
           ),
         ]),
@@ -150,6 +162,11 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
       return Container();
     }
 
+    final buttonColor = Colors.black38;
+
+    final multiSelectColor =
+        forceMultiSelect ? stateColors.primary : buttonColor;
+
     return Wrap(
       spacing: 12.0,
       runSpacing: 12.0,
@@ -160,27 +177,42 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
               forceMultiSelect = !forceMultiSelect;
             });
           },
-          icon: Padding(
-            padding: const EdgeInsets.only(bottom: 6.0),
-            child: Icon(UniconsLine.layers_alt),
+          icon: Icon(UniconsLine.layers_alt),
+          label: Text("multi_select".tr()),
+          style: OutlinedButton.styleFrom(
+            primary: multiSelectColor,
+            shape: RoundedRectangleBorder(),
+            textStyle: FontsUtils.mainStyle(
+              fontWeight: FontWeight.w600,
+            ),
+            side: BorderSide(
+              width: 2.0,
+              color: buttonColor.withOpacity(0.2),
+            ),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 28.0,
+              vertical: 18.0,
+            ),
           ),
-          label: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Text("multi_select".tr()),
-          ),
-          style: forceMultiSelect
-              ? TextButton.styleFrom(primary: Colors.lightGreen)
-              : TextButton.styleFrom(),
         ),
         OutlinedButton.icon(
           onPressed: () {},
-          icon: Padding(
-            padding: const EdgeInsets.only(bottom: 6.0),
-            child: Icon(UniconsLine.sort),
-          ),
-          label: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Text("sort".tr()),
+          icon: Icon(UniconsLine.sort),
+          label: Text("sort".tr()),
+          style: OutlinedButton.styleFrom(
+            primary: Colors.black38,
+            shape: RoundedRectangleBorder(),
+            textStyle: FontsUtils.mainStyle(
+              fontWeight: FontWeight.w600,
+            ),
+            side: BorderSide(
+              width: 2.0,
+              color: buttonColor.withOpacity(0.2),
+            ),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 28.0,
+              vertical: 18.0,
+            ),
           ),
         ),
       ],
