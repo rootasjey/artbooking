@@ -55,48 +55,27 @@ class IllustrationCard extends StatefulWidget {
 
 class _IllustrationCardState extends State<IllustrationCard>
     with AnimationMixin {
-  Animation<double> scaleAnimation;
-  Animation<Offset> offsetAnimation;
-  Animation<double> opacity;
+  Animation<double> _scaleAnimation;
+  AnimationController _scaleController;
 
-  AnimationController captionController;
-  AnimationController offsetController;
-  AnimationController scaleController;
+  bool _showPopupMenu = false;
 
-  bool showCaption = false;
+  double _startElevation = 3.0;
+  double _endElevation = 6.0;
+  double _elevation = 4.0;
 
-  double initElevation = 4.0;
-  double size = 300.0;
-  double elevation = 4.0;
-  double scale = 1.0;
-
-  final keyboardFocusNode = FocusNode();
+  final _keyboardFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
 
-    size = widget.size;
-
-    captionController = createController();
-    captionController.duration = 300.milliseconds;
-    opacity = 0.0.tweenTo(1.0).animatedBy(captionController);
-
-    offsetController = createController()..duration = 250.milliseconds;
-
-    offsetAnimation =
-        Offset(0, 0.25).tweenTo(Offset.zero).animatedBy(offsetController);
-
-    scaleController = createController()..duration = 500.milliseconds;
-
-    scaleAnimation = 0.8
-        .tweenTo(1.0)
-        .animatedBy(scaleController)
-        .curve(Curves.fastOutSlowIn);
+    _scaleController = createController()..duration = 250.milliseconds;
+    _scaleAnimation =
+        0.6.tweenTo(1.0).animatedBy(_scaleController).curve(Curves.elasticOut);
 
     setState(() {
-      size = widget.size;
-      elevation = initElevation;
+      _elevation = _startElevation;
     });
   }
 
@@ -105,13 +84,17 @@ class _IllustrationCardState extends State<IllustrationCard>
     final illustration = widget.illustration;
 
     return SizedBox(
-      width: size,
-      height: size,
-      child: Card(
-        color: widget.selected ? Colors.blue : ThemeData().cardTheme.color,
-        elevation: elevation,
-        child: ScaleTransition(
-          scale: scaleAnimation,
+      width: widget.size,
+      height: widget.size,
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: Card(
+          color: widget.selected ? Colors.blue : ThemeData().cardTheme.color,
+          elevation: _elevation,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          clipBehavior: Clip.antiAlias,
           child: Ink.image(
             image: NetworkImage(
               illustration.getThumbnail(),
@@ -126,60 +109,32 @@ class _IllustrationCardState extends State<IllustrationCard>
               },
               onHover: (isHover) {
                 if (isHover) {
-                  elevation = 8.0;
-                  showCaption = true;
-                  scaleController.forward();
-                  offsetController.forward();
-                  captionController.forward();
-                } else {
-                  elevation = initElevation;
-                  showCaption = false;
-                  scaleController.reverse();
-                  offsetController.reverse();
-                  captionController.reverse();
+                  setState(() {
+                    _elevation = _endElevation;
+                    _showPopupMenu = true;
+                    _scaleController.forward();
+                  });
+
+                  return;
                 }
 
-                setState(() {});
+                setState(() {
+                  _elevation = _startElevation;
+                  _showPopupMenu = false;
+                  _scaleController.reverse();
+                });
               },
               child: Stack(
                 children: [
-                  caption(),
                   multiSelectButton(),
+                  if (_showPopupMenu)
+                    Positioned(
+                      bottom: 10.0,
+                      right: 10.0,
+                      child: popupMenuButton(),
+                    ),
                 ],
               ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget caption() {
-    final illustration = widget.illustration;
-
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: SlideTransition(
-        position: offsetAnimation,
-        child: Opacity(
-          opacity: opacity.value,
-          child: Container(
-            color: Colors.black26,
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    illustration.name,
-                    style: FontsUtils.mainStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                popupMenuButton(),
-              ],
             ),
           ),
         ),
@@ -285,9 +240,16 @@ class _IllustrationCardState extends State<IllustrationCard>
     }
 
     return PopupMenuButton(
-      child: Icon(
-        Icons.more_vert,
-        color: Colors.white,
+      icon: MirrorAnimation<Color>(
+        tween: stateColors.primary.tweenTo(stateColors.secondary),
+        duration: 2.seconds,
+        curve: Curves.decelerate,
+        builder: (context, child, value) {
+          return Icon(
+            UniconsLine.ellipsis_h,
+            color: value,
+          );
+        },
       ),
       onSelected: (value) {
         switch (value) {
@@ -347,7 +309,7 @@ class _IllustrationCardState extends State<IllustrationCard>
       containerWidget: (context, animation, child) {
         return RawKeyboardListener(
           autofocus: true,
-          focusNode: keyboardFocusNode,
+          focusNode: _keyboardFocusNode,
           onKey: (keyEvent) {
             if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
               Navigator.of(context).pop();
