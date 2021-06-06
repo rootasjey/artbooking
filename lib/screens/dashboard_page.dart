@@ -197,7 +197,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget topSidePanel() {
     return SliverPadding(
       padding: const EdgeInsets.only(
-        top: 20.0,
+        top: 40.0,
         bottom: 50.0,
       ),
       sliver: SliverList(
