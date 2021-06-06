@@ -111,7 +111,7 @@ class AvatarMenu extends StatelessWidget {
           )
         ]),
         child: ListTile(
-          leading: Icon(UniconsLine.newspaper),
+          leading: Icon(UniconsLine.picture),
           title: Text(
             "illustrations_my".tr(),
             style: FontsUtils.mainStyle(
@@ -129,7 +129,7 @@ class AvatarMenu extends StatelessWidget {
           )
         ]),
         child: ListTile(
-          leading: Icon(UniconsLine.books),
+          leading: Icon(UniconsLine.book_alt),
           title: Text(
             "books_my".tr(),
             style: FontsUtils.mainStyle(
