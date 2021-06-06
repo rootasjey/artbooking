@@ -1,12 +1,12 @@
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/user_books.dart';
-import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/one_illus_op_resp.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -31,10 +31,10 @@ class IllustrationCard extends StatefulWidget {
   final VoidCallback onBeforeDelete;
   final Function(OneIllusOpResp) onAfterDelete;
   final Function(bool) onLongPress;
-  final Function onBeforePressed;
   final Function(Illustration) onRemove;
   final double size;
   final IllustrationCardType type;
+  final VoidCallback onTap;
 
   IllustrationCard({
     @required this.illustration,
@@ -42,11 +42,11 @@ class IllustrationCard extends StatefulWidget {
     this.selectionMode = false,
     this.onAfterDelete,
     this.onBeforeDelete,
-    this.onBeforePressed,
     this.onLongPress,
     this.onRemove,
     this.size = 300.0,
     this.type = IllustrationCardType.illustration,
+    this.onTap,
   });
 
   @override
@@ -101,7 +101,7 @@ class _IllustrationCardState extends State<IllustrationCard>
             ),
             fit: BoxFit.cover,
             child: InkWell(
-              onTap: onTap,
+              onTap: widget.onTap,
               onLongPress: () {
                 if (widget.onLongPress != null) {
                   widget.onLongPress(widget.selected);
@@ -281,25 +281,25 @@ class _IllustrationCardState extends State<IllustrationCard>
               children: [
                 ListTile(
                   title: Text(
-                    'Confirm',
+                    "delete".tr(),
                     style: TextStyle(
                       color: Colors.white,
                     ),
                   ),
                   trailing: Icon(
-                    Icons.check,
+                    UniconsLine.check,
                     color: Colors.white,
                   ),
                   tileColor: Color(0xfff55c5c),
                   onTap: () {
-                    Navigator.of(context).pop();
+                    context.router.pop();
                     deleteIllustration();
                   },
                 ),
                 ListTile(
-                  title: Text('Cancel'),
-                  trailing: Icon(Icons.close),
-                  onTap: () => Navigator.of(context).pop(),
+                  title: Text("cancel".tr()),
+                  trailing: Icon(UniconsLine.times),
+                  onTap: context.router.pop,
                 ),
               ],
             ),
@@ -356,24 +356,6 @@ class _IllustrationCardState extends State<IllustrationCard>
     if (widget.onAfterDelete != null) {
       widget.onAfterDelete(response);
     }
-  }
-
-  void onTap() {
-    bool handled = false;
-    if (widget.onBeforePressed != null) {
-      handled = widget.onBeforePressed();
-    }
-
-    if (handled) {
-      return;
-    }
-
-    context.router.root.push(
-      IllustrationPageRoute(
-        illustrationId: widget.illustration.id,
-        illustration: widget.illustration,
-      ),
-    );
   }
 
   void showAddToBook() {

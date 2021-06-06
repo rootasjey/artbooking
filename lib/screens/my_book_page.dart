@@ -2,6 +2,7 @@ import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/illustration_card.dart';
 import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/types/book.dart';
@@ -366,25 +367,6 @@ class _MyBookPageState extends State<MyBookPage> {
                   illustrations.insert(index, illustration);
                 });
               },
-              onBeforePressed: () {
-                if (multiSelectedItems.isEmpty && !forceMultiSelect) {
-                  return false;
-                }
-
-                if (selected) {
-                  setState(() {
-                    multiSelectedItems.remove(illustration.id);
-                    forceMultiSelect = multiSelectedItems.length > 0;
-                  });
-                } else {
-                  setState(() {
-                    multiSelectedItems.putIfAbsent(
-                        illustration.id, () => illustration);
-                  });
-                }
-
-                return true;
-              },
               onLongPress: (selected) {
                 if (selected) {
                   setState(() {
@@ -745,6 +727,41 @@ class _MyBookPageState extends State<MyBookPage> {
 
     setState(() {
       processingIllus.clear();
+    });
+  }
+
+  void onTapIllustrationCard(Illustration illustration) {
+    if (multiSelectedItems.isEmpty && !forceMultiSelect) {
+      navigateToIllustrationPage(illustration);
+      return;
+    }
+
+    multiSelectIllustration(illustration);
+  }
+
+  void navigateToIllustrationPage(Illustration illustration) {
+    context.router.root.push(
+      IllustrationPageRoute(
+        illustrationId: illustration.id,
+        illustration: illustration,
+      ),
+    );
+  }
+
+  void multiSelectIllustration(Illustration illustration) {
+    final selected = multiSelectedItems.containsKey(illustration.id);
+
+    if (selected) {
+      setState(() {
+        multiSelectedItems.remove(illustration.id);
+        forceMultiSelect = multiSelectedItems.length > 0;
+      });
+
+      return;
+    }
+
+    setState(() {
+      multiSelectedItems.putIfAbsent(illustration.id, () => illustration);
     });
   }
 }

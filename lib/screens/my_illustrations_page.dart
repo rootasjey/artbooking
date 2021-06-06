@@ -3,6 +3,7 @@ import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/illustration_card.dart';
 import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
+import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
@@ -10,6 +11,7 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -52,44 +54,9 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: isFabVisible
-          ? FloatingActionButton(
-              onPressed: () {
-                scrollController.animateTo(
-                  0.0,
-                  duration: 1.seconds,
-                  curve: Curves.easeOut,
-                );
-              },
-              backgroundColor: stateColors.primary,
-              foregroundColor: Colors.white,
-              child: Icon(Icons.arrow_upward),
-            )
-          : null,
+      floatingActionButton: fab(),
       body: NotificationListener<ScrollNotification>(
-        onNotification: (scrollNotification) {
-          // FAB visibility
-          if (scrollNotification.metrics.pixels < 50 && isFabVisible) {
-            setState(() {
-              isFabVisible = false;
-            });
-          } else if (scrollNotification.metrics.pixels > 50 && !isFabVisible) {
-            setState(() {
-              isFabVisible = true;
-            });
-          }
-
-          if (scrollNotification.metrics.pixels <
-              scrollNotification.metrics.maxScrollExtent) {
-            return false;
-          }
-
-          if (hasNext && !isLoadingMore) {
-            fetchMore();
-          }
-
-          return false;
-        },
+        onNotification: onNotification,
         child: CustomScrollView(
           controller: scrollController,
           slivers: <Widget>[
@@ -108,11 +75,31 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     );
   }
 
+  Widget fab() {
+    if (!isFabVisible) {
+      return Container();
+    }
+
+    return FloatingActionButton(
+      onPressed: () {
+        scrollController.animateTo(
+          0.0,
+          duration: 1.seconds,
+          curve: Curves.easeOut,
+        );
+      },
+      backgroundColor: stateColors.primary,
+      foregroundColor: Colors.white,
+      child: Icon(Icons.arrow_upward),
+    );
+  }
+
   Widget header() {
     return SliverPadding(
       padding: const EdgeInsets.only(
         top: 60.0,
         left: 50.0,
+        bottom: 24.0,
       ),
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
@@ -299,6 +286,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
               illustration: illustration,
               selected: selected,
               selectionMode: selectionMode,
+              onTap: () => onTapIllustrationCard(illustration),
               onBeforeDelete: () {
                 setState(() {
                   illustrationsList.removeAt(index);
@@ -312,25 +300,6 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
                 setState(() {
                   illustrationsList.insert(index, illustration);
                 });
-              },
-              onBeforePressed: () {
-                if (multiSelectedItems.isEmpty && !forceMultiSelect) {
-                  return false;
-                }
-
-                if (selected) {
-                  setState(() {
-                    multiSelectedItems.remove(illustration.id);
-                    forceMultiSelect = multiSelectedItems.length > 0;
-                  });
-                } else {
-                  setState(() {
-                    multiSelectedItems.putIfAbsent(
-                        illustration.id, () => illustration);
-                  });
-                }
-
-                return true;
               },
               onLongPress: (selected) {
                 if (selected) {
@@ -602,5 +571,63 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     } catch (error) {
       appLogger.e(error);
     }
+  }
+
+  bool onNotification(ScrollNotification notification) {
+    // FAB visibility
+    if (notification.metrics.pixels < 50 && isFabVisible) {
+      setState(() {
+        isFabVisible = false;
+      });
+    } else if (notification.metrics.pixels > 50 && !isFabVisible) {
+      setState(() {
+        isFabVisible = true;
+      });
+    }
+
+    if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
+      return false;
+    }
+
+    if (hasNext && !isLoadingMore) {
+      fetchMore();
+    }
+
+    return false;
+  }
+
+  void onTapIllustrationCard(Illustration illustration) {
+    if (multiSelectedItems.isEmpty && !forceMultiSelect) {
+      navigateToIllustrationPage(illustration);
+      return;
+    }
+
+    multiSelectIllustration(illustration);
+  }
+
+  void navigateToIllustrationPage(Illustration illustration) {
+    context.router.root.push(
+      IllustrationPageRoute(
+        illustrationId: illustration.id,
+        illustration: illustration,
+      ),
+    );
+  }
+
+  void multiSelectIllustration(Illustration illustration) {
+    final selected = multiSelectedItems.containsKey(illustration.id);
+
+    if (selected) {
+      setState(() {
+        multiSelectedItems.remove(illustration.id);
+        forceMultiSelect = multiSelectedItems.length > 0;
+      });
+
+      return;
+    }
+
+    setState(() {
+      multiSelectedItems.putIfAbsent(illustration.id, () => illustration);
+    });
   }
 }
