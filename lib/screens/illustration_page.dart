@@ -1,9 +1,11 @@
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
+import 'package:artbooking/components/author_header.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/illustration_poster.dart';
 import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
@@ -181,48 +183,61 @@ class _IllustrationPageState extends State<IllustrationPage> {
     );
   }
 
+  Widget description() {
+    if (_illustration.description == null ||
+        _illustration.description.isEmpty) {
+      return Container();
+    }
+
+    return Container(
+      width: 400.0,
+      child: Opacity(
+        opacity: 0.4,
+        child: Text(
+          _illustration.description ?? '',
+          style: FontsUtils.mainStyle(
+            fontSize: 18.0,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget summary() {
+    if (_illustration.summary == null || _illustration.summary.isEmpty) {
+      return Container();
+    }
+
+    return Container(
+      width: 400.0,
+      padding: const EdgeInsets.only(top: 12.0),
+      child: Opacity(
+        opacity: 0.6,
+        child: Text(
+          _illustration.summary ?? '',
+          style: FontsUtils.mainStyle(
+            fontSize: 24.0,
+            fontWeight: FontWeight.w200,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget metadata() {
     return Padding(
       padding: const EdgeInsets.only(
-        top: 24.0,
+        top: 60.0,
       ),
       child: Column(
         children: [
-          Opacity(
-            opacity: 0.8,
-            child: Text(
-              _illustration.name ?? '',
-              style: FontsUtils.mainStyle(
-                fontSize: 56.0,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+          AuthorHeader(
+            authorId: _illustration.author.id,
+            padding: const EdgeInsets.only(bottom: 60.0),
           ),
-          if (_illustration.description != null &&
-              _illustration.description.isNotEmpty)
-            Opacity(
-              opacity: 0.4,
-              child: Text(
-                _illustration.description ?? '',
-                style: TextStyle(
-                  fontSize: 16.0,
-                ),
-              ),
-            ),
-          if (_illustration.summary != null && _illustration.summary.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 24.0),
-              child: Opacity(
-                opacity: 0.6,
-                child: Text(
-                  _illustration.summary ?? '',
-                  style: FontsUtils.mainStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.w200,
-                  ),
-                ),
-              ),
-            ),
+          description(),
+          summary(),
         ],
       ),
     );
@@ -367,37 +382,48 @@ class _IllustrationPageState extends State<IllustrationPage> {
 
   Widget userActions() {
     return Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        children: [
-          IconButton(
-            icon: Icon(UniconsLine.heart),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(UniconsLine.share),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(UniconsLine.edit),
-            onPressed: () {
-              setState(() {
-                _nameController.text = _illustration.name;
-                _descController.text = _illustration.description;
-                _summaryController.text = _illustration.summary;
+      padding: const EdgeInsets.only(
+        top: 32.0,
+        left: 12.0,
+        right: 12.0,
+      ),
+      child: Opacity(
+        opacity: 0.8,
+        child: Wrap(
+          spacing: 16.0,
+          alignment: WrapAlignment.center,
+          children: [
+            IconButton(
+              tooltip: "like".tr(),
+              icon: Icon(UniconsLine.heart),
+              onPressed: () {},
+            ),
+            IconButton(
+              tooltip: "share".tr(),
+              icon: Icon(UniconsLine.share),
+              onPressed: () {},
+            ),
+            IconButton(
+              tooltip: "edit".tr(),
+              icon: Icon(UniconsLine.edit),
+              onPressed: () {
+                setState(() {
+                  _nameController.text = _illustration.name;
+                  _descController.text = _illustration.description;
+                  _summaryController.text = _illustration.summary;
 
-                _newName = _illustration.name;
-                _newDesc = _illustration.description;
-                _newSummary = _illustration.summary;
-                _newLicense = _illustration.license;
-                _newVisibility = _illustration.visibility;
+                  _newName = _illustration.name;
+                  _newDesc = _illustration.description;
+                  _newSummary = _illustration.summary;
+                  _newLicense = _illustration.license;
+                  _newVisibility = _illustration.visibility;
 
-                _isEditModeOn = !_isEditModeOn;
-              });
-            },
-          ),
-        ],
+                  _isEditModeOn = !_isEditModeOn;
+                });
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
