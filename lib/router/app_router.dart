@@ -1,3 +1,4 @@
+import 'package:artbooking/components/hero_empty_router_page.dart';
 import 'package:artbooking/router/auth_guard.dart';
 import 'package:artbooking/router/no_auth_guard.dart';
 import 'package:artbooking/screens/about_page.dart';
@@ -64,7 +65,7 @@ export 'app_router.gr.dart';
         MaterialRoute(
           path: 'illustrations',
           name: 'DashIllustrationsRouter',
-          page: EmptyRouterPage,
+          page: HeroEmptyRouterPage,
           children: [
             CustomRoute(
               path: '',

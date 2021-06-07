@@ -3,7 +3,7 @@ import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/illustration_card.dart';
 import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
-import 'package:artbooking/router/app_router.gr.dart';
+import 'package:artbooking/screens/illustration_page.dart';
 import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
@@ -11,7 +11,6 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -606,12 +605,29 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   }
 
   void navigateToIllustrationPage(Illustration illustration) {
-    context.router.root.push(
-      IllustrationPageRoute(
-        illustrationId: illustration.id,
-        illustration: illustration,
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return IllustrationPage(
+            illustration: illustration,
+            illustrationId: illustration.id,
+          );
+        },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return child;
+        },
       ),
     );
+
+    /// NOTE: Use auto router when issue #418 is resolved
+    /// https://github.com/Milad-Akarie/auto_route_library/issues/418
+    ///
+    // context.router.push(
+    //   DashIllustrationPage(
+    //     illustrationId: illustration.id,
+    //     illustration: illustration,
+    //   ),
+    // );
   }
 
   void multiSelectIllustration(Illustration illustration) {

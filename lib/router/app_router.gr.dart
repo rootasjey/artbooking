@@ -8,32 +8,33 @@ import 'package:auto_route/auto_route.dart' as _i1;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' as _i2;
 
+import '../components/hero_empty_router_page.dart' as _i18;
 import '../screens/about_page.dart' as _i6;
 import '../screens/changelog_page.dart' as _i7;
 import '../screens/contact_page.dart' as _i8;
 import '../screens/dashboard_page.dart' as _i9;
-import '../screens/delete_account_page.dart' as _i24;
-import '../screens/edit_image_page.dart' as _i23;
+import '../screens/delete_account_page.dart' as _i25;
+import '../screens/edit_image_page.dart' as _i24;
 import '../screens/forgot_password_page.dart' as _i10;
 import '../screens/home_page.dart' as _i5;
-import '../screens/illustration_page.dart' as _i19;
-import '../screens/illustrations_page.dart' as _i28;
+import '../screens/illustration_page.dart' as _i20;
+import '../screens/illustrations_page.dart' as _i29;
 import '../screens/my_activity_page.dart' as _i17;
-import '../screens/my_book_page.dart' as _i21;
-import '../screens/my_books_page.dart' as _i20;
-import '../screens/my_illustrations_page.dart' as _i18;
-import '../screens/my_profile_page.dart' as _i22;
+import '../screens/my_book_page.dart' as _i22;
+import '../screens/my_books_page.dart' as _i21;
+import '../screens/my_illustrations_page.dart' as _i19;
+import '../screens/my_profile_page.dart' as _i23;
 import '../screens/search_page.dart' as _i11;
 import '../screens/settings_page.dart' as _i12;
 import '../screens/signin_page.dart' as _i13;
 import '../screens/signup_page.dart' as _i14;
 import '../screens/tos_page.dart' as _i15;
 import '../screens/undefined_page.dart' as _i16;
-import '../screens/update_email_page.dart' as _i25;
-import '../screens/update_password_page.dart' as _i26;
-import '../screens/update_username_page.dart' as _i27;
-import '../types/book.dart' as _i30;
-import '../types/illustration/illustration.dart' as _i29;
+import '../screens/update_email_page.dart' as _i26;
+import '../screens/update_password_page.dart' as _i27;
+import '../screens/update_username_page.dart' as _i28;
+import '../types/book.dart' as _i31;
+import '../types/illustration/illustration.dart' as _i30;
 import 'auth_guard.dart' as _i3;
 import 'no_auth_guard.dart' as _i4;
 
@@ -179,7 +180,7 @@ class AppRouter extends _i1.RootStackRouter {
     DashIllustrationsRouter.name: (routeData) => _i1.MaterialPageX<dynamic>(
         routeData: routeData,
         builder: (_) {
-          return const _i1.EmptyRouterPage();
+          return _i18.HeroEmptyRouterPage();
         }),
     DashBooksRouter.name: (routeData) => _i1.MaterialPageX<dynamic>(
         routeData: routeData,
@@ -202,7 +203,7 @@ class AppRouter extends _i1.RootStackRouter {
     MyIllustrationsPageRoute.name: (routeData) => _i1.CustomPage<dynamic>(
         routeData: routeData,
         builder: (_) {
-          return _i18.MyIllustrationsPage();
+          return _i19.MyIllustrationsPage();
         },
         transitionsBuilder: _i1.TransitionsBuilders.fadeIn,
         opaque: true,
@@ -214,7 +215,7 @@ class AppRouter extends _i1.RootStackRouter {
           final args = data.argsAs<DashIllustrationPageArgs>(
               orElse: () => DashIllustrationPageArgs(
                   illustrationId: pathParams.getString('illustrationId')));
-          return _i19.IllustrationPage(
+          return _i20.IllustrationPage(
               key: args.key,
               illustrationId: args.illustrationId,
               illustration: args.illustration);
@@ -225,7 +226,7 @@ class AppRouter extends _i1.RootStackRouter {
     MyBooksPageRoute.name: (routeData) => _i1.CustomPage<dynamic>(
         routeData: routeData,
         builder: (_) {
-          return _i20.MyBooksPage();
+          return _i21.MyBooksPage();
         },
         transitionsBuilder: _i1.TransitionsBuilders.fadeIn,
         opaque: true,
@@ -237,7 +238,7 @@ class AppRouter extends _i1.RootStackRouter {
           final args = data.argsAs<DashBookPageArgs>(
               orElse: () =>
                   DashBookPageArgs(bookId: pathParams.getString('bookId')));
-          return _i21.MyBookPage(
+          return _i22.MyBookPage(
               key: args.key, bookId: args.bookId, book: args.book);
         },
         transitionsBuilder: _i1.TransitionsBuilders.fadeIn,
@@ -246,7 +247,7 @@ class AppRouter extends _i1.RootStackRouter {
     MyProfilePageRoute.name: (routeData) => _i1.CustomPage<dynamic>(
         routeData: routeData,
         builder: (_) {
-          return _i22.MyProfilePage();
+          return _i23.MyProfilePage();
         },
         transitionsBuilder: _i1.TransitionsBuilders.fadeIn,
         opaque: true,
@@ -256,7 +257,7 @@ class AppRouter extends _i1.RootStackRouter {
         builder: (data) {
           final args = data.argsAs<EditImagePageRouteArgs>(
               orElse: () => const EditImagePageRouteArgs());
-          return _i23.EditImagePage(key: args.key, image: args.image);
+          return _i24.EditImagePage(key: args.key, image: args.image);
         },
         transitionsBuilder: _i1.TransitionsBuilders.fadeIn,
         opaque: true,
@@ -275,7 +276,7 @@ class AppRouter extends _i1.RootStackRouter {
     DeleteAccountPageRoute.name: (routeData) => _i1.CustomPage<dynamic>(
         routeData: routeData,
         builder: (_) {
-          return _i24.DeleteAccountPage();
+          return _i25.DeleteAccountPage();
         },
         transitionsBuilder: _i1.TransitionsBuilders.fadeIn,
         opaque: true,
@@ -291,28 +292,28 @@ class AppRouter extends _i1.RootStackRouter {
     UpdateEmailPageRoute.name: (routeData) => _i1.CustomPage<dynamic>(
         routeData: routeData,
         builder: (_) {
-          return _i25.UpdateEmailPage();
+          return _i26.UpdateEmailPage();
         },
         opaque: true,
         barrierDismissible: false),
     UpdatePasswordPageRoute.name: (routeData) => _i1.CustomPage<dynamic>(
         routeData: routeData,
         builder: (_) {
-          return _i26.UpdatePasswordPage();
+          return _i27.UpdatePasswordPage();
         },
         opaque: true,
         barrierDismissible: false),
     UpdateUsernamePageRoute.name: (routeData) => _i1.CustomPage<dynamic>(
         routeData: routeData,
         builder: (_) {
-          return _i27.UpdateUsernamePage();
+          return _i28.UpdateUsernamePage();
         },
         opaque: true,
         barrierDismissible: false),
     IllustrationsPageRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
         routeData: routeData,
         builder: (_) {
-          return _i28.IllustrationsPage();
+          return _i29.IllustrationsPage();
         }),
     IllustrationPageRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
         routeData: routeData,
@@ -321,7 +322,7 @@ class AppRouter extends _i1.RootStackRouter {
           final args = data.argsAs<IllustrationPageRouteArgs>(
               orElse: () => IllustrationPageRouteArgs(
                   illustrationId: pathParams.getString('illustrationId')));
-          return _i19.IllustrationPage(
+          return _i20.IllustrationPage(
               key: args.key,
               illustrationId: args.illustrationId,
               illustration: args.illustration);
@@ -574,7 +575,7 @@ class MyIllustrationsPageRoute extends _i1.PageRouteInfo {
 
 class DashIllustrationPage extends _i1.PageRouteInfo<DashIllustrationPageArgs> {
   DashIllustrationPage(
-      {_i2.Key key, String illustrationId, _i29.Illustration illustration})
+      {_i2.Key key, String illustrationId, _i30.Illustration illustration})
       : super(name,
             path: ':illustrationId',
             args: DashIllustrationPageArgs(
@@ -594,7 +595,7 @@ class DashIllustrationPageArgs {
 
   final String illustrationId;
 
-  final _i29.Illustration illustration;
+  final _i30.Illustration illustration;
 }
 
 class MyBooksPageRoute extends _i1.PageRouteInfo {
@@ -604,7 +605,7 @@ class MyBooksPageRoute extends _i1.PageRouteInfo {
 }
 
 class DashBookPage extends _i1.PageRouteInfo<DashBookPageArgs> {
-  DashBookPage({_i2.Key key, String bookId, _i30.Book book})
+  DashBookPage({_i2.Key key, String bookId, _i31.Book book})
       : super(name,
             path: ':bookId',
             args: DashBookPageArgs(key: key, bookId: bookId, book: book),
@@ -620,7 +621,7 @@ class DashBookPageArgs {
 
   final String bookId;
 
-  final _i30.Book book;
+  final _i31.Book book;
 }
 
 class MyProfilePageRoute extends _i1.PageRouteInfo {
@@ -703,7 +704,7 @@ class IllustrationsPageRoute extends _i1.PageRouteInfo {
 class IllustrationPageRoute
     extends _i1.PageRouteInfo<IllustrationPageRouteArgs> {
   IllustrationPageRoute(
-      {_i2.Key key, String illustrationId, _i29.Illustration illustration})
+      {_i2.Key key, String illustrationId, _i30.Illustration illustration})
       : super(name,
             path: ':illustrationId',
             args: IllustrationPageRouteArgs(
@@ -723,7 +724,7 @@ class IllustrationPageRouteArgs {
 
   final String illustrationId;
 
-  final _i29.Illustration illustration;
+  final _i30.Illustration illustration;
 }
 
 class GitHubRoute extends _i1.PageRouteInfo {

@@ -83,57 +83,60 @@ class _IllustrationCardState extends State<IllustrationCard>
   Widget build(BuildContext context) {
     final illustration = widget.illustration;
 
-    return SizedBox(
-      width: widget.size,
-      height: widget.size,
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: Card(
-          color: widget.selected ? Colors.blue : ThemeData().cardTheme.color,
-          elevation: _elevation,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Ink.image(
-            image: NetworkImage(
-              illustration.getThumbnail(),
+    return Hero(
+      tag: illustration.id,
+      child: SizedBox(
+        width: widget.size,
+        height: widget.size,
+        child: ScaleTransition(
+          scale: _scaleAnimation,
+          child: Card(
+            color: widget.selected ? Colors.blue : ThemeData().cardTheme.color,
+            elevation: _elevation,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
             ),
-            fit: BoxFit.cover,
-            child: InkWell(
-              onTap: widget.onTap,
-              onLongPress: () {
-                if (widget.onLongPress != null) {
-                  widget.onLongPress(widget.selected);
-                }
-              },
-              onHover: (isHover) {
-                if (isHover) {
+            clipBehavior: Clip.antiAlias,
+            child: Ink.image(
+              image: NetworkImage(
+                illustration.getThumbnail(),
+              ),
+              fit: BoxFit.cover,
+              child: InkWell(
+                onTap: widget.onTap,
+                onLongPress: () {
+                  if (widget.onLongPress != null) {
+                    widget.onLongPress(widget.selected);
+                  }
+                },
+                onHover: (isHover) {
+                  if (isHover) {
+                    setState(() {
+                      _elevation = _endElevation;
+                      _showPopupMenu = true;
+                      _scaleController.forward();
+                    });
+
+                    return;
+                  }
+
                   setState(() {
-                    _elevation = _endElevation;
-                    _showPopupMenu = true;
-                    _scaleController.forward();
+                    _elevation = _startElevation;
+                    _showPopupMenu = false;
+                    _scaleController.reverse();
                   });
-
-                  return;
-                }
-
-                setState(() {
-                  _elevation = _startElevation;
-                  _showPopupMenu = false;
-                  _scaleController.reverse();
-                });
-              },
-              child: Stack(
-                children: [
-                  multiSelectButton(),
-                  if (_showPopupMenu)
-                    Positioned(
-                      bottom: 10.0,
-                      right: 10.0,
-                      child: popupMenuButton(),
-                    ),
-                ],
+                },
+                child: Stack(
+                  children: [
+                    multiSelectButton(),
+                    if (_showPopupMenu)
+                      Positioned(
+                        bottom: 10.0,
+                        right: 10.0,
+                        child: popupMenuButton(),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),

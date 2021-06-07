@@ -1,7 +1,10 @@
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/fade_in_y.dart';
+import 'package:artbooking/components/illustration_poster.dart';
 import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/sliver_edge_padding.dart';
+import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/license.dart';
@@ -9,6 +12,7 @@ import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -29,33 +33,33 @@ class IllustrationPage extends StatefulWidget {
 
 class _IllustrationPageState extends State<IllustrationPage> {
   /// True if data is being loaded.
-  bool isLoading = false;
+  bool _isLoading = false;
 
-  Illustration illustration;
+  Illustration _illustration;
 
-  String newName = '';
-  String newDesc = '';
-  String newSummary = '';
+  String _newName = '';
+  String _newDesc = '';
+  String _newSummary = '';
 
-  bool isEditModeOn = false;
+  bool _isEditModeOn = false;
 
-  TextEditingController nameController;
-  TextEditingController descController;
-  TextEditingController summaryController;
+  TextEditingController _nameController;
+  TextEditingController _descController;
+  TextEditingController _summaryController;
 
-  IllustrationLicense newLicense = IllustrationLicense();
-  ContentVisibility newVisibility = ContentVisibility.private;
+  IllustrationLicense _newLicense = IllustrationLicense();
+  ContentVisibility _newVisibility = ContentVisibility.private;
 
   @override
   void initState() {
     super.initState();
 
-    nameController = TextEditingController();
-    descController = TextEditingController();
-    summaryController = TextEditingController();
+    _nameController = TextEditingController();
+    _descController = TextEditingController();
+    _summaryController = TextEditingController();
 
     if (widget.illustration != null) {
-      illustration = widget.illustration;
+      _illustration = widget.illustration;
     } else {
       fetchIllustration();
     }
@@ -63,9 +67,9 @@ class _IllustrationPageState extends State<IllustrationPage> {
 
   @override
   void dispose() {
-    nameController?.dispose();
-    descController?.dispose();
-    summaryController?.dispose();
+    _nameController?.dispose();
+    _descController?.dispose();
+    _summaryController?.dispose();
 
     super.dispose();
   }
@@ -78,6 +82,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
           NotificationListener(
             child: CustomScrollView(
               slivers: [
+                SliverEdgePadding(),
                 MainAppBar(),
                 body(),
                 SliverPadding(
@@ -95,11 +100,35 @@ class _IllustrationPageState extends State<IllustrationPage> {
   }
 
   Widget body() {
-    if (isLoading) {
+    if (_isLoading) {
       return loadingView();
     }
 
     return idleView();
+  }
+
+  Widget header() {
+    return Row(
+      children: [
+        IconButton(
+          color: stateColors.primary,
+          onPressed: context.router.pop,
+          icon: Icon(UniconsLine.arrow_left),
+        ),
+        Expanded(
+          child: Opacity(
+            opacity: 0.8,
+            child: Text(
+              _illustration.name ?? '',
+              style: FontsUtils.mainStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget idleView() {
@@ -107,30 +136,26 @@ class _IllustrationPageState extends State<IllustrationPage> {
       padding: const EdgeInsets.all(60.0),
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
+          header(),
           illustrationCard(),
           userActions(),
-          if (isEditModeOn) metdataEdit() else metadata(),
+          if (_isEditModeOn) metdataEdit() else metadata(),
         ]),
       ),
     );
   }
 
   Widget illustrationCard() {
+    final size = MediaQuery.of(context).size;
+
     return Center(
-      child: SizedBox(
-        width: 600.0,
-        height: 600.0,
-        child: Card(
-          elevation: 4.0,
-          child: Ink.image(
-            image: NetworkImage(
-              illustration.getHDThumbnail(),
-            ),
-            fit: BoxFit.cover,
-            child: InkWell(
-              onTap: () {},
-            ),
-          ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: size.width - 200.0,
+          maxHeight: size.height,
+        ),
+        child: IllustrationPoster(
+          illustration: _illustration,
         ),
       ),
     );
@@ -166,31 +191,31 @@ class _IllustrationPageState extends State<IllustrationPage> {
           Opacity(
             opacity: 0.8,
             child: Text(
-              illustration.name ?? '',
+              _illustration.name ?? '',
               style: FontsUtils.mainStyle(
                 fontSize: 56.0,
                 fontWeight: FontWeight.w700,
               ),
             ),
           ),
-          if (illustration.description != null &&
-              illustration.description.isNotEmpty)
+          if (_illustration.description != null &&
+              _illustration.description.isNotEmpty)
             Opacity(
               opacity: 0.4,
               child: Text(
-                illustration.description ?? '',
+                _illustration.description ?? '',
                 style: TextStyle(
                   fontSize: 16.0,
                 ),
               ),
             ),
-          if (illustration.summary != null && illustration.summary.isNotEmpty)
+          if (_illustration.summary != null && _illustration.summary.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 24.0),
               child: Opacity(
                 opacity: 0.6,
                 child: Text(
-                  illustration.summary ?? '',
+                  _illustration.summary ?? '',
                   style: FontsUtils.mainStyle(
                     fontSize: 24.0,
                     fontWeight: FontWeight.w200,
@@ -214,14 +239,14 @@ class _IllustrationPageState extends State<IllustrationPage> {
             width: 250.0,
             child: TextField(
               autofocus: true,
-              controller: nameController,
+              controller: _nameController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: "Name",
               ),
               textInputAction: TextInputAction.next,
               onChanged: (newValue) {
-                newName = newValue;
+                _newName = newValue;
               },
             ),
           ),
@@ -229,14 +254,14 @@ class _IllustrationPageState extends State<IllustrationPage> {
             width: 250.0,
             padding: const EdgeInsets.only(top: 12.0),
             child: TextField(
-              controller: descController,
+              controller: _descController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: "Description",
               ),
               textInputAction: TextInputAction.next,
               onChanged: (newValue) {
-                newDesc = newValue;
+                _newDesc = newValue;
               },
             ),
           ),
@@ -244,14 +269,14 @@ class _IllustrationPageState extends State<IllustrationPage> {
             width: 500.0,
             padding: const EdgeInsets.only(top: 24.0),
             child: TextField(
-              controller: summaryController,
+              controller: _summaryController,
               decoration: InputDecoration(
                 labelText: "Summary",
               ),
               maxLines: null,
               textInputAction: TextInputAction.next,
               onChanged: (newValue) {
-                newSummary = newValue;
+                _newSummary = newValue;
               },
             ),
           ),
@@ -261,7 +286,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
   }
 
   Widget saveChangesPanel() {
-    if (!isEditModeOn) {
+    if (!_isEditModeOn) {
       return Container();
     }
 
@@ -294,7 +319,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
                   child: TextButton(
                     onPressed: () {
                       setState(() {
-                        isEditModeOn = false;
+                        _isEditModeOn = false;
                       });
                     },
                     child: Padding(
@@ -314,7 +339,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      isEditModeOn = false;
+                      _isEditModeOn = false;
                     });
 
                     saveNewMetadata();
@@ -358,17 +383,17 @@ class _IllustrationPageState extends State<IllustrationPage> {
             icon: Icon(UniconsLine.edit),
             onPressed: () {
               setState(() {
-                nameController.text = illustration.name;
-                descController.text = illustration.description;
-                summaryController.text = illustration.summary;
+                _nameController.text = _illustration.name;
+                _descController.text = _illustration.description;
+                _summaryController.text = _illustration.summary;
 
-                newName = illustration.name;
-                newDesc = illustration.description;
-                newSummary = illustration.summary;
-                newLicense = illustration.license;
-                newVisibility = illustration.visibility;
+                _newName = _illustration.name;
+                _newDesc = _illustration.description;
+                _newSummary = _illustration.summary;
+                _newLicense = _illustration.license;
+                _newVisibility = _illustration.visibility;
 
-                isEditModeOn = !isEditModeOn;
+                _isEditModeOn = !_isEditModeOn;
               });
             },
           ),
@@ -379,7 +404,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
 
   void fetchIllustration() async {
     setState(() {
-      isLoading = true;
+      _isLoading = true;
     });
 
     try {
@@ -403,33 +428,33 @@ class _IllustrationPageState extends State<IllustrationPage> {
       illusData['id'] = illusSnap.id;
 
       setState(() {
-        illustration = Illustration.fromJSON(illusData);
-        isLoading = false;
+        _illustration = Illustration.fromJSON(illusData);
+        _isLoading = false;
       });
     } catch (error) {
       appLogger.e(error);
       setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
     }
   }
 
   void saveNewMetadata() async {
     setState(() {
-      illustration.name = newName;
-      illustration.description = newDesc;
-      illustration.summary = newSummary;
-      illustration.license = newLicense;
-      illustration.visibility = newVisibility;
+      _illustration.name = _newName;
+      _illustration.description = _newDesc;
+      _illustration.summary = _newSummary;
+      _illustration.license = _newLicense;
+      _illustration.visibility = _newVisibility;
     });
 
     final result = await IllustrationsActions.updateMetadata(
-      name: newName,
-      description: newDesc,
-      summary: newSummary,
-      license: newLicense,
-      visibility: newVisibility,
-      illustration: illustration,
+      name: _newName,
+      description: _newDesc,
+      summary: _newSummary,
+      license: _newLicense,
+      visibility: _newVisibility,
+      illustration: _illustration,
     );
 
     if (!result.success) {
