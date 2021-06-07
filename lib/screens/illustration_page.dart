@@ -17,6 +17,7 @@ import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:unicons/unicons.dart';
 
 class IllustrationPage extends StatefulWidget {
@@ -109,6 +110,24 @@ class _IllustrationPageState extends State<IllustrationPage> {
     return idleView();
   }
 
+  Widget dates() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Opacity(
+          opacity: 0.6,
+          child: Text(
+            Jiffy(_illustration.createdAt).fromNow(),
+            style: FontsUtils.mainStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget header() {
     return Row(
       children: [
@@ -140,6 +159,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
         delegate: SliverChildListDelegate.fixed([
           header(),
           illustrationCard(),
+          dates(),
           userActions(),
           if (_isEditModeOn) metdataEdit() else metadata(),
         ]),
