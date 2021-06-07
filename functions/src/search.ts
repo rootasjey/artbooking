@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import algolia from 'algoliasearch';
 import deepEqual = require('deep-equal');
+import { cloudRegions } from './utils';
 
 const env = functions.config();
 
@@ -11,7 +12,7 @@ const usersIndex = client.initIndex('users');
 // Illustrations index
 // -------------------
 export const onIndexIllustration = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .firestore
   .document('illustrations/{illustrationId}')
   .onCreate(async (snapshot) => {
@@ -30,7 +31,7 @@ export const onIndexIllustration = functions
   });
 
 export const onReIndexIllustration = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .firestore
   .document('illustrations/{illustrationId}')
   .onUpdate(async (snapshot) => {
@@ -49,7 +50,7 @@ export const onReIndexIllustration = functions
   });
 
 export const onUnIndexIllustration = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .firestore
   .document('illustrations/{illustrationId}')
   .onDelete(async (snapshot) => {
@@ -67,7 +68,7 @@ export const onUnIndexIllustration = functions
 // Users index
 // -----------
 export const onIndexUser = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .firestore
   .document('users/{userId}')
   .onCreate(async (snapshot) => {
@@ -85,7 +86,7 @@ export const onIndexUser = functions
   });
 
 export const onReIndexUser = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .firestore
   .document('users/{userId}')
   .onUpdate(async (snapshot) => {
@@ -108,7 +109,7 @@ export const onReIndexUser = functions
   });
 
 export const onUnIndexUser = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .firestore
   .document('users/{userId}')
   .onDelete(async (snapshot) => {

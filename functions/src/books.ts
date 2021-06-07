@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import { adminApp } from './adminApp';
-import { checkOrGetDefaultVisibility } from './utils';
+import { checkOrGetDefaultVisibility, cloudRegions } from './utils';
 
 const firebaseTools = require('firebase-tools');
 const firestore = adminApp.firestore();
@@ -9,7 +9,7 @@ const firestore = adminApp.firestore();
  * Add illustrations to an existing book.
  */
 export const addIllustrations = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (params: UpdateBookIllustrationsParams, context) => {
     const userAuth = context.auth;
@@ -100,7 +100,7 @@ export const addIllustrations = functions
  * Create a book document in Firestore.
  */
 export const createOne = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (params: CreateBookParams, context) => {
     const userAuth = context.auth;
@@ -168,7 +168,7 @@ export const createOne = functions
  * Delete a book document from Firestore.
  */
 export const deleteOne = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (params: DeleteBookParams, context) => {
     const userAuth = context.auth;
@@ -220,7 +220,7 @@ export const deleteOne = functions
  * Delete multiple books documents from Firestore.
  */
 export const deleteMany = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (params: DeleteBooksParams, context) => {
     const userAuth = context.auth;
@@ -315,7 +315,7 @@ export const deleteMany = functions
  * Delete illustrations from an existing book.
  */
 export const removeIllustrations = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (params: UpdateBookIllustrationsParams, context) => {
     const userAuth = context.auth;
@@ -397,7 +397,7 @@ export const removeIllustrations = functions
  * The cover is from an existing illustration in the current book.
  */
 export const setCover = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (params: any, context) => {
     const userAuth = context.auth;
@@ -473,7 +473,7 @@ export const setCover = functions
  * Update book's properties.
  */
 export const updateMetadata = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (params: UpdateBookPropertiesParams, context) => {
     const userAuth = context.auth;
@@ -543,7 +543,7 @@ export const updateMetadata = functions
  * For all [layout] except {extendedGrid} with the [matrice] property.
  */
 export const updateIllustrationPosition = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (params: UpdateIllusPositionParams, context) => {
     const userAuth = context.auth;

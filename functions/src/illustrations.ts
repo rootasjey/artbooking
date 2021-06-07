@@ -8,7 +8,7 @@ import { join, dirname } from 'path';
 import * as sharp from 'sharp';
 
 import { adminApp } from './adminApp';
-import { checkOrGetDefaultVisibility } from './utils';
+import { checkOrGetDefaultVisibility, cloudRegions } from './utils';
 
 const firestore = adminApp.firestore();
 const gcs = new Storage();
@@ -25,7 +25,7 @@ interface GenerateImageThumbsParams {
  * Create a new document with predefined values.
  */
 export const createOne = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (params: CreateIllustrationParams, context) => {
     const userAuth = context.auth;
@@ -133,7 +133,7 @@ export const createOne = functions
  * Delete an image document from Firestore and from Cloud Storage.
  */
 export const deleteOne = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (params: DeleteIllustrationParams, context) => {
     const userAuth = context.auth;
@@ -200,7 +200,7 @@ export const deleteOne = functions
  * Delete multiple illustrations documents from Firestore and from Cloud Storage.
  */
 export const deleteMany = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (params: DeleteMultipleIllustrationsParams, context) => {
     const userAuth = context.auth;
@@ -308,7 +308,7 @@ export const onStorageUpload = functions
     memory: '2GB',
     timeoutSeconds: 180,
   })
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .storage
   .object()
   .onFinalize(async (objectMeta) => {
@@ -403,7 +403,7 @@ export const onStorageUpload = functions
  * Set the illustration's author id same as user's id.
  */
 export const setUserAuthor = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (data: SetUserAuthorParams, context) => {
     const userAuth = context.auth;
@@ -462,7 +462,7 @@ export const setUserAuthor = functions
  * Unset the image's author id same as user's id.
  */
 export const unsetUserAuthor = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (data: SetUserAuthorParams, context) => {
     const userAuth = context.auth;
@@ -520,7 +520,7 @@ export const unsetUserAuthor = functions
  * Update description, name, license, summary, & visibility if specified.
  */
 export const updateMetadata = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (data: UpdateIllusMetadataParams, context) => {
     const userAuth = context.auth;
@@ -580,7 +580,7 @@ export const updateMetadata = functions
   });
 
 export const updateCategories = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (data: UpdateIllusCategoriesParams, context) => {
     const userAuth = context.auth;
@@ -640,7 +640,7 @@ export const updateCategories = functions
   });
 
 export const updateTopics = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (data: UpdateIllusTopicsParams, context) => {
     const userAuth = context.auth;

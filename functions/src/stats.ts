@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions';
 import { adminApp } from './adminApp';
+import { cloudRegions } from './utils';
 
 const firestore = adminApp.firestore();
 
@@ -7,7 +8,7 @@ const firestore = adminApp.firestore();
 // Books
 // ------
 export const onCreateBook = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .firestore
   .document('books/{bookId}')
   .onCreate(async (bookSnap) => {
@@ -62,7 +63,7 @@ export const onCreateBook = functions
 
 
 export const onDeleteBook = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .firestore
   .document('books/{bookId}')
   .onDelete(async (bookSnap) => {
@@ -130,7 +131,7 @@ export const onDeleteBook = functions
 // Illustrations
 // -------------
 export const onCreateIllustration = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .firestore
   .document('illustrations/{illustrationId}')
   .onCreate(async (illustrationSnap) => {
@@ -185,7 +186,7 @@ export const onCreateIllustration = functions
 
 
 export const onDeleteIllustration = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .firestore
   .document('illustrations/{illustrationId}')
   .onDelete(async (illustrationSnap) => {
@@ -258,7 +259,7 @@ export const onDeleteIllustration = functions
 // Users
 // ------
 export const onCreateUser = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .firestore
   .document('users/{userId}')
   .onCreate(async (userSnap) => {
@@ -293,7 +294,7 @@ export const onCreateUser = functions
   });
 
 export const onUpdateUser = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .firestore
   .document('users/{userId}')
   .onUpdate(async (change) => {
@@ -342,7 +343,7 @@ export const onUpdateUser = functions
   });
 
 export const onDeleteUser = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .firestore
   .document('users/{userId}')
   .onDelete(async (userSnap) => {

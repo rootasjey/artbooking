@@ -11,7 +11,7 @@ const firestore = adminApp.firestore();
  * Must be used after app updates (mobile & web).
  */
 export const updateUserLists = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onRequest(async ({}, res) => {
     // The app has very few users right now (less than 20).
@@ -59,7 +59,7 @@ export const updateUserLists = functions
   });
 
 export const checkEmailAvailability = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (data) => {
     const email: string = data.email;
@@ -89,7 +89,7 @@ export const checkEmailAvailability = functions
   });
 
 export const checkUsernameAvailability = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (data) => {
     const name: string = data.name;
@@ -127,7 +127,7 @@ export const checkUsernameAvailability = functions
  * Check user's provided arguments and exit if wrong.
  */
 export const createAccount = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (data: CreateUserAccountParams) => {
     if (!checkCreateAccountData(data)) {
@@ -260,7 +260,7 @@ export const createAccount = functions
  * Delete user's entry from Firebase auth and from Firestore. 
  */
 export const deleteAccount = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (data: DeleteAccountParams, context) => {
     const userAuth = context.auth;
@@ -356,7 +356,7 @@ export const fetchUser = functions
  * before validating the new email.
  */
 export const updateEmail = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (data: UpdateEmailParams, context) => {
     const userAuth = context.auth;
@@ -416,7 +416,7 @@ export const updateEmail = functions
  * before validating the new username.
  */
 export const updateUsername = functions
-  .region('europe-west3')
+  .region(cloudRegions.eu)
   .https
   .onCall(async (data: UpdateUsernameParams, context) => {
     const userAuth = context.auth;
