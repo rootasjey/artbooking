@@ -14,6 +14,15 @@ class Urls {
     this.share,
   });
 
+  factory Urls.empty() {
+    return Urls(
+      original: '',
+      share: ShareUrls.empty(),
+      storage: '',
+      thumbnails: ThumbnailUrls.empty(),
+    );
+  }
+
   factory Urls.fromJSON(Map<String, dynamic> json) {
     return Urls(
       original: json['original'],

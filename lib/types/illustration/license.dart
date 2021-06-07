@@ -24,6 +24,15 @@ class IllustrationLicense {
     this.usage,
   });
 
+  factory IllustrationLicense.empty() {
+    return IllustrationLicense(
+      custom: false,
+      description: '',
+      name: '',
+      existingLicenseId: '',
+      usage: LicenseUsage.empty(),
+    );
+  }
   factory IllustrationLicense.fromJSON(Map<String, dynamic> data) {
     return IllustrationLicense(
       custom: data['custom'],

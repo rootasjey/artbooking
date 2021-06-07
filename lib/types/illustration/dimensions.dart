@@ -10,6 +10,13 @@ class Dimensions {
     this.width = 0,
   });
 
+  factory Dimensions.empty() {
+    return Dimensions(
+      height: 0,
+      width: 0,
+    );
+  }
+
   factory Dimensions.fromJSON(Map<String, dynamic> data) {
     return Dimensions(
       height: data['height'],

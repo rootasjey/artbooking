@@ -38,6 +38,20 @@ class LicenseUsage {
     this.view,
   });
 
+  factory LicenseUsage.empty() {
+    return LicenseUsage(
+      edit: false,
+      print: false,
+      sell: false,
+      share: false,
+      showAttribution: false,
+      useInOtherFree: false,
+      useInOtherOss: false,
+      useInOtherPaid: false,
+      view: false,
+    );
+  }
+
   factory LicenseUsage.fromJSON(Map<String, dynamic> data) {
     return LicenseUsage(
       edit: data['edit'],

@@ -7,6 +7,13 @@ class ShareUrls {
     this.write = '',
   });
 
+  factory ShareUrls.empty() {
+    return ShareUrls(
+      read: '',
+      write: '',
+    );
+  }
+
   factory ShareUrls.fromJSON(Map<String, dynamic> json) {
     return ShareUrls(
       read: json['read'],

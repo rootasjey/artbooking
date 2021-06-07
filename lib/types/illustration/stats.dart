@@ -11,7 +11,21 @@ class IllustrationStats {
   /// How many times a user went to this illustration's page.
   final int views;
 
-  IllustrationStats({this.downloads, this.fav, this.shares, this.views});
+  IllustrationStats({
+    this.downloads,
+    this.fav,
+    this.shares,
+    this.views,
+  });
+
+  factory IllustrationStats.empty() {
+    return IllustrationStats(
+      downloads: 0,
+      fav: 0,
+      shares: 0,
+      views: 0,
+    );
+  }
 
   factory IllustrationStats.fromJSON(Map<String, dynamic> data) {
     return IllustrationStats(
