@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 
 import { adminApp } from './adminApp';
-import { checkUserIsSignedIn } from './utils';
+import { checkUserIsSignedIn, cloudRegions } from './utils';
 
 const firebaseTools = require('firebase-tools');
 const firestore = adminApp.firestore();
@@ -256,28 +256,6 @@ export const createAccount = functions
     };
   });
 
-function checkCreateAccountData(data: any) {
-  if (Object.keys(data).length !== 3) {
-    return false;
-  }
-
-  const keys = Object.keys(data);
-
-  if (!keys.includes('username')
-    || !keys.includes('email')
-    || !keys.includes('password')) {
-    return false;
-  }
-
-  if (typeof data['username'] !== 'string' ||
-    typeof data['email'] !== 'string' ||
-    typeof data['password'] !== 'string') {
-    return false;
-  }
-
-  return true;
-}
-
 /**
  * Delete user's entry from Firebase auth and from Firestore. 
  */
@@ -330,46 +308,47 @@ export const deleteAccount = functions
     };
   });
 
-async function isUserExistsByEmail(email: string) {
-  const emailSnapshot = await firestore
-    .collection('users')
-    .where('email', '==', email)
-    .limit(1)
-    .get();
+/**
+ * Return user's data.
+ */
+export const fetchUser = functions
+  .region(cloudRegions.eu)
+  .https
+  .onCall(async (data) => {
+    const userId: string = data.userId;
 
-  if (!emailSnapshot.empty) {
-    return true;
-  }
-
-  try {
-    const userRecord = await adminApp
-      .auth()
-      .getUserByEmail(email);
-
-    if (userRecord) {
-      return true;
+    if (!userId) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `'fetchUser' must be called with one (1) argument 
+        representing the author's id to fetch.`,
+      );
     }
 
-    return false;
+    const userSnap = await firestore
+      .collection('users')
+      .doc(userId)
+      .get();
 
-  } catch (error) {
-    return false;
-  }
-}
+    const userData = userSnap.data();
 
-async function isUserExistsByUsername(nameLowerCase: string) {
-  const nameSnapshot = await firestore
-    .collection('users')
-    .where('nameLowerCase', '==', nameLowerCase)
-    .limit(1)
-    .get();
+    if (!userSnap.exists || !userData) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        `The specified user does not exist. 
+        It may have been deleted.`,
+      );
+    }
 
-  if (nameSnapshot.empty) {
-    return false;
-  }
 
-  return true;
-}
+    const userDataWithId = {
+      ...userData,
+      ...{ id: userSnap.id },
+    };
+
+    return formatUserData(userDataWithId);
+  });
+
 
 /**
  * Update an user's email in Firebase auth and in Firestore.
@@ -489,6 +468,97 @@ export const updateUsername = functions
       user: { id: userAuth.uid },
     };
   });
+
+// ----------------
+// HELPER FUNCTIONS
+// ----------------
+
+function checkCreateAccountData(data: any) {
+  if (Object.keys(data).length !== 3) {
+    return false;
+  }
+
+  const keys = Object.keys(data);
+
+  if (!keys.includes('username')
+    || !keys.includes('email')
+    || !keys.includes('password')) {
+    return false;
+  }
+
+  if (typeof data['username'] !== 'string' ||
+    typeof data['email'] !== 'string' ||
+    typeof data['password'] !== 'string') {
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Take a raw Firestore data object and return formated data.
+ * @param userData User's data.
+ * @returns Return a formated data to consume.
+ */
+function formatUserData(userData: any) {
+  return {
+    createdAt: userData.createdAt,
+    email: userData.email,
+    id: userData.id,
+    job: userData.job ?? '',
+    lang: userData.lang ?? '',
+    location: userData.location,
+    name: userData.name,
+    pp: userData.pp,
+    pricing: userData.pricing,
+    role: userData.role,
+    stats: userData.stats,
+    summary: userData.summary,
+    updatedAt: userData.updatedAt,
+    urls: userData.urls,
+  };
+}
+
+async function isUserExistsByEmail(email: string) {
+  const emailSnapshot = await firestore
+    .collection('users')
+    .where('email', '==', email)
+    .limit(1)
+    .get();
+
+  if (!emailSnapshot.empty) {
+    return true;
+  }
+
+  try {
+    const userRecord = await adminApp
+      .auth()
+      .getUserByEmail(email);
+
+    if (userRecord) {
+      return true;
+    }
+
+    return false;
+
+  } catch (error) {
+    return false;
+  }
+}
+
+async function isUserExistsByUsername(nameLowerCase: string) {
+  const nameSnapshot = await firestore
+    .collection('users')
+    .where('nameLowerCase', '==', nameLowerCase)
+    .limit(1)
+    .get();
+
+  if (nameSnapshot.empty) {
+    return false;
+  }
+
+  return true;
+}
 
 function validateEmailFormat(email: string) {
   const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;

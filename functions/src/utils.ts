@@ -3,6 +3,10 @@ import { adminApp } from './adminApp';
 
 const env = functions.config();
 
+export const cloudRegions = {
+  eu: 'europe-west3'
+};
+
 export async function checkUserIsSignedIn(
   context: functions.https.CallableContext,
   idToken: string,
