@@ -47,6 +47,7 @@ class Illustration {
 
   /// Downloads, favourites, shares, views... of this illustration.
   IllustrationStats stats;
+
   final DateTime updatedAt;
   Urls urls;
   List<IllustrationVersion> versions;
@@ -72,9 +73,31 @@ class Illustration {
     this.visibility,
   });
 
+  factory Illustration.empty() {
+    return Illustration(
+      acl: const [],
+      author: Author.empty(),
+      categories: const [],
+      createdAt: DateTime.now(),
+      description: '',
+      dimensions: Dimensions.empty(),
+      extension: '',
+      id: '',
+      license: IllustrationLicense.empty(),
+      name: '',
+      stats: IllustrationStats.empty(),
+      size: 0,
+      summary: '',
+      updatedAt: DateTime.now(),
+      urls: Urls.empty(),
+      versions: const [],
+      visibility: ContentVisibility.private,
+    );
+  }
+
   factory Illustration.fromJSON(Map<String, dynamic> data) {
     return Illustration(
-      author: Author.fromJSON(data['author']),
+      author: Author.fromJSON(data['user']),
       categories: parseCategories(data['categories']),
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       description: data['description'],
