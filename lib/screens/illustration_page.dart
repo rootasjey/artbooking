@@ -473,9 +473,9 @@ class _IllustrationPageState extends State<IllustrationPage> {
     );
   }
 
-  void fetchIllustration() async {
+  void fetchIllustration({bool silent = false}) async {
     setState(() {
-      _isLoading = true;
+      _isLoading = !silent;
     });
 
     try {
@@ -652,12 +652,14 @@ class _IllustrationPageState extends State<IllustrationPage> {
     );
   }
 
-  void showMetaDataSheet() {
-    showCupertinoModalBottomSheet(
+  void showMetaDataSheet() async {
+    await showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => EditIllustrationMeta(
         illustration: _illustration,
       ),
     );
+
+    fetchIllustration(silent: true);
   }
 }
