@@ -15,6 +15,7 @@ import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
+import 'package:verbal_expressions/verbal_expressions.dart';
 
 class EditIllustrationMeta extends StatefulWidget {
   final Illustration illustration;
@@ -41,7 +42,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
   final _descriptionTextController = TextEditingController();
   final _platformController = TextEditingController();
-  final _tagController = TextEditingController();
+  final _topicsTextController = TextEditingController();
   final _storyTextController = TextEditingController();
   final _nameTextController = TextEditingController();
   final _linkNameInputController = TextEditingController();
@@ -59,17 +60,21 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   };
 
   final _programmingLanguages = Map<String, bool>();
-  final _tags = Map<String, bool>();
+  final _topics = Map<String, bool>();
   final _links = Map<String, String>();
 
   final GlobalKey<ExpansionTileCardState> _presentationCard = GlobalKey();
+
+  final _numberRegex = VerbalExpression()
+    ..digit()
+    ..oneOrMore();
 
   String _editingExistingLinkName = '';
   String _jwt = '';
   String _linkName = '';
   String _linkValue = '';
   String _platformInputValue = '';
-  String _tagInputValue = '';
+  String _topicInputValue = '';
 
   /// Illustration's name after page loading.
   /// Used to know if they're pending changes.
@@ -138,8 +143,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           presentationSection(),
+          topicsSection(),
           platformsSection(),
-          tagsSection(),
           linksSection(),
           metaValidationButton(),
         ],
@@ -558,7 +563,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     );
   }
 
-  Widget tagsSection() {
+  Widget topicsSection() {
     return Container(
       width: 600.0,
       padding: const EdgeInsets.only(
@@ -569,27 +574,27 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         expandedTextColor: Colors.black,
         baseColor: stateColors.lightBackground,
         expandedColor: stateColors.lightBackground,
-        title: tagsHeader(),
+        title: topicsHeader(),
         children: [
-          tagsContent(),
-          tagsInput(),
+          topicsContent(),
+          topicsInput(),
         ],
       ),
     );
   }
 
-  Widget tagsHeader() {
+  Widget topicsHeader() {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        headerTitle("tags".tr()),
-        headerDescription("tags_description".tr()),
+        headerTitle("topics".tr()),
+        headerDescription("topics_description".tr()),
       ],
     );
   }
 
-  Widget tagsContent() {
+  Widget topicsContent() {
     return Align(
       alignment: Alignment.topLeft,
       child: Padding(
@@ -597,7 +602,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         child: Wrap(
           spacing: 10.0,
           runSpacing: 10.0,
-          children: _tags.entries.map((entry) {
+          children: _topics.entries.map((entry) {
             return InputChip(
               label: Opacity(
                 opacity: 0.8,
@@ -612,7 +617,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
               labelPadding: const EdgeInsets.symmetric(horizontal: 12.0),
               deleteIconColor: stateColors.secondary.withOpacity(0.8),
               onDeleted: () {
-                removeTagAndUpdate(entry);
+                removeTopicAndUpdate(entry);
               },
               onSelected: (isSelected) {},
             );
@@ -622,41 +627,64 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     );
   }
 
-  Widget tagsInput() {
+  Widget topicsInput() {
     return Align(
       alignment: Alignment.topLeft,
       child: Padding(
         padding: const EdgeInsets.only(top: 20.0, left: 16.0),
-        child: Row(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              width: 300.0,
-              child: TextFormField(
-                  controller: _tagController,
-                  decoration: InputDecoration(
-                    labelText: "tag_new_dot".tr(),
-                    border: UnderlineInputBorder(),
-                  ),
-                  onChanged: (value) {
-                    _tagInputValue = value.toLowerCase();
-                  },
-                  onFieldSubmitted: (value) {
-                    addTagAndUpdate();
-                  }),
-            ),
             Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: IconButton(
-                tooltip: "tag_add".tr(),
-                icon: Opacity(
-                  opacity: 0.6,
-                  child: Icon(UniconsLine.check),
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Text(
+                "topics".tr(),
+                style: FontsUtils.mainStyle(
+                  fontWeight: FontWeight.w600,
                 ),
-                onPressed: () {
-                  addTagAndUpdate();
-                },
               ),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 300.0,
+                  child: TextFormField(
+                    controller: _topicsTextController,
+                    decoration: InputDecoration(
+                      labelText: "topics_label_text".tr(),
+                      filled: true,
+                      isDense: true,
+                      fillColor: stateColors.clairPink,
+                      focusColor: stateColors.clairPink,
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          width: 2.0,
+                          color: stateColors.primary,
+                        ),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      _topicInputValue = value;
+                    },
+                    onFieldSubmitted: (value) {
+                      addTopicAndUpdate();
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: IconButton(
+                    tooltip: "topic_add".tr(),
+                    icon: Opacity(
+                      opacity: 0.6,
+                      child: Icon(UniconsLine.plus),
+                    ),
+                    onPressed: addTopicAndUpdate,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -937,8 +965,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     }
   }
 
-  void addTagAndUpdate() async {
-    if (_tagInputValue.isEmpty) {
+  void addTopicAndUpdate() async {
+    if (_topicInputValue.isEmpty) {
       Snack.e(
         context: context,
         message: "input_empty_invalid".tr(),
@@ -947,21 +975,61 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       return;
     }
 
+    final topicsList = _topicInputValue.split(",");
+
     setState(() {
-      _tags[_tagInputValue] = true;
-      _tagController.clear();
+      _topicsTextController.clear();
+
+      for (String topic in topicsList) {
+        _topics[topic] = true;
+      }
+
       _isSaving = true;
     });
 
     try {
-      await _illustrationSnapshot.reference.update({'tags': _tags});
-    } catch (error) {
+      final response = await Cloud.illustrations("updateTopics").call({
+        "illustrationId": widget.illustration.id,
+        "topics": _topics.keys.toList(),
+      });
+
+      final bool success = response.data["success"];
+
+      if (!success) {
+        throw "topics_update_fail".tr();
+      }
+    } on FirebaseFunctionsException catch (error) {
       appLogger.e(error);
-      _tags.remove(_tagInputValue);
+
+      for (String topic in topicsList) {
+        _topics.remove(topic);
+      }
+
+      String errorMessage = error.message;
+
+      if (error.code == "out-of-range") {
+        final matches = _numberRegex.toRegExp().allMatches(error.message);
+
+        final String numberOfTopics =
+            matches.last.group(matches.last.groupCount);
+
+        errorMessage = "topics_update_out_of_range".tr(args: [numberOfTopics]);
+      }
 
       Snack.e(
         context: context,
-        message: "project_update_tags_fail".tr(),
+        message: errorMessage,
+      );
+    } catch (error) {
+      appLogger.e(error);
+
+      for (String topic in topicsList) {
+        _topics.remove(topic);
+      }
+
+      Snack.e(
+        context: context,
+        message: error.toString(),
       );
     } finally {
       setState(() => _isSaving = false);
@@ -1067,6 +1135,10 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     _nameTextController.text = illustration.name;
     _descriptionTextController.text = illustration.description;
     _storyTextController.text = illustration.story;
+
+    illustration.topics.forEach((key) {
+      _topics.putIfAbsent(key, () => true);
+    });
   }
 
   void removePlatformAndUpdate(MapEntry<String, bool> entry) async {
@@ -1112,21 +1184,30 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     }
   }
 
-  void removeTagAndUpdate(MapEntry<String, bool> entry) async {
+  void removeTopicAndUpdate(MapEntry<String, bool> entry) async {
     setState(() {
-      _tags.remove(entry.key);
+      _topics.remove(entry.key);
       _isSaving = true;
     });
 
     try {
-      await _illustrationSnapshot.reference.update({'tags': _tags});
+      final response = await Cloud.illustrations("updateTopics").call({
+        "illustrationId": widget.illustration.id,
+        "topics": _topics.keys.toList(),
+      });
+
+      final bool success = response.data["success"];
+
+      if (!success) {
+        throw "topics_update_fail".tr();
+      }
     } catch (error) {
       appLogger.e(error);
-      _tags.putIfAbsent(entry.key, () => entry.value);
+      _topics.putIfAbsent(entry.key, () => entry.value);
 
       Snack.e(
         context: context,
-        message: "project_update_tags_fail".tr(),
+        message: error.toString(),
       );
     } finally {
       setState(() => _isSaving = false);
