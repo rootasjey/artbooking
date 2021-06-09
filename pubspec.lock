@@ -1071,6 +1071,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
+  verbal_expressions:
+    dependency: "direct main"
+    description:
+      name: verbal_expressions
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   watcher:
     dependency: transitive
     description:
