@@ -124,7 +124,9 @@ export const createOne = functions
       });
 
     return {
-      illustrationId: illustrationSnap.id,
+      illustration: {
+        id: illustrationSnap.id,
+      },
       success: true,
     };
   });
@@ -191,7 +193,9 @@ export const deleteOne = functions
     await illustrationSnap.ref.delete();
 
     return {
-      illustrationId,
+      illustration: {
+        id: illustrationId,
+      },
       success: true,
     };
   });
@@ -453,7 +457,9 @@ export const setUserAuthor = functions
       }});
 
     return {
-      illustrationId,
+      illustration: {
+        id: illustrationId,
+      },
       success: true,
     }
   });
@@ -511,7 +517,9 @@ export const unsetUserAuthor = functions
     });
 
     return {
-      illustrationId,
+      illustration: {
+        id: illustrationId,
+      },
       success: true,
     }
   });
@@ -612,7 +620,9 @@ export const updatePresentation = functions
     });
 
     return {
-      illustrationId,
+      illustration: {
+        id: illustrationId,
+      },
       success: true,
     }
   });
@@ -672,7 +682,9 @@ export const updateCategories = functions
     await illustrationSnap.ref.update({categories});
 
     return { 
-      illustrationId,
+      illustration: {
+        id: illustrationId,
+      }, 
       success: true, 
     };
   });
@@ -733,7 +745,9 @@ export const updateTopics = functions
     await illustrationSnap.ref.update({ topics });
 
     return {
-      illustrationId,
+      illustration: {
+        id: illustrationId,
+      },
       success: true,
     }
   });
