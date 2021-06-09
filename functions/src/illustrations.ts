@@ -519,10 +519,10 @@ export const unsetUserAuthor = functions
 /**
  * Update description, name, license, story, & visibility if specified.
  */
-export const updateMetadata = functions
+export const updatePresentation = functions
   .region(cloudRegions.eu)
   .https
-  .onCall(async (data: UpdateIllusMetadataParams, context) => {
+  .onCall(async (data: UpdateIllusPresentationParams, context) => {
     const userAuth = context.auth;
 
     if (!userAuth) {
@@ -532,17 +532,14 @@ export const updateMetadata = functions
       );
     }
 
-    checkUpdateParams(data);
+    checkUpdatePresentationParams(data);
 
     const { 
       description,
       illustrationId,
       name,
-      license,
       story,
     } = data;
-
-    const visibility = checkLicenseFormat(data.visibility);
 
     const illustrationSnap = await firestore
       .collection('illustrations')
@@ -568,9 +565,7 @@ export const updateMetadata = functions
     await illustrationSnap.ref.update({
       description,
       name,
-      license,
       story,
-      visibility,
     });
 
     return {
@@ -708,7 +703,7 @@ export const updateTopics = functions
  * Check properties presence.
  * @param data Object containing updated properties.
  */
-function checkUpdateParams(data: UpdateIllusMetadataParams) {
+function checkUpdatePresentationParams(data: UpdateIllusPresentationParams) {
   if (!data) {
     throw new functions.https.HttpsError(
       'invalid-argument', 
@@ -720,11 +715,9 @@ function checkUpdateParams(data: UpdateIllusMetadataParams) {
 
   const { 
     description,
-    illustrationId, 
-    name, 
-    license, 
-    story, 
-    visibility, 
+    illustrationId,
+    name,
+    story,
   } = data;
 
   if (typeof description !== 'string') {
@@ -751,14 +744,6 @@ function checkUpdateParams(data: UpdateIllusMetadataParams) {
     );
   }
 
-  if (typeof license !== 'object') {
-    throw new functions.https.HttpsError(
-      'invalid-argument', 
-      `The function must be called with a valid [license]
-       parameter which is the image's license.`,
-    );
-  }
-
   if (typeof story !== 'string') {
     throw new functions.https.HttpsError(
       'invalid-argument', 
@@ -766,16 +751,9 @@ function checkUpdateParams(data: UpdateIllusMetadataParams) {
        parameter which is the image's license.`,
       );
   }
-
-  if (typeof visibility !== 'string') {
-    throw new functions.https.HttpsError(
-      'invalid-argument', 
-      `The function must be called with a valid [visibility]
-       parameter which is the image's visibility.`,
-    );
-  }
 }
 
+// @ts-ignore
 function checkLicenseFormat(data: any) {
   const defaultLicense = {
     custom: false,

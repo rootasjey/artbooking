@@ -239,32 +239,26 @@ interface UpdateIllusPositionParams {
   illustrationId: string;
 }
 
-interface UpdateIllusMetadataParams {
-  /** Illustration's description. */
-  description: string,
-  
-  /** Illustration's id. */
-  illustrationId: string;
-  
-  /** Illustration's name. */
-  name: string;
-  
-  /** Illustration's license. */
-  license: string;
-  
-  /** Detailed text explaining more about this illustration. */
-  story: string;
-
-  /** Image's visibility. */
-  visibility: Visibility;
-}
-
 interface UpdateIllusCategoriesParams {
   /** Image's categories. */
   categories: [string],
   
   /** Illustration's id. */
   illustrationId: string;
+}
+
+interface UpdateIllusPresentationParams {
+  /** Illustration's description. */
+  description: string,
+
+  /** Illustration's id. */
+  illustrationId: string;
+
+  /** Illustration's name. */
+  name: string;
+
+  /** Detailed text explaining more about this illustration. */
+  story: string;
 }
 
 interface UpdateIllusTopicsParams {
