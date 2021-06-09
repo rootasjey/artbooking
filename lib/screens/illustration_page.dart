@@ -1,6 +1,7 @@
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/author_header.dart';
+import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/illustration_poster.dart';
 import 'package:artbooking/components/main_app_bar.dart';
@@ -114,13 +115,16 @@ class _IllustrationPageState extends State<IllustrationPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Opacity(
-          opacity: 0.6,
-          child: Text(
-            Jiffy(_illustration.createdAt).fromNow(),
-            style: FontsUtils.mainStyle(
-              fontSize: 18.0,
-              fontWeight: FontWeight.w600,
+        InkWell(
+          onTap: onTapDates,
+          child: Opacity(
+            opacity: 0.6,
+            child: Text(
+              Jiffy(_illustration.createdAt).fromNow(),
+              style: FontsUtils.mainStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ),
@@ -512,5 +516,118 @@ class _IllustrationPageState extends State<IllustrationPage> {
 
       fetchIllustration();
     }
+  }
+
+  void onTapDates() {
+    showMyDialog(
+      title: "dates",
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text.rich(
+            TextSpan(
+              text: "Created: ",
+              style: FontsUtils.mainStyle(
+                fontSize: 18.0,
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+              ),
+              children: [
+                TextSpan(
+                  text: Jiffy(_illustration.createdAt).fromNow(),
+                  style: FontsUtils.mainStyle(
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text.rich(
+            TextSpan(
+              text: "Updated: ",
+              style: FontsUtils.mainStyle(
+                fontSize: 18.0,
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+              ),
+              children: [
+                TextSpan(
+                  text: Jiffy(_illustration.updatedAt).fromNow(),
+                  style: FontsUtils.mainStyle(
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> showMyDialog({
+    @required String title,
+    @required Widget body,
+  }) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: stateColors.clairPink,
+          title: Opacity(
+            opacity: 0.6,
+            child: Text(
+              title.toUpperCase(),
+            ),
+          ),
+          titleTextStyle: FontsUtils.mainStyle(
+            fontSize: 14.0,
+            color: Colors.black,
+            fontWeight: FontWeight.w700,
+          ),
+          titlePadding: const EdgeInsets.only(
+            top: 24.0,
+            left: 24.0,
+            right: 24.0,
+          ),
+          contentPadding: const EdgeInsets.only(top: 12.0),
+          actionsPadding: const EdgeInsets.only(
+            top: 12.0,
+            bottom: 24.0,
+          ),
+          content: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 700.0,
+            ),
+            child: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Divider(
+                    thickness: 2.0,
+                    color: stateColors.secondary.withOpacity(0.4),
+                    height: 0.0,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Opacity(
+                      opacity: 0.8,
+                      child: body,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            Center(
+              child: DarkElevatedButton(
+                onPressed: context.router.pop,
+                child: Text("close".tr().toUpperCase()),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
