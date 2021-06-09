@@ -96,6 +96,10 @@ class _AuthorHeaderState extends State<AuthorHeader> {
       final hashMap = LinkedHashMap.from(resp.data);
       final data = Cloud.convertFromFun(hashMap);
 
+      if (!mounted) {
+        return;
+      }
+
       setState(() => _user = UserFirestore.fromJSON(data));
     } catch (error) {
       appLogger.e(error);
