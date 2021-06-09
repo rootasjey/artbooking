@@ -24,13 +24,20 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:unicons/unicons.dart';
 
 class IllustrationPage extends StatefulWidget {
+  /// Illustration's id, used if direct navigation by url.
   final String illustrationId;
+
+  /// Illustration object, used if navigation from a previous page.
   final Illustration illustration;
+
+  /// True if navigating from dashboard.
+  final bool fromDashboard;
 
   const IllustrationPage({
     Key key,
     @PathParam() this.illustrationId,
     this.illustration,
+    this.fromDashboard = false,
   }) : super(key: key);
 
   @override
@@ -83,6 +90,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: fab(),
       body: Stack(
         children: [
           NotificationListener(
@@ -131,6 +139,31 @@ class _IllustrationPageState extends State<IllustrationPage> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget fab() {
+    if (!widget.fromDashboard) {
+      return Container();
+    }
+
+    return FloatingActionButton.extended(
+      onPressed: showMetaDataSheet,
+      backgroundColor: stateColors.primary,
+      foregroundColor: Colors.white,
+      icon: Padding(
+        padding: const EdgeInsets.only(left: 8.0),
+        child: Icon(UniconsLine.edit),
+      ),
+      label: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          "edit".tr(),
+          style: FontsUtils.mainStyle(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
     );
   }
 

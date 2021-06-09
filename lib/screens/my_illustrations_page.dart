@@ -611,6 +611,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
           return IllustrationPage(
             illustration: illustration,
             illustrationId: illustration.id,
+            fromDashboard: true,
           );
         },
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
