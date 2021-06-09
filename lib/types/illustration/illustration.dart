@@ -40,7 +40,7 @@ class Illustration {
   String name;
 
   /// Detailed text explaining more about this illustration.
-  String summary;
+  String story;
 
   /// Cloud Storage file's size in bytes.
   final int size;
@@ -66,7 +66,7 @@ class Illustration {
     this.name = '',
     this.stats,
     this.size = 0,
-    this.summary = '',
+    this.story = '',
     this.updatedAt,
     this.urls,
     this.versions = const [],
@@ -87,7 +87,7 @@ class Illustration {
       name: '',
       stats: IllustrationStats.empty(),
       size: 0,
-      summary: '',
+      story: '',
       updatedAt: DateTime.now(),
       urls: Urls.empty(),
       versions: const [],
@@ -108,7 +108,7 @@ class Illustration {
       name: data['name'],
       stats: IllustrationStats.fromJSON(data['stats']),
       size: data['size'],
-      summary: data['summary'] ?? '',
+      story: data['story'] ?? '',
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
       urls: Urls.fromJSON(data['urls']),
       versions: [],

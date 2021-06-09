@@ -160,7 +160,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
           header(),
           illustrationCard(),
           dates(),
-          userActions(),
+          actionsRow(),
           if (_isEditModeOn) metdataEdit() else metadata(),
         ]),
       ),
@@ -225,7 +225,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
   }
 
   Widget summary() {
-    if (_illustration.summary == null || _illustration.summary.isEmpty) {
+    if (_illustration.story == null || _illustration.story.isEmpty) {
       return Container();
     }
 
@@ -235,7 +235,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
       child: Opacity(
         opacity: 0.6,
         child: Text(
-          _illustration.summary ?? '',
+          _illustration.story ?? '',
           style: FontsUtils.mainStyle(
             fontSize: 24.0,
             fontWeight: FontWeight.w200,
@@ -400,7 +400,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
     );
   }
 
-  Widget userActions() {
+  Widget actionsRow() {
     return Padding(
       padding: const EdgeInsets.only(
         top: 32.0,
@@ -430,11 +430,11 @@ class _IllustrationPageState extends State<IllustrationPage> {
                 setState(() {
                   _nameController.text = _illustration.name;
                   _descController.text = _illustration.description;
-                  _summaryController.text = _illustration.summary;
+                  _summaryController.text = _illustration.story;
 
                   _newName = _illustration.name;
                   _newDesc = _illustration.description;
-                  _newSummary = _illustration.summary;
+                  _newSummary = _illustration.story;
                   _newLicense = _illustration.license;
                   _newVisibility = _illustration.visibility;
 
@@ -489,7 +489,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
     setState(() {
       _illustration.name = _newName;
       _illustration.description = _newDesc;
-      _illustration.summary = _newSummary;
+      _illustration.story = _newSummary;
       _illustration.license = _newLicense;
       _illustration.visibility = _newVisibility;
     });
