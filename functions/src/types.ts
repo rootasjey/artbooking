@@ -261,9 +261,9 @@ interface UpdateIllusPositionParams {
   illustrationId: string;
 }
 
-interface UpdateIllusCategoriesParams {
-  /** Image's categories. */
-  categories: [string],
+interface UpdateIllusStylesParams {
+  /** Image's styles. */
+  styles: [string],
   
   /** Illustration's id. */
   illustrationId: string;

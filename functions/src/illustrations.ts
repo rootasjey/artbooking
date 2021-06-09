@@ -56,7 +56,6 @@ export const createOne = functions
       .collection('illustrations')
       .add({
         author,
-        categories: {},
         createdAt: adminApp.firestore.Timestamp.now(),
         description: '',
         dimensions: {
@@ -90,6 +89,7 @@ export const createOne = functions
           views: 0,
         },
         story: '',
+        styles: {},
         timelapse: {
           createdAt: null,
           description: '',
@@ -627,10 +627,13 @@ export const updatePresentation = functions
     }
   });
 
-export const updateCategories = functions
+  /**
+   * Update illustration's styles.
+   */
+export const updateStyles = functions
   .region(cloudRegions.eu)
   .https
-  .onCall(async (data: UpdateIllusCategoriesParams, context) => {
+  .onCall(async (data: UpdateIllusStylesParams, context) => {
     const userAuth = context.auth;
 
     if (!userAuth) {
@@ -640,7 +643,7 @@ export const updateCategories = functions
       );
     }
     
-    const { categories, illustrationId } = data;
+    const { styles, illustrationId } = data;
     
     if (typeof illustrationId !== 'string') {
       throw new functions.https.HttpsError(
@@ -650,13 +653,21 @@ export const updateCategories = functions
       );
     }
     
-    if (!Array.isArray(categories)) {
+    if (!Array.isArray(styles)) {
       throw new functions.https.HttpsError(
         'invalid-argument', 
-        `The function must be called  with a valid [categories]
+        `The function must be called  with a valid [styles]
          argument which is an array of string.`,
       );
     }
+    
+    if (styles.length > 5) {
+      throw new functions.https.HttpsError(
+        'out-of-range',
+        `Please use no more than 5 styles. You provided ${styles.length} styles.`
+      )
+    }
+
 
     const illustrationSnap = await firestore
       .collection('illustrations')
@@ -679,7 +690,13 @@ export const updateCategories = functions
       );
     }
 
-    await illustrationSnap.ref.update({categories});
+    const stylesMap: Record<string, boolean> = {};
+
+    for (const style of styles) {
+      stylesMap[style] = true;
+    }
+
+    await illustrationSnap.ref.update({ styles: stylesMap });;
 
     return { 
       illustration: {
