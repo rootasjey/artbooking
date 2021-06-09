@@ -48,9 +48,20 @@ class Illustration {
   /// Downloads, favourites, shares, views... of this illustration.
   IllustrationStats stats;
 
+  /// Arbitrary subjects (e.g. video games, movies) — Limited to 5.
+  List<String> topics;
+
+  /// Last time this illustration was updated.
   final DateTime updatedAt;
+
+  /// This illustration's urls.
   Urls urls;
+
+  /// All available file versions of this illusration.
   List<IllustrationVersion> versions;
+
+  /// Access control policy.
+  /// Define who can read or write this illustration.
   ContentVisibility visibility;
 
   Illustration({
@@ -67,6 +78,7 @@ class Illustration {
     this.stats,
     this.size = 0,
     this.story = '',
+    this.topics = const [],
     this.updatedAt,
     this.urls,
     this.versions = const [],
@@ -88,6 +100,7 @@ class Illustration {
       stats: IllustrationStats.empty(),
       size: 0,
       story: '',
+      topics: const [],
       updatedAt: DateTime.now(),
       urls: Urls.empty(),
       versions: const [],
@@ -109,6 +122,7 @@ class Illustration {
       stats: IllustrationStats.fromJSON(data['stats']),
       size: data['size'],
       story: data['story'] ?? '',
+      topics: parseTopics(data['topics']),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
       urls: Urls.fromJSON(data['urls']),
       versions: [],
@@ -155,6 +169,20 @@ class Illustration {
   }
 
   static List<String> parseCategories(Map<String, dynamic> data) {
+    final results = <String>[];
+
+    if (data == null) {
+      return results;
+    }
+
+    data.forEach((key, value) {
+      results.add(key);
+    });
+
+    return results;
+  }
+
+  static List<String> parseTopics(data) {
     final results = <String>[];
 
     if (data == null) {
