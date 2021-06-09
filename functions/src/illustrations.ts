@@ -517,6 +517,49 @@ export const unsetUserAuthor = functions
   });
 
 /**
+ * Update illustration's license.
+ */
+export const updateLicense = functions
+  .region(cloudRegions.eu)
+  .https
+  .onCall(async (data: UpdateIllusLicenseParams, context) => {
+    const userAuth = context.auth;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
+    }
+
+    const { illustrationId, license } = data;
+    const formatedLicense = checkLicenseFormat(license);
+
+    const illusSnap = await firestore
+      .collection('illustrations')
+      .doc(illustrationId)
+      .get();
+
+    if (!illusSnap || !illusSnap.exists) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        `Sorry we didn't find the illustration you're trying to update. It may have been deleted.`
+      )
+    }
+
+    await illusSnap.ref.update({
+      license: formatedLicense,
+    });
+
+    return {
+      illustration: {
+        id: illustrationId,
+      },
+      success: true,
+    };
+  });
+
+/**
  * Update description, name, license, story, & visibility if specified.
  */
 export const updatePresentation = functions
@@ -629,7 +672,7 @@ export const updateCategories = functions
     await illustrationSnap.ref.update({categories});
 
     return { 
-      illustrationId, 
+      illustrationId,
       success: true, 
     };
   });
@@ -753,7 +796,6 @@ function checkUpdatePresentationParams(data: UpdateIllusPresentationParams) {
   }
 }
 
-// @ts-ignore
 function checkLicenseFormat(data: any) {
   const defaultLicense = {
     custom: false,
@@ -834,7 +876,7 @@ function checkLicenseFormat(data: any) {
     defaultLicense.usage.view = data.usage.view;
   }
 
-  return data;
+  return defaultLicense;
 }
 
 /**

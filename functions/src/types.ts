@@ -147,6 +147,28 @@ interface ImageDimensions {
   height: number;
   width: number;
 }
+
+/**
+ * Illustration's license.
+ */
+interface License {
+  custom: boolean;
+  description: string;
+  name: string;
+  existingLicenseId: string;
+  usage: {
+    edit: boolean;
+    print: boolean;
+    sell: boolean;
+    share: boolean;
+    showAttribution: boolean;
+    useInOtherFree: boolean;
+    useInOtherOss: boolean;
+    useInOtherPaid: boolean;
+    view: boolean;
+  };
+}
+
 interface NotifFuncParams {
   userId: string;
   userData: any;
@@ -247,6 +269,11 @@ interface UpdateIllusCategoriesParams {
   illustrationId: string;
 }
 
+interface UpdateIllusLicenseParams {
+  illustrationId: string;
+  license: License;
+}
+
 interface UpdateIllusPresentationParams {
   /** Illustration's description. */
   description: string,
@@ -267,6 +294,14 @@ interface UpdateIllusTopicsParams {
   
   /** Illustration's id. */
   illustrationId: string;
+}
+
+interface UpdateIllusVisibilityParams {
+  /** Illustration's id. */
+  illustrationId: string;
+
+  /** Image's visibility. */
+  visibility: Visibility;
 }
 
 interface UpdateUsernameParams {
