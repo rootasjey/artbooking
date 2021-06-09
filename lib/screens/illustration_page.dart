@@ -2,6 +2,7 @@ import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/author_header.dart';
 import 'package:artbooking/components/dark_elevated_button.dart';
+import 'package:artbooking/components/edit_illustration_meta.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/illustration_poster.dart';
 import 'package:artbooking/components/main_app_bar.dart';
@@ -19,6 +20,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:unicons/unicons.dart';
 
 class IllustrationPage extends StatefulWidget {
@@ -430,21 +432,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
             IconButton(
               tooltip: "edit".tr(),
               icon: Icon(UniconsLine.edit),
-              onPressed: () {
-                setState(() {
-                  _nameController.text = _illustration.name;
-                  _descController.text = _illustration.description;
-                  _summaryController.text = _illustration.story;
-
-                  _newName = _illustration.name;
-                  _newDesc = _illustration.description;
-                  _newSummary = _illustration.story;
-                  _newLicense = _illustration.license;
-                  _newVisibility = _illustration.visibility;
-
-                  _isEditModeOn = !_isEditModeOn;
-                });
-              },
+              onPressed: showMetaDataSheet,
             ),
           ],
         ),
@@ -628,6 +616,15 @@ class _IllustrationPageState extends State<IllustrationPage> {
           ],
         );
       },
+    );
+  }
+
+  void showMetaDataSheet() {
+    showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => EditIllustrationMeta(
+        illustration: _illustration,
+      ),
     );
   }
 }
