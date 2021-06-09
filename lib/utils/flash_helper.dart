@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/utils/fonts.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -156,6 +157,9 @@ class FlashHelper {
               child: Text(
                 message,
                 overflow: TextOverflow.ellipsis,
+                style: FontsUtils.mainStyle(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             primaryAction: Row(
