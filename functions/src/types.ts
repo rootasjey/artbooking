@@ -253,7 +253,7 @@ interface UpdateIllusMetadataParams {
   license: string;
   
   /** Detailed text explaining more about this illustration. */
-  summary: string;
+  story: string;
 
   /** Image's visibility. */
   visibility: Visibility;

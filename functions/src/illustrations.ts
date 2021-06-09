@@ -89,7 +89,7 @@ export const createOne = functions
           shares: 0,
           views: 0,
         },
-        summary: '',
+        story: '',
         timelapse: {
           createdAt: null,
           description: '',
@@ -517,7 +517,7 @@ export const unsetUserAuthor = functions
   });
 
 /**
- * Update description, name, license, summary, & visibility if specified.
+ * Update description, name, license, story, & visibility if specified.
  */
 export const updateMetadata = functions
   .region(cloudRegions.eu)
@@ -535,11 +535,11 @@ export const updateMetadata = functions
     checkUpdateParams(data);
 
     const { 
-      description, 
-      illustrationId, 
-      name, 
-      license, 
-      summary, 
+      description,
+      illustrationId,
+      name,
+      license,
+      story,
     } = data;
 
     const visibility = checkLicenseFormat(data.visibility);
@@ -569,7 +569,7 @@ export const updateMetadata = functions
       description,
       name,
       license,
-      summary,
+      story,
       visibility,
     });
 
@@ -723,7 +723,7 @@ function checkUpdateParams(data: UpdateIllusMetadataParams) {
     illustrationId, 
     name, 
     license, 
-    summary, 
+    story, 
     visibility, 
   } = data;
 
@@ -759,7 +759,7 @@ function checkUpdateParams(data: UpdateIllusMetadataParams) {
     );
   }
 
-  if (typeof summary !== 'string') {
+  if (typeof story !== 'string') {
     throw new functions.https.HttpsError(
       'invalid-argument', 
       `The function must be called with a valid [license]
