@@ -720,6 +720,13 @@ export const updateTopics = functions
          argument which is an array of string.`,
       );
     }
+
+    if (topics.length > 5) {
+      throw new functions.https.HttpsError(
+        'out-of-range',
+        `Please use no more than 5 topics. You provided ${topics.length} topics.`
+      )
+    }
     
     const illustrationSnap = await firestore
       .collection('illustrations')
@@ -742,7 +749,13 @@ export const updateTopics = functions
       );
     }
 
-    await illustrationSnap.ref.update({ topics });
+    const topicsMap: Record<string, boolean> = {};
+    
+    for (const topic of topics) {
+      topicsMap[topic] = true;
+    }
+
+    await illustrationSnap.ref.update({ topics: topicsMap });
 
     return {
       illustration: {
