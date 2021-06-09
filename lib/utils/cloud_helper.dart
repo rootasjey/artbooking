@@ -25,6 +25,7 @@ class Cloud {
     return converted;
   }
 
+  /// Call cloud functions related to tihs app on the right region.
   static HttpsCallable fun(
     String functionName, {
     HttpsCallableOptions options,
@@ -34,6 +35,23 @@ class Cloud {
       region: 'europe-west3',
     ).httpsCallable(
       functionName,
+      options: options,
+    );
+  }
+
+  /// Call cloud functions related to illustrations.
+  /// Only the suffix is necessary,
+  /// e.g. if the function's name is `illustrations-updateMetadata`,
+  /// You only need to specify `updateMetadata`.
+  static HttpsCallable illustrations(
+    String functionName, {
+    HttpsCallableOptions options,
+  }) {
+    return FirebaseFunctions.instanceFor(
+      app: Firebase.app(),
+      region: 'europe-west3',
+    ).httpsCallable(
+      "illustrations-$functionName",
       options: options,
     );
   }
