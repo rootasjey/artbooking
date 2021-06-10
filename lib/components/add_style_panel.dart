@@ -43,6 +43,7 @@ class AddStylePanel extends StatefulWidget {
 class _AddStylePanelState extends State<AddStylePanel> {
   /// True if there're more data to fetch.
   bool _hasNext = false;
+  bool _isLoadingMore = false;
 
   /// All available art styles.
   final List<Style> _availableStyles = [];
@@ -97,22 +98,25 @@ class _AddStylePanelState extends State<AddStylePanel> {
   Widget content() {
     return Padding(
       padding: const EdgeInsets.only(top: 90.0),
-      child: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: const EdgeInsets.only(top: 0.0),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate.fixed([
-                Column(
-                  children: [
-                    stylesInput(),
-                  ],
-                ),
-              ]),
+      child: NotificationListener<ScrollNotification>(
+        onNotification: onNotification,
+        child: CustomScrollView(
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.only(top: 0.0),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate.fixed([
+                  Column(
+                    children: [
+                      stylesInput(),
+                    ],
+                  ),
+                ]),
+              ),
             ),
-          ),
-          predefStylesList(),
-        ],
+            predefStylesList(),
+          ],
+        ),
       ),
     );
   }
@@ -297,9 +301,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
 
   /// 2nd + more fetches
   void fetchMoreStyles() async {
-    if (!_hasNext || _lastDocumentSnapshot == null) {
-      return;
-    }
+    _isLoadingMore = true;
 
     try {
       final stylesSnap = await FirebaseFirestore.instance
@@ -333,5 +335,18 @@ class _AddStylePanelState extends State<AddStylePanel> {
     } catch (error) {
       appLogger.e(error);
     }
+  }
+
+  /// On scroll notification
+  bool onNotification(ScrollNotification notification) {
+    if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
+      return false;
+    }
+
+    if (_hasNext && !_isLoadingMore && _lastDocumentSnapshot != null) {
+      fetchMoreStyles();
+    }
+
+    return false;
   }
 }
