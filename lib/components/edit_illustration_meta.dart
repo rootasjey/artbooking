@@ -1,8 +1,10 @@
+import 'package:artbooking/components/add_style_panel.dart';
 import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/sheet_header.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/style.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:artbooking/utils/fonts.dart';
@@ -32,6 +34,7 @@ class EditIllustrationMeta extends StatefulWidget {
 class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   bool _isLoading = false;
   bool _isSaving = false;
+  bool _isSidePanelStylesVisible = false;
 
   bool _isEditingExistingLink = false;
 
@@ -41,23 +44,14 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   final _linkValueFocusNode = FocusNode();
 
   final _descriptionTextController = TextEditingController();
-  final _platformController = TextEditingController();
   final _topicsTextController = TextEditingController();
   final _storyTextController = TextEditingController();
   final _nameTextController = TextEditingController();
   final _linkNameInputController = TextEditingController();
   final _linkValueInputController = TextEditingController();
 
-  final _platforms = {
-    'android': false,
-    'androidtv': false,
-    'ios': false,
-    'ipados': false,
-    'linux': false,
-    'macos': false,
-    'web': false,
-    'windows': false,
-  };
+  /// Illustration's selected art styles.
+  final List<String> _selectedStyles = [];
 
   final _programmingLanguages = Map<String, bool>();
   final _topics = Map<String, bool>();
@@ -73,7 +67,6 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   String _jwt = '';
   String _linkName = '';
   String _linkValue = '';
-  String _platformInputValue = '';
   String _topicInputValue = '';
 
   /// Illustration's name after page loading.
@@ -127,6 +120,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
             ),
           ),
           popupProgressIndicator(),
+          stylesSidePanel(),
         ],
       ),
     );
@@ -144,7 +138,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         children: [
           presentationSection(),
           topicsSection(),
-          platformsSection(),
+          stylesSection(),
           linksSection(),
           metaValidationButton(),
         ],
@@ -286,115 +280,6 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       child: DarkElevatedButton(
         onPressed: context.router.pop,
         child: Text("done".tr()),
-      ),
-    );
-  }
-
-  Widget platformsSection() {
-    return Container(
-      width: 600.0,
-      padding: const EdgeInsets.only(top: 100.0),
-      child: ExpansionTileCard(
-        elevation: 0.0,
-        expandedTextColor: Colors.black,
-        baseColor: stateColors.lightBackground,
-        expandedColor: stateColors.lightBackground,
-        title: platformsHeader(),
-        children: [
-          platformsContent(),
-          platformsInput(),
-        ],
-      ),
-    );
-  }
-
-  Widget platformsHeader() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        headerTitle("platforms".tr()),
-        headerDescription("platforms_description".tr()),
-      ],
-    );
-  }
-
-  Widget platformsContent() {
-    return Align(
-      alignment: Alignment.topLeft,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 16.0, left: 16.0),
-        child: Wrap(
-            spacing: 12.0,
-            runSpacing: 12.0,
-            children: _platforms.entries.map((entry) {
-              return InputChip(
-                label: Opacity(
-                  opacity: 0.8,
-                  child: Text(entry.key),
-                ),
-                labelStyle: FontsUtils.mainStyle(fontWeight: FontWeight.w700),
-                elevation: entry.value ? 2.0 : 0.0,
-                selected: entry.value,
-                deleteIconColor: entry.value
-                    ? stateColors.secondary.withOpacity(0.8)
-                    : Colors.black26,
-                labelPadding: const EdgeInsets.symmetric(horizontal: 12.0),
-                checkmarkColor: Colors.black26,
-                onDeleted: () {
-                  removePlatformAndUpdate(entry);
-                },
-                onSelected: (isSelected) {
-                  togglePlatformAndUpdate(
-                    entry,
-                    isSelected,
-                  );
-                },
-              );
-            }).toList()),
-      ),
-    );
-  }
-
-  Widget platformsInput() {
-    return Align(
-      alignment: Alignment.topLeft,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 20.0, left: 16.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: 300.0,
-              child: TextFormField(
-                controller: _platformController,
-                decoration: InputDecoration(
-                  labelText: "platform_new".tr(),
-                  border: UnderlineInputBorder(),
-                ),
-                onChanged: (value) {
-                  _platformInputValue = value.toLowerCase();
-                },
-                onFieldSubmitted: (value) {
-                  addPlatformAndUpdate();
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Opacity(
-                opacity: 0.6,
-                child: IconButton(
-                  tooltip: "platform_add".tr(),
-                  icon: Icon(UniconsLine.check),
-                  onPressed: () {
-                    addPlatformAndUpdate();
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -937,28 +822,147 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     );
   }
 
-  void addPlatformAndUpdate() async {
-    setState(() => _isSaving = true);
+  Widget stylesSection() {
+    return Container(
+      width: 600.0,
+      padding: const EdgeInsets.only(top: 100.0),
+      child: ExpansionTileCard(
+        elevation: 0.0,
+        expandedTextColor: Colors.black,
+        baseColor: stateColors.lightBackground,
+        expandedColor: stateColors.lightBackground,
+        title: stylesHeader(),
+        children: [
+          selectedStyles(),
+          stylesAddButton(),
+        ],
+      ),
+    );
+  }
 
+  Widget stylesAddButton() {
+    return Align(
+      alignment: Alignment.topLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(
+          top: 24.0,
+          left: 16.0,
+        ),
+        child: DarkElevatedButton(
+          onPressed: () {
+            setState(() {
+              _isSidePanelStylesVisible = !_isSidePanelStylesVisible;
+            });
+          },
+          child: Text(
+            _isSidePanelStylesVisible
+                ? "style_hide_panel".tr()
+                : "style_add".tr(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget stylesHeader() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        headerTitle("styles".tr()),
+        headerDescription("styles_description".tr()),
+      ],
+    );
+  }
+
+  Widget stylesSidePanel() {
+    return Positioned(
+      top: 100.0,
+      right: 24.0,
+      child: AddStylePanel(
+        isVisible: _isSidePanelStylesVisible,
+        selectedStyles: _selectedStyles,
+        onClose: () {
+          setState(() => _isSidePanelStylesVisible = false);
+        },
+        toggleStyleAndUpdate: toggleStyleAndUpdate,
+      ),
+    );
+  }
+
+  Widget selectedStyles() {
+    return Align(
+      alignment: Alignment.topLeft,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Wrap(
+            spacing: 12.0,
+            runSpacing: 12.0,
+            children: _selectedStyles.map((style) {
+              return InputChip(
+                label: Opacity(
+                  opacity: 0.8,
+                  child: Text(style),
+                ),
+                labelStyle: FontsUtils.mainStyle(fontWeight: FontWeight.w700),
+                elevation: 2.0,
+                deleteIconColor: stateColors.secondary.withOpacity(0.8),
+                labelPadding: const EdgeInsets.symmetric(horizontal: 12.0),
+                onDeleted: () {
+                  removeStyleAndUpdate(style);
+                },
+                onSelected: (isSelected) {},
+              );
+            }).toList()),
+      ),
+    );
+  }
+
+  void addStyleAndUpdate(String styleName) async {
     setState(() {
-      _platforms[_platformInputValue] = true;
-      _platformController.clear();
+      _selectedStyles.add(styleName);
+      _isSaving = true;
     });
 
     try {
-      await _illustrationSnapshot.reference.update({
-        'platforms': _platforms,
+      final response = await Cloud.illustrations("updateStyles").call({
+        "illustrationId": widget.illustration.id,
+        "styles": _selectedStyles,
       });
+
+      final bool success = response.data["success"];
+
+      if (!success) {
+        throw "styles_update_fail".tr();
+      }
+    } on FirebaseFunctionsException catch (error) {
+      appLogger.e(error);
+
+      String errorMessage = "styles_update_fail".tr();
+
+      if (error.code == "out-of-range") {
+        final matches = _numberRegex.toRegExp().allMatches(error.message);
+
+        final String numberOfStyles =
+            matches.last.group(matches.last.groupCount);
+
+        errorMessage = "styles_update_out_of_range".tr(args: [numberOfStyles]);
+      }
+
+      Snack.e(
+        context: context,
+        message: errorMessage,
+      );
     } catch (error) {
       appLogger.e(error);
 
       setState(() {
-        _platforms.remove(_platformInputValue);
+        _selectedStyles.remove(styleName);
       });
 
       Snack.e(
         context: context,
-        message: "project_update_platforms_fail".tr(),
+        message: "styles_update_fail".tr(),
       );
     } finally {
       setState(() => _isSaving = false);
@@ -1139,25 +1143,41 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     illustration.topics.forEach((key) {
       _topics.putIfAbsent(key, () => true);
     });
+
+    _selectedStyles.addAll(widget.illustration.styles);
   }
 
-  void removePlatformAndUpdate(MapEntry<String, bool> entry) async {
+  void removeStyleAndUpdate(String styleName) async {
     setState(() {
       _isSaving = true;
-      _platforms.remove(entry.key);
+      _selectedStyles.remove(styleName);
     });
 
     try {
-      await _illustrationSnapshot.reference.update({
-        'platforms': _platforms,
+      final response = await Cloud.illustrations("updateStyles").call({
+        "illustrationId": widget.illustration.id,
+        "styles": _selectedStyles,
       });
-    } catch (error) {
+
+      final bool success = response.data["success"];
+
+      if (!success) {
+        throw "styles_update_fail".tr();
+      }
+    } on FirebaseFunctionsException catch (error) {
       appLogger.e(error);
-      _platforms.putIfAbsent(entry.key, () => entry.value);
 
       Snack.e(
         context: context,
-        message: "project_update_platforms_fail".tr(),
+        message: error.message,
+      );
+    } catch (error) {
+      appLogger.e(error);
+      _selectedStyles.add(styleName);
+
+      Snack.e(
+        context: context,
+        message: "styles_update_fail".tr(),
       );
     } finally {
       setState(() => _isSaving = false);
@@ -1214,32 +1234,6 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     }
   }
 
-  void togglePlatformAndUpdate(
-    MapEntry<String, bool> entry,
-    bool isSelected,
-  ) async {
-    setState(() {
-      _platforms[entry.key] = isSelected;
-      _isSaving = true;
-    });
-
-    try {
-      await _illustrationSnapshot.reference.update({
-        'platforms': _platforms,
-      });
-    } catch (error) {
-      appLogger.e(error);
-      _platforms[entry.key] = !isSelected;
-
-      Snack.e(
-        context: context,
-        message: "project_update_platforms_fail".tr(),
-      );
-    } finally {
-      setState(() => _isSaving = false);
-    }
-  }
-
   void updatePresentation() async {
     _presentationCard.currentState.collapse();
     setState(() => _isSaving = true);
@@ -1273,5 +1267,14 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     } finally {
       setState(() => _isSaving = false);
     }
+  }
+
+  void toggleStyleAndUpdate(Style style, bool selected) {
+    if (selected) {
+      removeStyleAndUpdate(style.name);
+      return;
+    }
+
+    addStyleAndUpdate(style.name);
   }
 }
