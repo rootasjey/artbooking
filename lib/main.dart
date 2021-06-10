@@ -28,6 +28,7 @@ void main() async {
   await appStorage.initialize();
   await Future.wait([_autoLogin(), _initLang()]);
   await EasyLocalization.ensureInitialized();
+  await GlobalConfiguration().loadFromAsset("app_settings");
 
   SearchHelper.init(
     applicationId: GlobalConfiguration().getValue('algolia_app_id'),
