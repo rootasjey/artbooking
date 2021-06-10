@@ -7,8 +7,59 @@ const env = functions.config();
 
 const client = algolia(env.algolia.appid, env.algolia.apikey);
 const illustrationsIndex = client.initIndex('illustrations');
+const stylesIndex = client.initIndex('styles');
 const usersIndex = client.initIndex('users');
 
+// ----------------
+// Art styles index
+// ----------------
+/**
+ * Update styles index on create document.
+ */
+export const onIndexStyle = functions
+  .region(cloudRegions.eu)
+  .firestore
+  .document('styles/{styleId}')
+  .onCreate(async (snapshot) => {
+    const data = snapshot.data();
+    const objectID = snapshot.id;
+
+    return stylesIndex.saveObject({
+      objectID,
+      ...data,
+    })
+  });
+
+/**
+ * Update styles index on update document.
+ */
+  export const onReIndexStyle = functions
+  .region(cloudRegions.eu)
+  .firestore
+  .document('styles/{styleId}')
+  .onUpdate(async (snapshot) => {
+    const data = snapshot.after.data();
+    const objectID = snapshot.after.id;
+
+    return stylesIndex.saveObject({
+      objectID,
+      ...data,
+    })
+  });
+
+/**
+ * Update styles index on delete document.
+ */
+  export const onUnIndexStyle = functions
+  .region(cloudRegions.eu)
+  .firestore
+  .document('styles/{styleId}')
+  .onDelete(async (snapshot) => {
+    const objectID = snapshot.id;
+    return stylesIndex.deleteObject(objectID);
+  });
+
+// -------------------
 // Illustrations index
 // -------------------
 export const onIndexIllustration = functions
@@ -65,6 +116,7 @@ export const onUnIndexIllustration = functions
     return illustrationsIndex.deleteObject(objectID);
   });
 
+// -----------
 // Users index
 // -----------
 export const onIndexUser = functions
