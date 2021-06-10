@@ -15,9 +15,6 @@ class Illustration {
   /// Author's illustration.
   Author author;
 
-  /// Illustration's style (e.g. pointillism, realism) — Limited to 5.
-  List<String> categories;
-
   /// The time this illustration has been created.
   final DateTime createdAt;
 
@@ -48,6 +45,9 @@ class Illustration {
   /// Downloads, favourites, shares, views... of this illustration.
   IllustrationStats stats;
 
+  /// Art style (e.g. pointillism, realism) — Limited to 5.
+  List<String> styles;
+
   /// Arbitrary subjects (e.g. video games, movies) — Limited to 5.
   List<String> topics;
 
@@ -67,7 +67,7 @@ class Illustration {
   Illustration({
     this.acl = const [],
     this.author,
-    this.categories = const [],
+    this.styles = const [],
     this.createdAt,
     this.description = '',
     this.dimensions,
@@ -89,7 +89,7 @@ class Illustration {
     return Illustration(
       acl: const [],
       author: Author.empty(),
-      categories: const [],
+      styles: const [],
       createdAt: DateTime.now(),
       description: '',
       dimensions: Dimensions.empty(),
@@ -111,7 +111,7 @@ class Illustration {
   factory Illustration.fromJSON(Map<String, dynamic> data) {
     return Illustration(
       author: Author.fromJSON(data['user']),
-      categories: parseCategories(data['categories']),
+      styles: parseStyles(data['styles']),
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       description: data['description'],
       dimensions: Dimensions.fromJSON(data['dimensions']),
@@ -168,7 +168,7 @@ class Illustration {
     return urls.original;
   }
 
-  static List<String> parseCategories(Map<String, dynamic> data) {
+  static List<String> parseStyles(Map<String, dynamic> data) {
     final results = <String>[];
 
     if (data == null) {
