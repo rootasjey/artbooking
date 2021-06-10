@@ -6,11 +6,13 @@ import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/app_storage.dart';
+import 'package:artbooking/utils/search.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:global_configuration/global_configuration.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:url_strategy/url_strategy.dart';
@@ -26,6 +28,11 @@ void main() async {
   await appStorage.initialize();
   await Future.wait([_autoLogin(), _initLang()]);
   await EasyLocalization.ensureInitialized();
+
+  SearchHelper.init(
+    applicationId: GlobalConfiguration().getValue('algolia_app_id'),
+    searchApiKey: GlobalConfiguration().getValue('algolia_search_api_key'),
+  );
 
   // final brightness = BrightnessUtils.getCurrent();
 
