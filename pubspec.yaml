@@ -47,6 +47,7 @@ dependencies:
     sdk: flutter
   flutter_mobx: 2.0.0-nullsafety.3
   font_awesome_flutter: 9.0.0
+  global_configuration: 2.0.0-nullsafety.0
   google_fonts: 2.0.0
   image: 3.0.2
   image_editor: 1.0.0
@@ -104,6 +105,7 @@ flutter:
     - assets/images/default-avatar.png
     - assets/images/gummy-canvas.png
     - assets/translations/
+    - assets/cfg/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
