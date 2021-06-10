@@ -1,12 +1,17 @@
+import 'dart:async';
+
+import 'package:algolia/algolia.dart';
 import 'package:artbooking/components/circle_button.dart';
 import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/style.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/utils/search.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
 /// A side panel to add art style to an illustration.
@@ -45,8 +50,14 @@ class _AddStylePanelState extends State<AddStylePanel> {
   bool _hasNext = false;
   bool _isLoadingMore = false;
 
+  /// Last fetched document snapshot. Useful for pagination.
+  DocumentSnapshot<Object> _lastDocumentSnapshot;
+
   /// All available art styles.
   final List<Style> _availableStyles = [];
+
+  /// Search results.
+  final List<Style> _suggestionsStyles = [];
 
   /// Search controller.
   final _searchTextController = TextEditingController();
@@ -57,13 +68,20 @@ class _AddStylePanelState extends State<AddStylePanel> {
   /// Maximum styles to fetch in one request.
   int _limitStyles = 10;
 
-  /// Last fetched document snapshot. Useful for pagination.
-  DocumentSnapshot<Object> _lastDocumentSnapshot;
+  /// Delay search after typing input.
+  Timer _searchTimer;
 
   @override
   initState() {
     super.initState();
     fetchStyles();
+  }
+
+  @override
+  void dispose() {
+    _searchTimer?.cancel();
+    _searchTextController.dispose();
+    super.dispose();
   }
 
   @override
@@ -114,11 +132,20 @@ class _AddStylePanelState extends State<AddStylePanel> {
                 ]),
               ),
             ),
-            predefStylesList(),
+            body(),
           ],
         ),
       ),
     );
+  }
+
+  Widget body() {
+    if (_searchTextController.text.isNotEmpty &&
+        _suggestionsStyles.isNotEmpty) {
+      return searchResultsStylesList();
+    }
+
+    return predefStylesList();
   }
 
   Widget header() {
@@ -221,40 +248,119 @@ class _AddStylePanelState extends State<AddStylePanel> {
     );
   }
 
+  Widget searchResultsStylesList() {
+    return SliverPadding(
+      padding: const EdgeInsets.all(8.0),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final style = _suggestionsStyles.elementAt(index);
+            final selected = widget.selectedStyles.contains(style.name);
+
+            return ListTile(
+              onTap: () => widget.toggleStyleAndUpdate(style, selected),
+              title: Opacity(
+                opacity: 0.8,
+                child: Row(
+                  children: [
+                    if (selected)
+                      Icon(
+                        UniconsLine.check,
+                        color: selected ? stateColors.secondary : null,
+                      ),
+                    Expanded(
+                      child: Text(
+                        style.name.toUpperCase(),
+                        style: FontsUtils.mainStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.w700,
+                            color: selected ? stateColors.secondary : null),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              subtitle: Text(
+                style.description,
+                style: FontsUtils.mainStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              contentPadding: const EdgeInsets.all(16.0),
+            );
+          },
+          childCount: _suggestionsStyles.length,
+        ),
+      ),
+    );
+  }
+
   Widget stylesInput() {
     return Padding(
       padding: const EdgeInsets.all(24.0),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 300.0,
-            child: TextFormField(
-              controller: _searchTextController,
-              decoration: InputDecoration(
-                filled: true,
-                isDense: true,
-                labelText: "style_label_text".tr(),
-                fillColor: stateColors.clairPink,
-                focusColor: stateColors.clairPink,
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    width: 4.0,
-                    color: stateColors.primary,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 300.0,
+                child: TextFormField(
+                  autofocus: true,
+                  controller: _searchTextController,
+                  decoration: InputDecoration(
+                    filled: true,
+                    isDense: true,
+                    labelText: "style_label_text".tr(),
+                    fillColor: stateColors.clairPink,
+                    focusColor: stateColors.clairPink,
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        width: 4.0,
+                        color: stateColors.primary,
+                      ),
+                    ),
+                  ),
+                  onChanged: (value) {
+                    _searchTimer?.cancel();
+
+                    _searchTimer = Timer(
+                      500.milliseconds,
+                      searchStyle,
+                    );
+                  },
+                  onFieldSubmitted: (value) {},
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Opacity(
+                  opacity: 0.6,
+                  child: IconButton(
+                    tooltip: "styles_search".tr(),
+                    icon: Icon(UniconsLine.search),
+                    onPressed: searchStyle,
                   ),
                 ),
               ),
-              onFieldSubmitted: (value) {},
-            ),
+            ],
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Opacity(
-              opacity: 0.6,
-              child: IconButton(
-                tooltip: "styles_search".tr(),
-                icon: Icon(UniconsLine.search),
-                onPressed: () {},
+            padding: const EdgeInsets.only(top: 6.0),
+            child: TextButton.icon(
+              onPressed: () {
+                setState(() {
+                  _searchTextController.clear();
+                });
+              },
+              icon: Icon(UniconsLine.times),
+              label: Text("clear".tr()),
+              style: TextButton.styleFrom(
+                primary: Colors.black54,
+                textStyle: FontsUtils.mainStyle(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
@@ -348,5 +454,35 @@ class _AddStylePanelState extends State<AddStylePanel> {
     }
 
     return false;
+  }
+
+  void searchStyle() async {
+    _suggestionsStyles.clear();
+
+    try {
+      final AlgoliaQuery query = await SearchHelper.algolia
+          .index("styles")
+          .query(_searchTextController.text)
+          .setHitsPerPage(_limitStyles)
+          .setPage(0);
+
+      final AlgoliaQuerySnapshot snapshot = await query.getObjects();
+
+      if (snapshot.empty) {
+        return;
+      }
+
+      setState(() {
+        for (final AlgoliaObjectSnapshot hit in snapshot.hits) {
+          final data = hit.data;
+          data['id'] = hit.objectID;
+
+          final style = Style.fromJSON(data);
+          _suggestionsStyles.add(style);
+        }
+      });
+    } catch (error) {
+      appLogger.e(error);
+    }
   }
 }
