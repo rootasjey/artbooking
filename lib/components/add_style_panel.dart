@@ -13,6 +13,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// A side panel to add art style to an illustration.
 class AddStylePanel extends StatefulWidget {
@@ -48,7 +49,12 @@ class AddStylePanel extends StatefulWidget {
 class _AddStylePanelState extends State<AddStylePanel> {
   /// True if there're more data to fetch.
   bool _hasNext = false;
+
+  /// True if loading more style from Firestore.
   bool _isLoadingMore = false;
+
+  /// True if the style's image is visible.
+  bool _isImagePreviewVisible = false;
 
   /// Last fetched document snapshot. Useful for pagination.
   DocumentSnapshot<Object> _lastDocumentSnapshot;
@@ -67,6 +73,9 @@ class _AddStylePanelState extends State<AddStylePanel> {
 
   /// Maximum styles to fetch in one request.
   int _limitStyles = 10;
+
+  /// Selected style for image preview.
+  Style _selectedStylePreview;
 
   /// Delay search after typing input.
   Timer _searchTimer;
@@ -114,8 +123,12 @@ class _AddStylePanelState extends State<AddStylePanel> {
   }
 
   Widget content() {
+    if (_isImagePreviewVisible) {
+      return imagePreview();
+    }
+
     return Padding(
-      padding: const EdgeInsets.only(top: 90.0),
+      padding: const EdgeInsets.only(top: 120.0),
       child: NotificationListener<ScrollNotification>(
         onNotification: onNotification,
         child: CustomScrollView(
@@ -160,32 +173,50 @@ class _AddStylePanelState extends State<AddStylePanel> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Wrap(
-              spacing: 24.0,
-              alignment: WrapAlignment.spaceAround,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: CircleButton(
-                    icon: Icon(
-                      UniconsLine.times,
-                      color: Colors.black54,
-                    ),
-                    onTap: widget.onClose,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 0.0),
-                  child: Text(
-                    "styles_available".tr(),
-                    style: FontsUtils.mainStyle(
-                      fontSize: 22.0,
-                      fontWeight: FontWeight.w600,
+            SizedBox(
+              width: 380.0,
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: CircleButton(
+                      icon: Icon(
+                        UniconsLine.times,
+                        color: Colors.black54,
+                      ),
+                      onTap: widget.onClose,
                     ),
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "styles_available".tr(),
+                            style: FontsUtils.mainStyle(
+                              fontSize: 22.0,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Opacity(
+                            opacity: 0.5,
+                            child: Text(
+                              "styles_subtitle".tr(),
+                              style: FontsUtils.mainStyle(
+                                height: 1.0,
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             SizedBox(
               width: _containerWidth,
@@ -193,6 +224,93 @@ class _AddStylePanelState extends State<AddStylePanel> {
                 thickness: 2.0,
                 color: stateColors.secondary,
                 height: 40.0,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget imagePreview() {
+    Widget imageContainer;
+
+    if (_selectedStylePreview == null) {
+      imageContainer = Container();
+    } else {
+      imageContainer = Material(
+        elevation: 2.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Ink.image(
+          image: NetworkImage(_selectedStylePreview.urls.image),
+          width: 300.0,
+          height: 260.0,
+          fit: BoxFit.cover,
+          child: InkWell(
+            onTap: () => launch(_selectedStylePreview.urls.image),
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: 140.0,
+        bottom: 12.0,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 40.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    tooltip: "back".tr(),
+                    onPressed: () {
+                      setState(() {
+                        _isImagePreviewVisible = false;
+                      });
+                    },
+                    icon: Icon(UniconsLine.arrow_left),
+                  ),
+                  Expanded(
+                    child: Opacity(
+                      opacity: 0.8,
+                      child: Text(
+                        _selectedStylePreview.name.toUpperCase(),
+                        style: FontsUtils.mainStyle(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            imageContainer,
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Opacity(
+                opacity: 0.6,
+                child: Text(
+                  _selectedStylePreview.description,
+                  style: FontsUtils.mainStyle(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () => launch(_selectedStylePreview.urls.wikipedia),
+              child: Text(_selectedStylePreview.urls.wikipedia),
+              style: TextButton.styleFrom(
+                primary: Colors.black54,
               ),
             ),
           ],
@@ -212,6 +330,12 @@ class _AddStylePanelState extends State<AddStylePanel> {
 
             return ListTile(
               onTap: () => widget.toggleStyleAndUpdate(style, selected),
+              onLongPress: () {
+                setState(() {
+                  _selectedStylePreview = style;
+                  _isImagePreviewVisible = true;
+                });
+              },
               title: Opacity(
                 opacity: 0.8,
                 child: Row(

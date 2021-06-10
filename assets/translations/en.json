@@ -522,6 +522,7 @@
   "styles_available": "Available styles",
   "styles_description": "You can select one or more styles for your artwork (e.g. pointillism, realism). Styles are predefined.",
   "styles_search": "Search styles",
+  "styles_subtitle": "Tap to select or unselect a style. Long tap for image preview.",
   "styles_update_fail": "Sorry, we couldn't update your illustration's styles. Please try again later.",
   "styles_update_out_of_range": "Please use no more than 5 art styles. You tried to set {} styles.",
   "subscribe": "Subscribe",

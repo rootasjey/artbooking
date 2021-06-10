@@ -522,6 +522,7 @@
   "styles_available": "Styles disponibles",
   "styles_description": "Vous pouvez sélectionner un ou plusieurs styles pour votre œuvre (e.g. pointillisme, realisme). Les styles sont prédéfinis.",
   "styles_search": "Rechercher des styles d'art",
+  "styles_subtitle": "Tapotez pour sélectionner ou désélectionner un style. Appuyez longuement pour afficher l'image associée.",
   "styles_update_fail": "Désolés, nous n'avons pas pu mettre à jour vos styles. Veuillez réessayer plus tard.",
   "styles_update_out_of_range": "Veuillez utiliser au maximum 5 styles d'art. Vous avez essayé d'en mettre {}.",
   "subscribe": "Souscrire",
