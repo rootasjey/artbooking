@@ -31,7 +31,7 @@ class CircleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       shape: CircleBorder(),
-      clipBehavior: Clip.hardEdge,
+      clipBehavior: Clip.antiAlias,
       color: Colors.transparent,
       elevation: elevation,
       child: Tooltip(
