@@ -3,6 +3,7 @@ import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/sheet_header.dart';
 import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/style.dart';
 import 'package:artbooking/utils/app_logger.dart';
@@ -39,9 +40,6 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   bool _isEditingExistingLink = false;
 
   DocumentSnapshot _illustrationSnapshot;
-
-  final _linkNameFocusNode = FocusNode();
-  final _linkValueFocusNode = FocusNode();
 
   final _descriptionTextController = TextEditingController();
   final _topicsTextController = TextEditingController();
@@ -137,9 +135,9 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           presentationSection(),
-          topicsSection(),
           stylesSection(),
-          linksSection(),
+          topicsSection(),
+          visibilitySection(),
           metaValidationButton(),
         ],
       ),
@@ -605,223 +603,6 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     );
   }
 
-  Widget linksContent() {
-    return Align(
-      alignment: Alignment.topLeft,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 16.0),
-        child: Wrap(
-          spacing: 12.0,
-          runSpacing: 12.0,
-          children: _links.entries.map((entry) {
-            return InputChip(
-              label: Opacity(
-                opacity: 0.8,
-                child: Text(entry.key),
-              ),
-              labelPadding: const EdgeInsets.symmetric(
-                horizontal: 12.0,
-                vertical: 2.0,
-              ),
-              labelStyle: FontsUtils.mainStyle(
-                fontWeight: FontWeight.w600,
-              ),
-              elevation: entry.value.isEmpty ? 0.0 : 2.0,
-              selected: entry.value.isNotEmpty,
-              checkmarkColor: Colors.black26,
-              deleteIconColor: entry.value.isEmpty
-                  ? Colors.black26
-                  : stateColors.secondary.withOpacity(0.8),
-              onDeleted: () {
-                deleteUrlAndUpdate(entry);
-              },
-              onPressed: () {
-                setState(() {
-                  _linkName = entry.key;
-                  _linkValue = entry.value;
-                  _editingExistingLinkName = entry.key;
-                  _isEditingExistingLink = true;
-                  _linkNameInputController.text = '';
-                  _linkValueInputController.text = entry.value;
-                });
-
-                _linkValueFocusNode.requestFocus();
-              },
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-
-  Widget linksHeader() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          headerTitle("urls_ext".tr()),
-          headerDescription("urls_ext_description".tr()),
-        ],
-      ),
-    );
-  }
-
-  Widget linksSection() {
-    return Container(
-      width: 600.0,
-      padding: const EdgeInsets.only(
-        top: 100.0,
-      ),
-      child: ExpansionTileCard(
-        elevation: 0.0,
-        expandedTextColor: Colors.black,
-        baseColor: stateColors.lightBackground,
-        expandedColor: stateColors.lightBackground,
-        title: linksHeader(),
-        children: [
-          linksContent(),
-          linksInput(),
-        ],
-      ),
-    );
-  }
-
-  Widget editingExistingLinkContainer() {
-    if (!_isEditingExistingLink) {
-      return Padding(padding: EdgeInsets.zero);
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 12.0, bottom: 24.0),
-      child: Wrap(
-        spacing: 12.0,
-        runSpacing: 12.0,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          Text(
-            "You are editing an existing link.",
-            style: FontsUtils.mainStyle(
-              color: stateColors.primary,
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _linkName = '';
-                _linkValue = '';
-                _editingExistingLinkName = '';
-                _isEditingExistingLink = false;
-                _linkValueInputController.clear();
-              });
-
-              _linkNameFocusNode.requestFocus();
-            },
-            style: OutlinedButton.styleFrom(
-              primary: Colors.black54,
-              textStyle: FontsUtils.mainStyle(
-                fontSize: 14.0,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12.0,
-                vertical: 8.0,
-              ),
-              child: Stack(
-                children: [
-                  Text("url_new".tr()),
-                  Positioned(
-                    left: 0.0,
-                    right: 0.0,
-                    bottom: 0.0,
-                    child: Container(
-                      color: Colors.black38,
-                      height: 1.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget linksInput() {
-    return Align(
-      alignment: Alignment.topLeft,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 36.0, left: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            editingExistingLinkContainer(),
-            Container(
-              width: 260.0,
-              padding: const EdgeInsets.only(bottom: 12.0),
-              child: TextFormField(
-                focusNode: _linkNameFocusNode,
-                controller: _linkNameInputController,
-                textInputAction: TextInputAction.next,
-                decoration: InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: _linkName.isNotEmpty ? _linkName : "url_name".tr(),
-                ),
-                onChanged: (value) {
-                  _linkName = value;
-
-                  setState(() {
-                    _isEditingExistingLink = _links.containsKey(_linkName);
-                  });
-                },
-              ),
-            ),
-            Wrap(
-              spacing: 24.0,
-              runSpacing: 24.0,
-              crossAxisAlignment: WrapCrossAlignment.end,
-              children: [
-                SizedBox(
-                  width: 260.0,
-                  child: TextFormField(
-                    focusNode: _linkValueFocusNode,
-                    controller: _linkValueInputController,
-                    textInputAction: TextInputAction.go,
-                    decoration: InputDecoration(
-                      border: UnderlineInputBorder(),
-                      labelText: 'https://$_linkName...',
-                    ),
-                    keyboardType: TextInputType.url,
-                    onChanged: (value) {
-                      _linkValue = value;
-                    },
-                    onFieldSubmitted: (value) {
-                      addLinkAndUpdate();
-                    },
-                  ),
-                ),
-                IconButton(
-                  tooltip: "url_add".tr(),
-                  icon: Opacity(
-                    opacity: 0.6,
-                    child: Icon(UniconsLine.check),
-                  ),
-                  onPressed: () {
-                    addLinkAndUpdate();
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget stylesSection() {
     return Container(
       width: 600.0,
@@ -914,6 +695,119 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                 onSelected: (isSelected) {},
               );
             }).toList()),
+      ),
+    );
+  }
+
+  Widget visibilityBody() {
+    return Align(
+      alignment: Alignment.topLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 12.0, left: 16.0),
+        child: PopupMenuButton(
+          tooltip: "illustration_visibilty_choose".tr(),
+          child: visibilityCurrentButton(),
+          onSelected: updateVisibility,
+          itemBuilder: (context) => <PopupMenuEntry<ContentVisibility>>[
+            visibiltyPopupItem(
+              value: ContentVisibility.private,
+              titleValue: "visibility_private".tr(),
+              subtitleValue: "visibility_private_description".tr(),
+            ),
+            visibiltyPopupItem(
+              value: ContentVisibility.public,
+              titleValue: "visibility_public".tr(),
+              subtitleValue: "visibility_public_description".tr(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget visibilityCurrentButton() {
+    final illustration = widget.illustration;
+
+    return Material(
+      color: Colors.black87,
+      elevation: 4.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(6.0),
+      ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 200.0,
+          minHeight: 48.0,
+        ),
+        child: Center(
+          child: Text(
+            "visibility_${illustration.visibilityToString()}"
+                .tr()
+                .toUpperCase(),
+            style: FontsUtils.mainStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget visibilityHeader() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          headerTitle("visibility".tr()),
+          headerDescription("illustration_visibility_description".tr()),
+        ],
+      ),
+    );
+  }
+
+  PopupMenuItem<ContentVisibility> visibiltyPopupItem({
+    ContentVisibility value,
+    String titleValue,
+    String subtitleValue,
+  }) {
+    return PopupMenuItem(
+      value: value,
+      child: ListTile(
+        title: Text(
+          titleValue,
+          style: FontsUtils.mainStyle(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        subtitle: Text(
+          subtitleValue,
+          style: FontsUtils.mainStyle(
+            fontSize: 14.0,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget visibilitySection() {
+    return Container(
+      width: 600.0,
+      padding: const EdgeInsets.only(
+        top: 100.0,
+      ),
+      child: ExpansionTileCard(
+        elevation: 0.0,
+        expandedTextColor: Colors.black,
+        baseColor: stateColors.lightBackground,
+        expandedColor: stateColors.lightBackground,
+        title: visibilityHeader(),
+        children: [
+          visibilityBody(),
+        ],
       ),
     );
   }
@@ -1276,5 +1170,40 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     }
 
     addStyleAndUpdate(style.name);
+  }
+
+  void updateVisibility(ContentVisibility visibility) async {
+    final illustration = widget.illustration;
+    final previousVisibility = widget.illustration.visibility;
+
+    setState(() {
+      _isSaving = true;
+      illustration.visibility = visibility;
+    });
+
+    try {
+      final HttpsCallableResult response =
+          await Cloud.illustrations("updateVisibility").call({
+        "illustrationId": illustration.id,
+        "visibility": illustration.visibilityToString(),
+      });
+
+      final bool success = response.data["success"];
+
+      if (!success) {
+        throw "illustration_visibility_update_fail".tr();
+      }
+    } catch (error) {
+      appLogger.e(error);
+
+      illustration.visibility = previousVisibility;
+
+      Snack.e(
+        context: context,
+        message: "illustration_visibility_update_fail".tr(),
+      );
+    } finally {
+      setState(() => _isSaving = false);
+    }
   }
 }
