@@ -297,7 +297,7 @@ interface UpdateIllusVisibilityParams {
   /** Illustration's id. */
   illustrationId: string;
 
-  /** Image's visibility. */
+  /** Illustration's visibility. */
   visibility: Visibility;
 }
 

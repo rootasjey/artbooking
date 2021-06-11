@@ -822,6 +822,8 @@ export const updateVisibility = functions
       );
     }
 
+    checkVisibilityValue(visibility);
+
     const illustrationSnap = await firestore
       .collection('illustrations')
       .doc(illustrationId)
@@ -991,6 +993,33 @@ function checkLicenseFormat(data: any) {
   }
 
   return defaultLicense;
+}
+
+/**
+ * Throw an exception if the visibility's value is not
+ * among allowed values.
+ */
+function checkVisibilityValue(visibility: string) {
+  let isAllowed = false;
+
+  switch (visibility) {
+    case "acl":
+    case "private":
+    case "public":
+    case "unulisted":
+      isAllowed = true;
+      break;
+    default:
+      isAllowed = false;
+      break;
+  }
+
+  if (!isAllowed) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      `Invalide [visibility] value. Allowed values are: [acl], [private], [public], [unlisted].`,
+    );
+  }
 }
 
 /**
