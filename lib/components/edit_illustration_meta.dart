@@ -1193,6 +1193,14 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       if (!success) {
         throw "illustration_visibility_update_fail".tr();
       }
+    } on FirebaseFunctionsException catch (error) {
+      appLogger.e(error);
+      illustration.visibility = previousVisibility;
+
+      Snack.e(
+        context: context,
+        message: "[${error.code}] ${error.message}",
+      );
     } catch (error) {
       appLogger.e(error);
 
