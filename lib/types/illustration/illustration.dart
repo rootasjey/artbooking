@@ -126,7 +126,7 @@ class Illustration {
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
       urls: Urls.fromJSON(data['urls']),
       versions: [],
-      visibility: parseVisibility(data['visibilty']),
+      visibility: parseVisibility(data['visibility']),
     );
   }
 
