@@ -66,20 +66,17 @@ enum Visibility {
   /** Custom access control list based on users' roles. */
   acl = 'acl',
 
-  /** Inherit the challenge's visibility. */
-  challenge = 'challenge',
-
-  /** Inherit the contest's visibility. */
-  contest = 'contest',
-
-  /** Inherit the gallery's visibility. */
-  gallery = 'gallery',
-
   /** Only the owner can view this illustration. */
   private = 'private',
 
   /** Anyone with a link can view this illustration. */
   public = 'public',
+
+  /**
+   * Hidden from user's profile (if not the owner) but accessible through link or containers.
+   * Containers can be: books, challenges, contests, galleries.
+   */
+  unlisted = 'inlisted',
 }
 
 interface CreateUserAccountParams {
