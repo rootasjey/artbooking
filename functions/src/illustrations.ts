@@ -568,7 +568,7 @@ export const updateLicense = functions
   });
 
 /**
- * Update description, name, license, story, & visibility if specified.
+ * Update name, description, story.
  */
 export const updatePresentation = functions
   .region(cloudRegions.eu)
@@ -627,9 +627,10 @@ export const updatePresentation = functions
     }
   });
 
-  /**
-   * Update illustration's styles.
-   */
+/**
+ * Update illustration's styles.
+ * Styles are pre-defined (by the app) and are limited to 5.
+ */
 export const updateStyles = functions
   .region(cloudRegions.eu)
   .https
@@ -706,6 +707,10 @@ export const updateStyles = functions
     };
   });
 
+/**
+ * Update illustration's topics.
+ * Topics are user generated and limited to 5.
+ */
 export const updateTopics = functions
   .region(cloudRegions.eu)
   .https
@@ -782,6 +787,72 @@ export const updateTopics = functions
     }
   });
 
+/**
+ * Update illustration's visibility.
+ * Define who can view, edit or share this illustration.
+ */
+export const updateVisibility = functions
+  .region(cloudRegions.eu)
+  .https
+  .onCall(async (data: UpdateIllusVisibilityParams, context) => {
+    const userAuth = context.auth;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
+    }
+
+    const { illustrationId, visibility } = data;
+
+    if (typeof illustrationId !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called  with a valid [illustrationId]
+         argument which is the illustration's id.`,
+      );
+    }
+
+    if (typeof visibility !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called  with a valid [visibility]
+         argument which is a string.`,
+      );
+    }
+
+    const illustrationSnap = await firestore
+      .collection('illustrations')
+      .doc(illustrationId)
+      .get();
+
+    const illustrationData = illustrationSnap.data();
+
+    if (!illustrationSnap.exists || !illustrationData) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        `The illustration id [${illustrationId}] doesn't exist.`,
+      );
+    }
+
+    if (illustrationData.user.id !== userAuth.uid) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        `You don't have the permission to edit this illustration.`,
+      );
+    }
+
+    await illustrationSnap.ref.update({ visibility });
+
+    return {
+      illustration: {
+        id: illustrationId,
+      },
+      success: true,
+    }
+  });
+
 // ----------------
 // Helper functions
 // ----------------
@@ -795,8 +866,7 @@ function checkUpdatePresentationParams(data: UpdateIllusPresentationParams) {
     throw new functions.https.HttpsError(
       'invalid-argument', 
       `The function must be called with valid
-       [description], [illustrationId], [name],
-       [license] and [visibility] parameters.`,
+       [description], [illustrationId], [name], [story] parameters.`,
     );
   }
 
