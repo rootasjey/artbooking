@@ -213,10 +213,6 @@ class Book {
     switch (stringVisibility) {
       case 'acl':
         return ContentVisibility.acl;
-      case 'challenge':
-        return ContentVisibility.challenge;
-      case 'contest':
-        return ContentVisibility.contest;
       case 'private':
         return ContentVisibility.private;
       case 'public':
@@ -230,10 +226,6 @@ class Book {
     switch (visibility) {
       case ContentVisibility.acl:
         return 'acl';
-      case ContentVisibility.challenge:
-        return 'challenge';
-      case ContentVisibility.contest:
-        return 'contest';
       case ContentVisibility.private:
         return 'private';
       case ContentVisibility.public:

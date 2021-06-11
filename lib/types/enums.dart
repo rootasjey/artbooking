@@ -118,11 +118,9 @@ enum BookLayoutOrientation {
 
 enum ContentVisibility {
   acl,
-  challenge,
-  contest,
-  gallery,
   private,
   public,
+  unlisted,
 }
 
 enum DiscoverType {

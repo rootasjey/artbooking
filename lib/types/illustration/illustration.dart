@@ -200,21 +200,10 @@ class Illustration {
     switch (stringVisiblity) {
       case 'acl':
         return ContentVisibility.acl;
-      case 'challenge':
-        return ContentVisibility.challenge;
-        break;
-      case 'contest':
-        return ContentVisibility.contest;
-        break;
-      case 'gallery':
-        return ContentVisibility.gallery;
-        break;
       case 'private':
         return ContentVisibility.private;
-        break;
       case 'public':
         return ContentVisibility.public;
-        break;
       default:
         return ContentVisibility.private;
     }
@@ -224,12 +213,6 @@ class Illustration {
     switch (visibility) {
       case ContentVisibility.acl:
         return 'acl';
-      case ContentVisibility.challenge:
-        return 'challenge';
-      case ContentVisibility.contest:
-        return 'contest';
-      case ContentVisibility.gallery:
-        return 'gallery';
       case ContentVisibility.private:
         return 'private';
       case ContentVisibility.public:
@@ -243,12 +226,6 @@ class Illustration {
     switch (visibility) {
       case ContentVisibility.acl:
         return 'acl';
-      case ContentVisibility.challenge:
-        return 'challenge';
-      case ContentVisibility.contest:
-        return 'contest';
-      case ContentVisibility.gallery:
-        return 'gallery';
       case ContentVisibility.private:
         return 'private';
       case ContentVisibility.public:
