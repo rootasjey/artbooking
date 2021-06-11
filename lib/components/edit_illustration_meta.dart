@@ -288,7 +288,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     }
 
     return Positioned(
-      top: 100.0,
+      top: 40.0,
       right: 24.0,
       child: SizedBox(
         width: 240.0,
