@@ -7,6 +7,7 @@ const env = functions.config();
 
 const client = algolia(env.algolia.appid, env.algolia.apikey);
 const illustrationsIndex = client.initIndex('illustrations');
+const licensesIndex = client.initIndex('licenses');
 const stylesIndex = client.initIndex('styles');
 const usersIndex = client.initIndex('users');
 
@@ -114,6 +115,55 @@ export const onUnIndexIllustration = functions
     }
 
     return illustrationsIndex.deleteObject(objectID);
+  });
+
+// ----------------
+// Licenses index
+// ----------------
+/**
+ * Update licenses index on create document.
+ */
+export const onIndexLicense = functions
+  .region(cloudRegions.eu)
+  .firestore
+  .document('licenses/{licenseId}')
+  .onCreate(async (snapshot) => {
+    const data = snapshot.data();
+    const objectID = snapshot.id;
+
+    return licensesIndex.saveObject({
+      objectID,
+      ...data,
+    })
+  });
+
+/**
+ * Update licenses index on update document.
+ */
+export const onReIndexLicense = functions
+  .region(cloudRegions.eu)
+  .firestore
+  .document('licenses/{licenseId}')
+  .onUpdate(async (snapshot) => {
+    const data = snapshot.after.data();
+    const objectID = snapshot.after.id;
+
+    return licensesIndex.saveObject({
+      objectID,
+      ...data,
+    })
+  });
+
+/**
+ * Update licenses index on delete document.
+ */
+export const onUnIndexLicense = functions
+  .region(cloudRegions.eu)
+  .firestore
+  .document('licenses/{licenseId}')
+  .onDelete(async (snapshot) => {
+    const objectID = snapshot.id;
+    return licensesIndex.deleteObject(objectID);
   });
 
 // -----------
