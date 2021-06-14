@@ -105,13 +105,15 @@ interface CreateIllustrationParams {
 
 interface CreateOneLicenseParams {
   /**
-     * Tell if the license is from the platform or the author.
-     * This property is mandatory to know where to find the license from its id.
-     */
+   * Tell if the license is from the platform or the author.
+   * This property is mandatory to know where to find the license from its id.
+   */
   from: LicenseFrom,
-
+  
+  /** License's data. */
   license: License;
 }
+
 interface DataUpdateParams {
   beforeData: FirebaseFirestore.DocumentData;
   afterData: FirebaseFirestore.DocumentData;
@@ -149,6 +151,17 @@ interface DeleteListParams {
   idToken: string;
 }
 
+interface DeleteOneLicenseParams {
+  /**
+   * Tell if the license is from the platform or the author.
+   * This property is mandatory to know where to find the license from its id.
+   */
+  from: LicenseFrom,
+
+  /** License to delete. */
+  licenseId: string;
+}
+
 interface GenerateImageThumbsResult {
   dimensions: ImageDimensions;
   thumbnails: ThumbnailUrls;
@@ -172,11 +185,11 @@ interface License {
     id: string;
   },
 
-  /** True if not a predefined license.A custom license is set by an author. */
-  custom: boolean;
-
   /** Information about this license. */
   description: string;
+
+  /** Tell if this license has been created by an artist or by the platform's staff. */
+  from: LicenseFrom,
 
   /** License's id. */
   id: string;
