@@ -602,11 +602,20 @@ export const updateLicense = functions
       .doc(illustrationId)
       .get();
 
-    if (!illusSnap || !illusSnap.exists) {
+    const illustrationData = illusSnap.data();
+
+    if (!illusSnap.exists || !illustrationData) {
       throw new functions.https.HttpsError(
         'not-found',
         `Sorry we didn't find the illustration you're trying to update. It may have been deleted.`
       )
+    }
+
+    if (illustrationData.user.id !== userAuth.uid) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        `You don't have the permission to edit this illustration.`,
+      );
     }
 
     await illusSnap.ref.update({
