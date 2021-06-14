@@ -465,6 +465,60 @@ export const setUserAuthor = functions
   });
 
 /**
+ * Unset illustration's license.
+ */
+export const unsetLicense = functions
+  .region(cloudRegions.eu)
+  .https
+  .onCall(async (data: UpdateIllusLicenseParams, context) => {
+    const userAuth = context.auth;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
+    }
+
+    const { illustrationId } = data;
+
+    const illusSnap = await firestore
+      .collection('illustrations')
+      .doc(illustrationId)
+      .get();
+
+    const illustrationData = illusSnap.data();
+
+    if (!illusSnap.exists || !illustrationData) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        `Sorry we didn't find the illustration you're trying to update. It may have been deleted.`
+      )
+    }
+
+    if (illustrationData.user.id !== userAuth.uid) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        `You don't have the permission to edit this illustration.`,
+      );
+    }
+
+    await illusSnap.ref.update({
+      license: {
+        from: '',
+        id: '',
+      },
+    });
+
+    return {
+      illustration: {
+        id: illustrationId,
+      },
+      success: true,
+    };
+  });
+
+/**
  * Unset the image's author id same as user's id.
  */
 export const unsetUserAuthor = functions
