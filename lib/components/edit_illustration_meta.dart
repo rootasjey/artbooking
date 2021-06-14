@@ -1,10 +1,12 @@
 import 'package:artbooking/components/add_style_panel.dart';
 import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
+import 'package:artbooking/components/select_license_panel.dart';
 import 'package:artbooking/components/sheet_header.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/types/style.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
@@ -36,6 +38,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   bool _isLoading = false;
   bool _isSaving = false;
   bool _isSidePanelStylesVisible = false;
+  bool _isSidePanelLicenseVisible = false;
 
   bool _isEditingExistingLink = false;
 
@@ -83,7 +86,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   void initState() {
     super.initState();
     populateFields();
-    fetch();
+    fetchIllustration();
   }
 
   @override
@@ -119,6 +122,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
           ),
           popupProgressIndicator(),
           stylesSidePanel(),
+          licenseSidePanel(),
         ],
       ),
     );
@@ -138,6 +142,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
           stylesSection(),
           topicsSection(),
           visibilitySection(),
+          licenseSection(),
           metaValidationButton(),
         ],
       ),
@@ -705,7 +710,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       child: Padding(
         padding: const EdgeInsets.only(top: 12.0, left: 16.0),
         child: PopupMenuButton(
-          tooltip: "illustration_visibilty_choose".tr(),
+          tooltip: "illustration_visibility_choose".tr(),
           child: visibilityCurrentButton(),
           onSelected: updateVisibility,
           itemBuilder: (context) => <PopupMenuEntry<ContentVisibility>>[
@@ -808,6 +813,151 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         children: [
           visibilityBody(),
         ],
+      ),
+    );
+  }
+
+  Widget licenseCurrent() {
+    final illustration = widget.illustration;
+
+    return Align(
+      alignment: Alignment.topLeft,
+      child: Container(
+        width: 400.0,
+        padding: const EdgeInsets.only(
+          top: 24.0,
+          left: 12.0,
+          bottom: 12.0,
+        ),
+        child: Card(
+          elevation: 2.0,
+          child: InkWell(
+            onTap: () {},
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Opacity(
+                        opacity: 0.6,
+                        child: Text(
+                          "license_current".tr().toUpperCase(),
+                          style: FontsUtils.mainStyle(
+                            color: stateColors.primary,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                      Opacity(
+                        opacity: 0.8,
+                        child: Text(
+                          illustration.license.name.isEmpty
+                              ? "license_none".tr()
+                              : illustration.license.name,
+                          style: FontsUtils.mainStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Opacity(
+                    opacity: 0.8,
+                    child: IconButton(
+                      tooltip: "license_current_remove".tr(),
+                      onPressed: unselectLicenseAndUpdate,
+                      icon: Icon(UniconsLine.trash),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget licenseHeader() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          headerTitle("license".tr()),
+          headerDescription("illustration_license_description".tr()),
+        ],
+      ),
+    );
+  }
+
+  Widget licenseSection() {
+    return Container(
+      width: 600.0,
+      padding: const EdgeInsets.only(
+        top: 100.0,
+      ),
+      child: ExpansionTileCard(
+        elevation: 0.0,
+        expandedTextColor: Colors.black,
+        baseColor: stateColors.lightBackground,
+        expandedColor: stateColors.lightBackground,
+        onExpansionChanged: (isExpanded) {
+          if (!isExpanded) {
+            return;
+          }
+
+          fetchIllustrationLicense();
+        },
+        title: licenseHeader(),
+        children: [
+          licenseCurrent(),
+          licenseSelectButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget licenseSelectButton() {
+    return Align(
+      alignment: Alignment.topLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(
+          top: 24.0,
+          left: 16.0,
+        ),
+        child: DarkElevatedButton(
+          onPressed: () {
+            setState(() {
+              _isSidePanelLicenseVisible = !_isSidePanelLicenseVisible;
+            });
+          },
+          child: Text(
+            _isSidePanelStylesVisible
+                ? "license_hide_panel".tr()
+                : "license_select".tr(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget licenseSidePanel() {
+    return Positioned(
+      top: 100.0,
+      right: 24.0,
+      child: SelectLicensePanel(
+        isVisible: _isSidePanelLicenseVisible,
+        selectedLicense: widget.illustration.license,
+        onClose: () {
+          setState(() => _isSidePanelLicenseVisible = false);
+        },
+        toggleLicenseAndUpdate: toggleLicenseAndUpdate,
       ),
     );
   }
@@ -1002,7 +1152,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     }
   }
 
-  void fetch() async {
+  void fetchIllustration() async {
     setState(() => _isLoading = true);
 
     try {
@@ -1020,6 +1170,29 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       appLogger.e(error);
     } finally {
       setState(() => _isLoading = false);
+    }
+  }
+
+  void fetchIllustrationLicense() async {
+    try {
+      final licenseSnap = await FirebaseFirestore.instance
+          .collection("licenses")
+          .doc(widget.illustration.license.id)
+          .get();
+
+      if (!licenseSnap.exists) {
+        return;
+      }
+
+      final data = licenseSnap.data();
+      data['id'] = licenseSnap.id;
+
+      setState(() {
+        final completeLicense = IllustrationLicense.fromJSON(data);
+        widget.illustration.license = completeLicense;
+      });
+    } catch (error) {
+      appLogger.e(error);
     }
   }
 
@@ -1118,6 +1291,88 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     } catch (error) {
       appLogger.e(error);
       _topics.putIfAbsent(entry.key, () => entry.value);
+
+      Snack.e(
+        context: context,
+        message: error.toString(),
+      );
+    } finally {
+      setState(() => _isSaving = false);
+    }
+  }
+
+  void toggleLicenseAndUpdate(
+    IllustrationLicense illustrationLicense,
+    bool selected,
+  ) async {
+    if (selected) {
+      unselectLicenseAndUpdate();
+      return;
+    }
+
+    selectLicenseAndUpdate(illustrationLicense);
+  }
+
+  void selectLicenseAndUpdate(IllustrationLicense illustrationLicense) async {
+    setState(() => _isSaving = true);
+
+    final illustration = widget.illustration;
+    final previousLicense = illustration.license;
+    illustration.license = illustrationLicense;
+
+    try {
+      final response = await Cloud.illustrations("updateLicense").call({
+        "illustrationId": illustration.id,
+        "license": {
+          "id": illustrationLicense.id,
+          "from": illustrationLicense.from,
+        },
+      });
+
+      final bool success = response.data["success"];
+
+      if (!success) {
+        throw "license_update_fail".tr();
+      }
+    } catch (error) {
+      appLogger.e(error);
+
+      illustrationLicense = previousLicense;
+
+      Snack.e(
+        context: context,
+        message: error.toString(),
+      );
+    } finally {
+      setState(() => _isSaving = false);
+    }
+  }
+
+  void unselectLicenseAndUpdate() async {
+    setState(() => _isSaving = true);
+
+    final illustration = widget.illustration;
+    final previousLicense = illustration.license;
+    illustration.license = IllustrationLicense.empty();
+
+    try {
+      final response = await Cloud.illustrations("unsetLicense").call({
+        "illustrationId": illustration.id,
+        "license": {
+          "id": illustration.license.id,
+          "from": illustration.license.from,
+        },
+      });
+
+      final bool success = response.data["success"];
+
+      if (!success) {
+        throw "license_update_fail".tr();
+      }
+    } catch (error) {
+      appLogger.e(error);
+
+      illustration.license = previousLicense;
 
       Snack.e(
         context: context,
