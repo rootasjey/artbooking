@@ -8,7 +8,7 @@ import { join, dirname } from 'path';
 import * as sharp from 'sharp';
 
 import { adminApp } from './adminApp';
-import { checkOrGetDefaultVisibility, cloudRegions } from './utils';
+import { allowedLicenseFromValues, checkOrGetDefaultVisibility, cloudRegions } from './utils';
 
 const firestore = adminApp.firestore();
 const gcs = new Storage();
@@ -541,7 +541,7 @@ export const updateLicense = functions
     }
 
     const { illustrationId, license } = data;
-    const formatedLicense = checkLicenseFormat(license);
+    checkIllustrationLicenseFormat(license);
 
     const illusSnap = await firestore
       .collection('illustrations')
@@ -556,7 +556,10 @@ export const updateLicense = functions
     }
 
     await illusSnap.ref.update({
-      license: formatedLicense,
+      license: {
+        from: license.from ?? '',
+        id: license.id ?? '',
+      },
     });
 
     return {
@@ -912,87 +915,45 @@ function checkUpdatePresentationParams(data: UpdateIllusPresentationParams) {
   }
 }
 
-function checkLicenseFormat(data: any) {
-  const defaultLicense = {
-    custom: false,
-    description: '',
-    name: '',
-    existingLicenseId: '',
-    usage: {
-      edit: false,
-      print: false,
-      sell: false,
-      share: false,
-      showAttribution: true,
-      useInOtherFree: false,
-      useInOtherOss: false,
-      useInOtherPaid: false,
-      view: false,
-    },
-  };
-
-  if (!data) {
-    return defaultLicense;
+function checkIllustrationLicenseFormat(data: any) {
+  if (typeof data !== 'object') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      `The license data you provided is not an object. You provided a ${typeof data}. ` +
+      `You must specify an object, and it should have a [from] property which is a string, ` + 
+      `and an [id] property referencing an existing license in database.`,
+    )
+  }
+  
+  if (typeof data.id !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      `The license data you provided has the property [license.id] = ${data.id} - ` +
+      `which is not an string. ` +
+      `The property [id] must be a string ` + 
+      `and references an existing license in database.`,
+    )
   }
 
-  if (typeof data.custom === 'boolean') {
-    defaultLicense.custom = data.custom;
+  if (typeof data.from !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      `The license data you provided has the property [license.from] = ${data.from} - ` +
+      `which is not an string. ` +
+      `The property [from] must be a string ` + 
+      `among these values: ${allowedLicenseFromValues.join(", ")}`,
+    )
   }
 
-  if (typeof data.description === 'string') {
-    defaultLicense.description = data.description;
+  if (allowedLicenseFromValues.includes(data.from)) {
+    return;
   }
 
-  if (typeof data.name === 'string') {
-    defaultLicense.name = data.name;
-  }
-
-  if (typeof data.existingLicenseId === 'string') {
-    defaultLicense.existingLicenseId = data.existingLicenseId;
-  }
-
-  if (!data.usage) {
-    return data;
-  }
-
-  if (typeof data.usage.edit === 'boolean') {
-    defaultLicense.usage.edit = data.usage.edit;
-  }
-
-  if (typeof data.usage.print === 'boolean') {
-    defaultLicense.usage.print = data.usage.print;
-  }
-
-  if (typeof data.usage.sell === 'boolean') {
-    defaultLicense.usage.sell = data.usage.sell;
-  }
-
-  if (typeof data.usage.share === 'boolean') {
-    defaultLicense.usage.share = data.usage.share;
-  }
-
-  if (typeof data.usage.showAttribution === 'boolean') {
-    defaultLicense.usage.showAttribution = data.usage.showAttribution;
-  }
-
-  if (typeof data.usage.useInOtherFree === 'boolean') {
-    defaultLicense.usage.useInOtherFree = data.usage.useInOtherFree;
-  }
-
-
-  if (typeof data.usage.useInOtherOss === 'boolean') {
-    defaultLicense.usage.useInOtherOss = data.usage.useInOtherOss;
-  }
-    
-  if (typeof data.usage.useInOtherPaid === 'boolean') {
-    defaultLicense.usage.useInOtherPaid = data.usage.useInOtherPaid;
-  }
-
-  if (typeof data.usage.view === 'boolean') {
-    defaultLicense.usage.view = data.usage.view;
-  }
-
-  return defaultLicense;
+  throw new functions.https.HttpsError(
+    'invalid-argument',
+    `The value provided for [from] parameter is not valid. ` +
+    `Allowed values are: ${allowedLicenseFromValues.join(", ")}`,
+  );
 }
 
 /**

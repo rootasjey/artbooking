@@ -3,6 +3,8 @@ import { adminApp } from './adminApp';
 
 const env = functions.config();
 
+export const allowedLicenseFromValues = ["app", "author"];
+
 export const cloudRegions = {
   eu: 'europe-west3'
 };

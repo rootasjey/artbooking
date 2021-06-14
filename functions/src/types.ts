@@ -79,6 +79,11 @@ enum Visibility {
   unlisted = 'inlisted',
 }
 
+enum LicenseFrom {
+  app = 'app',
+  author = 'author',
+}
+
 interface CreateUserAccountParams {
   email: string;
   password: string;
@@ -98,6 +103,15 @@ interface CreateIllustrationParams {
   visibility: Visibility;
 }
 
+interface CreateOneLicenseParams {
+  /**
+     * Tell if the license is from the platform or the author.
+     * This property is mandatory to know where to find the license from its id.
+     */
+  from: LicenseFrom,
+
+  license: License;
+}
 interface DataUpdateParams {
   beforeData: FirebaseFirestore.DocumentData;
   afterData: FirebaseFirestore.DocumentData;
@@ -145,25 +159,121 @@ interface ImageDimensions {
   width: number;
 }
 
-/**
- * Illustration's license.
- */
+/** Illustration's license. */
 interface License {
+  /** The license short name. */
+  abbreviation: string;
+
+  /** When this entry was created in Firestore. */
+  createdAt: FirebaseFirestore.FieldValue;
+
+  /** User who created this license. */
+  createdBy: {
+    id: string;
+  },
+
+  /** True if not a predefined license.A custom license is set by an author. */
   custom: boolean;
+
+  /** Information about this license. */
   description: string;
+
+  /** License's id. */
+  id: string;
+
+  /** License's term of service & privacy policy update. */
+  licenseUpdatedAt: FirebaseFirestore.FieldValue;
+
+  /** License's name. */
   name: string;
-  existingLicenseId: string;
-  usage: {
-    edit: boolean;
-    print: boolean;
-    sell: boolean;
-    share: boolean;
-    showAttribution: boolean;
-    useInOtherFree: boolean;
-    useInOtherOss: boolean;
-    useInOtherPaid: boolean;
-    view: boolean;
+
+  /** Additional information about this license usage. */
+  notice: string;
+
+  /** Restrictions related to usage. */
+  terms: {
+    /** 
+     * You must give appropriate credit, provide a link to the license, 
+     * and indicate if changes were made. 
+    */
+    attribution: boolean;
+
+    /**
+     * You may not apply legal terms or technological measures 
+     * that legally restricts others from doing anything the license permits.
+     */
+    noAdditionalRestriction: boolean;
   };
+
+  /** When this entry was last updated in Firestore. */
+  updatedAt: FirebaseFirestore.FieldValue;
+
+  /** User who updated this license. */
+  updatedBy: {
+    id: string;
+  },
+
+  /** Specify how the illustration can be used. */
+  usage: {
+    /** Other can add, remove or modify part of this illustration freely. */
+    adapt: boolean;
+
+    /** Can be used in commercial projects & products. */
+    commercial: boolean;
+
+    /** Can be used in other free and open source projects. */
+    foss: boolean;
+
+    /** Can be used in other free softwares and projects. */
+    free: boolean;
+
+    /** Can be used in other open source projects. */
+    oss: boolean;
+
+    /** Can be used for personal use (e.g. wallpaper). */
+    personal: boolean;
+
+    /** Can be freely printed. */
+    print: boolean;
+
+    /** Can sell outside of the official app by another individual. */
+    sell: boolean;
+
+    /** Can be shared to other. */
+    share: boolean;
+
+    /** 
+     * Require that anyone who use the work - licensees - 
+     * make that new work available under the same license terms. 
+    */
+    shareALike: boolean;
+    /** Can be viewed. */
+    view: boolean;
+  },
+
+  /** License's urls. */
+  urls: {
+    /** Logo or image link. */
+    image: string;
+
+    /** Link to the legal code related to this license. */
+    legalCode: string;
+
+    /** Terms of Use url document. */
+    terms: string;
+
+    /** Privacy policy url document. */
+    privacy: string;
+
+    /** Wikipedia link related to this license. */
+    wikipedia: string;
+
+    /** Official website of this license. */
+    website: string;
+  },
+
+  /** If this license has a specific version. */
+  version: string;
 }
 
 interface NotifFuncParams {
@@ -266,9 +376,26 @@ interface UpdateIllusStylesParams {
   illustrationId: string;
 }
 
+/**
+ * Parameters when updating an illustration's license.
+ */
 interface UpdateIllusLicenseParams {
+  /** Illustration'id to update. */
   illustrationId: string;
-  license: License;
+  /** Specifies how this illustration can be used. */
+  license: {
+    /**
+     * Tell if the license is from the platform or the author.
+     * This property is mandatory to know where to find the license from its id.
+     */
+    from: LicenseFrom,
+    
+    /**
+     * Match an existing license id if not empty.
+     * The license can be a predefined on from the platform or a custom author's one.
+     */
+    id: string,
+  },
 }
 
 interface UpdateIllusPresentationParams {
