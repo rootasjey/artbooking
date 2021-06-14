@@ -1,67 +1,79 @@
+/// Part of the license specifing what you can do the artwork.
 class LicenseUsage {
-  /// Can add or remove part of the illustration.
-  final bool edit;
+  /// remix, transform, and build upon the material
+  /// for any purpose, even commercially.
+  final bool adapt;
 
-  /// Allowed to print the illustration.
+  /// Can be used in commercial projects & products.
+  final bool commercial;
+
+  /// Can be used in other free and open source projects.
+  final bool foss;
+
+  /// Can be used in other free softwares and projects.
+  final bool free;
+
+  /// Can be used in other open source projects.
+  final bool oss;
+
+  ///Can be used for personal use (e.g. wallpaper).
+  final bool personal;
+
+  /// Can be freely printed.
   final bool print;
 
   /// Can sell outside of the official app by another individual.
   final bool sell;
 
-  /// Can share outside of the official app.
+  /// copy and redistribute the material in any medium or format.
   final bool share;
-
-  /// Can be used in another free software
-  final bool useInOtherFree;
-
-  /// Show illustrations's credits (author, source, url).
-  final bool showAttribution;
-
-  /// Can be used in another open source software.
-  final bool useInOtherOss;
-
-  /// Can be used in another paid software.
-  final bool useInOtherPaid;
 
   /// Can view this illustration.
   final bool view;
 
   LicenseUsage({
-    this.edit,
+    this.commercial,
+    this.adapt,
+    this.foss,
+    this.free,
+    this.oss,
+    this.personal,
     this.print,
     this.sell,
     this.share,
-    this.showAttribution,
-    this.useInOtherFree,
-    this.useInOtherOss,
-    this.useInOtherPaid,
     this.view,
   });
 
   factory LicenseUsage.empty() {
     return LicenseUsage(
-      edit: false,
+      commercial: false,
+      adapt: false,
+      foss: false,
+      free: false,
+      oss: false,
+      personal: false,
       print: false,
       sell: false,
       share: false,
-      showAttribution: false,
-      useInOtherFree: false,
-      useInOtherOss: false,
-      useInOtherPaid: false,
       view: false,
     );
   }
 
   factory LicenseUsage.fromJSON(Map<String, dynamic> data) {
+    if (data == null) {
+      return LicenseUsage.empty();
+    }
+
     return LicenseUsage(
-      edit: data['edit'],
+      commercial: data['commercial'],
+      adapt: data['adapt'],
+      foss: data['foss'],
+      free: data['free'],
+      oss: data['oss'],
+      personal: data['personal'],
       print: data['print'],
       sell: data['sell'],
       share: data['share'],
-      showAttribution: data['showAttribution'],
-      useInOtherFree: data['useInOtherFree'],
-      useInOtherOss: data['useInOtherOss'],
-      useInOtherPaid: data['useInOtherPaid'],
       view: data['view'],
     );
   }
@@ -69,13 +81,15 @@ class LicenseUsage {
   Map<String, bool> toJSON() {
     final data = Map<String, bool>();
 
-    data['edit'] = edit;
+    data['commercial'] = commercial;
+    data['adapt'] = adapt;
+    data['foss'] = foss;
+    data['free'] = free;
+    data['oss'] = oss;
+    data['personal'] = personal;
     data['print'] = print;
     data['sell'] = sell;
     data['share'] = share;
-    data['showAttribution'] = showAttribution;
-    data['useInOtherFree'] = useInOtherFree;
-    data['useInOtherPaid'] = useInOtherPaid;
     data['view'] = view;
 
     return data;
