@@ -101,7 +101,11 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SheetHeader(
-                    title: "illustration_metadata".tr(),
+                    title: "illustration_name_metadata".tr(
+                      args: [
+                        widget.illustration.name,
+                      ],
+                    ),
                     tooltip: "close".tr(),
                     subtitle: "illustration_metadata_description".tr(),
                     bottom: Opacity(
