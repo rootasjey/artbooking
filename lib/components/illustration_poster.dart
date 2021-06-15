@@ -1,5 +1,6 @@
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:flutter/material.dart';
+import 'package:supercharged/supercharged.dart';
 
 class IllustrationPoster extends StatefulWidget {
   final Illustration illustration;
@@ -15,6 +16,14 @@ class IllustrationPoster extends StatefulWidget {
 
 class _IllustrationPosterState extends State<IllustrationPoster> {
   double _elevation = 4.0;
+  String _networkImageUrl = '';
+
+  @override
+  initState() {
+    super.initState();
+    _networkImageUrl = widget.illustration.getThumbnail();
+    delayedFetchHDImage();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +39,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
         ),
         child: Ink.image(
           image: NetworkImage(
-            illustration.getHDThumbnail(),
+            _networkImageUrl,
           ),
           fit: BoxFit.cover,
           child: InkWell(
@@ -51,6 +60,17 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
           ),
         ),
       ),
+    );
+  }
+
+  void delayedFetchHDImage() {
+    Future.delayed(
+      1.seconds,
+      () {
+        setState(() {
+          _networkImageUrl = widget.illustration.getHDThumbnail();
+        });
+      },
     );
   }
 }
