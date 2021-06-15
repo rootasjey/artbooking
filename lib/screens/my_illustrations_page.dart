@@ -76,7 +76,12 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
 
   Widget fab() {
     if (!isFabVisible) {
-      return Container();
+      return FloatingActionButton(
+        onPressed: fetch,
+        backgroundColor: stateColors.primary,
+        foregroundColor: Colors.white,
+        child: Icon(UniconsLine.refresh),
+      );
     }
 
     return FloatingActionButton(
@@ -89,7 +94,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
       },
       backgroundColor: stateColors.primary,
       foregroundColor: Colors.white,
-      child: Icon(Icons.arrow_upward),
+      child: Icon(UniconsLine.arrow_up),
     );
   }
 
@@ -483,6 +488,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   void fetch() async {
     setState(() {
       isLoading = true;
+      illustrationsList.clear();
     });
 
     try {
