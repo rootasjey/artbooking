@@ -8,7 +8,7 @@ import { join, dirname } from 'path';
 import * as sharp from 'sharp';
 
 import { adminApp } from './adminApp';
-import { allowedLicenseFromValues, checkOrGetDefaultVisibility, cloudRegions } from './utils';
+import { allowedLicenseFromValues, cloudRegions } from './utils';
 
 const firestore = adminApp.firestore();
 const gcs = new Storage();
@@ -29,7 +29,7 @@ export const createOne = functions
   .https
   .onCall(async (params: CreateIllustrationParams, context) => {
     const userAuth = context.auth;
-    const { name } = params;
+    const { name, visibility, isUserAuthor } = params;
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -48,9 +48,11 @@ export const createOne = functions
 
     const author: any = {};
 
-    if (params.isUserAuthor) {
+    if (isUserAuthor) {
       author.id = userAuth.token.uid;
     }
+
+    checkVisibilityValue(visibility);
 
     const illustrationSnap = await firestore
       .collection('illustrations')
@@ -80,7 +82,7 @@ export const createOne = functions
             view: false,
           },
         },
-        name: params.name,
+        name: name,
         size: 0, // File's ize in bytes
         stats: {
           downloads: 0,
@@ -120,7 +122,7 @@ export const createOne = functions
         user: {
           id: userAuth.token.uid,
         },
-        visibility: checkOrGetDefaultVisibility(params.visibility),
+        visibility: visibility,
       });
 
     return {

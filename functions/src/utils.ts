@@ -75,12 +75,12 @@ export function sendNotification(notificationData: any) {
 /**
  * Check and return the passed value.
  * If the passed value is unknown, return a default one.
- * @param visibilityParam - Visibility value. Accepted values: acl, challenge, contest, gallery, private, public.
+ * @param visibilityParam - Visibility value. Accepted values: acl, private, public, unlisted.
  */
 export function checkOrGetDefaultVisibility(visibilityParam: string) {
   const defaultVisibility = 'private';
 
-  const allowedVisibility = ['acl', 'challenge', 'contest', 'gallery', 'private', 'public'];
+  const allowedVisibility = ['acl', 'private', 'public', 'unlisted'];
 
   if (allowedVisibility.includes(visibilityParam)) {
     return visibilityParam;
