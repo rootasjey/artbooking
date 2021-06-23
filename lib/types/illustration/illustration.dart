@@ -13,16 +13,16 @@ class Illustration {
   List<ACL> acl;
 
   /// Author's illustration.
-  Author author;
+  Author? author;
 
   /// The time this illustration has been created.
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
   /// This illustration's description.
   String description;
 
   /// This Illustration's dimensions.
-  Dimensions dimensions;
+  Dimensions? dimensions;
 
   /// File's extension.
   String extension;
@@ -31,7 +31,7 @@ class Illustration {
   String id;
 
   /// Specifies how this illustration can be used.
-  IllustrationLicense license;
+  IllustrationLicense? license;
 
   /// This illustration's name.
   String name;
@@ -43,7 +43,7 @@ class Illustration {
   final int size;
 
   /// Downloads, favourites, shares, views... of this illustration.
-  IllustrationStats stats;
+  IllustrationStats? stats;
 
   /// Art style (e.g. pointillism, realism) — Limited to 5.
   List<String> styles;
@@ -52,17 +52,17 @@ class Illustration {
   List<String> topics;
 
   /// Last time this illustration was updated.
-  final DateTime updatedAt;
+  final DateTime? updatedAt;
 
   /// This illustration's urls.
-  Urls urls;
+  Urls? urls;
 
   /// All available file versions of this illusration.
   List<IllustrationVersion> versions;
 
   /// Access control policy.
   /// Define who can read or write this illustration.
-  ContentVisibility visibility;
+  ContentVisibility? visibility;
 
   Illustration({
     this.acl = const [],
@@ -113,14 +113,14 @@ class Illustration {
       author: Author.fromJSON(data['user']),
       styles: parseStyles(data['styles']),
       createdAt: (data['createdAt'] as Timestamp).toDate(),
-      description: data['description'],
+      description: data['description'] ?? '',
       dimensions: Dimensions.fromJSON(data['dimensions']),
-      extension: data['extension'],
-      id: data['id'],
+      extension: data['extension'] ?? '',
+      id: data['id'] ?? '',
       license: IllustrationLicense.fromJSON(data['license']),
-      name: data['name'],
+      name: data['name'] ?? '',
       stats: IllustrationStats.fromJSON(data['stats']),
-      size: data['size'],
+      size: data['size'] ?? 0,
       story: data['story'] ?? '',
       topics: parseTopics(data['topics']),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
@@ -130,45 +130,45 @@ class Illustration {
     );
   }
 
-  String getHDThumbnail() {
-    final t720 = urls.thumbnails.t720;
+  String? getHDThumbnail() {
+    final t720 = urls!.thumbnails!.t720;
     if (t720 != null && t720.isNotEmpty) {
       return t720;
     }
 
-    final t1080 = urls.thumbnails.t1080;
+    final t1080 = urls!.thumbnails!.t1080;
     if (t1080 != null && t1080.isNotEmpty) {
       return t1080;
     }
 
-    return urls.original;
+    return urls!.original;
   }
 
-  String getThumbnail() {
-    final t360 = urls.thumbnails.t360;
+  String? getThumbnail() {
+    final t360 = urls!.thumbnails!.t360;
     if (t360 != null && t360.isNotEmpty) {
       return t360;
     }
 
-    final t480 = urls.thumbnails.t480;
+    final t480 = urls!.thumbnails!.t480;
     if (t480 != null && t480.isNotEmpty) {
       return t480;
     }
 
-    final t720 = urls.thumbnails.t720;
+    final t720 = urls!.thumbnails!.t720;
     if (t720 != null && t720.isNotEmpty) {
       return t720;
     }
 
-    final t1080 = urls.thumbnails.t1080;
+    final t1080 = urls!.thumbnails!.t1080;
     if (t1080 != null && t1080.isNotEmpty) {
       return t1080;
     }
 
-    return urls.original;
+    return urls!.original;
   }
 
-  static List<String> parseStyles(Map<String, dynamic> data) {
+  static List<String> parseStyles(Map<String, dynamic>? data) {
     final results = <String>[];
 
     if (data == null) {
@@ -196,7 +196,7 @@ class Illustration {
     return results;
   }
 
-  static ContentVisibility parseVisibility(String stringVisiblity) {
+  static ContentVisibility parseVisibility(String? stringVisiblity) {
     switch (stringVisiblity) {
       case 'acl':
         return ContentVisibility.acl;

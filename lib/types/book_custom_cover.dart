@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BookCustomCover {
-  final String url;
-  final DateTime updatedAt;
+  final String? url;
+  final DateTime? updatedAt;
 
   BookCustomCover({this.url, this.updatedAt});
 
-  factory BookCustomCover.fromJSON(Map<String, dynamic> data) {
+  factory BookCustomCover.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
       return BookCustomCover(
         url: '',

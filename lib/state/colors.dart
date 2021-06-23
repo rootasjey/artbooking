@@ -29,10 +29,10 @@ abstract class StateColorsBase with Store {
   final Color validation = Color(0xff38d589);
   final Color clairPink = Color(0xFFf5eaf9);
 
-  ThemeData themeData;
+  ThemeData? themeData;
 
   @action
-  void refreshTheme(Brightness brightness) {
+  void refreshTheme(Brightness? brightness) {
     if (brightness == Brightness.dark) {
       foreground = Colors.white;
       background = Colors.black;

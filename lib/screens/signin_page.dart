@@ -18,9 +18,9 @@ import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
 class SigninPage extends StatefulWidget {
-  final void Function(bool isAuthenticated) onSigninResult;
+  final void Function(bool isAuthenticated)? onSigninResult;
 
-  const SigninPage({Key key, this.onSigninResult}) : super(key: key);
+  const SigninPage({Key? key, this.onSigninResult}) : super(key: key);
 
   @override
   _SigninPageState createState() => _SigninPageState();
@@ -124,7 +124,7 @@ class _SigninPageState extends State<SigninPage> {
               },
               onFieldSubmitted: (value) => passwordNode.requestFocus(),
               validator: (value) {
-                if (value.isEmpty) {
+                if (value!.isEmpty) {
                   return "email_empty_forbidden".tr();
                 }
 
@@ -263,7 +263,7 @@ class _SigninPageState extends State<SigninPage> {
               },
               onFieldSubmitted: (value) => signInProcess(),
               validator: (value) {
-                if (value.isEmpty) {
+                if (value!.isEmpty) {
                   return "password_empty_forbidden".tr();
                 }
 
@@ -383,7 +383,7 @@ class _SigninPageState extends State<SigninPage> {
       // If this callback is defined,
       // this page is call from AuthGuard.
       if (widget.onSigninResult != null) {
-        widget.onSigninResult(true);
+        widget.onSigninResult!(true);
         return;
       }
 

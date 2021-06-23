@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
 
 class IllustrationPoster extends StatefulWidget {
-  final Illustration illustration;
+  final Illustration? illustration;
 
   const IllustrationPoster({
-    Key key,
-    @required this.illustration,
+    Key? key,
+    required this.illustration,
   }) : super(key: key);
 
   @override
@@ -16,18 +16,18 @@ class IllustrationPoster extends StatefulWidget {
 
 class _IllustrationPosterState extends State<IllustrationPoster> {
   double _elevation = 4.0;
-  String _networkImageUrl = '';
+  String? _networkImageUrl = '';
 
   @override
   initState() {
     super.initState();
-    _networkImageUrl = widget.illustration.getThumbnail();
+    _networkImageUrl = widget.illustration!.getThumbnail();
     delayedFetchHDImage();
   }
 
   @override
   Widget build(BuildContext context) {
-    final illustration = widget.illustration;
+    final illustration = widget.illustration!;
 
     return Hero(
       tag: illustration.id,
@@ -39,7 +39,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
         ),
         child: Ink.image(
           image: NetworkImage(
-            _networkImageUrl,
+            _networkImageUrl!,
           ),
           fit: BoxFit.cover,
           child: InkWell(
@@ -68,7 +68,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
       1.seconds,
       () {
         setState(() {
-          _networkImageUrl = widget.illustration.getHDThumbnail();
+          _networkImageUrl = widget.illustration!.getHDThumbnail();
         });
       },
     );

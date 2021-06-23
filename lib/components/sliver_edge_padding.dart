@@ -7,7 +7,7 @@ class SliverEdgePadding extends StatelessWidget {
   final EdgeInsets padding;
 
   const SliverEdgePadding({
-    Key key,
+    Key? key,
     this.padding = const EdgeInsets.only(top: 30.0),
   }) : super(key: key);
 

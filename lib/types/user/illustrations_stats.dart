@@ -1,18 +1,18 @@
 class UserIllustrationsStats {
   /// Total illustrations this user has uploaded.
-  int created;
+  int? created;
 
   /// Total illustrations this user has deleted.
-  int deleted;
+  int? deleted;
 
   /// Total illustrations this user has fav.
-  int fav;
+  int? fav;
 
   /// Number of existing illustrations this user own.
-  int owned;
+  int? owned;
 
   /// Total illustrations updates by providing a new version.
-  int updated;
+  int? updated;
 
   UserIllustrationsStats({
     this.created = 0,
@@ -32,7 +32,7 @@ class UserIllustrationsStats {
     );
   }
 
-  factory UserIllustrationsStats.fromJSON(Map<String, dynamic> data) {
+  factory UserIllustrationsStats.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
       return UserIllustrationsStats.empty();
     }

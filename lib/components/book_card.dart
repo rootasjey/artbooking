@@ -16,14 +16,14 @@ class BookCard extends StatefulWidget {
   final bool selected;
   final bool selectionMode;
   final Book book;
-  final VoidCallback onBeforeDelete;
-  final Function(OneBookOpResp) onAfterDelete;
-  final Function(bool) onLongPress;
-  final Function onBeforePressed;
+  final VoidCallback? onBeforeDelete;
+  final Function(OneBookOpResp)? onAfterDelete;
+  final Function(bool)? onLongPress;
+  final Function? onBeforePressed;
   final double size;
 
   BookCard({
-    @required this.book,
+    required this.book,
     this.selected = false,
     this.selectionMode = false,
     this.onAfterDelete,
@@ -38,13 +38,13 @@ class BookCard extends StatefulWidget {
 }
 
 class _BookCardState extends State<BookCard> with AnimationMixin {
-  Animation<double> scaleAnimation;
-  Animation<Offset> offsetAnimation;
-  Animation<double> opacity;
+  late Animation<double> scaleAnimation;
+  late Animation<Offset> offsetAnimation;
+  late Animation<double> opacity;
 
-  AnimationController captionController;
-  AnimationController scaleController;
-  AnimationController offsetController;
+  late AnimationController captionController;
+  late AnimationController scaleController;
+  late AnimationController offsetController;
 
   bool showCaption = false;
 
@@ -87,10 +87,10 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     final book = widget.book;
     ImageProvider imageProvider;
 
-    if (book.cover.custom.url.isNotEmpty) {
-      imageProvider = NetworkImage(book.cover.custom.url);
-    } else if (book.cover.auto.url.isNotEmpty) {
-      imageProvider = NetworkImage(book.cover.auto.url);
+    if (book.cover!.custom!.url!.isNotEmpty) {
+      imageProvider = NetworkImage(book.cover!.custom!.url!);
+    } else if (book.cover!.auto!.url!.isNotEmpty) {
+      imageProvider = NetworkImage(book.cover!.auto!.url!);
     } else {
       imageProvider = AssetImage('assets/images/gummy-canvas.png');
     }
@@ -110,7 +110,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
               onTap: onTap,
               onLongPress: () {
                 if (widget.onLongPress != null) {
-                  widget.onLongPress(widget.selected);
+                  widget.onLongPress!(widget.selected);
                 }
               },
               onHover: (isHover) {
@@ -162,7 +162,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
                 children: [
                   Expanded(
                     child: Text(
-                      illustration.name,
+                      illustration.name!,
                       style: FontsUtils.mainStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w600,
@@ -224,7 +224,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
         Icons.more_vert,
         color: Colors.white,
       ),
-      onSelected: (value) {
+      onSelected: (dynamic value) {
         switch (value) {
           case 'delete':
             confirmDeletion();
@@ -330,7 +330,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     final book = widget.book;
 
     if (widget.onBeforeDelete != null) {
-      widget.onBeforeDelete();
+      widget.onBeforeDelete!();
     }
 
     final response = await BooksActions.deleteOne(
@@ -338,17 +338,17 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     );
 
     if (widget.onAfterDelete != null) {
-      widget.onAfterDelete(response);
+      widget.onAfterDelete!(response);
     }
   }
 
   void onTap() {
-    bool handled = false;
+    bool? handled = false;
     if (widget.onBeforePressed != null) {
-      handled = widget.onBeforePressed();
+      handled = widget.onBeforePressed!();
     }
 
-    if (handled) {
+    if (handled!) {
       return;
     }
 

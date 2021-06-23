@@ -4,15 +4,15 @@ import 'package:supercharged/supercharged.dart';
 
 class UnderlinedButton extends StatefulWidget {
   final Color underlineColor;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final Widget child;
-  final Widget leading;
-  final Widget trailing;
+  final Widget? leading;
+  final Widget? trailing;
 
   const UnderlinedButton({
-    Key key,
+    Key? key,
     this.underlineColor = Colors.black45,
-    @required this.child,
+    required this.child,
     this.leading,
     this.trailing,
     this.onTap,
@@ -24,11 +24,11 @@ class UnderlinedButton extends StatefulWidget {
 
 class _UnderlinedButtonState extends State<UnderlinedButton>
     with AnimationMixin {
-  Animation<Offset> _slideAnimation;
-  Animation<double> _underlineAnimation;
+  late Animation<Offset> _slideAnimation;
+  late Animation<double> _underlineAnimation;
 
-  double right;
-  double width = 0.0;
+  double? right;
+  double? width = 0.0;
 
   @override
   void initState() {
@@ -65,7 +65,7 @@ class _UnderlinedButtonState extends State<UnderlinedButton>
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (widget.leading != null) widget.leading,
+          if (widget.leading != null) widget.leading!,
           Padding(
             padding: const EdgeInsets.only(
               left: 8.0,

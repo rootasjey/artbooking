@@ -4,8 +4,8 @@ import 'package:artbooking/types/user/partial_user.dart';
 class CreateAccountResp {
   bool success;
   final String message;
-  final CloudFuncError error;
-  final PartialUser user;
+  final CloudFuncError? error;
+  final PartialUser? user;
 
   CreateAccountResp({
     this.success = true,
@@ -23,10 +23,6 @@ class CreateAccountResp {
   }
 
   factory CreateAccountResp.fromJSON(Map<dynamic, dynamic> data) {
-    if (data == null) {
-      return CreateAccountResp.empty();
-    }
-
     return CreateAccountResp(
       success: data['success'] ?? true,
       user: PartialUser.fromJSON(data['user']),

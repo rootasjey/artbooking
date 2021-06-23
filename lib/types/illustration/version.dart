@@ -1,10 +1,10 @@
 import 'package:artbooking/types/illustration/urls.dart';
 
 class IllustrationVersion {
-  String id;
-  String name;
-  DateTime createdAt;
-  Urls urls;
+  String? id;
+  String? name;
+  DateTime? createdAt;
+  Urls? urls;
 
   IllustrationVersion({
     this.createdAt,

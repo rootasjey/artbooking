@@ -3,8 +3,8 @@ import 'package:artbooking/types/user/partial_user.dart';
 
 class UpdateEmailResp {
   bool success;
-  final CloudFuncError error;
-  final PartialUser user;
+  final CloudFuncError? error;
+  final PartialUser? user;
 
   UpdateEmailResp({
     this.success = true,

@@ -1,6 +1,6 @@
 class UserPPUrl {
-  final String edited;
-  final String original;
+  final String? edited;
+  final String? original;
 
   UserPPUrl({
     this.edited,
@@ -14,7 +14,7 @@ class UserPPUrl {
     );
   }
 
-  factory UserPPUrl.fromJSON(Map<String, dynamic> data) {
+  factory UserPPUrl.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
       return UserPPUrl.empty();
     }
@@ -26,8 +26,8 @@ class UserPPUrl {
   }
 
   UserPPUrl mergeFromValues({
-    String edited,
-    String original,
+    String? edited,
+    String? original,
   }) {
     final newEditedValue = edited != null ? edited : this.edited;
     final newOriginalValue = original != null ? original : this.original;

@@ -28,16 +28,16 @@ class IllustrationCard extends StatefulWidget {
   final bool selected;
   final bool selectionMode;
   final Illustration illustration;
-  final VoidCallback onBeforeDelete;
-  final Function(OneIllusOpResp) onAfterDelete;
-  final Function(bool) onLongPress;
-  final Function(Illustration) onRemove;
+  final VoidCallback? onBeforeDelete;
+  final Function(OneIllusOpResp)? onAfterDelete;
+  final Function(bool)? onLongPress;
+  final Function(Illustration)? onRemove;
   final double size;
   final IllustrationCardType type;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   IllustrationCard({
-    @required this.illustration,
+    required this.illustration,
     this.selected = false,
     this.selectionMode = false,
     this.onAfterDelete,
@@ -55,8 +55,8 @@ class IllustrationCard extends StatefulWidget {
 
 class _IllustrationCardState extends State<IllustrationCard>
     with AnimationMixin {
-  Animation<double> _scaleAnimation;
-  AnimationController _scaleController;
+  late Animation<double> _scaleAnimation;
+  late AnimationController _scaleController;
 
   bool _showPopupMenu = false;
 
@@ -99,14 +99,14 @@ class _IllustrationCardState extends State<IllustrationCard>
             clipBehavior: Clip.antiAlias,
             child: Ink.image(
               image: NetworkImage(
-                illustration.getThumbnail(),
+                illustration.getThumbnail()!,
               ),
               fit: BoxFit.cover,
               child: InkWell(
                 onTap: widget.onTap,
                 onLongPress: () {
                   if (widget.onLongPress != null) {
-                    widget.onLongPress(widget.selected);
+                    widget.onLongPress!(widget.selected);
                   }
                 },
                 onHover: (isHover) {
@@ -243,7 +243,7 @@ class _IllustrationCardState extends State<IllustrationCard>
     }
 
     return PopupMenuButton(
-      icon: MirrorAnimation<Color>(
+      icon: MirrorAnimation<Color?>(
         tween: stateColors.primary.tweenTo(stateColors.secondary),
         duration: 2.seconds,
         curve: Curves.decelerate,
@@ -254,7 +254,7 @@ class _IllustrationCardState extends State<IllustrationCard>
           );
         },
       ),
-      onSelected: (value) {
+      onSelected: (dynamic value) {
         switch (value) {
           case 'delete':
             confirmDeletion();
@@ -349,7 +349,7 @@ class _IllustrationCardState extends State<IllustrationCard>
     final illus = widget.illustration;
 
     if (widget.onBeforeDelete != null) {
-      widget.onBeforeDelete();
+      widget.onBeforeDelete!();
     }
 
     final response = await IllustrationsActions.deleteOne(
@@ -357,7 +357,7 @@ class _IllustrationCardState extends State<IllustrationCard>
     );
 
     if (widget.onAfterDelete != null) {
-      widget.onAfterDelete(response);
+      widget.onAfterDelete!(response);
     }
   }
 
@@ -397,7 +397,7 @@ class _IllustrationCardState extends State<IllustrationCard>
 
   void removeFromBook() {
     if (widget.onRemove != null) {
-      widget.onRemove(widget.illustration);
+      widget.onRemove!(widget.illustration);
     }
   }
 }

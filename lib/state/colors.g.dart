@@ -73,7 +73,7 @@ mixin _$StateColors on StateColorsBase, Store {
       ActionController(name: 'StateColorsBase');
 
   @override
-  void refreshTheme(Brightness brightness) {
+  void refreshTheme(Brightness? brightness) {
     final _$actionInfo = _$StateColorsBaseActionController.startAction(
         name: 'StateColorsBase.refreshTheme');
     try {

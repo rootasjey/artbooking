@@ -2,8 +2,8 @@ import 'package:artbooking/types/book_auto_cover.dart';
 import 'package:artbooking/types/book_custom_cover.dart';
 
 class BookCover {
-  final BookAutoCover auto;
-  final BookCustomCover custom;
+  final BookAutoCover? auto;
+  final BookCustomCover? custom;
 
   BookCover({
     this.auto,

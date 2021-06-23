@@ -4,10 +4,10 @@ import 'package:cloud_functions/cloud_functions.dart';
 
 class OneIllusOpResp {
   bool success;
-  final String illustrationId;
+  final String? illustrationId;
   final String message;
-  final CloudFuncError error;
-  final PartialUser user;
+  final CloudFuncError? error;
+  final PartialUser? user;
 
   OneIllusOpResp({
     this.illustrationId = '',

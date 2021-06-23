@@ -10,8 +10,8 @@ class PageTitle extends StatelessWidget {
   final MainAxisAlignment mainAxisAlignment;
 
   const PageTitle({
-    Key key,
-    @required this.textTitle,
+    Key? key,
+    required this.textTitle,
     this.isLoading = false,
     this.mainAxisAlignment = MainAxisAlignment.start,
   }) : super(key: key);

@@ -333,7 +333,7 @@ class DeleteAccountPageState extends State<DeleteAccountPage> {
             },
             onFieldSubmitted: (value) => deleteAccountProcess(),
             validator: (value) {
-              if (value.isEmpty) {
+              if (value!.isEmpty) {
                 return "password_empty_forbidden".tr();
               }
 
@@ -389,7 +389,7 @@ class DeleteAccountPageState extends State<DeleteAccountPage> {
       }
 
       final credentials = EmailAuthProvider.credential(
-        email: userAuth.email,
+        email: userAuth.email!,
         password: password,
       );
 
@@ -399,7 +399,7 @@ class DeleteAccountPageState extends State<DeleteAccountPage> {
       final respDelAcc = await stateUser.deleteAccount(idToken);
 
       if (!respDelAcc.success) {
-        final exception = respDelAcc.error;
+        final exception = respDelAcc.error!;
 
         setState(() {
           isDeleting = false;

@@ -15,12 +15,12 @@ class UploadItemCard extends StatefulWidget {
   // final String percent;
   // final double progress;
   // final UploadTask uploadTask;
-  final CustomUploadTask customUploadTask;
-  final Function onCancel;
-  final Function onDone;
+  final CustomUploadTask? customUploadTask;
+  final Function? onCancel;
+  final Function? onDone;
 
   const UploadItemCard({
-    Key key,
+    Key? key,
     // @required this.name,
     // @required this.percent,
     // @required this.progress,
@@ -41,13 +41,13 @@ class _UploadItemCardState extends State<UploadItemCard> {
   int _totalBytes = 0;
   // TaskState _uploadState = TaskState.running;
 
-  StreamSubscription<TaskSnapshot> _taskListener;
+  StreamSubscription<TaskSnapshot>? _taskListener;
 
   @override
   void initState() {
     super.initState();
 
-    _taskListener = widget.customUploadTask.task?.snapshotEvents?.listen(
+    _taskListener = widget.customUploadTask!.task?.snapshotEvents.listen(
       (TaskSnapshot snapshot) {
         _bytesTransferred = snapshot.bytesTransferred;
         _totalBytes = snapshot.totalBytes;
@@ -110,11 +110,11 @@ class _UploadItemCardState extends State<UploadItemCard> {
   }
 
   Widget nameAndProgress() {
-    final customUploadTask = widget.customUploadTask;
+    final customUploadTask = widget.customUploadTask!;
 
     double progress = _bytesTransferred / _totalBytes;
 
-    if (customUploadTask.task.snapshot.state == TaskState.success) {
+    if (customUploadTask.task!.snapshot.state == TaskState.success) {
       progress = 1.0;
     } else if (progress.isNaN || progress.isInfinite) {
       progress = 0;
@@ -127,7 +127,7 @@ class _UploadItemCardState extends State<UploadItemCard> {
           Opacity(
             opacity: 0.8,
             child: Text(
-              customUploadTask.name,
+              customUploadTask.name!,
               style: FontsUtils.mainStyle(
                 fontSize: 18.0,
                 fontWeight: FontWeight.w700,
@@ -152,7 +152,7 @@ class _UploadItemCardState extends State<UploadItemCard> {
     final double progress = _bytesTransferred / _totalBytes;
     double percent = progress * 100;
 
-    if (widget.customUploadTask.task.snapshot.state == TaskState.success) {
+    if (widget.customUploadTask!.task!.snapshot.state == TaskState.success) {
       percent = 100;
     } else if (percent.isInfinite || percent.isNaN) {
       percent = 0;
@@ -183,13 +183,13 @@ class _UploadItemCardState extends State<UploadItemCard> {
       return Container();
     }
 
-    final state = widget.customUploadTask.task.snapshot.state;
+    final state = widget.customUploadTask!.task!.snapshot.state;
 
     if (state == TaskState.running) {
       return CircleButton(
         tooltip: "cancel".tr(),
         radius: 16.0,
-        onTap: widget.onCancel,
+        onTap: widget.onCancel as void Function()?,
         icon: Icon(
           UniconsLine.times,
           size: 16.0,
@@ -200,7 +200,7 @@ class _UploadItemCardState extends State<UploadItemCard> {
 
     if (state == TaskState.success) {
       return CircleButton(
-        onTap: widget.onDone,
+        onTap: widget.onDone as void Function()?,
         tooltip: "done".tr(),
         radius: 16.0,
         icon: Icon(

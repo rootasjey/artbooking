@@ -1,18 +1,18 @@
 class UserGalleriesStats {
   /// Total virtual galleries this user has created.
-  int created;
+  int? created;
 
   /// Total virtual galleries this user has deleted.
-  int deleted;
+  int? deleted;
 
   /// Total virtual galleries this user has entered.
-  int entered;
+  int? entered;
 
   /// Total virtual galleries this user has entered.
-  int opened;
+  int? opened;
 
   /// Number of existing virtual galleries this user own.
-  int owned;
+  int? owned;
 
   UserGalleriesStats({
     this.created = 0,
@@ -32,7 +32,7 @@ class UserGalleriesStats {
     );
   }
 
-  factory UserGalleriesStats.fromJSON(Map<String, dynamic> data) {
+  factory UserGalleriesStats.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
       return UserGalleriesStats.empty();
     }

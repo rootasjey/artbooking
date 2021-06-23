@@ -12,14 +12,14 @@ class AvatarMenu extends StatelessWidget {
   final EdgeInsets padding;
 
   const AvatarMenu({
-    Key key,
+    Key? key,
     this.isSmall = false,
     this.padding = EdgeInsets.zero,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final arrStr = stateUser.username.split(' ');
+    final arrStr = stateUser.username!.split(' ');
     String initials = '';
 
     if (arrStr.length > 0) {
@@ -27,7 +27,7 @@ class AvatarMenu extends StatelessWidget {
           ? arrStr.reduce((value, element) => value + element.substring(1))
           : arrStr.first;
 
-      if (initials != null && initials.isNotEmpty) {
+      if (initials.isNotEmpty) {
         initials = initials.substring(0, 1);
       }
     }

@@ -6,7 +6,7 @@ import 'package:supercharged/supercharged.dart';
 /// Animate translateX and opacity of a child widget.
 class FadeInX extends StatelessWidget {
   final Duration delay;
-  final Widget child;
+  final Widget? child;
 
   final double beginX;
   final double endX;

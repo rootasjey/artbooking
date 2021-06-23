@@ -17,7 +17,7 @@ class DateHelper {
       if (data is int) {
         date = DateTime.fromMillisecondsSinceEpoch(data);
       } else if (data is Timestamp) {
-        date = data?.toDate();
+        date = data.toDate();
       } else if (data is String) {
         date = DateTime.parse(data);
       } else if (data != null && data['_seconds'] != null) {

@@ -2,34 +2,34 @@
 class LicenseUsage {
   /// remix, transform, and build upon the material
   /// for any purpose, even commercially.
-  final bool adapt;
+  final bool? adapt;
 
   /// Can be used in commercial projects & products.
-  final bool commercial;
+  final bool? commercial;
 
   /// Can be used in other free and open source projects.
-  final bool foss;
+  final bool? foss;
 
   /// Can be used in other free softwares and projects.
-  final bool free;
+  final bool? free;
 
   /// Can be used in other open source projects.
-  final bool oss;
+  final bool? oss;
 
   ///Can be used for personal use (e.g. wallpaper).
-  final bool personal;
+  final bool? personal;
 
   /// Can be freely printed.
-  final bool print;
+  final bool? print;
 
   /// Can sell outside of the official app by another individual.
-  final bool sell;
+  final bool? sell;
 
   /// copy and redistribute the material in any medium or format.
-  final bool share;
+  final bool? share;
 
   /// Can view this illustration.
-  final bool view;
+  final bool? view;
 
   LicenseUsage({
     this.commercial,
@@ -59,7 +59,7 @@ class LicenseUsage {
     );
   }
 
-  factory LicenseUsage.fromJSON(Map<String, dynamic> data) {
+  factory LicenseUsage.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
       return LicenseUsage.empty();
     }
@@ -78,8 +78,8 @@ class LicenseUsage {
     );
   }
 
-  Map<String, bool> toJSON() {
-    final data = Map<String, bool>();
+  Map<String, bool?> toJSON() {
+    final data = Map<String, bool?>();
 
     data['commercial'] = commercial;
     data['adapt'] = adapt;

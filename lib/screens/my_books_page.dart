@@ -24,7 +24,7 @@ class MyBooksPage extends StatefulWidget {
 }
 
 class _MyBooksPageState extends State<MyBooksPage> {
-  bool isLoading;
+  late bool isLoading;
   bool descending = true;
   bool hasNext = true;
   bool isFabVisible = false;
@@ -32,18 +32,18 @@ class _MyBooksPageState extends State<MyBooksPage> {
   bool forceMultiSelect = false;
   bool isCreating = false;
 
-  DocumentSnapshot lastDoc;
+  DocumentSnapshot? lastDoc;
 
   final books = <Book>[];
   final keyboardFocusNode = FocusNode();
 
   int limit = 20;
 
-  Map<String, Book> multiSelectedItems = Map();
+  Map<String?, Book> multiSelectedItems = Map();
 
   ScrollController scrollController = ScrollController();
 
-  TextEditingController newBookNameController;
+  TextEditingController? newBookNameController;
   String newBookName = '';
   String newBookDescription = '';
 
@@ -519,7 +519,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection('books')
-          .where('user.id', isEqualTo: stateUser.userAuth.uid)
+          .where('user.id', isEqualTo: stateUser.userAuth!.uid)
           .orderBy('createdAt', descending: descending)
           .limit(limit)
           .get();
@@ -573,7 +573,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
           .where('user.id', isEqualTo: userAuth.uid)
           .orderBy('createdAt', descending: descending)
           .limit(limit)
-          .startAfterDocument(lastDoc)
+          .startAfterDocument(lastDoc!)
           .get();
 
       if (snapshot.docs.isEmpty) {
@@ -602,14 +602,14 @@ class _MyBooksPageState extends State<MyBooksPage> {
     }
   }
 
-  void fetchOne(String bookId) async {
+  void fetchOne(String? bookId) async {
     try {
       final bookSnap = await FirebaseFirestore.instance
           .collection('books')
           .doc(bookId)
           .get();
 
-      final bookData = bookSnap.data();
+      final bookData = bookSnap.data()!;
       bookData['id'] = bookSnap.id;
 
       final book = Book.fromJSON(bookData);

@@ -1,21 +1,21 @@
 class UserContestsStats {
   /// Total contests this user has created.
-  int created;
+  int? created;
 
   /// Total contests this user has deleted.
-  int deleted;
+  int? deleted;
 
   /// Total contests this user has entered.
-  int entered;
+  int? entered;
 
   /// Number of existing contests this user own.
-  int owned;
+  int? owned;
 
   /// Number of existing contests this user is doing.
-  int participating;
+  int? participating;
 
   /// Total contests this user has won.
-  int won;
+  int? won;
 
   UserContestsStats({
     this.created = 0,
@@ -37,7 +37,7 @@ class UserContestsStats {
     );
   }
 
-  factory UserContestsStats.fromJSON(Map<String, dynamic> data) {
+  factory UserContestsStats.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
       return UserContestsStats.empty();
     }

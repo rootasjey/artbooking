@@ -25,7 +25,7 @@ class LicenseUrls {
   }
 
   /// Parse JSON data corresponding to this object and return a new instance.
-  factory LicenseUrls.fromJSON(Map<String, dynamic> data) {
+  factory LicenseUrls.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
       return LicenseUrls.empty();
     }

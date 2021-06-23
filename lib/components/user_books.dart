@@ -2,6 +2,7 @@ import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/flash_helper.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:auto_route/auto_route.dart';
@@ -11,10 +12,10 @@ import 'package:unicons/unicons.dart';
 import 'package:supercharged/supercharged.dart';
 
 class UserBooks extends StatefulWidget {
-  final ScrollController scrollController;
+  final ScrollController? scrollController;
   final Illustration illustration;
 
-  UserBooks({this.scrollController, @required this.illustration});
+  UserBooks({this.scrollController, required this.illustration});
 
   @override
   _UserBooksState createState() => _UserBooksState();
@@ -27,9 +28,7 @@ class _UserBooksState extends State<UserBooks> {
   bool hasNext = false;
   bool isLoadingMore = false;
 
-  DocumentSnapshot lastDoc;
-
-  Error error;
+  late DocumentSnapshot lastDoc;
 
   final limit = 10;
 
@@ -134,7 +133,7 @@ class _UserBooksState extends State<UserBooks> {
     );
   }
 
-  Widget errorTileList({Function onPressed}) {
+  Widget errorTileList({Function? onPressed}) {
     return Padding(
       padding: EdgeInsets.all(5.0),
       child: Column(
@@ -167,13 +166,13 @@ class _UserBooksState extends State<UserBooks> {
       },
       title: Center(
         child: Text(
-          book.name,
+          book.name!,
         ),
       ),
     );
   }
 
-  void addQuoteToList({String bookId}) async {
+  void addQuoteToList({required String bookId}) async {
     Snack.s(
       context: context,
       title: "Add",
@@ -214,7 +213,7 @@ class _UserBooksState extends State<UserBooks> {
 
     FlashHelper.dismissProgress(id: 'create_book');
 
-    if (createdList == null) {
+    if (!createdList.success) {
       Snack.e(
         context: context,
         message: "There was and issue while creating the book. "
@@ -239,7 +238,7 @@ class _UserBooksState extends State<UserBooks> {
 
       final snapshot = await FirebaseFirestore.instance
           .collection('books')
-          .where('user.id', isEqualTo: stateUser.userAuth.uid)
+          .where('user.id', isEqualTo: stateUser.userAuth!.uid)
           .limit(limit)
           .orderBy('updatedAt', descending: true)
           .get();
@@ -267,12 +266,11 @@ class _UserBooksState extends State<UserBooks> {
         hasNext = snapshot.docs.length == limit;
         isLoading = false;
       });
-    } catch (err) {
-      debugPrint(err.toString());
+    } catch (error) {
+      appLogger.e(error);
 
       setState(() {
         isLoading = false;
-        error = err;
         hasErrors = false;
       });
 
@@ -295,7 +293,7 @@ class _UserBooksState extends State<UserBooks> {
 
       final snapshot = await FirebaseFirestore.instance
           .collection('books')
-          .where('user.id', isEqualTo: stateUser.userAuth.uid)
+          .where('user.id', isEqualTo: stateUser.userAuth!.uid)
           .limit(limit)
           .orderBy('updatedAt', descending: true)
           .startAfterDocument(lastDoc)
@@ -324,12 +322,11 @@ class _UserBooksState extends State<UserBooks> {
         hasNext = snapshot.docs.length == limit;
         isLoadingMore = false;
       });
-    } catch (err) {
-      debugPrint(err.toString());
+    } catch (error) {
+      appLogger.e(error);
 
       setState(() {
         isLoadingMore = false;
-        error = err;
         hasErrors = false;
       });
 
@@ -340,7 +337,7 @@ class _UserBooksState extends State<UserBooks> {
     }
   }
 
-  Future<bool> showCreateBookDialog(BuildContext context) {
+  Future<bool?> showCreateBookDialog(BuildContext context) {
     return showDialog(
       context: context,
       barrierDismissible: true,

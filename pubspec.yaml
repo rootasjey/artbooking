@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 0.40.0+1
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   adaptive_theme: 2.0.0
@@ -60,10 +60,10 @@ dependencies:
   photo_view: 0.11.1
   share: 2.0.1
   simple_animations: 3.0.3
-  sticky_headers: 0.1.8+1
+  sticky_headers: 0.2.0
   supercharged: 2.0.0
   timelines: 0.1.0
-  unicons: 1.0.1
+  unicons: 2.0.1
   url_launcher: 6.0.2
   url_strategy: 0.2.0
   verbal_expressions: 1.0.0
@@ -73,8 +73,6 @@ dev_dependencies:
   auto_route_generator: 2.1.0
   build_runner:
   flutter_launcher_icons: 0.9.0
-  flutter_rename_app:
-    git: https://github.com/rootasjey/flutter_rename_app.git
   flutter_test:
     sdk: flutter
   mobx_codegen: 2.0.0-nullsafety.2

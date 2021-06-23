@@ -35,7 +35,7 @@ class MyProfilePage extends StatefulWidget {
 class _MyProfilePageState extends State<MyProfilePage> {
   bool _isUpdating = false;
 
-  TextEditingController _textInputController;
+  TextEditingController? _textInputController;
 
   String _selectedLink = '';
 
@@ -49,7 +49,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
   @override
   void dispose() {
-    _textInputController.dispose();
+    _textInputController!.dispose();
     super.dispose();
   }
 
@@ -135,7 +135,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       onCancel: context.router.pop,
                       onValidate: () {
                         setState(() {
-                          stateUser.userFirestore.urls.copyFrom(_tempUserUrls);
+                          stateUser.userFirestore.urls!.copyFrom(_tempUserUrls);
                         });
 
                         updateUser();
@@ -160,7 +160,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
         spacing: 4.0,
         runSpacing: 4.0,
         alignment: WrapAlignment.center,
-        children: stateUser.userFirestore.urls
+        children: stateUser.userFirestore.urls!
             .getAvailableLinks()
             .entries
             .map((entry) {
@@ -218,14 +218,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   BlendMode.saturation,
                 ),
                 onTap: () {
-                  if (stateUser.userFirestore.pp.url.edited.isEmpty) {
+                  if (stateUser.userFirestore.pp!.url!.edited!.isEmpty) {
                     return;
                   }
 
                   context.router.push(
                     EditImagePageRoute(
                       image: ExtendedNetworkImageProvider(
-                        stateUser.userFirestore.pp.url.original,
+                        stateUser.userFirestore.pp!.url!.original!,
                         cache: true,
                         cacheRawData: true,
                       ),
@@ -273,7 +273,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }
 
   Widget clearInputButton(void Function(void Function() p1) childSetState) {
-    if (_textInputController.text.isEmpty) {
+    if (_textInputController!.text.isEmpty) {
       return Container(height: 36.0);
     }
 
@@ -289,7 +289,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
           child: TextButton.icon(
             onPressed: () {
               childSetState(() {
-                _textInputController.clear();
+                _textInputController!.clear();
                 _tempUserUrls.setUrl(_selectedLink, '');
               });
             },
@@ -315,12 +315,12 @@ class _MyProfilePageState extends State<MyProfilePage> {
       child: Wrap(
         spacing: 12.0,
         runSpacing: 12.0,
-        children: user.urls.socialMap.entries.map((entry) {
+        children: user.urls!.socialMap!.entries.map((entry) {
           return SizedBox(
             width: 80.0,
             height: 80.0,
             child: Card(
-              elevation: user.urls.socialMap[entry.key].isEmpty ? 0.0 : 3.0,
+              elevation: user.urls!.socialMap![entry.key]!.isEmpty ? 0.0 : 3.0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6.0),
                 side: BorderSide(
@@ -336,7 +336,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   onTap: () {
                     childSetState(() {
                       _selectedLink = entry.key;
-                      _textInputController.text = user.urls.map[entry.key];
+                      _textInputController!.text = user.urls!.map![entry.key]!;
                     });
                   },
                   child: Padding(
@@ -412,13 +412,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
         childSetState(() {
           _tempUserUrls.setUrl(
             _selectedLink,
-            _textInputController.text,
+            _textInputController!.text,
           );
         });
       },
       onSubmitted: (_) {
         setState(() {
-          stateUser.userFirestore.urls.copyFrom(_tempUserUrls);
+          stateUser.userFirestore.urls!.copyFrom(_tempUserUrls);
         });
 
         context.router.pop();
@@ -572,7 +572,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
           child: Opacity(
             opacity: 0.6,
             child: Text(
-              stateUser.userFirestore.summary,
+              stateUser.userFirestore.summary!,
               style: TextStyle(
                 fontSize: 18.0,
               ),
@@ -642,7 +642,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
             horizontal: 8.0,
           ),
           child: Text(
-            stateUser.userFirestore.name,
+            stateUser.userFirestore.name!,
             style: TextStyle(
               fontSize: 32.0,
             ),
@@ -653,13 +653,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }
 
   String getAvatarUrl() {
-    String avatarUrl = stateUser.userFirestore.pp.url.edited;
+    String? avatarUrl = stateUser.userFirestore.pp!.url!.edited;
 
     if (avatarUrl == null || avatarUrl.isEmpty) {
-      avatarUrl = stateUser.userFirestore.pp.url.original;
+      avatarUrl = stateUser.userFirestore.pp!.url!.original;
     }
 
-    if (avatarUrl.isEmpty) {
+    if (avatarUrl!.isEmpty) {
       avatarUrl = "https://img.icons8.com/plasticine/100/000000/flower.png";
     }
 
@@ -667,11 +667,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }
 
   void showAddLink() {
-    _textInputController.text = _selectedLink.isEmpty
+    _textInputController!.text = _selectedLink.isEmpty
         ? ''
-        : stateUser.userFirestore.urls.map[_selectedLink];
+        : stateUser.userFirestore.urls!.map![_selectedLink]!;
 
-    _tempUserUrls = UserUrls.fromJSON(stateUser.userFirestore.urls.map);
+    _tempUserUrls = UserUrls.fromJSON(stateUser.userFirestore.urls!.map);
 
     showCupertinoModalBottomSheet(
       context: context,
@@ -684,7 +684,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   void showEditJob() {
     final user = stateUser.userFirestore;
 
-    _textInputController.text = user.job.isNotEmpty ? user.job : '';
+    _textInputController!.text = user.job.isNotEmpty ? user.job : '';
 
     showCupertinoModalBottomSheet(
       context: context,
@@ -719,14 +719,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         },
                         onSubmitted: (_) {
                           childSetState(() {
-                            user.job = _textInputController.text;
+                            user.job = _textInputController!.text;
                           });
 
                           context.router.pop();
                           updateUser();
                         },
                       ),
-                      if (_textInputController.text.isNotEmpty)
+                      if (_textInputController!.text.isNotEmpty)
                         Align(
                           alignment: Alignment.topLeft,
                           child: Padding(
@@ -739,7 +739,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               child: TextButton.icon(
                                 onPressed: () {
                                   childSetState(() {
-                                    _textInputController.clear();
+                                    _textInputController!.clear();
                                   });
                                 },
                                 icon: Icon(UniconsLine.times),
@@ -765,7 +765,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             onCancel: context.router.pop,
                             onValidate: () {
                               setState(() {
-                                user.job = _textInputController.text;
+                                user.job = _textInputController!.text;
                               });
 
                               updateUser();
@@ -786,7 +786,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
   void showEditLocation() {
     final user = stateUser.userFirestore;
-    _textInputController.text = user.location.isNotEmpty ? user.location : '';
+    _textInputController!.text = user.location.isNotEmpty ? user.location : '';
 
     showCupertinoModalBottomSheet(
       context: context,
@@ -822,14 +822,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         onSubmitted: (_) {
                           childSetState(() {
                             stateUser.userFirestore.location =
-                                _textInputController.text;
+                                _textInputController!.text;
                           });
 
                           context.router.pop();
                           updateUser();
                         },
                       ),
-                      if (_textInputController.text.isNotEmpty)
+                      if (_textInputController!.text.isNotEmpty)
                         Align(
                           alignment: Alignment.topLeft,
                           child: Padding(
@@ -842,7 +842,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               child: TextButton.icon(
                                 onPressed: () {
                                   childSetState(() {
-                                    _textInputController.clear();
+                                    _textInputController!.clear();
                                   });
                                 },
                                 icon: Icon(UniconsLine.times),
@@ -869,7 +869,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             onValidate: () {
                               setState(() {
                                 stateUser.userFirestore.location =
-                                    _textInputController.text;
+                                    _textInputController!.text;
                               });
 
                               updateUser();
@@ -890,7 +890,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
   void showEditSummary() {
     final user = stateUser.userFirestore;
-    _textInputController.text = user.summary.isNotEmpty ? user.summary : '';
+    _textInputController!.text = user.summary!.isNotEmpty ? user.summary! : '';
 
     showCupertinoModalBottomSheet(
       context: context,
@@ -927,14 +927,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         onSubmitted: (_) {
                           setState(() {
                             stateUser.userFirestore.summary =
-                                _textInputController.text;
+                                _textInputController!.text;
                           });
 
                           context.router.pop();
                           updateUser();
                         },
                       ),
-                      if (_textInputController.text.isNotEmpty)
+                      if (_textInputController!.text.isNotEmpty)
                         Align(
                           alignment: Alignment.topLeft,
                           child: Padding(
@@ -947,7 +947,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               child: TextButton.icon(
                                 onPressed: () {
                                   childSetState(() {
-                                    _textInputController.clear();
+                                    _textInputController!.clear();
                                   });
                                 },
                                 icon: Icon(UniconsLine.times),
@@ -974,7 +974,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             onValidate: () {
                               setState(() {
                                 stateUser.userFirestore.summary =
-                                    _textInputController.text;
+                                    _textInputController!.text;
                               });
 
                               updateUser();
@@ -1035,7 +1035,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
     setState(() => _isUpdating = true);
 
     final ext =
-        choosenFile.fileName.substring(choosenFile.fileName.lastIndexOf('.'));
+        choosenFile.fileName!.substring(choosenFile.fileName!.lastIndexOf('.'));
 
     final metadata = SettableMetadata(
       contentType: mime(choosenFile.fileName),
@@ -1063,8 +1063,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
       final String downloadUrl = await snapshot.ref.getDownloadURL();
 
       setState(() {
-        stateUser.userFirestore.urls.setUrl('image', downloadUrl);
-        stateUser.userFirestore.pp.update(
+        stateUser.userFirestore.urls!.setUrl('image', downloadUrl);
+        stateUser.userFirestore.pp!.update(
           UserPP(
             ext: ext.replaceFirst('.', ''),
             size: choosenFile.length,

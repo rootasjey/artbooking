@@ -5,7 +5,6 @@
 // **************************************************************************
 
 import 'package:auto_route/auto_route.dart' as _i1;
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' as _i2;
 
 import '../components/hero_empty_router_page.dart' as _i18;
@@ -40,9 +39,9 @@ import 'no_auth_guard.dart' as _i4;
 
 class AppRouter extends _i1.RootStackRouter {
   AppRouter(
-      {_i2.GlobalKey<_i2.NavigatorState> navigatorKey,
-      @required this.authGuard,
-      @required this.noAuthGuard})
+      {_i2.GlobalKey<_i2.NavigatorState>? navigatorKey,
+      required this.authGuard,
+      required this.noAuthGuard})
       : super(navigatorKey);
 
   final _i3.AuthGuard authGuard;
@@ -432,7 +431,7 @@ class ContactPageRoute extends _i1.PageRouteInfo {
 }
 
 class DashboardPageRoute extends _i1.PageRouteInfo {
-  const DashboardPageRoute({List<_i1.PageRouteInfo> children})
+  const DashboardPageRoute({List<_i1.PageRouteInfo>? children})
       : super(name, path: '/dashboard', initialChildren: children);
 
   static const String name = 'DashboardPageRoute';
@@ -445,7 +444,7 @@ class ForgotPasswordPageRoute extends _i1.PageRouteInfo {
 }
 
 class IllustrationsRouter extends _i1.PageRouteInfo {
-  const IllustrationsRouter({List<_i1.PageRouteInfo> children})
+  const IllustrationsRouter({List<_i1.PageRouteInfo>? children})
       : super(name, path: '/illustrations', initialChildren: children);
 
   static const String name = 'IllustrationsRouter';
@@ -458,7 +457,7 @@ class SearchPageRoute extends _i1.PageRouteInfo {
 }
 
 class SettingsPageRoute extends _i1.PageRouteInfo<SettingsPageRouteArgs> {
-  SettingsPageRoute({_i2.Key key, bool showAppBar})
+  SettingsPageRoute({_i2.Key? key, bool? showAppBar})
       : super(name,
             path: '/settings',
             args: SettingsPageRouteArgs(key: key, showAppBar: showAppBar));
@@ -469,13 +468,13 @@ class SettingsPageRoute extends _i1.PageRouteInfo<SettingsPageRouteArgs> {
 class SettingsPageRouteArgs {
   const SettingsPageRouteArgs({this.key, this.showAppBar});
 
-  final _i2.Key key;
+  final _i2.Key? key;
 
-  final bool showAppBar;
+  final bool? showAppBar;
 }
 
 class SigninPageRoute extends _i1.PageRouteInfo<SigninPageRouteArgs> {
-  SigninPageRoute({_i2.Key key, void Function(bool) onSigninResult})
+  SigninPageRoute({_i2.Key? key, void Function(bool)? onSigninResult})
       : super(name,
             path: '/signin',
             args:
@@ -487,13 +486,13 @@ class SigninPageRoute extends _i1.PageRouteInfo<SigninPageRouteArgs> {
 class SigninPageRouteArgs {
   const SigninPageRouteArgs({this.key, this.onSigninResult});
 
-  final _i2.Key key;
+  final _i2.Key? key;
 
-  final void Function(bool) onSigninResult;
+  final void Function(bool)? onSigninResult;
 }
 
 class SignupPageRoute extends _i1.PageRouteInfo<SignupPageRouteArgs> {
-  SignupPageRoute({_i2.Key key, void Function(bool) onSignupResult})
+  SignupPageRoute({_i2.Key? key, void Function(bool)? onSignupResult})
       : super(name,
             path: '/signup',
             args:
@@ -505,9 +504,9 @@ class SignupPageRoute extends _i1.PageRouteInfo<SignupPageRouteArgs> {
 class SignupPageRouteArgs {
   const SignupPageRouteArgs({this.key, this.onSignupResult});
 
-  final _i2.Key key;
+  final _i2.Key? key;
 
-  final void Function(bool) onSignupResult;
+  final void Function(bool)? onSignupResult;
 }
 
 class SignOutRoute extends _i1.PageRouteInfo {
@@ -517,7 +516,7 @@ class SignOutRoute extends _i1.PageRouteInfo {
 }
 
 class ExtRouter extends _i1.PageRouteInfo {
-  const ExtRouter({List<_i1.PageRouteInfo> children})
+  const ExtRouter({List<_i1.PageRouteInfo>? children})
       : super(name, path: '/ext', initialChildren: children);
 
   static const String name = 'ExtRouter';
@@ -542,28 +541,28 @@ class MyActivityPageRoute extends _i1.PageRouteInfo {
 }
 
 class DashIllustrationsRouter extends _i1.PageRouteInfo {
-  const DashIllustrationsRouter({List<_i1.PageRouteInfo> children})
+  const DashIllustrationsRouter({List<_i1.PageRouteInfo>? children})
       : super(name, path: 'illustrations', initialChildren: children);
 
   static const String name = 'DashIllustrationsRouter';
 }
 
 class DashBooksRouter extends _i1.PageRouteInfo {
-  const DashBooksRouter({List<_i1.PageRouteInfo> children})
+  const DashBooksRouter({List<_i1.PageRouteInfo>? children})
       : super(name, path: 'books', initialChildren: children);
 
   static const String name = 'DashBooksRouter';
 }
 
 class DashProfileRouter extends _i1.PageRouteInfo {
-  const DashProfileRouter({List<_i1.PageRouteInfo> children})
+  const DashProfileRouter({List<_i1.PageRouteInfo>? children})
       : super(name, path: 'profile', initialChildren: children);
 
   static const String name = 'DashProfileRouter';
 }
 
 class DashSettingsRouter extends _i1.PageRouteInfo {
-  const DashSettingsRouter({List<_i1.PageRouteInfo> children})
+  const DashSettingsRouter({List<_i1.PageRouteInfo>? children})
       : super(name, path: 'settings', initialChildren: children);
 
   static const String name = 'DashSettingsRouter';
@@ -577,10 +576,10 @@ class MyIllustrationsPageRoute extends _i1.PageRouteInfo {
 
 class DashIllustrationPage extends _i1.PageRouteInfo<DashIllustrationPageArgs> {
   DashIllustrationPage(
-      {_i2.Key key,
-      String illustrationId,
-      _i30.Illustration illustration,
-      bool fromDashboard})
+      {_i2.Key? key,
+      String? illustrationId,
+      _i30.Illustration? illustration,
+      bool? fromDashboard})
       : super(name,
             path: ':illustrationId',
             args: DashIllustrationPageArgs(
@@ -597,13 +596,13 @@ class DashIllustrationPageArgs {
   const DashIllustrationPageArgs(
       {this.key, this.illustrationId, this.illustration, this.fromDashboard});
 
-  final _i2.Key key;
+  final _i2.Key? key;
 
-  final String illustrationId;
+  final String? illustrationId;
 
-  final _i30.Illustration illustration;
+  final _i30.Illustration? illustration;
 
-  final bool fromDashboard;
+  final bool? fromDashboard;
 }
 
 class MyBooksPageRoute extends _i1.PageRouteInfo {
@@ -613,7 +612,7 @@ class MyBooksPageRoute extends _i1.PageRouteInfo {
 }
 
 class DashBookPage extends _i1.PageRouteInfo<DashBookPageArgs> {
-  DashBookPage({_i2.Key key, String bookId, _i31.Book book})
+  DashBookPage({_i2.Key? key, String? bookId, _i31.Book? book})
       : super(name,
             path: ':bookId',
             args: DashBookPageArgs(key: key, bookId: bookId, book: book),
@@ -625,11 +624,11 @@ class DashBookPage extends _i1.PageRouteInfo<DashBookPageArgs> {
 class DashBookPageArgs {
   const DashBookPageArgs({this.key, this.bookId, this.book});
 
-  final _i2.Key key;
+  final _i2.Key? key;
 
-  final String bookId;
+  final String? bookId;
 
-  final _i31.Book book;
+  final _i31.Book? book;
 }
 
 class MyProfilePageRoute extends _i1.PageRouteInfo {
@@ -639,7 +638,7 @@ class MyProfilePageRoute extends _i1.PageRouteInfo {
 }
 
 class EditImagePageRoute extends _i1.PageRouteInfo<EditImagePageRouteArgs> {
-  EditImagePageRoute({_i2.Key key, _i2.ImageProvider<Object> image})
+  EditImagePageRoute({_i2.Key? key, _i2.ImageProvider<Object>? image})
       : super(name,
             path: 'edit/pp',
             args: EditImagePageRouteArgs(key: key, image: image));
@@ -650,13 +649,13 @@ class EditImagePageRoute extends _i1.PageRouteInfo<EditImagePageRouteArgs> {
 class EditImagePageRouteArgs {
   const EditImagePageRouteArgs({this.key, this.image});
 
-  final _i2.Key key;
+  final _i2.Key? key;
 
-  final _i2.ImageProvider<Object> image;
+  final _i2.ImageProvider<Object>? image;
 }
 
 class DashSettingsRoute extends _i1.PageRouteInfo<DashSettingsRouteArgs> {
-  DashSettingsRoute({_i2.Key key, bool showAppBar})
+  DashSettingsRoute({_i2.Key? key, bool? showAppBar})
       : super(name,
             path: '',
             args: DashSettingsRouteArgs(key: key, showAppBar: showAppBar));
@@ -667,9 +666,9 @@ class DashSettingsRoute extends _i1.PageRouteInfo<DashSettingsRouteArgs> {
 class DashSettingsRouteArgs {
   const DashSettingsRouteArgs({this.key, this.showAppBar});
 
-  final _i2.Key key;
+  final _i2.Key? key;
 
-  final bool showAppBar;
+  final bool? showAppBar;
 }
 
 class DeleteAccountPageRoute extends _i1.PageRouteInfo {
@@ -679,7 +678,7 @@ class DeleteAccountPageRoute extends _i1.PageRouteInfo {
 }
 
 class DashAccountUpdateRouter extends _i1.PageRouteInfo {
-  const DashAccountUpdateRouter({List<_i1.PageRouteInfo> children})
+  const DashAccountUpdateRouter({List<_i1.PageRouteInfo>? children})
       : super(name, path: 'update', initialChildren: children);
 
   static const String name = 'DashAccountUpdateRouter';
@@ -712,10 +711,10 @@ class IllustrationsPageRoute extends _i1.PageRouteInfo {
 class IllustrationPageRoute
     extends _i1.PageRouteInfo<IllustrationPageRouteArgs> {
   IllustrationPageRoute(
-      {_i2.Key key,
-      String illustrationId,
-      _i30.Illustration illustration,
-      bool fromDashboard})
+      {_i2.Key? key,
+      String? illustrationId,
+      _i30.Illustration? illustration,
+      bool? fromDashboard})
       : super(name,
             path: ':illustrationId',
             args: IllustrationPageRouteArgs(
@@ -732,13 +731,13 @@ class IllustrationPageRouteArgs {
   const IllustrationPageRouteArgs(
       {this.key, this.illustrationId, this.illustration, this.fromDashboard});
 
-  final _i2.Key key;
+  final _i2.Key? key;
 
-  final String illustrationId;
+  final String? illustrationId;
 
-  final _i30.Illustration illustration;
+  final _i30.Illustration? illustration;
 
-  final bool fromDashboard;
+  final bool? fromDashboard;
 }
 
 class GitHubRoute extends _i1.PageRouteInfo {

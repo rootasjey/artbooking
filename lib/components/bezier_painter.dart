@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 /// hardcoded bezier painter
 class BezierPainter extends CustomPainter {
   const BezierPainter({
-    @required this.color,
+    required this.color,
     this.drawStart = true,
     this.drawEnd = true,
   });

@@ -40,11 +40,11 @@ class _ContactPageState extends State<ContactPage> {
 
   Widget cardLink({
     Color color = const Color(0xFF45D09E),
-    Widget icon,
-    Function onTap,
-    String socialAccount,
-    String subTitle,
-    @required String textTitle,
+    Widget? icon,
+    Function? onTap,
+    required String socialAccount,
+    required String subTitle,
+    required String textTitle,
   }) {
     final horPadding = MediaQuery.of(context).size.width < 700.0 ? 20 : 80.0;
     final height = MediaQuery.of(context).size.width < 400.0 ? 400 : 200.0;
@@ -53,16 +53,16 @@ class _ContactPageState extends State<ContactPage> {
 
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: horPadding,
+        horizontal: horPadding as double,
         vertical: 24.0,
       ),
       child: SizedBox(
-        height: height,
+        height: height as double?,
         width: 700.0,
         child: Card(
           color: color,
           child: InkWell(
-            onTap: onTap,
+            onTap: onTap as void Function()?,
             child: Container(
               padding: const EdgeInsets.all(40.0),
               child: Row(

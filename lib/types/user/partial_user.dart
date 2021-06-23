@@ -17,7 +17,7 @@ class PartialUser {
     );
   }
 
-  factory PartialUser.fromJSON(Map<dynamic, dynamic> data) {
+  factory PartialUser.fromJSON(Map<dynamic, dynamic>? data) {
     if (data == null) {
       return PartialUser.empty();
     }

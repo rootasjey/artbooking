@@ -18,23 +18,23 @@ import 'package:url_launcher/url_launcher.dart';
 /// A side panel to add art style to an illustration.
 class AddStylePanel extends StatefulWidget {
   /// Aleady selected styles for the illustration.
-  final List<String> selectedStyles;
+  final List<String?>? selectedStyles;
 
   /// True if the panel is visible.
   final bool isVisible;
 
   /// Function callback when the panel is closed.
-  final void Function() onClose;
+  final void Function()? onClose;
 
   /// This callback when an item is tapped.
-  final void Function(Style style, bool selected) toggleStyleAndUpdate;
+  final void Function(Style style, bool selected)? toggleStyleAndUpdate;
 
   /// The panel elevation.
   final double elevation;
 
   /// Return an panel widget showing art styles.
   const AddStylePanel({
-    Key key,
+    Key? key,
     this.selectedStyles,
     this.isVisible = false,
     this.onClose,
@@ -57,7 +57,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
   bool _isImagePreviewVisible = false;
 
   /// Last fetched document snapshot. Useful for pagination.
-  DocumentSnapshot<Object> _lastDocumentSnapshot;
+  DocumentSnapshot<Object>? _lastDocumentSnapshot;
 
   /// All available art styles.
   final List<Style> _availableStyles = [];
@@ -75,10 +75,10 @@ class _AddStylePanelState extends State<AddStylePanel> {
   int _limitStyles = 10;
 
   /// Selected style for image preview.
-  Style _selectedStylePreview;
+  Style? _selectedStylePreview;
 
   /// Delay search after typing input.
-  Timer _searchTimer;
+  Timer? _searchTimer;
 
   @override
   initState() {
@@ -245,12 +245,12 @@ class _AddStylePanelState extends State<AddStylePanel> {
         ),
         clipBehavior: Clip.antiAlias,
         child: Ink.image(
-          image: NetworkImage(_selectedStylePreview.urls.image),
+          image: NetworkImage(_selectedStylePreview!.urls!.image!),
           width: 300.0,
           height: 260.0,
           fit: BoxFit.cover,
           child: InkWell(
-            onTap: () => launch(_selectedStylePreview.urls.image),
+            onTap: () => launch(_selectedStylePreview!.urls!.image!),
           ),
         ),
       );
@@ -283,7 +283,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                     child: Opacity(
                       opacity: 0.8,
                       child: Text(
-                        _selectedStylePreview.name.toUpperCase(),
+                        _selectedStylePreview!.name!.toUpperCase(),
                         style: FontsUtils.mainStyle(
                           fontWeight: FontWeight.w600,
                         ),
@@ -299,7 +299,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
               child: Opacity(
                 opacity: 0.6,
                 child: Text(
-                  _selectedStylePreview.description,
+                  _selectedStylePreview!.description!,
                   style: FontsUtils.mainStyle(
                     fontWeight: FontWeight.w500,
                   ),
@@ -307,8 +307,8 @@ class _AddStylePanelState extends State<AddStylePanel> {
               ),
             ),
             TextButton(
-              onPressed: () => launch(_selectedStylePreview.urls.wikipedia),
-              child: Text(_selectedStylePreview.urls.wikipedia),
+              onPressed: () => launch(_selectedStylePreview!.urls!.wikipedia!),
+              child: Text(_selectedStylePreview!.urls!.wikipedia!),
               style: TextButton.styleFrom(
                 primary: Colors.black54,
               ),
@@ -326,10 +326,10 @@ class _AddStylePanelState extends State<AddStylePanel> {
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             final style = _availableStyles.elementAt(index);
-            final selected = widget.selectedStyles.contains(style.name);
+            final selected = widget.selectedStyles!.contains(style.name);
 
             return ListTile(
-              onTap: () => widget.toggleStyleAndUpdate(style, selected),
+              onTap: () => widget.toggleStyleAndUpdate!(style, selected),
               onLongPress: () {
                 setState(() {
                   _selectedStylePreview = style;
@@ -347,7 +347,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                       ),
                     Expanded(
                       child: Text(
-                        style.name.toUpperCase(),
+                        style.name!.toUpperCase(),
                         style: FontsUtils.mainStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
@@ -358,7 +358,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                 ),
               ),
               subtitle: Text(
-                style.description,
+                style.description!,
                 style: FontsUtils.mainStyle(
                   fontWeight: FontWeight.w600,
                 ),
@@ -379,10 +379,10 @@ class _AddStylePanelState extends State<AddStylePanel> {
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             final style = _suggestionsStyles.elementAt(index);
-            final selected = widget.selectedStyles.contains(style.name);
+            final selected = widget.selectedStyles!.contains(style.name);
 
             return ListTile(
-              onTap: () => widget.toggleStyleAndUpdate(style, selected),
+              onTap: () => widget.toggleStyleAndUpdate!(style, selected),
               title: Opacity(
                 opacity: 0.8,
                 child: Row(
@@ -394,7 +394,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                       ),
                     Expanded(
                       child: Text(
-                        style.name.toUpperCase(),
+                        style.name!.toUpperCase(),
                         style: FontsUtils.mainStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
@@ -405,7 +405,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                 ),
               ),
               subtitle: Text(
-                style.description,
+                style.description!,
                 style: FontsUtils.mainStyle(
                   fontWeight: FontWeight.w600,
                 ),
@@ -538,7 +538,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
           .collection('styles')
           .limit(_limitStyles)
           .orderBy('name', descending: true)
-          .startAfterDocument(_lastDocumentSnapshot)
+          .startAfterDocument(_lastDocumentSnapshot!)
           .get();
 
       if (stylesSnap.size == 0) {
@@ -584,7 +584,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
     _suggestionsStyles.clear();
 
     try {
-      final AlgoliaQuery query = await SearchHelper.algolia
+      final AlgoliaQuery query = await SearchHelper.algolia!
           .index("styles")
           .query(_searchTextController.text)
           .setHitsPerPage(_limitStyles)

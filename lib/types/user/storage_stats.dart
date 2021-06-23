@@ -2,10 +2,10 @@ import 'package:artbooking/types/user/storage_stats_item.dart';
 
 class UserStorageStats {
   /// Number of existing illustrations this user own.
-  StorageStatsItem illustrations;
+  StorageStatsItem? illustrations;
 
   /// Total illustrations updates by providing a new version.
-  StorageStatsItem videos;
+  StorageStatsItem? videos;
 
   UserStorageStats({this.illustrations, this.videos});
 
@@ -16,7 +16,7 @@ class UserStorageStats {
     );
   }
 
-  factory UserStorageStats.fromJSON(Map<String, dynamic> data) {
+  factory UserStorageStats.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
       return UserStorageStats.empty();
     }

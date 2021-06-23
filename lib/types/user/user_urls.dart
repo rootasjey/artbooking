@@ -1,9 +1,9 @@
 class UserUrls {
   /// All URLs in a map.
-  Map<String, String> map = Map<String, String>();
+  Map<String, String>? map = Map<String, String>();
 
   /// Only social URLs in a map (without [image] for example).
-  Map<String, String> socialMap = Map<String, String>();
+  Map<String, String>? socialMap = Map<String, String>();
 
   String artbooking;
   String artstation;
@@ -81,7 +81,7 @@ class UserUrls {
     );
   }
 
-  factory UserUrls.fromJSON(Map<String, dynamic> data) {
+  factory UserUrls.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
       return UserUrls.empty();
     }
@@ -149,8 +149,7 @@ class UserUrls {
   }
 
   Map<String, String> getAvailableLinks() {
-    return Map.from(socialMap)
-      ..removeWhere((key, value) => value == null || value.isEmpty);
+    return Map.from(socialMap!)..removeWhere((key, value) => value.isEmpty);
   }
 
   Map<String, dynamic> toJSON() {
@@ -183,8 +182,8 @@ class UserUrls {
   /// Update the URL specified by [key] with the new [value].
   /// This function will propagate update to [map] and [socialMap].
   void setUrl(String key, String value) {
-    map[key] = value;
-    socialMap[key] = value;
+    map![key] = value;
+    socialMap![key] = value;
 
     switch (key) {
       case "artbooking":

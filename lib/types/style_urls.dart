@@ -2,11 +2,11 @@
 class StyleUrls {
   /// An image representation of this art style.
   /// Note that this is one example among many.
-  final String image;
+  final String? image;
 
   /// Wikipedia link about this art style.
   /// You may find useful information.
-  final String wikipedia;
+  final String? wikipedia;
 
   StyleUrls({
     this.image = '',
@@ -20,7 +20,7 @@ class StyleUrls {
     );
   }
 
-  factory StyleUrls.fromJSON(Map<String, dynamic> data) {
+  factory StyleUrls.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
       return StyleUrls.empty();
     }

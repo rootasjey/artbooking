@@ -20,12 +20,12 @@ import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
 class MyBookPage extends StatefulWidget {
-  final String bookId;
-  final Book book;
+  final String? bookId;
+  final Book? book;
 
   const MyBookPage({
-    Key key,
-    @required @PathParam() this.bookId,
+    Key? key,
+    @PathParam() required this.bookId,
     this.book,
   }) : super(key: key);
   @override
@@ -34,9 +34,9 @@ class MyBookPage extends StatefulWidget {
 
 class _MyBookPageState extends State<MyBookPage> {
   /// The viewing book.
-  Book bookPage;
+  Book? bookPage;
 
-  bool isLoading;
+  late bool isLoading;
   bool hasError = false;
   bool hasNext = true;
   bool isFabVisible = false;
@@ -50,7 +50,7 @@ class _MyBookPageState extends State<MyBookPage> {
   int startIndex = 0;
   int endIndex = 0;
 
-  Map<String, Illustration> multiSelectedItems = Map();
+  Map<String?, Illustration> multiSelectedItems = Map();
   Map<int, Illustration> processingIllus = Map();
 
   ScrollController scrollController = ScrollController();
@@ -126,7 +126,7 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   Widget header() {
-    final bookName = bookPage != null ? bookPage.name : 'My book';
+    final bookName = bookPage != null ? bookPage!.name! : 'My book';
 
     return SliverPadding(
       padding: const EdgeInsets.only(
@@ -540,7 +540,7 @@ class _MyBookPageState extends State<MyBookPage> {
     });
 
     final response = await BooksActions.removeIllustrations(
-      bookId: bookPage.id,
+      bookId: bookPage!.id,
       illustrationIds: illustrationIds,
     );
 
@@ -577,7 +577,7 @@ class _MyBookPageState extends State<MyBookPage> {
         });
       }
 
-      final bookData = bookSnap.data();
+      final bookData = bookSnap.data()!;
       bookData['id'] = bookSnap.id;
 
       setState(() {
@@ -599,7 +599,7 @@ class _MyBookPageState extends State<MyBookPage> {
       return;
     }
 
-    final bpIllustrations = bookPage.illustrations;
+    final bpIllustrations = bookPage!.illustrations;
 
     setState(() {
       isLoading = true;
@@ -629,7 +629,7 @@ class _MyBookPageState extends State<MyBookPage> {
           continue;
         }
 
-        final illusData = illustrationSnap.data();
+        final illusData = illustrationSnap.data()!;
         illusData['id'] = illustrationSnap.id;
 
         final illustration = Illustration.fromJSON(illusData);
@@ -638,7 +638,7 @@ class _MyBookPageState extends State<MyBookPage> {
 
       setState(() {
         isLoading = false;
-        hasNext = endIndex < bookPage.count;
+        hasNext = endIndex < bookPage!.count;
       });
     } catch (error) {
       appLogger.e(error);
@@ -662,7 +662,7 @@ class _MyBookPageState extends State<MyBookPage> {
     });
 
     try {
-      final range = bookPage.illustrations.getRange(startIndex, endIndex);
+      final range = bookPage!.illustrations.getRange(startIndex, endIndex);
 
       for (var bookIllustration in range) {
         final illustrationSnap = await FirebaseFirestore.instance
@@ -674,7 +674,7 @@ class _MyBookPageState extends State<MyBookPage> {
           continue;
         }
 
-        final illusData = illustrationSnap.data();
+        final illusData = illustrationSnap.data()!;
         illusData['id'] = illustrationSnap.id;
 
         final illustration = Illustration.fromJSON(illusData);
@@ -683,7 +683,7 @@ class _MyBookPageState extends State<MyBookPage> {
 
       setState(() {
         isLoadingMore = false;
-        hasNext = endIndex < bookPage.count;
+        hasNext = endIndex < bookPage!.count;
       });
     } catch (error) {
       appLogger.e(error);
@@ -694,12 +694,12 @@ class _MyBookPageState extends State<MyBookPage> {
     }
   }
 
-  void onRemoveFromBook({int index, Illustration illustration}) async {
+  void onRemoveFromBook({required int index, required Illustration illustration}) async {
     processingIllus.putIfAbsent(index, () => illustration);
     illustrations.removeAt(index);
 
     final response = await BooksActions.removeIllustrations(
-      bookId: bookPage.id,
+      bookId: bookPage!.id,
       illustrationIds: [illustration.id],
     );
 

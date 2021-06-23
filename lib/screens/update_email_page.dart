@@ -37,7 +37,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
   String _emailInputErrorMessage = '';
   String _passwordInputValue = '';
 
-  Timer _emailTimer;
+  Timer? _emailTimer;
 
   @override
   void dispose() {
@@ -312,13 +312,13 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
               }
 
               if (_emailTimer != null) {
-                _emailTimer.cancel();
+                _emailTimer!.cancel();
                 _emailTimer = null;
               }
 
               _emailTimer = Timer(1.seconds, () async {
                 final isAvailable =
-                    await UsersActions.checkEmailAvailability(_emailInputValue);
+                    await (UsersActions.checkEmailAvailability(_emailInputValue) as FutureOr<bool>);
 
                 if (!isAvailable) {
                   setState(() {
@@ -336,7 +336,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
               });
             },
             validator: (value) {
-              if (value.isEmpty) {
+              if (value!.isEmpty) {
                 return "email_empty_forbidden".tr();
               }
 
@@ -402,7 +402,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
             },
             onFieldSubmitted: (value) => updateEmailProcess(),
             validator: (value) {
-              if (value.isEmpty) {
+              if (value!.isEmpty) {
                 return "password_empty_forbidden".tr();
               }
 
@@ -475,7 +475,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
     });
 
     try {
-      if (!await valuesAvailabilityCheck()) {
+      if (!await (valuesAvailabilityCheck() as FutureOr<bool>)) {
         setState(() => _isUpdating = false);
 
         Snack.e(
@@ -495,7 +495,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
       }
 
       final credentials = EmailAuthProvider.credential(
-        email: userAuth.email,
+        email: userAuth.email!,
         password: _passwordInputValue,
       );
 
@@ -506,7 +506,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
           await stateUser.updateEmail(_emailInputValue, idToken);
 
       if (!respUpdateEmail.success) {
-        final exception = respUpdateEmail.error;
+        final exception = respUpdateEmail.error!;
 
         setState(() {
           _isUpdating = false;
@@ -540,7 +540,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
     }
   }
 
-  Future<bool> valuesAvailabilityCheck() async {
+  Future<bool?> valuesAvailabilityCheck() async {
     return await UsersActions.checkEmailAvailability(_emailInputValue);
   }
 

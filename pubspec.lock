@@ -36,13 +36,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
-  ansicolor:
-    dependency: transitive
-    description:
-      name: ansicolor
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.1.1"
   archive:
     dependency: transitive
     description:
@@ -543,15 +536,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
-  flutter_rename_app:
-    dependency: "direct dev"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "1cc536390923729ecb5681488dfe4cc4ae719099"
-      url: "https://github.com/rootasjey/flutter_rename_app.git"
-    source: git
-    version: "1.0.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -891,13 +875,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.1.0"
-  process_run:
-    dependency: transitive
-    description:
-      name: process_run
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.10.12+3"
   pub_semver:
     dependency: transitive
     description:
@@ -1056,7 +1033,7 @@ packages:
       name: sticky_headers
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.8+1"
+    version: "0.2.0"
   stream_channel:
     dependency: transitive
     description:
@@ -1133,7 +1110,7 @@ packages:
       name: unicons
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.1"
+    version: "2.0.1"
   url_launcher:
     dependency: "direct main"
     description:

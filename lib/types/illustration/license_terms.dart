@@ -7,7 +7,7 @@ class LicenseTerms {
   final bool noAdditionalRestriction;
 
   /// Require that anyone who use the work - licensees - make that new work available under the same license terms.
-  final bool shareAlike;
+  final bool? shareAlike;
 
   /// Create a new license instance.
   LicenseTerms({
@@ -26,7 +26,7 @@ class LicenseTerms {
   }
 
   /// Create a license instance from JSON data.
-  factory LicenseTerms.fromJSON(Map<String, dynamic> data) {
+  factory LicenseTerms.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
       return LicenseTerms.empty();
     }

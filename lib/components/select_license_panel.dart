@@ -18,23 +18,23 @@ import 'package:url_launcher/url_launcher.dart';
 /// A side panel to add art style to an illustration.
 class SelectLicensePanel extends StatefulWidget {
   /// Aleady selected styles for the illustration.
-  final IllustrationLicense selectedLicense;
+  final IllustrationLicense? selectedLicense;
 
   /// True if the panel is visible.
   final bool isVisible;
 
   /// Function callback when the panel is closed.
-  final void Function() onClose;
+  final void Function()? onClose;
 
   /// This callback when an item is tapped.
-  final void Function(IllustrationLicense, bool) toggleLicenseAndUpdate;
+  final void Function(IllustrationLicense, bool)? toggleLicenseAndUpdate;
 
   /// The panel elevation.
   final double elevation;
 
   /// Return an panel widget showing art styles.
   const SelectLicensePanel({
-    Key key,
+    Key? key,
     this.selectedLicense,
     this.isVisible = false,
     this.onClose,
@@ -57,7 +57,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
   bool _isImagePreviewVisible = false;
 
   /// Last fetched document snapshot. Useful for pagination.
-  DocumentSnapshot<Object> _lastDocumentSnapshot;
+  DocumentSnapshot<Object>? _lastDocumentSnapshot;
 
   /// All available art styles.
   final List<IllustrationLicense> _availableLicenses = [];
@@ -75,10 +75,10 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
   int _limitStyles = 10;
 
   /// Selected style for image preview.
-  IllustrationLicense _selectedLicensePreview;
+  IllustrationLicense? _selectedLicensePreview;
 
   /// Delay search after typing input.
-  Timer _searchTimer;
+  Timer? _searchTimer;
 
   @override
   initState() {
@@ -269,7 +269,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                     child: Opacity(
                       opacity: 0.8,
                       child: Text(
-                        _selectedLicensePreview.name.toUpperCase(),
+                        _selectedLicensePreview!.name!.toUpperCase(),
                         style: FontsUtils.mainStyle(
                           fontWeight: FontWeight.w600,
                         ),
@@ -285,7 +285,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
               child: Opacity(
                 opacity: 0.6,
                 child: Text(
-                  _selectedLicensePreview.description,
+                  _selectedLicensePreview!.description,
                   style: FontsUtils.mainStyle(
                     fontWeight: FontWeight.w500,
                   ),
@@ -306,9 +306,9 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
         spacing: 12.0,
         runSpacing: 12.0,
         children: [
-          if (_selectedLicensePreview.urls.wikipedia.isNotEmpty)
+          if (_selectedLicensePreview!.urls!.wikipedia.isNotEmpty)
             OutlinedButton(
-              onPressed: () => launch(_selectedLicensePreview.urls.wikipedia),
+              onPressed: () => launch(_selectedLicensePreview!.urls!.wikipedia),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text("wikipedia"),
@@ -317,9 +317,9 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                 primary: Colors.black54,
               ),
             ),
-          if (_selectedLicensePreview.urls.website.isNotEmpty)
+          if (_selectedLicensePreview!.urls!.website.isNotEmpty)
             OutlinedButton(
-              onPressed: () => launch(_selectedLicensePreview.urls.website),
+              onPressed: () => launch(_selectedLicensePreview!.urls!.website),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text("website"),
@@ -340,12 +340,12 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             final currentLicense = _availableLicenses.elementAt(index);
-            final selectedLicenseId = widget.selectedLicense.id;
+            final selectedLicenseId = widget.selectedLicense!.id;
             final selected = selectedLicenseId == currentLicense.id;
 
             return ListTile(
               onTap: () =>
-                  widget.toggleLicenseAndUpdate(currentLicense, selected),
+                  widget.toggleLicenseAndUpdate!(currentLicense, selected),
               onLongPress: () {
                 setState(() {
                   _selectedLicensePreview = currentLicense;
@@ -363,7 +363,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                       ),
                     Expanded(
                       child: Text(
-                        currentLicense.name.toUpperCase(),
+                        currentLicense.name!.toUpperCase(),
                         style: FontsUtils.mainStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
@@ -395,10 +395,10 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             final license = _suggestionsLicenses.elementAt(index);
-            final selected = widget.selectedLicense.id == license.id;
+            final selected = widget.selectedLicense!.id == license.id;
 
             return ListTile(
-              onTap: () => widget.toggleLicenseAndUpdate(license, selected),
+              onTap: () => widget.toggleLicenseAndUpdate!(license, selected),
               title: Opacity(
                 opacity: 0.8,
                 child: Row(
@@ -410,7 +410,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                       ),
                     Expanded(
                       child: Text(
-                        license.name.toUpperCase(),
+                        license.name!.toUpperCase(),
                         style: FontsUtils.mainStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
@@ -554,7 +554,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
           .collection('licenses')
           .limit(_limitStyles)
           .orderBy('name', descending: true)
-          .startAfterDocument(_lastDocumentSnapshot)
+          .startAfterDocument(_lastDocumentSnapshot!)
           .get();
 
       if (stylesSnap.size == 0) {
@@ -600,7 +600,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
     _suggestionsLicenses.clear();
 
     try {
-      final AlgoliaQuery query = await SearchHelper.algolia
+      final AlgoliaQuery query = await SearchHelper.algolia!
           .index("licenses")
           .query(_searchTextController.text)
           .setHitsPerPage(_limitStyles)

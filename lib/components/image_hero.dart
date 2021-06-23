@@ -9,8 +9,8 @@ class ImageHero extends StatefulWidget {
     this.maxScale = 2.0,
   });
 
-  final ImageProvider imageProvider;
-  final Decoration backgroundDecoration;
+  final ImageProvider? imageProvider;
+  final Decoration? backgroundDecoration;
   final dynamic minScale;
   final dynamic maxScale;
 
@@ -27,7 +27,7 @@ class _ImageHeroState extends State<ImageHero> {
     super.initState();
 
     photoViewController.outputStateStream.listen((event) {
-      if (event.scale < widget.minScale && !isPop) {
+      if (event.scale! < widget.minScale && !isPop) {
         isPop = true;
         Navigator.of(context).pop();
       }
@@ -48,7 +48,7 @@ class _ImageHeroState extends State<ImageHero> {
       ),
       child: PhotoView(
         imageProvider: widget.imageProvider,
-        backgroundDecoration: widget.backgroundDecoration,
+        backgroundDecoration: widget.backgroundDecoration as BoxDecoration?,
         minScale: widget.minScale,
         maxScale: widget.maxScale,
         controller: photoViewController,

@@ -9,7 +9,7 @@ import 'package:timelines/timelines.dart';
 import 'package:unicons/unicons.dart';
 
 class LandingRoadmap extends StatefulWidget {
-  const LandingRoadmap({Key key}) : super(key: key);
+  const LandingRoadmap({Key? key}) : super(key: key);
 
   @override
   _LandingRoadmapState createState() => _LandingRoadmapState();
@@ -146,7 +146,7 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        _processItems[index].title,
+                        _processItems[index].title!,
                         style: FontsUtils.mainStyle(
                           fontWeight: FontWeight.w700,
                           color: getColor(index),
@@ -155,7 +155,7 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
                       Opacity(
                         opacity: 0.6,
                         child: Text(
-                          _processItems[index].deadline,
+                          _processItems[index].deadline!,
                           style: FontsUtils.mainStyle(
                             fontSize: 14.0,
                             fontWeight: FontWeight.w400,
@@ -233,7 +233,7 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
               if (index == _processIndex) {
                 final prevColor = getColor(index - 1);
                 final color = getColor(index);
-                List<Color> gradientColors;
+                List<Color?> gradientColors;
                 if (type == ConnectorType.start) {
                   gradientColors = [Color.lerp(prevColor, color, 0.5), color];
                 } else {
@@ -245,7 +245,7 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
                 return DecoratedLineConnector(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: gradientColors,
+                      colors: gradientColors as List<Color>,
                     ),
                   ),
                 );
@@ -275,8 +275,8 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
   }
 
   Future<void> _showMyDialog({
-    @required String title,
-    @required String summary,
+    required String? title,
+    required String? summary,
   }) async {
     return showDialog<void>(
       context: context,
@@ -286,7 +286,7 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
           title: Opacity(
             opacity: 0.6,
             child: Text(
-              title.toUpperCase(),
+              title!.toUpperCase(),
             ),
           ),
           titleTextStyle: FontsUtils.mainStyle(
@@ -321,7 +321,7 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
                     padding: const EdgeInsets.all(24.0),
                     child: Opacity(
                       opacity: 0.8,
-                      child: Text(summary),
+                      child: Text(summary!),
                     ),
                   ),
                 ],

@@ -158,7 +158,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               },
               onFieldSubmitted: (value) => sendResetLink(),
               validator: (value) {
-                if (value.isEmpty) {
+                if (value!.isEmpty) {
                   return "email_empty_forbidden".tr();
                 }
 

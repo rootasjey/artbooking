@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 /// An alternative to IconButton.
 class CircleButton extends StatelessWidget {
   /// Tap callback.
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
-  final String tooltip;
+  final String? tooltip;
 
   /// Typically an Icon.
   final Widget icon;
@@ -20,7 +20,7 @@ class CircleButton extends StatelessWidget {
 
   CircleButton({
     this.onTap,
-    @required this.icon,
+    required this.icon,
     this.radius = 20.0,
     this.elevation = 0.0,
     this.backgroundColor = Colors.black12,
@@ -35,7 +35,7 @@ class CircleButton extends StatelessWidget {
       color: Colors.transparent,
       elevation: elevation,
       child: Tooltip(
-        message: tooltip,
+        message: tooltip!,
         child: Ink(
           child: InkWell(
             onTap: onTap,

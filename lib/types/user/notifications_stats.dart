@@ -1,9 +1,9 @@
 class UserNotificationsStats {
   /// Number of all notifications.
-  int total;
+  int? total;
 
   /// Number of unread notifications.
-  int unread;
+  int? unread;
 
   UserNotificationsStats({
     this.total = 0,
@@ -17,7 +17,7 @@ class UserNotificationsStats {
     );
   }
 
-  factory UserNotificationsStats.fromJSON(Map<String, dynamic> data) {
+  factory UserNotificationsStats.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
       return UserNotificationsStats.empty();
     }

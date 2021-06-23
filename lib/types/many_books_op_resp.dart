@@ -5,11 +5,11 @@ import 'package:cloud_functions/cloud_functions.dart';
 
 class ManyBooksOpResp {
   bool hasErrors;
-  final int successCount;
+  final int? successCount;
   final List<ProcessedBook> books;
   final String message;
-  final CloudFuncError error;
-  final PartialUser user;
+  final CloudFuncError? error;
+  final PartialUser? user;
 
   ManyBooksOpResp({
     this.books = const [],

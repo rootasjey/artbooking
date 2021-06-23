@@ -18,12 +18,12 @@ class _MessageItem<T> {
 class FlashHelper {
   static Completer<BuildContext> _buildCompleter = Completer<BuildContext>();
   static Queue<_MessageItem> _messageQueue = Queue<_MessageItem>();
-  static Completer _previousCompleter;
-  static FlashController _previousController;
+  static Completer? _previousCompleter;
+  static FlashController? _previousController;
   static String _currentProgressId = '';
 
   static void init(BuildContext context) {
-    if (_buildCompleter?.isCompleted == false) {
+    if (_buildCompleter.isCompleted == false) {
       _buildCompleter.complete(context);
     }
   }
@@ -31,7 +31,7 @@ class FlashHelper {
   static void dispose() {
     _messageQueue.clear();
 
-    if (_buildCompleter?.isCompleted == false) {
+    if (_buildCompleter.isCompleted == false) {
       _buildCompleter.completeError('NotInitalize');
     }
     _buildCompleter = Completer<BuildContext>();
@@ -48,14 +48,14 @@ class FlashHelper {
     }
   }
 
-  static Future<T> toast<T>(String message) async {
+  static Future<T?> toast<T>(String message) async {
     var context = await _buildCompleter.future;
 
     // Wait previous toast dismissed.
     if (_previousCompleter?.isCompleted == false) {
-      var item = _MessageItem<T>(message);
+      var item = _MessageItem<T?>(message);
       _messageQueue.add(item);
-      return await item.completer.future;
+      return await (item.completer.future as FutureOr<T?>);
     }
 
     _previousCompleter = Completer();
@@ -91,7 +91,7 @@ class FlashHelper {
           var item = _messageQueue.removeFirst();
           item.completer.complete(showToast(item.message));
         } else {
-          _previousCompleter.complete();
+          _previousCompleter!.complete();
         }
       });
     }
@@ -101,28 +101,28 @@ class FlashHelper {
 
   static Color _backgroundColor(BuildContext context) {
     var theme = Theme.of(context);
-    return theme.dialogTheme?.backgroundColor ?? theme.dialogBackgroundColor;
+    return theme.dialogTheme.backgroundColor ?? theme.dialogBackgroundColor;
   }
 
-  static TextStyle _titleStyle(BuildContext context, [Color color]) {
+  static TextStyle _titleStyle(BuildContext context, [Color? color]) {
     var theme = Theme.of(context);
-    return (theme.dialogTheme?.titleTextStyle ?? theme.textTheme.headline6)
+    return (theme.dialogTheme.titleTextStyle ?? theme.textTheme.headline6)!
         .copyWith(color: color);
   }
 
-  static TextStyle _contentStyle(BuildContext context, [Color color]) {
+  static TextStyle _contentStyle(BuildContext context, [Color? color]) {
     var theme = Theme.of(context);
-    return (theme.dialogTheme?.contentTextStyle ?? theme.textTheme.bodyText2)
+    return (theme.dialogTheme.contentTextStyle ?? theme.textTheme.bodyText2)!
         .copyWith(color: color);
   }
 
   static Future<T> groundedBottom<T>(
     BuildContext context, {
-    String title,
-    @required String message,
+    String? title,
+    required String? message,
     Widget icon = const Icon(UniconsLine.chat_info),
     Duration duration = const Duration(seconds: 5),
-    Widget primaryAction,
+    Widget? primaryAction,
   }) {
     return showFlash<T>(
       context: context,
@@ -155,7 +155,7 @@ class FlashHelper {
             message: Opacity(
               opacity: 0.5,
               child: Text(
-                message,
+                message!,
                 overflow: TextOverflow.ellipsis,
                 style: FontsUtils.mainStyle(
                   fontWeight: FontWeight.w600,
@@ -183,8 +183,8 @@ class FlashHelper {
 
   static Future<T> infoBar<T>(
     BuildContext context, {
-    String title,
-    @required String message,
+    String? title,
+    required String message,
     Duration duration = const Duration(seconds: 3),
   }) {
     return showFlash<T>(
@@ -210,8 +210,8 @@ class FlashHelper {
 
   static Future<T> successBar<T>(
     BuildContext context, {
-    String title,
-    @required String message,
+    String? title,
+    required String message,
     Duration duration = const Duration(seconds: 3),
   }) {
     return showFlash<T>(
@@ -237,9 +237,9 @@ class FlashHelper {
 
   static Future<T> errorBar<T>(
     BuildContext context, {
-    String title,
-    @required String message,
-    ChildBuilder<T> primaryAction,
+    String? title,
+    required String message,
+    ChildBuilder<T>? primaryAction,
     Duration duration = const Duration(seconds: 3),
   }) {
     return showFlash<T>(
@@ -269,9 +269,9 @@ class FlashHelper {
 
   static Future<T> actionBar<T>(
     BuildContext context, {
-    String title,
-    @required String message,
-    @required ChildBuilder<T> primaryAction,
+    String? title,
+    required String message,
+    required ChildBuilder<T> primaryAction,
     Duration duration = const Duration(seconds: 3),
   }) {
     return showFlash<T>(
@@ -289,7 +289,7 @@ class FlashHelper {
                   : Text(title, style: _titleStyle(context, Colors.white)),
               message:
                   Text(message, style: _contentStyle(context, Colors.white)),
-              primaryAction: primaryAction?.call(context, controller, setState),
+              primaryAction: primaryAction.call(context, controller, setState),
             ),
           );
         });
@@ -299,7 +299,7 @@ class FlashHelper {
 
   static Future<T> dialogWithChild<T>(
     BuildContext context, {
-    @required Widget child,
+    required Widget child,
   }) {
     return showFlash<T>(
       context: context,
@@ -330,11 +330,11 @@ class FlashHelper {
 
   static Future<T> simpleDialog<T>(
     BuildContext context, {
-    String title,
-    @required String message,
-    Color messageColor,
-    ChildBuilder<T> negativeAction,
-    ChildBuilder<T> positiveAction,
+    String? title,
+    required String message,
+    Color? messageColor,
+    ChildBuilder<T>? negativeAction,
+    ChildBuilder<T>? positiveAction,
   }) {
     return showFlash<T>(
       context: context,
@@ -369,10 +369,10 @@ class FlashHelper {
 
   static Future<T> customDialog<T>(
     BuildContext context, {
-    ChildBuilder<T> titleBuilder,
-    @required ChildBuilder messageBuilder,
-    ChildBuilder<T> negativeAction,
-    ChildBuilder<T> positiveAction,
+    ChildBuilder<T>? titleBuilder,
+    required ChildBuilder messageBuilder,
+    ChildBuilder<T>? negativeAction,
+    ChildBuilder<T>? positiveAction,
   }) {
     return showFlash<T>(
       context: context,
@@ -380,6 +380,10 @@ class FlashHelper {
       builder: (context, controller) {
         return StatefulBuilder(
           builder: (context, setState) {
+            final childTitle = titleBuilder != null
+                ? titleBuilder.call(context, controller, setState)
+                : Container();
+
             return Flash.dialog(
               controller: controller,
               backgroundColor: _backgroundColor(context),
@@ -388,7 +392,7 @@ class FlashHelper {
               child: FlashBar(
                 title: DefaultTextStyle(
                   style: _titleStyle(context),
-                  child: titleBuilder?.call(context, controller, setState),
+                  child: childTitle,
                 ),
                 message: DefaultTextStyle(
                   style: _contentStyle(context),
@@ -410,7 +414,7 @@ class FlashHelper {
 
   static Future<T> blockDialog<T>(
     BuildContext context, {
-    @required Completer<T> dismissCompleter,
+    required Completer<T> dismissCompleter,
   }) {
     var controller = FlashController<T>(
       context,
@@ -436,11 +440,11 @@ class FlashHelper {
 
   static Future<String> inputDialog(
     BuildContext context, {
-    String title,
-    String message,
-    String defaultValue,
+    String? title,
+    String? message,
+    String? defaultValue,
     bool persistent = true,
-    WillPopCallback onWillPop,
+    WillPopCallback? onWillPop,
   }) {
     var editingController = TextEditingController(text: defaultValue);
     return showFlash<String>(
@@ -485,9 +489,9 @@ class FlashHelper {
 
   static Future<T> showProgress<T>(
     BuildContext context, {
-    String title,
+    String? title,
     String progressId = '',
-    @required String message,
+    required String message,
     Widget icon = const Icon(UniconsLine.chat_info),
     Duration duration = const Duration(seconds: 10),
   }) {
@@ -551,4 +555,4 @@ class FlashHelper {
 }
 
 typedef ChildBuilder<T> = Widget Function(
-    BuildContext context, FlashController<T> controller, StateSetter setState);
+    BuildContext context, FlashController<T?> controller, StateSetter setState);

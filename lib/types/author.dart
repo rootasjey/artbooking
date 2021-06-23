@@ -1,6 +1,6 @@
 class Author {
   /// Author's id.
-  String id;
+  String? id;
 
   Author({
     this.id = '',

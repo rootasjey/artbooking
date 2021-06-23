@@ -6,10 +6,10 @@ import 'package:unicons/unicons.dart';
 /// Use as a form footer to cancel of validate data.
 class FormActionInputs extends StatelessWidget {
   /// Executed when the form is closed with the cancel button.
-  final VoidCallback onCancel;
+  final VoidCallback? onCancel;
 
   /// Executed when the form is closed with validate button.
-  final VoidCallback onValidate;
+  final VoidCallback? onValidate;
 
   /// Cancel button's text string value.
   final String cancelTextString;
@@ -24,7 +24,7 @@ class FormActionInputs extends StatelessWidget {
   final bool adaptivePadding;
 
   const FormActionInputs({
-    Key key,
+    Key? key,
     this.onCancel,
     this.onValidate,
     this.cancelTextString = 'Clear input',

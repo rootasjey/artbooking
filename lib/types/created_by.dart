@@ -1,6 +1,6 @@
 class CreatedBy {
   /// User's id.
-  final String id;
+  final String? id;
 
   CreatedBy({
     this.id = '',
@@ -14,7 +14,7 @@ class CreatedBy {
   }
 
   /// Create an instance from JSON data.
-  factory CreatedBy.fromJSON(Map<String, dynamic> data) {
+  factory CreatedBy.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
       return CreatedBy.empty();
     }

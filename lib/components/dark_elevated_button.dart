@@ -2,13 +2,13 @@ import 'package:artbooking/utils/fonts.dart';
 import 'package:flutter/material.dart';
 
 class DarkElevatedButton extends StatelessWidget {
-  final void Function() onPressed;
+  final void Function()? onPressed;
   final Widget child;
 
   const DarkElevatedButton({
-    Key key,
+    Key? key,
     this.onPressed,
-    @required this.child,
+    required this.child,
   }) : super(key: key);
 
   @override

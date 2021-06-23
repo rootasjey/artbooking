@@ -6,7 +6,7 @@ import 'package:supercharged/supercharged.dart';
 /// Animate translateY and opacity of a child widget.
 class FadeInY extends StatelessWidget {
   final Duration delay;
-  final Widget child;
+  final Widget? child;
 
   final double beginY;
   final double endY;

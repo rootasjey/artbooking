@@ -26,21 +26,21 @@ class MyIllustrationsPage extends StatefulWidget {
 }
 
 class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
-  bool isLoading;
+  late bool isLoading;
   bool descending = true;
   bool hasNext = true;
   bool isFabVisible = false;
   bool isLoadingMore = false;
   bool forceMultiSelect = false;
 
-  DocumentSnapshot lastDoc;
+  DocumentSnapshot? lastDoc;
 
   final illustrationsList = <Illustration>[];
   final keyboardFocusNode = FocusNode();
 
   int limit = 20;
 
-  Map<String, Illustration> multiSelectedItems = Map();
+  Map<String?, Illustration> multiSelectedItems = Map();
 
   ScrollController scrollController = ScrollController();
 
@@ -494,7 +494,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection('illustrations')
-          .where('user.id', isEqualTo: stateUser.userAuth.uid)
+          .where('user.id', isEqualTo: stateUser.userAuth!.uid)
           .orderBy('createdAt', descending: descending)
           .limit(limit)
           .get();
@@ -548,7 +548,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
           .where('user.id', isEqualTo: userAuth.uid)
           .orderBy('createdAt', descending: descending)
           .limit(limit)
-          .startAfterDocument(lastDoc)
+          .startAfterDocument(lastDoc!)
           .get();
 
       if (snapshot.docs.isEmpty) {

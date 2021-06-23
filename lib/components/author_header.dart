@@ -8,12 +8,12 @@ import 'package:artbooking/utils/fonts.dart';
 import 'package:flutter/material.dart';
 
 class AuthorHeader extends StatefulWidget {
-  final String authorId;
+  final String? authorId;
   final EdgeInsets padding;
 
   const AuthorHeader({
-    Key key,
-    @required this.authorId,
+    Key? key,
+    required this.authorId,
     this.padding = EdgeInsets.zero,
   }) : super(key: key);
 
@@ -64,7 +64,7 @@ class _AuthorHeaderState extends State<AuthorHeader> {
                 Opacity(
                   opacity: 0.8,
                   child: Text(
-                    _user.name,
+                    _user.name!,
                     style: FontsUtils.mainStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w600,

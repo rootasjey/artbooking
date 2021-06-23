@@ -25,16 +25,16 @@ import 'package:unicons/unicons.dart';
 
 class IllustrationPage extends StatefulWidget {
   /// Illustration's id, used if direct navigation by url.
-  final String illustrationId;
+  final String? illustrationId;
 
   /// Illustration object, used if navigation from a previous page.
-  final Illustration illustration;
+  final Illustration? illustration;
 
   /// True if navigating from dashboard.
-  final bool fromDashboard;
+  final bool? fromDashboard;
 
   const IllustrationPage({
-    Key key,
+    Key? key,
     @PathParam() this.illustrationId,
     this.illustration,
     this.fromDashboard = false,
@@ -48,7 +48,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
   /// True if data is being loaded.
   bool _isLoading = false;
 
-  Illustration _illustration;
+  Illustration? _illustration;
 
   String _newName = '';
   String _newDesc = '';
@@ -56,9 +56,9 @@ class _IllustrationPageState extends State<IllustrationPage> {
 
   bool _isEditModeOn = false;
 
-  TextEditingController _nameController;
-  TextEditingController _descController;
-  TextEditingController _summaryController;
+  TextEditingController? _nameController;
+  TextEditingController? _descController;
+  TextEditingController? _summaryController;
 
   IllustrationLicense _newLicense = IllustrationLicense();
   ContentVisibility _newVisibility = ContentVisibility.private;
@@ -130,7 +130,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
           child: Opacity(
             opacity: 0.6,
             child: Text(
-              Jiffy(_illustration.createdAt).fromNow(),
+              Jiffy(_illustration!.createdAt).fromNow(),
               style: FontsUtils.mainStyle(
                 fontSize: 18.0,
                 fontWeight: FontWeight.w600,
@@ -143,7 +143,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
   }
 
   Widget fab() {
-    if (!widget.fromDashboard) {
+    if (!widget.fromDashboard!) {
       return Container();
     }
 
@@ -179,7 +179,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
           child: Opacity(
             opacity: 0.8,
             child: Text(
-              _illustration.name ?? '',
+              _illustration!.name,
               style: FontsUtils.mainStyle(
                 fontSize: 20.0,
                 fontWeight: FontWeight.w700,
@@ -243,8 +243,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
   }
 
   Widget description() {
-    if (_illustration.description == null ||
-        _illustration.description.isEmpty) {
+    if (_illustration!.description.isEmpty) {
       return Container();
     }
 
@@ -253,7 +252,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
       child: Opacity(
         opacity: 0.4,
         child: Text(
-          _illustration.description ?? '',
+          _illustration!.description,
           style: FontsUtils.mainStyle(
             fontSize: 18.0,
             fontWeight: FontWeight.w600,
@@ -264,7 +263,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
   }
 
   Widget summary() {
-    if (_illustration.story == null || _illustration.story.isEmpty) {
+    if (_illustration!.story.isEmpty) {
       return Container();
     }
 
@@ -274,7 +273,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
       child: Opacity(
         opacity: 0.6,
         child: Text(
-          _illustration.story ?? '',
+          _illustration!.story,
           style: FontsUtils.mainStyle(
             fontSize: 24.0,
             fontWeight: FontWeight.w200,
@@ -292,7 +291,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
       child: Column(
         children: [
           AuthorHeader(
-            authorId: _illustration.author.id,
+            authorId: _illustration!.author!.id,
             padding: const EdgeInsets.only(bottom: 60.0),
           ),
           description(),
@@ -512,11 +511,11 @@ class _IllustrationPageState extends State<IllustrationPage> {
 
   void saveNewMetadata() async {
     setState(() {
-      _illustration.name = _newName;
-      _illustration.description = _newDesc;
-      _illustration.story = _newSummary;
-      _illustration.license = _newLicense;
-      _illustration.visibility = _newVisibility;
+      _illustration!.name = _newName;
+      _illustration!.description = _newDesc;
+      _illustration!.story = _newSummary;
+      _illustration!.license = _newLicense;
+      _illustration!.visibility = _newVisibility;
     });
 
     final result = await IllustrationsActions.updateMetadata(
@@ -525,7 +524,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
       summary: _newSummary,
       license: _newLicense,
       visibility: _newVisibility,
-      illustration: _illustration,
+      illustration: _illustration!,
     );
 
     if (!result.success) {
@@ -555,7 +554,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
               ),
               children: [
                 TextSpan(
-                  text: Jiffy(_illustration.createdAt).fromNow(),
+                  text: Jiffy(_illustration!.createdAt).fromNow(),
                   style: FontsUtils.mainStyle(
                     color: Colors.black54,
                   ),
@@ -573,7 +572,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
               ),
               children: [
                 TextSpan(
-                  text: Jiffy(_illustration.updatedAt).fromNow(),
+                  text: Jiffy(_illustration!.updatedAt).fromNow(),
                   style: FontsUtils.mainStyle(
                     color: Colors.black54,
                   ),
@@ -587,8 +586,8 @@ class _IllustrationPageState extends State<IllustrationPage> {
   }
 
   Future<void> showMyDialog({
-    @required String title,
-    @required Widget body,
+    required String title,
+    required Widget body,
   }) async {
     return showDialog<void>(
       context: context,

@@ -83,7 +83,7 @@ class _MyActivityPageState extends State<MyActivityPage> {
   }
 
   Widget squareStatsRow() {
-    final stats = stateUser.userFirestore.stats;
+    final stats = stateUser.userFirestore.stats!;
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -101,7 +101,7 @@ class _MyActivityPageState extends State<MyActivityPage> {
               UniconsLine.picture,
               size: 48.0,
             ),
-            count: stats.illustrations.owned,
+            count: stats.illustrations!.owned,
             onTap: () => context.router.navigate(MyIllustrationsPageRoute()),
           ),
           squareStats(
@@ -110,22 +110,22 @@ class _MyActivityPageState extends State<MyActivityPage> {
               UniconsLine.book_alt,
               size: 48.0,
             ),
-            count: stats.books.owned,
+            count: stats.books!.owned,
             onTap: () => context.router.navigate(MyBooksPageRoute()),
           ),
           squareStats(
             title: "galleries".tr(),
-            count: stats.galleries.owned,
+            count: stats.galleries!.owned,
             onTap: () {},
           ),
           squareStats(
             title: "challenges".tr(),
-            count: stats.challenges.participating,
+            count: stats.challenges!.participating,
             onTap: () {},
           ),
           squareStats(
             title: "contests".tr(),
-            count: stats.constests.participating,
+            count: stats.constests!.participating,
             onTap: () {},
           ),
         ],
@@ -134,10 +134,10 @@ class _MyActivityPageState extends State<MyActivityPage> {
   }
 
   Widget squareStats({
-    @required String title,
-    @required int count,
-    @required VoidCallback onTap,
-    Widget icon,
+    required String title,
+    required int? count,
+    required VoidCallback onTap,
+    Widget? icon,
   }) {
     return SizedBox(
       width: 200.0,
@@ -255,7 +255,7 @@ class _MyActivityPageState extends State<MyActivityPage> {
       final userAuth = FirebaseAuth.instance.currentUser;
 
       if (userAuth == null) {
-        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
           Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => SigninPage()),
           );
@@ -277,7 +277,7 @@ class _MyActivityPageState extends State<MyActivityPage> {
   }
 
   String getUsedSpace() {
-    final usedBytes = stateUser.userFirestore.stats.storage.illustrations.used;
+    final usedBytes = stateUser.userFirestore.stats!.storage!.illustrations!.used!;
     var units = 'bytes';
 
     if (usedBytes < 1000) {

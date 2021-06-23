@@ -35,10 +35,10 @@ import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
 class SettingsPage extends StatefulWidget {
-  final bool showAppBar;
+  final bool? showAppBar;
 
   const SettingsPage({
-    Key key,
+    Key? key,
     @PathParam() this.showAppBar = true,
   }) : super(key: key);
 
@@ -54,18 +54,18 @@ class _SettingsPageState extends State<SettingsPage> {
   bool notificationsON = false;
   bool _isUpdating = false;
 
-  Brightness brightness;
-  Brightness currentBrightness;
+  Brightness? brightness;
+  Brightness? currentBrightness;
 
   double beginY = 20.0;
 
   String avatarUrl = '';
   String imageUrl = '';
   String notifLang = 'en';
-  String selectedLang = 'English';
+  String? selectedLang = 'English';
 
-  Timer nameTimer;
-  Timer quotidiansNotifTimer;
+  Timer? nameTimer;
+  Timer? quotidiansNotifTimer;
 
   ScrollController _pageScrollController = ScrollController();
 
@@ -88,7 +88,7 @@ class _SettingsPageState extends State<SettingsPage> {
             CustomScrollView(
               controller: _pageScrollController,
               slivers: <Widget>[
-                if (widget.showAppBar) MainAppBar(),
+                if (widget.showAppBar!) MainAppBar(),
                 body(),
               ],
             ),
@@ -181,7 +181,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   BlendMode.saturation,
                 ),
                 onTap: () {
-                  if (stateUser.userFirestore.pp.url.edited.isEmpty) {
+                  if (stateUser.userFirestore.pp!.url!.edited!.isEmpty) {
                     return;
                   }
 
@@ -191,7 +191,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         children: [
                           EditImagePageRoute(
                             image: ExtendedNetworkImageProvider(
-                              stateUser.userFirestore.pp.url.original,
+                              stateUser.userFirestore.pp!.url!.original!,
                               cache: true,
                               cacheRawData: true,
                             ),
@@ -222,7 +222,7 @@ class _SettingsPageState extends State<SettingsPage> {
     bool showBigTitle = false;
 
     if (MediaQuery.of(context).size.width > Constants.maxMobileWidth) {
-      paddingTop = widget.showAppBar ? 60.0 : 20.0;
+      paddingTop = widget.showAppBar! ? 60.0 : 20.0;
       showBigTitle = true;
     }
 
@@ -415,7 +415,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                       ),
                       Text(
-                        stateUser.username,
+                        stateUser.username!,
                         style: FontsUtils.mainStyle(
                           fontWeight: FontWeight.w600,
                         ),
@@ -448,7 +448,7 @@ class _SettingsPageState extends State<SettingsPage> {
             fontFamily: GoogleFonts.raleway().fontFamily,
             fontWeight: FontWeight.bold,
           ),
-          onChanged: (String newValue) {
+          onChanged: (String? newValue) {
             setState(() {
               selectedLang = newValue;
             });
@@ -651,13 +651,13 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   String getAvatarUrl() {
-    String avatarUrl = stateUser.userFirestore.pp.url.edited;
+    String? avatarUrl = stateUser.userFirestore.pp!.url!.edited;
 
     if (avatarUrl == null || avatarUrl.isEmpty) {
-      avatarUrl = stateUser.userFirestore.pp.url.original;
+      avatarUrl = stateUser.userFirestore.pp!.url!.original;
     }
 
-    if (avatarUrl.isEmpty) {
+    if (avatarUrl!.isEmpty) {
       avatarUrl = "https://img.icons8.com/plasticine/100/000000/flower.png";
     }
 
@@ -688,11 +688,11 @@ class _SettingsPageState extends State<SettingsPage> {
         : "theme_manual_description".tr();
   }
 
-  void updateImageUrl({String imageName}) async {
+  void updateImageUrl({String? imageName}) async {
     setState(() => isLoadingAvatarUrl = true);
 
     try {
-      final userAuth = stateUser.userAuth;
+      final userAuth = stateUser.userAuth!;
 
       await FirebaseFirestore.instance
           .collection('users')
@@ -783,7 +783,7 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() => _isUpdating = true);
 
     final ext =
-        choosenFile.fileName.substring(choosenFile.fileName.lastIndexOf('.'));
+        choosenFile.fileName!.substring(choosenFile.fileName!.lastIndexOf('.'));
 
     final metadata = SettableMetadata(
       contentType: mime(choosenFile.fileName),
@@ -811,8 +811,8 @@ class _SettingsPageState extends State<SettingsPage> {
       final String downloadUrl = await snapshot.ref.getDownloadURL();
 
       setState(() {
-        stateUser.userFirestore.urls.setUrl('image', downloadUrl);
-        stateUser.userFirestore.pp.update(
+        stateUser.userFirestore.urls!.setUrl('image', downloadUrl);
+        stateUser.userFirestore.pp!.update(
           UserPP(
             ext: ext.replaceFirst('.', ''),
             size: choosenFile.length,

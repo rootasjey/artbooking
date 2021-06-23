@@ -9,13 +9,13 @@ class Book {
   final int count;
 
   /// Book's thumbnail.
-  final BookCover cover;
+  final BookCover? cover;
 
   /// When this book was created.
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
   /// This book's description.
-  String description;
+  String? description;
 
   /// Firestore's id.
   final String id;
@@ -41,7 +41,7 @@ class Book {
   BookLayoutOrientation layoutOrientationMobile;
 
   /// This book's name.
-  String name;
+  String? name;
 
   /// Used when [layout] value is {extendedGrid}.
   /// This property is initially empty and is filled when {extendedGrid} is chosen.
@@ -54,10 +54,10 @@ class Book {
   List<List<BookIllustration>> matrice;
 
   /// Last time this book was updated.
-  final DateTime updatedAt;
+  final DateTime? updatedAt;
 
   /// Urls of assets or other content.
-  final BookUrls urls;
+  final BookUrls? urls;
 
   /// Control if other people can view this book.
   final ContentVisibility visibility;
@@ -166,7 +166,7 @@ class Book {
     }
   }
 
-  static BookLayout parseStringLayout(String stringLayout) {
+  static BookLayout parseStringLayout(String? stringLayout) {
     switch (stringLayout) {
       case 'adaptativeGrid':
         return BookLayout.adaptativeGrid;
@@ -196,7 +196,7 @@ class Book {
   }
 
   static BookLayoutOrientation parseStringLayoutOrientation(
-      String stringOrientation) {
+      String? stringOrientation) {
     switch (stringOrientation) {
       case 'both':
         return BookLayoutOrientation.both;
@@ -209,7 +209,7 @@ class Book {
     }
   }
 
-  static ContentVisibility parseStringVisibility(String stringVisibility) {
+  static ContentVisibility parseStringVisibility(String? stringVisibility) {
     switch (stringVisibility) {
       case 'acl':
         return ContentVisibility.acl;

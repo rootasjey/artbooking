@@ -7,7 +7,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 
 class NavigationHelper {
-  static GlobalKey<NavigatorState> navigatorKey;
+  static GlobalKey<NavigatorState>? navigatorKey;
 
   static void clearSavedNotifiData() {
     appStorage.setString(StorageKeys.quoteIdNotification, '');
@@ -18,7 +18,7 @@ class NavigationHelper {
     PageRouteInfo pageRoute,
     BuildContext context,
   ) {
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+    SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
       context.router.navigate(pageRoute);
     });
   }

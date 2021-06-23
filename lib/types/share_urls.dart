@@ -1,6 +1,6 @@
 class ShareUrls {
-  String read;
-  String write;
+  String? read;
+  String? write;
 
   ShareUrls({
     this.read = '',

@@ -28,7 +28,7 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
   bool isUpdating = false;
   bool isCheckingName = false;
   bool isCompleted = false;
-  bool isNameAvailable = false;
+  bool? isNameAvailable = false;
 
   final beginY = 10.0;
   final passwordNode = FocusNode();
@@ -39,7 +39,7 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
   String nameErrorMessage = '';
   String newUsername = '';
 
-  Timer nameTimer;
+  Timer? nameTimer;
 
   @override
   void initState() {
@@ -335,7 +335,7 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
               }
 
               if (nameTimer != null) {
-                nameTimer.cancel();
+                nameTimer!.cancel();
                 nameTimer = null;
               }
 
@@ -343,7 +343,7 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
                 isNameAvailable =
                     await UsersActions.checkUsernameAvailability(newUsername);
 
-                if (!isNameAvailable) {
+                if (!isNameAvailable!) {
                   setState(() {
                     isCheckingName = false;
                     nameErrorMessage = "username_not_available".tr();
@@ -432,7 +432,7 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
       final data = user.data();
 
       setState(() {
-        currentUsername = data['name'] ?? '';
+        currentUsername = data!['name'] ?? '';
       });
     } catch (error) {
       appLogger.e(error);
@@ -469,7 +469,7 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
       isNameAvailable =
           await UsersActions.checkUsernameAvailability(newUsername);
 
-      if (!isNameAvailable) {
+      if (!isNameAvailable!) {
         setState(() {
           isCompleted = false;
           isUpdating = false;
@@ -498,7 +498,7 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
       final usernameUpdateResp = await stateUser.updateUsername(newUsername);
 
       if (!usernameUpdateResp.success) {
-        final exception = usernameUpdateResp.error;
+        final exception = usernameUpdateResp.error!;
 
         setState(() {
           isCompleted = false;

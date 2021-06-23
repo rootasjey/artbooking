@@ -4,16 +4,16 @@ import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:flutter/material.dart';
 
 class AppStorage {
-  static LocalStorageInterface _localStorage;
+  static LocalStorageInterface? _localStorage;
 
   // / --------------- /
   // /     General     /
   // / --------------- /
-  bool containsKey(String key) => _localStorage.containsKey(key);
+  bool containsKey(String key) => _localStorage!.containsKey(key);
 
-  String getString(String key) => _localStorage.getString(key);
+  String? getString(String key) => _localStorage!.getString(key);
 
-  bool getBool(String key) => _localStorage.getBool(key);
+  bool? getBool(String key) => _localStorage!.getBool(key);
 
   Future initialize() async {
     if (_localStorage != null) {
@@ -23,25 +23,25 @@ class AppStorage {
   }
 
   Future<bool> setBool(String key, bool value) =>
-      _localStorage.setBool(key, value);
+      _localStorage!.setBool(key, value);
 
   Future<bool> setString(String key, String value) =>
-      _localStorage.setString(key, value);
+      _localStorage!.setString(key, value);
 
   // / -----------------/
   // /   First launch   /
   // / -----------------/
   bool isFirstLanch() {
-    return _localStorage.getBool(StorageKeys.firstLaunch) ?? true;
+    return _localStorage!.getBool(StorageKeys.firstLaunch) ?? true;
   }
 
-  void setFirstLaunch({bool overrideValue}) {
+  void setFirstLaunch({bool? overrideValue}) {
     if (overrideValue != null) {
-      _localStorage.setBool(StorageKeys.firstLaunch, overrideValue);
+      _localStorage!.setBool(StorageKeys.firstLaunch, overrideValue);
       return;
     }
 
-    _localStorage.setBool(StorageKeys.firstLaunch, false);
+    _localStorage!.setBool(StorageKeys.firstLaunch, false);
   }
 
   // / --------------/
@@ -49,83 +49,83 @@ class AppStorage {
   // /---------------/
   void clearDrafts() {
     List<String> drafts = [];
-    _localStorage.setStringList(StorageKeys.drafts, drafts);
+    _localStorage!.setStringList(StorageKeys.drafts, drafts);
   }
 
-  void saveDraft({String draftString}) {
-    List<String> drafts = _localStorage.getStringList('drafts') ?? [];
+  void saveDraft({String? draftString}) {
+    List<String?> drafts = _localStorage!.getStringList('drafts') ?? [];
 
     drafts.add(draftString);
-    _localStorage.setStringList('drafts', drafts);
+    _localStorage!.setStringList('drafts', drafts as List<String>);
   }
 
   void setDrafts(List<String> drafts) {
-    _localStorage.setStringList('drafts', drafts);
+    _localStorage!.setStringList('drafts', drafts);
   }
 
   // / ---------------/
   // /      USER      /
   // /----------------/
   Future clearUserAuthData() async {
-    await _localStorage.remove(StorageKeys.username);
-    await _localStorage.remove(StorageKeys.email);
-    await _localStorage.remove(StorageKeys.password);
-    await _localStorage.remove(StorageKeys.userUid);
+    await _localStorage!.remove(StorageKeys.username);
+    await _localStorage!.remove(StorageKeys.email);
+    await _localStorage!.remove(StorageKeys.password);
+    await _localStorage!.remove(StorageKeys.userUid);
   }
 
-  Map<String, String> getCredentials() {
-    final credentials = Map<String, String>();
+  Map<String, String?> getCredentials() {
+    final credentials = Map<String, String?>();
 
-    credentials[StorageKeys.email] = _localStorage.getString(StorageKeys.email);
+    credentials[StorageKeys.email] = _localStorage!.getString(StorageKeys.email);
     credentials[StorageKeys.password] =
-        _localStorage.getString(StorageKeys.password);
+        _localStorage!.getString(StorageKeys.password);
 
     return credentials;
   }
 
-  String getLang() => _localStorage.getString(StorageKeys.lang) ?? 'en';
+  String getLang() => _localStorage!.getString(StorageKeys.lang) ?? 'en';
 
   bool isQuotidianNotifActive() {
-    return _localStorage.getBool('is_quotidian_notif_active') ?? true;
+    return _localStorage!.getBool('is_quotidian_notif_active') ?? true;
   }
 
-  String getUserName() => _localStorage.getString(StorageKeys.username) ?? '';
-  String getUserUid() => _localStorage.getString(StorageKeys.userUid) ?? '';
+  String getUserName() => _localStorage!.getString(StorageKeys.username) ?? '';
+  String getUserUid() => _localStorage!.getString(StorageKeys.userUid) ?? '';
 
-  void setCredentials({String email, String password}) {
-    _localStorage.setString(StorageKeys.email, email);
-    _localStorage.setString(StorageKeys.password, password);
+  void setCredentials({required String email, required String password}) {
+    _localStorage!.setString(StorageKeys.email, email);
+    _localStorage!.setString(StorageKeys.password, password);
   }
 
   void setEmail(String email) {
-    _localStorage.setString(StorageKeys.email, email);
+    _localStorage!.setString(StorageKeys.email, email);
   }
 
   void setPassword(String password) {
-    _localStorage.setString(StorageKeys.password, password);
+    _localStorage!.setString(StorageKeys.password, password);
   }
 
-  void setLang(String lang) => _localStorage.setString('lang', lang);
+  void setLang(String lang) => _localStorage!.setString('lang', lang);
 
   void setQuotidianNotif(bool active) {
-    _localStorage.setBool('is_quotidian_notif_active', active);
+    _localStorage!.setBool('is_quotidian_notif_active', active);
   }
 
   void setUserName(String userName) =>
-      _localStorage.setString('username', userName);
+      _localStorage!.setString('username', userName);
 
   void setUserUid(String userName) =>
-      _localStorage.setString('user_uid', userName);
+      _localStorage!.setString('user_uid', userName);
 
   // / -------------------/
   // /     Brightness     /
   // / -------------------/
   bool getAutoBrightness() {
-    return _localStorage.getBool(StorageKeys.autoBrightness) ?? true;
+    return _localStorage!.getBool(StorageKeys.autoBrightness) ?? true;
   }
 
   Brightness getBrightness() {
-    final brightness = _localStorage.getString(StorageKeys.brightness) == 'dark'
+    final brightness = _localStorage!.getString(StorageKeys.brightness) == 'dark'
         ? Brightness.dark
         : Brightness.light;
 
@@ -133,30 +133,30 @@ class AppStorage {
   }
 
   void setAutoBrightness(bool value) {
-    _localStorage.setBool(StorageKeys.autoBrightness, value);
+    _localStorage!.setBool(StorageKeys.autoBrightness, value);
   }
 
-  void setBrightness(Brightness brightness) {
+  void setBrightness(Brightness? brightness) {
     final strBrightness = brightness == Brightness.dark ? 'dark' : 'light';
-    _localStorage.setString(StorageKeys.brightness, strBrightness);
+    _localStorage!.setString(StorageKeys.brightness, strBrightness);
   }
 
   // / ----------------/
   // /      Layout     /
   // / ----------------/
   DiscoverType getDiscoverType() {
-    final value = _localStorage.getString(StorageKeys.discoverType);
+    final value = _localStorage!.getString(StorageKeys.discoverType);
     return value == 'authors' ? DiscoverType.authors : DiscoverType.references;
   }
 
   List<String> getDrafts() {
-    List<String> drafts = _localStorage.getStringList(StorageKeys.drafts) ?? [];
+    List<String> drafts = _localStorage!.getStringList(StorageKeys.drafts) ?? [];
     return drafts;
   }
 
   ItemsLayout getItemsStyle(String pageRoute) {
     final itemsStyle =
-        _localStorage.getString('${StorageKeys.itemsStyle}$pageRoute');
+        _localStorage!.getString('${StorageKeys.itemsStyle}$pageRoute');
 
     switch (itemsStyle) {
       case StorageKeys.itemsLayoutGrid:
@@ -168,15 +168,15 @@ class AppStorage {
     }
   }
 
-  String getPageLang({String pageRoute}) {
+  String getPageLang({String? pageRoute}) {
     final key = '$pageRoute?lang';
-    final lang = _localStorage.getString(key);
+    final lang = _localStorage!.getString(key);
     return lang ?? 'en';
   }
 
-  bool getPageOrder({String pageRoute}) {
+  bool getPageOrder({String? pageRoute}) {
     final key = '$pageRoute?order';
-    final descending = _localStorage.getBool(key);
+    final descending = _localStorage!.getBool(key);
     return descending ?? true;
   }
 
@@ -184,21 +184,21 @@ class AppStorage {
     final value =
         discoverType == DiscoverType.authors ? 'authors' : 'references';
 
-    _localStorage.setString('discover_type', value);
+    _localStorage!.setString('discover_type', value);
   }
 
-  void saveItemsStyle({String pageRoute, ItemsLayout style}) {
-    _localStorage.setString('items_style_$pageRoute', style.toString());
+  void saveItemsStyle({String? pageRoute, ItemsLayout? style}) {
+    _localStorage!.setString('items_style_$pageRoute', style.toString());
   }
 
-  void setPageLang({String lang, String pageRoute}) {
+  void setPageLang({required String lang, String? pageRoute}) {
     final key = '$pageRoute?lang';
-    _localStorage.setString(key, lang);
+    _localStorage!.setString(key, lang);
   }
 
-  void setPageOrder({bool descending, String pageRoute}) {
+  void setPageOrder({required bool descending, String? pageRoute}) {
     final key = '$pageRoute?order';
-    _localStorage.setBool(key, descending);
+    _localStorage!.setBool(key, descending);
   }
 }
 

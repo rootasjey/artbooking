@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BookAutoCover {
-  final String id;
-  final String url;
-  final DateTime updatedAt;
+  final String? id;
+  final String? url;
+  final DateTime? updatedAt;
 
   BookAutoCover({
     this.id,

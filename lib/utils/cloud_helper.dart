@@ -28,7 +28,7 @@ class Cloud {
   /// Call cloud functions related to tihs app on the right region.
   static HttpsCallable fun(
     String functionName, {
-    HttpsCallableOptions options,
+    HttpsCallableOptions? options,
   }) {
     return FirebaseFunctions.instanceFor(
       app: Firebase.app(),
@@ -45,7 +45,7 @@ class Cloud {
   /// You only need to specify `updateMetadata`.
   static HttpsCallable illustrations(
     String functionName, {
-    HttpsCallableOptions options,
+    HttpsCallableOptions? options,
   }) {
     return FirebaseFunctions.instanceFor(
       app: Firebase.app(),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
 class LandingCurated extends StatefulWidget {
-  const LandingCurated({Key key}) : super(key: key);
+  const LandingCurated({Key? key}) : super(key: key);
 
   @override
   _LandingCuratedState createState() => _LandingCuratedState();
@@ -68,7 +68,7 @@ class _LandingCuratedState extends State<LandingCurated> {
     double width = 300.0,
     height = 300.0,
     Color color = const Color(0xFF3544393),
-    String imageUrl,
+    String? imageUrl,
   }) {
     return Card(
       elevation: 0.0,

@@ -4,10 +4,10 @@ import 'package:cloud_functions/cloud_functions.dart';
 
 class OneBookOpResp {
   bool success;
-  final String bookId;
+  final String? bookId;
   final String message;
-  final CloudFuncError error;
-  final PartialUser user;
+  final CloudFuncError? error;
+  final PartialUser? user;
 
   OneBookOpResp({
     this.bookId = '',

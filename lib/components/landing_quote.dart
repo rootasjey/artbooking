@@ -6,7 +6,7 @@ import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LandingQuote extends StatefulWidget {
-  const LandingQuote({Key key}) : super(key: key);
+  const LandingQuote({Key? key}) : super(key: key);
 
   @override
   _LandingQuoteState createState() => _LandingQuoteState();

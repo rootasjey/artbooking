@@ -101,7 +101,7 @@ class _LandingHeroState extends State<LandingHero> {
     double width = 120.0,
     height = 120.0,
     Color color = const Color(0xFF3544393),
-    String imageUrl,
+    String? imageUrl,
   }) {
     return Card(
       elevation: 2.0,

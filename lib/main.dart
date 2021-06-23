@@ -60,11 +60,11 @@ void main() async {
 
 /// Main app class.
 class App extends StatefulWidget {
-  final AdaptiveThemeMode savedThemeMode;
-  final Brightness brightness;
+  final AdaptiveThemeMode? savedThemeMode;
+  final Brightness? brightness;
 
   const App({
-    Key key,
+    Key? key,
     this.savedThemeMode,
     this.brightness,
   }) : super(key: key);
@@ -111,13 +111,13 @@ class AppState extends State<App> {
 class AppWithTheme extends StatefulWidget {
   final ThemeData theme;
   final ThemeData darkTheme;
-  final Brightness brightness;
+  final Brightness? brightness;
 
   const AppWithTheme({
-    Key key,
-    @required this.brightness,
-    @required this.darkTheme,
-    @required this.theme,
+    Key? key,
+    required this.brightness,
+    required this.darkTheme,
+    required this.theme,
   }) : super(key: key);
 
   @override

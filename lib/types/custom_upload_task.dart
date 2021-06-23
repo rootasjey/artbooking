@@ -4,13 +4,13 @@ import 'package:firebase_storage/firebase_storage.dart';
 /// such as a Firestore document.
 class CustomUploadTask {
   /// Firebase storage upload task.
-  UploadTask task;
+  UploadTask? task;
 
   /// The illustration being uploaded.
-  String name;
+  String? name;
 
   /// The created illustration in Firestore.
-  String illustrationId;
+  String? illustrationId;
 
   CustomUploadTask({
     this.illustrationId = '',

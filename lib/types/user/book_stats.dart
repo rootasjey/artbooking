@@ -1,15 +1,15 @@
 class UserBooksStats {
   /// Total books this user has created.
-  int created;
+  int? created;
 
   /// Total books this user has deleted.
-  int deleted;
+  int? deleted;
 
   /// Total books this user has fav.
-  int fav;
+  int? fav;
 
   /// Number of existing books this user own.
-  int owned;
+  int? owned;
 
   UserBooksStats({
     this.created = 0,
@@ -27,7 +27,7 @@ class UserBooksStats {
     );
   }
 
-  factory UserBooksStats.fromJSON(Map<String, dynamic> data) {
+  factory UserBooksStats.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
       return UserBooksStats.empty();
     }

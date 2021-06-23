@@ -19,7 +19,7 @@ class MainAppBar extends StatefulWidget {
   final bool renderSliver;
 
   const MainAppBar({
-    Key key,
+    Key? key,
     this.renderSliver = true,
   }) : super(key: key);
 
@@ -316,7 +316,7 @@ class _MainAppBarState extends State<MainAppBar> {
   }
 
   Widget renderSliver({
-    bool isNarrow,
+    required bool isNarrow,
     EdgeInsets padding = EdgeInsets.zero,
   }) {
     return SliverAppBar(
@@ -361,8 +361,8 @@ class _MainAppBarState extends State<MainAppBar> {
   }
 
   Widget sectionButton({
-    VoidCallback onPressed,
-    String text,
+    VoidCallback? onPressed,
+    required String text,
   }) {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),

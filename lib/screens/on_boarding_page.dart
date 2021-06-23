@@ -31,7 +31,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   double horizontalPadding = 20.0;
   final double illusSize = 300.0;
 
-  Timer timer;
+  Timer? timer;
 
   @override
   void initState() {
@@ -42,8 +42,8 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   @override
   void dispose() {
     super.dispose();
-    if (timer != null && timer.isActive) {
-      timer.cancel();
+    if (timer != null && timer!.isActive) {
+      timer!.cancel();
       toggleQuotidianNotifications();
     }
   }
@@ -282,7 +282,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
     );
   }
 
-  Widget storeCard({@required Widget icon, @required url}) {
+  Widget storeCard({required Widget icon, required url}) {
     return SizedBox(
       width: 100.0,
       height: 100.0,
@@ -334,10 +334,14 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                 if (widget.isDesktop) {
                   Navigator.of(context).pop();
 
-                  return Navigator.push(
+                  Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => SigninPage()),
+                    MaterialPageRoute(builder: (_) {
+                      return SigninPage();
+                    }),
                   );
+
+                  return;
                 }
 
                 Navigator.of(context).push(

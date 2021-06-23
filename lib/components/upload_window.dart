@@ -11,7 +11,7 @@ import 'package:unicons/unicons.dart';
 
 class UploadWindow extends StatefulWidget {
   const UploadWindow({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override

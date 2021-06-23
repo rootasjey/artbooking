@@ -1,7 +1,7 @@
 import 'package:artbooking/types/user/notif_settings.dart';
 
 class UserSettings {
-  UserNotificationsSettings notifications;
+  UserNotificationsSettings? notifications;
 
   UserSettings({this.notifications});
 

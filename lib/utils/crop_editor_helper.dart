@@ -1,4 +1,5 @@
 //import 'dart:typed_data';
+import 'dart:async';
 import 'dart:isolate';
 import 'dart:typed_data';
 import 'dart:ui';
@@ -59,9 +60,9 @@ void _isolateEncodeImage(SendPort port) {
 }
 
 Future<Uint8List> cropImageDataWithDartLibrary(
-    {@required ExtendedImageEditorState state}) async {
+    {required ExtendedImageEditorState state}) async {
   /// Crop rect base on raw image
-  final Rect cropRect = state.getCropRect();
+  final Rect? cropRect = state.getCropRect();
 
   // On web, we can't get rawImageData due to
   // using following code to get imageCodec without download it.
@@ -83,12 +84,12 @@ Future<Uint8List> cropImageDataWithDartLibrary(
       //     .asUint8List()
       : state.rawImageData;
 
-  final EditActionDetails editAction = state.editAction;
+  final EditActionDetails? editAction = state.editAction;
 
   // final DateTime time1 = DateTime.now();
 
   // Decode source to Animation. It can holds multi frame.
-  Animation src;
+  Animation? src;
   // LoadBalancer lb;
   if (kIsWeb) {
     src = decodeAnimation(data);
@@ -102,13 +103,13 @@ Future<Uint8List> cropImageDataWithDartLibrary(
       // Clear orientation
       image = bakeOrientation(image);
 
-      if (editAction.needCrop) {
-        image = copyCrop(image, cropRect.left.toInt(), cropRect.top.toInt(),
+      if (editAction!.needCrop) {
+        image = copyCrop(image, cropRect!.left.toInt(), cropRect.top.toInt(),
             cropRect.width.toInt(), cropRect.height.toInt());
       }
 
       if (editAction.needFlip) {
-        Flip mode;
+        late Flip mode;
         if (editAction.flipY && editAction.flipX) {
           mode = Flip.both;
         } else if (editAction.flipY) {
@@ -138,7 +139,7 @@ Future<Uint8List> cropImageDataWithDartLibrary(
   // var fileData = await compute(encodeJpg, src);
   // var fileData = await isolateEncodeImage(src);
 
-  List<int> fileData;
+  List<int>? fileData;
   // final DateTime time4 = DateTime.now();
 
   if (src != null) {
@@ -158,13 +159,13 @@ Future<Uint8List> cropImageDataWithDartLibrary(
   // appLogger.d('${time5.difference(time4)} : encode');
   // appLogger.d('${time5.difference(time1)} : total time');
 
-  return Uint8List.fromList(fileData);
+  return Uint8List.fromList(fileData!);
 }
 
-Future<Uint8List> cropImageDataWithNativeLibrary(
-    {@required ExtendedImageEditorState state}) async {
-  final Rect cropRect = state.getCropRect();
-  final EditActionDetails action = state.editAction;
+Future<Uint8List?> cropImageDataWithNativeLibrary(
+    {required ExtendedImageEditorState state}) async {
+  final Rect? cropRect = state.getCropRect();
+  final EditActionDetails action = state.editAction!;
 
   final int rotateAngle = action.rotateAngle.toInt();
   final bool flipHorizontal = action.flipY;
@@ -174,7 +175,7 @@ Future<Uint8List> cropImageDataWithNativeLibrary(
   final ImageEditorOption option = ImageEditorOption();
 
   if (action.needCrop) {
-    option.addOption(ClipOption.fromRect(cropRect));
+    option.addOption(ClipOption.fromRect(cropRect!));
   }
 
   if (action.needFlip) {
@@ -187,7 +188,7 @@ Future<Uint8List> cropImageDataWithNativeLibrary(
   }
 
   // final DateTime start = DateTime.now();
-  final Uint8List result = await ImageEditor.editImage(
+  final Uint8List? result = await ImageEditor.editImage(
     image: img,
     imageEditorOption: option,
   );
@@ -199,12 +200,12 @@ Future<Uint8List> cropImageDataWithNativeLibrary(
 /// It may be failed, due to Cross-domain
 Future<Uint8List> _loadNetwork(ExtendedNetworkImageProvider key) async {
   try {
-    final Response response = await HttpClientHelper.get(Uri.parse(key.url),
+    final Response response = await (HttpClientHelper.get(Uri.parse(key.url),
         headers: key.headers,
         timeLimit: key.timeLimit,
         timeRetry: key.timeRetry,
         retries: key.retries,
-        cancelToken: key.cancelToken);
+        cancelToken: key.cancelToken) as FutureOr<Response>);
     return response.bodyBytes;
   } on OperationCanceledError catch (_) {
     appLogger.e('User cancel request ${key.url}.');

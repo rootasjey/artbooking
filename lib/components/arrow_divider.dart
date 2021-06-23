@@ -7,7 +7,7 @@ class ArrowDivider extends StatelessWidget {
   final EdgeInsets padding;
 
   const ArrowDivider({
-    Key key,
+    Key? key,
     this.padding = const EdgeInsets.only(top: 60.0),
   }) : super(key: key);
 

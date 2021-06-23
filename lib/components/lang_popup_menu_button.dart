@@ -11,12 +11,12 @@ class LangPopupMenuButton extends StatelessWidget {
   final EdgeInsets margin;
   final EdgeInsets padding;
   final double elevation;
-  final Color color;
+  final Color? color;
 
   const LangPopupMenuButton({
-    Key key,
-    @required this.lang,
-    @required this.onLangChanged,
+    Key? key,
+    required this.lang,
+    required this.onLangChanged,
     this.color,
     this.elevation = 0.0,
     this.opacity = 1.0,

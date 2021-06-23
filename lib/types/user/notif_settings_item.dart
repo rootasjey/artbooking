@@ -1,5 +1,5 @@
 class NotifSettingsItem {
-  bool all;
+  bool? all;
 
   NotifSettingsItem({this.all});
 

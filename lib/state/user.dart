@@ -18,14 +18,14 @@ part 'user.g.dart';
 class StateUser = StateUserBase with _$StateUser;
 
 abstract class StateUserBase with Store {
-  User _userAuth;
-  UserFirestore userFirestore;
+  User? _userAuth;
+  late UserFirestore userFirestore;
 
   @observable
   String avatarUrl = '';
 
   @observable
-  bool canManageData = false;
+  bool? canManageData = false;
 
   @observable
   String email = '';
@@ -40,7 +40,7 @@ abstract class StateUserBase with Store {
   bool isUserConnected = false;
 
   @observable
-  String username = '';
+  String? username = '';
 
   /// Used to sync fav. status between views,
   /// e.g. re-fetch on nav. back from quote page -> quotes list.
@@ -51,24 +51,26 @@ abstract class StateUserBase with Store {
   @observable
   DateTime updatedFavAt = DateTime.now();
 
-  User get userAuth {
+  User? get userAuth {
     return _userAuth;
   }
 
   Future refreshUserRights() async {
     try {
-      if (_userAuth == null || _userAuth.uid == null) {
+      final isAnonymous = _userAuth?.isAnonymous ?? true;
+
+      if (_userAuth == null || isAnonymous) {
         setAllRightsToFalse();
       }
 
       final userSnap = await FirebaseFirestore.instance
           .collection('users')
-          .doc(_userAuth.uid)
+          .doc(_userAuth!.uid)
           .get();
 
-      final userData = userSnap.data();
+      final userData = userSnap.data()!;
 
-      if (!userSnap.exists || userData == null) {
+      if (!userSnap.exists) {
         setAllRightsToFalse();
       }
 
@@ -165,7 +167,7 @@ abstract class StateUserBase with Store {
   }
 
   @action
-  void setUsername(String name) {
+  void setUsername(String? name) {
     username = name;
   }
 
@@ -180,7 +182,7 @@ abstract class StateUserBase with Store {
   }
 
   /// Signin user with credentials if FirebaseAuth is null.
-  Future<User> signin({String email, String password}) async {
+  Future<User?> signin({String? email, String? password}) async {
     try {
       final credentialsMap = appStorage.getCredentials();
 
@@ -215,7 +217,7 @@ abstract class StateUserBase with Store {
         password: password,
       );
 
-      appStorage.setUserName(_userAuth.displayName);
+      appStorage.setUserName(_userAuth!.displayName!);
       // PushNotifications.linkAuthUser(_userAuth.uid);
       setEmail(email);
 
@@ -228,7 +230,7 @@ abstract class StateUserBase with Store {
 
   @action
   Future signOut({
-    BuildContext context,
+    BuildContext? context,
     bool redirectOnComplete = false,
   }) async {
     _userAuth = null;

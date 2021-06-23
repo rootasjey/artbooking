@@ -7,9 +7,9 @@ class SideMenuItem {
   final Color hoverColor;
 
   const SideMenuItem({
-    @required this.iconData,
-    @required this.index,
-    @required this.label,
-    @required this.hoverColor,
+    required this.iconData,
+    required this.index,
+    required this.label,
+    required this.hoverColor,
   });
 }

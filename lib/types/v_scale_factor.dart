@@ -1,8 +1,8 @@
 class VScaleFactor {
-  final double height;
-  final double mobileHeight;
-  final double mobileWidth;
-  final double width;
+  final double? height;
+  final double? mobileHeight;
+  final double? mobileWidth;
+  final double? width;
 
   VScaleFactor({
     this.height,
@@ -20,8 +20,8 @@ class VScaleFactor {
     );
   }
 
-  Map<String, double> toJSON() {
-    final data = Map<String, double>();
+  Map<String, double?> toJSON() {
+    final data = Map<String, double?>();
 
     data['height'] = height;
     data['mobileHeight'] = mobileHeight;

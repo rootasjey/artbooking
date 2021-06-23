@@ -21,9 +21,9 @@ class _SideBarHeaderState extends State<SideBarHeader> {
     return ListTile(
       leading: Icon(Icons.person_outline_rounded),
       title: Tooltip(
-        message: stateUser.username,
+        message: stateUser.username!,
         child: Text(
-          stateUser.username,
+          stateUser.username!,
           overflow: TextOverflow.ellipsis,
         ),
       ),

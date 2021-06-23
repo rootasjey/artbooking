@@ -5,11 +5,11 @@ import 'package:cloud_functions/cloud_functions.dart';
 
 class ManyIllusOpResp {
   bool hasErrors;
-  final int successCount;
+  final int? successCount;
   final List<ProcessedIllustration> illustrations;
   final String message;
-  final CloudFuncError error;
-  final PartialUser user;
+  final CloudFuncError? error;
+  final PartialUser? user;
 
   ManyIllusOpResp({
     this.illustrations = const [],

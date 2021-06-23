@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class Language {
   /// Current application's language.
-  static String current = 'en';
+  static String? current = 'en';
 
   static const String en = 'en';
   static const String fr = 'fr';
@@ -17,7 +17,7 @@ class Language {
     return [en, fr];
   }
 
-  static String backend(String lang) {
+  static String backend(String? lang) {
     switch (lang) {
       case english:
         return en;
@@ -40,19 +40,14 @@ class Language {
   }
 
   /// Fetch user's lang from database.
-  static Future<String> fetch(User userAuth) async {
-    if (userAuth == null) {
-      String savedLang = appStorage.getLang();
-      return savedLang ?? 'en';
-    }
-
+  static Future<String?> fetch(User userAuth) async {
     final user = await FirebaseFirestore.instance
         .collection('users')
         .doc(userAuth.uid)
         .get();
 
     if (user.exists) {
-      current = user.data()['lang'];
+      current = user.data()!['lang'];
     }
 
     return current;

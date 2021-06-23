@@ -2,19 +2,19 @@ import 'package:artbooking/state/colors.dart';
 import 'package:flutter/material.dart';
 
 class CreditItem extends StatefulWidget {
-  final Function onTap;
-  final IconData iconData;
-  final Color hoverColor;
+  final Function? onTap;
+  final IconData? iconData;
+  final Color? hoverColor;
   final double opacity;
   final String textValue;
 
   const CreditItem({
-    Key key,
+    Key? key,
     this.onTap,
     this.hoverColor,
     this.iconData,
     this.opacity = 0.6,
-    @required this.textValue,
+    required this.textValue,
   }) : super(key: key);
 
   @override
@@ -22,9 +22,9 @@ class CreditItem extends StatefulWidget {
 }
 
 class _CreditItemState extends State<CreditItem> {
-  Color baseColor;
-  Color currentColor;
-  Color hoverColor;
+  Color? baseColor;
+  Color? currentColor;
+  Color? hoverColor;
 
   @override
   void initState() {
@@ -39,7 +39,7 @@ class _CreditItemState extends State<CreditItem> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: widget.onTap,
+      onTap: widget.onTap as void Function()?,
       onHover: (isHover) {
         if (isHover) {
           setState(() => currentColor = hoverColor);

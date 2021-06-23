@@ -4,12 +4,11 @@ import 'package:artbooking/types/one_book_op_resp.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:flutter/material.dart';
 
 class BooksActions {
   static Future<ManyIllusOpResp> addIllustrations({
-    @required String bookId,
-    @required List<String> illustrationIds,
+    required String bookId,
+    required List<String> illustrationIds,
   }) async {
     try {
       final response = await Cloud.fun('books-addIllustrations').call({
@@ -28,9 +27,9 @@ class BooksActions {
   }
 
   static Future<OneBookOpResp> createOne({
-    @required String name,
+    required String name,
     String description = '',
-    List<String> illustrationIds = const [],
+    List<String?> illustrationIds = const [],
   }) async {
     try {
       final response = await Cloud.fun('books-createOne').call({
@@ -50,7 +49,7 @@ class BooksActions {
   }
 
   static Future<OneBookOpResp> deleteOne({
-    @required String bookId,
+    required String? bookId,
   }) async {
     try {
       final response = await Cloud.fun('books-deleteOne').call({
@@ -68,7 +67,7 @@ class BooksActions {
   }
 
   static Future<ManyBooksOpResp> deleteMany({
-    @required List<String> bookIds,
+    required List<String?> bookIds,
   }) async {
     try {
       final response = await Cloud.fun('books-deleteMany').call({
@@ -86,8 +85,8 @@ class BooksActions {
   }
 
   static Future<ManyIllusOpResp> removeIllustrations({
-    @required String bookId,
-    @required List<String> illustrationIds,
+    required String? bookId,
+    required List<String?> illustrationIds,
   }) async {
     try {
       final response = await Cloud.fun('books-removeIllustrations').call({

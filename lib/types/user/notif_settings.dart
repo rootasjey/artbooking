@@ -1,8 +1,8 @@
 import 'package:artbooking/types/user/notif_settings_item.dart';
 
 class UserNotificationsSettings {
-  NotifSettingsItem email;
-  NotifSettingsItem push;
+  NotifSettingsItem? email;
+  NotifSettingsItem? push;
 
   UserNotificationsSettings({this.email, this.push});
 

@@ -1,10 +1,10 @@
 class BookUrls {
   /// Custom cover.
   /// Will override default cover if set (which is the last added image).
-  String cover;
+  String? cover;
 
   /// Custom icon. Will override default icon if set.
-  String icon;
+  String? icon;
 
   BookUrls({
     this.cover = '',

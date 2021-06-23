@@ -6,11 +6,10 @@ import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:flutter/material.dart';
 
 class IllustrationsActions {
   static Future<OneIllusOpResp> createOne({
-    @required String name,
+    required String name,
     ContentVisibility visibility = ContentVisibility.private,
   }) async {
     try {
@@ -30,7 +29,7 @@ class IllustrationsActions {
   }
 
   static Future<OneIllusOpResp> deleteOne({
-    @required String illustrationId,
+    /*required*/ required String? illustrationId,
   }) async {
     try {
       final response = await Cloud.fun('illustrations-deleteOne').call({
@@ -48,7 +47,7 @@ class IllustrationsActions {
   }
 
   static Future<ManyIllusOpResp> deleteMany({
-    @required List<String> illustrationIds,
+    required List<String?> illustrationIds,
   }) async {
     try {
       final response = await Cloud.fun('illustrations-deleteMany').call({
@@ -66,12 +65,12 @@ class IllustrationsActions {
   }
 
   static Future<OneIllusOpResp> updateMetadata({
-    String name,
-    String description,
-    String summary,
-    IllustrationLicense license,
+    String? name,
+    String? description,
+    String? summary,
+    required IllustrationLicense license,
     ContentVisibility visibility = ContentVisibility.private,
-    @required Illustration illustration,
+    required Illustration illustration,
   }) async {
     try {
       final response = await Cloud.fun('illustrations-updateMetadata').call({

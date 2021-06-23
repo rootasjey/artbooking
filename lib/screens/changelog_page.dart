@@ -158,8 +158,8 @@ class _ChangelogPageState extends State<ChangelogPage> {
   }
 
   ChangelogItem itemChangelogTemplate({
-    @required DateTime date,
-    @required String textTitle,
+    required DateTime date,
+    required String textTitle,
     List<Widget> children = const <Widget>[],
   }) {
     return ChangelogItem(
@@ -214,7 +214,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
               });
             },
             children: changelogItemsList.map((changelogItem) {
-              final date = changelogItem.date;
+              final date = changelogItem.date!;
               final day = date.day < 10 ? '0${date.day}' : date.day;
               final month = date.month < 10 ? '0${date.month}' : date.month;
 

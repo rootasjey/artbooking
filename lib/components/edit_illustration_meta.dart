@@ -23,11 +23,11 @@ import 'package:unicons/unicons.dart';
 import 'package:verbal_expressions/verbal_expressions.dart';
 
 class EditIllustrationMeta extends StatefulWidget {
-  final Illustration illustration;
+  final Illustration? illustration;
 
   const EditIllustrationMeta({
-    Key key,
-    @required this.illustration,
+    Key? key,
+    required this.illustration,
   }) : super(key: key);
 
   @override
@@ -42,7 +42,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
   bool _isEditingExistingLink = false;
 
-  DocumentSnapshot _illustrationSnapshot;
+  late DocumentSnapshot _illustrationSnapshot;
 
   final _descriptionTextController = TextEditingController();
   final _topicsTextController = TextEditingController();
@@ -52,7 +52,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   final _linkValueInputController = TextEditingController();
 
   /// Illustration's selected art styles.
-  final List<String> _selectedStyles = [];
+  final List<String?> _selectedStyles = [];
 
   final _programmingLanguages = Map<String, bool>();
   final _topics = Map<String, bool>();
@@ -72,11 +72,11 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
   /// Illustration's name after page loading.
   /// Used to know if they're pending changes.
-  String _initialName = "";
+  String? _initialName = "";
 
   /// Illustration's description after page loading.
   /// Used to know if they're pending changes.
-  String _initialDescription = "";
+  String? _initialDescription = "";
 
   /// Illustration's story after page loading.
   /// Used to know if they're pending changes.
@@ -103,7 +103,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                   SheetHeader(
                     title: "illustration_name_metadata".tr(
                       args: [
-                        widget.illustration.name,
+                        widget.illustration!.name,
                       ],
                     ),
                     tooltip: "close".tr(),
@@ -388,11 +388,11 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
               tooltip: "cancel".tr(),
               onPressed: () {
                 setState(() {
-                  _nameTextController.text = _initialName;
-                  _descriptionTextController.text = _initialDescription;
+                  _nameTextController.text = _initialName!;
+                  _descriptionTextController.text = _initialDescription!;
                   _storyTextController.text = _initialStory;
 
-                  _presentationCard.currentState.collapse();
+                  _presentationCard.currentState!.collapse();
                 });
               },
               icon: Opacity(
@@ -692,7 +692,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
               return InputChip(
                 label: Opacity(
                   opacity: 0.8,
-                  child: Text(style),
+                  child: Text(style!),
                 ),
                 labelStyle: FontsUtils.mainStyle(fontWeight: FontWeight.w700),
                 elevation: 2.0,
@@ -735,7 +735,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   }
 
   Widget visibilityCurrentButton() {
-    final illustration = widget.illustration;
+    final illustration = widget.illustration!;
 
     return Material(
       color: Colors.black87,
@@ -778,9 +778,9 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   }
 
   PopupMenuItem<ContentVisibility> visibiltyPopupItem({
-    ContentVisibility value,
-    String titleValue,
-    String subtitleValue,
+    ContentVisibility? value,
+    required String titleValue,
+    required String subtitleValue,
   }) {
     return PopupMenuItem(
       value: value,
@@ -822,7 +822,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   }
 
   Widget licenseCurrent() {
-    final illustration = widget.illustration;
+    final illustration = widget.illustration!;
 
     return Align(
       alignment: Alignment.topLeft,
@@ -858,9 +858,9 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                       Opacity(
                         opacity: 0.8,
                         child: Text(
-                          illustration.license.name.isEmpty
+                          illustration.license!.name!.isEmpty
                               ? "license_none".tr()
-                              : illustration.license.name,
+                              : illustration.license!.name!,
                           style: FontsUtils.mainStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
@@ -957,7 +957,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       right: 24.0,
       child: SelectLicensePanel(
         isVisible: _isSidePanelLicenseVisible,
-        selectedLicense: widget.illustration.license,
+        selectedLicense: widget.illustration!.license,
         onClose: () {
           setState(() => _isSidePanelLicenseVisible = false);
         },
@@ -966,7 +966,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     );
   }
 
-  void addStyleAndUpdate(String styleName) async {
+  void addStyleAndUpdate(String? styleName) async {
     setState(() {
       _selectedStyles.add(styleName);
       _isSaving = true;
@@ -974,7 +974,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
     try {
       final response = await Cloud.illustrations("updateStyles").call({
-        "illustrationId": widget.illustration.id,
+        "illustrationId": widget.illustration!.id,
         "styles": _selectedStyles,
       });
 
@@ -989,12 +989,12 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       String errorMessage = "styles_update_fail".tr();
 
       if (error.code == "out-of-range") {
-        final matches = _numberRegex.toRegExp().allMatches(error.message);
+        final matches = _numberRegex.toRegExp().allMatches(error.message!);
 
-        final String numberOfStyles =
+        final String? numberOfStyles =
             matches.last.group(matches.last.groupCount);
 
-        errorMessage = "styles_update_out_of_range".tr(args: [numberOfStyles]);
+        errorMessage = "styles_update_out_of_range".tr(args: [numberOfStyles!]);
       }
 
       Snack.e(
@@ -1041,7 +1041,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
     try {
       final response = await Cloud.illustrations("updateTopics").call({
-        "illustrationId": widget.illustration.id,
+        "illustrationId": widget.illustration!.id,
         "topics": _topics.keys.toList(),
       });
 
@@ -1057,15 +1057,15 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         _topics.remove(topic);
       }
 
-      String errorMessage = error.message;
+      String? errorMessage = error.message;
 
       if (error.code == "out-of-range") {
-        final matches = _numberRegex.toRegExp().allMatches(error.message);
+        final matches = _numberRegex.toRegExp().allMatches(error.message!);
 
-        final String numberOfTopics =
+        final String? numberOfTopics =
             matches.last.group(matches.last.groupCount);
 
-        errorMessage = "topics_update_out_of_range".tr(args: [numberOfTopics]);
+        errorMessage = "topics_update_out_of_range".tr(args: [numberOfTopics!]);
       }
 
       Snack.e(
@@ -1160,11 +1160,11 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     setState(() => _isLoading = true);
 
     try {
-      _jwt = await FirebaseAuth.instance.currentUser.getIdToken();
+      _jwt = await FirebaseAuth.instance.currentUser!.getIdToken();
 
       _illustrationSnapshot = await FirebaseFirestore.instance
           .collection("illustrations")
-          .doc(widget.illustration.id)
+          .doc(widget.illustration!.id)
           .get();
 
       if (!_illustrationSnapshot.exists) {
@@ -1181,19 +1181,19 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     try {
       final licenseSnap = await FirebaseFirestore.instance
           .collection("licenses")
-          .doc(widget.illustration.license.id)
+          .doc(widget.illustration!.license!.id)
           .get();
 
       if (!licenseSnap.exists) {
         return;
       }
 
-      final data = licenseSnap.data();
+      final data = licenseSnap.data()!;
       data['id'] = licenseSnap.id;
 
       setState(() {
         final completeLicense = IllustrationLicense.fromJSON(data);
-        widget.illustration.license = completeLicense;
+        widget.illustration!.license = completeLicense;
       });
     } catch (error) {
       appLogger.e(error);
@@ -1201,7 +1201,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   }
 
   void populateFields() {
-    final illustration = widget.illustration;
+    final illustration = widget.illustration!;
 
     _initialName = illustration.name;
     _initialDescription = illustration.description;
@@ -1215,10 +1215,10 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       _topics.putIfAbsent(key, () => true);
     });
 
-    _selectedStyles.addAll(widget.illustration.styles);
+    _selectedStyles.addAll(widget.illustration!.styles);
   }
 
-  void removeStyleAndUpdate(String styleName) async {
+  void removeStyleAndUpdate(String? styleName) async {
     setState(() {
       _isSaving = true;
       _selectedStyles.remove(styleName);
@@ -1226,7 +1226,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
     try {
       final response = await Cloud.illustrations("updateStyles").call({
-        "illustrationId": widget.illustration.id,
+        "illustrationId": widget.illustration!.id,
         "styles": _selectedStyles,
       });
 
@@ -1283,7 +1283,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
     try {
       final response = await Cloud.illustrations("updateTopics").call({
-        "illustrationId": widget.illustration.id,
+        "illustrationId": widget.illustration!.id,
         "topics": _topics.keys.toList(),
       });
 
@@ -1320,7 +1320,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   void selectLicenseAndUpdate(IllustrationLicense illustrationLicense) async {
     setState(() => _isSaving = true);
 
-    final illustration = widget.illustration;
+    final illustration = widget.illustration!;
     final previousLicense = illustration.license;
     illustration.license = illustrationLicense;
 
@@ -1341,7 +1341,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     } catch (error) {
       appLogger.e(error);
 
-      illustrationLicense = previousLicense;
+      illustrationLicense = previousLicense!;
 
       Snack.e(
         context: context,
@@ -1355,7 +1355,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   void unselectLicenseAndUpdate() async {
     setState(() => _isSaving = true);
 
-    final illustration = widget.illustration;
+    final illustration = widget.illustration!;
     final previousLicense = illustration.license;
     illustration.license = IllustrationLicense.empty();
 
@@ -1363,8 +1363,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       final response = await Cloud.illustrations("unsetLicense").call({
         "illustrationId": illustration.id,
         "license": {
-          "id": illustration.license.id,
-          "from": illustration.license.from,
+          "id": illustration.license!.id,
+          "from": illustration.license!.from,
         },
       });
 
@@ -1388,10 +1388,10 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   }
 
   void updatePresentation() async {
-    _presentationCard.currentState.collapse();
+    _presentationCard.currentState!.collapse();
     setState(() => _isSaving = true);
 
-    final illustration = widget.illustration;
+    final illustration = widget.illustration!;
 
     try {
       final HttpsCallableResult response =
@@ -1416,7 +1416,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         message: "project_update_title_fail".tr(),
       );
 
-      _presentationCard.currentState.expand();
+      _presentationCard.currentState!.expand();
     } finally {
       setState(() => _isSaving = false);
     }
@@ -1432,8 +1432,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   }
 
   void updateVisibility(ContentVisibility visibility) async {
-    final illustration = widget.illustration;
-    final previousVisibility = widget.illustration.visibility;
+    final illustration = widget.illustration!;
+    final previousVisibility = widget.illustration!.visibility;
 
     setState(() {
       _isSaving = true;

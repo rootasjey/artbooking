@@ -1,6 +1,6 @@
 class UserPPPath {
-  final String edited;
-  final String original;
+  final String? edited;
+  final String? original;
 
   UserPPPath({
     this.edited,
@@ -14,7 +14,7 @@ class UserPPPath {
     );
   }
 
-  factory UserPPPath.fromJSON(Map<String, dynamic> data) {
+  factory UserPPPath.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
       return UserPPPath.empty();
     }

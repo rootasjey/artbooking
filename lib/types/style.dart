@@ -3,11 +3,11 @@ import 'package:artbooking/utils/date_helper.dart';
 
 /// Art style.
 class Style {
-  final String name;
-  final String description;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final StyleUrls urls;
+  final String? name;
+  final String? description;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final StyleUrls? urls;
 
   Style({
     this.name = '',

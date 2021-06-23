@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AnimatedAppIcon extends StatefulWidget {
   final double size;
-  final String textTitle;
+  final String? textTitle;
 
   AnimatedAppIcon({
     this.size = 100.0,
@@ -31,7 +31,7 @@ class _AnimatedAppIconState extends State<AnimatedAppIcon> {
             child: Opacity(
               opacity: 0.6,
               child: Text(
-                widget.textTitle,
+                widget.textTitle!,
                 style: TextStyle(
                   fontSize: 18.0,
                 ),

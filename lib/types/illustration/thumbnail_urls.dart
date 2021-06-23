@@ -1,21 +1,21 @@
 class ThumbnailUrls {
   /// Thumbnail with a width of 1920 pixels.
-  final String t1920;
+  final String? t1920;
 
   /// Thumbnail with a width of 2400 pixels.
-  final String t2400;
+  final String? t2400;
 
   /// Thumbnail with a width of 1080 pixels.
-  final String t1080;
+  final String? t1080;
 
   /// Thumbnail with a width of 720 pixels.
-  final String t720;
+  final String? t720;
 
   /// Thumbnail with a width of 480 pixels.
-  final String t480;
+  final String? t480;
 
   /// Thumbnail with a width of 360 pixels.
-  final String t360;
+  final String? t360;
 
   ThumbnailUrls({
     this.t1920 = '',

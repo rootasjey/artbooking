@@ -1,15 +1,15 @@
 class IllustrationStats {
   /// How many times this illustration has been downloaded.
-  final int downloads;
+  final int? downloads;
 
   /// How many likes has this illustration.
-  final int fav;
+  final int? fav;
 
   /// How many times this illustration has been shared.
-  final int shares;
+  final int? shares;
 
   /// How many times a user went to this illustration's page.
-  final int views;
+  final int? views;
 
   IllustrationStats({
     this.downloads,

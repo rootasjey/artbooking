@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 /// Network interface for user's actions.
 class UsersActions {
   /// Check email availability accross the app.
-  static Future<bool> checkEmailAvailability(String email) async {
+  static Future<bool?> checkEmailAvailability(String email) async {
     try {
       final callable = FirebaseFunctions.instanceFor(
         app: Firebase.app(),
@@ -16,7 +16,7 @@ class UsersActions {
       ).httpsCallable('users-checkEmailAvailability');
 
       final resp = await callable.call({'email': email});
-      final isOk = resp.data['isAvailable'] as bool;
+      final isOk = resp.data['isAvailable'] as bool?;
       return isOk;
     } on FirebaseFunctionsException catch (exception) {
       debugPrint("[code: ${exception.code}] - ${exception.message}");
@@ -29,9 +29,9 @@ class UsersActions {
 
   /// Create a new account.
   static Future<CreateAccountResp> createAccount({
-    @required String email,
-    @required String username,
-    @required String password,
+    /*required*/ required String email,
+    required String username,
+    required String password,
   }) async {
     try {
       final callable = FirebaseFunctions.instanceFor(
@@ -74,7 +74,7 @@ class UsersActions {
   }
 
   /// Check username availability.
-  static Future<bool> checkUsernameAvailability(String username) async {
+  static Future<bool?> checkUsernameAvailability(String username) async {
     try {
       final callable = FirebaseFunctions.instanceFor(
         app: Firebase.app(),
@@ -82,7 +82,7 @@ class UsersActions {
       ).httpsCallable('users-checkUsernameAvailability');
 
       final resp = await callable.call({'name': username});
-      final isOk = resp.data['isAvailable'] as bool;
+      final isOk = resp.data['isAvailable'] as bool?;
       return isOk;
     } on FirebaseFunctionsException catch (exception) {
       debugPrint("[code: ${exception.code}] - ${exception.message}");

@@ -3,30 +3,29 @@ import 'package:artbooking/types/user/settings.dart';
 import 'package:artbooking/types/user/user_urls.dart';
 import 'package:artbooking/types/user/user_pp.dart';
 import 'package:artbooking/utils/date_helper.dart';
-import 'package:flutter/foundation.dart';
 
 class UserFirestore {
-  DateTime createdAt;
+  DateTime? createdAt;
   String email;
   final String id;
   String job;
   String lang;
   String location;
-  String name;
+  String? name;
   String nameLowerCase;
-  final UserPP pp;
+  final UserPP? pp;
   String pricing;
-  UserSettings settings;
-  UserStats stats;
-  String summary;
-  String uid;
-  DateTime updatedAt;
-  UserUrls urls;
+  UserSettings? settings;
+  UserStats? stats;
+  String? summary;
+  String? uid;
+  DateTime? updatedAt;
+  UserUrls? urls;
 
   UserFirestore({
     this.createdAt,
     this.email = '',
-    @required this.id,
+    required this.id,
     this.job = '',
     this.location = '',
     this.lang = 'en',
@@ -61,7 +60,7 @@ class UserFirestore {
     );
   }
 
-  factory UserFirestore.fromJSON(Map<String, dynamic> data) {
+  factory UserFirestore.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
       return UserFirestore.empty();
     }
@@ -96,11 +95,11 @@ class UserFirestore {
     data['job'] = job;
     data['lang'] = lang;
     data['location'] = location;
-    data['pp'] = pp.toJSON();
+    data['pp'] = pp!.toJSON();
     data['pricing'] = pricing;
     data['summary'] = summary;
     data['updatedAt'] = DateTime.now().millisecondsSinceEpoch;
-    data['urls'] = urls.toJSON();
+    data['urls'] = urls!.toJSON();
 
     return data;
   }
@@ -109,8 +108,8 @@ class UserFirestore {
   /// If [placeholder] is `true`, the method will return
   /// a default picture if the user hasn't set one.
   String getPP() {
-    final edited = pp.url.edited;
-    final original = pp.url.original;
+    final edited = pp!.url!.edited;
+    final original = pp!.url!.original;
     final defaultUrl =
         "https://img.icons8.com/plasticine/100/000000/flower.png";
 

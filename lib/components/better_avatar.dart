@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
 
 class BetterAvatar extends StatefulWidget {
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final ImageProvider<Object> image;
   final double size;
   final double elevation;
 
   /// Not used if onTap is null.
-  final ColorFilter colorFilter;
+  final ColorFilter? colorFilter;
 
   BetterAvatar({
-    @required this.image,
+    required this.image,
     this.elevation = 4.0,
     this.onTap,
     this.size = 220.0,
@@ -25,10 +25,10 @@ class BetterAvatar extends StatefulWidget {
 
 class _BetterAvatarState extends State<BetterAvatar>
     with TickerProviderStateMixin {
-  Animation<double> scaleAnimation;
-  AnimationController scaleAnimationController;
+  late Animation<double> scaleAnimation;
+  late AnimationController scaleAnimationController;
 
-  double elevation;
+  late double elevation;
 
   @override
   void initState() {

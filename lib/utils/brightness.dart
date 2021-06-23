@@ -25,7 +25,7 @@ class BrightnessUtils {
   }
 
   /// Refresh current theme with a specific brightness.
-  static void setBrightness(BuildContext context, Brightness brightness) {
+  static void setBrightness(BuildContext context, Brightness? brightness) {
     if (brightness == Brightness.dark) {
       AdaptiveTheme.of(context).setDark();
     } else {

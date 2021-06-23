@@ -13,7 +13,7 @@ import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Footer extends StatefulWidget {
-  final ScrollController pageScrollController;
+  final ScrollController? pageScrollController;
   final bool closeModalOnNav;
   final bool autoNavToHome;
 
@@ -188,7 +188,7 @@ class _FooterState extends State<Footer> {
     );
   }
 
-  Widget titleSection({@required title}) {
+  Widget titleSection({required title}) {
     return Padding(
       padding: const EdgeInsets.only(
         left: 8.0,
@@ -208,9 +208,9 @@ class _FooterState extends State<Footer> {
   }
 
   Widget textLink({
-    VoidCallback onPressed,
-    String heroTag,
-    @required String label,
+    VoidCallback? onPressed,
+    String? heroTag,
+    required String label,
   }) {
     final Widget text = Text(
       label,
@@ -291,7 +291,7 @@ class _FooterState extends State<Footer> {
 
   void notifyLangSuccess() {
     if (widget.pageScrollController != null) {
-      widget.pageScrollController.animateTo(
+      widget.pageScrollController!.animateTo(
         0.0,
         duration: Duration(seconds: 1),
         curve: Curves.easeOut,

@@ -7,11 +7,11 @@ import 'package:unicons/unicons.dart';
 class Snack {
   /// Show a snack with an error message.
   static Future e({
-    @required BuildContext context,
+    required BuildContext context,
     Duration duration = const Duration(seconds: 5),
-    Widget icon,
-    @required String message,
-    Widget primaryAction,
+    Widget? icon,
+    required String? message,
+    Widget? primaryAction,
     String title = '',
   }) {
     Widget _icon;
@@ -36,11 +36,11 @@ class Snack {
 
   /// Show a snack with an informative message.
   static Future i({
-    @required BuildContext context,
+    required BuildContext context,
     Duration duration = const Duration(seconds: 5),
-    Widget icon,
-    @required String message,
-    Widget primaryAction,
+    Widget? icon,
+    required String message,
+    Widget? primaryAction,
     String title = '',
   }) {
     Widget _icon;
@@ -65,11 +65,11 @@ class Snack {
 
   /// Show a snack with a success message.
   static Future s({
-    @required BuildContext context,
+    required BuildContext context,
     Duration duration = const Duration(seconds: 5),
-    Widget icon,
-    @required String message,
-    Widget primaryAction,
+    Widget? icon,
+    required String message,
+    Widget? primaryAction,
     String title = '',
   }) {
     Widget _icon;

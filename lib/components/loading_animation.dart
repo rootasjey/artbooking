@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class LoadingAnimation extends StatelessWidget {
   final TextStyle style;
   final String textTitle;
-  final Widget title;
+  final Widget? title;
   final double size;
 
   LoadingAnimation({
@@ -21,7 +21,7 @@ class LoadingAnimation extends StatelessWidget {
         CircularProgressIndicator(),
 
         title != null ?
-          title :
+          title! :
           Padding(
             padding: const EdgeInsets.only(top: 40.0),
             child: Text(

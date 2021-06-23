@@ -195,7 +195,7 @@ class _TosPageState extends State<TosPage> {
     );
   }
 
-  Widget titleBlock({@required String text}) {
+  Widget titleBlock({required String text}) {
     return Padding(
       padding: const EdgeInsets.only(top: 18.0, bottom: 16.0),
       child: Opacity(
@@ -212,7 +212,7 @@ class _TosPageState extends State<TosPage> {
     );
   }
 
-  Widget textSuperBlock({@required String text}) {
+  Widget textSuperBlock({required String text}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 30.0),
       child: Opacity(

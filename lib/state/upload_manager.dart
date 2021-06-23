@@ -59,7 +59,7 @@ abstract class UploadManagerBase with Store {
   /// A "select file/folder" window will appear. User will have to choose a file.
   /// This file will be then read, and uploaded to firebase storage;
   Future pickImage(BuildContext context) async {
-    List<FilePickerCross> pickerResult;
+    List<FilePickerCross>? pickerResult;
 
     try {
       pickerResult = await FilePickerCross.importMultipleFromStorage(
@@ -130,7 +130,7 @@ abstract class UploadManagerBase with Store {
 
     addCustomUploadTask(customUploadTask);
 
-    final String illustrationId = await _createFirestoreDocument(file);
+    final String? illustrationId = await _createFirestoreDocument(file);
     customUploadTask.illustrationId = illustrationId;
 
     _startStorageUpload(
@@ -140,8 +140,8 @@ abstract class UploadManagerBase with Store {
     );
   }
 
-  Future<String> _createFirestoreDocument(FilePickerCross file) async {
-    final String fileName = file.fileName;
+  Future<String?> _createFirestoreDocument(FilePickerCross file) async {
+    final String? fileName = file.fileName;
 
     try {
       final HttpsCallableResult responseResult =
@@ -157,7 +157,7 @@ abstract class UploadManagerBase with Store {
         throw "illustration_create_error".tr();
       }
 
-      final String documentId = responseResult.data["illustration"]["id"];
+      final String? documentId = responseResult.data["illustration"]["id"];
       return documentId;
     } catch (error) {
       appLogger.e(error);
@@ -166,9 +166,9 @@ abstract class UploadManagerBase with Store {
   }
 
   void _startStorageUpload({
-    FilePickerCross file,
-    String illustrationId,
-    CustomUploadTask customUploadTask,
+    FilePickerCross? file,
+    String? illustrationId,
+    CustomUploadTask? customUploadTask,
   }) async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
 
@@ -176,14 +176,14 @@ abstract class UploadManagerBase with Store {
       return;
     }
 
-    final fileName = file.fileName;
+    final fileName = file!.fileName!;
     final lastIndexDot = fileName.lastIndexOf(".") + 1;
     final String extension = fileName.substring(lastIndexDot);
 
     final String filePath =
         "/users/$userId/illustrations/$illustrationId/original.$extension";
 
-    final File uploadFile = File(file.path);
+    final File uploadFile = File(file.path!);
 
     final storage = FirebaseStorage.instance;
 
@@ -192,7 +192,7 @@ abstract class UploadManagerBase with Store {
         SettableMetadata(
           customMetadata: {
             "extension": extension,
-            "firestoreId": illustrationId,
+            "firestoreId": illustrationId!,
             "userId": userId,
             "visibility": "public",
           },
@@ -201,7 +201,7 @@ abstract class UploadManagerBase with Store {
           ),
         ));
 
-    _addUploadTask(uploadTask, customUploadTask);
+    _addUploadTask(uploadTask, customUploadTask!);
 
     try {
       await uploadTask;
@@ -241,8 +241,8 @@ abstract class UploadManagerBase with Store {
     if (customUploadTask.task != null) {
       decrementCounter(customUploadTask);
 
-      _removeFromTotalBytes(customUploadTask.task.snapshot.totalBytes);
-      customUploadTask.task.cancel();
+      _removeFromTotalBytes(customUploadTask.task!.snapshot.totalBytes);
+      customUploadTask.task!.cancel();
     }
 
     uploadTasksList.remove(customUploadTask);
@@ -362,7 +362,7 @@ abstract class UploadManagerBase with Store {
   }
 
   void decrementCounter(CustomUploadTask customUploadTask) {
-    final state = customUploadTask.task.snapshot.state;
+    final state = customUploadTask.task!.snapshot.state;
 
     switch (state) {
       case TaskState.running:

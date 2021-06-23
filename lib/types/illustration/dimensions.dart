@@ -3,7 +3,7 @@ class Dimensions {
   final int height;
 
   /// Illustration's width.
-  final int width;
+  final int? width;
 
   Dimensions({
     this.height = 0,

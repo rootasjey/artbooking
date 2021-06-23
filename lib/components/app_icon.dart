@@ -3,7 +3,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
 class AppIcon extends StatefulWidget {
-  final Function onTap;
+  final Function? onTap;
   final EdgeInsetsGeometry padding;
   final double size;
 
@@ -25,7 +25,7 @@ class _AppIconState extends State<AppIcon> {
         highlightColor: Colors.transparent,
         focusColor: Colors.transparent,
         hoverColor: Colors.transparent,
-        onTap: widget.onTap ?? defaultOnTap,
+        onTap: widget.onTap as void Function()? ?? defaultOnTap,
         child: Image.asset(
           'assets/images/app_icon/64.png',
           fit: BoxFit.cover,
