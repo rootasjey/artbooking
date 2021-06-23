@@ -1,5 +1,6 @@
 import 'package:artbooking/components/side_menu_item.dart';
 import 'package:artbooking/components/underlined_button.dart';
+import 'package:artbooking/components/upload_window.dart';
 import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
@@ -78,14 +79,23 @@ class _DashboardPageState extends State<DashboardPage> {
       ],
       builder: (context, child, animation) {
         return Material(
-          child: Row(
+          child: Stack(
             children: [
-              buildSidePanel(context, context.tabsRouter),
-              Expanded(
-                child: Material(
-                  elevation: 6.0,
-                  child: child,
-                ),
+              Row(
+                children: [
+                  buildSidePanel(context, context.tabsRouter),
+                  Expanded(
+                    child: Material(
+                      elevation: 6.0,
+                      child: child,
+                    ),
+                  ),
+                ],
+              ),
+              Positioned(
+                left: 16.0,
+                bottom: 16.0,
+                child: UploadWindow(),
               ),
             ],
           ),

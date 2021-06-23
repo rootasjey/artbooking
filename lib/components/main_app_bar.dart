@@ -4,6 +4,7 @@ import 'package:artbooking/components/lang_popup_menu_button.dart';
 import 'package:artbooking/components/underlined_button.dart';
 import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/utils/app_storage.dart';
 import 'package:artbooking/utils/brightness.dart';
@@ -52,7 +53,9 @@ class _MainAppBarState extends State<MainAppBar> {
   Widget addButton() {
     return IconButton(
       tooltip: "upload".tr(),
-      onPressed: () {},
+      onPressed: () {
+        appUploadManager.pickImage(context);
+      },
       icon: Icon(
         UniconsLine.plus,
         color: stateColors.foreground.withOpacity(0.6),

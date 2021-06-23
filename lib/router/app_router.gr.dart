@@ -218,7 +218,8 @@ class AppRouter extends _i1.RootStackRouter {
           return _i20.IllustrationPage(
               key: args.key,
               illustrationId: args.illustrationId,
-              illustration: args.illustration);
+              illustration: args.illustration,
+              fromDashboard: args.fromDashboard);
         },
         transitionsBuilder: _i1.TransitionsBuilders.fadeIn,
         opaque: true,
@@ -325,7 +326,8 @@ class AppRouter extends _i1.RootStackRouter {
           return _i20.IllustrationPage(
               key: args.key,
               illustrationId: args.illustrationId,
-              illustration: args.illustration);
+              illustration: args.illustration,
+              fromDashboard: args.fromDashboard);
         }),
     GitHubRoute.name: (routeData) => _i1.MaterialPageX<dynamic>(
         routeData: routeData,
@@ -575,13 +577,17 @@ class MyIllustrationsPageRoute extends _i1.PageRouteInfo {
 
 class DashIllustrationPage extends _i1.PageRouteInfo<DashIllustrationPageArgs> {
   DashIllustrationPage(
-      {_i2.Key key, String illustrationId, _i30.Illustration illustration})
+      {_i2.Key key,
+      String illustrationId,
+      _i30.Illustration illustration,
+      bool fromDashboard})
       : super(name,
             path: ':illustrationId',
             args: DashIllustrationPageArgs(
                 key: key,
                 illustrationId: illustrationId,
-                illustration: illustration),
+                illustration: illustration,
+                fromDashboard: fromDashboard),
             rawPathParams: {'illustrationId': illustrationId});
 
   static const String name = 'DashIllustrationPage';
@@ -589,13 +595,15 @@ class DashIllustrationPage extends _i1.PageRouteInfo<DashIllustrationPageArgs> {
 
 class DashIllustrationPageArgs {
   const DashIllustrationPageArgs(
-      {this.key, this.illustrationId, this.illustration});
+      {this.key, this.illustrationId, this.illustration, this.fromDashboard});
 
   final _i2.Key key;
 
   final String illustrationId;
 
   final _i30.Illustration illustration;
+
+  final bool fromDashboard;
 }
 
 class MyBooksPageRoute extends _i1.PageRouteInfo {
@@ -704,13 +712,17 @@ class IllustrationsPageRoute extends _i1.PageRouteInfo {
 class IllustrationPageRoute
     extends _i1.PageRouteInfo<IllustrationPageRouteArgs> {
   IllustrationPageRoute(
-      {_i2.Key key, String illustrationId, _i30.Illustration illustration})
+      {_i2.Key key,
+      String illustrationId,
+      _i30.Illustration illustration,
+      bool fromDashboard})
       : super(name,
             path: ':illustrationId',
             args: IllustrationPageRouteArgs(
                 key: key,
                 illustrationId: illustrationId,
-                illustration: illustration),
+                illustration: illustration,
+                fromDashboard: fromDashboard),
             rawPathParams: {'illustrationId': illustrationId});
 
   static const String name = 'IllustrationPageRoute';
@@ -718,13 +730,15 @@ class IllustrationPageRoute
 
 class IllustrationPageRouteArgs {
   const IllustrationPageRouteArgs(
-      {this.key, this.illustrationId, this.illustration});
+      {this.key, this.illustrationId, this.illustration, this.fromDashboard});
 
   final _i2.Key key;
 
   final String illustrationId;
 
   final _i30.Illustration illustration;
+
+  final bool fromDashboard;
 }
 
 class GitHubRoute extends _i1.PageRouteInfo {

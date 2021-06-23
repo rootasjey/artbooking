@@ -9,18 +9,140 @@ part of 'upload_manager.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$UploadManager on UploadManagerBase, Store {
-  final _$selectedFilesAtom = Atom(name: 'UploadManagerBase.selectedFiles');
+  final _$showUploadWindowAtom =
+      Atom(name: 'UploadManagerBase.showUploadWindow');
 
   @override
-  List<PlatformFile> get selectedFiles {
-    _$selectedFilesAtom.reportRead();
-    return super.selectedFiles;
+  bool get showUploadWindow {
+    _$showUploadWindowAtom.reportRead();
+    return super.showUploadWindow;
   }
 
   @override
-  set selectedFiles(List<PlatformFile> value) {
-    _$selectedFilesAtom.reportWrite(value, super.selectedFiles, () {
-      super.selectedFiles = value;
+  set showUploadWindow(bool value) {
+    _$showUploadWindowAtom.reportWrite(value, super.showUploadWindow, () {
+      super.showUploadWindow = value;
+    });
+  }
+
+  final _$uploadTasksListAtom = Atom(name: 'UploadManagerBase.uploadTasksList');
+
+  @override
+  List<CustomUploadTask> get uploadTasksList {
+    _$uploadTasksListAtom.reportRead();
+    return super.uploadTasksList;
+  }
+
+  @override
+  set uploadTasksList(List<CustomUploadTask> value) {
+    _$uploadTasksListAtom.reportWrite(value, super.uploadTasksList, () {
+      super.uploadTasksList = value;
+    });
+  }
+
+  final _$bytesTransferredAtom =
+      Atom(name: 'UploadManagerBase.bytesTransferred');
+
+  @override
+  int get bytesTransferred {
+    _$bytesTransferredAtom.reportRead();
+    return super.bytesTransferred;
+  }
+
+  @override
+  set bytesTransferred(int value) {
+    _$bytesTransferredAtom.reportWrite(value, super.bytesTransferred, () {
+      super.bytesTransferred = value;
+    });
+  }
+
+  final _$totalBytesAtom = Atom(name: 'UploadManagerBase.totalBytes');
+
+  @override
+  int get totalBytes {
+    _$totalBytesAtom.reportRead();
+    return super.totalBytes;
+  }
+
+  @override
+  set totalBytes(int value) {
+    _$totalBytesAtom.reportWrite(value, super.totalBytes, () {
+      super.totalBytes = value;
+    });
+  }
+
+  final _$addedCountAtom = Atom(name: 'UploadManagerBase.addedCount');
+
+  @override
+  int get addedTasksCount {
+    _$addedCountAtom.reportRead();
+    return super.addedTasksCount;
+  }
+
+  @override
+  set addedTasksCount(int value) {
+    _$addedCountAtom.reportWrite(value, super.addedTasksCount, () {
+      super.addedTasksCount = value;
+    });
+  }
+
+  final _$pausedCountAtom = Atom(name: 'UploadManagerBase.pausedCount');
+
+  @override
+  int get pausedTasksCount {
+    _$pausedCountAtom.reportRead();
+    return super.pausedTasksCount;
+  }
+
+  @override
+  set pausedTasksCount(int value) {
+    _$pausedCountAtom.reportWrite(value, super.pausedTasksCount, () {
+      super.pausedTasksCount = value;
+    });
+  }
+
+  final _$uploadingCountAtom = Atom(name: 'UploadManagerBase.uploadingCount');
+
+  @override
+  int get runningTasksCount {
+    _$uploadingCountAtom.reportRead();
+    return super.runningTasksCount;
+  }
+
+  @override
+  set runningTasksCount(int value) {
+    _$uploadingCountAtom.reportWrite(value, super.runningTasksCount, () {
+      super.runningTasksCount = value;
+    });
+  }
+
+  final _$completeCountAtom = Atom(name: 'UploadManagerBase.completeCount');
+
+  @override
+  int get successTasksCount {
+    _$completeCountAtom.reportRead();
+    return super.successTasksCount;
+  }
+
+  @override
+  set successTasksCount(int value) {
+    _$completeCountAtom.reportWrite(value, super.successTasksCount, () {
+      super.successTasksCount = value;
+    });
+  }
+
+  final _$abortedCountAtom = Atom(name: 'UploadManagerBase.abortedCount');
+
+  @override
+  int get abortedTasksCount {
+    _$abortedCountAtom.reportRead();
+    return super.abortedTasksCount;
+  }
+
+  @override
+  set abortedTasksCount(int value) {
+    _$abortedCountAtom.reportWrite(value, super.abortedTasksCount, () {
+      super.abortedTasksCount = value;
     });
   }
 
@@ -28,22 +150,188 @@ mixin _$UploadManager on UploadManagerBase, Store {
       ActionController(name: 'UploadManagerBase');
 
   @override
-  void setSelectedFiles(List<PlatformFile> files) {
+  void addCustomUploadTask(CustomUploadTask customUploadTask) {
     final _$actionInfo = _$UploadManagerBaseActionController.startAction(
-        name: 'UploadManagerBase.setSelectedFiles');
+        name: 'UploadManagerBase.addCustomUploadTask');
     try {
-      return super.setSelectedFiles(files);
+      return super.addCustomUploadTask(customUploadTask);
     } finally {
       _$UploadManagerBaseActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void addFiles(List<PlatformFile> files) {
+  void _addUploadTask(
+      UploadTask uploadTask, CustomUploadTask customUploadTask) {
     final _$actionInfo = _$UploadManagerBaseActionController.startAction(
-        name: 'UploadManagerBase.addFiles');
+        name: 'UploadManagerBase._addUploadTask');
     try {
-      return super.addFiles(files);
+      return super._addUploadTask(uploadTask, customUploadTask);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void removeCustomUploadTask(CustomUploadTask customUploadTask) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase.removeCustomUploadTask');
+    try {
+      return super.removeCustomUploadTask(customUploadTask);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _addToTotalBytes(int amount) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._addToTotalBytes');
+    try {
+      return super._addToTotalBytes(amount);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _removeFromTotalBytes(int amount) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._removeFromTotalBytes');
+    try {
+      return super._removeFromTotalBytes(amount);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void addToBytesTransferred(int amount) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase.addToBytesTransferred');
+    try {
+      return super.addToBytesTransferred(amount);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setUploadWindowsVisibility(bool show) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase.setUploadWindowsVisibility');
+    try {
+      return super.setUploadWindowsVisibility(show);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _incrAddedTasks(int amount) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._incrAddedTasks');
+    try {
+      return super._incrAddedTasks(amount);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _decrAddedTasks(int amount) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._decrAddedTasks');
+    try {
+      return super._decrAddedTasks(amount);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _incrPausedTasks(int amount) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._incrPausedTasks');
+    try {
+      return super._incrPausedTasks(amount);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _decrPausedTasks(int amount) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._decrPausedTasks');
+    try {
+      return super._decrPausedTasks(amount);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _incrRunningTasks(int amount) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._incrRunningTasks');
+    try {
+      return super._incrRunningTasks(amount);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _decrRunningTasks(int amount) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._decrRunningTasks');
+    try {
+      return super._decrRunningTasks(amount);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _decrSuccessTasks(int amount) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._decrSuccessTasks');
+    try {
+      return super._decrSuccessTasks(amount);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _incrSuccessTasks(int amount) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._incrSuccessTasks');
+    try {
+      return super._incrSuccessTasks(amount);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _decrAbortedTask(int amount) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._decrAbortedTask');
+    try {
+      return super._decrAbortedTask(amount);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _incrAbortedTasks(int amount) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._incrAbortedTasks');
+    try {
+      return super._incrAbortedTasks(amount);
     } finally {
       _$UploadManagerBaseActionController.endAction(_$actionInfo);
     }
@@ -52,7 +340,15 @@ mixin _$UploadManager on UploadManagerBase, Store {
   @override
   String toString() {
     return '''
-selectedFiles: ${selectedFiles}
+showUploadWindow: ${showUploadWindow},
+uploadTasksList: ${uploadTasksList},
+bytesTransferred: ${bytesTransferred},
+totalBytes: ${totalBytes},
+addedCount: ${addedTasksCount},
+pausedCount: ${pausedTasksCount},
+uploadingCount: ${runningTasksCount},
+completeCount: ${successTasksCount},
+abortedCount: ${abortedTasksCount}
     ''';
   }
 }
