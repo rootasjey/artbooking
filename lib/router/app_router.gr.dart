@@ -117,7 +117,7 @@ class AppRouter extends _i1.RootStackRouter {
           final pathParams = data.pathParams;
           final args = data.argsAs<SettingsPageRouteArgs>(
               orElse: () => SettingsPageRouteArgs(
-                  showAppBar: pathParams.getBool('showAppBar')));
+                  showAppBar: pathParams.optBool('showAppBar')));
           return _i12.SettingsPage(key: args.key, showAppBar: args.showAppBar);
         },
         transitionsBuilder: _i1.TransitionsBuilders.fadeIn,
@@ -213,7 +213,7 @@ class AppRouter extends _i1.RootStackRouter {
           final pathParams = data.pathParams;
           final args = data.argsAs<DashIllustrationPageArgs>(
               orElse: () => DashIllustrationPageArgs(
-                  illustrationId: pathParams.getString('illustrationId')));
+                  illustrationId: pathParams.optString('illustrationId')));
           return _i20.IllustrationPage(
               key: args.key,
               illustrationId: args.illustrationId,
@@ -237,7 +237,7 @@ class AppRouter extends _i1.RootStackRouter {
           final pathParams = data.pathParams;
           final args = data.argsAs<DashBookPageArgs>(
               orElse: () =>
-                  DashBookPageArgs(bookId: pathParams.getString('bookId')));
+                  DashBookPageArgs(bookId: pathParams.optString('bookId')));
           return _i22.MyBookPage(
               key: args.key, bookId: args.bookId, book: args.book);
         },
@@ -255,8 +255,7 @@ class AppRouter extends _i1.RootStackRouter {
     EditImagePageRoute.name: (routeData) => _i1.CustomPage<dynamic>(
         routeData: routeData,
         builder: (data) {
-          final args = data.argsAs<EditImagePageRouteArgs>(
-              orElse: () => const EditImagePageRouteArgs());
+          final args = data.argsAs<EditImagePageRouteArgs>();
           return _i24.EditImagePage(key: args.key, image: args.image);
         },
         transitionsBuilder: _i1.TransitionsBuilders.fadeIn,
@@ -268,7 +267,7 @@ class AppRouter extends _i1.RootStackRouter {
           final pathParams = data.pathParams;
           final args = data.argsAs<DashSettingsRouteArgs>(
               orElse: () => DashSettingsRouteArgs(
-                  showAppBar: pathParams.getBool('showAppBar')));
+                  showAppBar: pathParams.optBool('showAppBar')));
           return _i12.SettingsPage(key: args.key, showAppBar: args.showAppBar);
         },
         opaque: true,
@@ -321,7 +320,7 @@ class AppRouter extends _i1.RootStackRouter {
           final pathParams = data.pathParams;
           final args = data.argsAs<IllustrationPageRouteArgs>(
               orElse: () => IllustrationPageRouteArgs(
-                  illustrationId: pathParams.getString('illustrationId')));
+                  illustrationId: pathParams.optString('illustrationId')));
           return _i20.IllustrationPage(
               key: args.key,
               illustrationId: args.illustrationId,
@@ -612,7 +611,7 @@ class MyBooksPageRoute extends _i1.PageRouteInfo {
 }
 
 class DashBookPage extends _i1.PageRouteInfo<DashBookPageArgs> {
-  DashBookPage({_i2.Key? key, String? bookId, _i31.Book? book})
+  DashBookPage({_i2.Key? key, required String? bookId, _i31.Book? book})
       : super(name,
             path: ':bookId',
             args: DashBookPageArgs(key: key, bookId: bookId, book: book),
@@ -622,7 +621,7 @@ class DashBookPage extends _i1.PageRouteInfo<DashBookPageArgs> {
 }
 
 class DashBookPageArgs {
-  const DashBookPageArgs({this.key, this.bookId, this.book});
+  const DashBookPageArgs({this.key, required this.bookId, this.book});
 
   final _i2.Key? key;
 
@@ -638,7 +637,7 @@ class MyProfilePageRoute extends _i1.PageRouteInfo {
 }
 
 class EditImagePageRoute extends _i1.PageRouteInfo<EditImagePageRouteArgs> {
-  EditImagePageRoute({_i2.Key? key, _i2.ImageProvider<Object>? image})
+  EditImagePageRoute({_i2.Key? key, required _i2.ImageProvider<Object>? image})
       : super(name,
             path: 'edit/pp',
             args: EditImagePageRouteArgs(key: key, image: image));
@@ -647,7 +646,7 @@ class EditImagePageRoute extends _i1.PageRouteInfo<EditImagePageRouteArgs> {
 }
 
 class EditImagePageRouteArgs {
-  const EditImagePageRouteArgs({this.key, this.image});
+  const EditImagePageRouteArgs({this.key, required this.image});
 
   final _i2.Key? key;
 

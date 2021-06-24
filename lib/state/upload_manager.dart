@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
@@ -23,6 +24,10 @@ abstract class UploadManagerBase with Store {
   /// Upload tasks list.
   @observable
   List<CustomUploadTask> uploadTasksList = [];
+
+  /// List of tasks to delete.
+  @observable
+  List<CustomUploadTask> toDeleteTasksList = [];
 
   /// Sum of all bytes transferred among all current uploads.
   @observable
@@ -54,7 +59,8 @@ abstract class UploadManagerBase with Store {
 
   bool get allPaused => pausedTasksCount == addedTasksCount;
 
-  bool get hasUncompletedTasks => (runningTasksCount + pausedTasksCount) > 0;
+  bool get hasUncompletedTasks =>
+      (successTasksCount + abortedTasksCount) != addedTasksCount;
 
   /// A "select file/folder" window will appear. User will have to choose a file.
   /// This file will be then read, and uploaded to firebase storage;
@@ -88,7 +94,20 @@ abstract class UploadManagerBase with Store {
     return true;
   }
 
-  /// Return transfert percentage.
+  /// Return transfert percent (number).
+  int getPercent() {
+    final double ratio = bytesTransferred / totalBytes;
+    double ratioNormalize = ratio;
+
+    if (ratioNormalize.isNaN || ratioNormalize.isInfinite) {
+      ratioNormalize = 0.0;
+    }
+
+    final double percent = ratioNormalize * 100;
+    return percent.round();
+  }
+
+  /// Return transfert percentage (string).
   String getPercentage() {
     final double ratio = bytesTransferred / totalBytes;
     double ratioNormalize = ratio;
@@ -103,9 +122,29 @@ abstract class UploadManagerBase with Store {
   }
 
   /// Remove all current tasks whatever state their are.
-  void cancelAll() {
-    for (var customUploadTask in uploadTasksList) {
-      removeCustomUploadTask(customUploadTask);
+  void cancelAll() async {
+    // Save tasks to cancel running or paused ones later.
+    toDeleteTasksList.addAll(uploadTasksList);
+
+    setUploadWindowsVisibility(false);
+    uploadTasksList.clear();
+
+    _resetBytesTransferred();
+    _resetTotalBytes();
+
+    _setAbortedTasksCount(0);
+    _setAddedTasksCount(0);
+    _setPausedTasksCount(0);
+    _setRunningTasksCount(0);
+    _setSuccessTasksCount(0);
+
+    for (var customUploadTask in toDeleteTasksList) {
+      if (customUploadTask.task == null) {
+        continue;
+      }
+
+      customUploadTask.task!.cancel();
+      _deleteFirestoreDocIfUnfinished(customUploadTask);
     }
   }
 
@@ -125,10 +164,11 @@ abstract class UploadManagerBase with Store {
 
   void _uploadIllustration(FilePickerCross file) async {
     final customUploadTask = CustomUploadTask(
-      name: file.fileName,
+      name: file.fileName ?? "unknown".tr(),
     );
 
     addCustomUploadTask(customUploadTask);
+    _addToTotalBytes(file.length);
 
     final String? illustrationId = await _createFirestoreDocument(file);
     customUploadTask.illustrationId = illustrationId;
@@ -162,6 +202,22 @@ abstract class UploadManagerBase with Store {
     } catch (error) {
       appLogger.e(error);
       return "";
+    }
+  }
+
+  Future _deleteFirestoreDocument(
+    CustomUploadTask customUploadTaskasync,
+  ) async {
+    try {
+      final response = await IllustrationsActions.deleteOne(
+        illustrationId: customUploadTaskasync.illustrationId,
+      );
+
+      if (!response.success) {
+        throw "illustration_delete_error".tr();
+      }
+    } catch (error) {
+      appLogger.e(error);
     }
   }
 
@@ -205,7 +261,6 @@ abstract class UploadManagerBase with Store {
 
     try {
       await uploadTask;
-      appLogger.d("done uploading $fileName");
       _incrSuccessTasks(1);
     } on FirebaseException catch (error) {
       appLogger.e(error);
@@ -222,34 +277,61 @@ abstract class UploadManagerBase with Store {
     uploadTasksList.add(customUploadTask);
     setUploadWindowsVisibility(true);
     _incrAddedTasks(1);
-    // addToTotalBytes(customUploadTask.snapshot.totalBytes);
   }
 
   @action
   void _addUploadTask(
-      UploadTask uploadTask, CustomUploadTask customUploadTask) {
+    UploadTask uploadTask,
+    CustomUploadTask customUploadTask,
+  ) {
     customUploadTask.task = uploadTask;
-    _addToTotalBytes(uploadTask.snapshot.totalBytes);
     _incrRunningTasks(1);
   }
 
   /// Remove a completed or an failed upload task from the manager.
   @action
   void removeCustomUploadTask(CustomUploadTask customUploadTask) {
+    uploadTasksList.remove(customUploadTask);
     _decrAddedTasks(1);
 
     if (customUploadTask.task != null) {
       decrementCounter(customUploadTask);
 
-      _removeFromTotalBytes(customUploadTask.task!.snapshot.totalBytes);
-      customUploadTask.task!.cancel();
-    }
+      final snapshot = customUploadTask.task!.snapshot;
 
-    uploadTasksList.remove(customUploadTask);
+      _removeFromTotalBytes(snapshot.totalBytes);
+      removeFromBytesTransferred(snapshot.bytesTransferred);
+
+      customUploadTask.task!.cancel();
+      _deleteFirestoreDocIfUnfinished(customUploadTask);
+    }
 
     if (uploadTasksList.isEmpty) {
       setUploadWindowsVisibility(false);
     }
+  }
+
+  /// Delete the Firestore document created
+  /// if the task is running or paused
+  /// and was uploading the file to storage.
+  void _deleteFirestoreDocIfUnfinished(
+    CustomUploadTask customUploadTask,
+  ) async {
+    final hasCreatedIllustration =
+        customUploadTask.illustrationId?.isNotEmpty ?? false;
+
+    if (!hasCreatedIllustration) {
+      return;
+    }
+
+    final state = customUploadTask.task!.snapshot.state;
+    final unfinished = state == TaskState.running || state == TaskState.paused;
+
+    if (!unfinished) {
+      return;
+    }
+
+    await _deleteFirestoreDocument(customUploadTask);
   }
 
   /// Add the [amount] to total bytes among all uploads.
@@ -262,12 +344,38 @@ abstract class UploadManagerBase with Store {
   @action
   void _removeFromTotalBytes(int amount) {
     totalBytes -= amount;
+
+    if (totalBytes < 0) {
+      totalBytes = 0;
+    }
+  }
+
+  /// Reset total bytes.
+  @action
+  void _resetTotalBytes() {
+    totalBytes = 0;
+  }
+
+  /// Reset bytes transferred.
+  @action
+  void _resetBytesTransferred() {
+    bytesTransferred = 0;
   }
 
   /// Add the [amount] to bytes transferred among all uploads.
   @action
   void addToBytesTransferred(int amount) {
     bytesTransferred += amount;
+  }
+
+  /// Remove the [amount] to bytes transferred among all uploads.
+  @action
+  void removeFromBytesTransferred(int amount) {
+    bytesTransferred -= amount;
+
+    if (bytesTransferred < 0) {
+      bytesTransferred = 0;
+    }
   }
 
   @action
@@ -282,83 +390,153 @@ abstract class UploadManagerBase with Store {
 
   @action
   void _decrAddedTasks(int amount) {
-    if (addedTasksCount < 1) {
-      return;
-    }
-
     addedTasksCount -= amount;
+
+    if (addedTasksCount < 0) {
+      appLogger.w(
+        "addedTasksCount is above the limit. "
+        "Its value is $addedTasksCount whereas the limit is 0.",
+      );
+
+      addedTasksCount = 0;
+    }
+  }
+
+  @action
+  void _setAddedTasksCount(int value) {
+    addedTasksCount = value;
+  }
+
+  @action
+  void _setPausedTasksCount(int value) {
+    pausedTasksCount = value;
+  }
+
+  @action
+  void _setRunningTasksCount(int value) {
+    runningTasksCount = value;
+  }
+
+  @action
+  void _setAbortedTasksCount(int value) {
+    abortedTasksCount = value;
+  }
+
+  @action
+  void _setSuccessTasksCount(int value) {
+    successTasksCount = value;
   }
 
   @action
   void _incrPausedTasks(int amount) {
-    if (pausedTasksCount >= addedTasksCount) {
-      return;
-    }
-
     pausedTasksCount += amount;
+
+    if (pausedTasksCount > addedTasksCount) {
+      appLogger.w(
+        "pausedTasksCount is above the limit. "
+        "Its value is $pausedTasksCount whereas the limit is $addedTasksCount.",
+      );
+
+      pausedTasksCount = addedTasksCount;
+    }
   }
 
   @action
   void _decrPausedTasks(int amount) {
-    if (pausedTasksCount < 1) {
-      return;
-    }
-
     pausedTasksCount -= amount;
+
+    if (pausedTasksCount < 0) {
+      appLogger.w(
+        "pausedTasksCount is above the limit. "
+        "Its value is $pausedTasksCount whereas the limit is 0.",
+      );
+
+      pausedTasksCount = 0;
+    }
   }
 
   @action
   void _incrRunningTasks(int amount) {
-    if (runningTasksCount >= addedTasksCount) {
-      return;
-    }
-
     runningTasksCount += amount;
+
+    if (runningTasksCount > addedTasksCount) {
+      appLogger.w(
+        "runningTasksCount is above the limit. "
+        "Its value is $runningTasksCount whereas the limit is $addedTasksCount.",
+      );
+
+      runningTasksCount = addedTasksCount;
+    }
   }
 
   @action
   void _decrRunningTasks(int amount) {
-    if (runningTasksCount < 1) {
-      return;
-    }
-
     runningTasksCount -= amount;
+
+    if (runningTasksCount < 0) {
+      appLogger.w(
+        "runningTasksCount is above the limit. "
+        "Its value is $runningTasksCount whereas the limit is 0.",
+      );
+
+      runningTasksCount = 0;
+    }
   }
 
   @action
   void _decrSuccessTasks(int amount) {
-    if (successTasksCount < 1) {
-      return;
-    }
-
     successTasksCount -= amount;
+
+    if (successTasksCount < 0) {
+      appLogger.w(
+        "successTasksCount is above the limit. "
+        "Its value is $successTasksCount whereas the limit is 0.",
+      );
+
+      successTasksCount = 0;
+    }
   }
 
   @action
   void _incrSuccessTasks(int amount) {
-    if (successTasksCount >= addedTasksCount) {
-      return;
-    }
-
     successTasksCount += amount;
+
+    if (successTasksCount > addedTasksCount) {
+      appLogger.w(
+        "successTasksCount is above the limit. "
+        "Its value is $successTasksCount whereas the limit is $addedTasksCount.",
+      );
+
+      successTasksCount = addedTasksCount;
+    }
   }
 
   @action
   void _decrAbortedTask(int amount) {
-    if (abortedTasksCount < 1) {
-      return;
-    }
-
     abortedTasksCount -= amount;
+
+    if (abortedTasksCount < 0) {
+      appLogger.w(
+        "abortedTasksCount is under the limit. "
+        "Its value is $abortedTasksCount whereas the limit is 0.",
+      );
+
+      abortedTasksCount = 0;
+    }
   }
 
   @action
   void _incrAbortedTasks(int amount) {
-    if (abortedTasksCount >= addedTasksCount) {
-      return;
-    }
-
     abortedTasksCount += amount;
+
+    if (abortedTasksCount > addedTasksCount) {
+      appLogger.w(
+        "abortedTasksCount is above the limit. "
+        "Its value is $abortedTasksCount whereas the limit is $addedTasksCount.",
+      );
+
+      abortedTasksCount = addedTasksCount;
+    }
   }
 
   void decrementCounter(CustomUploadTask customUploadTask) {

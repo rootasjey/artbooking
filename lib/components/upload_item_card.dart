@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:artbooking/components/circle_button.dart';
 import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
@@ -11,20 +12,13 @@ import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
 class UploadItemCard extends StatefulWidget {
-  // final String name;
-  // final String percent;
-  // final double progress;
-  // final UploadTask uploadTask;
-  final CustomUploadTask? customUploadTask;
+  final CustomUploadTask customUploadTask;
   final Function? onCancel;
   final Function? onDone;
 
   const UploadItemCard({
     Key? key,
-    // @required this.name,
-    // @required this.percent,
-    // @required this.progress,
-    this.customUploadTask,
+    required this.customUploadTask,
     this.onCancel,
     this.onDone,
   }) : super(key: key);
@@ -39,7 +33,6 @@ class _UploadItemCardState extends State<UploadItemCard> {
 
   int _bytesTransferred = 0;
   int _totalBytes = 0;
-  // TaskState _uploadState = TaskState.running;
 
   StreamSubscription<TaskSnapshot>? _taskListener;
 
@@ -47,11 +40,11 @@ class _UploadItemCardState extends State<UploadItemCard> {
   void initState() {
     super.initState();
 
-    _taskListener = widget.customUploadTask!.task?.snapshotEvents.listen(
+    _taskListener = widget.customUploadTask.task?.snapshotEvents.listen(
       (TaskSnapshot snapshot) {
         _bytesTransferred = snapshot.bytesTransferred;
         _totalBytes = snapshot.totalBytes;
-        // _uploadState = snapshot.state;
+        appUploadManager.addToBytesTransferred(_bytesTransferred);
       },
       onError: (error) {
         appLogger.e(error);
@@ -110,11 +103,13 @@ class _UploadItemCardState extends State<UploadItemCard> {
   }
 
   Widget nameAndProgress() {
-    final customUploadTask = widget.customUploadTask!;
+    final customUploadTask = widget.customUploadTask;
 
     double progress = _bytesTransferred / _totalBytes;
 
-    if (customUploadTask.task!.snapshot.state == TaskState.success) {
+    if (customUploadTask.task == null) {
+      progress = 0;
+    } else if (customUploadTask.task!.snapshot.state == TaskState.success) {
       progress = 1.0;
     } else if (progress.isNaN || progress.isInfinite) {
       progress = 0;
@@ -127,7 +122,7 @@ class _UploadItemCardState extends State<UploadItemCard> {
           Opacity(
             opacity: 0.8,
             child: Text(
-              customUploadTask.name!,
+              customUploadTask.name,
               style: FontsUtils.mainStyle(
                 fontSize: 18.0,
                 fontWeight: FontWeight.w700,
@@ -152,7 +147,12 @@ class _UploadItemCardState extends State<UploadItemCard> {
     final double progress = _bytesTransferred / _totalBytes;
     double percent = progress * 100;
 
-    if (widget.customUploadTask!.task!.snapshot.state == TaskState.success) {
+    final customUploadTask = widget.customUploadTask;
+
+    if (customUploadTask.task == null) {
+      percent = 0;
+    } else if (widget.customUploadTask.task!.snapshot.state ==
+        TaskState.success) {
       percent = 100;
     } else if (percent.isInfinite || percent.isNaN) {
       percent = 0;
@@ -183,7 +183,22 @@ class _UploadItemCardState extends State<UploadItemCard> {
       return Container();
     }
 
-    final state = widget.customUploadTask!.task!.snapshot.state;
+    final customUploadTask = widget.customUploadTask;
+
+    if (customUploadTask.task == null) {
+      return CircleButton(
+        tooltip: "cancel".tr(),
+        radius: 16.0,
+        onTap: widget.onCancel as void Function()?,
+        icon: Icon(
+          UniconsLine.times,
+          size: 16.0,
+          color: Colors.black87,
+        ),
+      );
+    }
+
+    final state = customUploadTask.task!.snapshot.state;
 
     if (state == TaskState.running) {
       return CircleButton(

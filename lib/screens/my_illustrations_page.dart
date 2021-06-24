@@ -671,7 +671,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   ) {
     switch (action) {
       case BookItemAction.delete:
-        confirmBookDeletion(illustration, index);
+        confirmIllustrationDeletion(illustration, index);
         break;
       case BookItemAction.addToBook:
         showAddToBook(illustration);
@@ -681,7 +681,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     }
   }
 
-  void confirmBookDeletion(Illustration illustration, int index) async {
+  void confirmIllustrationDeletion(Illustration illustration, int index) async {
     showCustomModalBottomSheet(
       context: context,
       builder: (context) {

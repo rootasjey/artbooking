@@ -39,7 +39,7 @@ class SettingsPage extends StatefulWidget {
 
   const SettingsPage({
     Key? key,
-    @PathParam() this.showAppBar = true,
+    @PathParam("showAppBar") this.showAppBar = true,
   }) : super(key: key);
 
   @override

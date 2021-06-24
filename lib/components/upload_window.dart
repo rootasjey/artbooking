@@ -93,15 +93,7 @@ class _UploadWindowState extends State<UploadWindow> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                Opacity(
-                  opacity: 0.6,
-                  child: Text(
-                    getWindowSubtitle(),
-                    style: FontsUtils.mainStyle(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+                headerSubtitle(),
               ],
             ),
           ),
@@ -126,13 +118,36 @@ class _UploadWindowState extends State<UploadWindow> {
     );
   }
 
+  Widget headerSubtitle() {
+    final int percent = appUploadManager.getPercent();
+
+    if (percent == 0 && appUploadManager.hasUncompletedTasks) {
+      return SizedBox(
+        width: 200.0,
+        child: LinearProgressIndicator(
+          minHeight: 2.0,
+        ),
+      );
+    }
+
+    return Opacity(
+      opacity: 0.6,
+      child: Text(
+        getWindowSubtitle(),
+        style: FontsUtils.mainStyle(
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
   Widget body() {
     if (!_isExpanded) {
       return Container();
     }
 
     return Padding(
-      padding: const EdgeInsets.only(top: 12.0),
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -161,7 +176,7 @@ class _UploadWindowState extends State<UploadWindow> {
   }
 
   String getWindowTitle() {
-    if (appUploadManager.runningTasksCount == 0) {
+    if (!appUploadManager.hasUncompletedTasks) {
       return "All done.";
     }
 
@@ -171,8 +186,19 @@ class _UploadWindowState extends State<UploadWindow> {
   }
 
   String getWindowSubtitle() {
-    if (appUploadManager.runningTasksCount == 0) {
-      return "";
+    if (!appUploadManager.hasUncompletedTasks) {
+      String text = "illustration_upload_count".plural(
+        appUploadManager.successTasksCount,
+      );
+
+      if (appUploadManager.abortedTasksCount > 0) {
+        text += " ";
+        text += "illustration_upload_aborted_count".plural(
+          appUploadManager.abortedTasksCount,
+        );
+      }
+
+      return text;
     }
 
     return appUploadManager.getPercentage();

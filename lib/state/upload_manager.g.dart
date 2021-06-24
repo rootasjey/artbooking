@@ -40,6 +40,22 @@ mixin _$UploadManager on UploadManagerBase, Store {
     });
   }
 
+  final _$toDeleteTasksListAtom =
+      Atom(name: 'UploadManagerBase.toDeleteTasksList');
+
+  @override
+  List<CustomUploadTask> get toDeleteTasksList {
+    _$toDeleteTasksListAtom.reportRead();
+    return super.toDeleteTasksList;
+  }
+
+  @override
+  set toDeleteTasksList(List<CustomUploadTask> value) {
+    _$toDeleteTasksListAtom.reportWrite(value, super.toDeleteTasksList, () {
+      super.toDeleteTasksList = value;
+    });
+  }
+
   final _$bytesTransferredAtom =
       Atom(name: 'UploadManagerBase.bytesTransferred');
 
@@ -71,77 +87,81 @@ mixin _$UploadManager on UploadManagerBase, Store {
     });
   }
 
-  final _$addedCountAtom = Atom(name: 'UploadManagerBase.addedCount');
+  final _$addedTasksCountAtom = Atom(name: 'UploadManagerBase.addedTasksCount');
 
   @override
   int get addedTasksCount {
-    _$addedCountAtom.reportRead();
+    _$addedTasksCountAtom.reportRead();
     return super.addedTasksCount;
   }
 
   @override
   set addedTasksCount(int value) {
-    _$addedCountAtom.reportWrite(value, super.addedTasksCount, () {
+    _$addedTasksCountAtom.reportWrite(value, super.addedTasksCount, () {
       super.addedTasksCount = value;
     });
   }
 
-  final _$pausedCountAtom = Atom(name: 'UploadManagerBase.pausedCount');
+  final _$pausedTasksCountAtom =
+      Atom(name: 'UploadManagerBase.pausedTasksCount');
 
   @override
   int get pausedTasksCount {
-    _$pausedCountAtom.reportRead();
+    _$pausedTasksCountAtom.reportRead();
     return super.pausedTasksCount;
   }
 
   @override
   set pausedTasksCount(int value) {
-    _$pausedCountAtom.reportWrite(value, super.pausedTasksCount, () {
+    _$pausedTasksCountAtom.reportWrite(value, super.pausedTasksCount, () {
       super.pausedTasksCount = value;
     });
   }
 
-  final _$uploadingCountAtom = Atom(name: 'UploadManagerBase.uploadingCount');
+  final _$runningTasksCountAtom =
+      Atom(name: 'UploadManagerBase.runningTasksCount');
 
   @override
   int get runningTasksCount {
-    _$uploadingCountAtom.reportRead();
+    _$runningTasksCountAtom.reportRead();
     return super.runningTasksCount;
   }
 
   @override
   set runningTasksCount(int value) {
-    _$uploadingCountAtom.reportWrite(value, super.runningTasksCount, () {
+    _$runningTasksCountAtom.reportWrite(value, super.runningTasksCount, () {
       super.runningTasksCount = value;
     });
   }
 
-  final _$completeCountAtom = Atom(name: 'UploadManagerBase.completeCount');
+  final _$successTasksCountAtom =
+      Atom(name: 'UploadManagerBase.successTasksCount');
 
   @override
   int get successTasksCount {
-    _$completeCountAtom.reportRead();
+    _$successTasksCountAtom.reportRead();
     return super.successTasksCount;
   }
 
   @override
   set successTasksCount(int value) {
-    _$completeCountAtom.reportWrite(value, super.successTasksCount, () {
+    _$successTasksCountAtom.reportWrite(value, super.successTasksCount, () {
       super.successTasksCount = value;
     });
   }
 
-  final _$abortedCountAtom = Atom(name: 'UploadManagerBase.abortedCount');
+  final _$abortedTasksCountAtom =
+      Atom(name: 'UploadManagerBase.abortedTasksCount');
 
   @override
   int get abortedTasksCount {
-    _$abortedCountAtom.reportRead();
+    _$abortedTasksCountAtom.reportRead();
     return super.abortedTasksCount;
   }
 
   @override
   set abortedTasksCount(int value) {
-    _$abortedCountAtom.reportWrite(value, super.abortedTasksCount, () {
+    _$abortedTasksCountAtom.reportWrite(value, super.abortedTasksCount, () {
       super.abortedTasksCount = value;
     });
   }
@@ -206,11 +226,44 @@ mixin _$UploadManager on UploadManagerBase, Store {
   }
 
   @override
+  void _resetTotalBytes() {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._resetTotalBytes');
+    try {
+      return super._resetTotalBytes();
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _resetBytesTransferred() {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._resetBytesTransferred');
+    try {
+      return super._resetBytesTransferred();
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void addToBytesTransferred(int amount) {
     final _$actionInfo = _$UploadManagerBaseActionController.startAction(
         name: 'UploadManagerBase.addToBytesTransferred');
     try {
       return super.addToBytesTransferred(amount);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void removeFromBytesTransferred(int amount) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase.removeFromBytesTransferred');
+    try {
+      return super.removeFromBytesTransferred(amount);
     } finally {
       _$UploadManagerBaseActionController.endAction(_$actionInfo);
     }
@@ -244,6 +297,61 @@ mixin _$UploadManager on UploadManagerBase, Store {
         name: 'UploadManagerBase._decrAddedTasks');
     try {
       return super._decrAddedTasks(amount);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _setAddedTasksCount(int value) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._setAddedTasksCount');
+    try {
+      return super._setAddedTasksCount(value);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _setPausedTasksCount(int value) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._setPausedTasksCount');
+    try {
+      return super._setPausedTasksCount(value);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _setRunningTasksCount(int value) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._setRunningTasksCount');
+    try {
+      return super._setRunningTasksCount(value);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _setAbortedTasksCount(int value) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._setAbortedTasksCount');
+    try {
+      return super._setAbortedTasksCount(value);
+    } finally {
+      _$UploadManagerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _setSuccessTasksCount(int value) {
+    final _$actionInfo = _$UploadManagerBaseActionController.startAction(
+        name: 'UploadManagerBase._setSuccessTasksCount');
+    try {
+      return super._setSuccessTasksCount(value);
     } finally {
       _$UploadManagerBaseActionController.endAction(_$actionInfo);
     }
@@ -342,13 +450,14 @@ mixin _$UploadManager on UploadManagerBase, Store {
     return '''
 showUploadWindow: ${showUploadWindow},
 uploadTasksList: ${uploadTasksList},
+toDeleteTasksList: ${toDeleteTasksList},
 bytesTransferred: ${bytesTransferred},
 totalBytes: ${totalBytes},
-addedCount: ${addedTasksCount},
-pausedCount: ${pausedTasksCount},
-uploadingCount: ${runningTasksCount},
-completeCount: ${successTasksCount},
-abortedCount: ${abortedTasksCount}
+addedTasksCount: ${addedTasksCount},
+pausedTasksCount: ${pausedTasksCount},
+runningTasksCount: ${runningTasksCount},
+successTasksCount: ${successTasksCount},
+abortedTasksCount: ${abortedTasksCount}
     ''';
   }
 }
