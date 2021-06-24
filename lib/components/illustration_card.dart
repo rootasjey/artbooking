@@ -1,4 +1,5 @@
 import 'package:artbooking/actions/illustrations.dart';
+import 'package:artbooking/components/popup_menu_item_icon.dart';
 import 'package:artbooking/components/user_books.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/one_illus_op_resp.dart';
@@ -129,12 +130,11 @@ class _IllustrationCardState extends State<IllustrationCard>
                 child: Stack(
                   children: [
                     multiSelectButton(),
-                    if (_showPopupMenu)
-                      Positioned(
-                        bottom: 10.0,
-                        right: 10.0,
-                        child: popupMenuButton(),
-                      ),
+                    Positioned(
+                      bottom: 10.0,
+                      right: 10.0,
+                      child: popupMenuButton(),
+                    ),
                   ],
                 ),
               ),
@@ -204,71 +204,54 @@ class _IllustrationCardState extends State<IllustrationCard>
 
     if (widget.type == IllustrationCardType.illustration) {
       entries.addAll([
-        PopupMenuItem(
-          child: ListTile(
-            leading: Icon(UniconsLine.trash),
-            title: Opacity(
-              opacity: 0.6,
-              child: Text(
-                'Delete',
-                style: FontsUtils.mainStyle(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-          value: 'delete',
+        PopupMenuItemIcon(
+          value: "delete",
+          icon: Icon(UniconsLine.trash),
+          textLabel: "delete".tr(),
         ),
       ]);
     }
 
     if (widget.type == IllustrationCardType.book) {
       entries.addAll([
-        PopupMenuItem(
-          child: ListTile(
-            leading: Icon(UniconsLine.image_minus),
-            title: Opacity(
-              opacity: 0.6,
-              child: Text(
-                'Remove',
-                style: FontsUtils.mainStyle(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-          value: 'remove_from_book',
+        PopupMenuItemIcon(
+          value: "remove_from_book",
+          icon: Icon(UniconsLine.image_minus),
+          textLabel: "remove".tr(),
         ),
       ]);
     }
 
-    return PopupMenuButton(
-      icon: MirrorAnimation<Color?>(
-        tween: stateColors.primary.tweenTo(stateColors.secondary),
-        duration: 2.seconds,
-        curve: Curves.decelerate,
-        builder: (context, child, value) {
-          return Icon(
-            UniconsLine.ellipsis_h,
-            color: value,
-          );
+    return Opacity(
+      opacity: _showPopupMenu ? 1.0 : 0.0,
+      child: PopupMenuButton(
+        icon: MirrorAnimation<Color?>(
+          tween: stateColors.primary.tweenTo(stateColors.secondary),
+          duration: 2.seconds,
+          curve: Curves.decelerate,
+          builder: (context, child, value) {
+            return Icon(
+              UniconsLine.ellipsis_h,
+              color: value,
+            );
+          },
+        ),
+        onSelected: (String value) {
+          switch (value) {
+            case 'delete':
+              confirmDeletion();
+              break;
+            case 'add_to_book':
+              showAddToBook();
+              break;
+            case 'remove_from_book':
+              removeFromBook();
+              break;
+            default:
+          }
         },
+        itemBuilder: (_) => entries,
       ),
-      onSelected: (dynamic value) {
-        switch (value) {
-          case 'delete':
-            confirmDeletion();
-            break;
-          case 'add_to_book':
-            showAddToBook();
-            break;
-          case 'remove_from_book':
-            removeFromBook();
-            break;
-          default:
-        }
-      },
-      itemBuilder: (_) => entries,
     );
   }
 
