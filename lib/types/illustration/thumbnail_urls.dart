@@ -1,21 +1,21 @@
 class ThumbnailUrls {
   /// Thumbnail with a width of 1920 pixels.
-  final String? t1920;
+  final String t1920;
 
   /// Thumbnail with a width of 2400 pixels.
-  final String? t2400;
+  final String t2400;
 
   /// Thumbnail with a width of 1080 pixels.
-  final String? t1080;
+  final String t1080;
 
   /// Thumbnail with a width of 720 pixels.
-  final String? t720;
+  final String t720;
 
   /// Thumbnail with a width of 480 pixels.
-  final String? t480;
+  final String t480;
 
   /// Thumbnail with a width of 360 pixels.
-  final String? t360;
+  final String t360;
 
   ThumbnailUrls({
     this.t1920 = '',
@@ -30,14 +30,18 @@ class ThumbnailUrls {
     return ThumbnailUrls();
   }
 
-  factory ThumbnailUrls.fromJSON(Map<String, dynamic> json) {
+  factory ThumbnailUrls.fromJSON(Map<String, dynamic>? data) {
+    if (data == null) {
+      return ThumbnailUrls.empty();
+    }
+
     return ThumbnailUrls(
-      t1920: json['t1920'],
-      t2400: json['t2400'],
-      t1080: json['t1080'],
-      t720: json['t720'],
-      t480: json['t480'],
-      t360: json['t360'],
+      t1920: data['t1920'] ?? '',
+      t2400: data['t2400'] ?? '',
+      t1080: data['t1080'] ?? '',
+      t720: data['t720'] ?? '',
+      t480: data['t480'] ?? '',
+      t360: data['t360'] ?? '',
     );
   }
 }

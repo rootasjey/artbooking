@@ -55,7 +55,7 @@ class Illustration {
   final DateTime? updatedAt;
 
   /// This illustration's urls.
-  Urls? urls;
+  Urls urls;
 
   /// All available file versions of this illusration.
   List<IllustrationVersion> versions;
@@ -80,7 +80,7 @@ class Illustration {
     this.story = '',
     this.topics = const [],
     this.updatedAt,
-    this.urls,
+    required this.urls,
     this.versions = const [],
     this.visibility,
   });
@@ -131,41 +131,41 @@ class Illustration {
   }
 
   String? getHDThumbnail() {
-    final t720 = urls!.thumbnails!.t720;
-    if (t720 != null && t720.isNotEmpty) {
+    final t720 = urls.thumbnails.t720;
+    if (t720.isNotEmpty) {
       return t720;
     }
 
-    final t1080 = urls!.thumbnails!.t1080;
-    if (t1080 != null && t1080.isNotEmpty) {
+    final t1080 = urls.thumbnails.t1080;
+    if (t1080.isNotEmpty) {
       return t1080;
     }
 
-    return urls!.original;
+    return urls.original;
   }
 
   String? getThumbnail() {
-    final t360 = urls!.thumbnails!.t360;
-    if (t360 != null && t360.isNotEmpty) {
+    final t360 = urls.thumbnails.t360;
+    if (t360.isNotEmpty) {
       return t360;
     }
 
-    final t480 = urls!.thumbnails!.t480;
-    if (t480 != null && t480.isNotEmpty) {
+    final t480 = urls.thumbnails.t480;
+    if (t480.isNotEmpty) {
       return t480;
     }
 
-    final t720 = urls!.thumbnails!.t720;
-    if (t720 != null && t720.isNotEmpty) {
+    final t720 = urls.thumbnails.t720;
+    if (t720.isNotEmpty) {
       return t720;
     }
 
-    final t1080 = urls!.thumbnails!.t1080;
-    if (t1080 != null && t1080.isNotEmpty) {
+    final t1080 = urls.thumbnails.t1080;
+    if (t1080.isNotEmpty) {
       return t1080;
     }
 
-    return urls!.original;
+    return urls.original;
   }
 
   static List<String> parseStyles(Map<String, dynamic>? data) {

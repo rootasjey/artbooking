@@ -2,16 +2,16 @@ import 'package:artbooking/types/share_urls.dart';
 import 'package:artbooking/types/illustration/thumbnail_urls.dart';
 
 class Urls {
-  String? original;
-  ShareUrls? share;
-  String? storage;
-  ThumbnailUrls? thumbnails;
+  String original;
+  ShareUrls share;
+  String storage;
+  ThumbnailUrls thumbnails;
 
   Urls({
     this.original = '',
     this.storage = '',
-    this.thumbnails,
-    this.share,
+    required this.thumbnails,
+    required this.share,
   });
 
   factory Urls.empty() {
@@ -23,12 +23,16 @@ class Urls {
     );
   }
 
-  factory Urls.fromJSON(Map<String, dynamic> json) {
+  factory Urls.fromJSON(Map<String, dynamic>? data) {
+    if (data == null) {
+      return Urls.empty();
+    }
+
     return Urls(
-      original: json['original'],
-      share: ShareUrls.fromJSON(json['share']),
-      storage: json['storage'],
-      thumbnails: ThumbnailUrls.fromJSON(json['thumbnails']),
+      original: data['original'] ?? '',
+      share: ShareUrls.fromJSON(data['share']),
+      storage: data['storage'] ?? '',
+      thumbnails: ThumbnailUrls.fromJSON(data['thumbnails']),
     );
   }
 }

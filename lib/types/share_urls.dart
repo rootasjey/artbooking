@@ -1,6 +1,6 @@
 class ShareUrls {
-  String? read;
-  String? write;
+  String read;
+  String write;
 
   ShareUrls({
     this.read = '',
@@ -14,10 +14,14 @@ class ShareUrls {
     );
   }
 
-  factory ShareUrls.fromJSON(Map<String, dynamic> json) {
+  factory ShareUrls.fromJSON(Map<String, dynamic>? data) {
+    if (data == null) {
+      return ShareUrls.empty();
+    }
+
     return ShareUrls(
-      read: json['read'],
-      write: json['write'],
+      read: data['read'] ?? '',
+      write: data['write'] ?? '',
     );
   }
 }

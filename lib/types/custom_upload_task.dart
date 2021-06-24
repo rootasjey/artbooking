@@ -7,7 +7,7 @@ class CustomUploadTask {
   UploadTask? task;
 
   /// The illustration being uploaded.
-  String? name;
+  String name;
 
   /// The created illustration in Firestore.
   String? illustrationId;
