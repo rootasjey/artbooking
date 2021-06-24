@@ -268,6 +268,20 @@
   "illustration_story_dot": "Illustration'story...",
   "illustration_story_sample": "This illustration in one shot between 2PM - 4PM...",
   "illustration_title_dot": "Illustration's title...",
+  "illustration_upload_aborted_count": {
+    "zero": "{} aborted.",
+    "one": "{} aborted.",
+    "two": "{} aborted.",
+    "many": "{} aborted.",
+    "other": "{} aborted."
+  },
+  "illustration_upload_count": {
+    "zero": "{} uploaded.",
+    "one": "{} uploaded.",
+    "two": "{} uploaded.",
+    "many": "{} uploaded.",
+    "other": "{} uploaded."
+  },
   "illustration_upload_error": "Sorry, there was an issue while uploading your illustration. Please try again later.",
   "illustration_uploading_files": "Uploading {} files...",
   "illustration_visibility_choose": "Update visibility",
@@ -581,6 +595,7 @@
   "tos_7": "Your continued use of our website will be regarded as acceptance of our practices around privacy and personal information. If you have any questions about how we handle user data and personal information, feel free to contact us.",
   "tos_8": "This policy is effective as of 1 May 2020.",
   "tos_created_with": "Privacy Policy created with GetTerms.",
+  "unknown": "Unknown",
   "unpublish": "Unpublish",
   "unpublished": "Unpublished",
   "update": "Update",

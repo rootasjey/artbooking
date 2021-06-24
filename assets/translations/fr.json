@@ -268,6 +268,20 @@
   "illustration_story_dot": "Histoire derrière cette illustration...",
   "illustration_story_sample": "Cette illustration a été faite entre 14h et 15h...",
   "illustration_title_dot": "Titre de l'illustration...",
+  "illustration_upload_aborted_count": {
+    "zero": "{} abandonée.",
+    "one": "{} abandonée.",
+    "two": "{} abandonée.",
+    "many": "{} abandonées.",
+    "other": "{} abandonées."
+  },
+  "illustration_upload_count": {
+    "zero": "{} envoyée.",
+    "one": "{} envoyée.",
+    "two": "{} envoyée.",
+    "many": "{} envoyées.",
+    "other": "{} envoyées."
+  },
   "illustration_upload_error": "Désolés, nous avons rencontré une erreur durant le transfert de votre illustration. Veuillez réessayer plus tard.",
   "illustration_uploading_files": "Transfert de {} fichier...",
   "illustration_visibility_choose": "Modifier la visibilité",
@@ -581,6 +595,7 @@
   "tos_7": "Votre utilisation prolongée de notre site web et nos applications sera comprise comme l'acceptation et l'adhésion à nos conditions générales d'utilisation, notre politique de confidentialité, ainsi que nos pratiques concernant l'utilisation de vos données. Si vous avez des questions à propos de l'utilisaiton des données personnelles et de vos données, vous pouvez nous contacter à feedback@fig.style.",
   "tos_8": "Cette politique est applicable depuis le 1 Mai 2020.",
   "tos_created_with": "Politique de confidentialité créée avec GetTerms.",
+  "unknown": "Inconnu(e)",
   "unpublish": "Rendre non-public",
   "unpublished": "Unpublish",
   "update": "Mettre à jour",
