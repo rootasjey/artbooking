@@ -1,54 +1,54 @@
-import 'package:artbooking/actions/illustrations.dart';
-import 'package:artbooking/components/popup_menu_item_icon.dart';
-import 'package:artbooking/components/user_books.dart';
 import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/types/one_illus_op_resp.dart';
+import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
-import 'package:artbooking/utils/constants.dart';
-import 'package:artbooking/utils/fonts.dart';
-import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
-/// Determines which actions will be displayed on the card.
-enum IllustrationCardType {
-  /// When the illustration is viewed inside a book.
-  book,
-
-  /// When the illustration is displayed on an illustrations page.
-  illustration,
-}
-
 /// A component representing an illustration with its main content (an image).
 class IllustrationCard extends StatefulWidget {
-  final bool selected;
-  final bool selectionMode;
-  final Illustration illustration;
-  final VoidCallback? onBeforeDelete;
-  final Function(OneIllusOpResp)? onAfterDelete;
-  final Function(bool)? onLongPress;
-  final Function(Illustration)? onRemove;
-  final double size;
-  final IllustrationCardType type;
-  final VoidCallback? onTap;
-
+  /// A component representing an illustration with its main content (an image).
   IllustrationCard({
+    this.index = 0,
     required this.illustration,
     this.selected = false,
     this.selectionMode = false,
-    this.onAfterDelete,
-    this.onBeforeDelete,
     this.onLongPress,
-    this.onRemove,
     this.size = 300.0,
-    this.type = IllustrationCardType.illustration,
     this.onTap,
+    this.onPopupMenuItemSelected,
+    this.popupMenuEntries = const [],
   });
+
+  /// Index position in a list, if available.
+  final int index;
+
+  /// If true, the card will be marked with a check circle.
+  final bool selected;
+
+  /// If true, this card is in selection mode
+  /// alongside all other cards in the list/grid, if any.
+  final bool selectionMode;
+
+  /// Illustration's data for this card.
+  final Illustration illustration;
+
+  /// Trigger when the user long press this card.
+  final Function(bool)? onLongPress;
+
+  /// Card's size (width = height).
+  final double size;
+
+  /// Trigger when the user taps on this card.
+  final VoidCallback? onTap;
+
+  /// Popup menu item entries.
+  final List<PopupMenuEntry<BookItemAction>> popupMenuEntries;
+
+  /// Callback function when popup menu item entries are tapped.
+  final void Function(BookItemAction, int, Illustration)?
+      onPopupMenuItemSelected;
 
   @override
   _IllustrationCardState createState() => _IllustrationCardState();
@@ -64,8 +64,6 @@ class _IllustrationCardState extends State<IllustrationCard>
   double _startElevation = 3.0;
   double _endElevation = 6.0;
   double _elevation = 4.0;
-
-  final _keyboardFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -92,7 +90,9 @@ class _IllustrationCardState extends State<IllustrationCard>
         child: ScaleTransition(
           scale: _scaleAnimation,
           child: Card(
-            color: widget.selected ? Colors.blue : ThemeData().cardTheme.color,
+            color: widget.selected
+                ? stateColors.primary
+                : ThemeData().cardTheme.color,
             elevation: _elevation,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16.0),
@@ -160,7 +160,7 @@ class _IllustrationCardState extends State<IllustrationCard>
           clipBehavior: Clip.hardEdge,
           shape: CircleBorder(),
           child: Icon(
-            Icons.circle,
+            UniconsLine.circle,
             color: stateColors.primary,
           ),
         ),
@@ -176,7 +176,7 @@ class _IllustrationCardState extends State<IllustrationCard>
         clipBehavior: Clip.hardEdge,
         shape: CircleBorder(),
         child: Icon(
-          Icons.check_circle,
+          UniconsLine.check_circle,
           color: stateColors.primary,
         ),
       ),
@@ -184,47 +184,9 @@ class _IllustrationCardState extends State<IllustrationCard>
   }
 
   Widget popupMenuButton() {
-    final entries = <PopupMenuEntry<String>>[
-      PopupMenuItem(
-        child: ListTile(
-          leading: Icon(UniconsLine.book_medical),
-          title: Opacity(
-            opacity: 0.6,
-            child: Text(
-              'Add to book',
-              style: FontsUtils.mainStyle(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
-        value: 'add_to_book',
-      ),
-    ];
-
-    if (widget.type == IllustrationCardType.illustration) {
-      entries.addAll([
-        PopupMenuItemIcon(
-          value: "delete",
-          icon: Icon(UniconsLine.trash),
-          textLabel: "delete".tr(),
-        ),
-      ]);
-    }
-
-    if (widget.type == IllustrationCardType.book) {
-      entries.addAll([
-        PopupMenuItemIcon(
-          value: "remove_from_book",
-          icon: Icon(UniconsLine.image_minus),
-          textLabel: "remove".tr(),
-        ),
-      ]);
-    }
-
     return Opacity(
       opacity: _showPopupMenu ? 1.0 : 0.0,
-      child: PopupMenuButton(
+      child: PopupMenuButton<BookItemAction>(
         icon: MirrorAnimation<Color?>(
           tween: stateColors.primary.tweenTo(stateColors.secondary),
           duration: 2.seconds,
@@ -236,151 +198,15 @@ class _IllustrationCardState extends State<IllustrationCard>
             );
           },
         ),
-        onSelected: (String value) {
-          switch (value) {
-            case 'delete':
-              confirmDeletion();
-              break;
-            case 'add_to_book':
-              showAddToBook();
-              break;
-            case 'remove_from_book':
-              removeFromBook();
-              break;
-            default:
-          }
+        onSelected: (BookItemAction action) {
+          widget.onPopupMenuItemSelected?.call(
+            action,
+            widget.index,
+            widget.illustration,
+          );
         },
-        itemBuilder: (_) => entries,
+        itemBuilder: (_) => widget.popupMenuEntries,
       ),
     );
-  }
-
-  void confirmDeletion() async {
-    showCustomModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Material(
-          child: SafeArea(
-            top: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text(
-                    "delete".tr(),
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                  trailing: Icon(
-                    UniconsLine.check,
-                    color: Colors.white,
-                  ),
-                  tileColor: Color(0xfff55c5c),
-                  onTap: () {
-                    context.router.pop();
-                    deleteIllustration();
-                  },
-                ),
-                ListTile(
-                  title: Text("cancel".tr()),
-                  trailing: Icon(UniconsLine.times),
-                  onTap: context.router.pop,
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-      containerWidget: (context, animation, child) {
-        return RawKeyboardListener(
-          autofocus: true,
-          focusNode: _keyboardFocusNode,
-          onKey: (keyEvent) {
-            if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
-              Navigator.of(context).pop();
-              deleteIllustration();
-            }
-          },
-          child: SafeArea(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: 500.0,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 40.0,
-                  ),
-                  child: Material(
-                    clipBehavior: Clip.antiAlias,
-                    borderRadius: BorderRadius.circular(12.0),
-                    child: child,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void deleteIllustration() async {
-    final illus = widget.illustration;
-
-    if (widget.onBeforeDelete != null) {
-      widget.onBeforeDelete!();
-    }
-
-    final response = await IllustrationsActions.deleteOne(
-      illustrationId: illus.id,
-    );
-
-    if (widget.onAfterDelete != null) {
-      widget.onAfterDelete!(response);
-    }
-  }
-
-  void showAddToBook() {
-    int flex =
-        MediaQuery.of(context).size.width < Constants.maxMobileWidth ? 5 : 3;
-
-    showCustomModalBottomSheet(
-      context: context,
-      builder: (context) => UserBooks(
-        scrollController: ModalScrollController.of(context),
-        illustration: widget.illustration,
-      ),
-      containerWidget: (context, animation, child) {
-        return SafeArea(
-          child: Row(
-            children: [
-              Spacer(),
-              Expanded(
-                flex: flex,
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Material(
-                    clipBehavior: Clip.antiAlias,
-                    borderRadius: BorderRadius.circular(12.0),
-                    child: child,
-                  ),
-                ),
-              ),
-              Spacer(),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void removeFromBook() {
-    if (widget.onRemove != null) {
-      widget.onRemove!(widget.illustration);
-    }
   }
 }

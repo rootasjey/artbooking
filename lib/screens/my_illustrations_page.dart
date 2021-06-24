@@ -2,15 +2,20 @@ import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/illustration_card.dart';
 import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/popup_menu_item_icon.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
+import 'package:artbooking/components/user_books.dart';
 import 'package:artbooking/screens/illustration_page.dart';
 import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
+import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
+import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -37,12 +42,26 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
 
   final illustrationsList = <Illustration>[];
   final keyboardFocusNode = FocusNode();
+  final _keyboardFocusNode = FocusNode();
 
   int limit = 20;
 
   Map<String?, Illustration> multiSelectedItems = Map();
 
   ScrollController scrollController = ScrollController();
+
+  final List<PopupMenuEntry<BookItemAction>> popupMenuEntries = [
+    PopupMenuItemIcon(
+      value: BookItemAction.addToBook,
+      icon: Icon(UniconsLine.book_medical),
+      textLabel: "add_to_book".tr(),
+    ),
+    PopupMenuItemIcon(
+      value: BookItemAction.delete,
+      icon: Icon(UniconsLine.trash),
+      textLabel: "delete".tr(),
+    ),
+  ];
 
   @override
   initState() {
@@ -153,10 +172,8 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
       return Container();
     }
 
-    final buttonColor = Colors.black38;
-
     final multiSelectColor =
-        forceMultiSelect ? stateColors.primary : buttonColor;
+        forceMultiSelect ? stateColors.primary : Colors.black38;
 
     return Wrap(
       spacing: 12.0,
@@ -178,7 +195,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
             ),
             side: BorderSide(
               width: 2.0,
-              color: buttonColor.withOpacity(0.2),
+              color: Colors.black38.withOpacity(0.2),
             ),
             padding: const EdgeInsets.symmetric(
               horizontal: 28.0,
@@ -186,26 +203,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
             ),
           ),
         ),
-        OutlinedButton.icon(
-          onPressed: () {},
-          icon: Icon(UniconsLine.sort),
-          label: Text("sort".tr()),
-          style: OutlinedButton.styleFrom(
-            primary: Colors.black38,
-            shape: RoundedRectangleBorder(),
-            textStyle: FontsUtils.mainStyle(
-              fontWeight: FontWeight.w600,
-            ),
-            side: BorderSide(
-              width: 2.0,
-              color: buttonColor.withOpacity(0.2),
-            ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 28.0,
-              vertical: 18.0,
-            ),
-          ),
-        ),
+        sortButton(),
       ],
     );
   }
@@ -287,24 +285,13 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
             final selected = multiSelectedItems.containsKey(illustration.id);
 
             return IllustrationCard(
+              index: index,
               illustration: illustration,
               selected: selected,
               selectionMode: selectionMode,
               onTap: () => onTapIllustrationCard(illustration),
-              onBeforeDelete: () {
-                setState(() {
-                  illustrationsList.removeAt(index);
-                });
-              },
-              onAfterDelete: (response) {
-                if (response.success) {
-                  return;
-                }
-
-                setState(() {
-                  illustrationsList.insert(index, illustration);
-                });
-              },
+              onPopupMenuItemSelected: onPopupMenuItemSelected,
+              popupMenuEntries: popupMenuEntries,
               onLongPress: (selected) {
                 if (selected) {
                   setState(() {
@@ -374,7 +361,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
           label: Text("select_all".tr()),
         ),
         TextButton.icon(
-          onPressed: confirmDeletion,
+          onPressed: confirmSelectionDeletion,
           style: TextButton.styleFrom(
             primary: Colors.red,
           ),
@@ -385,7 +372,30 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     );
   }
 
-  void confirmDeletion() async {
+  Widget sortButton() {
+    return OutlinedButton.icon(
+      onPressed: () {},
+      icon: Icon(UniconsLine.sort),
+      label: Text("sort".tr()),
+      style: OutlinedButton.styleFrom(
+        primary: Colors.black38,
+        shape: RoundedRectangleBorder(),
+        textStyle: FontsUtils.mainStyle(
+          fontWeight: FontWeight.w600,
+        ),
+        side: BorderSide(
+          width: 2.0,
+          color: Colors.black38.withOpacity(0.2),
+        ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 28.0,
+          vertical: 18.0,
+        ),
+      ),
+    );
+  }
+
+  void confirmSelectionDeletion() async {
     showCustomModalBottomSheet(
       context: context,
       builder: (context) {
@@ -652,5 +662,147 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     setState(() {
       multiSelectedItems.putIfAbsent(illustration.id, () => illustration);
     });
+  }
+
+  void onPopupMenuItemSelected(
+    BookItemAction action,
+    int index,
+    Illustration illustration,
+  ) {
+    switch (action) {
+      case BookItemAction.delete:
+        confirmBookDeletion(illustration, index);
+        break;
+      case BookItemAction.addToBook:
+        showAddToBook(illustration);
+        break;
+      default:
+        break;
+    }
+  }
+
+  void confirmBookDeletion(Illustration illustration, int index) async {
+    showCustomModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Material(
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: Text(
+                    "delete".tr(),
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  trailing: Icon(
+                    UniconsLine.check,
+                    color: Colors.white,
+                  ),
+                  tileColor: Color(0xfff55c5c),
+                  onTap: () {
+                    context.router.pop();
+                    deleteIllustration(illustration, index);
+                  },
+                ),
+                ListTile(
+                  title: Text("cancel".tr()),
+                  trailing: Icon(UniconsLine.times),
+                  onTap: context.router.pop,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      containerWidget: (context, animation, child) {
+        return RawKeyboardListener(
+          autofocus: true,
+          focusNode: _keyboardFocusNode,
+          onKey: (keyEvent) {
+            if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
+              Navigator.of(context).pop();
+              deleteIllustration(illustration, index);
+            }
+          },
+          child: SafeArea(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: 500.0,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                    vertical: 40.0,
+                  ),
+                  child: Material(
+                    clipBehavior: Clip.antiAlias,
+                    borderRadius: BorderRadius.circular(12.0),
+                    child: child,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void deleteIllustration(Illustration illustration, int index) async {
+    setState(() {
+      illustrationsList.removeAt(index);
+    });
+
+    final response = await IllustrationsActions.deleteOne(
+      illustrationId: illustration.id,
+    );
+
+    if (response.success) {
+      return;
+    }
+
+    setState(() {
+      illustrationsList.insert(index, illustration);
+    });
+  }
+
+  void showAddToBook(Illustration illustration) {
+    int flex =
+        MediaQuery.of(context).size.width < Constants.maxMobileWidth ? 5 : 3;
+
+    showCustomModalBottomSheet(
+      context: context,
+      builder: (context) => UserBooks(
+        scrollController: ModalScrollController.of(context),
+        illustration: illustration,
+      ),
+      containerWidget: (context, animation, child) {
+        return SafeArea(
+          child: Row(
+            children: [
+              Spacer(),
+              Expanded(
+                flex: flex,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Material(
+                    clipBehavior: Clip.antiAlias,
+                    borderRadius: BorderRadius.circular(12.0),
+                    child: child,
+                  ),
+                ),
+              ),
+              Spacer(),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

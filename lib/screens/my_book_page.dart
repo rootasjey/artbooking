@@ -1,13 +1,18 @@
 import 'package:artbooking/actions/books.dart';
+import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/illustration_card.dart';
 import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/popup_menu_item_icon.dart';
+import 'package:artbooking/components/user_books.dart';
 import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/types/book.dart';
+import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
+import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:auto_route/auto_route.dart';
@@ -44,7 +49,7 @@ class _MyBookPageState extends State<MyBookPage> {
   bool forceMultiSelect = false;
 
   final illustrations = <Illustration>[];
-  final keyboardFocusNode = FocusNode();
+  final _keyboardFocusNode = FocusNode();
 
   int limit = 20;
   int startIndex = 0;
@@ -54,6 +59,19 @@ class _MyBookPageState extends State<MyBookPage> {
   Map<int, Illustration> processingIllus = Map();
 
   ScrollController scrollController = ScrollController();
+
+  final List<PopupMenuEntry<BookItemAction>> popupMenuEntries = [
+    PopupMenuItemIcon(
+      value: BookItemAction.addToBook,
+      icon: Icon(UniconsLine.book_medical),
+      textLabel: "add_to_book".tr(),
+    ),
+    PopupMenuItemIcon(
+      value: BookItemAction.removeFromBook,
+      icon: Icon(UniconsLine.image_minus),
+      textLabel: "remove".tr(),
+    ),
+  ];
 
   @override
   initState() {
@@ -352,21 +370,8 @@ class _MyBookPageState extends State<MyBookPage> {
               illustration: illustration,
               selected: selected,
               selectionMode: selectionMode,
-              type: IllustrationCardType.book,
-              onBeforeDelete: () {
-                setState(() {
-                  illustrations.removeAt(index);
-                });
-              },
-              onAfterDelete: (response) {
-                if (response.success) {
-                  return;
-                }
-
-                setState(() {
-                  illustrations.insert(index, illustration);
-                });
-              },
+              onPopupMenuItemSelected: onPopupMenuItemSelected,
+              popupMenuEntries: popupMenuEntries,
               onLongPress: (selected) {
                 if (selected) {
                   setState(() {
@@ -379,12 +384,6 @@ class _MyBookPageState extends State<MyBookPage> {
                   multiSelectedItems.putIfAbsent(
                       illustration.id, () => illustration);
                 });
-              },
-              onRemove: (_) {
-                onRemoveFromBook(
-                  index: index,
-                  illustration: illustration,
-                );
               },
             );
           },
@@ -442,7 +441,7 @@ class _MyBookPageState extends State<MyBookPage> {
           label: Text('select_all'.tr()),
         ),
         TextButton.icon(
-          onPressed: confirmDeletion,
+          onPressed: confirmSelectionDeletion,
           style: TextButton.styleFrom(
             primary: Colors.red,
           ),
@@ -453,7 +452,98 @@ class _MyBookPageState extends State<MyBookPage> {
     );
   }
 
-  void confirmDeletion() async {
+  void confirmBookDeletion(Illustration illustration, int index) async {
+    showCustomModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Material(
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: Text(
+                    "delete".tr(),
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  trailing: Icon(
+                    UniconsLine.check,
+                    color: Colors.white,
+                  ),
+                  tileColor: Color(0xfff55c5c),
+                  onTap: () {
+                    context.router.pop();
+                    deleteIllustration(illustration, index);
+                  },
+                ),
+                ListTile(
+                  title: Text("cancel".tr()),
+                  trailing: Icon(UniconsLine.times),
+                  onTap: context.router.pop,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      containerWidget: (context, animation, child) {
+        return RawKeyboardListener(
+          autofocus: true,
+          focusNode: _keyboardFocusNode,
+          onKey: (keyEvent) {
+            if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
+              Navigator.of(context).pop();
+              deleteIllustration(illustration, index);
+            }
+          },
+          child: SafeArea(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: 500.0,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                    vertical: 40.0,
+                  ),
+                  child: Material(
+                    clipBehavior: Clip.antiAlias,
+                    borderRadius: BorderRadius.circular(12.0),
+                    child: child,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void deleteIllustration(Illustration illustration, int index) async {
+    setState(() {
+      illustrations.removeAt(index);
+    });
+
+    final response = await IllustrationsActions.deleteOne(
+      illustrationId: illustration.id,
+    );
+
+    if (response.success) {
+      return;
+    }
+
+    setState(() {
+      illustrations.insert(index, illustration);
+    });
+  }
+
+  void confirmSelectionDeletion() async {
     showCustomModalBottomSheet(
       context: context,
       builder: (context) {
@@ -493,7 +583,7 @@ class _MyBookPageState extends State<MyBookPage> {
       containerWidget: (context, animation, child) {
         return RawKeyboardListener(
           autofocus: true,
-          focusNode: keyboardFocusNode,
+          focusNode: _keyboardFocusNode,
           onKey: (keyEvent) {
             if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
               Navigator.of(context).pop();
@@ -694,7 +784,10 @@ class _MyBookPageState extends State<MyBookPage> {
     }
   }
 
-  void onRemoveFromBook({required int index, required Illustration illustration}) async {
+  void onRemoveFromBook({
+    required int index,
+    required Illustration illustration,
+  }) async {
     processingIllus.putIfAbsent(index, () => illustration);
     illustrations.removeAt(index);
 
@@ -763,5 +856,61 @@ class _MyBookPageState extends State<MyBookPage> {
     setState(() {
       multiSelectedItems.putIfAbsent(illustration.id, () => illustration);
     });
+  }
+
+  void onPopupMenuItemSelected(
+    BookItemAction action,
+    int index,
+    Illustration illustration,
+  ) {
+    switch (action) {
+      case BookItemAction.delete:
+        confirmBookDeletion(illustration, index);
+        break;
+      case BookItemAction.addToBook:
+        showAddToBook(illustration);
+        break;
+      case BookItemAction.removeFromBook:
+        onRemoveFromBook(
+          index: index,
+          illustration: illustration,
+        );
+        break;
+      default:
+    }
+  }
+
+  void showAddToBook(Illustration illustration) {
+    int flex =
+        MediaQuery.of(context).size.width < Constants.maxMobileWidth ? 5 : 3;
+
+    showCustomModalBottomSheet(
+      context: context,
+      builder: (context) => UserBooks(
+        scrollController: ModalScrollController.of(context),
+        illustration: illustration,
+      ),
+      containerWidget: (context, animation, child) {
+        return SafeArea(
+          child: Row(
+            children: [
+              Spacer(),
+              Expanded(
+                flex: flex,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Material(
+                    clipBehavior: Clip.antiAlias,
+                    borderRadius: BorderRadius.circular(12.0),
+                    child: child,
+                  ),
+                ),
+              ),
+              Spacer(),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

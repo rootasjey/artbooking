@@ -52,6 +52,18 @@ enum AppBarSettings {
   fr,
 }
 
+/// Actions for a book item.
+enum BookItemAction {
+  /// Add this illustration to a book.
+  addToBook,
+
+  /// Delete this illustration from database.
+  delete,
+
+  /// Remove this illustration from a book.
+  removeFromBook,
+}
+
 enum BookLayout {
   /// Display illustrations on a grid with a size adapted to the aspect ratio
   /// of each illustration's dimensions.
