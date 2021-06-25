@@ -130,7 +130,7 @@ class Illustration {
     );
   }
 
-  String? getHDThumbnail() {
+  String getHDThumbnail() {
     final t720 = urls.thumbnails.t720;
     if (t720.isNotEmpty) {
       return t720;
@@ -144,7 +144,7 @@ class Illustration {
     return urls.original;
   }
 
-  String? getThumbnail() {
+  String getThumbnail() {
     final t360 = urls.thumbnails.t360;
     if (t360.isNotEmpty) {
       return t360;
