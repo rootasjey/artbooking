@@ -65,6 +65,13 @@ class _IllustrationCardState extends State<IllustrationCard>
   double _endElevation = 6.0;
   double _elevation = 4.0;
 
+  /// Default thumbnail URL
+  /// if no URL has been set (should be rare).
+  static String _noImageThumbnailUrl = "https://firebasestorage.googleapis.com/"
+      "v0/b/artbooking-54d22.appspot.com/o/"
+      "static%2Ficons%2Fno_image_1024.png"
+      "?alt=media&token=198de6bd-882b-4174-83ec-e31e3e1c9fd6";
+
   @override
   void initState() {
     super.initState();
@@ -82,6 +89,14 @@ class _IllustrationCardState extends State<IllustrationCard>
   Widget build(BuildContext context) {
     final illustration = widget.illustration;
 
+    String imageUrl = illustration.getThumbnail();
+    Color defaultColor = Colors.transparent;
+
+    if (illustration.getThumbnail().isEmpty) {
+      imageUrl = _noImageThumbnailUrl;
+      defaultColor = Colors.black87;
+    }
+
     return Hero(
       tag: illustration.id,
       child: SizedBox(
@@ -90,18 +105,14 @@ class _IllustrationCardState extends State<IllustrationCard>
         child: ScaleTransition(
           scale: _scaleAnimation,
           child: Card(
-            color: widget.selected
-                ? stateColors.primary
-                : ThemeData().cardTheme.color,
+            color: widget.selected ? stateColors.primary : defaultColor,
             elevation: _elevation,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16.0),
             ),
             clipBehavior: Clip.antiAlias,
             child: Ink.image(
-              image: NetworkImage(
-                illustration.getThumbnail()!,
-              ),
+              image: NetworkImage(imageUrl),
               fit: BoxFit.cover,
               child: InkWell(
                 onTap: widget.onTap,
