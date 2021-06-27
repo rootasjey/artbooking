@@ -86,7 +86,7 @@ class _IllustrationCardState extends State<IllustrationCard>
       _elevation = _startElevation;
     });
 
-    checkUrls();
+    checkProperties();
   }
 
   @override
@@ -228,7 +228,7 @@ class _IllustrationCardState extends State<IllustrationCard>
   /// If all thumbnails' urls are empty,
   /// try retrieve the urls from Firebase Storage
   /// and set them to the Firestore document.
-  void checkUrls() async {
+  void checkProperties() async {
     final illustration = widget.illustration;
     final thumbnailUrl = illustration.getThumbnail();
 
@@ -237,7 +237,7 @@ class _IllustrationCardState extends State<IllustrationCard>
     }
 
     try {
-      await IllustrationsActions.checkUrls(
+      await IllustrationsActions.checkProperties(
         illustrationId: illustration.id,
       );
     } catch (error) {

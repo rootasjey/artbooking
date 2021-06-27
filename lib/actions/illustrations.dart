@@ -9,14 +9,15 @@ import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class IllustrationsActions {
-  /// Call this method if an illustration's thumbnail url is empty.
-  /// It may be due to a cloud function execution error.
-  /// This call will try to set the urls again.
-  static Future<CheckUrlsOpResp> checkUrls({
+  /// Check an illustration document in Firestore from its id [illustrationId].
+  /// If the document has missing properties, try to populate them from storage file.
+  /// If there's no corresponding storage file, delete the firestore document.
+  /// (The missing values may be due to a cloud function execution error)
+  static Future<CheckUrlsOpResp> checkProperties({
     required String illustrationId,
   }) async {
     try {
-      final response = await Cloud.fun('illustrations-checkUrls').call({
+      final response = await Cloud.fun('illustrations-checkProperties').call({
         'illustrationId': illustrationId,
       });
 
