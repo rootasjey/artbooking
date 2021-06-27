@@ -526,6 +526,7 @@
   "security_checks": "Vérifications de sécurité",
   "security_checks_description": "Déployé en HTTPS (chiffrement) et tests de vulnérabilités.",
   "see_you": "Nous espérons vous revoir à nouveau 👋",
+  "select_all": "Sélectionner tout",
   "send": "Envoyer",
   "sending_message": "Envoie de votre message...",
   "send_app": "Envoyer la proposition",
