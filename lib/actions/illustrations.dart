@@ -1,3 +1,4 @@
+import 'package:artbooking/types/check_thumbnail_op_resp.dart';
 import 'package:artbooking/types/many_illus_op_resp.dart';
 import 'package:artbooking/types/one_illus_op_resp.dart';
 import 'package:artbooking/types/enums.dart';
@@ -8,6 +9,27 @@ import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class IllustrationsActions {
+  /// Call this method if an illustration's thumbnail url is empty.
+  /// It may be due to a cloud function execution error.
+  /// This call will try to set the urls again.
+  static Future<CheckUrlsOpResp> checkUrls({
+    required String illustrationId,
+  }) async {
+    try {
+      final response = await Cloud.fun('illustrations-checkUrls').call({
+        'illustrationId': illustrationId,
+      });
+
+      return CheckUrlsOpResp.fromJSON(response.data);
+    } on FirebaseFunctionsException catch (exception) {
+      appLogger.e(exception);
+      return CheckUrlsOpResp.fromException(exception);
+    } catch (error) {
+      appLogger.e(error);
+      return CheckUrlsOpResp.fromMessage(error.toString());
+    }
+  }
+
   static Future<OneIllusOpResp> createOne({
     required String name,
     ContentVisibility visibility = ContentVisibility.private,
