@@ -84,6 +84,10 @@ enum LicenseFrom {
   author = 'author',
 }
 
+interface CheckUrlsParams {
+  illustrationId: string;
+}
+
 interface CreateUserAccountParams {
   email: string;
   password: string;
@@ -167,9 +171,19 @@ interface GenerateImageThumbsResult {
   thumbnails: ThumbnailUrls;
 }
 
+/** Image's size, orientation & extension. */
 interface ImageDimensions {
-  height: number;
-  width: number;
+  /** Image's height. */
+  height?: number;
+
+  /** Image orientation. */
+  orientation?: number;
+  
+  /** Image's extension. */
+  type?: string;
+  
+  /** Image's width. */
+  width?: number;
 }
 
 /** Illustration's license. */

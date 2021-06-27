@@ -2,13 +2,16 @@ import { Storage } from '@google-cloud/storage';
 import * as functions from 'firebase-functions';
 // @ts-ignore
 import * as fs  from 'fs-extra';
-const sizeOf = require('image-size');
+import sizeOf = require('image-size');
 import { tmpdir } from 'os';
 import { join, dirname } from 'path';
 import * as sharp from 'sharp';
 
 import { adminApp } from './adminApp';
 import { allowedLicenseFromValues, cloudRegions } from './utils';
+
+import https = require('https');
+import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 
 const firestore = adminApp.firestore();
 const gcs = new Storage();
@@ -20,6 +23,137 @@ interface GenerateImageThumbsParams {
   objectMeta: functions.storage.ObjectMetadata;
   visibility: string;
 }
+
+/**
+ * Check an illustration document in Firestore from its id [illustrationId].
+ * If the document has missing urls, try to populate them from storage file.
+ * If there's no corresponding storage file, delete the firestore document.
+ */
+export const checkUrls = functions
+  .region(cloudRegions.eu)
+  .https
+  .onCall(async (params: CheckUrlsParams, context) => {
+    const userAuth = context.auth;
+    const { illustrationId } = params;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
+    }
+
+    if (typeof illustrationId !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called with a valid [illustrationId] argument (string)
+         which is the illustration's id to delete.`,
+      );
+    }
+
+    const illustrationSnap = await firestore
+      .collection('illustrations')
+      .doc(illustrationId)
+      .get();
+
+    const illustrationData = illustrationSnap.data();
+
+    if (!illustrationSnap.exists || !illustrationData) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        `The illustration id [${illustrationId}] doesn't exist.`,
+      );
+    }
+
+    const urls = illustrationData.urls;
+    const illusDataWidth = illustrationData.dimensions.width;
+    const illusDataHeight = illustrationData.dimensions.height;
+
+    const dimensionsAreNumbers = typeof illusDataWidth === 'number' && typeof illusDataHeight === 'number';
+    const dimensionsAreStrictlyPositive = illusDataWidth > 0 && illusDataHeight > 0;
+    const dimensionsAreOK = dimensionsAreNumbers && dimensionsAreStrictlyPositive;
+
+    if (urls.original && urls.storage && dimensionsAreOK) {
+      return {
+        success: false,
+        message: `Nothing to change. Everything is up-to-date.`,
+        illustration: {
+          id: illustrationId,
+        },
+      };
+    }
+
+    const dir = await adminApp.storage()
+      .bucket()
+      .getFiles({
+        directory: `users/${userAuth.uid}/illustrations/${illustrationId}`
+      });
+
+    let storagePath: string = '';
+    const files = dir[0];
+
+    if (!files || files.length === 0) {
+      await illustrationSnap.ref.delete();
+
+      return {
+        success: false,
+        illustration: {
+          id: illustrationId,
+        },
+      };
+    }
+
+    const firstFile = files[0];
+    const [metadata] = await firstFile.getMetadata();
+
+    const thumbnails: ThumbnailUrls = {
+      t1080: '',
+      t1920: '',
+      t2400: '',
+      t360: '',
+      t480: '',
+      t720: '',
+    };
+
+    /** Image's original url from Firebase Storage. */
+    let originalUrl = '';
+
+    for await (const file of files) {
+      const atIndex = file.name.lastIndexOf('@');
+      const dotIndex = file.name.lastIndexOf('.');
+      const sizeStr = file.name.substring(atIndex + 1, dotIndex);
+
+      if (atIndex > -1) { // thumbnails
+        thumbnails[`t${sizeStr}`] = file.publicUrl();
+      } else { // original image
+        originalUrl = file.publicUrl();
+        storagePath = file.name || '';
+      }
+    }
+
+    const { height, width, type: extension } = await getDimensionsFromUrl(originalUrl);
+
+    await illustrationSnap.ref.update({
+      dimensions: {
+        height: height,
+        width: width,
+      },
+      extension: extension,
+      size: parseFloat(metadata.size),
+      urls: {
+        original: originalUrl,
+        storage: storagePath,
+        thumbnails,
+      },
+    });
+
+    return {
+      success: true,
+      illustration: {
+        id: illustrationId,
+      },
+    };
+  });
 
 /**
  * Create a new document with predefined values.
@@ -341,7 +475,7 @@ export const onStorageUpload = functions
       .file(storageUrl);
 
     if (!await imageFile.exists()) {
-      console.log('file does not exist')
+      console.error('file does not exist')
       return;
     }
 
@@ -1098,11 +1232,11 @@ async function generateImageThumbs(
     destination: tmpFilePath,
   });
 
-  // 2.1. Trye calculate dimensions.
-  let dimensions = { height: 0, width: 0 };
+  // 2.1. Try calculate dimensions.
+  let dimensions: ISizeCalculationResult = { height: 0, width: 0 };
 
   try {
-    dimensions = sizeOf(tmpFilePath);
+    dimensions = sizeOf.imageSize(tmpFilePath);
   } catch (error) {
     console.error(error);
   }
@@ -1146,4 +1280,38 @@ async function generateImageThumbs(
   }
 
   return { dimensions, thumbnails };
+}
+
+/**
+ * Return a image's dimensions & extension.
+ * @param url Image's string to fetch.
+ * @returns An object containing the image's dimensions & extension.
+ */
+async function getDimensionsFromUrl(url: string): Promise<ISizeCalculationResult> {
+  return new Promise((resolve) => {
+    const options = new URL(url);
+
+    https.get(options, function (response) {
+      const chunks: any[] = [];
+      let chunksLength = 0;
+
+      response.on('data', function (chunk) {
+        chunks.push(chunk)
+        chunksLength += chunk.length;
+
+        if (chunksLength > 1000) {
+          response.destroy();
+        }
+      }).on('end', function () {
+        const buffer = Buffer.concat(chunks);
+
+        try {
+          resolve(sizeOf.imageSize(buffer));
+        } catch (error) {
+          console.error(error);
+          resolve({ height: 0, width: 0 });
+        }
+      });
+    });
+  })
 }
