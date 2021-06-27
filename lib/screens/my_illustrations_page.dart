@@ -297,12 +297,15 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
                   setState(() {
                     multiSelectedItems.remove(illustration.id);
                   });
+
                   return;
                 }
 
                 setState(() {
                   multiSelectedItems.putIfAbsent(
-                      illustration.id, () => illustration);
+                    illustration.id,
+                    () => illustration,
+                  );
                 });
               },
             );

@@ -3,26 +3,26 @@ import 'package:artbooking/types/user/partial_user.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class OneIllusOpResp {
-  bool success;
-  final String? illustrationId;
+  final bool success;
+  final String illustrationId;
   final String message;
-  final CloudFuncError? error;
-  final PartialUser? user;
+  final CloudFuncError error;
+  final PartialUser user;
 
   OneIllusOpResp({
-    this.illustrationId = '',
-    this.success = true,
+    required this.illustrationId,
+    required this.success,
     this.message = '',
-    this.error,
-    this.user,
+    required this.error,
+    required this.user,
   });
 
   factory OneIllusOpResp.empty({bool success = false}) {
     return OneIllusOpResp(
       success: success,
       illustrationId: '',
-      error: CloudFuncError(),
-      user: PartialUser(),
+      error: CloudFuncError.empty(),
+      user: PartialUser.empty(),
     );
   }
 
@@ -36,19 +36,11 @@ class OneIllusOpResp {
   }
 
   factory OneIllusOpResp.fromJSON(Map<dynamic, dynamic> data) {
-    final _user = data['user'] != null
-        ? PartialUser.fromJSON(data['user'])
-        : PartialUser();
-
-    final _error = data['error'] != null
-        ? CloudFuncError.fromJSON(data['error'])
-        : CloudFuncError();
-
     return OneIllusOpResp(
       illustrationId: data['illustrationId'],
       success: data['success'] ?? true,
-      user: _user,
-      error: _error,
+      user: PartialUser.fromJSON(data['user']),
+      error: CloudFuncError.fromJSON(data['error']),
     );
   }
 

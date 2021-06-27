@@ -25,7 +25,7 @@ import 'package:unicons/unicons.dart';
 
 class IllustrationPage extends StatefulWidget {
   /// Illustration's id, used if direct navigation by url.
-  final String? illustrationId;
+  final String illustrationId;
 
   /// Illustration object, used if navigation from a previous page.
   final Illustration? illustration;
@@ -35,7 +35,7 @@ class IllustrationPage extends StatefulWidget {
 
   const IllustrationPage({
     Key? key,
-    @PathParam() this.illustrationId,
+    @PathParam('illustrationId') required this.illustrationId,
     this.illustration,
     this.fromDashboard = false,
   }) : super(key: key);
@@ -454,12 +454,12 @@ class _IllustrationPageState extends State<IllustrationPage> {
             IconButton(
               tooltip: "like".tr(),
               icon: Icon(UniconsLine.heart),
-              onPressed: () {},
+              onPressed: like,
             ),
             IconButton(
               tooltip: "share".tr(),
               icon: Icon(UniconsLine.share),
-              onPressed: () {},
+              onPressed: share,
             ),
             IconButton(
               tooltip: "edit".tr(),
@@ -661,4 +661,8 @@ class _IllustrationPageState extends State<IllustrationPage> {
 
     fetchIllustration(silent: true);
   }
+
+  void like() async {}
+
+  void share() async {}
 }
