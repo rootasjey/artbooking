@@ -14,7 +14,9 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/utils/shortcut_intents.dart';
 import 'package:artbooking/utils/snack.dart';
+import 'package:artbooking/utils/validation_shortcuts.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -31,26 +33,18 @@ class MyIllustrationsPage extends StatefulWidget {
 }
 
 class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
-  late bool isLoading;
-  bool descending = true;
-  bool hasNext = true;
-  bool isFabVisible = false;
-  bool isLoadingMore = false;
-  bool forceMultiSelect = false;
+  late bool _isLoading;
+  bool _descending = true;
+  bool _hasNext = true;
+  bool _isFabVisible = false;
+  bool _isLoadingMore = false;
+  bool _forceMultiSelect = false;
 
-  DocumentSnapshot? lastDoc;
+  DocumentSnapshot? _lastFirestoreDoc;
 
-  final illustrationsList = <Illustration>[];
-  final keyboardFocusNode = FocusNode();
-  final _keyboardFocusNode = FocusNode();
+  final _illustrationsList = <Illustration>[];
 
-  int limit = 20;
-
-  Map<String?, Illustration> multiSelectedItems = Map();
-
-  ScrollController scrollController = ScrollController();
-
-  final List<PopupMenuEntry<BookItemAction>> popupMenuEntries = [
+  final List<PopupMenuEntry<BookItemAction>> _popupMenuEntries = [
     PopupMenuItemIcon(
       value: BookItemAction.addToBook,
       icon: Icon(UniconsLine.book_medical),
@@ -62,6 +56,12 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
       textLabel: "delete".tr(),
     ),
   ];
+
+  int _limit = 20;
+
+  Map<String?, Illustration> _multiSelectedItems = Map();
+
+  ScrollController _scrollController = ScrollController();
 
   @override
   initState() {
@@ -76,7 +76,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
       body: NotificationListener<ScrollNotification>(
         onNotification: onNotification,
         child: CustomScrollView(
-          controller: scrollController,
+          controller: _scrollController,
           slivers: <Widget>[
             SliverEdgePadding(),
             MainAppBar(),
@@ -94,7 +94,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   }
 
   Widget fab() {
-    if (!isFabVisible) {
+    if (!_isFabVisible) {
       return FloatingActionButton(
         onPressed: fetch,
         backgroundColor: stateColors.primary,
@@ -105,7 +105,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
 
     return FloatingActionButton(
       onPressed: () {
-        scrollController.animateTo(
+        _scrollController.animateTo(
           0.0,
           duration: 1.seconds,
           curve: Curves.easeOut,
@@ -147,7 +147,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   }
 
   Widget body() {
-    if (isLoading) {
+    if (_isLoading) {
       return SliverList(
         delegate: SliverChildListDelegate.fixed([
           Padding(
@@ -160,7 +160,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
       );
     }
 
-    if (illustrationsList.isEmpty) {
+    if (_illustrationsList.isEmpty) {
       return emptyView();
     }
 
@@ -168,12 +168,12 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   }
 
   Widget defaultActionsToolbar() {
-    if (multiSelectedItems.isNotEmpty) {
+    if (_multiSelectedItems.isNotEmpty) {
       return Container();
     }
 
     final multiSelectColor =
-        forceMultiSelect ? stateColors.primary : Colors.black38;
+        _forceMultiSelect ? stateColors.primary : Colors.black38;
 
     return Wrap(
       spacing: 12.0,
@@ -182,7 +182,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
         OutlinedButton.icon(
           onPressed: () {
             setState(() {
-              forceMultiSelect = !forceMultiSelect;
+              _forceMultiSelect = !_forceMultiSelect;
             });
           },
           icon: Icon(UniconsLine.layers_alt),
@@ -269,7 +269,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   }
 
   Widget gridView() {
-    final selectionMode = forceMultiSelect || multiSelectedItems.isNotEmpty;
+    final selectionMode = _forceMultiSelect || _multiSelectedItems.isNotEmpty;
 
     return SliverPadding(
       padding: const EdgeInsets.all(40.0),
@@ -281,8 +281,8 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
         ),
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            final illustration = illustrationsList.elementAt(index);
-            final selected = multiSelectedItems.containsKey(illustration.id);
+            final illustration = _illustrationsList.elementAt(index);
+            final selected = _multiSelectedItems.containsKey(illustration.id);
 
             return IllustrationCard(
               index: index,
@@ -291,18 +291,18 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
               selectionMode: selectionMode,
               onTap: () => onTapIllustrationCard(illustration),
               onPopupMenuItemSelected: onPopupMenuItemSelected,
-              popupMenuEntries: popupMenuEntries,
+              popupMenuEntries: _popupMenuEntries,
               onLongPress: (selected) {
                 if (selected) {
                   setState(() {
-                    multiSelectedItems.remove(illustration.id);
+                    _multiSelectedItems.remove(illustration.id);
                   });
 
                   return;
                 }
 
                 setState(() {
-                  multiSelectedItems.putIfAbsent(
+                  _multiSelectedItems.putIfAbsent(
                     illustration.id,
                     () => illustration,
                   );
@@ -310,14 +310,14 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
               },
             );
           },
-          childCount: illustrationsList.length,
+          childCount: _illustrationsList.length,
         ),
       ),
     );
   }
 
   Widget multiSelectToolbar() {
-    if (multiSelectedItems.isEmpty) {
+    if (_multiSelectedItems.isEmpty) {
       return Container();
     }
 
@@ -328,7 +328,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
           opacity: 0.6,
           child: Text(
             "multi_items_selected"
-                .tr(args: [multiSelectedItems.length.toString()]),
+                .tr(args: [_multiSelectedItems.length.toString()]),
             style: TextStyle(
               fontSize: 30.0,
             ),
@@ -345,7 +345,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
         TextButton.icon(
           onPressed: () {
             setState(() {
-              multiSelectedItems.clear();
+              _multiSelectedItems.clear();
             });
           },
           icon: Icon(Icons.border_clear),
@@ -353,8 +353,8 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
         ),
         TextButton.icon(
           onPressed: () {
-            illustrationsList.forEach((illustration) {
-              multiSelectedItems.putIfAbsent(
+            _illustrationsList.forEach((illustration) {
+              _multiSelectedItems.putIfAbsent(
                   illustration.id, () => illustration);
             });
 
@@ -421,14 +421,14 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
                   ),
                   tileColor: Color(0xfff55c5c),
                   onTap: () {
-                    Navigator.of(context).pop();
+                    context.router.pop();
                     deleteSelection();
                   },
                 ),
                 ListTile(
                   title: Text("cancel".tr()),
                   trailing: Icon(Icons.close),
-                  onTap: () => Navigator.of(context).pop(),
+                  onTap: context.router.pop,
                 ),
               ],
             ),
@@ -436,31 +436,46 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
         );
       },
       containerWidget: (context, animation, child) {
-        return RawKeyboardListener(
-          autofocus: true,
-          focusNode: keyboardFocusNode,
-          onKey: (keyEvent) {
-            if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
-              Navigator.of(context).pop();
-              deleteSelection();
-            }
+        return Shortcuts(
+          shortcuts: {
+            LogicalKeySet(LogicalKeyboardKey.enter): const EnterIntent(),
+            LogicalKeySet(LogicalKeyboardKey.space): const EnterIntent(),
+            LogicalKeySet(LogicalKeyboardKey.escape): const EscapeIntent(),
           },
-          child: SafeArea(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: 500.0,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 40.0,
-                  ),
-                  child: Material(
-                    clipBehavior: Clip.antiAlias,
-                    borderRadius: BorderRadius.circular(12.0),
-                    child: child,
+          child: Actions(
+            actions: {
+              EnterIntent: CallbackAction<EnterIntent>(
+                onInvoke: (EnterIntent enterIntent) {
+                  context.router.pop();
+                  deleteSelection();
+                },
+              ),
+              EscapeIntent: CallbackAction<EscapeIntent>(
+                onInvoke: (EscapeIntent escapeIntent) {
+                  context.router.pop();
+                },
+              ),
+            },
+            child: Focus(
+              autofocus: true,
+              child: SafeArea(
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: 500.0,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 40.0,
+                      ),
+                      child: Material(
+                        clipBehavior: Clip.antiAlias,
+                        borderRadius: BorderRadius.circular(12.0),
+                        child: child,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -472,16 +487,16 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   }
 
   void deleteSelection() async {
-    multiSelectedItems.entries.forEach((multiSelectItem) {
-      illustrationsList.removeWhere((item) => item.id == multiSelectItem.key);
+    _multiSelectedItems.entries.forEach((multiSelectItem) {
+      _illustrationsList.removeWhere((item) => item.id == multiSelectItem.key);
     });
 
-    final duplicatedItems = multiSelectedItems.values.toList();
-    final illustrationIds = multiSelectedItems.keys.toList();
+    final duplicatedItems = _multiSelectedItems.values.toList();
+    final illustrationIds = _multiSelectedItems.keys.toList();
 
     setState(() {
-      multiSelectedItems.clear();
-      forceMultiSelect = false;
+      _multiSelectedItems.clear();
+      _forceMultiSelect = false;
     });
 
     final response = await IllustrationsActions.deleteMany(
@@ -494,28 +509,28 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
         message: "illustrations_delete_error".tr(),
       );
 
-      illustrationsList.addAll(duplicatedItems);
+      _illustrationsList.addAll(duplicatedItems);
     }
   }
 
   void fetch() async {
     setState(() {
-      isLoading = true;
-      illustrationsList.clear();
+      _isLoading = true;
+      _illustrationsList.clear();
     });
 
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection('illustrations')
           .where('user.id', isEqualTo: stateUser.userAuth!.uid)
-          .orderBy('createdAt', descending: descending)
-          .limit(limit)
+          .orderBy('createdAt', descending: _descending)
+          .limit(_limit)
           .get();
 
       if (snapshot.docs.isEmpty) {
         setState(() {
-          isLoading = false;
-          hasNext = false;
+          _isLoading = false;
+          _hasNext = false;
         });
 
         return;
@@ -525,29 +540,29 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        illustrationsList.add(Illustration.fromJSON(data));
+        _illustrationsList.add(Illustration.fromJSON(data));
       });
 
       setState(() {
-        isLoading = false;
-        lastDoc = snapshot.docs.last;
-        hasNext = snapshot.docs.length == limit;
+        _isLoading = false;
+        _lastFirestoreDoc = snapshot.docs.last;
+        _hasNext = snapshot.docs.length == _limit;
       });
     } catch (error) {
       appLogger.e(error);
 
       setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
     }
   }
 
   void fetchMore() async {
-    if (!hasNext || lastDoc == null) {
+    if (!_hasNext || _lastFirestoreDoc == null) {
       return;
     }
 
-    isLoadingMore = true;
+    _isLoadingMore = true;
 
     try {
       final userAuth = FirebaseAuth.instance.currentUser;
@@ -559,15 +574,15 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
       final snapshot = await FirebaseFirestore.instance
           .collection('illustrations')
           .where('user.id', isEqualTo: userAuth.uid)
-          .orderBy('createdAt', descending: descending)
-          .limit(limit)
-          .startAfterDocument(lastDoc!)
+          .orderBy('createdAt', descending: _descending)
+          .limit(_limit)
+          .startAfterDocument(_lastFirestoreDoc!)
           .get();
 
       if (snapshot.docs.isEmpty) {
         setState(() {
-          hasNext = false;
-          isLoadingMore = false;
+          _hasNext = false;
+          _isLoadingMore = false;
         });
 
         return;
@@ -577,14 +592,14 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        illustrationsList.add(Illustration.fromJSON(data));
+        _illustrationsList.add(Illustration.fromJSON(data));
       });
 
       setState(() {
-        isLoading = false;
-        lastDoc = snapshot.docs.last;
-        hasNext = snapshot.docs.length == limit;
-        isLoadingMore = false;
+        _isLoading = false;
+        _lastFirestoreDoc = snapshot.docs.last;
+        _hasNext = snapshot.docs.length == _limit;
+        _isLoadingMore = false;
       });
     } catch (error) {
       appLogger.e(error);
@@ -593,13 +608,13 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
 
   bool onNotification(ScrollNotification notification) {
     // FAB visibility
-    if (notification.metrics.pixels < 50 && isFabVisible) {
+    if (notification.metrics.pixels < 50 && _isFabVisible) {
       setState(() {
-        isFabVisible = false;
+        _isFabVisible = false;
       });
-    } else if (notification.metrics.pixels > 50 && !isFabVisible) {
+    } else if (notification.metrics.pixels > 50 && !_isFabVisible) {
       setState(() {
-        isFabVisible = true;
+        _isFabVisible = true;
       });
     }
 
@@ -607,7 +622,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
       return false;
     }
 
-    if (hasNext && !isLoadingMore) {
+    if (_hasNext && !_isLoadingMore) {
       fetchMore();
     }
 
@@ -615,7 +630,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   }
 
   void onTapIllustrationCard(Illustration illustration) {
-    if (multiSelectedItems.isEmpty && !forceMultiSelect) {
+    if (_multiSelectedItems.isEmpty && !_forceMultiSelect) {
       navigateToIllustrationPage(illustration);
       return;
     }
@@ -651,19 +666,19 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   }
 
   void multiSelectIllustration(Illustration illustration) {
-    final selected = multiSelectedItems.containsKey(illustration.id);
+    final selected = _multiSelectedItems.containsKey(illustration.id);
 
     if (selected) {
       setState(() {
-        multiSelectedItems.remove(illustration.id);
-        forceMultiSelect = multiSelectedItems.length > 0;
+        _multiSelectedItems.remove(illustration.id);
+        _forceMultiSelect = _multiSelectedItems.length > 0;
       });
 
       return;
     }
 
     setState(() {
-      multiSelectedItems.putIfAbsent(illustration.id, () => illustration);
+      _multiSelectedItems.putIfAbsent(illustration.id, () => illustration);
     });
   }
 
@@ -722,14 +737,11 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
         );
       },
       containerWidget: (context, animation, child) {
-        return RawKeyboardListener(
-          autofocus: true,
-          focusNode: _keyboardFocusNode,
-          onKey: (keyEvent) {
-            if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
-              Navigator.of(context).pop();
-              deleteIllustration(illustration, index);
-            }
+        return ValidationShortcuts(
+          onCancel: context.router.pop,
+          onValidate: () {
+            context.router.pop();
+            deleteIllustration(illustration, index);
           },
           child: SafeArea(
             child: Align(
@@ -759,7 +771,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
 
   void deleteIllustration(Illustration illustration, int index) async {
     setState(() {
-      illustrationsList.removeAt(index);
+      _illustrationsList.removeAt(index);
     });
 
     final response = await IllustrationsActions.deleteOne(
@@ -771,7 +783,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     }
 
     setState(() {
-      illustrationsList.insert(index, illustration);
+      _illustrationsList.insert(index, illustration);
     });
   }
 
