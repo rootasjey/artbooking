@@ -1,6 +1,8 @@
+import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
@@ -83,6 +85,8 @@ class _IllustrationCardState extends State<IllustrationCard>
     setState(() {
       _elevation = _startElevation;
     });
+
+    checkUrls();
   }
 
   @override
@@ -219,5 +223,25 @@ class _IllustrationCardState extends State<IllustrationCard>
         itemBuilder: (_) => widget.popupMenuEntries,
       ),
     );
+  }
+
+  /// If all thumbnails' urls are empty,
+  /// try retrieve the urls from Firebase Storage
+  /// and set them to the Firestore document.
+  void checkUrls() async {
+    final illustration = widget.illustration;
+    final thumbnailUrl = illustration.getThumbnail();
+
+    if (thumbnailUrl.isNotEmpty) {
+      return;
+    }
+
+    try {
+      await IllustrationsActions.checkUrls(
+        illustrationId: illustration.id,
+      );
+    } catch (error) {
+      appLogger.e(error);
+    }
   }
 }
