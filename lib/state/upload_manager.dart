@@ -210,7 +210,7 @@ abstract class UploadManagerBase with Store {
   ) async {
     try {
       final response = await IllustrationsActions.deleteOne(
-        illustrationId: customUploadTaskasync.illustrationId,
+        illustrationId: customUploadTaskasync.illustrationId!,
       );
 
       if (!response.success) {

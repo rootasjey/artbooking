@@ -52,7 +52,7 @@ class IllustrationsActions {
   }
 
   static Future<OneIllusOpResp> deleteOne({
-    /*required*/ required String? illustrationId,
+    required String illustrationId,
   }) async {
     try {
       final response = await Cloud.fun('illustrations-deleteOne').call({
