@@ -337,7 +337,8 @@ export const deleteOne = functions
   });
 
 /**
- * Delete multiple illustrations documents from Firestore and from Cloud Storage.
+ * Delete multiple illustrations documents 
+ * from Firestore and from Cloud Storage.
  */
 export const deleteMany = functions
   .region(cloudRegions.eu)
@@ -377,7 +378,9 @@ export const deleteMany = functions
 
         if (!illustrationSnap.exists || !illustrationData) {
           itemsProcessed.push({
-            illustrationId,
+            illustration: {
+              id: illustrationId,
+            },
             success: false,
             errorMessage,
           });
@@ -393,7 +396,9 @@ export const deleteMany = functions
             to delete the illustration [${illustrationId}].`;
 
           itemsProcessed.push({
-            illustrationId,
+            illustration: {
+              id: illustrationId,
+            },
             success: false,
             errorMessage,
           });
@@ -422,7 +427,9 @@ export const deleteMany = functions
         successCount++;
 
         itemsProcessed.push({
-          illustrationId,
+          illustration: {
+            id: illustrationId,
+          },
           success: true,
         });
 
