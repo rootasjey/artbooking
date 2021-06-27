@@ -22,26 +22,31 @@ class ManyIllusOpResp {
 
   factory ManyIllusOpResp.fromException(FirebaseFunctionsException exception) {
     return ManyIllusOpResp(
+      error: CloudFuncError.fromException(exception),
       hasErrors: true,
       illustrations: [],
-      error: CloudFuncError.fromException(exception),
-      user: PartialUser(),
+      user: PartialUser.empty(),
     );
   }
 
-  factory ManyIllusOpResp.fromJSON(Map<dynamic, dynamic> data) {
-    final _user = data['user'] != null
-        ? PartialUser.fromJSON(data['user'])
-        : PartialUser();
+  factory ManyIllusOpResp.empty() {
+    return ManyIllusOpResp(
+      error: CloudFuncError.empty(),
+      hasErrors: true,
+      illustrations: [],
+      user: PartialUser.empty(),
+    );
+  }
 
-    final _error = data['error'] != null
-        ? CloudFuncError.fromJSON(data['error'])
-        : CloudFuncError();
+  factory ManyIllusOpResp.fromJSON(Map<dynamic, dynamic>? data) {
+    if (data == null) {
+      return ManyIllusOpResp.empty();
+    }
 
     final _illustrations = <ProcessedIllustration>[];
 
     if (data['items'] != null) {
-      for (Map<String, dynamic> item in data['items']) {
+      for (Map<dynamic, dynamic> item in data['items']) {
         _illustrations.add(ProcessedIllustration.fromJSON(item));
       }
     }
@@ -50,8 +55,8 @@ class ManyIllusOpResp {
       illustrations: _illustrations,
       successCount: data['successCount'],
       hasErrors: data['hasErrors'] ?? true,
-      user: _user,
-      error: _error,
+      user: PartialUser.fromJSON(data['user']),
+      error: CloudFuncError.fromJSON(data['error']),
     );
   }
 

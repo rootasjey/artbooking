@@ -1,15 +1,28 @@
+import 'package:artbooking/types/minimal_illustration_resp.dart';
+
 class ProcessedIllustration {
-  final String illustrationId;
+  final MinimalIllustrationResp illustration;
   final bool success;
 
   ProcessedIllustration({
-    this.illustrationId = '',
+    required this.illustration,
     this.success = false,
   });
 
-  factory ProcessedIllustration.fromJSON(Map<String, dynamic> data) {
+  factory ProcessedIllustration.empty() {
     return ProcessedIllustration(
-      illustrationId: data['illustrationId'] ?? '',
+      illustration: MinimalIllustrationResp.empty(),
+      success: true,
+    );
+  }
+
+  factory ProcessedIllustration.fromJSON(Map<dynamic, dynamic>? data) {
+    if (data == null) {
+      return ProcessedIllustration.empty();
+    }
+
+    return ProcessedIllustration(
+      illustration: MinimalIllustrationResp.fromJSON(data['illustration']),
       success: data['success'] ?? false,
     );
   }
