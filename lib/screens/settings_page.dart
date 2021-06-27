@@ -19,7 +19,6 @@ import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/language.dart';
 import 'package:artbooking/utils/snack.dart';
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -35,11 +34,8 @@ import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
 class SettingsPage extends StatefulWidget {
-  final bool? showAppBar;
-
   const SettingsPage({
     Key? key,
-    @PathParam("showAppBar") this.showAppBar = true,
   }) : super(key: key);
 
   @override
@@ -62,7 +58,7 @@ class _SettingsPageState extends State<SettingsPage> {
   String avatarUrl = '';
   String imageUrl = '';
   String notifLang = 'en';
-  String? selectedLang = 'English';
+  String selectedLang = 'English';
 
   Timer? nameTimer;
   Timer? quotidiansNotifTimer;
@@ -88,7 +84,7 @@ class _SettingsPageState extends State<SettingsPage> {
             CustomScrollView(
               controller: _pageScrollController,
               slivers: <Widget>[
-                if (widget.showAppBar!) MainAppBar(),
+                MainAppBar(),
                 body(),
               ],
             ),
@@ -218,11 +214,11 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget body() {
-    double paddingTop = 0.0;
+    double paddingTop = 60.0;
     bool showBigTitle = false;
 
     if (MediaQuery.of(context).size.width > Constants.maxMobileWidth) {
-      paddingTop = widget.showAppBar! ? 60.0 : 20.0;
+      paddingTop = 20.0;
       showBigTitle = true;
     }
 
@@ -450,7 +446,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           onChanged: (String? newValue) {
             setState(() {
-              selectedLang = newValue;
+              selectedLang = newValue ?? '';
             });
 
             updateLang();

@@ -113,12 +113,8 @@ class AppRouter extends _i1.RootStackRouter {
         barrierDismissible: false),
     SettingsPageRoute.name: (routeData) => _i1.CustomPage<dynamic>(
         routeData: routeData,
-        builder: (data) {
-          final pathParams = data.pathParams;
-          final args = data.argsAs<SettingsPageRouteArgs>(
-              orElse: () => SettingsPageRouteArgs(
-                  showAppBar: pathParams.optBool('showAppBar')));
-          return _i12.SettingsPage(key: args.key, showAppBar: args.showAppBar);
+        builder: (_) {
+          return const _i12.SettingsPage();
         },
         transitionsBuilder: _i1.TransitionsBuilders.fadeIn,
         opaque: true,
@@ -213,7 +209,7 @@ class AppRouter extends _i1.RootStackRouter {
           final pathParams = data.pathParams;
           final args = data.argsAs<DashIllustrationPageArgs>(
               orElse: () => DashIllustrationPageArgs(
-                  illustrationId: pathParams.optString('illustrationId')));
+                  illustrationId: pathParams.getString('illustrationId')));
           return _i20.IllustrationPage(
               key: args.key,
               illustrationId: args.illustrationId,
@@ -263,12 +259,8 @@ class AppRouter extends _i1.RootStackRouter {
         barrierDismissible: false),
     DashSettingsRoute.name: (routeData) => _i1.CustomPage<dynamic>(
         routeData: routeData,
-        builder: (data) {
-          final pathParams = data.pathParams;
-          final args = data.argsAs<DashSettingsRouteArgs>(
-              orElse: () => DashSettingsRouteArgs(
-                  showAppBar: pathParams.optBool('showAppBar')));
-          return _i12.SettingsPage(key: args.key, showAppBar: args.showAppBar);
+        builder: (_) {
+          return const _i12.SettingsPage();
         },
         opaque: true,
         barrierDismissible: false),
@@ -320,7 +312,7 @@ class AppRouter extends _i1.RootStackRouter {
           final pathParams = data.pathParams;
           final args = data.argsAs<IllustrationPageRouteArgs>(
               orElse: () => IllustrationPageRouteArgs(
-                  illustrationId: pathParams.optString('illustrationId')));
+                  illustrationId: pathParams.getString('illustrationId')));
           return _i20.IllustrationPage(
               key: args.key,
               illustrationId: args.illustrationId,
@@ -455,21 +447,10 @@ class SearchPageRoute extends _i1.PageRouteInfo {
   static const String name = 'SearchPageRoute';
 }
 
-class SettingsPageRoute extends _i1.PageRouteInfo<SettingsPageRouteArgs> {
-  SettingsPageRoute({_i2.Key? key, bool? showAppBar})
-      : super(name,
-            path: '/settings',
-            args: SettingsPageRouteArgs(key: key, showAppBar: showAppBar));
+class SettingsPageRoute extends _i1.PageRouteInfo {
+  const SettingsPageRoute() : super(name, path: '/settings');
 
   static const String name = 'SettingsPageRoute';
-}
-
-class SettingsPageRouteArgs {
-  const SettingsPageRouteArgs({this.key, this.showAppBar});
-
-  final _i2.Key? key;
-
-  final bool? showAppBar;
 }
 
 class SigninPageRoute extends _i1.PageRouteInfo<SigninPageRouteArgs> {
@@ -576,7 +557,7 @@ class MyIllustrationsPageRoute extends _i1.PageRouteInfo {
 class DashIllustrationPage extends _i1.PageRouteInfo<DashIllustrationPageArgs> {
   DashIllustrationPage(
       {_i2.Key? key,
-      String? illustrationId,
+      required String illustrationId,
       _i30.Illustration? illustration,
       bool? fromDashboard})
       : super(name,
@@ -593,11 +574,14 @@ class DashIllustrationPage extends _i1.PageRouteInfo<DashIllustrationPageArgs> {
 
 class DashIllustrationPageArgs {
   const DashIllustrationPageArgs(
-      {this.key, this.illustrationId, this.illustration, this.fromDashboard});
+      {this.key,
+      required this.illustrationId,
+      this.illustration,
+      this.fromDashboard});
 
   final _i2.Key? key;
 
-  final String? illustrationId;
+  final String illustrationId;
 
   final _i30.Illustration? illustration;
 
@@ -653,21 +637,10 @@ class EditImagePageRouteArgs {
   final _i2.ImageProvider<Object>? image;
 }
 
-class DashSettingsRoute extends _i1.PageRouteInfo<DashSettingsRouteArgs> {
-  DashSettingsRoute({_i2.Key? key, bool? showAppBar})
-      : super(name,
-            path: '',
-            args: DashSettingsRouteArgs(key: key, showAppBar: showAppBar));
+class DashSettingsRoute extends _i1.PageRouteInfo {
+  const DashSettingsRoute() : super(name, path: '');
 
   static const String name = 'DashSettingsRoute';
-}
-
-class DashSettingsRouteArgs {
-  const DashSettingsRouteArgs({this.key, this.showAppBar});
-
-  final _i2.Key? key;
-
-  final bool? showAppBar;
 }
 
 class DeleteAccountPageRoute extends _i1.PageRouteInfo {
@@ -711,7 +684,7 @@ class IllustrationPageRoute
     extends _i1.PageRouteInfo<IllustrationPageRouteArgs> {
   IllustrationPageRoute(
       {_i2.Key? key,
-      String? illustrationId,
+      required String illustrationId,
       _i30.Illustration? illustration,
       bool? fromDashboard})
       : super(name,
@@ -728,11 +701,14 @@ class IllustrationPageRoute
 
 class IllustrationPageRouteArgs {
   const IllustrationPageRouteArgs(
-      {this.key, this.illustrationId, this.illustration, this.fromDashboard});
+      {this.key,
+      required this.illustrationId,
+      this.illustration,
+      this.fromDashboard});
 
   final _i2.Key? key;
 
-  final String? illustrationId;
+  final String illustrationId;
 
   final _i30.Illustration? illustration;
 
