@@ -26,13 +26,13 @@ interface GenerateImageThumbsParams {
 
 /**
  * Check an illustration document in Firestore from its id [illustrationId].
- * If the document has missing urls, try to populate them from storage file.
+ * If the document has missing properties, try to populate them from storage file.
  * If there's no corresponding storage file, delete the firestore document.
  */
-export const checkUrls = functions
+export const checkProperties = functions
   .region(cloudRegions.eu)
   .https
-  .onCall(async (params: CheckUrlsParams, context) => {
+  .onCall(async (params: CheckPropertiesParams, context) => {
     const userAuth = context.auth;
     const { illustrationId } = params;
 

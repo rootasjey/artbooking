@@ -84,7 +84,7 @@ enum LicenseFrom {
   author = 'author',
 }
 
-interface CheckUrlsParams {
+interface CheckPropertiesParams {
   illustrationId: string;
 }
 
