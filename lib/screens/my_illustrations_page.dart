@@ -6,6 +6,7 @@ import 'package:artbooking/components/illustration_card.dart';
 import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/components/popup_menu_item_icon.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
+import 'package:artbooking/components/text_rectangle_button.dart';
 import 'package:artbooking/components/user_books.dart';
 import 'package:artbooking/screens/illustration_page.dart';
 import 'package:artbooking/state/upload_manager.dart';
@@ -191,37 +192,11 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
       return Container();
     }
 
-    final multiSelectColor =
-        _forceMultiSelect ? stateColors.primary : Colors.black38;
-
     return Wrap(
       spacing: 12.0,
       runSpacing: 12.0,
       children: [
-        OutlinedButton.icon(
-          onPressed: () {
-            setState(() {
-              _forceMultiSelect = !_forceMultiSelect;
-            });
-          },
-          icon: Icon(UniconsLine.layers_alt),
-          label: Text("multi_select".tr()),
-          style: OutlinedButton.styleFrom(
-            primary: multiSelectColor,
-            shape: RoundedRectangleBorder(),
-            textStyle: FontsUtils.mainStyle(
-              fontWeight: FontWeight.w600,
-            ),
-            side: BorderSide(
-              width: 2.0,
-              color: Colors.black38.withOpacity(0.2),
-            ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 28.0,
-              vertical: 18.0,
-            ),
-          ),
-        ),
+        multiSelectButton(),
         sortButton(),
       ],
     );
@@ -335,6 +310,22 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     );
   }
 
+  Widget multiSelectButton() {
+    final multiSelectColor =
+        _forceMultiSelect ? stateColors.primary : Colors.black38;
+
+    return TextRectangleButton(
+      onPressed: () {
+        setState(() {
+          _forceMultiSelect = !_forceMultiSelect;
+        });
+      },
+      icon: Icon(UniconsLine.layers),
+      label: Text("multi_select".tr()),
+      primary: multiSelectColor,
+    );
+  }
+
   Widget multiSelectToolbar() {
     if (_multiSelectedItems.isEmpty) {
       return Container();
@@ -395,25 +386,11 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   }
 
   Widget sortButton() {
-    return OutlinedButton.icon(
+    return TextRectangleButton(
       onPressed: () {},
       icon: Icon(UniconsLine.sort),
       label: Text("sort".tr()),
-      style: OutlinedButton.styleFrom(
-        primary: Colors.black38,
-        shape: RoundedRectangleBorder(),
-        textStyle: FontsUtils.mainStyle(
-          fontWeight: FontWeight.w600,
-        ),
-        side: BorderSide(
-          width: 2.0,
-          color: Colors.black38.withOpacity(0.2),
-        ),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 28.0,
-          vertical: 18.0,
-        ),
-      ),
+      primary: Colors.black38,
     );
   }
 
