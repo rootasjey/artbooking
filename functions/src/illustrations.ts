@@ -199,6 +199,7 @@ export const createOne = functions
           width: 0,
         },
         extension: '',
+        hasPendingCreation: true,
         license: {
           custom: false,
           description: '',
@@ -510,20 +511,19 @@ export const onStorageUpload = functions
     await firestore
       .collection('illustrations')
       .doc(firestoreId)
-      .set({
+      .update({
         dimensions: {
           height,
           width,
         },
         extension,
+        hasPendingCreation: false,
         size: parseFloat(objectMeta.size),
         urls: {
           original: imageFile.publicUrl(),
           storage: storageUrl,
           thumbnails,
         },
-      }, { 
-        merge: true,
       });
 
     // Update used storage.
