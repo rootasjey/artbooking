@@ -27,6 +27,13 @@ class Illustration {
   /// File's extension.
   String extension;
 
+  /// True if this document is being created.
+  /// Illustration creation has 3 steps:
+  ///   1. Firestore document creation with an id.
+  ///   2. File upload to Firebase Cloud Storage.
+  ///   3. (Update) Populate Firestore document with new properties (& urls).
+  final bool hasPendingCreates;
+
   /// Firestore id.
   String id;
 
@@ -72,6 +79,7 @@ class Illustration {
     this.description = '',
     this.dimensions,
     this.extension = '',
+    this.hasPendingCreates = false,
     this.id = '',
     this.license,
     this.name = '',
@@ -94,6 +102,7 @@ class Illustration {
       description: '',
       dimensions: Dimensions.empty(),
       extension: '',
+      hasPendingCreates: false,
       id: '',
       license: IllustrationLicense.empty(),
       name: '',
@@ -116,6 +125,7 @@ class Illustration {
       description: data['description'] ?? '',
       dimensions: Dimensions.fromJSON(data['dimensions']),
       extension: data['extension'] ?? '',
+      hasPendingCreates: data['hasPendingCreates'] ?? false,
       id: data['id'] ?? '',
       license: IllustrationLicense.fromJSON(data['license']),
       name: data['name'] ?? '',
