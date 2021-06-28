@@ -222,11 +222,14 @@ class _MyBooksPageState extends State<MyBooksPage> {
             padding: const EdgeInsets.only(bottom: 16.0),
             child: Row(
               children: [
-                Text(
-                  "books".tr().toUpperCase(),
-                  style: FontsUtils.mainStyle(
-                    fontSize: 30.0,
-                    fontWeight: FontWeight.w800,
+                Opacity(
+                  opacity: 0.8,
+                  child: Text(
+                    "books".tr().toUpperCase(),
+                    style: FontsUtils.mainStyle(
+                      fontSize: 30.0,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
                 if (_isCreating)
@@ -254,7 +257,8 @@ class _MyBooksPageState extends State<MyBooksPage> {
       padding: const EdgeInsets.all(40.0),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 300.0,
+          mainAxisExtent: 410.0,
+          maxCrossAxisExtent: 340.0,
           mainAxisSpacing: 20.0,
           crossAxisSpacing: 20.0,
         ),
