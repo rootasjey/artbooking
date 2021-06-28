@@ -1,22 +1,29 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:artbooking/utils/date_helper.dart';
 
 class BookCustomCover {
-  final String? url;
+  final String url;
   final DateTime? updatedAt;
 
-  BookCustomCover({this.url, this.updatedAt});
+  BookCustomCover({
+    required this.url,
+    this.updatedAt,
+  });
+
+  factory BookCustomCover.empty() {
+    return BookCustomCover(
+      url: '',
+      updatedAt: DateTime.now(),
+    );
+  }
 
   factory BookCustomCover.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
-      return BookCustomCover(
-        url: '',
-        updatedAt: DateTime.now(),
-      );
+      return BookCustomCover.empty();
     }
 
     return BookCustomCover(
       url: data['url'] ?? '',
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      updatedAt: DateHelper.fromFirestore(data['updatedAt']),
     );
   }
 }

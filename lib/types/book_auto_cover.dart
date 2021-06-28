@@ -1,21 +1,32 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:artbooking/utils/date_helper.dart';
 
 class BookAutoCover {
-  final String? id;
-  final String? url;
+  final String id;
+  final String url;
   final DateTime? updatedAt;
 
   BookAutoCover({
-    this.id,
-    this.url,
+    required this.id,
+    required this.url,
     this.updatedAt,
   });
 
-  factory BookAutoCover.fromJSON(Map<String, dynamic> data) {
+  factory BookAutoCover.empty() {
+    return BookAutoCover(
+      id: '',
+      url: '',
+    );
+  }
+
+  factory BookAutoCover.fromJSON(Map<String, dynamic>? data) {
+    if (data == null) {
+      return BookAutoCover.empty();
+    }
+
     return BookAutoCover(
       id: data['id'] ?? '',
       url: data['url'] ?? '',
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      updatedAt: DateHelper.fromFirestore(data['updatedAt']),
     );
   }
 }

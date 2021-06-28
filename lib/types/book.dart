@@ -2,20 +2,20 @@ import 'package:artbooking/types/book_cover.dart';
 import 'package:artbooking/types/book_illustration.dart';
 import 'package:artbooking/types/book_urls.dart';
 import 'package:artbooking/types/enums.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:artbooking/utils/date_helper.dart';
 
 class Book {
   /// Number of illustrations in this book.
   final int count;
 
   /// Book's thumbnail.
-  final BookCover? cover;
+  final BookCover cover;
 
   /// When this book was created.
   final DateTime? createdAt;
 
   /// This book's description.
-  String? description;
+  String description;
 
   /// Firestore's id.
   final String id;
@@ -41,7 +41,7 @@ class Book {
   BookLayoutOrientation layoutOrientationMobile;
 
   /// This book's name.
-  String? name;
+  String name;
 
   /// Used when [layout] value is {extendedGrid}.
   /// This property is initially empty and is filled when {extendedGrid} is chosen.
@@ -57,14 +57,14 @@ class Book {
   final DateTime? updatedAt;
 
   /// Urls of assets or other content.
-  final BookUrls? urls;
+  final BookUrls urls;
 
   /// Control if other people can view this book.
   final ContentVisibility visibility;
 
   Book({
     this.count = 0,
-    this.cover,
+    required this.cover,
     this.createdAt,
     this.description = '',
     this.id = '',
@@ -76,7 +76,7 @@ class Book {
     this.matrice = const [[]],
     this.name = '',
     this.updatedAt,
-    this.urls,
+    required this.urls,
     this.visibility = ContentVisibility.private,
   });
 
@@ -84,17 +84,17 @@ class Book {
     return Book(
       count: data['count'] ?? 0,
       cover: BookCover.fromJSON(data['cover']),
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      description: data['description'],
-      id: data['id'],
+      createdAt: DateHelper.fromFirestore(data['createdAt']),
+      description: data['description'] ?? '',
+      id: data['id'] ?? '',
       illustrations: parseIllustrations(data['illustrations']),
       layout: parseLayout(data['layout']),
       layoutMobile: parseLayout(data['layoutMobile']),
       layoutOrientation: parseOrientation(data['layoutOrientation']),
       layoutOrientationMobile:
           parseOrientation(data['layoutOrientationMobile']),
-      name: data['name'],
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      name: data['name'] ?? '',
+      updatedAt: DateHelper.fromFirestore(data['updatedAt']),
       urls: BookUrls.fromJSON(data['urls']),
       visibility: parseStringVisibility(data['visibility']),
     );
