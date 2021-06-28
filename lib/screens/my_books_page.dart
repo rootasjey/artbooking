@@ -2,6 +2,8 @@ import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/book_card.dart';
 import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/sliver_edge_padding.dart';
+import 'package:artbooking/components/text_rectangle_button.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/book.dart';
@@ -24,86 +26,52 @@ class MyBooksPage extends StatefulWidget {
 }
 
 class _MyBooksPageState extends State<MyBooksPage> {
-  late bool isLoading;
-  bool descending = true;
-  bool hasNext = true;
-  bool isFabVisible = false;
-  bool isLoadingMore = false;
-  bool forceMultiSelect = false;
-  bool isCreating = false;
+  bool _isLoading = false;
+  bool _descending = true;
+  bool _hasNext = true;
+  bool _isFabVisible = false;
+  bool _isLoadingMore = false;
+  bool _forceMultiSelect = false;
+  bool _isCreating = false;
 
-  DocumentSnapshot? lastDoc;
+  DocumentSnapshot? _lastFirestoreDoc;
 
-  final books = <Book>[];
-  final keyboardFocusNode = FocusNode();
+  final _books = <Book>[];
+  final _keyboardFocusNode = FocusNode();
 
-  int limit = 20;
+  int _limit = 20;
 
-  Map<String?, Book> multiSelectedItems = Map();
+  Map<String?, Book> _multiSelectedItems = Map();
 
-  ScrollController scrollController = ScrollController();
+  ScrollController _scrollController = ScrollController();
 
-  TextEditingController? newBookNameController;
-  String newBookName = '';
-  String newBookDescription = '';
+  TextEditingController? _newBookNameController;
+  String _newBookName = '';
+  String _newBookDescription = '';
 
   @override
   initState() {
     super.initState();
-    newBookNameController = TextEditingController();
+    _newBookNameController = TextEditingController();
     fetchMany();
   }
 
   @override
   void dispose() {
-    newBookNameController?.dispose();
+    _newBookNameController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: isFabVisible
-          ? FloatingActionButton(
-              onPressed: () {
-                scrollController.animateTo(
-                  0.0,
-                  duration: 1.seconds,
-                  curve: Curves.easeOut,
-                );
-              },
-              backgroundColor: stateColors.primary,
-              foregroundColor: Colors.white,
-              child: Icon(Icons.arrow_upward),
-            )
-          : null,
+      floatingActionButton: fab(),
       body: NotificationListener<ScrollNotification>(
-        onNotification: (scrollNotification) {
-          // FAB visibility
-          if (scrollNotification.metrics.pixels < 50 && isFabVisible) {
-            setState(() {
-              isFabVisible = false;
-            });
-          } else if (scrollNotification.metrics.pixels > 50 && !isFabVisible) {
-            setState(() {
-              isFabVisible = true;
-            });
-          }
-
-          if (scrollNotification.metrics.pixels <
-              scrollNotification.metrics.maxScrollExtent) {
-            return false;
-          }
-
-          if (hasNext && !isLoadingMore) {
-            fetchManyMore();
-          }
-
-          return false;
-        },
+        onNotification: onNotification,
         child: CustomScrollView(
-          controller: scrollController,
+          controller: _scrollController,
           slivers: <Widget>[
+            SliverEdgePadding(),
             MainAppBar(),
             header(),
             body(),
@@ -119,26 +87,33 @@ class _MyBooksPageState extends State<MyBooksPage> {
   Widget header() {
     return SliverPadding(
       padding: const EdgeInsets.only(
-        top: 40.0,
+        top: 60.0,
         left: 50.0,
+        bottom: 24.0,
       ),
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
-          Row(
-            children: [
-              Text(
-                "books".tr(),
-                style: FontsUtils.title(),
-              ),
-              if (isCreating)
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 24.0,
-                    top: 12.0,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Row(
+              children: [
+                Text(
+                  "books".tr().toUpperCase(),
+                  style: FontsUtils.mainStyle(
+                    fontSize: 30.0,
+                    fontWeight: FontWeight.w800,
                   ),
-                  child: CircularProgressIndicator(),
                 ),
-            ],
+                if (_isCreating)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 24.0,
+                      top: 12.0,
+                    ),
+                    child: CircularProgressIndicator(),
+                  ),
+              ],
+            ),
           ),
           defaultActionsToolbar(),
           multiSelectToolbar(),
@@ -148,7 +123,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   }
 
   Widget body() {
-    if (isLoading) {
+    if (_isLoading) {
       return SliverList(
         delegate: SliverChildListDelegate.fixed([
           Padding(
@@ -159,15 +134,24 @@ class _MyBooksPageState extends State<MyBooksPage> {
       );
     }
 
-    if (books.isEmpty) {
+    if (_books.isEmpty) {
       return emptyView();
     }
 
     return gridView();
   }
 
+  Widget createButton() {
+    return TextRectangleButton(
+      onPressed: showBookCreationDialog,
+      icon: Icon(UniconsLine.plus),
+      label: Text('create'.tr()),
+      primary: Colors.black38,
+    );
+  }
+
   Widget defaultActionsToolbar() {
-    if (multiSelectedItems.isNotEmpty) {
+    if (_multiSelectedItems.isNotEmpty) {
       return Container();
     }
 
@@ -175,47 +159,47 @@ class _MyBooksPageState extends State<MyBooksPage> {
       spacing: 12.0,
       runSpacing: 12.0,
       children: [
-        OutlinedButton.icon(
-          onPressed: showBookCreationDialog,
-          icon: Padding(
-            padding: const EdgeInsets.only(bottom: 6.0),
-            child: Icon(UniconsLine.plus),
-          ),
-          label: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Text('create'.tr()),
-          ),
-        ),
-        OutlinedButton.icon(
-          onPressed: () {
-            setState(() {
-              forceMultiSelect = !forceMultiSelect;
-            });
-          },
-          icon: Padding(
-            padding: const EdgeInsets.only(bottom: 6.0),
-            child: Icon(UniconsLine.layers_alt),
-          ),
-          label: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Text('multi_select'.tr()),
-          ),
-          style: forceMultiSelect
-              ? TextButton.styleFrom(primary: Colors.lightGreen)
-              : TextButton.styleFrom(),
-        ),
-        OutlinedButton.icon(
-          onPressed: () {},
-          icon: Padding(
-            padding: const EdgeInsets.only(bottom: 6.0),
-            child: Icon(UniconsLine.sort),
-          ),
-          label: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Text('sort'.tr()),
-          ),
-        ),
+        createButton(),
+        multiSelectButton(),
+        sortButton(),
       ],
+    );
+  }
+
+  Widget fab() {
+    if (!_isFabVisible) {
+      return FloatingActionButton(
+        onPressed: fetchMany,
+        backgroundColor: stateColors.primary,
+        foregroundColor: Colors.white,
+        child: Icon(UniconsLine.refresh),
+      );
+    }
+
+    return FloatingActionButton(
+      onPressed: () {
+        _scrollController.animateTo(
+          0.0,
+          duration: 1.seconds,
+          curve: Curves.easeOut,
+        );
+      },
+      backgroundColor: stateColors.primary,
+      foregroundColor: Colors.white,
+      child: Icon(UniconsLine.arrow_up),
+    );
+  }
+
+  Widget multiSelectButton() {
+    return TextRectangleButton(
+      onPressed: () {
+        setState(() {
+          _forceMultiSelect = !_forceMultiSelect;
+        });
+      },
+      icon: Icon(UniconsLine.layers_alt),
+      label: Text('multi_select'.tr()),
+      primary: _forceMultiSelect ? Colors.lightGreen : Colors.black38,
     );
   }
 
@@ -277,7 +261,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   }
 
   Widget gridView() {
-    final selectionMode = forceMultiSelect || multiSelectedItems.isNotEmpty;
+    final selectionMode = _forceMultiSelect || _multiSelectedItems.isNotEmpty;
 
     return SliverPadding(
       padding: const EdgeInsets.all(40.0),
@@ -289,8 +273,8 @@ class _MyBooksPageState extends State<MyBooksPage> {
         ),
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            final book = books.elementAt(index);
-            final selected = multiSelectedItems.containsKey(book.id);
+            final book = _books.elementAt(index);
+            final selected = _multiSelectedItems.containsKey(book.id);
 
             return BookCard(
               book: book,
@@ -298,7 +282,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
               selectionMode: selectionMode,
               onBeforeDelete: () {
                 setState(() {
-                  books.removeAt(index);
+                  _books.removeAt(index);
                 });
               },
               onAfterDelete: (response) {
@@ -307,22 +291,22 @@ class _MyBooksPageState extends State<MyBooksPage> {
                 }
 
                 setState(() {
-                  books.insert(index, book);
+                  _books.insert(index, book);
                 });
               },
               onBeforePressed: () {
-                if (multiSelectedItems.isEmpty && !forceMultiSelect) {
+                if (_multiSelectedItems.isEmpty && !_forceMultiSelect) {
                   return false;
                 }
 
                 if (selected) {
                   setState(() {
-                    multiSelectedItems.remove(book.id);
-                    forceMultiSelect = multiSelectedItems.length > 0;
+                    _multiSelectedItems.remove(book.id);
+                    _forceMultiSelect = _multiSelectedItems.length > 0;
                   });
                 } else {
                   setState(() {
-                    multiSelectedItems.putIfAbsent(book.id, () => book);
+                    _multiSelectedItems.putIfAbsent(book.id, () => book);
                   });
                 }
 
@@ -331,25 +315,25 @@ class _MyBooksPageState extends State<MyBooksPage> {
               onLongPress: (selected) {
                 if (selected) {
                   setState(() {
-                    multiSelectedItems.remove(book.id);
+                    _multiSelectedItems.remove(book.id);
                   });
                   return;
                 }
 
                 setState(() {
-                  multiSelectedItems.putIfAbsent(book.id, () => book);
+                  _multiSelectedItems.putIfAbsent(book.id, () => book);
                 });
               },
             );
           },
-          childCount: books.length,
+          childCount: _books.length,
         ),
       ),
     );
   }
 
   Widget multiSelectToolbar() {
-    if (multiSelectedItems.isEmpty) {
+    if (_multiSelectedItems.isEmpty) {
       return Container();
     }
 
@@ -360,7 +344,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
           opacity: 0.6,
           child: Text(
             "multi_items_selected"
-                .tr(args: [multiSelectedItems.length.toString()]),
+                .tr(args: [_multiSelectedItems.length.toString()]),
             style: TextStyle(
               fontSize: 30.0,
             ),
@@ -377,7 +361,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
         TextButton.icon(
           onPressed: () {
             setState(() {
-              multiSelectedItems.clear();
+              _multiSelectedItems.clear();
             });
           },
           icon: Icon(Icons.border_clear),
@@ -387,8 +371,8 @@ class _MyBooksPageState extends State<MyBooksPage> {
         ),
         TextButton.icon(
           onPressed: () {
-            books.forEach((illustration) {
-              multiSelectedItems.putIfAbsent(
+            _books.forEach((illustration) {
+              _multiSelectedItems.putIfAbsent(
                   illustration.id, () => illustration);
             });
 
@@ -406,6 +390,15 @@ class _MyBooksPageState extends State<MyBooksPage> {
           label: Text("delete".tr()),
         ),
       ],
+    );
+  }
+
+  Widget sortButton() {
+    return TextRectangleButton(
+      onPressed: () {},
+      icon: Icon(UniconsLine.sort),
+      label: Text('sort'.tr()),
+      primary: Colors.black38,
     );
   }
 
@@ -449,7 +442,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
       containerWidget: (context, animation, child) {
         return RawKeyboardListener(
           autofocus: true,
-          focusNode: keyboardFocusNode,
+          focusNode: _keyboardFocusNode,
           onKey: (keyEvent) {
             if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
               Navigator.of(context).pop();
@@ -483,16 +476,16 @@ class _MyBooksPageState extends State<MyBooksPage> {
   }
 
   void deleteSelection() async {
-    multiSelectedItems.entries.forEach((multiSelectItem) {
-      books.removeWhere((item) => item.id == multiSelectItem.key);
+    _multiSelectedItems.entries.forEach((multiSelectItem) {
+      _books.removeWhere((item) => item.id == multiSelectItem.key);
     });
 
-    final copyItems = multiSelectedItems.values.toList();
-    final booksIds = multiSelectedItems.keys.toList();
+    final copyItems = _multiSelectedItems.values.toList();
+    final booksIds = _multiSelectedItems.keys.toList();
 
     setState(() {
-      multiSelectedItems.clear();
-      forceMultiSelect = false;
+      _multiSelectedItems.clear();
+      _forceMultiSelect = false;
     });
 
     final response = await BooksActions.deleteMany(
@@ -505,29 +498,29 @@ class _MyBooksPageState extends State<MyBooksPage> {
         message: "illustrations_delete_error".tr(),
       );
 
-      books.addAll(copyItems);
+      _books.addAll(copyItems);
     }
   }
 
   void fetchMany() async {
     setState(() {
-      isLoading = true;
-      hasNext = true;
-      books.clear();
+      _isLoading = true;
+      _hasNext = true;
+      _books.clear();
     });
 
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection('books')
           .where('user.id', isEqualTo: stateUser.userAuth!.uid)
-          .orderBy('createdAt', descending: descending)
-          .limit(limit)
+          .orderBy('createdAt', descending: _descending)
+          .limit(_limit)
           .get();
 
       if (snapshot.docs.isEmpty) {
         setState(() {
-          isLoading = false;
-          hasNext = false;
+          _isLoading = false;
+          _hasNext = false;
         });
 
         return;
@@ -537,29 +530,28 @@ class _MyBooksPageState extends State<MyBooksPage> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        books.add(Book.fromJSON(data));
+        _books.add(Book.fromJSON(data));
       });
 
       setState(() {
-        isLoading = false;
-        lastDoc = snapshot.docs.last;
-        hasNext = snapshot.docs.length == limit;
+        _lastFirestoreDoc = snapshot.docs.last;
+        _hasNext = snapshot.docs.length == _limit;
       });
     } catch (error) {
       appLogger.e(error);
-
+    } finally {
       setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
     }
   }
 
   void fetchManyMore() async {
-    if (!hasNext || lastDoc == null) {
+    if (!_hasNext || _lastFirestoreDoc == null) {
       return;
     }
 
-    isLoadingMore = true;
+    _isLoadingMore = true;
 
     try {
       final userAuth = FirebaseAuth.instance.currentUser;
@@ -571,15 +563,15 @@ class _MyBooksPageState extends State<MyBooksPage> {
       final snapshot = await FirebaseFirestore.instance
           .collection('books')
           .where('user.id', isEqualTo: userAuth.uid)
-          .orderBy('createdAt', descending: descending)
-          .limit(limit)
-          .startAfterDocument(lastDoc!)
+          .orderBy('createdAt', descending: _descending)
+          .limit(_limit)
+          .startAfterDocument(_lastFirestoreDoc!)
           .get();
 
       if (snapshot.docs.isEmpty) {
         setState(() {
-          hasNext = false;
-          isLoadingMore = false;
+          _hasNext = false;
+          _isLoadingMore = false;
         });
 
         return;
@@ -589,13 +581,13 @@ class _MyBooksPageState extends State<MyBooksPage> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        books.add(Book.fromJSON(data));
+        _books.add(Book.fromJSON(data));
       });
 
       setState(() {
-        isLoadingMore = false;
-        lastDoc = snapshot.docs.last;
-        hasNext = snapshot.docs.length == limit;
+        _isLoadingMore = false;
+        _lastFirestoreDoc = snapshot.docs.last;
+        _hasNext = snapshot.docs.length == _limit;
       });
     } catch (error) {
       appLogger.e(error);
@@ -615,7 +607,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
       final book = Book.fromJSON(bookData);
 
       setState(() {
-        books.add(book);
+        _books.add(book);
       });
     } catch (error) {
       appLogger.e(error);
@@ -624,15 +616,15 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
   void createBook() async {
     setState(() {
-      isCreating = true;
+      _isCreating = true;
     });
 
     final response = await BooksActions.createOne(
-      name: newBookName,
-      description: newBookDescription,
+      name: _newBookName,
+      description: _newBookDescription,
     );
 
-    setState(() => isCreating = false);
+    setState(() => _isCreating = false);
 
     if (!response.success) {
       Snack.e(
@@ -651,6 +643,29 @@ class _MyBooksPageState extends State<MyBooksPage> {
     fetchOne(response.bookId);
   }
 
+  bool onNotification(ScrollNotification notification) {
+    // FAB visibility
+    if (notification.metrics.pixels < 50 && _isFabVisible) {
+      setState(() {
+        _isFabVisible = false;
+      });
+    } else if (notification.metrics.pixels > 50 && !_isFabVisible) {
+      setState(() {
+        _isFabVisible = true;
+      });
+    }
+
+    if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
+      return false;
+    }
+
+    if (_hasNext && !_isLoadingMore) {
+      fetchManyMore();
+    }
+
+    return false;
+  }
+
   void showBookCreationDialog() {
     showDialog(
       context: context,
@@ -667,7 +682,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
               constraints: BoxConstraints.tight(Size(250.0, 80)),
               child: TextField(
                 autofocus: true,
-                controller: newBookNameController,
+                controller: _newBookNameController,
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
                   labelText: "title".tr(),
@@ -680,7 +695,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
                   ),
                 ),
                 onChanged: (newValue) {
-                  newBookName = newValue;
+                  _newBookName = newValue;
                 },
               ),
             ),
@@ -703,7 +718,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
                   ),
                 ),
                 onChanged: (newValue) {
-                  newBookDescription = newValue;
+                  _newBookDescription = newValue;
                 },
                 onSubmitted: (value) {
                   createBook();
