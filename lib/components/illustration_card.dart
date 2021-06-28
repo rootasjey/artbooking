@@ -230,8 +230,11 @@ class _IllustrationCardState extends State<IllustrationCard>
   /// and set them to the Firestore document.
   void checkProperties() async {
     final illustration = widget.illustration;
-    final thumbnailUrl = illustration.getThumbnail();
+    if (illustration.hasPendingCreates) {
+      return;
+    }
 
+    final thumbnailUrl = illustration.getThumbnail();
     if (thumbnailUrl.isNotEmpty) {
       return;
     }

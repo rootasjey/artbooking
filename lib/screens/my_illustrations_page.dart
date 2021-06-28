@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/illustration_card.dart';
@@ -8,7 +10,6 @@ import 'package:artbooking/components/user_books.dart';
 import 'package:artbooking/screens/illustration_page.dart';
 import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
@@ -26,6 +27,16 @@ import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
+
+/// A stream subscription returning a map withing a query snapshot.
+typedef SnapshotStreamSubscription
+    = StreamSubscription<QuerySnapshot<Map<String, dynamic>>>;
+
+/// A query containing a map.
+typedef QueryMap = Query<Map<String, dynamic>>;
+
+/// A document change containing a map.
+typedef DocumentChangeMap = DocumentChange<Map<String, dynamic>>;
 
 class MyIllustrationsPage extends StatefulWidget {
   @override
@@ -63,10 +74,18 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
 
   ScrollController _scrollController = ScrollController();
 
+  SnapshotStreamSubscription? _streamSubscription;
+
   @override
   initState() {
     super.initState();
     fetch();
+  }
+
+  @override
+  void dispose() {
+    _streamSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -398,6 +417,22 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     );
   }
 
+  /// Fire when a new document has been created in Firestore.
+  /// Add the corresponding document in the UI.
+  void addStreamingDoc(DocumentChangeMap documentChange) {
+    final data = documentChange.doc.data();
+
+    if (data == null) {
+      return;
+    }
+
+    setState(() {
+      data['id'] = documentChange.doc.id;
+      final illustration = Illustration.fromJSON(data);
+      _illustrationsList.insert(0, illustration);
+    });
+  }
+
   void confirmSelectionDeletion() async {
     showCustomModalBottomSheet(
       context: context,
@@ -520,12 +555,20 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     });
 
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final User? userAuth = FirebaseAuth.instance.currentUser;
+
+      if (userAuth == null) {
+        throw Exception("User is not authenticated.");
+      }
+
+      final QueryMap query = FirebaseFirestore.instance
           .collection('illustrations')
-          .where('user.id', isEqualTo: stateUser.userAuth!.uid)
+          .where('user.id', isEqualTo: userAuth.uid)
           .orderBy('createdAt', descending: _descending)
-          .limit(_limit)
-          .get();
+          .limit(_limit);
+
+      startListenningToData(query);
+      final snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
         setState(() {
@@ -535,13 +578,6 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
 
         return;
       }
-
-      snapshot.docs.forEach((doc) {
-        final data = doc.data();
-        data['id'] = doc.id;
-
-        _illustrationsList.add(Illustration.fromJSON(data));
-      });
 
       setState(() {
         _isLoading = false;
@@ -565,19 +601,21 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     _isLoadingMore = true;
 
     try {
-      final userAuth = FirebaseAuth.instance.currentUser;
+      final User? userAuth = FirebaseAuth.instance.currentUser;
 
       if (userAuth == null) {
         throw Exception("User is not authenticated.");
       }
 
-      final snapshot = await FirebaseFirestore.instance
+      final QueryMap query = await FirebaseFirestore.instance
           .collection('illustrations')
           .where('user.id', isEqualTo: userAuth.uid)
           .orderBy('createdAt', descending: _descending)
           .limit(_limit)
-          .startAfterDocument(_lastFirestoreDoc!)
-          .get();
+          .startAfterDocument(_lastFirestoreDoc!);
+
+      startListenningToData(query);
+      final snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
         setState(() {
@@ -587,13 +625,6 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
 
         return;
       }
-
-      snapshot.docs.forEach((doc) {
-        final data = doc.data();
-        data['id'] = doc.id;
-
-        _illustrationsList.add(Illustration.fromJSON(data));
-      });
 
       setState(() {
         _isLoading = false;
@@ -787,6 +818,16 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     });
   }
 
+  /// Fire when a new document has been delete from Firestore.
+  /// Delete the corresponding document from the UI.
+  void removeStreamingDoc(DocumentChangeMap documentChange) {
+    setState(() {
+      _illustrationsList.removeWhere(
+        (illustration) => illustration.id == documentChange.doc.id,
+      );
+    });
+  }
+
   void showAddToBook(Illustration illustration) {
     int flex =
         MediaQuery.of(context).size.width < Constants.maxMobileWidth ? 5 : 3;
@@ -819,5 +860,59 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
         );
       },
     );
+  }
+
+  /// Listen to the last Firestore query of this page.
+  void startListenningToData(QueryMap query) {
+    _streamSubscription = query.snapshots().listen(
+      (snapshot) {
+        for (DocumentChangeMap documentChange in snapshot.docChanges) {
+          switch (documentChange.type) {
+            case DocumentChangeType.added:
+              addStreamingDoc(documentChange);
+              break;
+            case DocumentChangeType.modified:
+              updateStreamingDoc(documentChange);
+              break;
+            case DocumentChangeType.removed:
+              removeStreamingDoc(documentChange);
+              break;
+          }
+        }
+      },
+      onError: (error) {
+        appLogger.e(error);
+      },
+    );
+  }
+
+  /// Fire when a new document has been updated in Firestore.
+  /// Update the corresponding document in the UI.
+  void updateStreamingDoc(DocumentChangeMap documentChange) {
+    try {
+      final data = documentChange.doc.data();
+      if (data == null) {
+        return;
+      }
+
+      final int index = _illustrationsList.indexWhere(
+        (illustration) => illustration.id == documentChange.doc.id,
+      );
+
+      data['id'] = documentChange.doc.id;
+      final updatedIllustration = Illustration.fromJSON(data);
+
+      setState(() {
+        _illustrationsList.removeAt(index);
+        _illustrationsList.insert(index, updatedIllustration);
+      });
+    } on Exception catch (error) {
+      appLogger.e(
+        "The document with the id ${documentChange.doc.id} "
+        "doesn't exist in the illustrations list.",
+      );
+
+      appLogger.e(error);
+    }
   }
 }
