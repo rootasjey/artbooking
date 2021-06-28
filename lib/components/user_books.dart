@@ -166,7 +166,7 @@ class _UserBooksState extends State<UserBooks> {
       },
       title: Center(
         child: Text(
-          book.name!,
+          book.name,
         ),
       ),
     );

@@ -144,7 +144,7 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   Widget header() {
-    final bookName = bookPage != null ? bookPage!.name! : 'My book';
+    final bookName = bookPage != null ? bookPage!.name : 'My book';
 
     return SliverPadding(
       padding: const EdgeInsets.only(

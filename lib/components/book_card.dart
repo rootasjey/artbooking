@@ -114,7 +114,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
             child: Opacity(
               opacity: 0.8,
               child: Text(
-                illustration.name!,
+                illustration.name,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: FontsUtils.mainStyle(
@@ -134,10 +134,10 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     final book = widget.book;
     ImageProvider imageProvider;
 
-    if (book.cover!.custom!.url!.isNotEmpty) {
-      imageProvider = NetworkImage(book.cover!.custom!.url!);
-    } else if (book.cover!.auto!.url!.isNotEmpty) {
-      imageProvider = NetworkImage(book.cover!.auto!.url!);
+    if (book.cover.custom.url.isNotEmpty) {
+      imageProvider = NetworkImage(book.cover.custom.url);
+    } else if (book.cover.auto.url.isNotEmpty) {
+      imageProvider = NetworkImage(book.cover.auto.url);
     } else {
       imageProvider = AssetImage('assets/images/gummy-canvas.png');
     }
