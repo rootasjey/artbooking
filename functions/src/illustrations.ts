@@ -199,7 +199,7 @@ export const createOne = functions
           width: 0,
         },
         extension: '',
-        hasPendingCreation: true,
+        hasPendingCreates: true,
         license: {
           from: '',
           id: '',
@@ -504,7 +504,7 @@ export const onStorageUpload = functions
           width,
         },
         extension,
-        hasPendingCreation: false,
+        hasPendingCreates: false,
         size: parseFloat(objectMeta.size),
         urls: {
           original: imageFile.publicUrl(),
