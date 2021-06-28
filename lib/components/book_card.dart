@@ -20,7 +20,6 @@ class BookCard extends StatefulWidget {
   final Function(OneBookOpResp)? onAfterDelete;
   final Function(bool)? onLongPress;
   final Function? onBeforePressed;
-  final double size;
 
   BookCard({
     required this.book,
@@ -30,7 +29,6 @@ class BookCard extends StatefulWidget {
     this.onBeforeDelete,
     this.onBeforePressed,
     this.onLongPress,
-    this.size = 300.0,
   });
 
   @override
@@ -38,52 +36,101 @@ class BookCard extends StatefulWidget {
 }
 
 class _BookCardState extends State<BookCard> with AnimationMixin {
-  late Animation<double> scaleAnimation;
-  late Animation<Offset> offsetAnimation;
-  late Animation<double> opacity;
+  late Animation<double> _scaleAnimation;
 
-  late AnimationController captionController;
-  late AnimationController scaleController;
-  late AnimationController offsetController;
+  late AnimationController _scaleController;
 
-  bool showCaption = false;
+  double _initElevation = 4.0;
 
-  double initElevation = 4.0;
-  double size = 300.0;
+  double _elevation = 4.0;
 
-  double elevation = 4.0;
-  double scale = 1.0;
-
-  final keyboardFocusNode = FocusNode();
+  final _keyboardFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
 
-    captionController = createController();
-    captionController.duration = 300.milliseconds;
-    opacity = 0.0.tweenTo(1.0).animatedBy(captionController);
+    _scaleController = createController()..duration = 250.milliseconds;
 
-    offsetController = createController()..duration = 250.milliseconds;
-
-    offsetAnimation =
-        Offset(0, 0.25).tweenTo(Offset.zero).animatedBy(offsetController);
-
-    scaleController = createController()..duration = 500.milliseconds;
-
-    scaleAnimation = 0.8
-        .tweenTo(1.0)
-        .animatedBy(scaleController)
-        .curve(Curves.fastOutSlowIn);
+    _scaleAnimation =
+        0.6.tweenTo(1.0).animatedBy(_scaleController).curve(Curves.elasticOut);
 
     setState(() {
-      size = widget.size;
-      elevation = initElevation;
+      _elevation = _initElevation;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    return SizedBox(
+      width: 360.0,
+      height: 440.0,
+      child: Column(
+        children: [
+          Stack(
+            children: [
+              backCard(),
+              frontCard(),
+            ],
+          ),
+          caption(),
+        ],
+      ),
+    );
+  }
+
+  Widget backCard() {
+    return Positioned(
+      top: 0.0,
+      right: 0.0,
+      width: 200.0,
+      child: Container(
+        width: 280.0,
+        height: 360.0,
+        child: Card(
+          elevation: _elevation / 2.0,
+          color: Colors.white70,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          clipBehavior: Clip.hardEdge,
+        ),
+      ),
+    );
+  }
+
+  Widget caption() {
+    final illustration = widget.book;
+
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: 8.0,
+        left: 16.0,
+        right: 16.0,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Opacity(
+              opacity: 0.8,
+              child: Text(
+                illustration.name!,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: FontsUtils.mainStyle(
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ),
+          popupMenuButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget frontCard() {
     final book = widget.book;
     ImageProvider imageProvider;
 
@@ -95,14 +142,19 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
       imageProvider = AssetImage('assets/images/gummy-canvas.png');
     }
 
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Card(
-        color: widget.selected ? Colors.blue : ThemeData().cardTheme.color,
-        elevation: elevation,
-        child: ScaleTransition(
-          scale: scaleAnimation,
+    return Container(
+      width: 300.0,
+      height: 360.0,
+      padding: const EdgeInsets.only(right: 12.0),
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: Card(
+          color: widget.selected ? stateColors.primary : Colors.transparent,
+          elevation: _elevation,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          clipBehavior: Clip.antiAlias,
           child: Ink.image(
             image: imageProvider,
             fit: BoxFit.cover,
@@ -115,62 +167,19 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
               },
               onHover: (isHover) {
                 if (isHover) {
-                  elevation = 8.0;
-                  showCaption = true;
-
-                  captionController.forward();
-                  offsetController.forward();
-                  scaleController.forward();
+                  _elevation = 8.0;
+                  _scaleController.forward();
                 } else {
-                  elevation = initElevation;
-                  showCaption = false;
-
-                  captionController.reverse();
-                  offsetController.reverse();
-                  scaleController.reverse();
+                  _elevation = _initElevation;
+                  _scaleController.reverse();
                 }
 
                 setState(() {});
               },
               child: Stack(
                 children: [
-                  caption(),
+                  // caption(),
                   multiSelectButton(),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget caption() {
-    final illustration = widget.book;
-
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: SlideTransition(
-        position: offsetAnimation,
-        child: Opacity(
-          opacity: opacity.value,
-          child: Container(
-            color: Colors.black26,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      illustration.name!,
-                      style: FontsUtils.mainStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  popupMenuButton(),
                 ],
               ),
             ),
@@ -220,9 +229,11 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
 
   Widget popupMenuButton() {
     return PopupMenuButton(
-      child: Icon(
-        Icons.more_vert,
-        color: Colors.white,
+      icon: Opacity(
+        opacity: 0.8,
+        child: Icon(
+          UniconsLine.ellipsis_h,
+        ),
       ),
       onSelected: (dynamic value) {
         switch (value) {
@@ -293,7 +304,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
       containerWidget: (context, animation, child) {
         return RawKeyboardListener(
           autofocus: true,
-          focusNode: keyboardFocusNode,
+          focusNode: _keyboardFocusNode,
           onKey: (keyEvent) {
             if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
               Navigator.of(context).pop();
