@@ -113,59 +113,6 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     );
   }
 
-  Widget fab() {
-    if (!_isFabVisible) {
-      return FloatingActionButton(
-        onPressed: fetch,
-        backgroundColor: stateColors.primary,
-        foregroundColor: Colors.white,
-        child: Icon(UniconsLine.refresh),
-      );
-    }
-
-    return FloatingActionButton(
-      onPressed: () {
-        _scrollController.animateTo(
-          0.0,
-          duration: 1.seconds,
-          curve: Curves.easeOut,
-        );
-      },
-      backgroundColor: stateColors.primary,
-      foregroundColor: Colors.white,
-      child: Icon(UniconsLine.arrow_up),
-    );
-  }
-
-  Widget header() {
-    return SliverPadding(
-      padding: const EdgeInsets.only(
-        top: 60.0,
-        left: 50.0,
-        bottom: 24.0,
-      ),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: Opacity(
-              opacity: 0.8,
-              child: Text(
-                'illustrations'.tr().toUpperCase(),
-                style: FontsUtils.mainStyle(
-                  fontSize: 30.0,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-          ),
-          defaultActionsToolbar(),
-          multiSelectToolbar(),
-        ]),
-      ),
-    );
-  }
-
   Widget body() {
     if (_isLoading) {
       return SliverList(
@@ -262,6 +209,30 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     );
   }
 
+  Widget fab() {
+    if (!_isFabVisible) {
+      return FloatingActionButton(
+        onPressed: fetch,
+        backgroundColor: stateColors.primary,
+        foregroundColor: Colors.white,
+        child: Icon(UniconsLine.refresh),
+      );
+    }
+
+    return FloatingActionButton(
+      onPressed: () {
+        _scrollController.animateTo(
+          0.0,
+          duration: 1.seconds,
+          curve: Curves.easeOut,
+        );
+      },
+      backgroundColor: stateColors.primary,
+      foregroundColor: Colors.white,
+      child: Icon(UniconsLine.arrow_up),
+    );
+  }
+
   Widget gridView() {
     final selectionMode = _forceMultiSelect || _multiSelectedItems.isNotEmpty;
 
@@ -306,6 +277,35 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
           },
           childCount: _illustrationsList.length,
         ),
+      ),
+    );
+  }
+
+  Widget header() {
+    return SliverPadding(
+      padding: const EdgeInsets.only(
+        top: 60.0,
+        left: 50.0,
+        bottom: 24.0,
+      ),
+      sliver: SliverList(
+        delegate: SliverChildListDelegate.fixed([
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Opacity(
+              opacity: 0.8,
+              child: Text(
+                'illustrations'.tr().toUpperCase(),
+                style: FontsUtils.mainStyle(
+                  fontSize: 30.0,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ),
+          defaultActionsToolbar(),
+          multiSelectToolbar(),
+        ]),
       ),
     );
   }

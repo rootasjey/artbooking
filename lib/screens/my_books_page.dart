@@ -84,44 +84,6 @@ class _MyBooksPageState extends State<MyBooksPage> {
     );
   }
 
-  Widget header() {
-    return SliverPadding(
-      padding: const EdgeInsets.only(
-        top: 60.0,
-        left: 50.0,
-        bottom: 24.0,
-      ),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: Row(
-              children: [
-                Text(
-                  "books".tr().toUpperCase(),
-                  style: FontsUtils.mainStyle(
-                    fontSize: 30.0,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                if (_isCreating)
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 24.0,
-                      top: 12.0,
-                    ),
-                    child: CircularProgressIndicator(),
-                  ),
-              ],
-            ),
-          ),
-          defaultActionsToolbar(),
-          multiSelectToolbar(),
-        ]),
-      ),
-    );
-  }
-
   Widget body() {
     if (_isLoading) {
       return SliverList(
@@ -163,43 +125,6 @@ class _MyBooksPageState extends State<MyBooksPage> {
         multiSelectButton(),
         sortButton(),
       ],
-    );
-  }
-
-  Widget fab() {
-    if (!_isFabVisible) {
-      return FloatingActionButton(
-        onPressed: fetchMany,
-        backgroundColor: stateColors.primary,
-        foregroundColor: Colors.white,
-        child: Icon(UniconsLine.refresh),
-      );
-    }
-
-    return FloatingActionButton(
-      onPressed: () {
-        _scrollController.animateTo(
-          0.0,
-          duration: 1.seconds,
-          curve: Curves.easeOut,
-        );
-      },
-      backgroundColor: stateColors.primary,
-      foregroundColor: Colors.white,
-      child: Icon(UniconsLine.arrow_up),
-    );
-  }
-
-  Widget multiSelectButton() {
-    return TextRectangleButton(
-      onPressed: () {
-        setState(() {
-          _forceMultiSelect = !_forceMultiSelect;
-        });
-      },
-      icon: Icon(UniconsLine.layers_alt),
-      label: Text('multi_select'.tr()),
-      primary: _forceMultiSelect ? Colors.lightGreen : Colors.black38,
     );
   }
 
@@ -255,6 +180,68 @@ class _MyBooksPageState extends State<MyBooksPage> {
               ),
             ],
           ),
+        ]),
+      ),
+    );
+  }
+
+  Widget fab() {
+    if (!_isFabVisible) {
+      return FloatingActionButton(
+        onPressed: fetchMany,
+        backgroundColor: stateColors.primary,
+        foregroundColor: Colors.white,
+        child: Icon(UniconsLine.refresh),
+      );
+    }
+
+    return FloatingActionButton(
+      onPressed: () {
+        _scrollController.animateTo(
+          0.0,
+          duration: 1.seconds,
+          curve: Curves.easeOut,
+        );
+      },
+      backgroundColor: stateColors.primary,
+      foregroundColor: Colors.white,
+      child: Icon(UniconsLine.arrow_up),
+    );
+  }
+
+  Widget header() {
+    return SliverPadding(
+      padding: const EdgeInsets.only(
+        top: 60.0,
+        left: 50.0,
+        bottom: 24.0,
+      ),
+      sliver: SliverList(
+        delegate: SliverChildListDelegate.fixed([
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Row(
+              children: [
+                Text(
+                  "books".tr().toUpperCase(),
+                  style: FontsUtils.mainStyle(
+                    fontSize: 30.0,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                if (_isCreating)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 24.0,
+                      top: 12.0,
+                    ),
+                    child: CircularProgressIndicator(),
+                  ),
+              ],
+            ),
+          ),
+          defaultActionsToolbar(),
+          multiSelectToolbar(),
         ]),
       ),
     );
@@ -329,6 +316,19 @@ class _MyBooksPageState extends State<MyBooksPage> {
           childCount: _books.length,
         ),
       ),
+    );
+  }
+
+  Widget multiSelectButton() {
+    return TextRectangleButton(
+      onPressed: () {
+        setState(() {
+          _forceMultiSelect = !_forceMultiSelect;
+        });
+      },
+      icon: Icon(UniconsLine.layers_alt),
+      label: Text('multi_select'.tr()),
+      primary: _forceMultiSelect ? Colors.lightGreen : Colors.black38,
     );
   }
 
@@ -475,6 +475,35 @@ class _MyBooksPageState extends State<MyBooksPage> {
     );
   }
 
+  void createBook() async {
+    setState(() {
+      _isCreating = true;
+    });
+
+    final response = await BooksActions.createOne(
+      name: _newBookName,
+      description: _newBookDescription,
+    );
+
+    setState(() => _isCreating = false);
+
+    if (!response.success) {
+      Snack.e(
+        context: context,
+        message: "book_creation_error".tr(),
+      );
+
+      return;
+    }
+
+    Snack.s(
+      context: context,
+      message: "book_creation_success".tr(),
+    );
+
+    fetchOne(response.bookId);
+  }
+
   void deleteSelection() async {
     _multiSelectedItems.entries.forEach((multiSelectItem) {
       _books.removeWhere((item) => item.id == multiSelectItem.key);
@@ -612,35 +641,6 @@ class _MyBooksPageState extends State<MyBooksPage> {
     } catch (error) {
       appLogger.e(error);
     }
-  }
-
-  void createBook() async {
-    setState(() {
-      _isCreating = true;
-    });
-
-    final response = await BooksActions.createOne(
-      name: _newBookName,
-      description: _newBookDescription,
-    );
-
-    setState(() => _isCreating = false);
-
-    if (!response.success) {
-      Snack.e(
-        context: context,
-        message: "book_creation_error".tr(),
-      );
-
-      return;
-    }
-
-    Snack.s(
-      context: context,
-      message: "book_creation_success".tr(),
-    );
-
-    fetchOne(response.bookId);
   }
 
   bool onNotification(ScrollNotification notification) {
