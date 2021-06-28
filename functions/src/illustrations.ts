@@ -201,21 +201,8 @@ export const createOne = functions
         extension: '',
         hasPendingCreation: true,
         license: {
-          custom: false,
-          description: '',
-          name: '',
-          existingLicenseId: '',
-          usage: {
-            edit: false,
-            print: false,
-            sell: false,
-            share: false,
-            showAttribution: true,
-            useInOtherFree: false,
-            useInOtherOss: false,
-            useInOtherPaid: false,
-            view: false,
-          },
+          from: '',
+          id: '',
         },
         name: name,
         size: 0, // File's ize in bytes
