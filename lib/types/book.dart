@@ -81,40 +81,37 @@ class Book {
   });
 
   factory Book.fromJSON(Map<String, dynamic> data) {
-    final _illustrations = <BookIllustration>[];
-
-    if (data['illustrations'] != null) {
-      for (var bookIllusData in data['illustrations']) {
-        _illustrations.add(BookIllustration.fromJSON(bookIllusData));
-      }
-    }
-
-    final _layout = parseStringLayout(data['layout']);
-
-    final _layoutMobile = parseStringLayout(data['layoutMobile']);
-
-    final _layputOrientation =
-        parseStringLayoutOrientation(data['layoutOrientation']);
-
-    final _layoutOrientationMobile =
-        parseStringLayoutOrientation(data['layoutOrientationMobile']);
-
     return Book(
       count: data['count'] ?? 0,
       cover: BookCover.fromJSON(data['cover']),
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       description: data['description'],
       id: data['id'],
-      illustrations: _illustrations,
-      layout: _layout,
-      layoutMobile: _layoutMobile,
-      layoutOrientation: _layputOrientation,
-      layoutOrientationMobile: _layoutOrientationMobile,
+      illustrations: parseIllustrations(data['illustrations']),
+      layout: parseLayout(data['layout']),
+      layoutMobile: parseLayout(data['layoutMobile']),
+      layoutOrientation: parseOrientation(data['layoutOrientation']),
+      layoutOrientationMobile:
+          parseOrientation(data['layoutOrientationMobile']),
       name: data['name'],
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
       urls: BookUrls.fromJSON(data['urls']),
       visibility: parseStringVisibility(data['visibility']),
     );
+  }
+
+  static List<BookIllustration> parseIllustrations(data) {
+    final illustrations = <BookIllustration>[];
+
+    if (data == null) {
+      return illustrations;
+    }
+
+    for (var bookIllustrationData in data) {
+      illustrations.add(BookIllustration.fromJSON(bookIllustrationData));
+    }
+
+    return illustrations;
   }
 
   String layoutOrientationToString({bool isMobile = false}) {
@@ -166,7 +163,7 @@ class Book {
     }
   }
 
-  static BookLayout parseStringLayout(String? stringLayout) {
+  static BookLayout parseLayout(String? stringLayout) {
     switch (stringLayout) {
       case 'adaptativeGrid':
         return BookLayout.adaptativeGrid;
@@ -195,8 +192,7 @@ class Book {
     }
   }
 
-  static BookLayoutOrientation parseStringLayoutOrientation(
-      String? stringOrientation) {
+  static BookLayoutOrientation parseOrientation(String? stringOrientation) {
     switch (stringOrientation) {
       case 'both':
         return BookLayoutOrientation.both;

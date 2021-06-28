@@ -1,27 +1,27 @@
 class VScaleFactor {
-  final double? height;
-  final double? mobileHeight;
-  final double? mobileWidth;
-  final double? width;
+  final int height;
+  final int mobileHeight;
+  final int mobileWidth;
+  final int width;
 
   VScaleFactor({
-    this.height,
-    this.mobileHeight,
-    this.mobileWidth,
-    this.width,
+    required this.height,
+    required this.mobileHeight,
+    required this.mobileWidth,
+    required this.width,
   });
 
   factory VScaleFactor.fromJSON(Map<String, dynamic> data) {
     return VScaleFactor(
-      height: data['height'] ?? 1.0,
-      mobileHeight: data['mobileHeight'] ?? 1.0,
-      mobileWidth: data['mobileWidth'] ?? 1.0,
-      width: data['width'] ?? 1.0,
+      height: data['height'] ?? 1,
+      mobileHeight: data['mobileHeight'] ?? 1,
+      mobileWidth: data['mobileWidth'] ?? 1,
+      width: data['width'] ?? 1,
     );
   }
 
-  Map<String, double?> toJSON() {
-    final data = Map<String, double?>();
+  Map<String, int> toJSON() {
+    final data = Map<String, int>();
 
     data['height'] = height;
     data['mobileHeight'] = mobileHeight;
