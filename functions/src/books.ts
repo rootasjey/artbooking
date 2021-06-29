@@ -83,7 +83,7 @@ export const addIllustrations = functions
 
     const items = illustrationIds.map((id) => { 
       return { 
-        illustrationId: id, 
+        illustration: { id }, 
         success: true, 
       };
     });
@@ -159,7 +159,9 @@ export const createOne = functions
       });
 
     return {
-      bookId: addedBook.id,
+      book: {
+        id: addedBook.id,
+      },
       success: true,
     };
   });
@@ -211,7 +213,7 @@ export const deleteOne = functions
       });
 
     return {
-      bookId,
+      book: { id: bookId },
       success: true,
     };
   });
@@ -257,7 +259,7 @@ export const deleteMany = functions
 
         if (!bookSnap.exists || !bookData) {
           itemsProcessed.push({
-            bookId,
+            book: { id: bookId },
             success: false,
             errorMessage,
           });
@@ -273,7 +275,7 @@ export const deleteMany = functions
             to delete the book [${bookId}].`;
 
           itemsProcessed.push({
-            bookId,
+            book: { id: bookId },
             success: false,
             errorMessage,
           });
@@ -292,7 +294,7 @@ export const deleteMany = functions
           });
 
         itemsProcessed.push({
-          bookId,
+          book: { id: bookId },
           success: true,
         });
 
@@ -380,7 +382,7 @@ export const removeIllustrations = functions
 
     const items = illustrationIds.map((id) => {
       return {
-        illustrationId: id,
+        illustration: { id },
         success: true,
       };
     });
@@ -464,7 +466,7 @@ export const setCover = functions
     });
 
     return {
-      bookId,
+      book: { id: bookId },
       success: true,
     };
   });
@@ -533,7 +535,7 @@ export const updateMetadata = functions
     });
 
     return {
-      bookId,
+      book: { id: bookId },
       success: true,
     };
   });
@@ -619,7 +621,9 @@ export const updateIllustrationPosition = functions
     });
 
     return {
-      illustrationId,
+      illustration: { 
+        id: illustrationId, 
+      },
       success: true,
     };
   });
