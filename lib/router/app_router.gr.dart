@@ -233,7 +233,7 @@ class AppRouter extends _i1.RootStackRouter {
           final pathParams = data.pathParams;
           final args = data.argsAs<DashBookPageArgs>(
               orElse: () =>
-                  DashBookPageArgs(bookId: pathParams.optString('bookId')));
+                  DashBookPageArgs(bookId: pathParams.getString('bookId')));
           return _i22.MyBookPage(
               key: args.key, bookId: args.bookId, book: args.book);
         },
@@ -595,7 +595,7 @@ class MyBooksPageRoute extends _i1.PageRouteInfo {
 }
 
 class DashBookPage extends _i1.PageRouteInfo<DashBookPageArgs> {
-  DashBookPage({_i2.Key? key, required String? bookId, _i31.Book? book})
+  DashBookPage({_i2.Key? key, required String bookId, _i31.Book? book})
       : super(name,
             path: ':bookId',
             args: DashBookPageArgs(key: key, bookId: bookId, book: book),
@@ -609,7 +609,7 @@ class DashBookPageArgs {
 
   final _i2.Key? key;
 
-  final String? bookId;
+  final String bookId;
 
   final _i31.Book? book;
 }

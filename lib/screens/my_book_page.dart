@@ -1,13 +1,17 @@
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
+import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/illustration_card.dart';
 import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/components/popup_menu_item_icon.dart';
+import 'package:artbooking/components/sliver_edge_padding.dart';
+import 'package:artbooking/components/text_divider.dart';
+import 'package:artbooking/components/text_rectangle_button.dart';
+import 'package:artbooking/components/underlined_button.dart';
 import 'package:artbooking/components/user_books.dart';
 import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
@@ -20,12 +24,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
 class MyBookPage extends StatefulWidget {
-  final String? bookId;
+  final String bookId;
   final Book? book;
 
   const MyBookPage({
@@ -41,24 +46,22 @@ class _MyBookPageState extends State<MyBookPage> {
   /// The viewing book.
   Book? bookPage;
 
-  late bool isLoading;
-  bool hasError = false;
-  bool hasNext = true;
-  bool isFabVisible = false;
-  bool isLoadingMore = false;
-  bool forceMultiSelect = false;
+  bool _isLoading = false;
+  bool _hasError = false;
+  bool _isFabVisible = false;
+  bool _forceMultiSelect = false;
 
-  final illustrations = <Illustration>[];
+  final _illustrations = <Illustration>[];
   final _keyboardFocusNode = FocusNode();
 
-  int limit = 20;
-  int startIndex = 0;
-  int endIndex = 0;
+  int _limit = 20;
+  int _startIndex = 0;
+  int _endIndex = 0;
 
-  Map<String?, Illustration> multiSelectedItems = Map();
-  Map<int, Illustration> processingIllus = Map();
+  Map<String?, Illustration> _multiSelectedItems = Map();
+  Map<int, Illustration> _processingIllustrations = Map();
 
-  ScrollController scrollController = ScrollController();
+  ScrollController _scrollController = ScrollController();
 
   final List<PopupMenuEntry<BookItemAction>> popupMenuEntries = [
     PopupMenuItemIcon(
@@ -88,47 +91,13 @@ class _MyBookPageState extends State<MyBookPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: isFabVisible
-          ? FloatingActionButton(
-              onPressed: () {
-                scrollController.animateTo(
-                  0.0,
-                  duration: 1.seconds,
-                  curve: Curves.easeOut,
-                );
-              },
-              backgroundColor: stateColors.primary,
-              foregroundColor: Colors.white,
-              child: Icon(Icons.arrow_upward),
-            )
-          : null,
+      floatingActionButton: fab(),
       body: NotificationListener<ScrollNotification>(
-        onNotification: (scrollNotification) {
-          // FAB visibility
-          if (scrollNotification.metrics.pixels < 50 && isFabVisible) {
-            setState(() {
-              isFabVisible = false;
-            });
-          } else if (scrollNotification.metrics.pixels > 50 && !isFabVisible) {
-            setState(() {
-              isFabVisible = true;
-            });
-          }
-
-          if (scrollNotification.metrics.pixels <
-              scrollNotification.metrics.maxScrollExtent) {
-            return false;
-          }
-
-          if (hasNext && !isLoadingMore) {
-            fetchMoreIllustrations();
-          }
-
-          return false;
-        },
+        onNotification: onNotification,
         child: CustomScrollView(
-          controller: scrollController,
+          controller: _scrollController,
           slivers: <Widget>[
+            SliverEdgePadding(),
             MainAppBar(),
             header(),
             body(),
@@ -143,28 +112,39 @@ class _MyBookPageState extends State<MyBookPage> {
     );
   }
 
-  Widget header() {
-    final bookName = bookPage != null ? bookPage!.name : 'My book';
+  Widget bookCoverCard() {
+    if (bookPage == null) {
+      return SizedBox(
+        height: 260.0,
+        width: 200.0,
+        child: Card(
+          elevation: 2.0,
+          color: stateColors.clairPink,
+        ),
+      );
+    }
 
-    return SliverPadding(
-      padding: const EdgeInsets.only(
-        left: 50.0,
-      ),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
-          Text(
-            bookName,
-            style: FontsUtils.title(),
-          ),
-          defaultActionsToolbar(),
-          multiSelectToolbar(),
-        ]),
+    return SizedBox(
+      height: 260.0,
+      width: 200.0,
+      child: Card(
+        elevation: 4.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Ink.image(
+          image: NetworkImage(bookPage!.getCoverUrl()),
+          height: 260.0,
+          width: 200.0,
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }
 
   Widget body() {
-    if (isLoading) {
+    if (_isLoading) {
       return SliverList(
         delegate: SliverChildListDelegate.fixed([
           Padding(
@@ -177,19 +157,73 @@ class _MyBookPageState extends State<MyBookPage> {
       );
     }
 
-    if (hasError) {
+    if (_hasError) {
       return errorView();
     }
 
-    if (illustrations.isEmpty) {
+    if (_illustrations.isEmpty) {
       return emptyView();
     }
 
     return gridView();
   }
 
+  Widget createdAt() {
+    if (bookPage == null) {
+      return Container();
+    }
+
+    final DateTime? createdAt = bookPage!.createdAt;
+
+    if (createdAt == null) {
+      return Container();
+    }
+
+    String createdAtStr = "";
+
+    if (DateTime.now().difference(createdAt).inDays > 60) {
+      createdAtStr = "date_created_at".tr(
+        args: [
+          Jiffy(bookPage!.createdAt).yMMMMEEEEd,
+        ],
+      );
+    } else {
+      createdAtStr = "date_created_ago".tr(
+        args: [Jiffy(bookPage!.createdAt).fromNow()],
+      );
+    }
+
+    return Opacity(
+      opacity: 0.6,
+      child: Text(
+        createdAtStr,
+        style: FontsUtils.mainStyle(
+          fontSize: 16.0,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget description() {
+    if (bookPage == null) {
+      return Container();
+    }
+
+    return Opacity(
+      opacity: 0.6,
+      child: Text(
+        bookPage!.description,
+        style: FontsUtils.mainStyle(
+          fontSize: 16.0,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
   Widget defaultActionsToolbar() {
-    if (multiSelectedItems.isNotEmpty) {
+    if (_multiSelectedItems.isNotEmpty) {
       return Container();
     }
 
@@ -197,37 +231,7 @@ class _MyBookPageState extends State<MyBookPage> {
       spacing: 12.0,
       runSpacing: 12.0,
       children: [
-        OutlinedButton.icon(
-          onPressed: () {
-            setState(() {
-              forceMultiSelect = !forceMultiSelect;
-            });
-          },
-          icon: Padding(
-            padding: const EdgeInsets.only(bottom: 6.0),
-            child: Icon(UniconsLine.layers_alt),
-          ),
-          label: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Text(
-              'multi_select'.tr(),
-            ),
-          ),
-          style: forceMultiSelect
-              ? TextButton.styleFrom(primary: Colors.lightGreen)
-              : TextButton.styleFrom(),
-        ),
-        OutlinedButton.icon(
-          onPressed: () {},
-          icon: Padding(
-            padding: const EdgeInsets.only(bottom: 6.0),
-            child: Icon(UniconsLine.sort),
-          ),
-          label: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Text('sort'.tr()),
-          ),
-        ),
+        multiSelectButton(),
       ],
     );
   }
@@ -241,53 +245,90 @@ class _MyBookPageState extends State<MyBookPage> {
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
           Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(
-                  bottom: 12.0,
-                ),
-                child: Text(
-                  "lonely_there".tr(),
-                  style: TextStyle(
-                    fontSize: 32.0,
-                    color: stateColors.primary,
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: Opacity(
+                  opacity: 0.8,
+                  child: Icon(
+                    UniconsLine.trees,
+                    size: 80.0,
+                    color: Colors.lightGreen,
                   ),
                 ),
               ),
-              Padding(
+              Opacity(
+                opacity: 0.6,
+                child: Text(
+                  "This is a new start".toUpperCase(),
+                  style: FontsUtils.mainStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Container(
+                width: 400.0,
                 padding: const EdgeInsets.only(
                   bottom: 16.0,
-                  // top: 24.0,
                 ),
                 child: Opacity(
                   opacity: 0.4,
                   child: Text(
                     "book_no_illustrations".tr(),
-                    style: TextStyle(
+                    textAlign: TextAlign.center,
+                    style: FontsUtils.mainStyle(
                       fontSize: 16.0,
                     ),
                   ),
                 ),
               ),
-              ElevatedButton.icon(
-                onPressed: () {
-                  appUploadManager.pickImage(context);
-                },
-                icon: Icon(UniconsLine.upload),
-                label: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Text(
-                    "upload".tr(),
-                    style: TextStyle(
-                      fontSize: 16.0,
-                    ),
-                  ),
-                ),
-              ),
+              emptyViewActions(),
             ],
           ),
         ]),
+      ),
+    );
+  }
+
+  Widget emptyViewActions() {
+    return Container(
+      width: 400.0,
+      padding: const EdgeInsets.only(top: 24.0),
+      child: Column(
+        children: [
+          IconButton(
+            tooltip: "book_upload_illustration".tr(),
+            onPressed: uploadAndAddToThisBook,
+            icon: Icon(UniconsLine.upload),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: TextDivider(
+              text: Opacity(
+                opacity: 0.6,
+                child: Text(
+                  "or".tr().toUpperCase(),
+                  style: FontsUtils.mainStyle(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          UnderlinedButton(
+            onTap: () {
+              context.router.root.push(
+                DashboardPageRoute(
+                  children: [DashIllustrationsRouter()],
+                ),
+              );
+            },
+            child: Text("illustrations_browse".tr()),
+          ),
+        ],
       ),
     );
   }
@@ -350,8 +391,32 @@ class _MyBookPageState extends State<MyBookPage> {
     );
   }
 
+  Widget fab() {
+    if (!_isFabVisible) {
+      return FloatingActionButton(
+        onPressed: fetchIllustrations,
+        backgroundColor: stateColors.primary,
+        foregroundColor: Colors.white,
+        child: Icon(UniconsLine.refresh),
+      );
+    }
+
+    return FloatingActionButton(
+      onPressed: () {
+        _scrollController.animateTo(
+          0.0,
+          duration: 1.seconds,
+          curve: Curves.easeOut,
+        );
+      },
+      backgroundColor: stateColors.primary,
+      foregroundColor: Colors.white,
+      child: Icon(UniconsLine.arrow_up),
+    );
+  }
+
   Widget gridView() {
-    final selectionMode = forceMultiSelect || multiSelectedItems.isNotEmpty;
+    final selectionMode = _forceMultiSelect || _multiSelectedItems.isNotEmpty;
 
     return SliverPadding(
       padding: const EdgeInsets.all(40.0),
@@ -363,8 +428,8 @@ class _MyBookPageState extends State<MyBookPage> {
         ),
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            final illustration = illustrations.elementAt(index);
-            final selected = multiSelectedItems.containsKey(illustration.id);
+            final illustration = _illustrations.elementAt(index);
+            final selected = _multiSelectedItems.containsKey(illustration.id);
 
             return IllustrationCard(
               illustration: illustration,
@@ -375,26 +440,111 @@ class _MyBookPageState extends State<MyBookPage> {
               onLongPress: (selected) {
                 if (selected) {
                   setState(() {
-                    multiSelectedItems.remove(illustration.id);
+                    _multiSelectedItems.remove(illustration.id);
                   });
                   return;
                 }
 
                 setState(() {
-                  multiSelectedItems.putIfAbsent(
+                  _multiSelectedItems.putIfAbsent(
                       illustration.id, () => illustration);
                 });
               },
             );
           },
-          childCount: illustrations.length,
+          childCount: _illustrations.length,
         ),
       ),
     );
   }
 
+  Widget header() {
+    return SliverPadding(
+      padding: const EdgeInsets.only(
+        top: 60.0,
+        left: 50.0,
+        bottom: 24.0,
+      ),
+      sliver: SliverList(
+        delegate: SliverChildListDelegate.fixed([
+          headerTop(),
+          headerBottom(),
+        ]),
+      ),
+    );
+  }
+
+  Widget headerBottom() {
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: 32.0,
+        left: 8.0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          defaultActionsToolbar(),
+          multiSelectToolbar(),
+        ],
+      ),
+    );
+  }
+
+  Widget headerTop() {
+    return Wrap(
+      spacing: 24.0,
+      runSpacing: 24.0,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        bookCoverCard(),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Opacity(
+              opacity: 0.6,
+              child: IconButton(
+                tooltip: "back".tr(),
+                onPressed: context.router.pop,
+                icon: Icon(UniconsLine.arrow_left),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  title(),
+                  description(),
+                  updatedAt(),
+                  stats(),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget multiSelectButton() {
+    if (_illustrations.isEmpty) {
+      return Container();
+    }
+
+    return TextRectangleButton(
+      onPressed: () {
+        setState(() {
+          _forceMultiSelect = !_forceMultiSelect;
+        });
+      },
+      icon: Icon(UniconsLine.layers_alt),
+      label: Text('multi_select'.tr()),
+      primary: _forceMultiSelect ? Colors.lightGreen : Colors.black38,
+    );
+  }
+
   Widget multiSelectToolbar() {
-    if (multiSelectedItems.isEmpty) {
+    if (_multiSelectedItems.isEmpty) {
       return Container();
     }
 
@@ -405,7 +555,7 @@ class _MyBookPageState extends State<MyBookPage> {
           opacity: 0.6,
           child: Text(
             "multi_items_selected"
-                .tr(args: [multiSelectedItems.length.toString()]),
+                .tr(args: [_multiSelectedItems.length.toString()]),
             style: TextStyle(
               fontSize: 30.0,
             ),
@@ -422,7 +572,7 @@ class _MyBookPageState extends State<MyBookPage> {
         TextButton.icon(
           onPressed: () {
             setState(() {
-              multiSelectedItems.clear();
+              _multiSelectedItems.clear();
             });
           },
           icon: Icon(Icons.border_clear),
@@ -430,8 +580,8 @@ class _MyBookPageState extends State<MyBookPage> {
         ),
         TextButton.icon(
           onPressed: () {
-            illustrations.forEach((illustration) {
-              multiSelectedItems.putIfAbsent(
+            _illustrations.forEach((illustration) {
+              _multiSelectedItems.putIfAbsent(
                   illustration.id, () => illustration);
             });
 
@@ -449,6 +599,83 @@ class _MyBookPageState extends State<MyBookPage> {
           label: Text('delete'.tr()),
         ),
       ],
+    );
+  }
+
+  Widget stats() {
+    if (bookPage == null) {
+      return Container();
+    }
+
+    final Color color = bookPage!.illustrations.isEmpty
+        ? stateColors.secondary
+        : stateColors.primary;
+
+    return Opacity(
+      opacity: 0.8,
+      child: Text(
+        "illustrations_count".plural(bookPage!.illustrations.length),
+        style: FontsUtils.mainStyle(
+          color: color,
+          fontSize: 16.0,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget title() {
+    final bookName = bookPage != null ? bookPage!.name : 'My book';
+
+    return Opacity(
+      opacity: 0.8,
+      child: Text(
+        bookName,
+        style: FontsUtils.mainStyle(
+          fontSize: 40.0,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
+
+  Widget updatedAt({bool clickable = true}) {
+    if (bookPage == null) {
+      return Container();
+    }
+
+    final DateTime? updatedAt = bookPage!.updatedAt;
+
+    if (updatedAt == null) {
+      return Container();
+    }
+
+    String updatedAtStr = "";
+
+    if (DateTime.now().difference(updatedAt).inDays > 60) {
+      updatedAtStr = "date_updated_at".tr(
+        args: [
+          Jiffy(bookPage!.updatedAt).yMMMMEEEEd,
+        ],
+      );
+    } else {
+      updatedAtStr = "date_updated_ago".tr(
+        args: [Jiffy(bookPage!.updatedAt).fromNow()],
+      );
+    }
+
+    return InkWell(
+      onTap: clickable ? showDatesDialog : null,
+      child: Opacity(
+        opacity: 0.6,
+        child: Text(
+          updatedAtStr,
+          style: FontsUtils.mainStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
     );
   }
 
@@ -527,7 +754,7 @@ class _MyBookPageState extends State<MyBookPage> {
 
   void deleteIllustration(Illustration illustration, int index) async {
     setState(() {
-      illustrations.removeAt(index);
+      _illustrations.removeAt(index);
     });
 
     final response = await IllustrationsActions.deleteOne(
@@ -539,7 +766,7 @@ class _MyBookPageState extends State<MyBookPage> {
     }
 
     setState(() {
-      illustrations.insert(index, illustration);
+      _illustrations.insert(index, illustration);
     });
   }
 
@@ -617,16 +844,16 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   void deleteSelection() async {
-    multiSelectedItems.entries.forEach((multiSelectItem) {
-      illustrations.removeWhere((item) => item.id == multiSelectItem.key);
+    _multiSelectedItems.entries.forEach((multiSelectItem) {
+      _illustrations.removeWhere((item) => item.id == multiSelectItem.key);
     });
 
-    final duplicatedItems = multiSelectedItems.values.toList();
-    final illustrationIds = multiSelectedItems.keys.toList();
+    final duplicatedItems = _multiSelectedItems.values.toList();
+    final illustrationIds = _multiSelectedItems.keys.toList();
 
     setState(() {
-      multiSelectedItems.clear();
-      forceMultiSelect = false;
+      _multiSelectedItems.clear();
+      _forceMultiSelect = false;
     });
 
     final response = await BooksActions.removeIllustrations(
@@ -640,7 +867,7 @@ class _MyBookPageState extends State<MyBookPage> {
         message: "illustrations_delete_error".tr(),
       );
 
-      illustrations.addAll(duplicatedItems);
+      _illustrations.addAll(duplicatedItems);
     }
   }
 
@@ -651,7 +878,7 @@ class _MyBookPageState extends State<MyBookPage> {
 
   Future fetchBook() async {
     setState(() {
-      isLoading = true;
+      _isLoading = true;
     });
 
     try {
@@ -662,8 +889,8 @@ class _MyBookPageState extends State<MyBookPage> {
 
       if (!bookSnap.exists) {
         setState(() {
-          hasError = true;
-          isLoading = false;
+          _hasError = true;
+          _isLoading = false;
         });
       }
 
@@ -672,14 +899,14 @@ class _MyBookPageState extends State<MyBookPage> {
 
       setState(() {
         bookPage = Book.fromJSON(bookData);
-        isLoading = false;
+        _isLoading = false;
       });
     } catch (error) {
       appLogger.e(error);
 
       setState(() {
-        hasError = true;
-        isLoading = true;
+        _hasError = true;
+        _isLoading = true;
       });
     }
   }
@@ -692,22 +919,19 @@ class _MyBookPageState extends State<MyBookPage> {
     final bpIllustrations = bookPage!.illustrations;
 
     setState(() {
-      isLoading = true;
-      startIndex = 0;
-      endIndex =
-          bpIllustrations.length >= limit ? limit : bpIllustrations.length;
+      _isLoading = true;
+      _startIndex = 0;
+      _endIndex =
+          bpIllustrations.length >= _limit ? _limit : bpIllustrations.length;
     });
 
     try {
       if (bpIllustrations.isEmpty) {
-        setState(() {
-          isLoading = false;
-        });
-
+        setState(() => _isLoading = false);
         return;
       }
 
-      final range = bpIllustrations.getRange(startIndex, endIndex);
+      final range = bpIllustrations.getRange(_startIndex, _endIndex);
 
       for (var bookIllustration in range) {
         final illustrationSnap = await FirebaseFirestore.instance
@@ -723,73 +947,52 @@ class _MyBookPageState extends State<MyBookPage> {
         illusData['id'] = illustrationSnap.id;
 
         final illustration = Illustration.fromJSON(illusData);
-        illustrations.add(illustration);
+        _illustrations.add(illustration);
       }
 
       setState(() {
-        isLoading = false;
-        hasNext = endIndex < bookPage!.count;
+        _isLoading = false;
       });
     } catch (error) {
       appLogger.e(error);
 
       setState(() {
-        hasError = true;
-        isLoading = false;
+        _hasError = true;
+        _isLoading = false;
       });
     }
   }
 
-  void fetchMoreIllustrations() async {
-    if (!hasNext || bookPage == null) {
-      return;
-    }
-
-    setState(() {
-      startIndex = endIndex;
-      endIndex = endIndex + limit;
-      isLoadingMore = true;
-    });
-
-    try {
-      final range = bookPage!.illustrations.getRange(startIndex, endIndex);
-
-      for (var bookIllustration in range) {
-        final illustrationSnap = await FirebaseFirestore.instance
-            .collection('illustrations')
-            .doc(bookIllustration.id)
-            .get();
-
-        if (!illustrationSnap.exists) {
-          continue;
-        }
-
-        final illusData = illustrationSnap.data()!;
-        illusData['id'] = illustrationSnap.id;
-
-        final illustration = Illustration.fromJSON(illusData);
-        illustrations.add(illustration);
-      }
-
+  /// On scroll notifications.
+  bool onNotification(ScrollNotification notification) {
+    // FAB visibility
+    if (notification.metrics.pixels < 50 && _isFabVisible) {
       setState(() {
-        isLoadingMore = false;
-        hasNext = endIndex < bookPage!.count;
+        _isFabVisible = false;
       });
-    } catch (error) {
-      appLogger.e(error);
-
+    } else if (notification.metrics.pixels > 50 && !_isFabVisible) {
       setState(() {
-        isLoadingMore = false;
+        _isFabVisible = true;
       });
     }
+
+    if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
+      return false;
+    }
+
+    // if (_hasNext && !_isLoadingMore) {
+    //   fetchMoreIllustrations();
+    // }
+
+    return false;
   }
 
   void onRemoveFromBook({
     required int index,
     required Illustration illustration,
   }) async {
-    processingIllus.putIfAbsent(index, () => illustration);
-    illustrations.removeAt(index);
+    _processingIllustrations.putIfAbsent(index, () => illustration);
+    _illustrations.removeAt(index);
 
     final response = await BooksActions.removeIllustrations(
       bookId: bookPage!.id,
@@ -802,12 +1005,12 @@ class _MyBookPageState extends State<MyBookPage> {
         message: "illustrations_remove_error".tr(),
       );
 
-      processingIllus.forEach((pIndex, pIllus) {
-        illustrations.insert(index, pIllus);
+      _processingIllustrations.forEach((pIndex, pIllus) {
+        _illustrations.insert(index, pIllus);
       });
 
       setState(() {
-        processingIllus.clear();
+        _processingIllustrations.clear();
       });
 
       return;
@@ -819,12 +1022,12 @@ class _MyBookPageState extends State<MyBookPage> {
     );
 
     setState(() {
-      processingIllus.clear();
+      _processingIllustrations.clear();
     });
   }
 
   void onTapIllustrationCard(Illustration illustration) {
-    if (multiSelectedItems.isEmpty && !forceMultiSelect) {
+    if (_multiSelectedItems.isEmpty && !_forceMultiSelect) {
       navigateToIllustrationPage(illustration);
       return;
     }
@@ -842,19 +1045,19 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   void multiSelectIllustration(Illustration illustration) {
-    final selected = multiSelectedItems.containsKey(illustration.id);
+    final selected = _multiSelectedItems.containsKey(illustration.id);
 
     if (selected) {
       setState(() {
-        multiSelectedItems.remove(illustration.id);
-        forceMultiSelect = multiSelectedItems.length > 0;
+        _multiSelectedItems.remove(illustration.id);
+        _forceMultiSelect = _multiSelectedItems.length > 0;
       });
 
       return;
     }
 
     setState(() {
-      multiSelectedItems.putIfAbsent(illustration.id, () => illustration);
+      _multiSelectedItems.putIfAbsent(illustration.id, () => illustration);
     });
   }
 
@@ -912,5 +1115,67 @@ class _MyBookPageState extends State<MyBookPage> {
         );
       },
     );
+  }
+
+  void showDatesDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          titlePadding: EdgeInsets.zero,
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(
+                  top: 24.0,
+                  left: 24.0,
+                  right: 24.0,
+                  bottom: 12.0,
+                ),
+                child: Text(
+                  "Dates".toUpperCase(),
+                  style: FontsUtils.mainStyle(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Divider(
+                thickness: 1.5,
+                color: stateColors.secondary,
+              ),
+            ],
+          ),
+          contentPadding: const EdgeInsets.all(24.0),
+          children: [
+            Row(
+              children: [
+                Text("• "),
+                createdAt(),
+              ],
+            ),
+            Row(
+              children: [
+                Text("• "),
+                updatedAt(clickable: false),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 24.0),
+              child: DarkElevatedButton(
+                onPressed: context.router.pop,
+                child: Text(
+                  "close".tr(),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void uploadAndAddToThisBook() {
+    // appUploadManager.pickImage(context);
   }
 }

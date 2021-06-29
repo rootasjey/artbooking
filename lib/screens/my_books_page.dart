@@ -661,6 +661,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     }
   }
 
+  /// On scroll notifications.
   bool onNotification(ScrollNotification notification) {
     // FAB visibility
     if (notification.metrics.pixels < 50 && _isFabVisible) {
