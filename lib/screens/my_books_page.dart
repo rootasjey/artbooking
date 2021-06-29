@@ -516,9 +516,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   }
 
   void createBook() async {
-    setState(() {
-      _isCreating = true;
-    });
+    setState(() => _isCreating = true);
 
     final OneBookOpResp response = await BooksActions.createOne(
       name: _newBookName,
@@ -540,8 +538,6 @@ class _MyBooksPageState extends State<MyBooksPage> {
       context: context,
       message: "book_creation_success".tr(),
     );
-
-    fetchOneBook(response.book.id);
   }
 
   void deleteSelection() async {
@@ -662,26 +658,6 @@ class _MyBooksPageState extends State<MyBooksPage> {
       appLogger.e(error);
     } finally {
       setState(() => _isLoading = false);
-    }
-  }
-
-  void fetchOneBook(String bookId) async {
-    try {
-      final bookSnap = await FirebaseFirestore.instance
-          .collection('books')
-          .doc(bookId)
-          .get();
-
-      final bookData = bookSnap.data()!;
-      bookData['id'] = bookSnap.id;
-
-      final book = Book.fromJSON(bookData);
-
-      setState(() {
-        _books.add(book);
-      });
-    } catch (error) {
-      appLogger.e(error);
     }
   }
 
