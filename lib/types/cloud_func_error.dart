@@ -38,15 +38,15 @@ class CloudFuncError {
     }
 
     return CloudFuncError(
-      message: data['message'],
-      code: data['code'],
-      details: data['details'],
+      message: data['message'] ?? '',
+      code: data['code'] ?? '',
+      details: data['details'] ?? '',
     );
   }
 
-  factory CloudFuncError.fromMessage(String message) {
+  factory CloudFuncError.fromMessage(String? message) {
     return CloudFuncError(
-      message: message,
+      message: message ?? '',
       code: '',
       details: '',
     );
