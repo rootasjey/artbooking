@@ -139,7 +139,12 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     } else if (book.cover.auto.url.isNotEmpty) {
       imageProvider = NetworkImage(book.cover.auto.url);
     } else {
-      imageProvider = AssetImage('assets/images/gummy-canvas.png');
+      imageProvider = NetworkImage(
+        "https://firebasestorage.googleapis.com/"
+        "v0/b/artbooking-54d22.appspot.com/o/static"
+        "%2Fimages%2Fbook_cover_512x683.png"
+        "?alt=media&token=d77bc23b-90d7-4663-be3a-e878c6403e51",
+      );
     }
 
     return Container(
