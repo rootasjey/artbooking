@@ -39,6 +39,9 @@ typedef QueryMap = Query<Map<String, dynamic>>;
 /// A document change containing a map.
 typedef DocumentChangeMap = DocumentChange<Map<String, dynamic>>;
 
+/// A query document snapshot containing a map.
+typedef DocSnapMap = QueryDocumentSnapshot<Map<String, dynamic>>;
+
 class MyIllustrationsPage extends StatefulWidget {
   @override
   _MyIllustrationsPageState createState() => _MyIllustrationsPageState();
@@ -525,6 +528,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     }
   }
 
+  /// Fetch illustrations data from Firestore.
   void fetch() async {
     setState(() {
       _isLoading = true;
@@ -556,20 +560,25 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
         return;
       }
 
+      for (DocSnapMap document in snapshot.docs) {
+        final data = document.data();
+        data['id'] = document.id;
+
+        _illustrationsList.add(Illustration.fromJSON(data));
+      }
+
       setState(() {
-        _isLoading = false;
         _lastFirestoreDoc = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
       });
     } catch (error) {
       appLogger.e(error);
-
-      setState(() {
-        _isLoading = false;
-      });
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
+  /// Fetch more illustrations data from Firestore.
   void fetchMore() async {
     if (!_hasNext || _lastFirestoreDoc == null) {
       return;
@@ -603,14 +612,22 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
         return;
       }
 
+      for (DocSnapMap document in snapshot.docs) {
+        final data = document.data();
+        data['id'] = document.id;
+
+        _illustrationsList.add(Illustration.fromJSON(data));
+      }
+
       setState(() {
-        _isLoading = false;
         _lastFirestoreDoc = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
         _isLoadingMore = false;
       });
     } catch (error) {
       appLogger.e(error);
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
@@ -841,7 +858,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
 
   /// Listen to the last Firestore query of this page.
   void startListenningToData(QueryMap query) {
-    _streamSubscription = query.snapshots().listen(
+    _streamSubscription = query.snapshots().skip(1).listen(
       (snapshot) {
         for (DocumentChangeMap documentChange in snapshot.docChanges) {
           switch (documentChange.type) {
