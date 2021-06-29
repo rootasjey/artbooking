@@ -7,6 +7,7 @@ import 'package:artbooking/components/text_rectangle_button.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/book.dart';
+import 'package:artbooking/types/one_book_op_resp.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
@@ -484,7 +485,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
       _isCreating = true;
     });
 
-    final response = await BooksActions.createOne(
+    final OneBookOpResp response = await BooksActions.createOne(
       name: _newBookName,
       description: _newBookDescription,
     );
@@ -505,7 +506,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
       message: "book_creation_success".tr(),
     );
 
-    fetchOne(response.bookId);
+    fetchOne(response.book.id);
   }
 
   void deleteSelection() async {
@@ -627,7 +628,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     }
   }
 
-  void fetchOne(String? bookId) async {
+  void fetchOne(String bookId) async {
     try {
       final bookSnap = await FirebaseFirestore.instance
           .collection('books')
