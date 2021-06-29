@@ -1,57 +1,43 @@
 import 'package:artbooking/types/cloud_func_error.dart';
-import 'package:artbooking/types/processed_book.dart';
+import 'package:artbooking/types/book_op.dart';
 import 'package:artbooking/types/user/partial_user.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class ManyBooksOpResp {
-  bool hasErrors;
-  final int? successCount;
-  final List<ProcessedBook> books;
+  final bool hasErrors;
+  final int successCount;
+  final List<BookOp> books;
   final String message;
-  final CloudFuncError? error;
-  final PartialUser? user;
+  final CloudFuncError error;
+  final PartialUser user;
 
   ManyBooksOpResp({
     this.books = const [],
+    required this.error,
     this.hasErrors = false,
     this.message = '',
-    this.error,
     this.successCount = 0,
-    this.user,
+    required this.user,
   });
 
   factory ManyBooksOpResp.fromException(FirebaseFunctionsException exception) {
     return ManyBooksOpResp(
-      hasErrors: true,
       books: [],
       error: CloudFuncError.fromException(exception),
+      hasErrors: true,
+      message: '',
+      successCount: 0,
       user: PartialUser(),
     );
   }
 
   factory ManyBooksOpResp.fromJSON(Map<dynamic, dynamic> data) {
-    final _user = data['user'] != null
-        ? PartialUser.fromJSON(data['user'])
-        : PartialUser();
-
-    final _error = data['error'] != null
-        ? CloudFuncError.fromJSON(data['error'])
-        : CloudFuncError();
-
-    final _books = <ProcessedBook>[];
-
-    if (data['items'] != null) {
-      for (Map<String, dynamic> item in data['items']) {
-        _books.add(ProcessedBook.fromJSON(item));
-      }
-    }
-
     return ManyBooksOpResp(
-      books: _books,
+      books: parseBooks(data['items']),
       hasErrors: data['hasErrors'] ?? true,
       successCount: data['successCount'],
-      user: _user,
-      error: _error,
+      user: PartialUser.fromJSON(data['user']),
+      error: CloudFuncError.fromJSON(data['error']),
     );
   }
 
@@ -62,5 +48,19 @@ class ManyBooksOpResp {
       error: CloudFuncError.fromMessage(message),
       user: PartialUser(),
     );
+  }
+
+  static List<BookOp> parseBooks(data) {
+    final books = <BookOp>[];
+
+    if (data['items'] == null) {
+      return books;
+    }
+
+    for (Map<String, dynamic> item in data) {
+      books.add(BookOp.fromJSON(item));
+    }
+
+    return books;
   }
 }

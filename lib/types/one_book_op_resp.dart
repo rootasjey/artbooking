@@ -1,61 +1,54 @@
 import 'package:artbooking/types/cloud_func_error.dart';
+import 'package:artbooking/types/minimal_book_resp.dart';
 import 'package:artbooking/types/user/partial_user.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class OneBookOpResp {
-  bool success;
-  final String? bookId;
+  final MinimalBookResp book;
+  final CloudFuncError error;
   final String message;
-  final CloudFuncError? error;
-  final PartialUser? user;
+  final bool success;
+  final PartialUser user;
 
   OneBookOpResp({
-    this.bookId = '',
-    this.success = true,
+    required this.book,
+    required this.error,
     this.message = '',
-    this.error,
-    this.user,
+    this.success = false,
+    required this.user,
   });
 
   factory OneBookOpResp.empty({bool success = false}) {
     return OneBookOpResp(
+      book: MinimalBookResp.empty(),
+      error: CloudFuncError.empty(),
       success: success,
-      bookId: '',
-      error: CloudFuncError(),
-      user: PartialUser(),
+      user: PartialUser.empty(),
     );
   }
 
   factory OneBookOpResp.fromException(FirebaseFunctionsException exception) {
     return OneBookOpResp(
-      success: false,
-      bookId: '',
+      book: MinimalBookResp.empty(),
       error: CloudFuncError.fromException(exception),
-      user: PartialUser(),
+      success: false,
+      user: PartialUser.empty(),
     );
   }
 
   factory OneBookOpResp.fromJSON(Map<dynamic, dynamic> data) {
-    final _user = data['user'] != null
-        ? PartialUser.fromJSON(data['user'])
-        : PartialUser();
-
-    final _error = data['error'] != null
-        ? CloudFuncError.fromJSON(data['error'])
-        : CloudFuncError();
-
     return OneBookOpResp(
-      bookId: data['bookId'],
+      book: MinimalBookResp.fromJSON(data['book']),
       success: data['success'] ?? true,
-      user: _user,
-      error: _error,
+      user: PartialUser.fromJSON(data['user']),
+      error: CloudFuncError.fromJSON(data['error']),
     );
   }
 
   factory OneBookOpResp.fromMessage(String message) {
     return OneBookOpResp(
       success: false,
-      bookId: '',
+      book: MinimalBookResp.empty(),
       error: CloudFuncError.fromMessage(message),
       user: PartialUser(),
     );
