@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/book_card.dart';
@@ -20,6 +22,19 @@ import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
+
+/// A stream subscription returning a map withing a query snapshot.
+typedef SnapshotStreamSubscription
+    = StreamSubscription<QuerySnapshot<Map<String, dynamic>>>;
+
+/// A query containing a map.
+typedef QueryMap = Query<Map<String, dynamic>>;
+
+/// A document change containing a map.
+typedef DocumentChangeMap = DocumentChange<Map<String, dynamic>>;
+
+/// A query document snapshot containing a map.
+typedef DocSnapMap = QueryDocumentSnapshot<Map<String, dynamic>>;
 
 class MyBooksPage extends StatefulWidget {
   @override
@@ -50,16 +65,19 @@ class _MyBooksPageState extends State<MyBooksPage> {
   String _newBookName = '';
   String _newBookDescription = '';
 
+  SnapshotStreamSubscription? _streamSubscription;
+
   @override
   initState() {
     super.initState();
     _newBookNameController = TextEditingController();
-    fetchMany();
+    fetchManyBooks();
   }
 
   @override
   void dispose() {
     _newBookNameController?.dispose();
+    _streamSubscription?.cancel();
     super.dispose();
   }
 
@@ -189,7 +207,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   Widget fab() {
     if (!_isFabVisible) {
       return FloatingActionButton(
-        onPressed: fetchMany,
+        onPressed: fetchManyBooks,
         backgroundColor: stateColors.primary,
         foregroundColor: Colors.white,
         child: Icon(UniconsLine.refresh),
@@ -407,6 +425,22 @@ class _MyBooksPageState extends State<MyBooksPage> {
     );
   }
 
+  /// Fire when a new document has been created in Firestore.
+  /// Add the corresponding document in the UI.
+  void addStreamingDoc(DocumentChangeMap documentChange) {
+    final data = documentChange.doc.data();
+
+    if (data == null) {
+      return;
+    }
+
+    setState(() {
+      data['id'] = documentChange.doc.id;
+      final book = Book.fromJSON(data);
+      _books.insert(0, book);
+    });
+  }
+
   void confirmDeletion() async {
     showCustomModalBottomSheet(
       context: context,
@@ -506,7 +540,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
       message: "book_creation_success".tr(),
     );
 
-    fetchOne(response.book.id);
+    fetchOneBook(response.book.id);
   }
 
   void deleteSelection() async {
@@ -536,7 +570,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     }
   }
 
-  void fetchMany() async {
+  void fetchManyBooks() async {
     setState(() {
       _isLoading = true;
       _hasNext = true;
@@ -544,12 +578,14 @@ class _MyBooksPageState extends State<MyBooksPage> {
     });
 
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final query = FirebaseFirestore.instance
           .collection('books')
           .where('user.id', isEqualTo: stateUser.userAuth!.uid)
           .orderBy('createdAt', descending: _descending)
-          .limit(_limit)
-          .get();
+          .limit(_limit);
+
+      startListenningToData(query);
+      final snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
         setState(() {
@@ -560,12 +596,12 @@ class _MyBooksPageState extends State<MyBooksPage> {
         return;
       }
 
-      snapshot.docs.forEach((doc) {
-        final data = doc.data();
-        data['id'] = doc.id;
+      for (DocSnapMap document in snapshot.docs) {
+        final data = document.data();
+        data['id'] = document.id;
 
         _books.add(Book.fromJSON(data));
-      });
+      }
 
       setState(() {
         _lastFirestoreDoc = snapshot.docs.last;
@@ -574,13 +610,11 @@ class _MyBooksPageState extends State<MyBooksPage> {
     } catch (error) {
       appLogger.e(error);
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
-  void fetchManyMore() async {
+  void fetchManyBooksMore() async {
     if (!_hasNext || _lastFirestoreDoc == null) {
       return;
     }
@@ -611,12 +645,12 @@ class _MyBooksPageState extends State<MyBooksPage> {
         return;
       }
 
-      snapshot.docs.forEach((doc) {
-        final data = doc.data();
-        data['id'] = doc.id;
+      for (DocSnapMap document in snapshot.docs) {
+        final data = document.data();
+        data['id'] = document.id;
 
         _books.add(Book.fromJSON(data));
-      });
+      }
 
       setState(() {
         _isLoadingMore = false;
@@ -625,10 +659,12 @@ class _MyBooksPageState extends State<MyBooksPage> {
       });
     } catch (error) {
       appLogger.e(error);
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
-  void fetchOne(String bookId) async {
+  void fetchOneBook(String bookId) async {
     try {
       final bookSnap = await FirebaseFirestore.instance
           .collection('books')
@@ -665,10 +701,18 @@ class _MyBooksPageState extends State<MyBooksPage> {
     }
 
     if (_hasNext && !_isLoadingMore) {
-      fetchManyMore();
+      fetchManyBooksMore();
     }
 
     return false;
+  }
+
+  /// Fire when a new document has been delete from Firestore.
+  /// Delete the corresponding document from the UI.
+  void removeStreamingDoc(DocumentChangeMap documentChange) {
+    setState(() {
+      _books.removeWhere((book) => book.id == documentChange.doc.id);
+    });
   }
 
   void showBookCreationDialog() {
@@ -786,5 +830,59 @@ class _MyBooksPageState extends State<MyBooksPage> {
         ],
       ),
     );
+  }
+
+  /// Listen to the last Firestore query of this page.
+  void startListenningToData(QueryMap query) {
+    _streamSubscription = query.snapshots().skip(1).listen(
+      (snapshot) {
+        for (DocumentChangeMap documentChange in snapshot.docChanges) {
+          switch (documentChange.type) {
+            case DocumentChangeType.added:
+              addStreamingDoc(documentChange);
+              break;
+            case DocumentChangeType.modified:
+              updateStreamingDoc(documentChange);
+              break;
+            case DocumentChangeType.removed:
+              removeStreamingDoc(documentChange);
+              break;
+          }
+        }
+      },
+      onError: (error) {
+        appLogger.e(error);
+      },
+    );
+  }
+
+  /// Fire when a new document has been updated in Firestore.
+  /// Update the corresponding document in the UI.
+  void updateStreamingDoc(DocumentChangeMap documentChange) {
+    try {
+      final data = documentChange.doc.data();
+      if (data == null) {
+        return;
+      }
+
+      final int index = _books.indexWhere(
+        (book) => book.id == documentChange.doc.id,
+      );
+
+      data['id'] = documentChange.doc.id;
+      final updatedBook = Book.fromJSON(data);
+
+      setState(() {
+        _books.removeAt(index);
+        _books.insert(index, updatedBook);
+      });
+    } on Exception catch (error) {
+      appLogger.e(
+        "The document with the id ${documentChange.doc.id} "
+        "doesn't exist in the books list.",
+      );
+
+      appLogger.e(error);
+    }
   }
 }
