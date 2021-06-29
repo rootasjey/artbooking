@@ -1,27 +1,29 @@
 import 'package:artbooking/types/minimal_illustration_resp.dart';
 
-class ProcessedIllustration {
+/// An operation on an illustration.
+/// It can be adding this illustration to another data structure for example.
+class IllustrationOp {
   final MinimalIllustrationResp illustration;
   final bool success;
 
-  ProcessedIllustration({
+  IllustrationOp({
     required this.illustration,
     this.success = false,
   });
 
-  factory ProcessedIllustration.empty() {
-    return ProcessedIllustration(
+  factory IllustrationOp.empty() {
+    return IllustrationOp(
       illustration: MinimalIllustrationResp.empty(),
       success: true,
     );
   }
 
-  factory ProcessedIllustration.fromJSON(Map<dynamic, dynamic>? data) {
+  factory IllustrationOp.fromJSON(Map<dynamic, dynamic>? data) {
     if (data == null) {
-      return ProcessedIllustration.empty();
+      return IllustrationOp.empty();
     }
 
-    return ProcessedIllustration(
+    return IllustrationOp(
       illustration: MinimalIllustrationResp.fromJSON(data['illustration']),
       success: data['success'] ?? false,
     );
