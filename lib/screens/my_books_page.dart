@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/book_card.dart';
+import 'package:artbooking/components/create_or_edit_book_dialog.dart';
 import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/text_rectangle_button.dart';
@@ -718,116 +719,21 @@ class _MyBooksPageState extends State<MyBooksPage> {
   void showBookCreationDialog() {
     showDialog(
       context: context,
-      builder: (_) => SimpleDialog(
-        title: Text("book_create".tr()),
-        children: [
-          Padding(
-            padding: EdgeInsets.only(
-              left: 25.0,
-              right: 25.0,
-              top: 32.0,
-            ),
-            child: ConstrainedBox(
-              constraints: BoxConstraints.tight(Size(250.0, 80)),
-              child: TextField(
-                autofocus: true,
-                controller: _newBookNameController,
-                textInputAction: TextInputAction.next,
-                decoration: InputDecoration(
-                  labelText: "title".tr(),
-                  labelStyle: TextStyle(color: stateColors.primary),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: stateColors.primary,
-                      width: 2.0,
-                    ),
-                  ),
-                ),
-                onChanged: (newValue) {
-                  _newBookName = newValue;
-                },
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 25.0,
-            ),
-            child: ConstrainedBox(
-              constraints: BoxConstraints.tight(Size(250.0, 80)),
-              child: TextField(
-                decoration: InputDecoration(
-                  labelText: "description".tr(),
-                  labelStyle: TextStyle(color: stateColors.primary),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: stateColors.primary,
-                      width: 2.0,
-                    ),
-                  ),
-                ),
-                onChanged: (newValue) {
-                  _newBookDescription = newValue;
-                },
-                onSubmitted: (value) {
-                  createBook();
-                  context.router.pop();
-                },
-              ),
-            ),
-          ),
-          Container(
-            height: 80.0,
-            padding: EdgeInsets.only(
-              top: 28.0,
-              left: 24.0,
-              right: 24.0,
-            ),
-            child: Wrap(
-              spacing: 10.0,
-              runSpacing: 10.0,
-              alignment: WrapAlignment.end,
-              children: [
-                OutlinedButton.icon(
-                  onPressed: context.router.pop,
-                  icon: Icon(UniconsLine.times),
-                  label: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 12.0,
-                      horizontal: 12.0,
-                    ),
-                    child: Opacity(
-                      opacity: 1.0,
-                      child: Text('cancel'.tr()),
-                    ),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    primary: stateColors.foreground,
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    createBook();
-                    context.router.pop();
-                  },
-                  icon: Icon(UniconsLine.plus),
-                  label: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 12.0,
-                      horizontal: 12.0,
-                    ),
-                    child: Text(
-                      "create".tr(),
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    primary: stateColors.validation,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+      builder: (context) => CreateOrEditBookDialog(
+        textTitle: "book_create".tr().toUpperCase(),
+        textSubtitle: "book_create_description".tr(),
+        nameController: _newBookNameController,
+        onNameChanged: (newValue) {
+          _newBookName = newValue;
+        },
+        onDescriptionChanged: (newValue) {
+          _newBookDescription = newValue;
+        },
+        onCancel: context.router.pop,
+        onSubmitted: (value) {
+          createBook();
+          context.router.pop();
+        },
       ),
     );
   }
