@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
+import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -64,7 +65,7 @@ abstract class UploadManagerBase with Store {
 
   /// A "select file/folder" window will appear. User will have to choose a file.
   /// This file will be then read, and uploaded to firebase storage;
-  Future pickImage(BuildContext context) async {
+  Future<List<FilePickerCross>> pickImage(BuildContext context) async {
     List<FilePickerCross>? pickerResult;
 
     try {
@@ -74,16 +75,17 @@ abstract class UploadManagerBase with Store {
     } on Exception catch (_) {}
 
     if (pickerResult == null) {
-      return;
+      return [];
     }
 
-    for (FilePickerCross file in pickerResult) {
-      final bool isOk = _checkFile(file);
+    final List<FilePickerCross> passedFiles =
+        pickerResult.where(_checkFile).toList();
 
-      if (isOk) {
-        _uploadIllustration(file);
-      }
+    for (FilePickerCross passedFile in passedFiles) {
+      _uploadIllustration(passedFile);
     }
+
+    return passedFiles;
   }
 
   bool _checkFile(FilePickerCross file) {
@@ -162,6 +164,15 @@ abstract class UploadManagerBase with Store {
     }
   }
 
+  void _cleanFailedTask({
+    required FilePickerCross file,
+    required CustomUploadTask task,
+    required UploadTaskStep step,
+  }) {
+    _removeFromTotalBytes(file.length);
+    removeCustomUploadTask(task);
+  }
+
   void _uploadIllustration(FilePickerCross file) async {
     final customUploadTask = CustomUploadTask(
       name: file.fileName ?? "unknown".tr(),
@@ -170,7 +181,18 @@ abstract class UploadManagerBase with Store {
     addCustomUploadTask(customUploadTask);
     _addToTotalBytes(file.length);
 
-    final String? illustrationId = await _createFirestoreDocument(file);
+    final String illustrationId = await _createFirestoreDocument(file);
+
+    if (illustrationId.isEmpty) {
+      _cleanFailedTask(
+        file: file,
+        task: customUploadTask,
+        step: UploadTaskStep.Firestore,
+      );
+
+      return;
+    }
+
     customUploadTask.illustrationId = illustrationId;
 
     _startStorageUpload(
@@ -180,7 +202,7 @@ abstract class UploadManagerBase with Store {
     );
   }
 
-  Future<String?> _createFirestoreDocument(FilePickerCross file) async {
+  Future<String> _createFirestoreDocument(FilePickerCross file) async {
     final String? fileName = file.fileName;
 
     try {
@@ -198,10 +220,10 @@ abstract class UploadManagerBase with Store {
       }
 
       final String? documentId = responseResult.data["illustration"]["id"];
-      return documentId;
+      return documentId ?? '';
     } catch (error) {
       appLogger.e(error);
-      return "";
+      return '';
     }
   }
 
@@ -222,8 +244,8 @@ abstract class UploadManagerBase with Store {
   }
 
   void _startStorageUpload({
-    FilePickerCross? file,
-    String? illustrationId,
+    required FilePickerCross file,
+    required String illustrationId,
     CustomUploadTask? customUploadTask,
   }) async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
@@ -232,7 +254,7 @@ abstract class UploadManagerBase with Store {
       return;
     }
 
-    final fileName = file!.fileName!;
+    final fileName = file.fileName!;
     final lastIndexDot = fileName.lastIndexOf(".") + 1;
     final String extension = fileName.substring(lastIndexDot);
 
@@ -248,7 +270,7 @@ abstract class UploadManagerBase with Store {
         SettableMetadata(
           customMetadata: {
             "extension": extension,
-            "firestoreId": illustrationId!,
+            "firestoreId": illustrationId,
             "userId": userId,
             "visibility": "public",
           },

@@ -156,6 +156,15 @@ enum SnackType {
   success,
 }
 
+/// Specify where an upload task is at.
+enum UploadTaskStep {
+  /// Creating the Firestore document.
+  Firestore,
+
+  /// Uploading the file to Firebase Cloud Storage.
+  Storage,
+}
+
 enum UserMenuSelect {
   about,
   books,
