@@ -64,7 +64,7 @@ class ManyIllusOpResp {
   static List<IllustrationOp> parseIllustrations(data) {
     final illustrations = <IllustrationOp>[];
 
-    if (data['items'] == null) {
+    if (data == null) {
       return illustrations;
     }
 
