@@ -158,7 +158,7 @@ class _UserBooksState extends State<UserBooks> {
   Widget tileList(Book book) {
     return ListTile(
       onTap: () {
-        addQuoteToList(
+        addIllustrationToBook(
           bookId: book.id,
         );
 
@@ -172,7 +172,7 @@ class _UserBooksState extends State<UserBooks> {
     );
   }
 
-  void addQuoteToList({required String bookId}) async {
+  void addIllustrationToBook({required String bookId}) async {
     Snack.s(
       context: context,
       title: "Add",
