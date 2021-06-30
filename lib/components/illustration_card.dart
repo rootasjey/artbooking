@@ -4,6 +4,7 @@ import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
@@ -67,13 +68,6 @@ class _IllustrationCardState extends State<IllustrationCard>
   double _endElevation = 6.0;
   double _elevation = 4.0;
 
-  /// Default thumbnail URL
-  /// if no URL has been set (should be rare).
-  static String _noImageThumbnailUrl = "https://firebasestorage.googleapis.com/"
-      "v0/b/artbooking-54d22.appspot.com/o/"
-      "static%2Ficons%2Fno_image_1024.png"
-      "?alt=media&token=198de6bd-882b-4174-83ec-e31e3e1c9fd6";
-
   @override
   void initState() {
     super.initState();
@@ -92,13 +86,10 @@ class _IllustrationCardState extends State<IllustrationCard>
   @override
   Widget build(BuildContext context) {
     final illustration = widget.illustration;
-
-    String imageUrl = illustration.getThumbnail();
-    Color defaultColor = Colors.transparent;
+    Widget child = imageCard();
 
     if (illustration.getThumbnail().isEmpty) {
-      imageUrl = _noImageThumbnailUrl;
-      defaultColor = Colors.black87;
+      child = loadingCard();
     }
 
     return Hero(
@@ -108,54 +99,77 @@ class _IllustrationCardState extends State<IllustrationCard>
         height: widget.size,
         child: ScaleTransition(
           scale: _scaleAnimation,
-          child: Card(
-            color: widget.selected ? stateColors.primary : defaultColor,
-            elevation: _elevation,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.0),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Ink.image(
-              image: NetworkImage(imageUrl),
-              fit: BoxFit.cover,
-              child: InkWell(
-                onTap: widget.onTap,
-                onLongPress: () {
-                  if (widget.onLongPress != null) {
-                    widget.onLongPress!(widget.selected);
-                  }
-                },
-                onHover: (isHover) {
-                  if (isHover) {
-                    setState(() {
-                      _elevation = _endElevation;
-                      _showPopupMenu = true;
-                      _scaleController.forward();
-                    });
+          child: child,
+        ),
+      ),
+    );
+  }
 
-                    return;
-                  }
+  Widget imageCard() {
+    String imageUrl = widget.illustration.getThumbnail();
+    Color defaultColor = Colors.transparent;
 
-                  setState(() {
-                    _elevation = _startElevation;
-                    _showPopupMenu = false;
-                    _scaleController.reverse();
-                  });
-                },
-                child: Stack(
-                  children: [
-                    multiSelectButton(),
-                    Positioned(
-                      bottom: 10.0,
-                      right: 10.0,
-                      child: popupMenuButton(),
-                    ),
-                  ],
-                ),
+    return Card(
+      color: widget.selected ? stateColors.primary : defaultColor,
+      elevation: _elevation,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Ink.image(
+        image: NetworkImage(imageUrl),
+        fit: BoxFit.cover,
+        child: InkWell(
+          onTap: widget.onTap,
+          onLongPress: () {
+            if (widget.onLongPress != null) {
+              widget.onLongPress!(widget.selected);
+            }
+          },
+          onHover: (isHover) {
+            if (isHover) {
+              setState(() {
+                _elevation = _endElevation;
+                _showPopupMenu = true;
+                _scaleController.forward();
+              });
+
+              return;
+            }
+
+            setState(() {
+              _elevation = _startElevation;
+              _showPopupMenu = false;
+              _scaleController.reverse();
+            });
+          },
+          child: Stack(
+            children: [
+              multiSelectButton(),
+              Positioned(
+                bottom: 10.0,
+                right: 10.0,
+                child: popupMenuButton(),
               ),
-            ),
+            ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget loadingCard() {
+    return Card(
+      color: stateColors.clairPink,
+      elevation: _elevation,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Shimmer(
+        colorOpacity: 0.2,
+        color: stateColors.primary,
+        child: Container(),
       ),
     );
   }
@@ -230,6 +244,7 @@ class _IllustrationCardState extends State<IllustrationCard>
   /// and set them to the Firestore document.
   void checkProperties() async {
     final illustration = widget.illustration;
+
     if (illustration.hasPendingCreates) {
       return;
     }
