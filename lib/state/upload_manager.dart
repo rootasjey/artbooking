@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
 import 'package:artbooking/types/enums.dart';
@@ -88,6 +89,69 @@ abstract class UploadManagerBase with Store {
     return passedFiles;
   }
 
+  /// Select an image file to upload to your illustrations collection,
+  /// and add this illustration to the specified book (with its id).
+  Future<List<FilePickerCross>> pickImageAndAddToBook(
+    BuildContext context, {
+    required String bookId,
+  }) async {
+    List<FilePickerCross>? pickerResult;
+
+    try {
+      pickerResult = await FilePickerCross.importMultipleFromStorage(
+        type: FileTypeCross.image,
+      );
+    } on Exception catch (_) {}
+
+    if (pickerResult == null) {
+      return [];
+    }
+
+    final List<FilePickerCross> passedFiles =
+        pickerResult.where(_checkFile).toList();
+
+    for (FilePickerCross passedFile in passedFiles) {
+      _uploadIllustrationToBook(
+        file: passedFile,
+        bookId: bookId,
+      );
+    }
+
+    return passedFiles;
+  }
+
+  /// Upload a file creating a Firestore document and adding a new file to
+  /// Firebase Cloud Storage. Then add this new created illustration to
+  /// an existing book.
+  Future _uploadIllustrationToBook({
+    required FilePickerCross file,
+    required String bookId,
+  }) async {
+    final customUploadTask = await _uploadIllustration(file);
+    final String illustrationId = customUploadTask.illustrationId ?? '';
+
+    if (illustrationId.isEmpty) {
+      appLogger.e(
+        "A custom task upload cannot have an empty [illustrationId] "
+        "at this step.",
+      );
+
+      return;
+    }
+
+    final response = await BooksActions.addIllustrations(
+      bookId: bookId,
+      illustrationIds: [illustrationId],
+    );
+
+    if (response.hasErrors) {
+      appLogger.e(
+        "There was an error while adding "
+        "the illustration $illustrationId.",
+      );
+    }
+  }
+
   bool _checkFile(FilePickerCross file) {
     if (file.length > 25 * 1024 * 1024) {
       return false;
@@ -173,7 +237,7 @@ abstract class UploadManagerBase with Store {
     removeCustomUploadTask(task);
   }
 
-  void _uploadIllustration(FilePickerCross file) async {
+  Future<CustomUploadTask> _uploadIllustration(FilePickerCross file) async {
     final customUploadTask = CustomUploadTask(
       name: file.fileName ?? "unknown".tr(),
     );
@@ -190,12 +254,12 @@ abstract class UploadManagerBase with Store {
         step: UploadTaskStep.Firestore,
       );
 
-      return;
+      return customUploadTask;
     }
 
     customUploadTask.illustrationId = illustrationId;
 
-    _startStorageUpload(
+    return await _startStorageUpload(
       file: file,
       illustrationId: illustrationId,
       customUploadTask: customUploadTask,
@@ -243,29 +307,29 @@ abstract class UploadManagerBase with Store {
     }
   }
 
-  void _startStorageUpload({
+  Future<CustomUploadTask> _startStorageUpload({
     required FilePickerCross file,
     required String illustrationId,
-    CustomUploadTask? customUploadTask,
+    required CustomUploadTask customUploadTask,
   }) async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
 
     if (userId == null) {
-      return;
+      return customUploadTask;
     }
 
     final fileName = file.fileName!;
     final lastIndexDot = fileName.lastIndexOf(".") + 1;
     final String extension = fileName.substring(lastIndexDot);
 
-    final String filePath =
+    final String cloudStorageFilePath =
         "/users/$userId/illustrations/$illustrationId/original.$extension";
 
     final File uploadFile = File(file.path!);
 
     final storage = FirebaseStorage.instance;
 
-    final UploadTask uploadTask = storage.ref(filePath).putFile(
+    final UploadTask uploadTask = storage.ref(cloudStorageFilePath).putFile(
         uploadFile,
         SettableMetadata(
           customMetadata: {
@@ -279,7 +343,7 @@ abstract class UploadManagerBase with Store {
           ),
         ));
 
-    _addUploadTask(uploadTask, customUploadTask!);
+    _addUploadTask(uploadTask, customUploadTask);
 
     try {
       await uploadTask;
@@ -290,6 +354,8 @@ abstract class UploadManagerBase with Store {
     } catch (error) {
       appLogger.e(error);
       _incrAbortedTasks(1);
+    } finally {
+      return customUploadTask;
     }
   }
 
