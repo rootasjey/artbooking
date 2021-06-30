@@ -1175,8 +1175,10 @@ class _MyBookPageState extends State<MyBookPage> {
     required int index,
     required Illustration illustration,
   }) async {
-    _processingIllustrations.putIfAbsent(index, () => illustration);
-    _illustrations.removeWhere((key, value) => key == illustration.id);
+    setState(() {
+      _processingIllustrations.putIfAbsent(index, () => illustration);
+      _illustrations.removeWhere((key, value) => key == illustration.id);
+    });
 
     final response = await BooksActions.removeIllustrations(
       bookId: bookPage!.id,
