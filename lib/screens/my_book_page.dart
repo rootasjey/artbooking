@@ -81,14 +81,14 @@ class _MyBookPageState extends State<MyBookPage> {
 
   ScrollController _scrollController = ScrollController();
 
-  final List<PopupMenuEntry<BookItemAction>> _popupMenuEntries = [
+  final List<PopupMenuEntry<IllustrationItemAction>> _popupMenuEntries = [
     PopupMenuItemIcon(
-      value: BookItemAction.addToBook,
+      value: IllustrationItemAction.addToBook,
       icon: Icon(UniconsLine.book_medical),
       textLabel: "add_to_book".tr(),
     ),
     PopupMenuItemIcon(
-      value: BookItemAction.removeFromBook,
+      value: IllustrationItemAction.removeFromBook,
       icon: Icon(UniconsLine.image_minus),
       textLabel: "remove".tr(),
     ),
@@ -1248,18 +1248,18 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   void onPopupMenuItemSelected(
-    BookItemAction action,
+    IllustrationItemAction action,
     int index,
     Illustration illustration,
   ) {
     switch (action) {
-      case BookItemAction.delete:
+      case IllustrationItemAction.delete:
         confirmBookDeletion(illustration, index);
         break;
-      case BookItemAction.addToBook:
+      case IllustrationItemAction.addToBook:
         showAddToBook(illustration);
         break;
-      case BookItemAction.removeFromBook:
+      case IllustrationItemAction.removeFromBook:
         onRemoveFromBook(
           index: index,
           illustration: illustration,

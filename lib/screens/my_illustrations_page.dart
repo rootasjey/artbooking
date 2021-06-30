@@ -59,14 +59,14 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
 
   final _illustrationsList = <Illustration>[];
 
-  final List<PopupMenuEntry<BookItemAction>> _popupMenuEntries = [
+  final List<PopupMenuEntry<IllustrationItemAction>> _popupMenuEntries = [
     PopupMenuItemIcon(
-      value: BookItemAction.addToBook,
+      value: IllustrationItemAction.addToBook,
       icon: Icon(UniconsLine.book_medical),
       textLabel: "add_to_book".tr(),
     ),
     PopupMenuItemIcon(
-      value: BookItemAction.delete,
+      value: IllustrationItemAction.delete,
       icon: Icon(UniconsLine.trash),
       textLabel: "delete".tr(),
     ),
@@ -708,15 +708,15 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   }
 
   void onPopupMenuItemSelected(
-    BookItemAction action,
+    IllustrationItemAction action,
     int index,
     Illustration illustration,
   ) {
     switch (action) {
-      case BookItemAction.delete:
+      case IllustrationItemAction.delete:
         confirmIllustrationDeletion(illustration, index);
         break;
-      case BookItemAction.addToBook:
+      case IllustrationItemAction.addToBook:
         showAddToBook(illustration);
         break;
       default:

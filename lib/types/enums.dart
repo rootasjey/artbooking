@@ -52,8 +52,8 @@ enum AppBarSettings {
   fr,
 }
 
-/// Actions for a book item.
-enum BookItemAction {
+/// Actions for an illustration item.
+enum IllustrationItemAction {
   /// Add this illustration to a book.
   addToBook,
 

@@ -47,10 +47,10 @@ class IllustrationCard extends StatefulWidget {
   final VoidCallback? onTap;
 
   /// Popup menu item entries.
-  final List<PopupMenuEntry<BookItemAction>> popupMenuEntries;
+  final List<PopupMenuEntry<IllustrationItemAction>> popupMenuEntries;
 
   /// Callback function when popup menu item entries are tapped.
-  final void Function(BookItemAction, int, Illustration)?
+  final void Function(IllustrationItemAction, int, Illustration)?
       onPopupMenuItemSelected;
 
   @override
@@ -215,7 +215,7 @@ class _IllustrationCardState extends State<IllustrationCard>
   Widget popupMenuButton() {
     return Opacity(
       opacity: _showPopupMenu ? 1.0 : 0.0,
-      child: PopupMenuButton<BookItemAction>(
+      child: PopupMenuButton<IllustrationItemAction>(
         icon: MirrorAnimation<Color?>(
           tween: stateColors.primary.tweenTo(stateColors.secondary),
           duration: 2.seconds,
@@ -227,7 +227,7 @@ class _IllustrationCardState extends State<IllustrationCard>
             );
           },
         ),
-        onSelected: (BookItemAction action) {
+        onSelected: (IllustrationItemAction action) {
           widget.onPopupMenuItemSelected?.call(
             action,
             widget.index,
