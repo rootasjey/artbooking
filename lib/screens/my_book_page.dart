@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
@@ -12,6 +14,7 @@ import 'package:artbooking/components/underlined_button.dart';
 import 'package:artbooking/components/user_books.dart';
 import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
@@ -28,6 +31,10 @@ import 'package:jiffy/jiffy.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
+
+/// A stream subscription returning a map withing a query snapshot.
+typedef SnapshotStreamSubscription
+    = StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>;
 
 class MyBookPage extends StatefulWidget {
   final String bookId;
@@ -48,8 +55,10 @@ class _MyBookPageState extends State<MyBookPage> {
 
   bool _isLoading = false;
   bool _hasError = false;
+  bool _hasNext = false;
   bool _isFabVisible = false;
   bool _forceMultiSelect = false;
+  bool _isLoadingMore = false;
 
   final _illustrations = <Illustration>[];
   final _keyboardFocusNode = FocusNode();
@@ -63,7 +72,7 @@ class _MyBookPageState extends State<MyBookPage> {
 
   ScrollController _scrollController = ScrollController();
 
-  final List<PopupMenuEntry<BookItemAction>> popupMenuEntries = [
+  final List<PopupMenuEntry<BookItemAction>> _popupMenuEntries = [
     PopupMenuItemIcon(
       value: BookItemAction.addToBook,
       icon: Icon(UniconsLine.book_medical),
@@ -76,6 +85,8 @@ class _MyBookPageState extends State<MyBookPage> {
     ),
   ];
 
+  SnapshotStreamSubscription? _streamSubscription;
+
   @override
   initState() {
     super.initState();
@@ -83,9 +94,14 @@ class _MyBookPageState extends State<MyBookPage> {
     if (widget.book == null) {
       fetchBookAndIllustrations();
     } else {
-      bookPage = widget.book;
-      fetchIllustrations();
+      fetchIllustrationsAndListenToUpdates();
     }
+  }
+
+  @override
+  void dispose() {
+    _streamSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -150,7 +166,7 @@ class _MyBookPageState extends State<MyBookPage> {
           Padding(
             padding: const EdgeInsets.only(top: 100.0),
             child: AnimatedAppIcon(
-              textTitle: "loading_illustrations".tr(),
+              textTitle: "illustrations_loading".tr(),
             ),
           ),
         ]),
@@ -231,6 +247,7 @@ class _MyBookPageState extends State<MyBookPage> {
       spacing: 12.0,
       runSpacing: 12.0,
       children: [
+        uploadToBookButton(),
         multiSelectButton(),
       ],
     );
@@ -245,7 +262,6 @@ class _MyBookPageState extends State<MyBookPage> {
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
           Column(
-            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
                 padding: const EdgeInsets.only(bottom: 12.0),
@@ -261,7 +277,7 @@ class _MyBookPageState extends State<MyBookPage> {
               Opacity(
                 opacity: 0.6,
                 child: Text(
-                  "This is a new start".toUpperCase(),
+                  "new_start_sentence".tr().toUpperCase(),
                   style: FontsUtils.mainStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.w700,
@@ -300,7 +316,7 @@ class _MyBookPageState extends State<MyBookPage> {
         children: [
           IconButton(
             tooltip: "book_upload_illustration".tr(),
-            onPressed: uploadAndAddToThisBook,
+            onPressed: uploadToThisBook,
             icon: Icon(UniconsLine.upload),
           ),
           Padding(
@@ -326,7 +342,7 @@ class _MyBookPageState extends State<MyBookPage> {
                 ),
               );
             },
-            child: Text("illustrations_browse".tr()),
+            child: Text("illustrations_yours_browse".tr()),
           ),
         ],
       ),
@@ -436,7 +452,7 @@ class _MyBookPageState extends State<MyBookPage> {
               selected: selected,
               selectionMode: selectionMode,
               onPopupMenuItemSelected: onPopupMenuItemSelected,
-              popupMenuEntries: popupMenuEntries,
+              popupMenuEntries: _popupMenuEntries,
               onLongPress: (selected) {
                 if (selected) {
                   setState(() {
@@ -679,6 +695,28 @@ class _MyBookPageState extends State<MyBookPage> {
     );
   }
 
+  Widget uploadToBookButton() {
+    return Tooltip(
+      message: "book_upload_illustration".tr(),
+      child: InkWell(
+        onTap: uploadToThisBook,
+        child: Opacity(
+          opacity: 0.4,
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              border: Border.all(
+                width: 2.0,
+                color: Colors.black54,
+              ),
+            ),
+            child: Icon(UniconsLine.upload),
+          ),
+        ),
+      ),
+    );
+  }
+
   void confirmBookDeletion(Illustration illustration, int index) async {
     showCustomModalBottomSheet(
       context: context,
@@ -882,32 +920,36 @@ class _MyBookPageState extends State<MyBookPage> {
     });
 
     try {
-      final bookSnap = await FirebaseFirestore.instance
-          .collection('books')
-          .doc(widget.bookId)
-          .get();
+      final query =
+          FirebaseFirestore.instance.collection('books').doc(widget.bookId);
 
-      if (!bookSnap.exists) {
+      final bookSnap = await query.get();
+      final bookData = bookSnap.data();
+
+      if (!bookSnap.exists || bookData == null) {
         setState(() {
           _hasError = true;
           _isLoading = false;
         });
+
+        return;
       }
 
-      final bookData = bookSnap.data()!;
       bookData['id'] = bookSnap.id;
+
+      startListenningToData(query);
 
       setState(() {
         bookPage = Book.fromJSON(bookData);
-        _isLoading = false;
       });
     } catch (error) {
       appLogger.e(error);
 
       setState(() {
         _hasError = true;
-        _isLoading = true;
       });
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
@@ -916,22 +958,23 @@ class _MyBookPageState extends State<MyBookPage> {
       return;
     }
 
-    final bpIllustrations = bookPage!.illustrations;
+    final illustrationsBook = bookPage!.illustrations;
 
     setState(() {
       _isLoading = true;
       _startIndex = 0;
-      _endIndex =
-          bpIllustrations.length >= _limit ? _limit : bpIllustrations.length;
+      _endIndex = illustrationsBook.length >= _limit
+          ? _limit
+          : illustrationsBook.length;
     });
 
     try {
-      if (bpIllustrations.isEmpty) {
+      if (illustrationsBook.isEmpty) {
         setState(() => _isLoading = false);
         return;
       }
 
-      final range = bpIllustrations.getRange(_startIndex, _endIndex);
+      final range = illustrationsBook.getRange(_startIndex, _endIndex);
 
       for (var bookIllustration in range) {
         final illustrationSnap = await FirebaseFirestore.instance
@@ -943,10 +986,10 @@ class _MyBookPageState extends State<MyBookPage> {
           continue;
         }
 
-        final illusData = illustrationSnap.data()!;
-        illusData['id'] = illustrationSnap.id;
+        final illustrationData = illustrationSnap.data()!;
+        illustrationData['id'] = illustrationSnap.id;
 
-        final illustration = Illustration.fromJSON(illusData);
+        final illustration = Illustration.fromJSON(illustrationData);
         _illustrations.add(illustration);
       }
 
@@ -960,6 +1003,54 @@ class _MyBookPageState extends State<MyBookPage> {
         _hasError = true;
         _isLoading = false;
       });
+    }
+  }
+
+  void fetchIllustrationsAndListenToUpdates() {
+    bookPage = widget.book;
+    fetchIllustrations();
+
+    final query =
+        FirebaseFirestore.instance.collection('books').doc(widget.bookId);
+
+    startListenningToData(query);
+  }
+
+  void fetchIllustrationsMore() async {
+    if (!_hasNext || bookPage == null || _isLoadingMore) {
+      return;
+    }
+
+    _startIndex = _endIndex;
+    _endIndex = _endIndex + _limit;
+    _isLoadingMore = true;
+
+    final range = bookPage!.illustrations.getRange(_startIndex, _endIndex);
+
+    try {
+      for (var bookIllustration in range) {
+        final illustrationSnap = await FirebaseFirestore.instance
+            .collection('illustrations')
+            .doc(bookIllustration.id)
+            .get();
+
+        if (!illustrationSnap.exists) {
+          continue;
+        }
+
+        final illustrationData = illustrationSnap.data()!;
+        illustrationData['id'] = illustrationSnap.id;
+
+        final illustration = Illustration.fromJSON(illustrationData);
+        _illustrations.add(illustration);
+      }
+      setState(() {
+        _hasNext = _endIndex < bookPage!.count;
+      });
+    } catch (error) {
+      appLogger.e(error);
+    } finally {
+      setState(() => _isLoadingMore = false);
     }
   }
 
@@ -980,9 +1071,9 @@ class _MyBookPageState extends State<MyBookPage> {
       return false;
     }
 
-    // if (_hasNext && !_isLoadingMore) {
-    //   fetchMoreIllustrations();
-    // }
+    if (_hasNext && !_isLoadingMore) {
+      fetchIllustrationsMore();
+    }
 
     return false;
   }
@@ -1175,7 +1266,28 @@ class _MyBookPageState extends State<MyBookPage> {
     );
   }
 
-  void uploadAndAddToThisBook() {
-    // appUploadManager.pickImage(context);
+  void uploadToThisBook() async {
+    await appUploadManager.pickImageAndAddToBook(
+      context,
+      bookId: widget.bookId,
+    );
+  }
+
+  void startListenningToData(DocumentReference<Map<String, dynamic>> query) {
+    appLogger.d("start listenning...");
+    _streamSubscription = query.snapshots().skip(1).listen(
+      (DocumentSnapshot<Map<String, dynamic>> snapshot) {
+        final bookData = snapshot.data();
+        if (!snapshot.exists || bookData == null) {
+          return;
+        }
+
+        bookData['id'] = snapshot.id;
+        bookPage = Book.fromJSON(bookData);
+      },
+      onError: (error) {
+        appLogger.e(error);
+      },
+    );
   }
 }
