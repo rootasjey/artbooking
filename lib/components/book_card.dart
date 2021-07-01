@@ -73,19 +73,22 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 360.0,
-      height: 440.0,
-      child: Column(
-        children: [
-          Stack(
-            children: [
-              backCard(),
-              frontCard(),
-            ],
-          ),
-          caption(),
-        ],
+    return Hero(
+      tag: widget.book.id,
+      child: SizedBox(
+        width: 360.0,
+        height: 440.0,
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                backCard(),
+                frontCard(),
+              ],
+            ),
+            caption(),
+          ],
+        ),
       ),
     );
   }

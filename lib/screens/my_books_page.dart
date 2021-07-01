@@ -9,7 +9,7 @@ import 'package:artbooking/components/popup_menu_item_icon.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/text_rectangle_button.dart';
 import 'package:artbooking/components/themed_dialog.dart';
-import 'package:artbooking/router/app_router.gr.dart';
+import 'package:artbooking/screens/my_book_page.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/book.dart';
@@ -812,14 +812,29 @@ class _MyBooksPageState extends State<MyBooksPage> {
   }
 
   void navigateToBook(Book book) {
-    context.router.push(
-      DashBookPage(
-        bookId: book.id,
-        book: book,
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return MyBookPage(
+            bookId: book.id,
+            book: book,
+          );
+        },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return child;
+        },
       ),
     );
+
+    // context.router.push(
+    //   DashBookPage(
+    //     bookId: book.id,
+    //     book: book,
+    //   ),
+    // );
   }
 
+  /// When [onTap] event fires on a book.
   void onTap(Book book) {
     if (_multiSelectedItems.isEmpty && !_forceMultiSelect) {
       navigateToBook(book);
