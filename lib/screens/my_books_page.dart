@@ -23,8 +23,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
@@ -428,73 +426,47 @@ class _MyBooksPageState extends State<MyBooksPage> {
   }
 
   void confirmSelectionDeletion() async {
-    showCustomModalBottomSheet(
+    showDialog(
       context: context,
       builder: (context) {
-        return Material(
-          child: SafeArea(
-            top: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text(
-                    "confirm".tr(),
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                  trailing: Icon(
-                    Icons.check,
-                    color: Colors.white,
-                  ),
-                  tileColor: Color(0xfff55c5c),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    deleteSelection();
-                  },
-                ),
-                ListTile(
-                  title: Text("cancel".tr()),
-                  trailing: Icon(Icons.close),
-                  onTap: () => Navigator.of(context).pop(),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-      containerWidget: (context, animation, child) {
-        return RawKeyboardListener(
-          autofocus: true,
+        return ThemedDialog(
           focusNode: _focusNode,
-          onKey: (keyEvent) {
-            if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
-              Navigator.of(context).pop();
-              deleteSelection();
-            }
-          },
-          child: SafeArea(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: 500.0,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 40.0,
-                  ),
-                  child: Material(
-                    clipBehavior: Clip.antiAlias,
-                    borderRadius: BorderRadius.circular(12.0),
-                    child: child,
+          title: Column(
+            children: [
+              Opacity(
+                opacity: 0.8,
+                child: Text(
+                  "books_delete".tr().toUpperCase(),
+                  style: FontsUtils.mainStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
-            ),
+              Container(
+                width: 300.0,
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Opacity(
+                  opacity: 0.4,
+                  child: Text(
+                    "books_delete_description".tr(),
+                    textAlign: TextAlign.center,
+                    style: FontsUtils.mainStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
+          body: SingleChildScrollView(),
+          textButtonValidation: "delete".tr(),
+          onCancel: context.router.pop,
+          onValidate: () {
+            deleteSelection();
+            context.router.pop();
+          },
         );
       },
     );
@@ -755,7 +727,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   }
 
   void confirmBookDeletion(Book book, int index) async {
-    await showDialog(
+    showDialog(
       context: context,
       builder: (context) {
         return ThemedDialog(
