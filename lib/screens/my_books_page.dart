@@ -7,9 +7,11 @@ import 'package:artbooking/components/create_or_edit_book_dialog.dart';
 import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/text_rectangle_button.dart';
+import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/book.dart';
+import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/one_book_op_resp.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
@@ -55,6 +57,24 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
   final _books = <Book>[];
   final _keyboardFocusNode = FocusNode();
+
+  final _popupMenuEntries = <PopupMenuEntry<BookItemAction>>[
+    PopupMenuItem(
+      child: ListTile(
+        leading: Icon(UniconsLine.trash),
+        title: Opacity(
+          opacity: 0.6,
+          child: Text(
+            "delete".tr(),
+            style: FontsUtils.mainStyle(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+      value: BookItemAction.delete,
+    ),
+  ];
 
   int _limit = 20;
 
@@ -291,43 +311,15 @@ class _MyBooksPageState extends State<MyBooksPage> {
               book: book,
               selected: selected,
               selectionMode: selectionMode,
-              onBeforeDelete: () {
-                setState(() {
-                  _books.removeAt(index);
-                });
-              },
-              onAfterDelete: (response) {
-                if (response.success) {
-                  return;
-                }
-
-                setState(() {
-                  _books.insert(index, book);
-                });
-              },
-              onBeforePressed: () {
-                if (_multiSelectedItems.isEmpty && !_forceMultiSelect) {
-                  return false;
-                }
-
-                if (selected) {
-                  setState(() {
-                    _multiSelectedItems.remove(book.id);
-                    _forceMultiSelect = _multiSelectedItems.length > 0;
-                  });
-                } else {
-                  setState(() {
-                    _multiSelectedItems.putIfAbsent(book.id, () => book);
-                  });
-                }
-
-                return true;
-              },
+              onTap: () => onTap(book),
+              onPopupMenuItemSelected: onPopupMenuItemSelected,
+              popupMenuEntries: _popupMenuEntries,
               onLongPress: (selected) {
                 if (selected) {
                   setState(() {
                     _multiSelectedItems.remove(book.id);
                   });
+
                   return;
                 }
 
@@ -406,7 +398,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
           label: Text("select_all".tr()),
         ),
         TextButton.icon(
-          onPressed: confirmDeletion,
+          onPressed: confirmSelectionDeletion,
           style: TextButton.styleFrom(
             primary: Colors.red,
           ),
@@ -442,7 +434,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     });
   }
 
-  void confirmDeletion() async {
+  void confirmSelectionDeletion() async {
     showCustomModalBottomSheet(
       context: context,
       builder: (context) {
@@ -766,6 +758,146 @@ class _MyBooksPageState extends State<MyBooksPage> {
       );
 
       appLogger.e(error);
+    }
+  }
+
+  void confirmBookDeletion(Book book, int index) async {
+    showCustomModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Material(
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: Text(
+                    "delete".tr(),
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  trailing: Icon(
+                    UniconsLine.check,
+                    color: Colors.white,
+                  ),
+                  tileColor: stateColors.secondary,
+                  onTap: () {
+                    deleteBook(book, index);
+                    context.router.pop();
+                  },
+                ),
+                ListTile(
+                  title: Text("cancel".tr()),
+                  trailing: Icon(UniconsLine.times),
+                  onTap: context.router.pop,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      containerWidget: (context, animation, child) {
+        return RawKeyboardListener(
+          autofocus: true,
+          focusNode: _keyboardFocusNode,
+          onKey: (keyEvent) {
+            if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
+              deleteBook(book, index);
+              context.router.pop();
+            }
+          },
+          child: SafeArea(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: 500.0,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                    vertical: 40.0,
+                  ),
+                  child: Material(
+                    clipBehavior: Clip.antiAlias,
+                    borderRadius: BorderRadius.circular(12.0),
+                    child: child,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void deleteBook(Book book, int index) async {
+    setState(() => _books.removeAt(index));
+
+    final response = await BooksActions.deleteOne(
+      bookId: book.id,
+    );
+
+    if (response.success) {
+      return;
+    }
+
+    setState(() => _books.insert(index, book));
+
+    Snack.e(
+      context: context,
+      message: response.error.details,
+    );
+  }
+
+  void multiSelectBook(book) {
+    final selected = _multiSelectedItems.containsKey(book.id);
+
+    if (selected) {
+      setState(() {
+        _multiSelectedItems.remove(book.id);
+        _forceMultiSelect = _multiSelectedItems.length > 0;
+      });
+
+      return;
+    }
+
+    setState(() {
+      _multiSelectedItems.putIfAbsent(book.id, () => book);
+    });
+  }
+
+  void navigateToBook(Book book) {
+    context.router.push(
+      DashBookPage(
+        bookId: book.id,
+        book: book,
+      ),
+    );
+  }
+
+  void onTap(Book book) {
+    if (_multiSelectedItems.isEmpty && !_forceMultiSelect) {
+      navigateToBook(book);
+      return;
+    }
+
+    multiSelectBook(book);
+  }
+
+  void onPopupMenuItemSelected(
+    BookItemAction action,
+    int index,
+    Book book,
+  ) {
+    switch (action) {
+      case BookItemAction.delete:
+        confirmBookDeletion(book, index);
+        break;
+      default:
     }
   }
 }

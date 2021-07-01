@@ -53,6 +53,21 @@ enum AppBarSettings {
 }
 
 /// Actions for an illustration item.
+enum BookItemAction {
+  /// Delete this book from database.
+  delete,
+
+  /// Rename book's title.
+  rename,
+
+  /// Update properties of this book.
+  update,
+
+  /// Update this book's description.
+  updateDescription,
+}
+
+/// Actions for an illustration item.
 enum IllustrationItemAction {
   /// Add this illustration to a book.
   addToBook,

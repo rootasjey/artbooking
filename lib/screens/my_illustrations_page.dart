@@ -745,7 +745,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
                     UniconsLine.check,
                     color: Colors.white,
                   ),
-                  tileColor: Color(0xfff55c5c),
+                  tileColor: stateColors.secondary,
                   onTap: () {
                     context.router.pop();
                     deleteIllustration(illustration, index);

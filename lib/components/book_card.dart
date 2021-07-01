@@ -1,35 +1,50 @@
-import 'package:artbooking/actions/books.dart';
-import 'package:artbooking/router/app_router.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/book.dart';
-import 'package:artbooking/types/one_book_op_resp.dart';
+import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/utils/fonts.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
+/// A card representing a book;
 class BookCard extends StatefulWidget {
-  final bool selected;
-  final bool selectionMode;
-  final Book book;
-  final VoidCallback? onBeforeDelete;
-  final Function(OneBookOpResp)? onAfterDelete;
-  final Function(bool)? onLongPress;
-  final Function? onBeforePressed;
-
   BookCard({
     required this.book,
     this.selected = false,
     this.selectionMode = false,
-    this.onAfterDelete,
-    this.onBeforeDelete,
-    this.onBeforePressed,
     this.onLongPress,
+    this.popupMenuEntries = const [],
+    this.onPopupMenuItemSelected,
+    this.index = 0,
+    this.onTap,
   });
+
+  /// Book's data for this card.
+  final Book book;
+
+  /// Index position in a list, if available.
+  final int index;
+
+  /// Trigger when the user long press this card.
+  final Function(bool)? onLongPress;
+
+  /// Callback function when popup menu item entries are tapped.
+  final void Function(BookItemAction, int, Book)? onPopupMenuItemSelected;
+
+  /// Trigger when the user taps on this card.
+  final Function()? onTap;
+
+  /// Popup menu item entries.
+  final List<PopupMenuEntry<BookItemAction>> popupMenuEntries;
+
+  /// If true, this card is in selection mode
+  /// alongside all other cards in the list/grid, if any.
+  final bool selected;
+
+  /// If true, this card is in selection mode
+  /// alongside all other cards in the list/grid, if any.
+  final bool selectionMode;
 
   @override
   _BookCardState createState() => _BookCardState();
@@ -37,14 +52,10 @@ class BookCard extends StatefulWidget {
 
 class _BookCardState extends State<BookCard> with AnimationMixin {
   late Animation<double> _scaleAnimation;
-
   late AnimationController _scaleController;
 
   double _initElevation = 4.0;
-
   double _elevation = 4.0;
-
-  final _keyboardFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -164,7 +175,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
             image: imageProvider,
             fit: BoxFit.cover,
             child: InkWell(
-              onTap: onTap,
+              onTap: widget.onTap,
               onLongPress: () {
                 if (widget.onLongPress != null) {
                   widget.onLongPress!(widget.selected);
@@ -240,139 +251,14 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
           UniconsLine.ellipsis_h,
         ),
       ),
-      onSelected: (dynamic value) {
-        switch (value) {
-          case 'delete':
-            confirmDeletion();
-            break;
-
-          default:
-        }
-      },
-      itemBuilder: (_) => <PopupMenuEntry<String>>[
-        PopupMenuItem(
-          child: ListTile(
-            leading: Icon(UniconsLine.trash),
-            title: Opacity(
-              opacity: 0.6,
-              child: Text(
-                'Delete',
-                style: FontsUtils.mainStyle(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-          value: 'delete',
-        ),
-      ],
-    );
-  }
-
-  void confirmDeletion() async {
-    showCustomModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Material(
-          child: SafeArea(
-            top: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text(
-                    'Confirm',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                  trailing: Icon(
-                    Icons.check,
-                    color: Colors.white,
-                  ),
-                  tileColor: Color(0xfff55c5c),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    deleteBook();
-                  },
-                ),
-                ListTile(
-                  title: Text('Cancel'),
-                  trailing: Icon(Icons.close),
-                  onTap: () => Navigator.of(context).pop(),
-                ),
-              ],
-            ),
-          ),
+      onSelected: (BookItemAction action) {
+        widget.onPopupMenuItemSelected?.call(
+          action,
+          widget.index,
+          widget.book,
         );
       },
-      containerWidget: (context, animation, child) {
-        return RawKeyboardListener(
-          autofocus: true,
-          focusNode: _keyboardFocusNode,
-          onKey: (keyEvent) {
-            if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
-              Navigator.of(context).pop();
-              deleteBook();
-            }
-          },
-          child: SafeArea(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: 500.0,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 40.0,
-                  ),
-                  child: Material(
-                    clipBehavior: Clip.antiAlias,
-                    borderRadius: BorderRadius.circular(12.0),
-                    child: child,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void deleteBook() async {
-    final book = widget.book;
-
-    if (widget.onBeforeDelete != null) {
-      widget.onBeforeDelete!();
-    }
-
-    final response = await BooksActions.deleteOne(
-      bookId: book.id,
-    );
-
-    if (widget.onAfterDelete != null) {
-      widget.onAfterDelete!(response);
-    }
-  }
-
-  void onTap() {
-    bool? handled = false;
-    if (widget.onBeforePressed != null) {
-      handled = widget.onBeforePressed!();
-    }
-
-    if (handled!) {
-      return;
-    }
-
-    context.router.push(
-      DashBookPage(
-        bookId: widget.book.id,
-        book: widget.book,
-      ),
+      itemBuilder: (_) => widget.popupMenuEntries,
     );
   }
 }
