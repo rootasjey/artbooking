@@ -7,6 +7,7 @@ import 'package:artbooking/components/create_or_edit_book_dialog.dart';
 import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/text_rectangle_button.dart';
+import 'package:artbooking/components/themed_dialog.dart';
 import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
@@ -56,7 +57,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   DocumentSnapshot? _lastFirestoreDoc;
 
   final _books = <Book>[];
-  final _keyboardFocusNode = FocusNode();
+  final _focusNode = FocusNode();
 
   final _popupMenuEntries = <PopupMenuEntry<BookItemAction>>[
     PopupMenuItem(
@@ -99,6 +100,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   void dispose() {
     _newBookNameController?.dispose();
     _streamSubscription?.cancel();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -474,7 +476,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
       containerWidget: (context, animation, child) {
         return RawKeyboardListener(
           autofocus: true,
-          focusNode: _keyboardFocusNode,
+          focusNode: _focusNode,
           onKey: (keyEvent) {
             if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
               Navigator.of(context).pop();
@@ -762,73 +764,47 @@ class _MyBooksPageState extends State<MyBooksPage> {
   }
 
   void confirmBookDeletion(Book book, int index) async {
-    showCustomModalBottomSheet(
+    await showDialog(
       context: context,
       builder: (context) {
-        return Material(
-          child: SafeArea(
-            top: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text(
-                    "delete".tr(),
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                  trailing: Icon(
-                    UniconsLine.check,
-                    color: Colors.white,
-                  ),
-                  tileColor: stateColors.secondary,
-                  onTap: () {
-                    deleteBook(book, index);
-                    context.router.pop();
-                  },
-                ),
-                ListTile(
-                  title: Text("cancel".tr()),
-                  trailing: Icon(UniconsLine.times),
-                  onTap: context.router.pop,
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-      containerWidget: (context, animation, child) {
-        return RawKeyboardListener(
-          autofocus: true,
-          focusNode: _keyboardFocusNode,
-          onKey: (keyEvent) {
-            if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
-              deleteBook(book, index);
-              context.router.pop();
-            }
-          },
-          child: SafeArea(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: 500.0,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 40.0,
-                  ),
-                  child: Material(
-                    clipBehavior: Clip.antiAlias,
-                    borderRadius: BorderRadius.circular(12.0),
-                    child: child,
+        return ThemedDialog(
+          focusNode: _focusNode,
+          title: Column(
+            children: [
+              Opacity(
+                opacity: 0.8,
+                child: Text(
+                  "book_delete".tr().toUpperCase(),
+                  style: FontsUtils.mainStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
-            ),
+              Container(
+                width: 300.0,
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Opacity(
+                  opacity: 0.4,
+                  child: Text(
+                    "book_delete_description".tr(),
+                    textAlign: TextAlign.center,
+                    style: FontsUtils.mainStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
+          body: SingleChildScrollView(),
+          textButtonValidation: "delete".tr(),
+          onCancel: context.router.pop,
+          onValidate: () {
+            deleteBook(book, index);
+            context.router.pop();
+          },
         );
       },
     );
