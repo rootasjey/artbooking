@@ -27,6 +27,7 @@ import 'package:artbooking/screens/update_password_page.dart';
 import 'package:artbooking/screens/update_username_page.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/widgets.dart';
 
 export 'app_router.gr.dart';
 
@@ -88,21 +89,25 @@ export 'app_router.gr.dart';
             RedirectRoute(path: '*', redirectTo: ''),
           ],
         ),
-        MaterialRoute(
+        CustomRoute(
           path: 'books',
           name: 'DashBooksRouter',
-          page: EmptyRouterPage,
+          page: HeroEmptyRouterPage,
+          transitionsBuilder: autoRouteTransitionBuilder,
+          customRouteBuilder: autoRoutePageBuilder,
           children: [
             CustomRoute(
               path: '',
               page: MyBooksPage,
-              transitionsBuilder: TransitionsBuilders.fadeIn,
+              transitionsBuilder: autoRouteTransitionBuilder,
+              customRouteBuilder: autoRoutePageBuilder,
             ),
             CustomRoute(
               path: ':bookId',
               name: 'DashBookPage',
               page: MyBookPage,
-              transitionsBuilder: TransitionsBuilders.fadeIn,
+              transitionsBuilder: autoRouteTransitionBuilder,
+              customRouteBuilder: autoRoutePageBuilder,
             ),
             RedirectRoute(path: '*', redirectTo: ''),
           ],
@@ -230,3 +235,28 @@ export 'app_router.gr.dart';
   ],
 )
 class $AppRouter {}
+
+Widget autoRouteTransitionBuilder(
+  BuildContext context,
+  Animation<double> animation,
+  Animation<double> secondaryAnimation,
+  Widget child,
+) {
+  return child;
+}
+
+Route<bool> autoRoutePageBuilder<bool>(
+  BuildContext context,
+  Widget child,
+  CustomPage page,
+) {
+  return PageRouteBuilder(
+    settings: page,
+    pageBuilder: (context, animation, secondaryAnimation) {
+      return child;
+    },
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return child;
+    },
+  );
+}
