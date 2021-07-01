@@ -1,7 +1,7 @@
+import 'package:artbooking/components/popup_menu_item_icon.dart';
 import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -58,109 +58,51 @@ class AvatarMenu extends StatelessWidget {
   }
 
   List<PopupMenuEntry<PageRouteInfo<dynamic>>> itemBuilder(
-      BuildContext context) {
+    BuildContext context,
+  ) {
     return [
       if (isSmall) ...[
-        PopupMenuItem(
-          value: DashboardPageRoute(
-            children: [],
-          ),
-          child: ListTile(
-            leading: Icon(UniconsLine.plus),
-            title: Text(
-              "upload".tr(),
-              style: FontsUtils.mainStyle(
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ),
+        PopupMenuItemIcon(
+          icon: Icon(UniconsLine.plus, color: Colors.black87),
+          textLabel: "upload".tr(),
+          value: DashboardPageRoute(children: []),
         ),
-        PopupMenuItem(
+        PopupMenuItemIcon(
+          icon: Icon(UniconsLine.search, color: Colors.black87),
+          textLabel: "search".tr(),
           value: SearchPageRoute(),
-          child: ListTile(
-            leading: Icon(UniconsLine.search),
-            title: Text(
-              "search".tr(),
-              style: FontsUtils.mainStyle(
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ),
         ),
       ],
-      PopupMenuItem(
+      PopupMenuItemIcon(
+        icon: Icon(UniconsLine.chart_pie, color: Colors.black87),
+        textLabel: "activity_my".tr(),
         value: DashboardPageRoute(
           children: [MyActivityPageRoute()],
         ),
-        child: ListTile(
-          leading: Icon(UniconsLine.chart_pie),
-          title: Text(
-            "activity_my".tr(),
-            style: FontsUtils.mainStyle(
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
       ),
-      PopupMenuItem(
+      PopupMenuItemIcon(
+        icon: Icon(UniconsLine.picture, color: Colors.black87),
+        textLabel: "illustrations_my".tr(),
         value: DashboardPageRoute(children: [
-          DashIllustrationsRouter(
-            children: [
-              MyIllustrationsPageRoute(),
-            ],
-          )
+          DashIllustrationsRouter(children: [MyIllustrationsPageRoute()])
         ]),
-        child: ListTile(
-          leading: Icon(UniconsLine.picture),
-          title: Text(
-            "illustrations_my".tr(),
-            style: FontsUtils.mainStyle(
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
       ),
-      PopupMenuItem(
+      PopupMenuItemIcon(
         value: DashboardPageRoute(children: [
-          DashBooksRouter(
-            children: [
-              MyBooksPageRoute(),
-            ],
-          )
+          DashBooksRouter(children: [MyBooksPageRoute()])
         ]),
-        child: ListTile(
-          leading: Icon(UniconsLine.book_alt),
-          title: Text(
-            "books_my".tr(),
-            style: FontsUtils.mainStyle(
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
+        icon: Icon(UniconsLine.book_alt, color: Colors.black87),
+        textLabel: "books_my".tr(),
       ),
-      PopupMenuItem(
+      PopupMenuItemIcon(
         value: DashboardPageRoute(children: [DashProfileRouter()]),
-        child: ListTile(
-          leading: Icon(UniconsLine.user),
-          title: Text(
-            "profile_my".tr(),
-            style: FontsUtils.mainStyle(
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
+        icon: Icon(UniconsLine.user, color: Colors.black87),
+        textLabel: "profile_my".tr(),
       ),
-      PopupMenuItem(
+      PopupMenuItemIcon(
         value: SignOutRoute(),
-        child: ListTile(
-          leading: Icon(UniconsLine.sign_left),
-          title: Text(
-            "signout".tr(),
-            style: FontsUtils.mainStyle(
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
+        icon: Icon(UniconsLine.sign_left, color: Colors.black87),
+        textLabel: "signout".tr(),
       ),
     ];
   }

@@ -5,6 +5,7 @@ import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/book_card.dart';
 import 'package:artbooking/components/create_or_edit_book_dialog.dart';
 import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/popup_menu_item_icon.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/text_rectangle_button.dart';
 import 'package:artbooking/components/themed_dialog.dart';
@@ -60,19 +61,9 @@ class _MyBooksPageState extends State<MyBooksPage> {
   final _focusNode = FocusNode();
 
   final _popupMenuEntries = <PopupMenuEntry<BookItemAction>>[
-    PopupMenuItem(
-      child: ListTile(
-        leading: Icon(UniconsLine.trash),
-        title: Opacity(
-          opacity: 0.6,
-          child: Text(
-            "delete".tr(),
-            style: FontsUtils.mainStyle(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ),
+    PopupMenuItemIcon(
+      icon: Icon(UniconsLine.trash),
+      textLabel: "delete".tr(),
       value: BookItemAction.delete,
     ),
   ];
