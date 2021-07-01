@@ -65,7 +65,7 @@ class AvatarMenu extends StatelessWidget {
         PopupMenuItemIcon(
           icon: Icon(UniconsLine.plus, color: Colors.black87),
           textLabel: "upload".tr(),
-          value: DashboardPageRoute(children: []),
+          value: DashboardPageRoute(),
         ),
         PopupMenuItemIcon(
           icon: Icon(UniconsLine.search, color: Colors.black87),

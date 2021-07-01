@@ -129,9 +129,7 @@ class _MyBookPageState extends State<MyBookPage> {
             header(),
             body(),
             SliverPadding(
-              padding: const EdgeInsets.only(
-                bottom: 100.0,
-              ),
+              padding: const EdgeInsets.only(bottom: 100.0),
             ),
           ],
         ),
@@ -151,20 +149,23 @@ class _MyBookPageState extends State<MyBookPage> {
       );
     }
 
-    return SizedBox(
-      height: 260.0,
-      width: 200.0,
-      child: Card(
-        elevation: 4.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Ink.image(
-          image: NetworkImage(bookPage!.getCoverUrl()),
-          height: 260.0,
-          width: 200.0,
-          fit: BoxFit.cover,
+    return Hero(
+      tag: bookPage!.id,
+      child: SizedBox(
+        height: 260.0,
+        width: 200.0,
+        child: Card(
+          elevation: 4.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Ink.image(
+            image: NetworkImage(bookPage!.getCoverUrl()),
+            height: 260.0,
+            width: 200.0,
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );
