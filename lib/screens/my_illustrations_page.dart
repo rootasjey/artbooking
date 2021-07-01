@@ -7,6 +7,7 @@ import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/components/popup_menu_item_icon.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/text_rectangle_button.dart';
+import 'package:artbooking/components/themed_dialog.dart';
 import 'package:artbooking/components/user_books.dart';
 import 'package:artbooking/screens/illustration_page.dart';
 import 'package:artbooking/state/upload_manager.dart';
@@ -18,7 +19,6 @@ import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/shortcut_intents.dart';
 import 'package:artbooking/utils/snack.dart';
-import 'package:artbooking/utils/validation_shortcuts.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -72,6 +72,8 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     ),
   ];
 
+  final _focusNode = FocusNode();
+
   int _limit = 20;
 
   Map<String?, Illustration> _multiSelectedItems = Map();
@@ -89,6 +91,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   @override
   void dispose() {
     _streamSubscription?.cancel();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -725,70 +728,47 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   }
 
   void confirmIllustrationDeletion(Illustration illustration, int index) async {
-    showCustomModalBottomSheet(
+    showDialog(
       context: context,
       builder: (context) {
-        return Material(
-          child: SafeArea(
-            top: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text(
-                    "delete".tr(),
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                  trailing: Icon(
-                    UniconsLine.check,
-                    color: Colors.white,
-                  ),
-                  tileColor: stateColors.secondary,
-                  onTap: () {
-                    context.router.pop();
-                    deleteIllustration(illustration, index);
-                  },
-                ),
-                ListTile(
-                  title: Text("cancel".tr()),
-                  trailing: Icon(UniconsLine.times),
-                  onTap: context.router.pop,
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-      containerWidget: (context, animation, child) {
-        return ValidationShortcuts(
-          onCancel: context.router.pop,
-          onValidate: () {
-            context.router.pop();
-            deleteIllustration(illustration, index);
-          },
-          child: SafeArea(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: 500.0,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 40.0,
-                  ),
-                  child: Material(
-                    clipBehavior: Clip.antiAlias,
-                    borderRadius: BorderRadius.circular(12.0),
-                    child: child,
+        return ThemedDialog(
+          focusNode: _focusNode,
+          title: Column(
+            children: [
+              Opacity(
+                opacity: 0.8,
+                child: Text(
+                  "illustration_delete".tr().toUpperCase(),
+                  style: FontsUtils.mainStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
-            ),
+              Container(
+                width: 300.0,
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Opacity(
+                  opacity: 0.4,
+                  child: Text(
+                    "illustration_delete_description".tr(),
+                    textAlign: TextAlign.center,
+                    style: FontsUtils.mainStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
+          body: SingleChildScrollView(),
+          textButtonValidation: "delete".tr(),
+          onCancel: context.router.pop,
+          onValidate: () {
+            deleteIllustration(illustration, index);
+            context.router.pop();
+          },
         );
       },
     );
