@@ -389,7 +389,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
           label: Text("select_all".tr()),
         ),
         TextButton.icon(
-          onPressed: confirmSelectionDeletion,
+          onPressed: confirmDeleteManyBooks,
           style: TextButton.styleFrom(
             primary: Colors.red,
           ),
@@ -425,7 +425,8 @@ class _MyBooksPageState extends State<MyBooksPage> {
     });
   }
 
-  void confirmSelectionDeletion() async {
+  /// Show a dialog to confirm multiple books deletion.
+  void confirmDeleteManyBooks() async {
     showDialog(
       context: context,
       builder: (context) {
@@ -465,6 +466,54 @@ class _MyBooksPageState extends State<MyBooksPage> {
           onCancel: context.router.pop,
           onValidate: () {
             deleteSelection();
+            context.router.pop();
+          },
+        );
+      },
+    );
+  }
+
+  /// Show a dialog to confirm a single book deletion.
+  void confirmDeleteOneBook(Book book, int index) async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return ThemedDialog(
+          focusNode: _focusNode,
+          title: Column(
+            children: [
+              Opacity(
+                opacity: 0.8,
+                child: Text(
+                  "book_delete".tr().toUpperCase(),
+                  style: FontsUtils.mainStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Container(
+                width: 300.0,
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Opacity(
+                  opacity: 0.4,
+                  child: Text(
+                    "book_delete_description".tr(),
+                    textAlign: TextAlign.center,
+                    style: FontsUtils.mainStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          body: SingleChildScrollView(),
+          textButtonValidation: "delete".tr(),
+          onCancel: context.router.pop,
+          onValidate: () {
+            deleteBook(book, index);
             context.router.pop();
           },
         );
@@ -726,53 +775,6 @@ class _MyBooksPageState extends State<MyBooksPage> {
     }
   }
 
-  void confirmBookDeletion(Book book, int index) async {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return ThemedDialog(
-          focusNode: _focusNode,
-          title: Column(
-            children: [
-              Opacity(
-                opacity: 0.8,
-                child: Text(
-                  "book_delete".tr().toUpperCase(),
-                  style: FontsUtils.mainStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Container(
-                width: 300.0,
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Opacity(
-                  opacity: 0.4,
-                  child: Text(
-                    "book_delete_description".tr(),
-                    textAlign: TextAlign.center,
-                    style: FontsUtils.mainStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          body: SingleChildScrollView(),
-          textButtonValidation: "delete".tr(),
-          onCancel: context.router.pop,
-          onValidate: () {
-            deleteBook(book, index);
-            context.router.pop();
-          },
-        );
-      },
-    );
-  }
-
   void deleteBook(Book book, int index) async {
     setState(() => _books.removeAt(index));
 
@@ -834,7 +836,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   ) {
     switch (action) {
       case BookItemAction.delete:
-        confirmBookDeletion(book, index);
+        confirmDeleteOneBook(book, index);
         break;
       default:
     }

@@ -378,7 +378,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
           label: Text("select_all".tr()),
         ),
         TextButton.icon(
-          onPressed: confirmSelectionDeletion,
+          onPressed: confirmDeleteManyIllustrations,
           style: TextButton.styleFrom(
             primary: Colors.red,
           ),
@@ -414,7 +414,8 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     });
   }
 
-  void confirmSelectionDeletion() async {
+  /// Show a dialog to confirm multiple illustrations deletion.
+  void confirmDeleteManyIllustrations() async {
     showDialog(
       context: context,
       builder: (context) {
@@ -454,6 +455,57 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
           onCancel: context.router.pop,
           onValidate: () {
             deleteSelection();
+            context.router.pop();
+          },
+        );
+      },
+    );
+  }
+
+  /// Show a dialog to confirm single illustration deletion.
+  void confirmDeleteOneIllustration(
+    Illustration illustration,
+    int index,
+  ) async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return ThemedDialog(
+          focusNode: _focusNode,
+          title: Column(
+            children: [
+              Opacity(
+                opacity: 0.8,
+                child: Text(
+                  "illustration_delete".tr().toUpperCase(),
+                  style: FontsUtils.mainStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Container(
+                width: 300.0,
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Opacity(
+                  opacity: 0.4,
+                  child: Text(
+                    "illustration_delete_description".tr(),
+                    textAlign: TextAlign.center,
+                    style: FontsUtils.mainStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          body: SingleChildScrollView(),
+          textButtonValidation: "delete".tr(),
+          onCancel: context.router.pop,
+          onValidate: () {
+            deleteIllustration(illustration, index);
             context.router.pop();
           },
         );
@@ -674,7 +726,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   ) {
     switch (action) {
       case IllustrationItemAction.delete:
-        confirmIllustrationDeletion(illustration, index);
+        confirmDeleteOneIllustration(illustration, index);
         break;
       case IllustrationItemAction.addToBook:
         showAddToBook(illustration);
@@ -682,53 +734,6 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
       default:
         break;
     }
-  }
-
-  void confirmIllustrationDeletion(Illustration illustration, int index) async {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return ThemedDialog(
-          focusNode: _focusNode,
-          title: Column(
-            children: [
-              Opacity(
-                opacity: 0.8,
-                child: Text(
-                  "illustration_delete".tr().toUpperCase(),
-                  style: FontsUtils.mainStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Container(
-                width: 300.0,
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Opacity(
-                  opacity: 0.4,
-                  child: Text(
-                    "illustration_delete_description".tr(),
-                    textAlign: TextAlign.center,
-                    style: FontsUtils.mainStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          body: SingleChildScrollView(),
-          textButtonValidation: "delete".tr(),
-          onCancel: context.router.pop,
-          onValidate: () {
-            deleteIllustration(illustration, index);
-            context.router.pop();
-          },
-        );
-      },
-    );
   }
 
   void deleteIllustration(Illustration illustration, int index) async {
