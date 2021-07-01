@@ -17,14 +17,12 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
-import 'package:artbooking/utils/shortcut_intents.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
@@ -417,88 +415,47 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   }
 
   void confirmSelectionDeletion() async {
-    showCustomModalBottomSheet(
+    showDialog(
       context: context,
       builder: (context) {
-        return Material(
-          child: SafeArea(
-            top: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text(
-                    "confirm".tr(),
-                    style: TextStyle(
-                      color: Colors.white,
+        return ThemedDialog(
+          focusNode: _focusNode,
+          title: Column(
+            children: [
+              Opacity(
+                opacity: 0.8,
+                child: Text(
+                  "illustrations_delete".tr().toUpperCase(),
+                  style: FontsUtils.mainStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Container(
+                width: 300.0,
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Opacity(
+                  opacity: 0.4,
+                  child: Text(
+                    "illustrations_delete_description".tr(),
+                    textAlign: TextAlign.center,
+                    style: FontsUtils.mainStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  trailing: Icon(
-                    Icons.check,
-                    color: Colors.white,
-                  ),
-                  tileColor: Color(0xfff55c5c),
-                  onTap: () {
-                    context.router.pop();
-                    deleteSelection();
-                  },
                 ),
-                ListTile(
-                  title: Text("cancel".tr()),
-                  trailing: Icon(Icons.close),
-                  onTap: context.router.pop,
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        );
-      },
-      containerWidget: (context, animation, child) {
-        return Shortcuts(
-          shortcuts: {
-            LogicalKeySet(LogicalKeyboardKey.enter): const EnterIntent(),
-            LogicalKeySet(LogicalKeyboardKey.space): const EnterIntent(),
-            LogicalKeySet(LogicalKeyboardKey.escape): const EscapeIntent(),
+          body: SingleChildScrollView(),
+          textButtonValidation: "delete".tr(),
+          onCancel: context.router.pop,
+          onValidate: () {
+            deleteSelection();
+            context.router.pop();
           },
-          child: Actions(
-            actions: {
-              EnterIntent: CallbackAction<EnterIntent>(
-                onInvoke: (EnterIntent enterIntent) {
-                  context.router.pop();
-                  deleteSelection();
-                },
-              ),
-              EscapeIntent: CallbackAction<EscapeIntent>(
-                onInvoke: (EscapeIntent escapeIntent) {
-                  context.router.pop();
-                },
-              ),
-            },
-            child: Focus(
-              autofocus: true,
-              child: SafeArea(
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: 500.0,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20.0,
-                        vertical: 40.0,
-                      ),
-                      child: Material(
-                        clipBehavior: Clip.antiAlias,
-                        borderRadius: BorderRadius.circular(12.0),
-                        child: child,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
         );
       },
     );
