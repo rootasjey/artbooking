@@ -1,18 +1,18 @@
 class UserGalleriesStats {
   /// Total virtual galleries this user has created.
-  int? created;
+  int created;
 
   /// Total virtual galleries this user has deleted.
-  int? deleted;
+  int deleted;
 
   /// Total virtual galleries this user has entered.
-  int? entered;
+  int entered;
 
   /// Total virtual galleries this user has entered.
-  int? opened;
+  int opened;
 
   /// Number of existing virtual galleries this user own.
-  int? owned;
+  int owned;
 
   UserGalleriesStats({
     this.created = 0,
@@ -38,11 +38,11 @@ class UserGalleriesStats {
     }
 
     return UserGalleriesStats(
-      created: data['created'],
-      deleted: data['deleted'],
-      entered: data['entered'],
-      opened: data['opened'],
-      owned: data['owned'],
+      created: data['created'] ?? 0,
+      deleted: data['deleted'] ?? 0,
+      entered: data['entered'] ?? 0,
+      opened: data['opened'] ?? 0,
+      owned: data['owned'] ?? 0,
     );
   }
 }

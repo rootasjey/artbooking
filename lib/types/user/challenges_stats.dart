@@ -1,21 +1,21 @@
 class UserChallengesStats {
   /// Total challenges this user has created.
-  int? created;
+  int created;
 
   /// Total challenges this user has deleted.
-  int? deleted;
+  int deleted;
 
   /// Total challenges this user has entered.
-  int? entered;
+  int entered;
 
   /// Number of existing challenges this user own.
-  int? owned;
+  int owned;
 
   /// Number of existing challenges this user is doing.
-  int? participating;
+  int participating;
 
   /// Total challenges this user has won.
-  int? won;
+  int won;
 
   UserChallengesStats({
     this.created = 0,
@@ -43,12 +43,12 @@ class UserChallengesStats {
     }
 
     return UserChallengesStats(
-      created: data['created'],
-      deleted: data['deleted'],
-      entered: data['entered'],
-      owned: data['owned'],
-      participating: data['participating'],
-      won: data['won'],
+      created: data['created'] ?? 0,
+      deleted: data['deleted'] ?? 0,
+      entered: data['entered'] ?? 0,
+      owned: data['owned'] ?? 0,
+      participating: data['participating'] ?? 0,
+      won: data['won'] ?? 0,
     );
   }
 }

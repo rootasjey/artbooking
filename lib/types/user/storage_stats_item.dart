@@ -1,6 +1,6 @@
 class StorageStatsItem {
-  int? total;
-  int? used;
+  final int total;
+  final int used;
 
   StorageStatsItem({
     this.total = 0,
@@ -16,8 +16,8 @@ class StorageStatsItem {
 
   factory StorageStatsItem.fromJSON(Map<String, dynamic> data) {
     return StorageStatsItem(
-      total: data['total'],
-      used: data['used'],
+      total: data['total'] ?? 0,
+      used: data['used'] ?? 0,
     );
   }
 }

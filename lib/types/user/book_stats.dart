@@ -1,15 +1,15 @@
 class UserBooksStats {
   /// Total books this user has created.
-  int? created;
+  int created;
 
   /// Total books this user has deleted.
-  int? deleted;
+  int deleted;
 
   /// Total books this user has fav.
-  int? fav;
+  int fav;
 
   /// Number of existing books this user own.
-  int? owned;
+  int owned;
 
   UserBooksStats({
     this.created = 0,
@@ -33,10 +33,10 @@ class UserBooksStats {
     }
 
     return UserBooksStats(
-      created: data['created'],
-      deleted: data['deleted'],
-      fav: data['fav'],
-      owned: data['owned'],
+      created: data['created'] ?? 0,
+      deleted: data['deleted'] ?? 0,
+      fav: data['fav'] ?? 0,
+      owned: data['owned'] ?? 0,
     );
   }
 }

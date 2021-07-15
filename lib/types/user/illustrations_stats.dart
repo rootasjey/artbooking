@@ -1,18 +1,18 @@
 class UserIllustrationsStats {
   /// Total illustrations this user has uploaded.
-  int? created;
+  int created;
 
   /// Total illustrations this user has deleted.
-  int? deleted;
+  int deleted;
 
   /// Total illustrations this user has fav.
-  int? fav;
+  int fav;
 
   /// Number of existing illustrations this user own.
-  int? owned;
+  int owned;
 
   /// Total illustrations updates by providing a new version.
-  int? updated;
+  int updated;
 
   UserIllustrationsStats({
     this.created = 0,
@@ -38,11 +38,11 @@ class UserIllustrationsStats {
     }
 
     return UserIllustrationsStats(
-      created: data['created'],
-      deleted: data['deleted'],
-      fav: data['fav'],
-      owned: data['owned'],
-      updated: data['updated'],
+      created: data['created'] ?? 0,
+      deleted: data['deleted'] ?? 0,
+      fav: data['fav'] ?? 0,
+      owned: data['owned'] ?? 0,
+      updated: data['updated'] ?? 0,
     );
   }
 }

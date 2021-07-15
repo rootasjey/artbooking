@@ -7,22 +7,22 @@ import 'package:artbooking/types/user/notifications_stats.dart';
 import 'package:artbooking/types/user/storage_stats.dart';
 
 class UserStats {
-  UserBooksStats? books;
-  UserChallengesStats? challenges;
-  UserContestsStats? constests;
-  UserGalleriesStats? galleries;
-  UserIllustrationsStats? illustrations;
-  UserNotificationsStats? notifications;
-  UserStorageStats? storage;
+  UserBooksStats books;
+  UserChallengesStats challenges;
+  UserContestsStats constests;
+  UserGalleriesStats galleries;
+  UserIllustrationsStats illustrations;
+  UserNotificationsStats notifications;
+  UserStorageStats storage;
 
   UserStats({
-    this.books,
-    this.challenges,
-    this.constests,
-    this.galleries,
-    this.illustrations,
-    this.notifications,
-    this.storage,
+    required this.books,
+    required this.challenges,
+    required this.constests,
+    required this.galleries,
+    required this.illustrations,
+    required this.notifications,
+    required this.storage,
   });
 
   factory UserStats.empty() {
