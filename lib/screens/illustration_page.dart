@@ -7,6 +7,8 @@ import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/illustration_poster.dart';
 import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
+import 'package:artbooking/router/navigation_state_helper.dart';
+import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/enums.dart';
@@ -15,8 +17,6 @@ import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
-import 'package:auto_route/annotations.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
@@ -35,7 +35,7 @@ class IllustrationPage extends StatefulWidget {
 
   const IllustrationPage({
     Key? key,
-    @PathParam('illustrationId') required this.illustrationId,
+    required this.illustrationId,
     this.illustration,
     this.fromDashboard = false,
   }) : super(key: key);
@@ -71,8 +71,11 @@ class _IllustrationPageState extends State<IllustrationPage> {
     _descController = TextEditingController();
     _summaryController = TextEditingController();
 
-    if (widget.illustration != null) {
-      _illustration = widget.illustration;
+    Illustration? illustrationFromNav = NavigationStateHelper.illustration;
+
+    if (illustrationFromNav != null &&
+        illustrationFromNav.id == widget.illustrationId) {
+      _illustration = illustrationFromNav;
     } else {
       fetchIllustration();
     }
@@ -89,26 +92,29 @@ class _IllustrationPageState extends State<IllustrationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: fab(),
-      body: Stack(
-        children: [
-          NotificationListener(
-            child: CustomScrollView(
-              slivers: [
-                SliverEdgePadding(),
-                MainAppBar(),
-                body(),
-                SliverPadding(
-                  padding: const EdgeInsets.only(
-                    bottom: 120.0,
+    return HeroControllerScope(
+      controller: HeroController(),
+      child: Scaffold(
+        floatingActionButton: fab(),
+        body: Stack(
+          children: [
+            NotificationListener(
+              child: CustomScrollView(
+                slivers: [
+                  SliverEdgePadding(),
+                  MainAppBar(),
+                  body(),
+                  SliverPadding(
+                    padding: const EdgeInsets.only(
+                      bottom: 120.0,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          saveChangesPanel(),
-        ],
+            saveChangesPanel(),
+          ],
+        ),
       ),
     );
   }
@@ -172,7 +178,9 @@ class _IllustrationPageState extends State<IllustrationPage> {
       children: [
         IconButton(
           color: stateColors.primary,
-          onPressed: context.router.pop,
+          onPressed: () {
+            Beamer.of(context).popRoute();
+          },
           icon: Icon(UniconsLine.arrow_left),
         ),
         Expanded(
@@ -641,7 +649,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
           actions: <Widget>[
             Center(
               child: DarkElevatedButton(
-                onPressed: context.router.pop,
+                onPressed: context.beamBack,
                 child: Text("close".tr().toUpperCase()),
               ),
             ),

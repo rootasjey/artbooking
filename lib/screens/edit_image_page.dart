@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:artbooking/components/form_actions_inputs.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/user/user_pp_path.dart';
 import 'package:artbooking/types/user/user_pp_url.dart';
@@ -10,7 +11,7 @@ import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:artbooking/utils/crop_editor_helper.dart';
 import 'package:artbooking/utils/fonts.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,13 +23,8 @@ import 'package:unicons/unicons.dart';
 
 /// A widget to edit an image (crop, resize, flip, rotate).
 class EditImagePage extends StatefulWidget {
-  /// Image object. Should be defined is navigating from another page.
-  /// It's null when reloading the page for example.
-  final ImageProvider<Object>? image;
-
   const EditImagePage({
     Key? key,
-    required this.image,
   }) : super(key: key);
 
   @override
@@ -39,12 +35,18 @@ class _EditImagePageState extends State<EditImagePage> {
   bool _isCropping = false;
   bool _isUpdating = false;
 
+  /// Image object. Should be defined is navigating from another page.
+  /// It's null when reloading the page for example.
+  ImageProvider<Object>? imageToEdit;
+
   final GlobalKey<ExtendedImageEditorState> _editorKey =
       GlobalKey<ExtendedImageEditorState>();
 
   @override
   void initState() {
     super.initState();
+
+    imageToEdit = NavigationStateHelper.imageToEdit;
   }
 
   @override
@@ -87,7 +89,7 @@ class _EditImagePageState extends State<EditImagePage> {
       ExtendedImage(
         width: 600.0,
         height: 400.0,
-        image: widget.image!,
+        image: imageToEdit!,
         fit: BoxFit.contain,
         mode: ExtendedImageMode.editor,
         extendedImageEditorKey: _editorKey,
@@ -105,7 +107,7 @@ class _EditImagePageState extends State<EditImagePage> {
           bottom: 300.0,
         ),
         cancelTextString: "cancel".tr(),
-        onCancel: context.router.pop,
+        onCancel: Beamer.of(context).popRoute,
         onValidate: () {
           _cropImage(useNativeLib: false);
         },
@@ -165,7 +167,7 @@ class _EditImagePageState extends State<EditImagePage> {
                     child: Opacity(
                       opacity: 0.8,
                       child: IconButton(
-                        onPressed: context.router.pop,
+                        onPressed: Beamer.of(context).popRoute,
                         icon: Icon(UniconsLine.arrow_left),
                       ),
                     ),
@@ -301,7 +303,7 @@ class _EditImagePageState extends State<EditImagePage> {
         'updatePayload': stateUser.userFirestore.toJSON(),
       });
 
-      context.router.pop();
+      Beamer.of(context).popRoute();
     } catch (error) {
       appLogger.e(error);
     } finally {

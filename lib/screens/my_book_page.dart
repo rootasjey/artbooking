@@ -12,7 +12,8 @@ import 'package:artbooking/components/text_divider.dart';
 import 'package:artbooking/components/text_rectangle_button.dart';
 import 'package:artbooking/components/underlined_button.dart';
 import 'package:artbooking/components/user_books.dart';
-import 'package:artbooking/router/app_router.gr.dart';
+import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/types/book.dart';
@@ -22,7 +23,7 @@ import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +49,7 @@ class MyBookPage extends StatefulWidget {
 
   const MyBookPage({
     Key? key,
-    @PathParam() required this.bookId,
+    required this.bookId,
     this.book,
   }) : super(key: key);
   @override
@@ -348,11 +349,7 @@ class _MyBookPageState extends State<MyBookPage> {
           ),
           UnderlinedButton(
             onTap: () {
-              context.router.root.push(
-                DashboardPageRoute(
-                  children: [DashIllustrationsRouter()],
-                ),
-              );
+              context.beamToNamed(DashboardContentLocation.illustrationsRoute);
             },
             child: Text("illustrations_yours_browse".tr()),
           ),
@@ -532,7 +529,7 @@ class _MyBookPageState extends State<MyBookPage> {
               opacity: 0.6,
               child: IconButton(
                 tooltip: "back".tr(),
-                onPressed: context.router.pop,
+                onPressed: Beamer.of(context).popRoute,
                 icon: Icon(UniconsLine.arrow_left),
               ),
             ),
@@ -752,14 +749,14 @@ class _MyBookPageState extends State<MyBookPage> {
                   ),
                   tileColor: Color(0xfff55c5c),
                   onTap: () {
-                    context.router.pop();
+                    Beamer.of(context).popRoute();
                     deleteIllustration(illustration, index);
                   },
                 ),
                 ListTile(
                   title: Text("cancel".tr()),
                   trailing: Icon(UniconsLine.times),
-                  onTap: context.router.pop,
+                  onTap: Beamer.of(context).popRoute,
                 ),
               ],
             ),
@@ -1223,10 +1220,18 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   void navigateToIllustrationPage(Illustration illustration) {
-    context.router.root.push(
-      IllustrationPageRoute(
-        illustrationId: illustration.id,
-        illustration: illustration,
+    NavigationStateHelper.illustration = illustration;
+
+    context.currentBeamLocation.update(
+      (state) => state.copyWith(
+        pathBlueprintSegments: [
+          'dashboard',
+          'illustrations',
+          ':illustrationId',
+        ],
+        pathParameters: {
+          'illustrationId': illustration.id,
+        },
       ),
     );
   }
@@ -1350,7 +1355,7 @@ class _MyBookPageState extends State<MyBookPage> {
             Padding(
               padding: const EdgeInsets.only(top: 24.0),
               child: DarkElevatedButton(
-                onPressed: context.router.pop,
+                onPressed: Beamer.of(context).popRoute,
                 child: Text(
                   "close".tr(),
                 ),

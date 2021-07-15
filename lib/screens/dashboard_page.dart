@@ -1,12 +1,13 @@
 import 'package:artbooking/components/side_menu_item.dart';
 import 'package:artbooking/components/underlined_button.dart';
 import 'package:artbooking/components/upload_window.dart';
+import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/state/upload_manager.dart';
-import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -17,24 +18,27 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  final _sideMenuItems = <SideMenuItem>[
+  final _sidePanelItems = <SideMenuItem>[
     SideMenuItem(
       index: 0,
       iconData: UniconsLine.chart_pie,
       label: 'Activity',
       hoverColor: Colors.red,
+      path: DashboardContentLocation.activityRoute,
     ),
     SideMenuItem(
       index: 1,
       iconData: UniconsLine.picture,
       label: 'Illustrations',
       hoverColor: Colors.red,
+      path: DashboardContentLocation.illustrationsRoute,
     ),
     SideMenuItem(
       index: 2,
       iconData: UniconsLine.book_alt,
       label: 'Books',
       hoverColor: Colors.blue.shade700,
+      path: DashboardContentLocation.booksRoute,
     ),
     // SideMenuItem(
     //   destination: MyGalleriesDeepRoute(),
@@ -59,8 +63,11 @@ class _DashboardPageState extends State<DashboardPage> {
       iconData: UniconsLine.setting,
       label: 'Settings',
       hoverColor: Colors.blueGrey,
+      path: DashboardContentLocation.settingsRoute,
     ),
   ];
+
+  final _beamerKey = GlobalKey<BeamerState>();
 
   @override
   void initState() {
@@ -70,41 +77,40 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(context) {
-    return AutoTabsScaffold(
-      routes: const [
-        MyActivityPageRoute(),
-        DashIllustrationsRouter(),
-        DashBooksRouter(),
-        DashSettingsRouter(),
-      ],
-      builder: (context, child, animation) {
-        return Material(
-          child: Stack(
-            children: [
-              Row(
-                children: [
-                  buildSidePanel(context, context.tabsRouter),
-                  Expanded(
-                    child: Material(
-                      elevation: 6.0,
-                      child: child,
+    return HeroControllerScope(
+      controller: HeroController(),
+      child: Material(
+        child: Stack(
+          children: [
+            Row(
+              children: [
+                buildSidePanel(context),
+                Expanded(
+                  child: Material(
+                    elevation: 6.0,
+                    child: Beamer(
+                      key: _beamerKey,
+                      routerDelegate: BeamerDelegate(
+                        locationBuilder: (state) =>
+                            DashboardContentLocation(state),
+                      ),
                     ),
                   ),
-                ],
-              ),
-              Positioned(
-                left: 16.0,
-                bottom: 16.0,
-                child: UploadWindow(),
-              ),
-            ],
-          ),
-        );
-      },
+                ),
+              ],
+            ),
+            Positioned(
+              left: 16.0,
+              bottom: 16.0,
+              child: UploadWindow(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget buildSidePanel(BuildContext context, TabsRouter tabsRouter) {
+  Widget buildSidePanel(BuildContext context) {
     if (MediaQuery.of(context).size.width < Constants.maxMobileWidth) {
       return Container();
     }
@@ -117,7 +123,7 @@ class _DashboardPageState extends State<DashboardPage> {
           CustomScrollView(
             slivers: <Widget>[
               topSidePanel(),
-              bodySidePanel(tabsRouter),
+              bodySidePanel(),
             ],
           ),
         ],
@@ -154,7 +160,7 @@ class _DashboardPageState extends State<DashboardPage> {
     // ]);
   }
 
-  Widget bodySidePanel(TabsRouter tabsRouter) {
+  Widget bodySidePanel() {
     return SliverPadding(
       padding: const EdgeInsets.only(
         left: 20.0,
@@ -162,13 +168,14 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       sliver: SliverList(
           delegate: SliverChildListDelegate.fixed(
-        _sideMenuItems.map((item) {
+        _sidePanelItems.map((sidePanelItem) {
           Color color = stateColors.foreground.withOpacity(0.6);
           Color textColor = stateColors.foreground.withOpacity(0.4);
           FontWeight fontWeight = FontWeight.w600;
 
-          if (tabsRouter.activeIndex == item.index) {
-            color = item.hoverColor;
+          if (context.currentBeamLocation.state.uri.path
+              .contains(sidePanelItem.path)) {
+            color = sidePanelItem.hoverColor;
             textColor = stateColors.foreground.withOpacity(0.6);
             fontWeight = FontWeight.w700;
           }
@@ -182,12 +189,12 @@ class _DashboardPageState extends State<DashboardPage> {
               leading: Padding(
                 padding: const EdgeInsets.only(right: 16.0),
                 child: Icon(
-                  item.iconData,
+                  sidePanelItem.iconData,
                   color: color,
                 ),
               ),
               child: Text(
-                item.label,
+                sidePanelItem.label,
                 style: FontsUtils.mainStyle(
                   color: textColor,
                   fontSize: 16.0,
@@ -195,7 +202,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
               ),
               onTap: () {
-                tabsRouter.setActiveIndex(item.index);
+                context.beamToNamed(sidePanelItem.path);
+                setState(() {});
               },
             ),
           );
@@ -214,7 +222,7 @@ class _DashboardPageState extends State<DashboardPage> {
         delegate: SliverChildListDelegate.fixed([
           IconButton(
             tooltip: "home".tr(),
-            onPressed: () => context.router.navigate(HomePageRoute()),
+            onPressed: () => context.beamTo(HomeLocation()),
             icon: Opacity(
               opacity: 0.6,
               child: Icon(UniconsLine.home),

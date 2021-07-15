@@ -25,7 +25,7 @@ dependencies:
   adaptive_theme: 2.0.0
   algolia: 1.0.1
   animations: 2.0.0
-  auto_route:  2.2.0
+  beamer: 0.14.1
   cloud_firestore: 2.0.0
   cloud_functions: 1.0.6
   cross_local_storage: 2.0.1
@@ -71,7 +71,6 @@ dependencies:
   waterfall_flow: 3.0.1
 
 dev_dependencies:
-  auto_route_generator: 2.1.0
   build_runner:
   flutter_launcher_icons: 0.9.0
   flutter_test:

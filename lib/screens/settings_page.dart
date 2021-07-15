@@ -5,7 +5,8 @@ import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/components/page_title.dart';
-import 'package:artbooking/router/app_router.gr.dart';
+import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/user/user_pp.dart';
@@ -19,7 +20,7 @@ import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/language.dart';
 import 'package:artbooking/utils/snack.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
@@ -181,21 +182,32 @@ class _SettingsPageState extends State<SettingsPage> {
                     return;
                   }
 
-                  context.router.root.push(
-                    DashboardPageRoute(children: [
-                      DashProfileRouter(
-                        children: [
-                          EditImagePageRoute(
-                            image: ExtendedNetworkImageProvider(
-                              stateUser.userFirestore.pp!.url!.original!,
-                              cache: true,
-                              cacheRawData: true,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ]),
+                  NavigationStateHelper.imageToEdit =
+                      ExtendedNetworkImageProvider(
+                    stateUser.userFirestore.pp!.url!.original!,
+                    cache: true,
+                    cacheRawData: true,
                   );
+
+                  context.beamToNamed(
+                    DashboardContentLocation.editProfilePictureRoute,
+                  );
+
+                  // context.router.root.push(
+                  //   DashboardPageRoute(children: [
+                  //     DashProfileRouter(
+                  //       children: [
+                  //         EditImagePageRoute(
+                  //           image: ExtendedNetworkImageProvider(
+                  //             stateUser.userFirestore.pp!.url!.original!,
+                  //             cache: true,
+                  //             cacheRawData: true,
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ]),
+                  // );
                 },
               ),
             ),
@@ -247,8 +259,8 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Card(
             elevation: 4.0,
             child: InkWell(
-              onTap: () => context.router.push(
-                DeleteAccountPageRoute(),
+              onTap: () => context.beamToNamed(
+                DashboardContentLocation.deleteAccountRoute,
               ),
               child: Padding(
                 padding: const EdgeInsets.all(15.0),
@@ -290,11 +302,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget emailButton() {
     return TextButton(
       onPressed: () async {
-        context.router.push(
-          DashAccountUpdateRouter(
-            children: [UpdateEmailPageRoute()],
-          ),
-        );
+        context.beamToNamed(DashboardContentLocation.updateEmailRoute);
       },
       style: TextButton.styleFrom(
         primary: Colors.black,
@@ -374,11 +382,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget updateUsernameButton(bool isUserConnected) {
     return TextButton(
       onPressed: () {
-        context.router.push(
-          DashAccountUpdateRouter(
-            children: [UpdateUsernamePageRoute()],
-          ),
-        );
+        context.beamToNamed(DashboardContentLocation.updateUsernameRoute);
       },
       style: TextButton.styleFrom(
         primary: Colors.black,
@@ -613,10 +617,8 @@ class _SettingsPageState extends State<SettingsPage> {
             elevation: 4.0,
             child: InkWell(
               onTap: () {
-                context.router.push(
-                  DashAccountUpdateRouter(
-                    children: [UpdatePasswordPageRoute()],
-                  ),
+                context.beamToNamed(
+                  DashboardContentLocation.updatePasswordRoute,
                 );
               },
               child: Padding(

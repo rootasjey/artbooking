@@ -2,7 +2,7 @@ import 'package:artbooking/components/footer.dart';
 import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/utils/constants.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -67,7 +67,7 @@ class _TosPageState extends State<TosPage> {
   Widget backButton() {
     return IconButton(
       tooltip: "back".tr(),
-      onPressed: context.router.pop,
+      onPressed: Beamer.of(context).popRoute,
       icon: Icon(UniconsLine.arrow_left),
     );
   }
