@@ -5,13 +5,13 @@ import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
-import 'package:artbooking/router/app_router.gr.dart';
+import 'package:artbooking/router/locations/signin_location.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -108,7 +108,7 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
                 ),
               ),
               OutlinedButton(
-                onPressed: context.router.pop,
+                onPressed: Beamer.of(context).popRoute,
                 child: Text("back".tr()),
               ),
             ],
@@ -134,7 +134,7 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
                     child: Opacity(
                       opacity: 0.8,
                       child: IconButton(
-                        onPressed: context.router.pop,
+                        onPressed: Beamer.of(context).popRoute,
                         icon: Icon(UniconsLine.arrow_left),
                       ),
                     ),
@@ -491,7 +491,7 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
           isUpdating = false;
         });
 
-        context.router.navigate(SigninPageRoute());
+        context.beamToNamed(SigninLocation.route);
         return;
       }
 

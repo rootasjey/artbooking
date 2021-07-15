@@ -18,7 +18,7 @@ import 'package:artbooking/types/one_book_op_resp.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -463,10 +463,10 @@ class _MyBooksPageState extends State<MyBooksPage> {
           ),
           body: SingleChildScrollView(),
           textButtonValidation: "delete".tr(),
-          onCancel: context.router.pop,
+          onCancel: Beamer.of(context).popRoute,
           onValidate: () {
             deleteSelection();
-            context.router.pop();
+            Beamer.of(context).popRoute();
           },
         );
       },
@@ -511,10 +511,10 @@ class _MyBooksPageState extends State<MyBooksPage> {
           ),
           body: SingleChildScrollView(),
           textButtonValidation: "delete".tr(),
-          onCancel: context.router.pop,
+          onCancel: Beamer.of(context).popRoute,
           onValidate: () {
             deleteBook(book, index);
-            context.router.pop();
+            Beamer.of(context).popRoute();
           },
         );
       },
@@ -712,10 +712,10 @@ class _MyBooksPageState extends State<MyBooksPage> {
         onDescriptionChanged: (newValue) {
           _newBookDescription = newValue;
         },
-        onCancel: context.router.pop,
+        onCancel: Beamer.of(context).popRoute,
         onSubmitted: (value) {
           createBook();
-          context.router.pop();
+          Beamer.of(context).popRoute();
         },
       ),
     );

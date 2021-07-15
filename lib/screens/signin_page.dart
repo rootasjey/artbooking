@@ -4,15 +4,17 @@ import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/loading_animation.dart';
 import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/router/locations/forgot_password_location.dart';
+import 'package:artbooking/router/locations/home_location.dart';
+import 'package:artbooking/router/locations/signup_location.dart';
 import 'package:artbooking/utils/fonts.dart';
+import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/app_storage.dart';
 import 'package:artbooking/utils/snack.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
@@ -142,7 +144,9 @@ class _SigninPageState extends State<SigninPage> {
       delay: 100.milliseconds,
       beginY: 50.0,
       child: TextButton(
-        onPressed: () => context.router.push(ForgotPasswordPageRoute()),
+        onPressed: () {
+          context.beamToNamed(ForgotPasswordLocation.route);
+        },
         child: Opacity(
           opacity: 0.6,
           child: Row(
@@ -165,20 +169,19 @@ class _SigninPageState extends State<SigninPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        if (context.router.stack.length > 1)
-          FadeInX(
-            beginX: 10.0,
-            delay: 200.milliseconds,
-            child: Padding(
-              padding: const EdgeInsets.only(
-                right: 20.0,
-              ),
-              child: IconButton(
-                onPressed: () => context.router.pop(),
-                icon: Icon(Icons.arrow_back),
-              ),
+        FadeInX(
+          beginX: 10.0,
+          delay: 200.milliseconds,
+          child: Padding(
+            padding: const EdgeInsets.only(
+              right: 20.0,
+            ),
+            child: IconButton(
+              onPressed: Beamer.of(context).popRoute,
+              icon: Icon(UniconsLine.arrow_left),
             ),
           ),
+        ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -221,9 +224,7 @@ class _SigninPageState extends State<SigninPage> {
         padding: const EdgeInsets.only(top: 8.0),
         child: TextButton(
             onPressed: () {
-              context.router.navigate(
-                SignupPageRoute(onSignupResult: widget.onSigninResult),
-              );
+              context.beamToNamed(SignupLocation.route);
             },
             child: Opacity(
               opacity: 0.6,
@@ -387,7 +388,7 @@ class _SigninPageState extends State<SigninPage> {
         return;
       }
 
-      context.router.navigate(HomePageRoute());
+      context.beamToNamed(HomeLocation.route);
     } catch (error) {
       appLogger.d(error);
 

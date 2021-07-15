@@ -1,8 +1,9 @@
 import 'package:artbooking/components/popup_menu_item_icon.dart';
-import 'package:artbooking/router/app_router.gr.dart';
+import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/locations/search_location.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -34,7 +35,7 @@ class AvatarMenu extends StatelessWidget {
 
     return Padding(
       padding: padding,
-      child: PopupMenuButton<PageRouteInfo>(
+      child: PopupMenuButton<String>(
         icon: Material(
           elevation: 4.0,
           shape: CircleBorder(),
@@ -45,19 +46,19 @@ class AvatarMenu extends StatelessWidget {
           ),
         ),
         onSelected: (route) {
-          if (route.routeName == SignOutRoute.name) {
-            stateUser.signOut(context: context);
-            return;
-          }
+          // if (route.routeName == SignOutRoute.name) {
+          //   stateUser.signOut(context: context);
+          //   return;
+          // }
 
-          context.router.root.push(route);
+          context.beamToNamed(route);
         },
         itemBuilder: itemBuilder,
       ),
     );
   }
 
-  List<PopupMenuEntry<PageRouteInfo<dynamic>>> itemBuilder(
+  List<PopupMenuEntry<String>> itemBuilder(
     BuildContext context,
   ) {
     return [
@@ -65,44 +66,38 @@ class AvatarMenu extends StatelessWidget {
         PopupMenuItemIcon(
           icon: Icon(UniconsLine.plus, color: Colors.black87),
           textLabel: "upload".tr(),
-          value: DashboardPageRoute(),
+          value: '/dashboard',
         ),
         PopupMenuItemIcon(
           icon: Icon(UniconsLine.search, color: Colors.black87),
           textLabel: "search".tr(),
-          value: SearchPageRoute(),
+          value: SearchLocation.route,
         ),
       ],
       PopupMenuItemIcon(
         icon: Icon(UniconsLine.chart_pie, color: Colors.black87),
         textLabel: "activity_my".tr(),
-        value: DashboardPageRoute(
-          children: [MyActivityPageRoute()],
-        ),
+        value: DashboardContentLocation.activityRoute,
       ),
       PopupMenuItemIcon(
         icon: Icon(UniconsLine.picture, color: Colors.black87),
         textLabel: "illustrations_my".tr(),
-        value: DashboardPageRoute(children: [
-          DashIllustrationsRouter(children: [MyIllustrationsPageRoute()])
-        ]),
+        value: DashboardContentLocation.illustrationsRoute,
       ),
       PopupMenuItemIcon(
-        value: DashboardPageRoute(children: [
-          DashBooksRouter(children: [MyBooksPageRoute()])
-        ]),
         icon: Icon(UniconsLine.book_alt, color: Colors.black87),
         textLabel: "books_my".tr(),
+        value: DashboardContentLocation.booksRoute,
       ),
       PopupMenuItemIcon(
-        value: DashboardPageRoute(children: [DashProfileRouter()]),
         icon: Icon(UniconsLine.user, color: Colors.black87),
         textLabel: "profile_my".tr(),
+        value: '/dashboard/profile',
       ),
       PopupMenuItemIcon(
-        value: SignOutRoute(),
         icon: Icon(UniconsLine.sign_left, color: Colors.black87),
         textLabel: "signout".tr(),
+        value: '/dashboard',
       ),
     ];
   }

@@ -12,7 +12,7 @@ import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -285,7 +285,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     return Padding(
       padding: const EdgeInsets.only(top: 80.0),
       child: DarkElevatedButton(
-        onPressed: context.router.pop,
+        onPressed: Beamer.of(context).popRoute,
         child: Text("done".tr()),
       ),
     );

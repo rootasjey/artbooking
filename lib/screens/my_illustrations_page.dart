@@ -9,7 +9,7 @@ import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/text_rectangle_button.dart';
 import 'package:artbooking/components/themed_dialog.dart';
 import 'package:artbooking/components/user_books.dart';
-import 'package:artbooking/screens/illustration_page.dart';
+import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/enums.dart';
@@ -18,7 +18,7 @@ import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -95,23 +95,26 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: fab(),
-      body: NotificationListener<ScrollNotification>(
-        onNotification: onNotification,
-        child: CustomScrollView(
-          controller: _scrollController,
-          slivers: <Widget>[
-            SliverEdgePadding(),
-            MainAppBar(),
-            header(),
-            body(),
-            SliverPadding(
-              padding: const EdgeInsets.only(
-                bottom: 100.0,
+    return HeroControllerScope(
+      controller: HeroController(),
+      child: Scaffold(
+        floatingActionButton: fab(),
+        body: NotificationListener<ScrollNotification>(
+          onNotification: onNotification,
+          child: CustomScrollView(
+            controller: _scrollController,
+            slivers: <Widget>[
+              SliverEdgePadding(),
+              MainAppBar(),
+              header(),
+              body(),
+              SliverPadding(
+                padding: const EdgeInsets.only(
+                  bottom: 100.0,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -452,10 +455,10 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
           ),
           body: SingleChildScrollView(),
           textButtonValidation: "delete".tr(),
-          onCancel: context.router.pop,
+          onCancel: Beamer.of(context).popRoute,
           onValidate: () {
             deleteSelection();
-            context.router.pop();
+            Beamer.of(context).popRoute();
           },
         );
       },
@@ -503,10 +506,10 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
           ),
           body: SingleChildScrollView(),
           textButtonValidation: "delete".tr(),
-          onCancel: context.router.pop,
+          onCancel: Beamer.of(context).popRoute,
           onValidate: () {
             deleteIllustration(illustration, index);
-            context.router.pop();
+            Beamer.of(context).popRoute();
           },
         );
       },
@@ -676,30 +679,20 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
   }
 
   void navigateToIllustrationPage(Illustration illustration) {
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) {
-          return IllustrationPage(
-            illustration: illustration,
-            illustrationId: illustration.id,
-            fromDashboard: true,
-          );
-        },
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return child;
+    NavigationStateHelper.illustration = illustration;
+
+    context.currentBeamLocation.update(
+      (state) => state.copyWith(
+        pathBlueprintSegments: [
+          'dashboard',
+          'illustrations',
+          ':illustrationId',
+        ],
+        pathParameters: {
+          'illustrationId': illustration.id,
         },
       ),
     );
-
-    /// NOTE: Use auto router when issue #418 is resolved
-    /// https://github.com/Milad-Akarie/auto_route_library/issues/418
-    ///
-    // context.router.push(
-    //   DashIllustrationPage(
-    //     illustrationId: illustration.id,
-    //     illustration: illustration,
-    //   ),
-    // );
   }
 
   void multiSelectIllustration(Illustration illustration) {

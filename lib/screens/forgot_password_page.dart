@@ -3,11 +3,11 @@ import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/loading_animation.dart';
 import 'package:artbooking/components/main_app_bar.dart';
-import 'package:artbooking/router/app_router.gr.dart';
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/snack.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -110,7 +110,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           ),
           child: TextButton(
             onPressed: () {
-              context.router.navigate(HomePageRoute());
+              context.beamToNamed(HomeLocation.route);
             },
             child: Opacity(
               opacity: .6,
@@ -175,20 +175,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (context.router.stack.length > 1)
-          FadeInX(
-            beginX: 10.0,
-            delay: 100.milliseconds,
-            child: Padding(
-              padding: const EdgeInsets.only(
-                right: 20.0,
-              ),
-              child: IconButton(
-                onPressed: context.router.pop,
-                icon: Icon(UniconsLine.arrow_left),
-              ),
+        FadeInX(
+          beginX: 10.0,
+          delay: 100.milliseconds,
+          child: Padding(
+            padding: const EdgeInsets.only(
+              right: 20.0,
+            ),
+            child: IconButton(
+              onPressed: Beamer.of(context).popRoute,
+              icon: Icon(UniconsLine.arrow_left),
             ),
           ),
+        ),
         Flexible(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

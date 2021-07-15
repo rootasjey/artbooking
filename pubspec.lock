@@ -57,20 +57,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.6.1"
-  auto_route:
+  beamer:
     dependency: "direct main"
     description:
-      name: auto_route
+      name: beamer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.2.0"
-  auto_route_generator:
-    dependency: "direct dev"
-    description:
-      name: auto_route_generator
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.1.0"
+    version: "0.14.1"
   boolean_selector:
     dependency: transitive
     description:

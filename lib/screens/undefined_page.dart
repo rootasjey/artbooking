@@ -1,8 +1,11 @@
+import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/main_app_bar.dart';
-import 'package:artbooking/router/app_router.gr.dart';
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/state/colors.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:artbooking/utils/fonts.dart';
+import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
+import 'package:unicons/unicons.dart';
 
 class UndefinedPage extends StatefulWidget {
   @override
@@ -19,20 +22,21 @@ class _UndefinedPageState extends State<UndefinedPage> {
           SliverPadding(
             padding: const EdgeInsets.only(top: 60.0),
             sliver: SliverList(
-                delegate: SliverChildListDelegate.fixed([
-              Column(
-                children: <Widget>[
-                  title(),
-                  subtitle(),
-                  navButton(),
-                  illustration(),
-                  quoteCard(),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 300.0),
-                  ),
-                ],
-              ),
-            ])),
+              delegate: SliverChildListDelegate.fixed([
+                Column(
+                  children: <Widget>[
+                    title(),
+                    subtitle(),
+                    illustration(),
+                    navButton(),
+                    quoteCard(),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 300.0),
+                    ),
+                  ],
+                ),
+              ]),
+            ),
           )
         ],
       ),
@@ -43,7 +47,7 @@ class _UndefinedPageState extends State<UndefinedPage> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: SizedBox(
-        width: 500.0,
+        width: 400.0,
         child: Card(
             elevation: 2,
             child: Padding(
@@ -55,21 +59,11 @@ class _UndefinedPageState extends State<UndefinedPage> {
                     child: Text(
                       // 'It is by getting lost that we learn.',
                       'When we are lost, what matters is to find our way back.',
-                      style: TextStyle(
-                        fontSize: 30.0,
+                      style: FontsUtils.mainStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    width: 100.0,
-                    child: Divider(
-                      height: 50.0,
-                      thickness: 1.0,
-                    ),
-                  ),
-                  Opacity(
-                    opacity: 0.6,
-                    child: Text('fig.style'),
                   ),
                 ],
               ),
@@ -81,24 +75,25 @@ class _UndefinedPageState extends State<UndefinedPage> {
   Widget illustration() {
     return Padding(
       padding: const EdgeInsets.only(
-        top: 50.0,
-        bottom: 80.0,
+        top: 12.0,
+        bottom: 12.0,
       ),
-      child: Image(
-        image: AssetImage('assets/images/page-not-found-4.png'),
-        width: 350.0,
-        height: 350.0,
+      child: Icon(
+        UniconsLine.car_sideview,
+        size: 40.0,
       ),
     );
   }
 
   Widget navButton() {
-    return TextButton.icon(
-      onPressed: () => context.router.navigate(HomePageRoute()),
-      icon: Icon(Icons.arrow_back),
-      label: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text('Return on the way'),
+    return Padding(
+      padding: const EdgeInsets.only(top: 24.0, bottom: 24.0),
+      child: DarkElevatedButton(
+        onPressed: () => context.beamTo(HomeLocation()),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text('Return on the way'),
+        ),
       ),
     );
   }
@@ -117,7 +112,7 @@ class _UndefinedPageState extends State<UndefinedPage> {
             ),
             children: [
               TextSpan(
-                text: '${context.router.current.path}',
+                text: '${context.beamStateHistory.last.uri.path}',
                 style: TextStyle(
                   color: stateColors.secondary,
                   fontWeight: FontWeight.w700,

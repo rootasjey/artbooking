@@ -1,10 +1,9 @@
 import 'package:artbooking/components/app_icon.dart';
-import 'package:artbooking/router/app_router.gr.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -78,13 +77,15 @@ class _FooterState extends State<Footer> {
         textLink(
           label: "about_us".tr(),
           onPressed: () {
-            context.router.push(AboutPageRoute());
+            // context.router.push(AboutPageRoute());
+            context.beamToNamed('/about');
           },
         ),
         textLink(
           label: "contact_us".tr(),
           onPressed: () {
-            context.router.push(ContactPageRoute());
+            // context.router.push(ContactPageRoute());
+            context.beamToNamed('/contact');
           },
         ),
         textLink(
@@ -105,7 +106,7 @@ class _FooterState extends State<Footer> {
         textLink(
           label: "illustrations".tr(),
           onPressed: () {
-            context.router.push(IllustrationsPageRoute());
+            // context.router.push(IllustrationsPageRoute());
           },
         ),
         // textLink(
@@ -183,7 +184,8 @@ class _FooterState extends State<Footer> {
     return textLink(
       label: "privacy".tr(),
       onPressed: () {
-        context.router.push(TosPageRoute());
+        // context.router.push(TosPageRoute());
+        context.beamToNamed('/tos');
       },
     );
   }
@@ -247,7 +249,8 @@ class _FooterState extends State<Footer> {
       label: "tos".tr(),
       heroTag: "tos_hero",
       onPressed: () {
-        context.router.push(TosPageRoute());
+        // context.router.push(TosPageRoute());
+        context.beamToNamed('/tos');
       },
     );
   }
@@ -260,29 +263,31 @@ class _FooterState extends State<Footer> {
         textLink(
             label: "signin".tr(),
             onPressed: () {
-              context.router.push(SigninPageRoute());
+              // context.router.push(SigninPageRoute());
+              context.beamToNamed('/signin');
             }),
         textLink(
           label: "signup".tr(),
           onPressed: () {
-            context.router.push(SignupPageRoute());
+            // context.router.push(SignupPageRoute());
+            context.beamToNamed('/signout');
           },
         ),
         textLink(
           label: "settings".tr(),
           onPressed: () {
             if (stateUser.isUserConnected) {
-              context.router.push(
-                DashboardPageRoute(
-                  children: [DashSettingsRoute()],
-                ),
-              );
+              // context.router.push(
+              //   DashboardPageRoute(
+              //     children: [DashSettingsRoute()],
+              //   ),
+              // );
               return;
             }
 
-            context.router.push(
-              SettingsPageRoute(),
-            );
+            // context.router.push(
+            //   SettingsPageRoute(),
+            // );
           },
         ),
       ],
@@ -297,7 +302,8 @@ class _FooterState extends State<Footer> {
         curve: Curves.easeOut,
       );
     } else if (widget.autoNavToHome) {
-      context.router.push(HomePageRoute());
+      // context.router.push(HomePageRoute());
+      context.beamToNamed('/');
     }
 
     Snack.s(

@@ -2,7 +2,7 @@ import 'package:artbooking/components/bezier_painter.dart';
 import 'package:artbooking/components/roadmap_item.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/utils/fonts.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:timelines/timelines.dart';
@@ -347,7 +347,7 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
                 ),
                 child: Text("close".tr().toUpperCase()),
               ),
-              onPressed: context.router.pop,
+              onPressed: Beamer.of(context).popRoute,
             ),
           ],
         );

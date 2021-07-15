@@ -5,7 +5,7 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/flash_helper.dart';
 import 'package:artbooking/utils/snack.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -108,7 +108,7 @@ class _UserBooksState extends State<UserBooks> {
         final isBookCreated = await showCreateBookDialog(context);
 
         if (isBookCreated != null && isBookCreated) {
-          context.router.pop();
+          Beamer.of(context).popRoute();
         }
       },
       title: Row(
@@ -162,7 +162,7 @@ class _UserBooksState extends State<UserBooks> {
           bookId: book.id,
         );
 
-        context.router.pop();
+        Beamer.of(context).popRoute();
       },
       title: Center(
         child: Text(
@@ -378,7 +378,7 @@ class _UserBooksState extends State<UserBooks> {
               onSubmitted: (_) {
                 createBookAndAddIllustration(context);
                 return Navigator.of(context).pop(true);
-                // context.router.pop();
+                // Beamer.of(context).popRoute();
               },
             ),
             Padding(
@@ -390,7 +390,7 @@ class _UserBooksState extends State<UserBooks> {
                 TextButton(
                   onPressed: () {
                     return Navigator.of(context).pop(false);
-                    // context.router.pop();
+                    // Beamer.of(context).popRoute();
                   },
                   child: Text(
                     'Cancel',

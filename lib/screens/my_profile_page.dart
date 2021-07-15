@@ -2,7 +2,8 @@ import 'package:artbooking/components/better_avatar.dart';
 import 'package:artbooking/components/form_actions_inputs.dart';
 import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/components/sheet_header.dart';
-import 'package:artbooking/router/app_router.gr.dart';
+import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/user/user_pp.dart';
@@ -13,7 +14,7 @@ import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:file_picker_cross/file_picker_cross.dart';
@@ -132,14 +133,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       ),
                       cancelTextString: "cancel".tr(),
                       saveTextString: "done".tr(),
-                      onCancel: context.router.pop,
+                      onCancel: Beamer.of(context).popRoute,
                       onValidate: () {
                         setState(() {
                           stateUser.userFirestore.urls!.copyFrom(_tempUserUrls);
                         });
 
                         updateUser();
-                        context.router.pop();
+                        Beamer.of(context).popRoute();
                       },
                     ),
                   ],
@@ -202,7 +203,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
               opacity: 0.6,
               child: IconButton(
                 tooltip: "back".tr(),
-                onPressed: context.router.pop,
+                onPressed: Beamer.of(context).popRoute,
                 icon: Icon(UniconsLine.arrow_left),
               ),
             ),
@@ -222,14 +223,15 @@ class _MyProfilePageState extends State<MyProfilePage> {
                     return;
                   }
 
-                  context.router.push(
-                    EditImagePageRoute(
-                      image: ExtendedNetworkImageProvider(
-                        stateUser.userFirestore.pp!.url!.original!,
-                        cache: true,
-                        cacheRawData: true,
-                      ),
-                    ),
+                  NavigationStateHelper.imageToEdit =
+                      ExtendedNetworkImageProvider(
+                    stateUser.userFirestore.pp!.url!.original!,
+                    cache: true,
+                    cacheRawData: true,
+                  );
+
+                  context.beamToNamed(
+                    DashboardContentLocation.editProfilePictureRoute,
                   );
                 },
               ),
@@ -421,7 +423,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
           stateUser.userFirestore.urls!.copyFrom(_tempUserUrls);
         });
 
-        context.router.pop();
+        Beamer.of(context).popRoute();
         updateUser();
       },
     );
@@ -627,15 +629,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       padding: const EdgeInsets.only(top: 12.0),
       child: TextButton(
         onPressed: () {
-          context.router.push(
-            DashSettingsRouter(
-              children: [
-                DashAccountUpdateRouter(
-                  children: [UpdateUsernamePageRoute()],
-                ),
-              ],
-            ),
-          );
+          context.beamToNamed(DashboardContentLocation.updateUsernameRoute);
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -722,7 +716,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             user.job = _textInputController!.text;
                           });
 
-                          context.router.pop();
+                          Beamer.of(context).popRoute();
                           updateUser();
                         },
                       ),
@@ -762,7 +756,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           alignment: Alignment.topRight,
                           child: FormActionInputs(
                             cancelTextString: "cancel".tr(),
-                            onCancel: context.router.pop,
+                            onCancel: Beamer.of(context).popRoute,
                             onValidate: () {
                               setState(() {
                                 user.job = _textInputController!.text;
@@ -825,7 +819,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                 _textInputController!.text;
                           });
 
-                          context.router.pop();
+                          Beamer.of(context).popRoute();
                           updateUser();
                         },
                       ),
@@ -865,7 +859,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           alignment: Alignment.topRight,
                           child: FormActionInputs(
                             cancelTextString: "cancel".tr(),
-                            onCancel: context.router.pop,
+                            onCancel: Beamer.of(context).popRoute,
                             onValidate: () {
                               setState(() {
                                 stateUser.userFirestore.location =
@@ -930,7 +924,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                 _textInputController!.text;
                           });
 
-                          context.router.pop();
+                          Beamer.of(context).popRoute();
                           updateUser();
                         },
                       ),
@@ -970,7 +964,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           alignment: Alignment.topRight,
                           child: FormActionInputs(
                             cancelTextString: "cancel".tr(),
-                            onCancel: context.router.pop,
+                            onCancel: Beamer.of(context).popRoute,
                             onValidate: () {
                               setState(() {
                                 stateUser.userFirestore.summary =
