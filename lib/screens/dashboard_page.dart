@@ -20,25 +20,22 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   final _sidePanelItems = <SideMenuItem>[
     SideMenuItem(
-      index: 0,
       iconData: UniconsLine.chart_pie,
-      label: 'Activity',
-      hoverColor: Colors.red,
-      path: DashboardContentLocation.activityRoute,
+      label: "statistics".tr(),
+      hoverColor: stateColors.activity,
+      routePath: DashboardContentLocation.activityRoute,
     ),
     SideMenuItem(
-      index: 1,
       iconData: UniconsLine.picture,
-      label: 'Illustrations',
-      hoverColor: Colors.red,
-      path: DashboardContentLocation.illustrationsRoute,
+      label: "illustrations".tr(),
+      hoverColor: stateColors.illustrations,
+      routePath: DashboardContentLocation.illustrationsRoute,
     ),
     SideMenuItem(
-      index: 2,
       iconData: UniconsLine.book_alt,
-      label: 'Books',
-      hoverColor: Colors.blue.shade700,
-      path: DashboardContentLocation.booksRoute,
+      label: "books".tr(),
+      hoverColor: stateColors.books,
+      routePath: DashboardContentLocation.booksRoute,
     ),
     // SideMenuItem(
     //   destination: MyGalleriesDeepRoute(),
@@ -59,11 +56,10 @@ class _DashboardPageState extends State<DashboardPage> {
     //   hoverColor: Colors.yellow.shade800,
     // ),
     SideMenuItem(
-      index: 3,
       iconData: UniconsLine.setting,
-      label: 'Settings',
-      hoverColor: Colors.blueGrey,
-      path: DashboardContentLocation.settingsRoute,
+      label: "settings".tr(),
+      hoverColor: stateColors.settings,
+      routePath: DashboardContentLocation.settingsRoute,
     ),
   ];
 
@@ -174,7 +170,7 @@ class _DashboardPageState extends State<DashboardPage> {
           FontWeight fontWeight = FontWeight.w600;
 
           if (context.currentBeamLocation.state.uri.path
-              .contains(sidePanelItem.path)) {
+              .contains(sidePanelItem.routePath)) {
             color = sidePanelItem.hoverColor;
             textColor = stateColors.foreground.withOpacity(0.6);
             fontWeight = FontWeight.w700;
@@ -202,7 +198,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
               ),
               onTap: () {
-                context.beamToNamed(sidePanelItem.path);
+                context.beamToNamed(sidePanelItem.routePath);
                 setState(() {});
               },
             ),
