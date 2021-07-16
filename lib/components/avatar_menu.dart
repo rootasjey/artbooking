@@ -76,8 +76,8 @@ class AvatarMenu extends StatelessWidget {
       ],
       PopupMenuItemIcon(
         icon: Icon(UniconsLine.chart_pie, color: Colors.black87),
-        textLabel: "activity_my".tr(),
-        value: DashboardContentLocation.activityRoute,
+        textLabel: "statistics_my".tr(),
+        value: DashboardContentLocation.statisticsRoute,
       ),
       PopupMenuItemIcon(
         icon: Icon(UniconsLine.picture, color: Colors.black87),

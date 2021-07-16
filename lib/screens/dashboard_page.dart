@@ -23,7 +23,7 @@ class _DashboardPageState extends State<DashboardPage> {
       iconData: UniconsLine.chart_pie,
       label: "statistics".tr(),
       hoverColor: stateColors.activity,
-      routePath: DashboardContentLocation.activityRoute,
+      routePath: DashboardContentLocation.statisticsRoute,
     ),
     SideMenuItem(
       iconData: UniconsLine.picture,

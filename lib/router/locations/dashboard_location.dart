@@ -3,7 +3,7 @@ import 'package:artbooking/screens/dashboard_page.dart';
 import 'package:artbooking/screens/delete_account_page.dart';
 import 'package:artbooking/screens/edit_image_page.dart';
 import 'package:artbooking/screens/illustration_page.dart';
-import 'package:artbooking/screens/my_activity_page.dart';
+import 'package:artbooking/screens/my_statistics_page.dart';
 import 'package:artbooking/screens/my_books_page.dart';
 import 'package:artbooking/screens/my_illustrations_page.dart';
 import 'package:artbooking/screens/my_profile_page.dart';
@@ -13,6 +13,7 @@ import 'package:artbooking/screens/update_password_page.dart';
 import 'package:artbooking/screens/update_username_page.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:beamer/beamer.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 
 class DashboardLocation extends BeamLocation {
@@ -52,9 +53,6 @@ class DashboardContentLocation extends BeamLocation {
   /// Main root value for this location.
   static const String route = '/dashboard/';
 
-  /// Activity route value for this location.
-  static const String activityRoute = '/dashboard/activity';
-
   /// Books route value for this location.
   static const String booksRoute = '/dashboard/books';
 
@@ -72,6 +70,9 @@ class DashboardContentLocation extends BeamLocation {
 
   /// Delete account route value for this location.
   static const String deleteAccountRoute = '/dashboard/settings/delete/account';
+
+  /// Statistics route value for this location.
+  static const String statisticsRoute = '/dashboard/statistics';
 
   /// Update email route value for this location.
   static const String updateEmailRoute = '/dashboard/settings/update/email';
@@ -99,11 +100,11 @@ class DashboardContentLocation extends BeamLocation {
   @override
   List<BeamPage> buildPages(BuildContext context, BeamState state) {
     return [
-      if (state.pathBlueprintSegments.contains('activity'))
+      if (state.pathBlueprintSegments.contains('statistics'))
         BeamPage(
           child: MyActivityPage(),
           key: ValueKey(route),
-          title: "Activity",
+          title: "statistics".tr(),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathBlueprintSegments.contains('books'))
