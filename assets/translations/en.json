@@ -113,6 +113,7 @@
   "clear_content": "Clear content",
   "clear_selection": "Clear selection",
   "close": "Close",
+  "collapse": "Collapse",
   "confirm": "Confirm",
   "contact": "Contact",
   "contact_how": "How can we contact you?",
@@ -206,6 +207,7 @@
   "ending": "Ending",
   "enroll": "Enroll",
   "enroll_description": "This is the start process. You won't be charged until we validate your project.",
+  "expand": "Expand",
   "extra": "Extra",
   "extra_description": "You need extra features no listed here.",
   "faq": {

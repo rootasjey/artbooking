@@ -113,6 +113,7 @@
   "clear_content": "Vider le contenu",
   "clear_selection": "Annuler la sélection",
   "close": "Fermer",
+  "collapse": "Réduire",
   "confirm": "Confirmer",
   "contact": "Contact",
   "contact_how": "Comment peut-on vous contacter ?",
@@ -206,6 +207,7 @@
   "ending": "À la fin",
   "enroll": "M'inscrire",
   "enroll_description": "C'est le début du processus. Vous ne serez pas débité avant la validation du projet.",
+  "expand": "Expand",
   "extra": "Extra",
   "extra_description": "Vous avez besoin de fonctionnalités supplémentaires.",
   "faq": {
