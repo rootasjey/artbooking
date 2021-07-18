@@ -1,21 +1,35 @@
+import 'package:artbooking/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
 
 class UnderlinedButton extends StatefulWidget {
+  final Color? hoverColor;
   final Color underlineColor;
   final VoidCallback? onTap;
   final Widget child;
   final Widget? leading;
   final Widget? trailing;
 
+  /// If true, show only the icon as an [IconButton].
+  /// Else show a [Widget] similar to a [TextButton] with a [leading] icon.
+  final bool compact;
+
+  /// Text that describes the action that will occur when the button is pressed.
+  /// This text is displayed when the user long-presses on the button
+  /// and is used for accessibility.
+  final String? tooltip;
+
   const UnderlinedButton({
     Key? key,
+    this.hoverColor,
     this.underlineColor = Colors.black45,
     required this.child,
     this.leading,
     this.trailing,
     this.onTap,
+    this.compact = false,
+    this.tooltip,
   }) : super(key: key);
 
   @override
@@ -43,16 +57,40 @@ class _UnderlinedButtonState extends State<UnderlinedButton>
 
   @override
   Widget build(BuildContext context) {
+    if (widget.compact) {
+      return iconButton();
+    }
+
+    return iconWithLabel();
+  }
+
+  Widget iconButton() {
+    if (widget.leading == null) {
+      appLogger.w(
+        "This [UnderlinedButton] component doesn't have a [leading]"
+        "widget property, so it cannot be rendered in compact form.",
+      );
+
+      return Container();
+    }
+
+    return IconButton(
+      tooltip: widget.tooltip,
+      onPressed: widget.onTap,
+      icon: widget.leading!,
+    );
+  }
+
+  Widget iconWithLabel() {
     return InkWell(
+      hoverColor: widget.hoverColor,
       onTap: widget.onTap,
       onHover: (bool isHit) {
         if (isHit) {
           right = 40.0;
           width = null;
           controller.play(duration: 250.milliseconds);
-
           _underlineAnimation.addListener(underlineAnimListener);
-
           return;
         }
 
