@@ -4,22 +4,6 @@ import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
 
 class UnderlinedButton extends StatefulWidget {
-  final Color? hoverColor;
-  final Color underlineColor;
-  final VoidCallback? onTap;
-  final Widget child;
-  final Widget? leading;
-  final Widget? trailing;
-
-  /// If true, show only the icon as an [IconButton].
-  /// Else show a [Widget] similar to a [TextButton] with a [leading] icon.
-  final bool compact;
-
-  /// Text that describes the action that will occur when the button is pressed.
-  /// This text is displayed when the user long-presses on the button
-  /// and is used for accessibility.
-  final String? tooltip;
-
   const UnderlinedButton({
     Key? key,
     this.hoverColor,
@@ -31,6 +15,24 @@ class UnderlinedButton extends StatefulWidget {
     this.compact = false,
     this.tooltip,
   }) : super(key: key);
+
+  /// If true, show only the icon as an [IconButton].
+  /// Else show a [Widget] similar to a [TextButton] with a [leading] icon.
+  final bool compact;
+
+  final Color? hoverColor;
+  final Color underlineColor;
+
+  /// Text that describes the action that will occur when the button is pressed.
+  /// This text is displayed when the user long-presses on the button
+  /// and is used for accessibility.
+  final String? tooltip;
+
+  final VoidCallback? onTap;
+
+  final Widget child;
+  final Widget? leading;
+  final Widget? trailing;
 
   @override
   _UnderlinedButtonState createState() => _UnderlinedButtonState();

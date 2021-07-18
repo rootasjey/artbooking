@@ -192,22 +192,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   context.beamToNamed(
                     DashboardContentLocation.editProfilePictureRoute,
                   );
-
-                  // context.router.root.push(
-                  //   DashboardPageRoute(children: [
-                  //     DashProfileRouter(
-                  //       children: [
-                  //         EditImagePageRoute(
-                  //           image: ExtendedNetworkImageProvider(
-                  //             stateUser.userFirestore.pp!.url!.original!,
-                  //             cache: true,
-                  //             cacheRawData: true,
-                  //           ),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ]),
-                  // );
                 },
               ),
             ),
