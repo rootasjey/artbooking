@@ -37,13 +37,13 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
     RoadmapItemData(
       title: "Upload illustration",
       iconData: UniconsLine.upload,
-      deadline: "2020",
+      deadline: "2021",
       summary: "Upload one or more illustrations to the platform.",
     ),
     RoadmapItemData(
       title: "Manage books",
       iconData: UniconsLine.book,
-      deadline: "2020",
+      deadline: "2021",
       summary: "Create, upade and delete books",
     ),
     RoadmapItemData(
@@ -131,10 +131,6 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
               padding: const EdgeInsets.only(top: 15.0),
               child: InkWell(
                 onTap: () {
-                  // FlashHelper.simpleDialog(
-                  //   context,
-                  //   message: _processItems[index].summary,
-                  // );
                   _showMyDialog(
                     title: _processItems[index].title,
                     summary: _processItems[index].summary,
@@ -233,19 +229,33 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
               if (index == _processIndex) {
                 final prevColor = getColor(index - 1);
                 final color = getColor(index);
-                List<Color?> gradientColors;
+
+                List<Color?> maybeGradientColors;
+
                 if (type == ConnectorType.start) {
-                  gradientColors = [Color.lerp(prevColor, color, 0.5), color];
+                  maybeGradientColors = [
+                    Color.lerp(prevColor, color, 0.5),
+                    color
+                  ];
                 } else {
-                  gradientColors = [
+                  maybeGradientColors = [
                     prevColor,
                     Color.lerp(prevColor, color, 0.5)
                   ];
                 }
+
+                List<Color> gradientColors = [];
+
+                for (var col in maybeGradientColors) {
+                  if (col != null) {
+                    gradientColors.add(col);
+                  }
+                }
+
                 return DecoratedLineConnector(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: gradientColors as List<Color>,
+                      colors: gradientColors,
                     ),
                   ),
                 );
