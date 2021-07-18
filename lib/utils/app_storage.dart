@@ -19,6 +19,7 @@ class AppStorage {
     if (_localStorage != null) {
       return;
     }
+
     _localStorage = await LocalStorage.getInstance();
   }
 
@@ -44,25 +45,6 @@ class AppStorage {
     _localStorage!.setBool(StorageKeys.firstLaunch, false);
   }
 
-  // / --------------/
-  // /     Drafts    /
-  // /---------------/
-  void clearDrafts() {
-    List<String> drafts = [];
-    _localStorage!.setStringList(StorageKeys.drafts, drafts);
-  }
-
-  void saveDraft({String? draftString}) {
-    List<String?> drafts = _localStorage!.getStringList('drafts') ?? [];
-
-    drafts.add(draftString);
-    _localStorage!.setStringList('drafts', drafts as List<String>);
-  }
-
-  void setDrafts(List<String> drafts) {
-    _localStorage!.setStringList('drafts', drafts);
-  }
-
   // / ---------------/
   // /      USER      /
   // /----------------/
@@ -76,7 +58,8 @@ class AppStorage {
   Map<String, String?> getCredentials() {
     final credentials = Map<String, String?>();
 
-    credentials[StorageKeys.email] = _localStorage!.getString(StorageKeys.email);
+    credentials[StorageKeys.email] =
+        _localStorage!.getString(StorageKeys.email);
     credentials[StorageKeys.password] =
         _localStorage!.getString(StorageKeys.password);
 
@@ -125,9 +108,10 @@ class AppStorage {
   }
 
   Brightness getBrightness() {
-    final brightness = _localStorage!.getString(StorageKeys.brightness) == 'dark'
-        ? Brightness.dark
-        : Brightness.light;
+    final brightness =
+        _localStorage!.getString(StorageKeys.brightness) == 'dark'
+            ? Brightness.dark
+            : Brightness.light;
 
     return brightness;
   }
@@ -150,7 +134,8 @@ class AppStorage {
   }
 
   List<String> getDrafts() {
-    List<String> drafts = _localStorage!.getStringList(StorageKeys.drafts) ?? [];
+    List<String> drafts =
+        _localStorage!.getStringList(StorageKeys.drafts) ?? [];
     return drafts;
   }
 
@@ -180,6 +165,12 @@ class AppStorage {
     return descending ?? true;
   }
 
+  /// Return the expanded state of dashboard side menu.
+  bool getDashboardSideMenuExpanded() {
+    return _localStorage!.getBool(StorageKeys.dashboardSideMenuExpanded) ??
+        true;
+  }
+
   void saveDiscoverType(DiscoverType discoverType) {
     final value =
         discoverType == DiscoverType.authors ? 'authors' : 'references';
@@ -189,6 +180,14 @@ class AppStorage {
 
   void saveItemsStyle({String? pageRoute, ItemsLayout? style}) {
     _localStorage!.setString('items_style_$pageRoute', style.toString());
+  }
+
+  /// Set the expanded state of dashboard side menu.
+  void setDashboardSideMenuExpanded(bool expanded) async {
+    await _localStorage!.setBool(
+      StorageKeys.dashboardSideMenuExpanded,
+      expanded,
+    );
   }
 
   void setPageLang({required String lang, String? pageRoute}) {

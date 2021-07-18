@@ -1,6 +1,7 @@
 class StorageKeys {
   static const autoBrightness = 'autoBrightness';
   static const brightness = 'brightness';
+  static const dashboardSideMenuExpanded = 'dashboard_side_menu_expanded';
   static const discoverType = 'discover_type';
   static const drafts = 'drafts';
   static const email = 'email';
@@ -13,8 +14,8 @@ class StorageKeys {
   static const lang = 'lang';
   static const onOpenNotificationPath = 'on_open_notification_path';
   static const notificationsActivated = 'notifications_activated';
-  static const sendPushOnNewNotification = 'send_push_on_new_notification';
   static const quoteIdNotification = 'quote_id_notification';
+  static const sendPushOnNewNotification = 'send_push_on_new_notification';
   static const password = 'password';
   static const username = 'username';
   static const userUid = 'user_uid';

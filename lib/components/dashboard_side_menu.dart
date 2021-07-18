@@ -3,6 +3,7 @@ import 'package:artbooking/components/underlined_button.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/utils/app_storage.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
@@ -31,8 +32,6 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
   /// If false, the side menu shows only icon.
   /// Default to true.
   bool _isExpanded = true;
-
-  double _paneWidth = 300.0;
 
   final _sidePanelItems = <SideMenuItem>[
     SideMenuItem(
@@ -84,6 +83,8 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
     super.initState();
     _addAdminMenuItems();
 
+    _isExpanded = appStorage.getDashboardSideMenuExpanded();
+
     // NOTE: Beamer state isn't ready on 1st frame
     // probably because [SidePanelMenu] appears before the Beamer widget.
     // So we use [addPostFrameCallback] to access the state in the next frame.
@@ -112,7 +113,7 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
       child: AnimatedContainer(
         duration: 500.milliseconds,
         curve: Curves.easeOutExpo,
-        width: _paneWidth,
+        width: _isExpanded ? 300.0 : 70.0,
         child: Stack(
           children: [
             OverflowBox(
@@ -271,7 +272,7 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
   void _toggleSideMenu() {
     setState(() {
       _isExpanded = !_isExpanded;
-      _paneWidth = _isExpanded ? 300.0 : 70.0;
+      appStorage.setDashboardSideMenuExpanded(_isExpanded);
     });
   }
 }
