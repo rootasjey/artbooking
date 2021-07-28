@@ -1,9 +1,11 @@
 import 'package:artbooking/components/main_app_bar.dart';
 import 'package:artbooking/components/section_card.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
+import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/user.dart';
 import 'package:artbooking/utils/fonts.dart';
+import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -19,13 +21,13 @@ class DashboardWelcomePage extends StatelessWidget {
           SliverEdgePadding(),
           MainAppBar(),
           header(),
-          body(),
+          body(context),
         ],
       ),
     );
   }
 
-  Widget body() {
+  Widget body(BuildContext context) {
     return SliverList(
       delegate: SliverChildListDelegate.fixed([
         Padding(
@@ -35,7 +37,7 @@ class DashboardWelcomePage extends StatelessWidget {
             children: [
               greetings(),
               placeDescription(),
-              sectionsList(),
+              sectionsList(context),
             ],
           ),
         ),
@@ -130,7 +132,7 @@ class DashboardWelcomePage extends StatelessWidget {
     );
   }
 
-  Widget sectionsList() {
+  Widget sectionsList(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
         top: 32.0,
@@ -145,24 +147,36 @@ class DashboardWelcomePage extends StatelessWidget {
             iconData: UniconsLine.chart_pie,
             textTitle: "statistics".tr(),
             textSubtitle: "statistics_subtitle".tr(),
+            onTap: () {
+              context.beamToNamed(DashboardContentLocation.statisticsRoute);
+            },
           ),
           SectionCard(
             hoverColor: stateColors.illustrations,
             iconData: UniconsLine.picture,
             textTitle: "illustrations".tr(),
             textSubtitle: "illustrations_subtitle".tr(),
+            onTap: () {
+              context.beamToNamed(DashboardContentLocation.illustrationsRoute);
+            },
           ),
           SectionCard(
             hoverColor: stateColors.books,
             iconData: UniconsLine.book_alt,
             textTitle: "books".tr(),
             textSubtitle: "books_subtitle".tr(),
+            onTap: () {
+              context.beamToNamed(DashboardContentLocation.booksRoute);
+            },
           ),
           SectionCard(
             hoverColor: stateColors.settings,
             iconData: UniconsLine.setting,
             textTitle: "settings".tr(),
             textSubtitle: "settings_subtitle".tr(),
+            onTap: () {
+              context.beamToNamed(DashboardContentLocation.settingsRoute);
+            },
           ),
         ],
       ),

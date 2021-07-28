@@ -8,13 +8,14 @@ class SectionCard extends StatefulWidget {
     this.hoverColor = Colors.pink,
     required IconData this.iconData,
     required String this.textTitle,
-    required String this.textSubtitle,
+    required String this.textSubtitle, this.onTap,
   }) : super(key: key);
 
   final IconData iconData;
   final String textTitle;
   final String textSubtitle;
   final Color hoverColor;
+  final Function()? onTap;
 
   @override
   _SectionCardState createState() => _SectionCardState();
@@ -33,7 +34,7 @@ class _SectionCardState extends State<SectionCard> {
         elevation: _elevation,
         color: stateColors.clairPink,
         child: InkWell(
-          onTap: () {},
+          onTap: widget.onTap,
           onHover: (isHover) {
             if (isHover) {
               setState(() {
