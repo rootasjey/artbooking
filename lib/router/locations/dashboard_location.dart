@@ -1,4 +1,5 @@
 import 'package:artbooking/router/locations/signin_location.dart';
+import 'package:artbooking/screens/dashboard_welcome_page.dart';
 import 'package:artbooking/screens/dashboard_page.dart';
 import 'package:artbooking/screens/delete_account_page.dart';
 import 'package:artbooking/screens/edit_image_page.dart';
@@ -51,7 +52,7 @@ class DashboardContentLocation extends BeamLocation {
   DashboardContentLocation(BeamState state) : super(state);
 
   /// Main root value for this location.
-  static const String route = '/dashboard/';
+  static const String route = '/dashboard';
 
   /// Books route value for this location.
   static const String booksRoute = '/dashboard/books';
@@ -100,10 +101,16 @@ class DashboardContentLocation extends BeamLocation {
   @override
   List<BeamPage> buildPages(BuildContext context, BeamState state) {
     return [
+      BeamPage(
+        child: DashboardWelcomePage(),
+        key: ValueKey(route),
+        title: "dashboard".tr(),
+        type: BeamPageType.fadeTransition,
+      ),
       if (state.pathBlueprintSegments.contains('statistics'))
         BeamPage(
           child: MyActivityPage(),
-          key: ValueKey(route),
+          key: ValueKey(statisticsRoute),
           title: "statistics".tr(),
           type: BeamPageType.fadeTransition,
         ),
