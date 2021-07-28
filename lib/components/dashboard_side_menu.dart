@@ -225,7 +225,10 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
             children: [
               IconButton(
                 tooltip: "home".tr(),
-                onPressed: () => context.beamTo(HomeLocation()),
+                onPressed: () {
+                  Beamer.of(context, root: true)
+                      .beamToNamed(HomeLocation.route);
+                },
                 icon: Opacity(
                   opacity: 0.6,
                   child: Icon(UniconsLine.home),

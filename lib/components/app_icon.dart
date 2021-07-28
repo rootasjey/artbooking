@@ -1,3 +1,4 @@
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 
@@ -37,6 +38,6 @@ class _AppIconState extends State<AppIcon> {
   }
 
   void defaultOnTap() {
-    context.beamToNamed('/');
+    Beamer.of(context, root: true).beamToNamed(HomeLocation.route);
   }
 }

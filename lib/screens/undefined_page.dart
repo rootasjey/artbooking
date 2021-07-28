@@ -89,7 +89,7 @@ class _UndefinedPageState extends State<UndefinedPage> {
     return Padding(
       padding: const EdgeInsets.only(top: 24.0, bottom: 24.0),
       child: DarkElevatedButton(
-        onPressed: () => context.beamTo(HomeLocation()),
+        onPressed: () => context.beamToNamed(HomeLocation.route),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text('Return on the way'),
