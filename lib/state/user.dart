@@ -57,23 +57,25 @@ abstract class StateUserBase with Store {
 
   Future refreshUserRights() async {
     try {
-      final isAnonymous = _userAuth?.isAnonymous ?? true;
+      final bool isAnonymous = _userAuth?.isAnonymous ?? true;
 
       if (_userAuth == null || isAnonymous) {
         setAllRightsToFalse();
       }
 
-      final userSnap = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(_userAuth!.uid)
-          .get();
+      final DocumentSnapshot<Map<String, dynamic>> userSnap =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(_userAuth!.uid)
+              .get();
 
-      final userData = userSnap.data()!;
+      final Map<String, dynamic>? userData = userSnap.data();
 
-      if (!userSnap.exists) {
+      if (!userSnap.exists || userData == null) {
         setAllRightsToFalse();
       }
 
+      userData!['id'] = userSnap.id;
       userFirestore = UserFirestore.fromJSON(userData);
 
       final Map<String, dynamic> rights = userData['rights'];
@@ -96,12 +98,12 @@ abstract class StateUserBase with Store {
 
   Future<UpdateEmailResp> deleteAccount(String idToken) async {
     try {
-      final callable = FirebaseFunctions.instanceFor(
+      final HttpsCallable callable = FirebaseFunctions.instanceFor(
         app: Firebase.app(),
         region: 'europe-west3',
       ).httpsCallable('users-deleteAccount');
 
-      final response = await callable.call({
+      final HttpsCallableResult<dynamic> response = await callable.call({
         'idToken': idToken,
       });
 
@@ -184,7 +186,7 @@ abstract class StateUserBase with Store {
   /// Signin user with credentials if FirebaseAuth is null.
   Future<User?> signin({String? email, String? password}) async {
     try {
-      final credentialsMap = appStorage.getCredentials();
+      final Map<String, String?> credentialsMap = appStorage.getCredentials();
 
       email = email ?? credentialsMap['email'];
       password = password ?? credentialsMap['password'];
@@ -194,7 +196,8 @@ abstract class StateUserBase with Store {
         return null;
       }
 
-      final auth = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final UserCredential auth =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -258,12 +261,12 @@ abstract class StateUserBase with Store {
 
   Future<UpdateEmailResp> updateEmail(String email, String idToken) async {
     try {
-      final callable = FirebaseFunctions.instanceFor(
+      final HttpsCallable callable = FirebaseFunctions.instanceFor(
         app: Firebase.app(),
         region: 'europe-west3',
       ).httpsCallable('users-updateEmail');
 
-      final response = await callable.call({
+      final HttpsCallableResult<dynamic> response = await callable.call({
         'newEmail': email,
         'idToken': idToken,
       });
@@ -305,12 +308,12 @@ abstract class StateUserBase with Store {
 
   Future<UpdateEmailResp> updateUsername(String newUsername) async {
     try {
-      final callable = FirebaseFunctions.instanceFor(
+      final HttpsCallable callable = FirebaseFunctions.instanceFor(
         app: Firebase.app(),
         region: 'europe-west3',
       ).httpsCallable('users-updateUsername');
 
-      final response = await callable.call({
+      final HttpsCallableResult<dynamic> response = await callable.call({
         'newUsername': newUsername,
       });
 
