@@ -61,41 +61,48 @@ class AvatarMenu extends StatelessWidget {
   List<PopupMenuEntry<String>> itemBuilder(
     BuildContext context,
   ) {
+    final Color iconColor = Colors.black87;
+
     return [
       if (isSmall) ...[
         PopupMenuItemIcon(
-          icon: Icon(UniconsLine.plus, color: Colors.black87),
+          icon: Icon(UniconsLine.plus, color: iconColor),
           textLabel: "upload".tr(),
           value: '/dashboard',
         ),
         PopupMenuItemIcon(
-          icon: Icon(UniconsLine.search, color: Colors.black87),
+          icon: Icon(UniconsLine.search, color: iconColor),
           textLabel: "search".tr(),
           value: SearchLocation.route,
         ),
       ],
       PopupMenuItemIcon(
-        icon: Icon(UniconsLine.chart_pie, color: Colors.black87),
+        icon: Icon(UniconsLine.window_section, color: iconColor),
+        textLabel: "dashboard".tr(),
+        value: DashboardContentLocation.route,
+      ),
+      PopupMenuItemIcon(
+        icon: Icon(UniconsLine.chart_pie, color: iconColor),
         textLabel: "statistics_my".tr(),
         value: DashboardContentLocation.statisticsRoute,
       ),
       PopupMenuItemIcon(
-        icon: Icon(UniconsLine.picture, color: Colors.black87),
+        icon: Icon(UniconsLine.picture, color: iconColor),
         textLabel: "illustrations_my".tr(),
         value: DashboardContentLocation.illustrationsRoute,
       ),
       PopupMenuItemIcon(
-        icon: Icon(UniconsLine.book_alt, color: Colors.black87),
+        icon: Icon(UniconsLine.book_alt, color: iconColor),
         textLabel: "books_my".tr(),
         value: DashboardContentLocation.booksRoute,
       ),
       PopupMenuItemIcon(
-        icon: Icon(UniconsLine.user, color: Colors.black87),
+        icon: Icon(UniconsLine.user, color: iconColor),
         textLabel: "profile_my".tr(),
         value: '/dashboard/profile',
       ),
       PopupMenuItemIcon(
-        icon: Icon(UniconsLine.sign_left, color: Colors.black87),
+        icon: Icon(UniconsLine.sign_left, color: iconColor),
         textLabel: "signout".tr(),
         value: '/dashboard',
       ),
