@@ -24,7 +24,7 @@ final appLocationsBuilder = BeamerDelegate(
       SignupLocation(),
       SearchLocation(),
       TosLocation(),
-      UndefinedLocation(),
     ],
   ),
+  notFoundRedirect: UndefinedLocation(),
 );
