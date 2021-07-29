@@ -16,10 +16,13 @@ import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/upload_manager.dart';
+import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/book.dart';
+import 'package:artbooking/types/book_illustration.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
+import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
@@ -67,6 +70,7 @@ class _MyBookPageState extends State<MyBookPage> {
   bool _forceMultiSelect = false;
   bool _isLoadingMore = false;
 
+  // Why a map and not just a list?
   final _illustrations = Map<String, Illustration>();
   final _keyboardFocusNode = FocusNode();
 
@@ -726,6 +730,18 @@ class _MyBookPageState extends State<MyBookPage> {
     );
   }
 
+  /// Failed illustrations' fetchs means that
+  /// there may be deleted ones in this book.
+  void checkFetchErrors(List<String> illustrationsErrors) {
+    Cloud.fun('books-removeDeletedIllustrations').call({
+      'bookId': widget.bookId,
+      'illustrationIds': illustrationsErrors,
+    }).catchError((error, stack) {
+      appLogger.e(error);
+      throw error;
+    });
+  }
+
   void confirmBookDeletion(Illustration illustration, int index) async {
     showCustomModalBottomSheet(
       context: context,
@@ -992,15 +1008,20 @@ class _MyBookPageState extends State<MyBookPage> {
           : illustrationsBook.length;
     });
 
-    try {
-      if (illustrationsBook.isEmpty) {
-        setState(() => _isLoading = false);
-        return;
-      }
+    if (illustrationsBook.isEmpty) {
+      setState(() => _isLoading = false);
+      return;
+    }
 
-      final range = illustrationsBook.getRange(_startIndex, _endIndex);
+    final Iterable<BookIllustration> range = illustrationsBook.getRange(
+      _startIndex,
+      _endIndex,
+    );
 
-      for (var bookIllustration in range) {
+    final List<String> illustrationsErrors = [];
+
+    for (BookIllustration bookIllustration in range) {
+      try {
         final illustrationSnap = await FirebaseFirestore.instance
             .collection('illustrations')
             .doc(bookIllustration.id)
@@ -1015,20 +1036,22 @@ class _MyBookPageState extends State<MyBookPage> {
 
         final illustration = Illustration.fromJSON(illustrationData);
         _illustrations.putIfAbsent(illustration.id, () => illustration);
-      }
-    } catch (error) {
-      appLogger.e(error);
 
-      setState(() {
-        _hasError = true;
-      });
-    } finally {
-      setState(() => _isLoading = false);
+        setState(() => _isLoading = false);
+      } catch (error) {
+        appLogger.e(error);
+        illustrationsErrors.add(bookIllustration.id);
+      }
     }
+
+    checkFetchErrors(illustrationsErrors);
   }
 
   void fetchIllustrationsAndListenToUpdates() {
     bookPage = widget.book;
+    appLogger.d("bookId: ${widget.bookId}");
+    appLogger.d("stateUser.userFirestore.id: ${stateUser.userFirestore.id}");
+
     fetchIllustrations();
 
     final query =
