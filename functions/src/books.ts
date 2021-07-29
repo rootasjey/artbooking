@@ -26,7 +26,7 @@ export const addIllustrations = functions
     if (typeof bookId !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called with a valid [id] parameter
+        `The function must be called with a valid [bookId] parameter
          which is the book's id to update.`,
       );
     }
@@ -35,7 +35,7 @@ export const addIllustrations = functions
       throw new functions.https.HttpsError(
         'invalid-argument',
         `The function must be called with a valid [illustrationIds] parameter
-         which is an array of illustrations' ids to add.`,
+         which is an array of illustrations' ids to add. And not be empty.`,
       );
     }
 
@@ -51,14 +51,14 @@ export const addIllustrations = functions
     if (!bookSnap.exists || !bookData) {
       throw new functions.https.HttpsError(
         'not-found', 
-        `The book to update doesn't exist anymore.`,
+        `The book ${bookId} to update doesn't exist anymore.`,
       );
     }
 
     if (bookData.user.id !== userAuth.uid) {
       throw new functions.https.HttpsError(
         'permission-denied',
-        `You don't have the permission to update this book.`,
+        `You don't have the permission to update this book ${bookId}.`,
       )
     }
 
@@ -310,6 +310,122 @@ export const deleteMany = functions
       items: itemsProcessed,
       successCount,
       hasErrors: successCount === bookIds.length,
+    };
+  });
+
+/**
+ * For a given book, check a list of illustrations from their id.
+ * Check that each illustration currently exists.
+ * If a illustration does NOT exist anymore, remove it from this book.
+ */
+export const removeDeletedIllustrations = functions
+  .region(cloudRegions.eu)
+  .https
+  .onCall(async (params: UpdateBookIllustrationsParams, context) => {
+    const userAuth = context.auth;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
+    }
+
+    const { bookId, illustrationIds } = params;
+
+    if (typeof bookId !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called with a valid [bookId] parameter
+        which is the book's id to update.`,
+      );
+    }
+
+    if (!Array.isArray(illustrationIds) || illustrationIds.length === 0) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called with a valid [illustrationIds] parameter
+         which is an array of illustrations' ids to add. And not be empty.`,
+      );
+    }
+
+    /** Indicates if an operation had issue without resulting in an error. */
+    let warning = '';
+
+    const deletedIllustrations: Array<String> = [];
+
+    for await (const illustrationId of illustrationIds) {
+      const illustrationSnap = await firestore
+        .collection('illustrations')
+        .doc(illustrationId)
+        .get();
+
+      if (!illustrationSnap.exists) {
+        deletedIllustrations.push(illustrationId);
+      }
+    }
+
+    if (deletedIllustrations.length === 0) {      
+      return {
+        items: deletedIllustrations,
+        successCount: 0,
+        hasErrors: false,
+        warning,
+      };
+    }
+
+    const bookSnap = await firestore
+      .collection('books')
+      .doc(bookId)
+      .get();
+
+    const bookData = bookSnap.data();
+
+    if (!bookSnap.exists || !bookData) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        `The book ${bookId} to update doesn't exist anymore.`,
+      );
+    }
+
+    if (bookData.user.id !== userAuth.uid) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        `You don't have the permission to update this book ${bookId}.`,
+      );
+    }
+
+    const bookIllustrations: BookIllustration[] = bookData.illustrations;
+    let newBookIllustrations = bookIllustrations.filter(
+      (bookIllustration) => !deletedIllustrations.includes(bookIllustration.id),
+    );
+
+    const autoCover = await getAutoCover(newBookIllustrations);
+
+    if (newBookIllustrations.length > 100) {
+      newBookIllustrations = newBookIllustrations.slice(0, 100);
+      warning = `max_illustration_100`;
+    }
+
+    await bookSnap.ref.update({
+      count: newBookIllustrations.length,
+      cover: { auto: autoCover },
+      illustrations: newBookIllustrations,
+      updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
+    });
+
+    const items = deletedIllustrations.map((id) => {
+      return {
+        illustration: { id },
+        success: true,
+      };
+    });
+
+    return {
+      items,
+      successCount: deletedIllustrations,
+      hasErrors: false,
+      warning,
     };
   });
 
