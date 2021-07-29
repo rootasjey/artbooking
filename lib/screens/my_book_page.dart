@@ -16,7 +16,6 @@ import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/state/upload_manager.dart';
-import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/book_illustration.dart';
 import 'package:artbooking/types/enums.dart';
@@ -61,7 +60,7 @@ class MyBookPage extends StatefulWidget {
 
 class _MyBookPageState extends State<MyBookPage> {
   /// The viewing book.
-  Book? bookPage;
+  Book? _bookPage;
 
   bool _isLoading = false;
   bool _hasError = false;
@@ -74,7 +73,7 @@ class _MyBookPageState extends State<MyBookPage> {
   final _illustrations = Map<String, Illustration>();
   final _keyboardFocusNode = FocusNode();
 
-  /// Illustrations' ids matching [bookPage.illustrations].
+  /// Illustrations' ids matching [_bookPage.illustrations].
   List<String> _currentIllustrationIds = [];
 
   int _limit = 20;
@@ -143,7 +142,7 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   Widget bookCoverCard() {
-    if (bookPage == null) {
+    if (_bookPage == null) {
       return SizedBox(
         height: 260.0,
         width: 200.0,
@@ -155,7 +154,7 @@ class _MyBookPageState extends State<MyBookPage> {
     }
 
     return Hero(
-      tag: bookPage!.id,
+      tag: _bookPage!.id,
       child: SizedBox(
         height: 260.0,
         width: 200.0,
@@ -166,7 +165,7 @@ class _MyBookPageState extends State<MyBookPage> {
           ),
           clipBehavior: Clip.antiAlias,
           child: Ink.image(
-            image: NetworkImage(bookPage!.getCoverUrl()),
+            image: NetworkImage(_bookPage!.getCoverUrl()),
             height: 260.0,
             width: 200.0,
             fit: BoxFit.cover,
@@ -202,11 +201,11 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   Widget createdAt() {
-    if (bookPage == null) {
+    if (_bookPage == null) {
       return Container();
     }
 
-    final DateTime? createdAt = bookPage!.createdAt;
+    final DateTime? createdAt = _bookPage!.createdAt;
 
     if (createdAt == null) {
       return Container();
@@ -217,12 +216,12 @@ class _MyBookPageState extends State<MyBookPage> {
     if (DateTime.now().difference(createdAt).inDays > 60) {
       createdAtStr = "date_created_at".tr(
         args: [
-          Jiffy(bookPage!.createdAt).yMMMMEEEEd,
+          Jiffy(_bookPage!.createdAt).yMMMMEEEEd,
         ],
       );
     } else {
       createdAtStr = "date_created_ago".tr(
-        args: [Jiffy(bookPage!.createdAt).fromNow()],
+        args: [Jiffy(_bookPage!.createdAt).fromNow()],
       );
     }
 
@@ -239,14 +238,14 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   Widget description() {
-    if (bookPage == null) {
+    if (_bookPage == null) {
       return Container();
     }
 
     return Opacity(
       opacity: 0.6,
       child: Text(
-        bookPage!.description,
+        _bookPage!.description,
         style: FontsUtils.mainStyle(
           fontSize: 16.0,
           fontWeight: FontWeight.w600,
@@ -632,18 +631,18 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   Widget stats() {
-    if (bookPage == null) {
+    if (_bookPage == null) {
       return Container();
     }
 
-    final Color color = bookPage!.illustrations.isEmpty
+    final Color color = _bookPage!.illustrations.isEmpty
         ? stateColors.secondary
         : stateColors.primary;
 
     return Opacity(
       opacity: 0.8,
       child: Text(
-        "illustrations_count".plural(bookPage!.illustrations.length),
+        "illustrations_count".plural(_bookPage!.illustrations.length),
         style: FontsUtils.mainStyle(
           color: color,
           fontSize: 16.0,
@@ -654,7 +653,7 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   Widget title() {
-    final bookName = bookPage != null ? bookPage!.name : 'My book';
+    final bookName = _bookPage != null ? _bookPage!.name : 'My book';
 
     return Opacity(
       opacity: 0.8,
@@ -669,11 +668,11 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   Widget updatedAt({bool clickable = true}) {
-    if (bookPage == null) {
+    if (_bookPage == null) {
       return Container();
     }
 
-    final DateTime? updatedAt = bookPage!.updatedAt;
+    final DateTime? updatedAt = _bookPage!.updatedAt;
 
     if (updatedAt == null) {
       return Container();
@@ -684,12 +683,12 @@ class _MyBookPageState extends State<MyBookPage> {
     if (DateTime.now().difference(updatedAt).inDays > 60) {
       updatedAtStr = "date_updated_at".tr(
         args: [
-          Jiffy(bookPage!.updatedAt).yMMMMEEEEd,
+          Jiffy(_bookPage!.updatedAt).yMMMMEEEEd,
         ],
       );
     } else {
       updatedAtStr = "date_updated_ago".tr(
-        args: [Jiffy(bookPage!.updatedAt).fromNow()],
+        args: [Jiffy(_bookPage!.updatedAt).fromNow()],
       );
     }
 
@@ -733,6 +732,10 @@ class _MyBookPageState extends State<MyBookPage> {
   /// Failed illustrations' fetchs means that
   /// there may be deleted ones in this book.
   void checkFetchErrors(List<String> illustrationsErrors) {
+    if (illustrationsErrors.isEmpty) {
+      return;
+    }
+
     Cloud.fun('books-removeDeletedIllustrations').call({
       'bookId': widget.bookId,
       'illustrationIds': illustrationsErrors,
@@ -815,24 +818,6 @@ class _MyBookPageState extends State<MyBookPage> {
     );
   }
 
-  void deleteIllustration(Illustration illustration, int index) async {
-    setState(() {
-      _illustrations.removeWhere((key, value) => key == illustration.id);
-    });
-
-    final response = await IllustrationsActions.deleteOne(
-      illustrationId: illustration.id,
-    );
-
-    if (response.success) {
-      return;
-    }
-
-    setState(() {
-      _illustrations.putIfAbsent(illustration.id, () => illustration);
-    });
-  }
-
   void confirmSelectionDeletion() async {
     showCustomModalBottomSheet(
       context: context,
@@ -906,6 +891,24 @@ class _MyBookPageState extends State<MyBookPage> {
     );
   }
 
+  void deleteIllustration(Illustration illustration, int index) async {
+    setState(() {
+      _illustrations.removeWhere((key, value) => key == illustration.id);
+    });
+
+    final response = await IllustrationsActions.deleteOne(
+      illustrationId: illustration.id,
+    );
+
+    if (response.success) {
+      return;
+    }
+
+    setState(() {
+      _illustrations.putIfAbsent(illustration.id, () => illustration);
+    });
+  }
+
   void deleteSelection() async {
     _multiSelectedItems.entries.forEach(
       (MapEntry<String, Illustration> multiSelectItem) {
@@ -924,7 +927,7 @@ class _MyBookPageState extends State<MyBookPage> {
     });
 
     final response = await BooksActions.removeIllustrations(
-      bookId: bookPage!.id,
+      bookId: _bookPage!.id,
       illustrationIds: illustrationIds,
     );
 
@@ -941,7 +944,7 @@ class _MyBookPageState extends State<MyBookPage> {
   /// Get a differenciation of illustrations in this book
   /// and add or remove illustration accordingly.
   void diffIllustrations() {
-    if (bookPage == null) {
+    if (_bookPage == null) {
       return;
     }
 
@@ -979,8 +982,8 @@ class _MyBookPageState extends State<MyBookPage> {
       startListenningToData(query);
 
       setState(() {
-        bookPage = Book.fromJSON(bookData);
-        _currentIllustrationIds = bookPage!.illustrations
+        _bookPage = Book.fromJSON(bookData);
+        _currentIllustrationIds = _bookPage!.illustrations
             .map((bookIllustration) => bookIllustration.id)
             .toList();
       });
@@ -994,11 +997,11 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   void fetchIllustrations() async {
-    if (bookPage == null) {
+    if (_bookPage == null) {
       return;
     }
 
-    final illustrationsBook = bookPage!.illustrations;
+    final illustrationsBook = _bookPage!.illustrations;
 
     setState(() {
       _isLoading = true;
@@ -1048,10 +1051,7 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   void fetchIllustrationsAndListenToUpdates() {
-    bookPage = widget.book;
-    appLogger.d("bookId: ${widget.bookId}");
-    appLogger.d("stateUser.userFirestore.id: ${stateUser.userFirestore.id}");
-
+    _bookPage = widget.book;
     fetchIllustrations();
 
     final query =
@@ -1061,7 +1061,7 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   void fetchIllustrationsMore() async {
-    if (!_hasNext || bookPage == null || _isLoadingMore) {
+    if (!_hasNext || _bookPage == null || _isLoadingMore) {
       return;
     }
 
@@ -1069,7 +1069,7 @@ class _MyBookPageState extends State<MyBookPage> {
     _endIndex = _endIndex + _limit;
     _isLoadingMore = true;
 
-    final range = bookPage!.illustrations.getRange(_startIndex, _endIndex);
+    final range = _bookPage!.illustrations.getRange(_startIndex, _endIndex);
 
     try {
       for (var bookIllustration in range) {
@@ -1089,7 +1089,7 @@ class _MyBookPageState extends State<MyBookPage> {
         _illustrations.putIfAbsent(illustration.id, () => illustration);
       }
       setState(() {
-        _hasNext = _endIndex < bookPage!.count;
+        _hasNext = _endIndex < _bookPage!.count;
       });
     } catch (error) {
       appLogger.e(error);
@@ -1098,7 +1098,7 @@ class _MyBookPageState extends State<MyBookPage> {
     }
   }
 
-  /// Find new values in [bookPage.illustrations]
+  /// Find new values in [_bookPage.illustrations]
   /// that weren't there before the update.
   /// -------------------------------------------
   /// For each id in the new data:
@@ -1202,7 +1202,7 @@ class _MyBookPageState extends State<MyBookPage> {
     });
 
     final response = await BooksActions.removeIllustrations(
-      bookId: bookPage!.id,
+      bookId: _bookPage!.id,
       illustrationIds: [illustration.id],
     );
 
@@ -1407,8 +1407,8 @@ class _MyBookPageState extends State<MyBookPage> {
 
         setState(() {
           bookData['id'] = snapshot.id;
-          bookPage = Book.fromJSON(bookData);
-          _currentIllustrationIds = bookPage!.illustrations
+          _bookPage = Book.fromJSON(bookData);
+          _currentIllustrationIds = _bookPage!.illustrations
               .map((bookIllustration) => bookIllustration.id)
               .toList();
         });
