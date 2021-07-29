@@ -75,19 +75,24 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   Widget build(BuildContext context) {
     return Hero(
       tag: widget.book.id,
-      child: SizedBox(
-        width: 360.0,
-        height: 440.0,
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                backCard(),
-                frontCard(),
-              ],
-            ),
-            caption(),
-          ],
+      child: OverflowBox(
+        // avoid hero animation overflow
+        minHeight: 360.0,
+        maxHeight: 402.0,
+        child: SizedBox(
+          width: 360.0,
+          height: 440.0,
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  backCard(),
+                  frontCard(),
+                ],
+              ),
+              caption(),
+            ],
+          ),
         ),
       ),
     );
@@ -98,7 +103,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
       top: 0.0,
       right: 0.0,
       width: 200.0,
-      child: Container(
+      child: SizedBox(
         width: 280.0,
         height: 360.0,
         child: Card(
@@ -118,7 +123,6 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
 
     return Padding(
       padding: const EdgeInsets.only(
-        top: 8.0,
         left: 16.0,
         right: 16.0,
       ),
