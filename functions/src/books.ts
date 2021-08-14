@@ -68,7 +68,7 @@ export const addIllustrations = functions
     const bookIllustrations: BookIllustration[] = bookData.illustrations;
     let newBookIllustrations = bookIllustrations.concat(minimalIllustrations);
     const autoCover = await getAutoCover(newBookIllustrations);
-
+    
     if (newBookIllustrations.length > 100) {
       newBookIllustrations = newBookIllustrations.slice(0, 100);
       warning = `max_illustration_100`;
@@ -902,6 +902,7 @@ async function createBookIllustrations(ids: string[]) {
 
   for (const id of ids) {
     arrayResult.push({
+      createdAt: adminApp.firestore.Timestamp.now(),
       id,
       vScaleFactor: {
         height: 1,

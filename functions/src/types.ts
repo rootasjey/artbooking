@@ -314,7 +314,17 @@ interface SetUserAuthorParams {
 }
 
 interface BookIllustration {
+  /** Date when this illustration was added to this book. */
+  createdAt: FirebaseFirestore.FieldValue;
+
+  /** This illustration's id. */
   id: string;
+
+  /**
+   * Virtual scale factor defines illustrations size inside a book 
+   * when the [layout] (or [mobileLayout]) is {customGrid}, 
+   * {customVerticalList} or {customHorizontalList}.
+   */
   vScaleFactor: {
     height: number;
     mobileHeight: number;
