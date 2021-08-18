@@ -8,6 +8,7 @@ import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/search.dart';
 import 'package:artbooking/utils/snack.dart';
+import 'package:collection/collection.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -142,8 +143,9 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget postsColumn() {
     return Column(
-      children: _illustrationsSuggestions.map((illustration) {
+      children: _illustrationsSuggestions.mapIndexed((index, illustration) {
         return IllustrationCard(
+          index: index,
           illustration: illustration,
         );
       }).toList(),

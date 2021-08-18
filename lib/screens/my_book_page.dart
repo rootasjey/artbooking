@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:artbooking/actions/books.dart';
-import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/illustration_card.dart';
@@ -70,11 +69,15 @@ class _MyBookPageState extends State<MyBookPage> {
   bool _isLoadingMore = false;
 
   // Why a map and not just a list?
-  final _illustrations = Map<String, Illustration>();
+  // -> faster access & because it's already done.
+  // -> for [_multiSelectedItems] allow instant access to know
+  // if an illustration is currently in multi-select.
+  final _illustrations = MapStringIllustration();
   final _keyboardFocusNode = FocusNode();
 
   /// Illustrations' ids matching [_bookPage.illustrations].
-  List<String> _currentIllustrationIds = [];
+  /// Generated keys instead of simple ids due to possible duplicates.
+  List<String> _currentIllusKeys = [];
 
   int _limit = 20;
   int _startIndex = 0;
@@ -100,7 +103,9 @@ class _MyBookPageState extends State<MyBookPage> {
 
   SnapshotStreamSubscription? _streamSubscription;
 
-  final Map<String, SnapshotStreamSubscription> _illustrationsSubs = {};
+  final Map<String, SnapshotStreamSubscription> _illustrationSubs = {};
+
+  final String _keySeparator = '--';
 
   @override
   initState() {
@@ -457,9 +462,12 @@ class _MyBookPageState extends State<MyBookPage> {
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             final illustration = _illustrations.values.elementAt(index);
-            final selected = _multiSelectedItems.containsKey(illustration.id);
+            final illustrationKey = _illustrations.keys.elementAt(index);
+            final selected = _multiSelectedItems.containsKey(illustrationKey);
 
             return IllustrationCard(
+              key: ValueKey(illustrationKey),
+              index: index,
               illustration: illustration,
               selected: selected,
               selectionMode: selectionMode,
@@ -468,14 +476,16 @@ class _MyBookPageState extends State<MyBookPage> {
               onLongPress: (selected) {
                 if (selected) {
                   setState(() {
-                    _multiSelectedItems.remove(illustration.id);
+                    _multiSelectedItems.remove(illustrationKey);
                   });
                   return;
                 }
 
                 setState(() {
                   _multiSelectedItems.putIfAbsent(
-                      illustration.id, () => illustration);
+                    illustrationKey,
+                    () => illustration,
+                  );
                 });
               },
             );
@@ -608,9 +618,17 @@ class _MyBookPageState extends State<MyBookPage> {
         ),
         TextButton.icon(
           onPressed: () {
-            _illustrations.values.forEach((illustration) {
+            // _illustrations.values.forEach((illustration) {
+            //   _multiSelectedItems.putIfAbsent(
+            //     generateKey(illustration),
+            //     () => illustration,
+            //   );
+            // });
+            _illustrations.forEach((String key, Illustration illustration) {
               _multiSelectedItems.putIfAbsent(
-                  illustration.id, () => illustration);
+                key,
+                () => illustration,
+              );
             });
 
             setState(() {});
@@ -769,7 +787,7 @@ class _MyBookPageState extends State<MyBookPage> {
                   tileColor: Color(0xfff55c5c),
                   onTap: () {
                     Beamer.of(context).popRoute();
-                    deleteIllustration(illustration, index);
+                    deleteBook(illustration, index);
                   },
                 ),
                 ListTile(
@@ -789,7 +807,7 @@ class _MyBookPageState extends State<MyBookPage> {
           onKey: (keyEvent) {
             if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
               Navigator.of(context).pop();
-              deleteIllustration(illustration, index);
+              deleteBook(illustration, index);
             }
           },
           child: SafeArea(
@@ -891,24 +909,11 @@ class _MyBookPageState extends State<MyBookPage> {
     );
   }
 
-  void deleteIllustration(Illustration illustration, int index) async {
-    setState(() {
-      _illustrations.removeWhere((key, value) => key == illustration.id);
-    });
+  // TODO: Populate.
+  // Only allow remove from book o this view.
+  void deleteBook(Illustration illustration, int index) async {}
 
-    final response = await IllustrationsActions.deleteOne(
-      illustrationId: illustration.id,
-    );
-
-    if (response.success) {
-      return;
-    }
-
-    setState(() {
-      _illustrations.putIfAbsent(illustration.id, () => illustration);
-    });
-  }
-
+  // TODO: Use another variable to remove multiple illustrations.
   void deleteSelection() async {
     _multiSelectedItems.entries.forEach(
       (MapEntry<String, Illustration> multiSelectItem) {
@@ -919,7 +924,9 @@ class _MyBookPageState extends State<MyBookPage> {
     );
 
     final MapStringIllustration duplicatedItems = Map.from(_multiSelectedItems);
-    final List<String> illustrationIds = _multiSelectedItems.keys.toList();
+    final List<String> illustrationIds = _multiSelectedItems.values
+        .map((illustration) => illustration.id)
+        .toList();
 
     setState(() {
       _multiSelectedItems.clear();
@@ -983,8 +990,8 @@ class _MyBookPageState extends State<MyBookPage> {
 
       setState(() {
         _bookPage = Book.fromJSON(bookData);
-        _currentIllustrationIds = _bookPage!.illustrations
-            .map((bookIllustration) => bookIllustration.id)
+        _currentIllusKeys = _bookPage!.illustrations
+            .map((bookIllustration) => generateKey(bookIllustration))
             .toList();
       });
     } catch (error) {
@@ -996,6 +1003,7 @@ class _MyBookPageState extends State<MyBookPage> {
     }
   }
 
+  /// Fetch an range of illustrations of a book.
   void fetchIllustrations() async {
     if (_bookPage == null) {
       return;
@@ -1038,7 +1046,10 @@ class _MyBookPageState extends State<MyBookPage> {
         illustrationData['id'] = illustrationSnap.id;
 
         final illustration = Illustration.fromJSON(illustrationData);
-        _illustrations.putIfAbsent(illustration.id, () => illustration);
+        _illustrations.putIfAbsent(
+          generateKey(bookIllustration),
+          () => illustration,
+        );
 
         setState(() => _isLoading = false);
       } catch (error) {
@@ -1086,7 +1097,10 @@ class _MyBookPageState extends State<MyBookPage> {
         illustrationData['id'] = illustrationSnap.id;
 
         final illustration = Illustration.fromJSON(illustrationData);
-        _illustrations.putIfAbsent(illustration.id, () => illustration);
+        _illustrations.putIfAbsent(
+          generateKey(bookIllustration),
+          () => illustration,
+        );
       }
       setState(() {
         _hasNext = _endIndex < _bookPage!.count;
@@ -1098,6 +1112,14 @@ class _MyBookPageState extends State<MyBookPage> {
     }
   }
 
+  /// Generate an unique key for illustrations in book (frontend).
+  String generateKey(BookIllustration bookIllustration) {
+    final String id = bookIllustration.id;
+    DateTime createdAt = bookIllustration.createdAt;
+
+    return "$id$_keySeparator${createdAt.millisecondsSinceEpoch}";
+  }
+
   /// Find new values in [_bookPage.illustrations]
   /// that weren't there before the update.
   /// -------------------------------------------
@@ -1107,9 +1129,21 @@ class _MyBookPageState extends State<MyBookPage> {
   ///
   /// • if the value doesn't exist in [_illustrations] → new value.
   void handleAddedIllustrations() async {
-    final added = _currentIllustrationIds.filter(
-      (String illustrationId) {
-        if (_illustrations.containsKey(illustrationId)) {
+    final List<String> added = _currentIllusKeys.filter(
+      (String illustrationKey) {
+        // final idAndCreatedAt = illustrationKey.split('--');
+        // final illustrationId = idAndCreatedAt.elementAt(0);
+        // final illustrationCreatedAt = idAndCreatedAt.elementAt(1);
+
+        // final Illustration illustrationToFind = _illustrations.values
+        //     .firstWhere((illustration) => illustration.id == illustrationId);
+
+        // final String key = generateKey(illustrationToFind);
+
+        // if (_illustrations.containsKey(key)) {
+        //   return false;
+        // }
+        if (_illustrations.containsKey(illustrationKey)) {
           return false;
         }
 
@@ -1117,9 +1151,13 @@ class _MyBookPageState extends State<MyBookPage> {
       },
     ).toList();
 
-    for (String id in added) {
-      final DocumentMap query =
-          FirebaseFirestore.instance.collection('illustrations').doc(id);
+    for (String illustrationKey in added) {
+      final idAndCreatedAt = illustrationKey.split(_keySeparator);
+      final illustrationId = idAndCreatedAt.elementAt(0);
+
+      final DocumentMap query = FirebaseFirestore.instance
+          .collection('illustrations')
+          .doc(illustrationId);
 
       final illustrationSnap = await query.get();
       final illustrationData = illustrationSnap.data();
@@ -1133,11 +1171,14 @@ class _MyBookPageState extends State<MyBookPage> {
       final illustration = Illustration.fromJSON(illustrationData);
 
       setState(() {
-        _illustrations.putIfAbsent(illustration.id, () => illustration);
+        _illustrations.putIfAbsent(
+          illustrationKey,
+          () => illustration,
+        );
       });
 
       if (illustration.hasPendingCreates) {
-        waitForThumbnail(query);
+        waitForThumbnail(illustrationKey, query);
       }
     }
   }
@@ -1147,23 +1188,28 @@ class _MyBookPageState extends State<MyBookPage> {
   /// -------------------------------------------
   /// For each id in new data:
   ///
-  /// • if the value exist in [_currentIllustrationIds] → nothing changed
+  /// • if the value exist in [_currentIllusKeys] → nothing changed
   ///
-  /// • if the value deson't exist in [_currentIllustrationIds] → removed value.
+  /// • if the value doesn't exist in [_currentIllusKeys] → removed value.
   void handleRemovedIllustrations() {
-    final deleted = _illustrations.keys.filter(
-      (String illustrationId) {
-        if (_currentIllustrationIds.contains(illustrationId)) {
+    final Iterable<String> customRemovedIds = _illustrations.filter(
+      (MapEntry<String, Illustration> mapEntry) {
+        // final Illustration illustration = mapEntry.value;
+
+        // if (_currentIllusKeys.contains(illustration.id)) {
+        //   return false;
+        // }
+        if (_currentIllusKeys.contains(mapEntry.key)) {
           return false;
         }
 
         return true;
       },
-    ).toList();
+    ).map((mapEntry) => mapEntry.key);
 
     setState(() {
-      for (String id in deleted) {
-        _illustrations.remove(id);
+      for (String customId in customRemovedIds) {
+        _illustrations.remove(customId);
       }
     });
   }
@@ -1195,10 +1241,11 @@ class _MyBookPageState extends State<MyBookPage> {
   void onRemoveFromBook({
     required int index,
     required Illustration illustration,
+    required String illustrationKey,
   }) async {
     setState(() {
       _processingIllustrations.putIfAbsent(index, () => illustration);
-      _illustrations.removeWhere((key, value) => key == illustration.id);
+      _illustrations.remove(illustrationKey);
     });
 
     final response = await BooksActions.removeIllustrations(
@@ -1213,7 +1260,7 @@ class _MyBookPageState extends State<MyBookPage> {
       );
 
       _processingIllustrations.forEach((pIndex, pIllustration) {
-        _illustrations.putIfAbsent(pIllustration.id, () => pIllustration);
+        _illustrations.putIfAbsent(illustrationKey, () => pIllustration);
       });
 
       setState(() {
@@ -1233,13 +1280,14 @@ class _MyBookPageState extends State<MyBookPage> {
     });
   }
 
-  void onTapIllustrationCard(Illustration illustration) {
+  void onTapIllustrationCard(
+      String illustrationKey, Illustration illustration) {
     if (_multiSelectedItems.isEmpty && !_forceMultiSelect) {
       navigateToIllustrationPage(illustration);
       return;
     }
 
-    multiSelectIllustration(illustration);
+    multiSelectIllustration(illustrationKey, illustration);
   }
 
   void navigateToIllustrationPage(Illustration illustration) {
@@ -1259,12 +1307,13 @@ class _MyBookPageState extends State<MyBookPage> {
     );
   }
 
-  void multiSelectIllustration(Illustration illustration) {
-    final selected = _multiSelectedItems.containsKey(illustration.id);
+  void multiSelectIllustration(
+      String illustrationKey, Illustration illustration) {
+    final selected = _multiSelectedItems.containsKey(illustrationKey);
 
     if (selected) {
       setState(() {
-        _multiSelectedItems.remove(illustration.id);
+        _multiSelectedItems.remove(illustrationKey);
         _forceMultiSelect = _multiSelectedItems.length > 0;
       });
 
@@ -1272,15 +1321,15 @@ class _MyBookPageState extends State<MyBookPage> {
     }
 
     setState(() {
-      _multiSelectedItems.putIfAbsent(illustration.id, () => illustration);
+      _multiSelectedItems.putIfAbsent(
+        illustrationKey,
+        () => illustration,
+      );
     });
   }
 
-  void onPopupMenuItemSelected(
-    IllustrationItemAction action,
-    int index,
-    Illustration illustration,
-  ) {
+  void onPopupMenuItemSelected(IllustrationItemAction action, int index,
+      Illustration illustration, String illustrationKey) {
     switch (action) {
       case IllustrationItemAction.delete:
         confirmBookDeletion(illustration, index);
@@ -1292,6 +1341,7 @@ class _MyBookPageState extends State<MyBookPage> {
         onRemoveFromBook(
           index: index,
           illustration: illustration,
+          illustrationKey: illustrationKey,
         );
         break;
       default:
@@ -1408,8 +1458,8 @@ class _MyBookPageState extends State<MyBookPage> {
         setState(() {
           bookData['id'] = snapshot.id;
           _bookPage = Book.fromJSON(bookData);
-          _currentIllustrationIds = _bookPage!.illustrations
-              .map((bookIllustration) => bookIllustration.id)
+          _currentIllusKeys = _bookPage!.illustrations
+              .map((bookIllustration) => generateKey(bookIllustration))
               .toList();
         });
 
@@ -1424,7 +1474,7 @@ class _MyBookPageState extends State<MyBookPage> {
   /// If the target illustration has [hasPendingCreates] set to true,
   /// this method will listen to Firestore events in order to update
   /// the associated data in the map [_illustrations].
-  void waitForThumbnail(DocumentMap query) {
+  void waitForThumbnail(String illustrationKey, DocumentMap query) {
     final SnapshotStreamSubscription illustrationSub = query.snapshots().listen(
       (snapshot) {
         final Map<String, dynamic>? data = snapshot.data();
@@ -1442,22 +1492,22 @@ class _MyBookPageState extends State<MyBookPage> {
 
         setState(() {
           _illustrations.update(
-            illustration.id,
+            illustrationKey,
             (value) => illustration,
             ifAbsent: () => illustration,
           );
         });
 
-        if (_illustrationsSubs.containsKey(illustration.id)) {
+        if (_illustrationSubs.containsKey(illustration.id)) {
           final SnapshotStreamSubscription? targetSub =
-              _illustrationsSubs[illustration.id];
+              _illustrationSubs[illustration.id];
 
           targetSub?.cancel();
-          _illustrationsSubs.remove(illustration.id);
+          _illustrationSubs.remove(illustration.id);
         }
       },
     );
 
-    _illustrationsSubs.putIfAbsent(query.id, () => illustrationSub);
+    _illustrationSubs.putIfAbsent(query.id, () => illustrationSub);
   }
 }

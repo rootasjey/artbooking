@@ -716,6 +716,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     IllustrationItemAction action,
     int index,
     Illustration illustration,
+    String illustrationKey,
   ) {
     switch (action) {
       case IllustrationItemAction.delete:

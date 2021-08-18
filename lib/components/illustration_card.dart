@@ -12,17 +12,19 @@ import 'package:unicons/unicons.dart';
 /// A component representing an illustration with its main content (an image).
 class IllustrationCard extends StatefulWidget {
   /// A component representing an illustration with its main content (an image).
-  IllustrationCard({
-    this.index = 0,
+  const IllustrationCard({
+    Key? key,
     required this.illustration,
+    this.illustrationKey = '',
+    required this.index,
     this.selected = false,
     this.selectionMode = false,
     this.onLongPress,
     this.size = 300.0,
-    this.onTap,
     this.onPopupMenuItemSelected,
+    this.onTap,
     this.popupMenuEntries = const [],
-  });
+  }) : super(key: key);
 
   /// Index position in a list, if available.
   final int index;
@@ -50,8 +52,11 @@ class IllustrationCard extends StatefulWidget {
   final List<PopupMenuEntry<IllustrationItemAction>> popupMenuEntries;
 
   /// Callback function when popup menu item entries are tapped.
-  final void Function(IllustrationItemAction, int, Illustration)?
+  final void Function(IllustrationItemAction, int, Illustration, String)?
       onPopupMenuItemSelected;
+
+  /// Custom app generated key to perform operations quicker.
+  final String illustrationKey;
 
   @override
   _IllustrationCardState createState() => _IllustrationCardState();
@@ -232,6 +237,7 @@ class _IllustrationCardState extends State<IllustrationCard>
             action,
             widget.index,
             widget.illustration,
+            widget.illustrationKey,
           );
         },
         itemBuilder: (_) => widget.popupMenuEntries,
