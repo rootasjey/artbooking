@@ -14,6 +14,7 @@ class IllustrationCard extends StatefulWidget {
   /// A component representing an illustration with its main content (an image).
   const IllustrationCard({
     Key? key,
+    required this.heroTag,
     required this.illustration,
     this.illustrationKey = '',
     required this.index,
@@ -58,6 +59,11 @@ class IllustrationCard extends StatefulWidget {
   /// Custom app generated key to perform operations quicker.
   final String illustrationKey;
 
+  /// An unique tag to identify a single component for animation.
+  /// This tag must be unique on the page and among a list.
+  /// If you're not sure what to put, just use the illustration's id.
+  final String heroTag;
+
   @override
   _IllustrationCardState createState() => _IllustrationCardState();
 }
@@ -98,7 +104,7 @@ class _IllustrationCardState extends State<IllustrationCard>
     }
 
     return Hero(
-      tag: illustration.id,
+      tag: widget.heroTag,
       child: SizedBox(
         width: widget.size,
         height: widget.size,

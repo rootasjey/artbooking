@@ -146,6 +146,7 @@ class _SearchPageState extends State<SearchPage> {
       children: _illustrationsSuggestions.mapIndexed((index, illustration) {
         return IllustrationCard(
           index: index,
+          heroTag: illustration.id,
           illustration: illustration,
         );
       }).toList(),

@@ -258,6 +258,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
 
             return IllustrationCard(
               index: index,
+              heroTag: illustration.id,
               illustration: illustration,
               selected: selected,
               selectionMode: selectionMode,

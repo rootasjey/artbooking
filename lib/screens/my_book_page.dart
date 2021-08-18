@@ -466,9 +466,10 @@ class _MyBookPageState extends State<MyBookPage> {
             final selected = _multiSelectedItems.containsKey(illustrationKey);
 
             return IllustrationCard(
-              key: ValueKey(illustrationKey),
               index: index,
+              heroTag: illustrationKey,
               illustration: illustration,
+              key: ValueKey(illustrationKey),
               selected: selected,
               selectionMode: selectionMode,
               onPopupMenuItemSelected: onPopupMenuItemSelected,
