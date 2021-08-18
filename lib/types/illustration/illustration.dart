@@ -6,7 +6,7 @@ import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/types/illustration/stats.dart';
 import 'package:artbooking/types/illustration/version.dart';
 import 'package:artbooking/types/illustration/urls.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:artbooking/utils/date_helper.dart';
 
 class Illustration {
   /// Access Control List managing this illustration visibility to others users.
@@ -16,7 +16,7 @@ class Illustration {
   Author? author;
 
   /// The time this illustration has been created.
-  final DateTime? createdAt;
+  final DateTime createdAt;
 
   /// This illustration's description.
   String description;
@@ -75,7 +75,7 @@ class Illustration {
     this.acl = const [],
     this.author,
     this.styles = const [],
-    this.createdAt,
+    required this.createdAt,
     this.description = '',
     this.dimensions,
     this.extension = '',
@@ -121,7 +121,7 @@ class Illustration {
     return Illustration(
       author: Author.fromJSON(data['user']),
       styles: parseStyles(data['styles']),
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      createdAt: DateHelper.fromFirestore(data['createdAt']),
       description: data['description'] ?? '',
       dimensions: Dimensions.fromJSON(data['dimensions']),
       extension: data['extension'] ?? '',
@@ -133,7 +133,7 @@ class Illustration {
       size: data['size'] ?? 0,
       story: data['story'] ?? '',
       topics: parseTopics(data['topics']),
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      updatedAt: DateHelper.fromFirestore(data['updatedAt']),
       urls: Urls.fromJSON(data['urls']),
       versions: [],
       visibility: parseVisibility(data['visibility']),
