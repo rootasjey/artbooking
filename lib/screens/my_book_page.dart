@@ -45,27 +45,37 @@ typedef SnapshotStreamSubscription
 typedef MapStringIllustration = Map<String, Illustration>;
 
 class MyBookPage extends StatefulWidget {
+  /// Book's id.
   final String bookId;
-  final Book? book;
 
   const MyBookPage({
     Key? key,
     required this.bookId,
-    this.book,
   }) : super(key: key);
   @override
   _MyBookPageState createState() => _MyBookPageState();
 }
 
 class _MyBookPageState extends State<MyBookPage> {
-  /// The viewing book.
+  /// The book displayed on this page.
   Book? _bookPage;
 
+  /// True if the page is loading.
   bool _isLoading = false;
+
+  /// True if there was an error while fetching data.
   bool _hasError = false;
+
+  /// True if there's a next page to fetch for this book's illustrations.
   bool _hasNext = false;
+
+  /// True if the floating action button is visible.
   bool _isFabVisible = false;
+
+  /// True if the view is in multiselect mode.
   bool _forceMultiSelect = false;
+
+  /// True if there's a request to fetch the next illustration's batch.
   bool _isLoadingMore = false;
 
   // Why a map and not just a list?
@@ -79,15 +89,25 @@ class _MyBookPageState extends State<MyBookPage> {
   /// Generated keys instead of simple ids due to possible duplicates.
   List<String> _currentIllusKeys = [];
 
+  /// Count limit when fetchig this book's illustrations.
   int _limit = 20;
+
+  /// The first illustration to fetch in the array.
   int _startIndex = 0;
+
+  /// The last illustration to fetch in the array.
   int _endIndex = 0;
 
+  /// Currently selected illustrations.
   MapStringIllustration _multiSelectedItems = Map();
+
+  /// Illustrations being removed.
   Map<int, Illustration> _processingIllustrations = Map();
 
+  /// Handles page's scroll.
   ScrollController _scrollController = ScrollController();
 
+  /// Items when opening the popup.
   final List<PopupMenuEntry<IllustrationItemAction>> _popupMenuEntries = [
     PopupMenuItemIcon(
       value: IllustrationItemAction.addToBook,
@@ -101,26 +121,32 @@ class _MyBookPageState extends State<MyBookPage> {
     ),
   ];
 
-  SnapshotStreamSubscription? _streamSubscription;
+  /// Listens to book's updates.
+  SnapshotStreamSubscription? _bookStreamSubscription;
 
+  /// Listens to illustrations' updates.
   final Map<String, SnapshotStreamSubscription> _illustrationSubs = {};
 
+  /// String separator to generate unique key for illustrations.
   final String _keySeparator = '--';
 
   @override
   initState() {
     super.initState();
 
-    if (widget.book == null) {
-      fetchBookAndIllustrations();
-    } else {
+    Book? bookFromNav = NavigationStateHelper.book;
+
+    if (bookFromNav != null && bookFromNav.id == widget.bookId) {
+      _bookPage = bookFromNav;
       fetchIllustrationsAndListenToUpdates();
+    } else {
+      fetchBookAndIllustrations();
     }
   }
 
   @override
   void dispose() {
-    _streamSubscription?.cancel();
+    _bookStreamSubscription?.cancel();
     super.dispose();
   }
 
@@ -910,9 +936,25 @@ class _MyBookPageState extends State<MyBookPage> {
     );
   }
 
-  // TODO: Populate.
   // Only allow remove from book o this view.
-  void deleteBook(Illustration illustration, int index) async {}
+  void deleteBook(Illustration illustration, int index) async {
+    if (_bookPage == null) {
+      return;
+    }
+
+    // Will delete the book in background.
+    BooksActions.deleteOne(
+      bookId: _bookPage!.id,
+    );
+
+    Beamer.of(context).beamToNamed(
+      DashboardContentLocation.booksRoute,
+      data: {
+        'bookToDelete': _bookPage!.id,
+      },
+      replaceCurrent: true,
+    );
+  }
 
   // TODO: Use another variable to remove multiple illustrations.
   void deleteSelection() async {
@@ -1063,7 +1105,6 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   void fetchIllustrationsAndListenToUpdates() {
-    _bookPage = widget.book;
     fetchIllustrations();
 
     final query =
@@ -1449,7 +1490,7 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   void startListenningToData(DocumentReference<Map<String, dynamic>> query) {
-    _streamSubscription = query.snapshots().skip(1).listen(
+    _bookStreamSubscription = query.snapshots().skip(1).listen(
       (DocumentSnapshot<Map<String, dynamic>> snapshot) {
         final bookData = snapshot.data();
         if (!snapshot.exists || bookData == null) {
