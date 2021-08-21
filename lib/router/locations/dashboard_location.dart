@@ -4,6 +4,7 @@ import 'package:artbooking/screens/dashboard_page.dart';
 import 'package:artbooking/screens/delete_account_page.dart';
 import 'package:artbooking/screens/edit_image_page.dart';
 import 'package:artbooking/screens/illustration_page.dart';
+import 'package:artbooking/screens/my_book_page.dart';
 import 'package:artbooking/screens/my_statistics_page.dart';
 import 'package:artbooking/screens/my_books_page.dart';
 import 'package:artbooking/screens/my_illustrations_page.dart';
@@ -89,6 +90,8 @@ class DashboardContentLocation extends BeamLocation {
   @override
   List<String> get pathBlueprints => [
         booksRoute,
+        '$booksRoute/:bookId',
+        // -> '/dashboard/books/:bookId',
         '$illustrationsRoute/:illustrationId',
         // -> '/dashboard/illustrations/:illustrationId',
         settingsRoute,
@@ -119,6 +122,15 @@ class DashboardContentLocation extends BeamLocation {
           child: MyBooksPage(),
           key: ValueKey(booksRoute),
           title: "My Books",
+          type: BeamPageType.fadeTransition,
+        ),
+      if (state.pathBlueprintSegments.contains(':bookId'))
+        BeamPage(
+          child: MyBookPage(
+            bookId: state.pathParameters['bookId']!,
+          ),
+          key: ValueKey('$booksRoute/one'),
+          title: "Book",
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathBlueprintSegments.contains('illustrations'))
