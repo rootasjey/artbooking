@@ -3,7 +3,7 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:flutter/widgets.dart';
 
 /// State helper to keep track of passing arguments
-/// which are not string and simple types.
+/// which are not strings and simple types.
 /// Very useful to avoid re-fetching an already loaded data,
 /// and makes forward hero animation work.
 class NavigationStateHelper {
