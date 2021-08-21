@@ -887,7 +887,7 @@ class _MyBookPageState extends State<MyBookPage> {
                   tileColor: Color(0xfff55c5c),
                   onTap: () {
                     Navigator.of(context).pop();
-                    deleteSelection();
+                    deleteManyIllustrations();
                   },
                 ),
                 ListTile(
@@ -907,7 +907,7 @@ class _MyBookPageState extends State<MyBookPage> {
           onKey: (keyEvent) {
             if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
               Navigator.of(context).pop();
-              deleteSelection();
+              deleteManyIllustrations();
             }
           },
           child: SafeArea(
@@ -956,8 +956,11 @@ class _MyBookPageState extends State<MyBookPage> {
     );
   }
 
-  // TODO: Use another variable to remove multiple illustrations.
-  void deleteSelection() async {
+  void deleteManyIllustrations() async {
+    if (_bookPage == null) {
+      return;
+    }
+
     _multiSelectedItems.entries.forEach(
       (MapEntry<String, Illustration> multiSelectItem) {
         _illustrations.removeWhere(
