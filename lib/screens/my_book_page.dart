@@ -78,10 +78,12 @@ class _MyBookPageState extends State<MyBookPage> {
   /// True if there's a request to fetch the next illustration's batch.
   bool _isLoadingMore = false;
 
-  // Why a map and not just a list?
-  // -> faster access & because it's already done.
-  // -> for [_multiSelectedItems] allow instant access to know
-  // if an illustration is currently in multi-select.
+  /// Why a map and not just a list?
+  ///
+  /// -> faster access & because it's already done.
+  ///
+  /// -> for [_multiSelectedItems] allow instant access to know
+  /// if an illustration is currently in multi-select.
   final _illustrations = MapStringIllustration();
   final _keyboardFocusNode = FocusNode();
 
@@ -100,9 +102,6 @@ class _MyBookPageState extends State<MyBookPage> {
 
   /// Currently selected illustrations.
   MapStringIllustration _multiSelectedItems = Map();
-
-  /// Illustrations being removed.
-  Map<int, Illustration> _processingIllustrations = Map();
 
   /// Handles page's scroll.
   ScrollController _scrollController = ScrollController();
@@ -496,6 +495,7 @@ class _MyBookPageState extends State<MyBookPage> {
               heroTag: illustrationKey,
               illustration: illustration,
               key: ValueKey(illustrationKey),
+              illustrationKey: illustrationKey,
               selected: selected,
               selectionMode: selectionMode,
               onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -645,12 +645,6 @@ class _MyBookPageState extends State<MyBookPage> {
         ),
         TextButton.icon(
           onPressed: () {
-            // _illustrations.values.forEach((illustration) {
-            //   _multiSelectedItems.putIfAbsent(
-            //     generateKey(illustration),
-            //     () => illustration,
-            //   );
-            // });
             _illustrations.forEach((String key, Illustration illustration) {
               _multiSelectedItems.putIfAbsent(
                 key,
@@ -664,7 +658,7 @@ class _MyBookPageState extends State<MyBookPage> {
           label: Text('select_all'.tr()),
         ),
         TextButton.icon(
-          onPressed: confirmSelectionDeletion,
+          onPressed: confirmManyIllustrationsDeletion,
           style: TextButton.styleFrom(
             primary: Colors.red,
           ),
@@ -863,7 +857,7 @@ class _MyBookPageState extends State<MyBookPage> {
     );
   }
 
-  void confirmSelectionDeletion() async {
+  void confirmManyIllustrationsDeletion() async {
     showCustomModalBottomSheet(
       context: context,
       builder: (context) {
@@ -1283,15 +1277,20 @@ class _MyBookPageState extends State<MyBookPage> {
     return false;
   }
 
-  void onRemoveFromBook({
+  void onRemoveIllustrationFromBook({
     required int index,
     required Illustration illustration,
     required String illustrationKey,
   }) async {
+    Illustration? removedIllustration;
+
     setState(() {
-      _processingIllustrations.putIfAbsent(index, () => illustration);
-      _illustrations.remove(illustrationKey);
+      removedIllustration = _illustrations.remove(illustrationKey);
     });
+
+    if (removedIllustration == null) {
+      return;
+    }
 
     final response = await BooksActions.removeIllustrations(
       bookId: _bookPage!.id,
@@ -1304,25 +1303,21 @@ class _MyBookPageState extends State<MyBookPage> {
         message: "illustrations_remove_error".tr(),
       );
 
-      _processingIllustrations.forEach((pIndex, pIllustration) {
-        _illustrations.putIfAbsent(illustrationKey, () => pIllustration);
+      setState(() {
+        _illustrations.putIfAbsent(
+          illustrationKey,
+          () => illustration,
+        );
       });
 
-      setState(() {
-        _processingIllustrations.clear();
-      });
+    Snack.e(
+      context: context,
+      message: "illustrations_remove_error".tr(),
+    );
 
       return;
     }
 
-    Snack.s(
-      context: context,
-      message: "illustrations_remove_success".tr(),
-    );
-
-    setState(() {
-      _processingIllustrations.clear();
-    });
   }
 
   void onTapIllustrationCard(
@@ -1376,14 +1371,11 @@ class _MyBookPageState extends State<MyBookPage> {
   void onPopupMenuItemSelected(IllustrationItemAction action, int index,
       Illustration illustration, String illustrationKey) {
     switch (action) {
-      case IllustrationItemAction.delete:
-        confirmBookDeletion(illustration, index);
-        break;
       case IllustrationItemAction.addToBook:
         showAddToBook(illustration);
         break;
       case IllustrationItemAction.removeFromBook:
-        onRemoveFromBook(
+        onRemoveIllustrationFromBook(
           index: index,
           illustration: illustration,
           illustrationKey: illustrationKey,
