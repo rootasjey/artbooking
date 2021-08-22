@@ -9,6 +9,7 @@ import 'package:artbooking/components/popup_menu_item_icon.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/text_divider.dart';
 import 'package:artbooking/components/text_rectangle_button.dart';
+import 'package:artbooking/components/themed_dialog.dart';
 import 'package:artbooking/components/underlined_button.dart';
 import 'package:artbooking/components/user_books.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
@@ -267,6 +268,28 @@ class _MyBookPageState extends State<MyBookPage> {
     );
   }
 
+  Widget deleteBookButton() {
+    return Tooltip(
+      message: "book_delete".tr(),
+      child: InkWell(
+        onTap: confirmDeleteOneBook,
+        child: Opacity(
+          opacity: 0.4,
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              border: Border.all(
+                width: 2.0,
+                color: Colors.black54,
+              ),
+            ),
+            child: Icon(UniconsLine.trash),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget description() {
     if (_bookPage == null) {
       return Container();
@@ -294,6 +317,7 @@ class _MyBookPageState extends State<MyBookPage> {
       runSpacing: 12.0,
       children: [
         uploadToBookButton(),
+        deleteBookButton(),
         multiSelectButton(),
       ],
     );
@@ -784,74 +808,49 @@ class _MyBookPageState extends State<MyBookPage> {
     });
   }
 
-  void confirmBookDeletion(Illustration illustration, int index) async {
-    showCustomModalBottomSheet(
+  /// Show a dialog to confirm a single book deletion.
+  void confirmDeleteOneBook() async {
+    showDialog(
       context: context,
       builder: (context) {
-        return Material(
-          child: SafeArea(
-            top: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text(
-                    "delete".tr(),
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                  trailing: Icon(
-                    UniconsLine.check,
-                    color: Colors.white,
-                  ),
-                  tileColor: Color(0xfff55c5c),
-                  onTap: () {
-                    Beamer.of(context).popRoute();
-                    deleteBook(illustration, index);
-                  },
-                ),
-                ListTile(
-                  title: Text("cancel".tr()),
-                  trailing: Icon(UniconsLine.times),
-                  onTap: Beamer.of(context).popRoute,
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-      containerWidget: (context, animation, child) {
-        return RawKeyboardListener(
-          autofocus: true,
+        return ThemedDialog(
           focusNode: _keyboardFocusNode,
-          onKey: (keyEvent) {
-            if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
-              Navigator.of(context).pop();
-              deleteBook(illustration, index);
-            }
-          },
-          child: SafeArea(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: 500.0,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 40.0,
-                  ),
-                  child: Material(
-                    clipBehavior: Clip.antiAlias,
-                    borderRadius: BorderRadius.circular(12.0),
-                    child: child,
+          title: Column(
+            children: [
+              Opacity(
+                opacity: 0.8,
+                child: Text(
+                  "book_delete".tr().toUpperCase(),
+                  style: FontsUtils.mainStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
-            ),
+              Container(
+                width: 300.0,
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Opacity(
+                  opacity: 0.4,
+                  child: Text(
+                    "book_delete_description".tr(),
+                    textAlign: TextAlign.center,
+                    style: FontsUtils.mainStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
+          body: SingleChildScrollView(),
+          textButtonValidation: "delete".tr(),
+          onCancel: Beamer.of(context).popRoute,
+          onValidate: () {
+            deleteBook();
+            Beamer.of(context).popRoute();
+          },
         );
       },
     );
@@ -930,8 +929,9 @@ class _MyBookPageState extends State<MyBookPage> {
     );
   }
 
-  // Only allow remove from book o this view.
-  void deleteBook(Illustration illustration, int index) async {
+  /// Delete the currevent viewing book
+  /// and navigate back to the preview location or MyBooksPage.
+  void deleteBook() async {
     if (_bookPage == null) {
       return;
     }
@@ -943,9 +943,6 @@ class _MyBookPageState extends State<MyBookPage> {
 
     Beamer.of(context).beamToNamed(
       DashboardContentLocation.booksRoute,
-      data: {
-        'bookToDelete': _bookPage!.id,
-      },
       replaceCurrent: true,
     );
   }
@@ -1310,14 +1307,13 @@ class _MyBookPageState extends State<MyBookPage> {
         );
       });
 
-    Snack.e(
-      context: context,
-      message: "illustrations_remove_error".tr(),
-    );
+      Snack.e(
+        context: context,
+        message: "illustrations_remove_error".tr(),
+      );
 
       return;
     }
-
   }
 
   void onTapIllustrationCard(
