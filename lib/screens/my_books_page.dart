@@ -60,6 +60,11 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
   final _popupMenuEntries = <PopupMenuEntry<BookItemAction>>[
     PopupMenuItemIcon(
+      icon: Icon(UniconsLine.edit),
+      textLabel: "rename".tr(),
+      value: BookItemAction.rename,
+    ),
+    PopupMenuItemIcon(
       icon: Icon(UniconsLine.trash),
       textLabel: "delete".tr(),
       value: BookItemAction.delete,
@@ -73,6 +78,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   ScrollController _scrollController = ScrollController();
 
   TextEditingController? _newBookNameController;
+  TextEditingController? _newBookDescriptionController;
   String _newBookName = '';
   String _newBookDescription = '';
 
@@ -82,6 +88,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   initState() {
     super.initState();
     _newBookNameController = TextEditingController();
+    _newBookDescriptionController = TextEditingController();
     fetchManyBooks();
   }
 
@@ -721,6 +728,66 @@ class _MyBooksPageState extends State<MyBooksPage> {
     );
   }
 
+  void showRenameBookDialog(Book book) {
+    _newBookNameController!.text = book.name;
+    _newBookDescriptionController!.text = book.description;
+
+    showDialog(
+      context: context,
+      builder: (context) => CreateOrEditBookDialog(
+        textTitle: "book_rename".tr().toUpperCase(),
+        textSubtitle: "book_rename_description".tr(),
+        nameController: _newBookNameController,
+        onNameChanged: (newValue) {
+          _newBookName = newValue;
+        },
+        onDescriptionChanged: (newValue) {
+          _newBookDescription = newValue;
+        },
+        onCancel: Beamer.of(context).popRoute,
+        onSubmitted: (value) {
+          renameBook(book);
+          Beamer.of(context).popRoute();
+        },
+      ),
+    );
+  }
+
+  /// Rename one book.
+  void renameBook(Book book) async {
+    try {
+      final prevName = book.name;
+      final prevDescription = book.description;
+
+      setState(() {
+        book.name = _newBookName;
+        book.description = _newBookDescription;
+      });
+
+      final response = await BooksActions.renameOne(
+        name: _newBookName,
+        description: _newBookDescription,
+        bookId: book.id,
+      );
+
+      if (response.success) {
+        return;
+      }
+
+      setState(() {
+        book.name = prevName;
+        book.description = prevDescription;
+      });
+
+      Snack.e(
+        context: context,
+        message: response.error.details,
+      );
+    } catch (error) {
+      appLogger.e(error);
+    }
+  }
+
   /// Listen to the last Firestore query of this page.
   void startListenningToData(QueryMap query) {
     _streamSubscription = query.snapshots().skip(1).listen(
@@ -844,6 +911,9 @@ class _MyBooksPageState extends State<MyBooksPage> {
     Book book,
   ) {
     switch (action) {
+      case BookItemAction.rename:
+        showRenameBookDialog(book);
+        break;
       case BookItemAction.delete:
         confirmDeleteOneBook(book, index);
         break;
