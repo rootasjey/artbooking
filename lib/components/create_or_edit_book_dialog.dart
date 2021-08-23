@@ -20,8 +20,10 @@ class CreateOrEditBookDialog extends StatelessWidget {
     required this.onSubmitted,
     required this.onCancel,
     this.descriptionController,
+    this.submitButtonValue = '',
   }) : super(key: key);
 
+  final String submitButtonValue;
   final String textTitle;
   final String textSubtitle;
   final TextEditingController? nameController;
@@ -81,6 +83,9 @@ class CreateOrEditBookDialog extends StatelessWidget {
   }
 
   Widget footerButtons() {
+    final String textValue =
+        submitButtonValue.isNotEmpty ? submitButtonValue : "create".tr();
+
     return Padding(
       padding: EdgeInsets.all(24.0),
       child: DarkElevatedButton(
@@ -88,7 +93,7 @@ class CreateOrEditBookDialog extends StatelessWidget {
           final String value = nameController?.text ?? '';
           onSubmitted.call(value);
         },
-        child: Text("create".tr()),
+        child: Text(textValue),
       ),
     );
   }
