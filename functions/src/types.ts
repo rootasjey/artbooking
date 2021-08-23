@@ -349,6 +349,17 @@ interface UpdateBookIllustrationsParams {
   illustrationIds: string[];
 }
 
+interface RenameBookPropertiesParams {
+  /** This book's id. */
+  bookId: string;
+
+  /** This book's description. */
+  description: string;
+
+  /** This book's name. */
+  name: string;
+}
+
 interface UpdateBookPropertiesParams {
   /** This book's id. */
   bookId: string;

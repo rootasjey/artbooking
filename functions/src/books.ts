@@ -511,6 +511,63 @@ export const removeIllustrations = functions
   });
 
 /**
+ * Update book's name and description.
+ */
+export const renameOne = functions
+  .region(cloudRegions.eu)
+  .https
+  .onCall(async (params: UpdateBookPropertiesParams, context) => {
+    const userAuth = context.auth;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
+    }
+
+    checkRenameBookPropsParam(params);
+
+    const {
+      description,
+      bookId,
+      name,
+    } = params;
+
+    const bookSnap = await firestore
+      .collection('books')
+      .doc(bookId)
+      .get();
+
+    const bookData = bookSnap.data();
+
+    if (!bookSnap.exists || !bookData) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        `The book [${bookId}] doesn't exist anymore.`,
+      )
+    }
+
+    if (bookData.user.id !== userAuth.uid) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        `You don't have the permission to update this book.`,
+      )
+    }
+
+    await bookSnap.ref.update({
+      description,
+      name,
+      updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
+    });
+
+    return {
+      book: { id: bookId },
+      success: true,
+    };
+  });
+
+/**
  * Set a new cover to an existing book.
  * The cover is from an existing illustration in the current book.
  */
@@ -747,6 +804,41 @@ export const updateIllustrationPosition = functions
 // ----------------
 // Helper functions
 // ----------------
+
+/**
+ * Check book's rename properties types and values.
+ * @param params - Updated book's properties.
+ */
+function checkRenameBookPropsParam(params: RenameBookPropertiesParams) {
+  if (!params) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      `The function must be called with a valid [id] & [illustrationsIds] parameters 
+      which are respectively the book's id and an illustrations' ids array.`,
+    );
+  }
+
+  const {
+    description,
+    name,
+  } = params;
+
+  if (typeof description !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      `The function must have a [description] parameter
+       which is the updated Book's description.`,
+    )
+  }
+
+  if (typeof name !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      `The function must have a [name] parameter
+       which is the updated Book's name.`,
+    )
+  }
+}
 
 /**
  * Check new book's properties types and values.
