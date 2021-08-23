@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
+import 'package:artbooking/components/create_or_edit_book_dialog.dart';
 import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/illustration_card.dart';
 import 'package:artbooking/components/main_app_bar.dart';
@@ -130,9 +131,17 @@ class _MyBookPageState extends State<MyBookPage> {
   /// String separator to generate unique key for illustrations.
   final String _keySeparator = '--';
 
+  TextEditingController? _newBookNameController;
+  TextEditingController? _newBookDescriptionController;
+  String _newBookName = '';
+  String _newBookDescription = '';
+
   @override
   initState() {
     super.initState();
+
+    _newBookNameController = TextEditingController();
+    _newBookDescriptionController = TextEditingController();
 
     Book? bookFromNav = NavigationStateHelper.book;
 
@@ -147,6 +156,8 @@ class _MyBookPageState extends State<MyBookPage> {
   @override
   void dispose() {
     _bookStreamSubscription?.cancel();
+    _newBookNameController?.dispose();
+    _newBookDescriptionController?.dispose();
     super.dispose();
   }
 
@@ -318,6 +329,7 @@ class _MyBookPageState extends State<MyBookPage> {
       children: [
         uploadToBookButton(),
         deleteBookButton(),
+        renameBookButton(),
         multiSelectButton(),
       ],
     );
@@ -690,6 +702,28 @@ class _MyBookPageState extends State<MyBookPage> {
           label: Text('delete'.tr()),
         ),
       ],
+    );
+  }
+
+  Widget renameBookButton() {
+    return Tooltip(
+      message: "book_rename".tr(),
+      child: InkWell(
+        onTap: showRenameBookDialog,
+        child: Opacity(
+          opacity: 0.4,
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              border: Border.all(
+                width: 2.0,
+                color: Colors.black54,
+              ),
+            ),
+            child: Icon(UniconsLine.edit_alt),
+          ),
+        ),
+      ),
     );
   }
 
@@ -1381,6 +1415,41 @@ class _MyBookPageState extends State<MyBookPage> {
     }
   }
 
+  /// Rename one book.
+  void renameBook(Book book) async {
+    final prevName = book.name;
+    final prevDescription = book.description;
+
+    setState(() {
+      book.name = _newBookName;
+      book.description = _newBookDescription;
+    });
+
+    try {
+      final response = await BooksActions.renameOne(
+        name: _newBookName,
+        description: _newBookDescription,
+        bookId: book.id,
+      );
+
+      if (response.success) {
+        return;
+      }
+
+      setState(() {
+        book.name = prevName;
+        book.description = prevDescription;
+      });
+
+      Snack.e(
+        context: context,
+        message: response.error.details,
+      );
+    } catch (error) {
+      appLogger.e(error);
+    }
+  }
+
   void showAddToBook(Illustration illustration) {
     int flex =
         MediaQuery.of(context).size.width < Constants.maxMobileWidth ? 5 : 3;
@@ -1470,6 +1539,40 @@ class _MyBookPageState extends State<MyBookPage> {
           ],
         );
       },
+    );
+  }
+
+  void showRenameBookDialog() {
+    if (_bookPage == null) {
+      return;
+    }
+
+    _newBookNameController!.text = _bookPage!.name;
+    _newBookDescriptionController!.text = _bookPage!.description;
+
+    _newBookName = _bookPage!.name;
+    _newBookDescription = _bookPage!.description;
+
+    showDialog(
+      context: context,
+      builder: (context) => CreateOrEditBookDialog(
+        descriptionController: _newBookDescriptionController,
+        nameController: _newBookNameController,
+        submitButtonValue: "rename".tr(),
+        textTitle: "book_rename".tr().toUpperCase(),
+        textSubtitle: "book_rename_description".tr(),
+        onNameChanged: (newValue) {
+          _newBookName = newValue;
+        },
+        onDescriptionChanged: (newValue) {
+          _newBookDescription = newValue;
+        },
+        onCancel: Beamer.of(context).popRoute,
+        onSubmitted: (value) {
+          renameBook(_bookPage!);
+          Beamer.of(context).popRoute();
+        },
+      ),
     );
   }
 
