@@ -60,7 +60,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
   final _popupMenuEntries = <PopupMenuEntry<BookItemAction>>[
     PopupMenuItemIcon(
-      icon: Icon(UniconsLine.edit),
+      icon: Icon(UniconsLine.edit_alt),
       textLabel: "rename".tr(),
       value: BookItemAction.rename,
     ),
@@ -732,12 +732,17 @@ class _MyBooksPageState extends State<MyBooksPage> {
     _newBookNameController!.text = book.name;
     _newBookDescriptionController!.text = book.description;
 
+    _newBookName = book.name;
+    _newBookDescription = book.description;
+
     showDialog(
       context: context,
       builder: (context) => CreateOrEditBookDialog(
+        descriptionController: _newBookDescriptionController,
+        submitButtonValue: "rename".tr(),
+        nameController: _newBookNameController,
         textTitle: "book_rename".tr().toUpperCase(),
         textSubtitle: "book_rename_description".tr(),
-        nameController: _newBookNameController,
         onNameChanged: (newValue) {
           _newBookName = newValue;
         },
