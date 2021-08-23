@@ -103,4 +103,26 @@ class BooksActions {
       return ManyIllusOpResp.fromMessage(error.toString());
     }
   }
+
+  /// Rename one book with a new name and a new description.
+  static Future<OneBookOpResp> renameOne(
+      {required String name,
+      String description = '',
+      required String bookId}) async {
+    try {
+      final response = await Cloud.fun('books-renameOne').call({
+        'name': name,
+        'description': description,
+        'bookId': bookId,
+      });
+
+      return OneBookOpResp.fromJSON(response.data);
+    } on FirebaseFunctionsException catch (exception) {
+      appLogger.e(exception);
+      return OneBookOpResp.fromException(exception);
+    } catch (error) {
+      appLogger.e(error);
+      return OneBookOpResp.fromMessage(error.toString());
+    }
+  }
 }
