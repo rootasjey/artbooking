@@ -1178,6 +1178,10 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   }
 
   void fetchIllustrationLicense() async {
+    if (widget.illustration!.license!.id!.isEmpty) {
+      return;
+    }
+
     try {
       final licenseSnap = await FirebaseFirestore.instance
           .collection("licenses")
