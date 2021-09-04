@@ -314,14 +314,14 @@ export const deleteAccount = functions
 export const fetchUser = functions
   .region(cloudRegions.eu)
   .https
-  .onCall(async (data) => {
+  .onCall(async (data, context) => {
     const userId: string = data.userId;
 
-    if (!userId) {
+    if (typeof userId !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `'fetchUser' must be called with one (1) argument 
-        representing the author's id to fetch.`,
+        `'fetchUser' must be called with one (1) argument [userId]
+        representing the user's id to fetch.`,
       );
     }
 
