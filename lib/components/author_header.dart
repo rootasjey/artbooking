@@ -90,8 +90,9 @@ class _AuthorHeaderState extends State<AuthorHeader> {
 
   void fetch() async {
     try {
-      final resp =
-          await Cloud.fun('users-fetchUser').call({'userId': widget.authorId});
+      final resp = await Cloud.fun('users-fetchUser').call({
+        'userId': widget.authorId,
+      });
 
       final hashMap = LinkedHashMap.from(resp.data);
       final data = Cloud.convertFromFun(hashMap);
