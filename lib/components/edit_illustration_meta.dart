@@ -836,7 +836,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         child: Card(
           elevation: 2.0,
           child: InkWell(
-            onTap: () {},
+            onTap: onTapLicenseCurrent,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
@@ -869,14 +869,16 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                       ),
                     ],
                   ),
-                  Opacity(
-                    opacity: 0.8,
-                    child: IconButton(
-                      tooltip: "license_current_remove".tr(),
-                      onPressed: unselectLicenseAndUpdate,
-                      icon: Icon(UniconsLine.trash),
-                    ),
-                  ),
+                  illustration.license!.name!.isEmpty
+                      ? Container()
+                      : Opacity(
+                          opacity: 0.8,
+                          child: IconButton(
+                            tooltip: "license_current_remove".tr(),
+                            onPressed: unselectLicenseAndUpdate,
+                            icon: Icon(UniconsLine.trash),
+                          ),
+                        ),
                 ],
               ),
             ),
@@ -1319,6 +1321,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     }
 
     selectLicenseAndUpdate(illustrationLicense);
+    setState(() => _isSidePanelLicenseVisible = false);
   }
 
   void selectLicenseAndUpdate(IllustrationLicense illustrationLicense) async {
@@ -1476,5 +1479,11 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     } finally {
       setState(() => _isSaving = false);
     }
+  }
+
+  void onTapLicenseCurrent() {
+    setState(() {
+      _isSidePanelLicenseVisible = !_isSidePanelLicenseVisible;
+    });
   }
 }
