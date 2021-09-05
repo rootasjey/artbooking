@@ -358,7 +358,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
           _forceMultiSelect = !_forceMultiSelect;
         });
       },
-      icon: Icon(UniconsLine.layers_alt),
+      icon: Icon(UniconsLine.layers),
       label: Text('multi_select'.tr()),
       primary: _forceMultiSelect ? Colors.lightGreen : Colors.black38,
     );
