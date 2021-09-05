@@ -318,10 +318,22 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     );
   }
 
-  Widget multiSelectButton() {
-    final multiSelectColor =
-        _forceMultiSelect ? stateColors.primary : Colors.black38;
+  Widget multiSelectAll() {
+    return TextRectangleButton(
+      icon: Icon(UniconsLine.layers),
+      label: Text("select_all".tr()),
+      primary: Colors.black38,
+      onPressed: () {
+        _illustrationsList.forEach((illustration) {
+          _multiSelectedItems.putIfAbsent(illustration.id, () => illustration);
+        });
 
+        setState(() {});
+      },
+    );
+  }
+
+  Widget multiSelectButton() {
     return TextRectangleButton(
       onPressed: () {
         setState(() {
@@ -329,8 +341,46 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
         });
       },
       icon: Icon(UniconsLine.layers),
-      label: Text("multi_select".tr()),
-      primary: multiSelectColor,
+      label: Text('multi_select'.tr()),
+      primary: _forceMultiSelect ? Colors.lightGreen : Colors.black38,
+    );
+  }
+
+  Widget multiSelectClear() {
+    return TextRectangleButton(
+      icon: Icon(UniconsLine.ban),
+      label: Text("clear_selection".tr()),
+      primary: Colors.black38,
+      onPressed: () {
+        setState(() {
+          _multiSelectedItems.clear();
+
+          _forceMultiSelect = _multiSelectedItems.length > 0;
+        });
+      },
+    );
+  }
+
+  Widget multiSelectCount() {
+    return Opacity(
+      opacity: 0.6,
+      child: Text(
+        "multi_items_selected".tr(
+          args: [_multiSelectedItems.length.toString()],
+        ),
+        style: TextStyle(
+          fontSize: 30.0,
+        ),
+      ),
+    );
+  }
+
+  Widget multiSelectDelete() {
+    return TextRectangleButton(
+      icon: Icon(UniconsLine.trash),
+      label: Text("delete".tr()),
+      primary: Colors.black38,
+      onPressed: confirmDeleteManyIllustrations,
     );
   }
 
@@ -340,18 +390,10 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     }
 
     return Wrap(
+      spacing: 12.0,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        Opacity(
-          opacity: 0.6,
-          child: Text(
-            "multi_items_selected"
-                .tr(args: [_multiSelectedItems.length.toString()]),
-            style: TextStyle(
-              fontSize: 30.0,
-            ),
-          ),
-        ),
+        multiSelectCount(),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Container(
@@ -360,35 +402,9 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
             color: Colors.black12,
           ),
         ),
-        TextButton.icon(
-          onPressed: () {
-            setState(() {
-              _multiSelectedItems.clear();
-            });
-          },
-          icon: Icon(Icons.border_clear),
-          label: Text("clear_selection".tr()),
-        ),
-        TextButton.icon(
-          onPressed: () {
-            _illustrationsList.forEach((illustration) {
-              _multiSelectedItems.putIfAbsent(
-                  illustration.id, () => illustration);
-            });
-
-            setState(() {});
-          },
-          icon: Icon(Icons.select_all),
-          label: Text("select_all".tr()),
-        ),
-        TextButton.icon(
-          onPressed: confirmDeleteManyIllustrations,
-          style: TextButton.styleFrom(
-            primary: Colors.red,
-          ),
-          icon: Icon(Icons.delete_outline),
-          label: Text("delete".tr()),
-        ),
+        multiSelectClear(),
+        multiSelectAll(),
+        multiSelectDelete(),
       ],
     );
   }
