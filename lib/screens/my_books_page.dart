@@ -372,6 +372,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
       onPressed: () {
         setState(() {
           _multiSelectedItems.clear();
+          _forceMultiSelect = _multiSelectedItems.length > 0;
         });
       },
     );
