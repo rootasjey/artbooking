@@ -201,8 +201,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
               },
               child: Stack(
                 children: [
-                  // caption(),
-                  multiSelectButton(),
+                  multiSelectIndicator(),
                 ],
               ),
             ),
@@ -212,7 +211,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     );
   }
 
-  Widget multiSelectButton() {
+  Widget multiSelectIndicator() {
     if (!widget.selectionMode) {
       return Container();
     }
@@ -222,13 +221,15 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
         top: 10.0,
         right: 10.0,
         child: Material(
-          elevation: 2.0,
-          color: Colors.white,
+          elevation: 1.0,
+          color: Colors.red.shade100,
           clipBehavior: Clip.hardEdge,
-          shape: CircleBorder(),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(6.0),
+          ),
           child: Icon(
-            Icons.circle,
-            color: stateColors.primary,
+            UniconsLine.square_full,
+            color: Colors.transparent,
           ),
         ),
       );
@@ -239,12 +240,14 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
       right: 10.0,
       child: Material(
         elevation: 2.0,
-        color: Colors.white,
+        color: Colors.pink.shade100,
         clipBehavior: Clip.hardEdge,
-        shape: CircleBorder(),
+        shape: RoundedRectangleBorder(
+          side: BorderSide.none,
+        ),
         child: Icon(
-          Icons.check_circle,
-          color: stateColors.primary,
+          UniconsLine.check_square,
+          color: stateColors.secondary,
         ),
       ),
     );
