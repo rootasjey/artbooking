@@ -156,7 +156,7 @@ class _IllustrationCardState extends State<IllustrationCard>
           },
           child: Stack(
             children: [
-              multiSelectButton(),
+              multiSelectIndicator(),
               Positioned(
                 bottom: 10.0,
                 right: 10.0,
@@ -185,7 +185,7 @@ class _IllustrationCardState extends State<IllustrationCard>
     );
   }
 
-  Widget multiSelectButton() {
+  Widget multiSelectIndicator() {
     if (!widget.selectionMode) {
       return Container();
     }
@@ -195,13 +195,15 @@ class _IllustrationCardState extends State<IllustrationCard>
         top: 10.0,
         right: 10.0,
         child: Material(
-          elevation: 2.0,
-          color: Colors.white,
+          elevation: 1.0,
+          color: Colors.red.shade100,
           clipBehavior: Clip.hardEdge,
-          shape: CircleBorder(),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(6.0),
+          ),
           child: Icon(
-            UniconsLine.circle,
-            color: stateColors.primary,
+            UniconsLine.square_full,
+            color: Colors.transparent,
           ),
         ),
       );
@@ -212,12 +214,14 @@ class _IllustrationCardState extends State<IllustrationCard>
       right: 10.0,
       child: Material(
         elevation: 2.0,
-        color: Colors.white,
+        color: Colors.pink.shade100,
         clipBehavior: Clip.hardEdge,
-        shape: CircleBorder(),
+        shape: RoundedRectangleBorder(
+          side: BorderSide.none,
+        ),
         child: Icon(
-          UniconsLine.check_circle,
-          color: stateColors.primary,
+          UniconsLine.check_square,
+          color: stateColors.secondary,
         ),
       ),
     );
