@@ -352,6 +352,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     }
 
     return Wrap(
+      spacing: 12.0,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         Opacity(
@@ -372,18 +373,20 @@ class _MyBooksPageState extends State<MyBooksPage> {
             color: Colors.black12,
           ),
         ),
-        TextButton.icon(
+        TextRectangleButton(
+          icon: Icon(UniconsLine.ban),
+          label: Text("clear_selection".tr()),
+          primary: Colors.black38,
           onPressed: () {
             setState(() {
               _multiSelectedItems.clear();
             });
           },
-          icon: Icon(Icons.border_clear),
-          label: Text(
-            "clear_selection".tr(),
-          ),
         ),
-        TextButton.icon(
+        TextRectangleButton(
+          icon: Icon(UniconsLine.layers),
+          label: Text("select_all".tr()),
+          primary: Colors.black38,
           onPressed: () {
             _books.forEach((illustration) {
               _multiSelectedItems.putIfAbsent(
@@ -392,16 +395,12 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
             setState(() {});
           },
-          icon: Icon(Icons.select_all),
-          label: Text("select_all".tr()),
         ),
-        TextButton.icon(
-          onPressed: confirmDeleteManyBooks,
-          style: TextButton.styleFrom(
-            primary: Colors.red,
-          ),
-          icon: Icon(Icons.delete_outline),
+        TextRectangleButton(
+          icon: Icon(UniconsLine.trash),
           label: Text("delete".tr()),
+          primary: Colors.black38,
+          onPressed: confirmDeleteManyBooks,
         ),
       ],
     );
