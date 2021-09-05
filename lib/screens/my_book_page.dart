@@ -534,6 +534,7 @@ class _MyBookPageState extends State<MyBookPage> {
               illustrationKey: illustrationKey,
               selected: selected,
               selectionMode: selectionMode,
+              onTap: () => onTapIllustrationCard(illustrationKey, illustration),
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               popupMenuEntries: _popupMenuEntries,
               onLongPress: (selected) {
@@ -627,20 +628,71 @@ class _MyBookPageState extends State<MyBookPage> {
     );
   }
 
-  Widget multiSelectButton() {
-    if (_illustrations.isEmpty) {
-      return Container();
-    }
+  Widget multiSelectAll() {
+    return TextRectangleButton(
+      icon: Icon(UniconsLine.layers),
+      label: Text("select_all".tr()),
+      primary: Colors.black38,
+      onPressed: () {
+        _illustrations.forEach((String key, Illustration illustration) {
+          _multiSelectedItems.putIfAbsent(
+            key,
+            () => illustration,
+          );
+        });
 
+        setState(() {});
+      },
+    );
+  }
+
+  Widget multiSelectButton() {
     return TextRectangleButton(
       onPressed: () {
         setState(() {
           _forceMultiSelect = !_forceMultiSelect;
         });
       },
-      icon: Icon(UniconsLine.layers_alt),
+      icon: Icon(UniconsLine.layers),
       label: Text('multi_select'.tr()),
       primary: _forceMultiSelect ? Colors.lightGreen : Colors.black38,
+    );
+  }
+
+  Widget multiSelectClear() {
+    return TextRectangleButton(
+      icon: Icon(UniconsLine.ban),
+      label: Text("clear_selection".tr()),
+      primary: Colors.black38,
+      onPressed: () {
+        setState(() {
+          _multiSelectedItems.clear();
+          _forceMultiSelect = _multiSelectedItems.length > 0;
+        });
+      },
+    );
+  }
+
+  Widget multiSelectCount() {
+    return Opacity(
+      opacity: 0.6,
+      child: Text(
+        "multi_items_selected".tr(
+          args: [_multiSelectedItems.length.toString()],
+        ),
+        style: TextStyle(
+          fontSize: 30.0,
+        ),
+      ),
+    );
+  }
+
+  Widget multiSelectDelete() {
+    return TextRectangleButton(
+      icon: Icon(UniconsLine.trash),
+      label: Text("delete".tr()),
+      primary: Colors.black38,
+      onPressed: confirmManyIllustrationsDeletion,
     );
   }
 
@@ -650,18 +702,10 @@ class _MyBookPageState extends State<MyBookPage> {
     }
 
     return Wrap(
+      spacing: 12.0,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        Opacity(
-          opacity: 0.6,
-          child: Text(
-            "multi_items_selected"
-                .tr(args: [_multiSelectedItems.length.toString()]),
-            style: TextStyle(
-              fontSize: 30.0,
-            ),
-          ),
-        ),
+        multiSelectCount(),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Container(
@@ -670,37 +714,9 @@ class _MyBookPageState extends State<MyBookPage> {
             color: Colors.black12,
           ),
         ),
-        TextButton.icon(
-          onPressed: () {
-            setState(() {
-              _multiSelectedItems.clear();
-            });
-          },
-          icon: Icon(Icons.border_clear),
-          label: Text('clear_selection'.tr()),
-        ),
-        TextButton.icon(
-          onPressed: () {
-            _illustrations.forEach((String key, Illustration illustration) {
-              _multiSelectedItems.putIfAbsent(
-                key,
-                () => illustration,
-              );
-            });
-
-            setState(() {});
-          },
-          icon: Icon(Icons.select_all),
-          label: Text('select_all'.tr()),
-        ),
-        TextButton.icon(
-          onPressed: confirmManyIllustrationsDeletion,
-          style: TextButton.styleFrom(
-            primary: Colors.red,
-          ),
-          icon: Icon(Icons.delete_outline),
-          label: Text('delete'.tr()),
-        ),
+        multiSelectClear(),
+        multiSelectAll(),
+        multiSelectDelete(),
       ],
     );
   }
@@ -1351,7 +1367,9 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   void onTapIllustrationCard(
-      String illustrationKey, Illustration illustration) {
+    String illustrationKey,
+    Illustration illustration,
+  ) {
     if (_multiSelectedItems.isEmpty && !_forceMultiSelect) {
       navigateToIllustrationPage(illustration);
       return;
