@@ -22,43 +22,43 @@ environment:
   sdk: '>=2.13.0 <3.0.0'
 
 dependencies:
-  adaptive_theme: 2.0.0
+  adaptive_theme: 2.3.0
   algolia: 1.0.1
-  animations: 2.0.0
+  animations: 2.0.2
   beamer: 0.14.1
-  cloud_firestore: 2.0.0
-  cloud_functions: 1.0.6
+  cloud_firestore: 2.5.4
+  cloud_functions: 3.0.5
   cross_local_storage: 2.0.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: 1.0.2
+  cupertino_icons: 1.0.3
   easy_localization: 3.0.0
   expansion_tile_card: 2.0.0
-  extended_image: 4.1.0
-  file_picker: 3.0.2+2
-  file_picker_cross: 4.4.2
-  firebase_analytics: 7.1.1
-  firebase_auth: 1.1.4
-  firebase_core: 1.1.1
-  firebase_storage: 8.0.5
+  extended_image: 5.1.2
+  file_picker: 4.1.6
+  file_picker_cross: 4.5.0
+  firebase_analytics: 8.3.4
+  firebase_auth: 3.1.4
+  firebase_core: 1.8.0
+  firebase_storage: 10.0.6
   flash: 1.5.0
   flutter:
     sdk: flutter
-  flutter_mobx: 2.0.0-nullsafety.3
+  flutter_mobx: 2.0.2
   font_awesome_flutter: 9.0.0
   global_configuration: 2.0.0-nullsafety.0
   google_fonts: 2.0.0
   image: 3.0.2
-  image_editor: 1.0.0
+  image_editor: 1.0.1
   logger: 1.0.0
   introduction_screen: 2.0.0
   jiffy: 4.0.0
   mime_type: 1.0.0
-  mobx: 2.0.0-nullsafety.5
+  mobx: 2.0.5
   modal_bottom_sheet: 2.0.0
-  photo_view: 0.11.1
-  share: 2.0.1
+  photo_view: 0.13.0
+  share: 2.0.4
   shimmer_animation: 2.1.0+1
   simple_animations: 3.0.3
   sticky_headers: 0.2.0
@@ -75,7 +75,7 @@ dev_dependencies:
   flutter_launcher_icons: 0.9.0
   flutter_test:
     sdk: flutter
-  mobx_codegen: 2.0.0-nullsafety.2
+  mobx_codegen: 2.0.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
