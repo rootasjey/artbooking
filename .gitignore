@@ -122,3 +122,4 @@ ios/Runner/GoogleService-Info.plist
 .firebase/
 macos/Runner/GoogleService-Info.plist
 web/index.html
+web/config.json
