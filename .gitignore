@@ -123,3 +123,6 @@ ios/Runner/GoogleService-Info.plist
 macos/Runner/GoogleService-Info.plist
 web/index.html
 web/config.json
+
+# Generated file
+lib/generated_plugin_registrant.dart
