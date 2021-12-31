@@ -147,8 +147,12 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
           Color textColor = stateColors.foreground.withOpacity(0.4);
           FontWeight fontWeight = FontWeight.w600;
 
-          if (context.currentBeamLocation.state.uri.path
-              .contains(sidePanelItem.routePath)) {
+          final bool pathMatch = context
+                  .currentBeamLocation.state.routeInformation.location
+                  ?.contains(sidePanelItem.routePath) ??
+              false;
+
+          if (pathMatch) {
             color = sidePanelItem.hoverColor;
             textColor = stateColors.foreground.withOpacity(0.6);
             fontWeight = FontWeight.w700;

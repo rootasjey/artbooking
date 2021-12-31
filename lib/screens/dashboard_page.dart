@@ -31,8 +31,9 @@ class _DashboardPageState extends State<DashboardPage> {
                     child: Beamer(
                       key: _beamerKey,
                       routerDelegate: BeamerDelegate(
-                        locationBuilder: (state) =>
-                            DashboardContentLocation(state),
+                        locationBuilder: BeamerLocationBuilder(beamLocations: [
+                          DashboardContentLocation(),
+                        ]),
                       ),
                     ),
                   ),

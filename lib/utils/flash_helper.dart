@@ -5,7 +5,6 @@ import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:unicons/unicons.dart';
 
 class _MessageItem<T> {

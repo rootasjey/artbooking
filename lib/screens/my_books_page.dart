@@ -904,18 +904,11 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
   void navigateToBook(Book book) {
     NavigationStateHelper.book = book;
-
-    context.currentBeamLocation.update(
-      (state) => state.copyWith(
-        pathBlueprintSegments: [
-          'dashboard',
-          'books',
-          ':bookId',
-        ],
-        pathParameters: {
-          'bookId': book.id,
-        },
-      ),
+    Beamer.of(context).beamToNamed(
+      "dashboard/books/${book.id}",
+      data: {
+        "bookId": book.id,
+      },
     );
   }
 

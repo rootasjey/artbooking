@@ -25,7 +25,7 @@ dependencies:
   adaptive_theme: 2.3.0
   algolia: 1.0.1
   animations: 2.0.2
-  beamer: 0.14.1
+  beamer: 1.1.0
   cloud_firestore: 2.5.4
   cloud_functions: 3.0.5
   cross_local_storage: 2.0.1
@@ -35,7 +35,7 @@ dependencies:
   cupertino_icons: 1.0.3
   easy_localization: 3.0.0
   expansion_tile_card: 2.0.0
-  extended_image: 5.1.2
+  extended_image: 6.0.1
   file_picker: 4.1.6
   file_picker_cross: 4.5.0
   firebase_analytics: 8.3.4

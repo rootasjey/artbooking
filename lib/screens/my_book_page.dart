@@ -993,7 +993,6 @@ class _MyBookPageState extends State<MyBookPage> {
 
     Beamer.of(context).beamToNamed(
       DashboardContentLocation.booksRoute,
-      replaceCurrent: true,
     );
   }
 
@@ -1380,18 +1379,11 @@ class _MyBookPageState extends State<MyBookPage> {
 
   void navigateToIllustrationPage(Illustration illustration) {
     NavigationStateHelper.illustration = illustration;
-
-    context.currentBeamLocation.update(
-      (state) => state.copyWith(
-        pathBlueprintSegments: [
-          'dashboard',
-          'illustrations',
-          ':illustrationId',
-        ],
-        pathParameters: {
-          'illustrationId': illustration.id,
-        },
-      ),
+    Beamer.of(context).beamToNamed(
+      "dashboard/illustrations/${illustration.id}",
+      data: {
+        "illustrationId": illustration.id,
+      },
     );
   }
 

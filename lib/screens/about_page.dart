@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:animations/animations.dart';
 import 'package:artbooking/components/credit_item.dart';
 import 'package:artbooking/components/footer.dart';

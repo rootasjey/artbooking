@@ -697,18 +697,11 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
 
   void navigateToIllustrationPage(Illustration illustration) {
     NavigationStateHelper.illustration = illustration;
-
-    context.currentBeamLocation.update(
-      (state) => state.copyWith(
-        pathBlueprintSegments: [
-          'dashboard',
-          'illustrations',
-          ':illustrationId',
-        ],
-        pathParameters: {
-          'illustrationId': illustration.id,
-        },
-      ),
+    Beamer.of(context).beamToNamed(
+      "dashboard/illustrations/${illustration.id}",
+      data: {
+        "illustrationId": illustration.id,
+      },
     );
   }
 

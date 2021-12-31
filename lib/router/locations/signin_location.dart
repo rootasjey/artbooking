@@ -4,20 +4,20 @@ import 'package:artbooking/state/user.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/widgets.dart';
 
-class SigninLocation extends BeamLocation {
+class SigninLocation extends BeamLocation<BeamState> {
   /// Main root value for this location.
   static const String route = '/signin';
 
   @override
-  List<String> get pathBlueprints => [route];
+  List<String> get pathPatterns => [route];
 
   /// Redirect to home ('/') if the user is authenticated.
   @override
   List<BeamGuard> get guards => [
         BeamGuard(
-          pathBlueprints: [route],
+          pathPatterns: [route],
           check: (context, location) => !stateUser.isUserConnected,
-          beamToNamed: HomeLocation.route,
+          beamToNamed: (origin, target) => HomeLocation.route,
         ),
       ];
 

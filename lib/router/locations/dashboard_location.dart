@@ -18,21 +18,21 @@ import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 
-class DashboardLocation extends BeamLocation {
+class DashboardLocation extends BeamLocation<BeamState> {
   /// Main root value for this location.
   static const String route = '/dashboard/*';
 
   @override
-  List<String> get pathBlueprints => [route];
+  List<String> get pathPatterns => [route];
 
   /// Redirect to signin page ('/signin')
   /// if the user is not authenticated.
   @override
   List<BeamGuard> get guards => [
         BeamGuard(
-          pathBlueprints: [route],
+          pathPatterns: [route],
           check: (context, location) => stateUser.isUserConnected,
-          beamToNamed: SigninLocation.route,
+          beamToNamed: (origin, target) => SigninLocation.route,
         ),
       ];
 
@@ -49,9 +49,7 @@ class DashboardLocation extends BeamLocation {
   }
 }
 
-class DashboardContentLocation extends BeamLocation {
-  DashboardContentLocation(BeamState state) : super(state);
-
+class DashboardContentLocation extends BeamLocation<BeamState> {
   /// Main root value for this location.
   static const String route = '/dashboard';
 
@@ -88,7 +86,7 @@ class DashboardContentLocation extends BeamLocation {
       '/dashboard/settings/update/username';
 
   @override
-  List<String> get pathBlueprints => [
+  List<String> get pathPatterns => [
         booksRoute,
         '$booksRoute/:bookId',
         // -> '/dashboard/books/:bookId',
@@ -110,21 +108,21 @@ class DashboardContentLocation extends BeamLocation {
         title: "dashboard".tr(),
         type: BeamPageType.fadeTransition,
       ),
-      if (state.pathBlueprintSegments.contains('statistics'))
+      if (state.pathPatternSegments.contains('statistics'))
         BeamPage(
           child: MyActivityPage(),
           key: ValueKey(statisticsRoute),
           title: "statistics".tr(),
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathBlueprintSegments.contains('books'))
+      if (state.pathPatternSegments.contains('books'))
         BeamPage(
           child: MyBooksPage(),
           key: ValueKey(booksRoute),
           title: "My Books",
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathBlueprintSegments.contains(':bookId'))
+      if (state.pathPatternSegments.contains(':bookId'))
         BeamPage(
           child: MyBookPage(
             bookId: state.pathParameters['bookId']!,
@@ -133,14 +131,14 @@ class DashboardContentLocation extends BeamLocation {
           title: "Book",
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathBlueprintSegments.contains('illustrations'))
+      if (state.pathPatternSegments.contains('illustrations'))
         BeamPage(
           child: MyIllustrationsPage(),
           key: ValueKey(illustrationsRoute),
           title: "My Illustrations",
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathBlueprintSegments.contains(':illustrationId'))
+      if (state.pathPatternSegments.contains(':illustrationId'))
         BeamPage(
           child: IllustrationPage(
             illustrationId: state.pathParameters['illustrationId']!,
@@ -149,49 +147,49 @@ class DashboardContentLocation extends BeamLocation {
           title: "Illustration",
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathBlueprintSegments.contains('settings'))
+      if (state.pathPatternSegments.contains('settings'))
         BeamPage(
           child: SettingsPage(),
           key: ValueKey('$settingsRoute'),
           title: "Settings",
           type: BeamPageType.fadeTransition,
         ),
-      if (isDeleteAccount(state.pathBlueprintSegments))
+      if (isDeleteAccount(state.pathPatternSegments))
         BeamPage(
           child: DeleteAccountPage(),
           key: ValueKey('$deleteAccountRoute'),
           title: "Delete account",
           type: BeamPageType.fadeTransition,
         ),
-      if (isUpdateEmail(state.pathBlueprintSegments))
+      if (isUpdateEmail(state.pathPatternSegments))
         BeamPage(
           child: UpdateEmailPage(),
           key: ValueKey('$updateEmailRoute'),
           title: "Update email",
           type: BeamPageType.fadeTransition,
         ),
-      if (isUpdatePassword(state.pathBlueprintSegments))
+      if (isUpdatePassword(state.pathPatternSegments))
         BeamPage(
           child: UpdatePasswordPage(),
           key: ValueKey('$updatePasswordRoute'),
           title: "Update password",
           type: BeamPageType.fadeTransition,
         ),
-      if (isUpdateUsername(state.pathBlueprintSegments))
+      if (isUpdateUsername(state.pathPatternSegments))
         BeamPage(
           child: UpdateUsernamePage(),
           key: ValueKey('$updateUsernameRoute'),
           title: "Update username",
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathBlueprintSegments.contains('profile'))
+      if (state.pathPatternSegments.contains('profile'))
         BeamPage(
           child: MyProfilePage(),
           key: ValueKey('$editProfilePictureRoute'),
           title: "My Profile",
           type: BeamPageType.fadeTransition,
         ),
-      if (isEditPictureProfile(state.pathBlueprintSegments))
+      if (isEditPictureProfile(state.pathPatternSegments))
         BeamPage(
           child: EditImagePage(),
           key: ValueKey('$editProfilePictureRoute'),

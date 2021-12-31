@@ -99,6 +99,13 @@ class _UndefinedPageState extends State<UndefinedPage> {
   }
 
   Widget subtitle() {
+    final String location = Beamer.of(context)
+            .currentBeamLocation
+            .state
+            .routeInformation
+            .location ??
+        '';
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Opacity(
@@ -112,7 +119,7 @@ class _UndefinedPageState extends State<UndefinedPage> {
             ),
             children: [
               TextSpan(
-                text: '${context.beamStateHistory.last.uri.path}',
+                text: location,
                 style: TextStyle(
                   color: stateColors.secondary,
                   fontWeight: FontWeight.w700,
@@ -120,7 +127,7 @@ class _UndefinedPageState extends State<UndefinedPage> {
               ),
               TextSpan(
                 text: ' is not defined.',
-              )
+              ),
             ],
           ),
         ),
