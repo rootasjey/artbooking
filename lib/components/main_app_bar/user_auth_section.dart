@@ -35,7 +35,7 @@ class UserAuthSection extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          AddButton(),
+          UploadButton(),
           BrightnessButton(),
           if (!compact) LangButton(),
           ...trailing,

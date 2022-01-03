@@ -4,9 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
-// TODO: rename "upload button"
-class AddButton extends ConsumerWidget {
-  const AddButton({Key? key}) : super(key: key);
+class UploadButton extends ConsumerWidget {
+  const UploadButton({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
