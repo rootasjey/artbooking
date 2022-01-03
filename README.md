@@ -8,7 +8,7 @@ Your inspirational space.
 </p>
 
 <p aling="middle">
-  <img src="./screenshots/my_illus_web.png" />
+  <img src="./screenshots/home_desktop.png" />
 </p>
 
 > Early stage development
