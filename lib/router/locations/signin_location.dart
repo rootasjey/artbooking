@@ -1,6 +1,6 @@
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/screens/signin_page.dart';
-import 'package:artbooking/state/user.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/widgets.dart';
 
@@ -11,12 +11,14 @@ class SigninLocation extends BeamLocation<BeamState> {
   @override
   List<String> get pathPatterns => [route];
 
-  /// Redirect to home ('/') if the user is authenticated.
   @override
   List<BeamGuard> get guards => [
         BeamGuard(
           pathPatterns: [route],
-          check: (context, location) => !stateUser.isUserConnected,
+          check: (context, location) {
+            final userNotifier = Globals.state.getUserNotifier();
+            return !userNotifier.isAuthenticated;
+          },
           beamToNamed: (origin, target) => HomeLocation.route,
         ),
       ];

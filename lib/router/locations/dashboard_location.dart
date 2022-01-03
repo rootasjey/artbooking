@@ -5,15 +5,15 @@ import 'package:artbooking/screens/delete_account_page.dart';
 import 'package:artbooking/screens/edit_image_page.dart';
 import 'package:artbooking/screens/illustration_page.dart';
 import 'package:artbooking/screens/my_book_page.dart';
-import 'package:artbooking/screens/my_statistics_page.dart';
+import 'package:artbooking/screens/my_statistics_page/my_statistics_page.dart';
 import 'package:artbooking/screens/my_books_page.dart';
 import 'package:artbooking/screens/my_illustrations_page.dart';
 import 'package:artbooking/screens/my_profile_page.dart';
-import 'package:artbooking/screens/settings_page.dart';
+import 'package:artbooking/screens/settings/settings_page.dart';
 import 'package:artbooking/screens/update_email_page.dart';
 import 'package:artbooking/screens/update_password_page.dart';
 import 'package:artbooking/screens/update_username_page.dart';
-import 'package:artbooking/state/user.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
@@ -31,7 +31,10 @@ class DashboardLocation extends BeamLocation<BeamState> {
   List<BeamGuard> get guards => [
         BeamGuard(
           pathPatterns: [route],
-          check: (context, location) => stateUser.isUserConnected,
+          check: (context, location) {
+            final userNotifier = Globals.state.getUserNotifier();
+            return userNotifier.isAuthenticated;
+          },
           beamToNamed: (origin, target) => SigninLocation.route,
         ),
       ];
@@ -49,7 +52,7 @@ class DashboardLocation extends BeamLocation<BeamState> {
   }
 }
 
-class DashboardContentLocation extends BeamLocation<BeamState> {
+class DashboardLocationContent extends BeamLocation<BeamState> {
   /// Main root value for this location.
   static const String route = '/dashboard';
 

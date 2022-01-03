@@ -2,8 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:artbooking/components/credit_item.dart';
 import 'package:artbooking/components/footer.dart';
 import 'package:artbooking/components/image_hero.dart';
-import 'package:artbooking/components/main_app_bar.dart';
-import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
@@ -52,7 +51,7 @@ class _AboutPageState extends State<AboutPage> {
                   curve: Curves.easeOut,
                 );
               },
-              backgroundColor: stateColors.primary,
+              backgroundColor: Theme.of(context).primaryColor,
               foregroundColor: Colors.white,
               child: Icon(Icons.arrow_upward),
             )
@@ -265,7 +264,7 @@ class _AboutPageState extends State<AboutPage> {
             textValue: 'icons_by'.tr(args: [' Unicons']),
             onTap: () => launch('https://iconscout.com/unicons'),
             iconData: UniconsLine.palette,
-            hoverColor: stateColors.primary,
+            hoverColor: Theme.of(context).primaryColor,
           ),
           CreditItem(
             textValue: 'illustration_by_from'.tr(
@@ -279,7 +278,7 @@ class _AboutPageState extends State<AboutPage> {
             textValue: 'app_screenshot_credits'.tr(args: ['AppMockUp']),
             onTap: () => launch('https://app-mockup.com/'),
             iconData: UniconsLine.mobile_android,
-            hoverColor: stateColors.secondary,
+            hoverColor: Theme.of(context).secondaryHeaderColor,
           ),
         ],
       ),

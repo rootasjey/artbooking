@@ -1,6 +1,5 @@
 import 'package:artbooking/components/footer.dart';
-import 'package:artbooking/components/main_app_bar.dart';
-import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -24,7 +23,7 @@ class _TosPageState extends State<TosPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: stateColors.lightBackground,
+      backgroundColor: Theme.of(context).backgroundColor,
       floatingActionButton: floatingActionButton(),
       body: NotificationListener<ScrollNotification>(
         onNotification: onNotification,
@@ -132,7 +131,7 @@ class _TosPageState extends State<TosPage> {
           curve: Curves.easeOut,
         );
       },
-      backgroundColor: stateColors.primary,
+      backgroundColor: Theme.of(context).primaryColor,
       foregroundColor: Colors.white,
       child: Icon(Icons.arrow_upward),
     );
@@ -157,7 +156,7 @@ class _TosPageState extends State<TosPage> {
           "tos".tr(),
           style: TextStyle(
             fontSize: 50.0,
-            color: stateColors.primary,
+            color: Theme.of(context).primaryColor,
           ),
         ),
       ),
@@ -205,7 +204,7 @@ class _TosPageState extends State<TosPage> {
           style: TextStyle(
             fontSize: 16.0,
             fontWeight: FontWeight.bold,
-            color: stateColors.primary,
+            color: Theme.of(context).primaryColor,
           ),
         ),
       ),

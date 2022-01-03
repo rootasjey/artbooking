@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'package:artbooking/components/better_avatar.dart';
+import 'package:artbooking/components/avatar/better_avatar.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
@@ -8,7 +8,7 @@ import 'package:artbooking/utils/fonts.dart';
 import 'package:flutter/material.dart';
 
 class AuthorHeader extends StatefulWidget {
-  final String? authorId;
+  final String authorId;
   final EdgeInsets padding;
 
   const AuthorHeader({
@@ -64,7 +64,7 @@ class _AuthorHeaderState extends State<AuthorHeader> {
                 Opacity(
                   opacity: 0.8,
                   child: Text(
-                    _user.name!,
+                    _user.name,
                     style: FontsUtils.mainStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w600,

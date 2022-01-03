@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:artbooking/components/illustration_card.dart';
-import 'package:artbooking/components/main_app_bar.dart';
-import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/constants.dart';
@@ -69,7 +68,7 @@ class _SearchPageState extends State<SearchPage> {
                   curve: Curves.easeOut,
                 );
               },
-              backgroundColor: stateColors.primary,
+              backgroundColor: Theme.of(context).primaryColor,
               foregroundColor: Colors.white,
               child: Icon(Icons.arrow_upward),
             )
@@ -160,7 +159,7 @@ class _SearchPageState extends State<SearchPage> {
         text,
         style: TextStyle(
           fontSize: 26.0,
-          color: stateColors.primary,
+          color: Theme.of(context).primaryColor,
         ),
       ),
     );

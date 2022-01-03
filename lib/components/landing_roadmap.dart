@@ -1,6 +1,6 @@
 import 'package:artbooking/components/bezier_painter.dart';
 import 'package:artbooking/components/roadmap_item.dart';
-import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -61,7 +61,6 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
   ];
 
   final completeColor = Color(0xff5e6172);
-  final inProgressColor = stateColors.primary;
   final todoColor = Color(0xffd1d2d7);
 
   @override
@@ -169,7 +168,7 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
             var color;
             var child;
             if (index == _processIndex) {
-              color = inProgressColor;
+              color = Theme.of(context).primaryColor;
               child = Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: CircularProgressIndicator(
@@ -276,7 +275,7 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
 
   Color getColor(int index) {
     if (index == _processIndex) {
-      return inProgressColor;
+      return Theme.of(context).primaryColor;
     } else if (index < _processIndex) {
       return completeColor;
     } else {
@@ -292,7 +291,7 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: stateColors.clairPink,
+          backgroundColor: Globals.constants.colors.clairPink,
           title: Opacity(
             opacity: 0.6,
             child: Text(
@@ -324,7 +323,8 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
                 children: <Widget>[
                   Divider(
                     thickness: 2.0,
-                    color: stateColors.secondary.withOpacity(0.4),
+                    color:
+                        Theme.of(context).secondaryHeaderColor.withOpacity(0.4),
                     height: 0.0,
                   ),
                   Padding(

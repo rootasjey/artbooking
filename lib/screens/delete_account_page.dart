@@ -1,11 +1,10 @@
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/fade_in_y.dart';
-import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/locations/signin_location.dart';
-import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user.dart';
-import 'package:artbooking/utils/app_storage.dart';
+import 'package:artbooking/types/cloud_function_response.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
@@ -22,12 +21,12 @@ class DeleteAccountPage extends StatefulWidget {
 }
 
 class DeleteAccountPageState extends State<DeleteAccountPage> {
-  bool isDeleting = false;
-  bool isCompleted = false;
+  bool _isDeleting = false;
+  bool _isCompleted = false;
 
-  double beginY = 10.0;
+  double _beginY = 10.0;
 
-  String password = '';
+  String _password = '';
 
   @override
   Widget build(BuildContext context) {
@@ -43,11 +42,11 @@ class DeleteAccountPageState extends State<DeleteAccountPage> {
   }
 
   Widget body() {
-    if (isCompleted) {
+    if (_isCompleted) {
       return completedView();
     }
 
-    if (isDeleting) {
+    if (_isDeleting) {
       return deletingView();
     }
 
@@ -218,7 +217,7 @@ class DeleteAccountPageState extends State<DeleteAccountPage> {
         bottom: 40.0,
       ),
       child: Card(
-        color: stateColors.clairPink,
+        color: Globals.constants.colors.clairPink,
         child: ListTile(
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 32.0,
@@ -230,7 +229,7 @@ class DeleteAccountPageState extends State<DeleteAccountPage> {
                 padding: const EdgeInsets.only(right: 30.0),
                 child: Icon(
                   UniconsLine.exclamation_triangle,
-                  color: stateColors.secondary,
+                  color: Theme.of(context).secondaryHeaderColor,
                 ),
               ),
               Expanded(
@@ -277,17 +276,17 @@ class DeleteAccountPageState extends State<DeleteAccountPage> {
             children: <Widget>[
               FadeInY(
                 delay: 0.milliseconds,
-                beginY: beginY,
+                beginY: _beginY,
                 child: helperCard(),
               ),
               FadeInY(
                 delay: 100.milliseconds,
-                beginY: beginY,
+                beginY: _beginY,
                 child: passwordInput(),
               ),
               FadeInY(
                 delay: 200.milliseconds,
-                beginY: beginY,
+                beginY: _beginY,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 60.0),
                   child: validationButton(),
@@ -322,7 +321,7 @@ class DeleteAccountPageState extends State<DeleteAccountPage> {
           TextFormField(
             decoration: InputDecoration(
               fillColor: Colors.white,
-              focusColor: stateColors.clairPink,
+              focusColor: Globals.constants.colors.clairPink,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 8.0,
               ),
@@ -332,7 +331,7 @@ class DeleteAccountPageState extends State<DeleteAccountPage> {
             autofocus: true,
             obscureText: true,
             onChanged: (value) {
-              password = value;
+              _password = value;
             },
             onFieldSubmitted: (value) => deleteAccountProcess(),
             validator: (value) {
@@ -380,57 +379,44 @@ class DeleteAccountPageState extends State<DeleteAccountPage> {
       return;
     }
 
-    setState(() => isDeleting = true);
+    setState(() => _isDeleting = true);
 
     try {
-      final userAuth = stateUser.userAuth;
+      final userAuth = Globals.state.getUserAuth();
+      final userNotifier = Globals.state.getUserNotifier();
 
       if (userAuth == null) {
-        setState(() => isDeleting = false);
+        setState(() => _isDeleting = false);
         context.beamToNamed(SigninLocation.route);
         return;
       }
 
       final credentials = EmailAuthProvider.credential(
         email: userAuth.email!,
-        password: password,
+        password: _password,
       );
 
       await userAuth.reauthenticateWithCredential(credentials);
       final idToken = await userAuth.getIdToken();
+      final CloudFunctionResponse response = await userNotifier.deleteAccount(
+        idToken,
+      );
 
-      final respDelAcc = await stateUser.deleteAccount(idToken);
-
-      if (!respDelAcc.success) {
-        final exception = respDelAcc.error!;
-
-        setState(() {
-          isDeleting = false;
-        });
-
-        Snack.e(
-          context: context,
-          message: "[code: ${exception.code}] - ${exception.message}",
+      if (!response.success) {
+        throw ErrorDescription(
+          "We cannot delete your account right now. Try again later.",
         );
-
-        return;
       }
 
-      await stateUser.signOut();
-      stateUser.setUsername('');
-      appStorage.clearUserAuthData();
-
-      // PushNotifications.unlinkAuthUser();
-
       setState(() {
-        isDeleting = false;
-        isCompleted = true;
+        _isDeleting = false;
+        _isCompleted = true;
       });
     } catch (error) {
       debugPrint(error.toString());
 
       setState(() {
-        isDeleting = false;
+        _isDeleting = false;
       });
 
       Snack.e(
@@ -441,7 +427,7 @@ class DeleteAccountPageState extends State<DeleteAccountPage> {
   }
 
   bool inputValuesOk() {
-    if (password.isEmpty) {
+    if (_password.isEmpty) {
       Snack.e(
         context: context,
         message: "password_empty_forbidden".tr(),
@@ -458,7 +444,7 @@ class DeleteAccountPageState extends State<DeleteAccountPage> {
       context: context,
       builder: (context) {
         return SimpleDialog(
-          backgroundColor: stateColors.clairPink,
+          backgroundColor: Globals.constants.colors.clairPink,
           title: Text(
             "account_deletion_after".tr(),
             style: FontsUtils.mainStyle(
@@ -468,7 +454,7 @@ class DeleteAccountPageState extends State<DeleteAccountPage> {
           ),
           children: <Widget>[
             Divider(
-              color: stateColors.secondary,
+              color: Theme.of(context).secondaryHeaderColor,
               thickness: 1.0,
             ),
             Padding(

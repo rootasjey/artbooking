@@ -1,12 +1,11 @@
 import 'package:artbooking/components/app_icon.dart';
-import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user.dart';
+import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/locations/settings_location.dart';
+import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/user_notifier.dart';
 import 'package:artbooking/utils/fonts.dart';
-import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -77,14 +76,12 @@ class _FooterState extends State<Footer> {
         textLink(
           label: "about_us".tr(),
           onPressed: () {
-            // context.router.push(AboutPageRoute());
             context.beamToNamed('/about');
           },
         ),
         textLink(
           label: "contact_us".tr(),
           onPressed: () {
-            // context.router.push(ContactPageRoute());
             context.beamToNamed('/contact');
           },
         ),
@@ -167,13 +164,13 @@ class _FooterState extends State<Footer> {
         textLink(
           label: 'English',
           onPressed: () async {
-            updateUserAccountLang();
+            await context.setLocale(Locale('en'));
           },
         ),
         textLink(
           label: 'Français',
           onPressed: () async {
-            updateUserAccountLang();
+            await context.setLocale(Locale('fr'));
           },
         ),
       ],
@@ -239,7 +236,7 @@ class _FooterState extends State<Footer> {
         ),
       ),
       style: TextButton.styleFrom(
-        primary: stateColors.foreground,
+        primary: Theme.of(context).textTheme.bodyText1?.color,
       ),
     );
   }
@@ -276,66 +273,19 @@ class _FooterState extends State<Footer> {
         textLink(
           label: "settings".tr(),
           onPressed: () {
-            if (stateUser.isUserConnected) {
-              // context.router.push(
-              //   DashboardPageRoute(
-              //     children: [DashSettingsRoute()],
-              //   ),
-              // );
+            final UserNotifier userNotifier = Globals.state.getUserNotifier();
+
+            if (userNotifier.isAuthenticated) {
+              Beamer.of(context).beamToNamed(
+                DashboardLocationContent.settingsRoute,
+              );
               return;
             }
 
-            // context.router.push(
-            //   SettingsPageRoute(),
-            // );
+            Beamer.of(context).beamToNamed(SettingsLocation.route);
           },
         ),
       ],
     );
-  }
-
-  void notifyLangSuccess() {
-    if (widget.pageScrollController != null) {
-      widget.pageScrollController!.animateTo(
-        0.0,
-        duration: Duration(seconds: 1),
-        curve: Curves.easeOut,
-      );
-    } else if (widget.autoNavToHome) {
-      // context.router.push(HomePageRoute());
-      context.beamToNamed('/');
-    }
-
-    Snack.s(
-      context: context,
-      message: "language_update_success".tr(),
-    );
-  }
-
-  void updateUserAccountLang() async {
-    final userAuth = FirebaseAuth.instance.currentUser;
-
-    if (userAuth == null) {
-      notifyLangSuccess();
-      return;
-    }
-
-    try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userAuth.uid)
-          .update({
-        'lang': stateUser.lang,
-      });
-
-      notifyLangSuccess();
-    } catch (error) {
-      debugPrint(error.toString());
-
-      Snack.e(
-        context: context,
-        message: "language_update_error".tr(),
-      );
-    }
   }
 }

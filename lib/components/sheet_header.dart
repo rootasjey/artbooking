@@ -1,5 +1,4 @@
 import 'package:artbooking/components/circle_button.dart';
-import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +30,7 @@ class SheetHeader extends StatelessWidget {
             icon: Icon(
               UniconsLine.times,
               size: 20.0,
-              color: stateColors.primary,
+              color: Theme.of(context).primaryColor,
             ),
           ),
         ),

@@ -3,17 +3,15 @@ import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/loading_animation.dart';
-import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/router/locations/forgot_password_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/locations/signup_location.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/app_storage.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
@@ -29,22 +27,20 @@ class SigninPage extends StatefulWidget {
 }
 
 class _SigninPageState extends State<SigninPage> {
-  String email = '';
-  String password = '';
+  bool _isConnecting = false;
+  String _email = '';
 
-  bool isCheckingAuth = false;
-  bool isCompleted = false;
-  bool isConnecting = false;
+  final _passwordNode = FocusNode();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
-  final passwordNode = FocusNode();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  String _password = '';
 
   @override
   void dispose() {
-    passwordController.dispose();
-    emailController.dispose();
-    passwordNode.dispose();
+    _passwordController.dispose();
+    _emailController.dispose();
+    _passwordNode.dispose();
     super.dispose();
   }
 
@@ -78,7 +74,7 @@ class _SigninPageState extends State<SigninPage> {
   }
 
   Widget body() {
-    if (isConnecting) {
+    if (_isConnecting) {
       return LoadingAnimation(
         textTitle: "signin_dot".tr(),
       );
@@ -114,7 +110,7 @@ class _SigninPageState extends State<SigninPage> {
           children: <Widget>[
             TextFormField(
               autofocus: true,
-              controller: emailController,
+              controller: _emailController,
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 icon: Icon(Icons.email),
@@ -122,9 +118,9 @@ class _SigninPageState extends State<SigninPage> {
               ),
               keyboardType: TextInputType.emailAddress,
               onChanged: (value) {
-                email = value;
+                _email = value;
               },
-              onFieldSubmitted: (value) => passwordNode.requestFocus(),
+              onFieldSubmitted: (value) => _passwordNode.requestFocus(),
               validator: (value) {
                 if (value!.isEmpty) {
                   return "email_empty_forbidden".tr();
@@ -252,15 +248,15 @@ class _SigninPageState extends State<SigninPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             TextFormField(
-              focusNode: passwordNode,
-              controller: passwordController,
+              focusNode: _passwordNode,
+              controller: _passwordController,
               decoration: InputDecoration(
                 icon: Icon(Icons.lock_outline),
                 labelText: 'Password',
               ),
               obscureText: true,
               onChanged: (value) {
-                password = value;
+                _password = value;
               },
               onFieldSubmitted: (value) => signInProcess(),
               validator: (value) {
@@ -286,7 +282,7 @@ class _SigninPageState extends State<SigninPage> {
         child: ElevatedButton(
           onPressed: () => signInProcess(),
           style: ElevatedButton.styleFrom(
-            primary: stateColors.primary,
+            primary: Theme.of(context).primaryColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(
                 Radius.circular(7.0),
@@ -322,8 +318,12 @@ class _SigninPageState extends State<SigninPage> {
     );
   }
 
-  bool inputValuesOk() {
-    if (!UsersActions.checkEmailFormat(email)) {
+  bool checkInputsFormat() {
+    // ?NOTE: Triming because of TAB key on Desktop insert blank spaces.
+    _email = _email.trim();
+    _password = _password.trim();
+
+    if (!UsersActions.checkEmailFormat(_email)) {
       Snack.e(
         context: context,
         message: "email_not_valid".tr(),
@@ -332,7 +332,7 @@ class _SigninPageState extends State<SigninPage> {
       return false;
     }
 
-    if (password.isEmpty) {
+    if (_password.isEmpty) {
       Snack.e(
         context: context,
         message: "password_empty_forbidden".tr(),
@@ -345,25 +345,21 @@ class _SigninPageState extends State<SigninPage> {
   }
 
   void signInProcess() async {
-    if (!inputValuesOk()) {
+    if (!checkInputsFormat()) {
       return;
     }
 
-    setState(() {
-      isConnecting = true;
-    });
+    setState(() => _isConnecting = true);
 
     try {
-      final userCred = await stateUser.signin(
-        email: email,
-        password: password,
+      final userNotifier = Globals.state.getUserNotifier();
+      final userCred = await userNotifier.signIn(
+        email: _email,
+        password: _password,
       );
 
       if (userCred == null) {
-        appLogger.d("empty user");
-        setState(() {
-          isConnecting = false;
-        });
+        setState(() => _isConnecting = false);
 
         Snack.e(
           context: context,
@@ -373,20 +369,7 @@ class _SigninPageState extends State<SigninPage> {
         return;
       }
 
-      appStorage.setCredentials(
-        email: email,
-        password: password,
-      );
-
-      isConnecting = false;
-      isCompleted = true;
-
-      // If this callback is defined,
-      // this page is call from AuthGuard.
-      if (widget.onSigninResult != null) {
-        widget.onSigninResult!(true);
-        return;
-      }
+      _isConnecting = false;
 
       context.beamToNamed(HomeLocation.route);
     } catch (error) {
@@ -397,9 +380,7 @@ class _SigninPageState extends State<SigninPage> {
         message: "password_incorrect".tr(),
       );
 
-      setState(() {
-        isConnecting = false;
-      });
+      setState(() => _isConnecting = false);
     }
   }
 }

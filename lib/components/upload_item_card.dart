@@ -1,21 +1,17 @@
 import 'dart:async';
 
 import 'package:artbooking/components/circle_button.dart';
-import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
-class UploadItemCard extends StatefulWidget {
-  final CustomUploadTask customUploadTask;
-  final Function? onCancel;
-  final Function? onDone;
-
+class UploadItemCard extends ConsumerStatefulWidget {
   const UploadItemCard({
     Key? key,
     required this.customUploadTask,
@@ -23,11 +19,15 @@ class UploadItemCard extends StatefulWidget {
     this.onDone,
   }) : super(key: key);
 
+  final CustomUploadTask customUploadTask;
+  final VoidCallback? onCancel;
+  final VoidCallback? onDone;
+
   @override
   _UploadItemCardState createState() => _UploadItemCardState();
 }
 
-class _UploadItemCardState extends State<UploadItemCard> {
+class _UploadItemCardState extends ConsumerState<UploadItemCard> {
   double _elevation = 0.0;
   bool _isHover = false;
 
@@ -44,7 +44,11 @@ class _UploadItemCardState extends State<UploadItemCard> {
       (TaskSnapshot snapshot) {
         _bytesTransferred = snapshot.bytesTransferred;
         _totalBytes = snapshot.totalBytes;
-        appUploadManager.addToBytesTransferred(_bytesTransferred);
+
+        final uploadBytesTransferredNotifier =
+            Globals.state.upload.uploadBytesTransFerred.notifier;
+
+        ref.read(uploadBytesTransferredNotifier).add(_bytesTransferred);
       },
       onError: (error) {
         appLogger.e(error);
@@ -64,21 +68,13 @@ class _UploadItemCardState extends State<UploadItemCard> {
         borderRadius: BorderRadius.zero,
       ),
       elevation: _elevation,
-      color: stateColors.clairPink,
+      color: Globals.constants.colors.clairPink,
       child: InkWell(
         onTap: () {},
         onHover: (isHover) {
-          _isHover = isHover;
-
-          if (isHover) {
-            setState(() {
-              _elevation = 2.0;
-            });
-            return;
-          }
-
           setState(() {
-            _elevation = 0.0;
+            _isHover = isHover;
+            _elevation = isHover ? 2.0 : 0.0;
           });
         },
         child: Padding(
@@ -135,7 +131,7 @@ class _UploadItemCardState extends State<UploadItemCard> {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 2.0,
-              color: stateColors.secondary,
+              color: Theme.of(context).secondaryHeaderColor,
             ),
           ),
         ],
@@ -189,7 +185,7 @@ class _UploadItemCardState extends State<UploadItemCard> {
       return CircleButton(
         tooltip: "cancel".tr(),
         radius: 16.0,
-        onTap: widget.onCancel as void Function()?,
+        onTap: widget.onCancel,
         icon: Icon(
           UniconsLine.times,
           size: 16.0,
@@ -204,7 +200,7 @@ class _UploadItemCardState extends State<UploadItemCard> {
       return CircleButton(
         tooltip: "cancel".tr(),
         radius: 16.0,
-        onTap: widget.onCancel as void Function()?,
+        onTap: widget.onCancel,
         icon: Icon(
           UniconsLine.times,
           size: 16.0,
@@ -215,7 +211,7 @@ class _UploadItemCardState extends State<UploadItemCard> {
 
     if (state == TaskState.success) {
       return CircleButton(
-        onTap: widget.onDone as void Function()?,
+        onTap: widget.onDone,
         tooltip: "done".tr(),
         radius: 16.0,
         icon: Icon(

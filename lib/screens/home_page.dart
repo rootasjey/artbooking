@@ -4,9 +4,8 @@ import 'package:artbooking/components/landing_curated.dart';
 import 'package:artbooking/components/landing_hero.dart';
 import 'package:artbooking/components/landing_quote.dart';
 import 'package:artbooking/components/landing_roadmap.dart';
-import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
-import 'package:artbooking/state/colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
@@ -79,7 +78,7 @@ class _HomePageState extends State<HomePage> {
           curve: Curves.bounceIn,
         );
       },
-      backgroundColor: stateColors.secondary,
+      backgroundColor: Theme.of(context).secondaryHeaderColor,
       label: Text("scroll_to_top".tr()),
     );
   }

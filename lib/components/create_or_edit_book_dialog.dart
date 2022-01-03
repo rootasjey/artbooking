@@ -1,10 +1,9 @@
 import 'dart:math';
 
 import 'package:artbooking/components/dark_elevated_button.dart';
-import 'package:artbooking/components/dot_close_button.dart';
+import 'package:artbooking/components/edit_book_dialog/title_dialog.dart';
 import 'package:artbooking/components/outlined_text_field.dart';
-import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -12,8 +11,8 @@ import 'package:flutter/material.dart';
 class CreateOrEditBookDialog extends StatelessWidget {
   const CreateOrEditBookDialog({
     Key? key,
-    required this.textTitle,
-    required this.textSubtitle,
+    required this.titleValue,
+    required this.subtitleValue,
     this.nameController,
     this.onNameChanged,
     this.onDescriptionChanged,
@@ -24,8 +23,8 @@ class CreateOrEditBookDialog extends StatelessWidget {
   }) : super(key: key);
 
   final String submitButtonValue;
-  final String textTitle;
-  final String textSubtitle;
+  final String titleValue;
+  final String subtitleValue;
   final TextEditingController? nameController;
   final TextEditingController? descriptionController;
   final void Function(String)? onNameChanged;
@@ -36,8 +35,12 @@ class CreateOrEditBookDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SimpleDialog(
-      backgroundColor: stateColors.clairPink,
-      title: title(),
+      backgroundColor: Globals.constants.colors.clairPink,
+      title: TitleDialog(
+        titleValue: titleValue,
+        subtitleValue: subtitleValue,
+        onCancel: onCancel,
+      ),
       titlePadding: EdgeInsets.zero,
       contentPadding: const EdgeInsets.all(16.0),
       children: [
@@ -45,17 +48,6 @@ class CreateOrEditBookDialog extends StatelessWidget {
         descriptionInput(),
         footerButtons(),
       ],
-    );
-  }
-
-  Widget closeButton() {
-    return Positioned(
-      top: 12.0,
-      left: 12.0,
-      child: DotCloseButton(
-        tooltip: "cancel".tr(),
-        onTap: onCancel,
-      ),
     );
   }
 
@@ -88,7 +80,7 @@ class CreateOrEditBookDialog extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.all(24.0),
-      child: DarkElevatedButton(
+      child: DarkElevatedButton.large(
         onPressed: () {
           final String value = nameController?.text ?? '';
           onSubmitted.call(value);
@@ -113,56 +105,6 @@ class CreateOrEditBookDialog extends StatelessWidget {
         hintText: hintText,
         onChanged: onNameChanged,
       ),
-    );
-  }
-
-  Widget title() {
-    return Stack(
-      children: [
-        closeButton(),
-        Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 24.0,
-                left: 24.0,
-                right: 24.0,
-              ),
-              child: Column(
-                children: [
-                  Opacity(
-                    opacity: 0.8,
-                    child: Text(
-                      textTitle,
-                      style: FontsUtils.mainStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  Opacity(
-                    opacity: 0.4,
-                    child: Text(
-                      textSubtitle,
-                      style: FontsUtils.mainStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: Divider(
-                thickness: 1.5,
-                color: stateColors.secondary,
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }

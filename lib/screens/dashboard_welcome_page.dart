@@ -1,9 +1,9 @@
-import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/section_card.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
-import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user.dart';
+import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -35,7 +35,7 @@ class DashboardWelcomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              greetings(),
+              greetings(color: Theme.of(context).primaryColor),
               placeDescription(),
               sectionsList(context),
             ],
@@ -93,9 +93,11 @@ class DashboardWelcomePage extends StatelessWidget {
     );
   }
 
-  Widget greetings() {
-    final username = stateUser.username ?? '';
-    final email = stateUser.email;
+  Widget greetings({required Color color}) {
+    final UserFirestore userFirestore = Globals.state.getUserFirestore();
+
+    final username = userFirestore.name;
+    final email = userFirestore.email;
     final name = username.isNotEmpty ? username : email;
 
     return Text.rich(
@@ -105,7 +107,7 @@ class DashboardWelcomePage extends StatelessWidget {
           TextSpan(
             text: " $name",
             style: FontsUtils.mainStyle(
-              color: stateColors.primary,
+              color: color,
               fontSize: 18.0,
               fontWeight: FontWeight.w600,
             ),
@@ -143,39 +145,39 @@ class DashboardWelcomePage extends StatelessWidget {
         runSpacing: 24.0,
         children: [
           SectionCard(
-            hoverColor: stateColors.activity,
+            hoverColor: Globals.constants.colors.activity,
             iconData: UniconsLine.chart_pie,
             textTitle: "statistics".tr(),
             textSubtitle: "statistics_subtitle".tr(),
             onTap: () {
-              context.beamToNamed(DashboardContentLocation.statisticsRoute);
+              context.beamToNamed(DashboardLocationContent.statisticsRoute);
             },
           ),
           SectionCard(
-            hoverColor: stateColors.illustrations,
+            hoverColor: Globals.constants.colors.illustrations,
             iconData: UniconsLine.picture,
             textTitle: "illustrations".tr(),
             textSubtitle: "illustrations_subtitle".tr(),
             onTap: () {
-              context.beamToNamed(DashboardContentLocation.illustrationsRoute);
+              context.beamToNamed(DashboardLocationContent.illustrationsRoute);
             },
           ),
           SectionCard(
-            hoverColor: stateColors.books,
+            hoverColor: Globals.constants.colors.books,
             iconData: UniconsLine.book_alt,
             textTitle: "books".tr(),
             textSubtitle: "books_subtitle".tr(),
             onTap: () {
-              context.beamToNamed(DashboardContentLocation.booksRoute);
+              context.beamToNamed(DashboardLocationContent.booksRoute);
             },
           ),
           SectionCard(
-            hoverColor: stateColors.settings,
+            hoverColor: Globals.constants.colors.settings,
             iconData: UniconsLine.setting,
             textTitle: "settings".tr(),
             textSubtitle: "settings_subtitle".tr(),
             onTap: () {
-              context.beamToNamed(DashboardContentLocation.settingsRoute);
+              context.beamToNamed(DashboardLocationContent.settingsRoute);
             },
           ),
         ],

@@ -4,16 +4,15 @@ import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/book_card.dart';
 import 'package:artbooking/components/create_or_edit_book_dialog.dart';
-import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/popup_menu_item_icon.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/text_rectangle_button.dart';
 import 'package:artbooking/components/themed_dialog.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
-import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/enums.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/types/one_book_op_resp.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
@@ -185,7 +184,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
                   "lonely_there".tr(),
                   style: TextStyle(
                     fontSize: 32.0,
-                    color: stateColors.primary,
+                    color: Theme.of(context).primaryColor,
                   ),
                 ),
               ),
@@ -227,7 +226,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     if (!_isFabVisible) {
       return FloatingActionButton(
         onPressed: fetchManyBooks,
-        backgroundColor: stateColors.primary,
+        backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,
         child: Icon(UniconsLine.refresh),
       );
@@ -241,7 +240,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
           curve: Curves.easeOut,
         );
       },
-      backgroundColor: stateColors.primary,
+      backgroundColor: Theme.of(context).primaryColor,
       foregroundColor: Colors.white,
       child: Icon(UniconsLine.arrow_up),
     );
@@ -606,10 +605,12 @@ class _MyBooksPageState extends State<MyBooksPage> {
       _books.clear();
     });
 
+    final userAuth = Globals.state.getUserAuth();
+
     try {
       final query = FirebaseFirestore.instance
           .collection('books')
-          .where('user.id', isEqualTo: stateUser.userAuth!.uid)
+          .where('user.id', isEqualTo: userAuth?.uid)
           .orderBy('createdAt', descending: _descending)
           .limit(_limit);
 
@@ -729,8 +730,8 @@ class _MyBooksPageState extends State<MyBooksPage> {
     showDialog(
       context: context,
       builder: (context) => CreateOrEditBookDialog(
-        textTitle: "book_create".tr().toUpperCase(),
-        textSubtitle: "book_create_description".tr(),
+        titleValue: "book_create".tr().toUpperCase(),
+        subtitleValue: "book_create_description".tr(),
         nameController: _newBookNameController,
         onNameChanged: (newValue) {
           _newBookName = newValue;
@@ -760,8 +761,8 @@ class _MyBooksPageState extends State<MyBooksPage> {
         descriptionController: _newBookDescriptionController,
         submitButtonValue: "rename".tr(),
         nameController: _newBookNameController,
-        textTitle: "book_rename".tr().toUpperCase(),
-        textSubtitle: "book_rename_description".tr(),
+        titleValue: "book_rename".tr().toUpperCase(),
+        subtitleValue: "book_rename_description".tr(),
         onNameChanged: (newValue) {
           _newBookName = newValue;
         },

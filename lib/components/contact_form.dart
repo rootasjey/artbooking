@@ -1,6 +1,5 @@
 import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
-import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
@@ -172,7 +171,7 @@ class _ContactFormState extends State<ContactForm> {
                 Text(
                   _subject!.toLowerCase(),
                   style: TextStyle(
-                    color: stateColors.primary,
+                    color: Theme.of(context).primaryColor,
                   ),
                 ),
               ],
@@ -289,7 +288,7 @@ class _ContactFormState extends State<ContactForm> {
                   TextSpan(
                     text: email,
                     style: FontsUtils.mainStyle(
-                      color: stateColors.primary,
+                      color: Theme.of(context).primaryColor,
                       fontWeight: FontWeight.w600,
                     ),
                   )

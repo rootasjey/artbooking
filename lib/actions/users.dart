@@ -1,5 +1,5 @@
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:artbooking/types/cloud_func_error.dart';
+import 'package:artbooking/types/cloud_function_error.dart';
 import 'package:artbooking/types/create_account_resp.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 /// Network interface for user's actions.
 class UsersActions {
   /// Check email availability accross the app.
-  static Future<bool?> checkEmailAvailability(String email) async {
+  static Future<bool> checkEmailAvailability(String email) async {
     try {
       final callable = FirebaseFunctions.instanceFor(
         app: Firebase.app(),
@@ -17,7 +17,7 @@ class UsersActions {
 
       final resp = await callable.call({'email': email});
       final isOk = resp.data['isAvailable'] as bool?;
-      return isOk;
+      return isOk ?? false;
     } on FirebaseFunctionsException catch (exception) {
       debugPrint("[code: ${exception.code}] - ${exception.message}");
       return false;
@@ -50,7 +50,7 @@ class UsersActions {
       debugPrint("[code: ${exception.code}] - ${exception.message}");
       return CreateAccountResp(
         success: false,
-        error: CloudFuncError(
+        error: CloudFunctionError(
           code: exception.code,
           message: exception.message,
         ),
@@ -58,7 +58,7 @@ class UsersActions {
     } catch (error) {
       return CreateAccountResp(
         success: false,
-        error: CloudFuncError(
+        error: CloudFunctionError(
           code: '',
           message: error.toString(),
         ),
@@ -74,7 +74,7 @@ class UsersActions {
   }
 
   /// Check username availability.
-  static Future<bool?> checkUsernameAvailability(String username) async {
+  static Future<bool> checkUsernameAvailability(String username) async {
     try {
       final callable = FirebaseFunctions.instanceFor(
         app: Firebase.app(),
@@ -83,7 +83,7 @@ class UsersActions {
 
       final resp = await callable.call({'name': username});
       final isOk = resp.data['isAvailable'] as bool?;
-      return isOk;
+      return isOk ?? false;
     } on FirebaseFunctionsException catch (exception) {
       debugPrint("[code: ${exception.code}] - ${exception.message}");
       return false;

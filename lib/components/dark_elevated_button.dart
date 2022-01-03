@@ -2,17 +2,40 @@ import 'package:artbooking/utils/fonts.dart';
 import 'package:flutter/material.dart';
 
 class DarkElevatedButton extends StatelessWidget {
-  final void Function()? onPressed;
-  final Widget child;
-
   const DarkElevatedButton({
     Key? key,
     this.onPressed,
     required this.child,
   }) : super(key: key);
 
+  final void Function()? onPressed;
+  final Widget child;
+
   @override
   Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20.0,
+          vertical: 10.0,
+        ),
+        child: child,
+      ),
+      style: ElevatedButton.styleFrom(
+        primary: Colors.black,
+        shape: RoundedRectangleBorder(),
+        textStyle: FontsUtils.mainStyle(
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  static Widget large({
+    Function()? onPressed,
+    required Widget child,
+  }) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         primary: Colors.black87,

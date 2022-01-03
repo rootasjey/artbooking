@@ -5,7 +5,7 @@ import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/create_or_edit_book_dialog.dart';
 import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/illustration_card.dart';
-import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/popup_menu_item_icon.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/text_divider.dart';
@@ -15,11 +15,10 @@ import 'package:artbooking/components/underlined_button.dart';
 import 'package:artbooking/components/user_books.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
-import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/upload_manager.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/book_illustration.dart';
 import 'package:artbooking/types/enums.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
@@ -31,6 +30,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:supercharged/supercharged.dart';
@@ -46,19 +46,20 @@ typedef SnapshotStreamSubscription
 /// A Map with [String] as key and [Illustration] as value.
 typedef MapStringIllustration = Map<String, Illustration>;
 
-class MyBookPage extends StatefulWidget {
-  /// Book's id.
-  final String bookId;
-
+class MyBookPage extends ConsumerStatefulWidget {
   const MyBookPage({
     Key? key,
     required this.bookId,
   }) : super(key: key);
+
+  /// Book's id.
+  final String bookId;
+
   @override
   _MyBookPageState createState() => _MyBookPageState();
 }
 
-class _MyBookPageState extends State<MyBookPage> {
+class _MyBookPageState extends ConsumerState<MyBookPage> {
   /// The book displayed on this page.
   Book? _bookPage;
 
@@ -190,7 +191,7 @@ class _MyBookPageState extends State<MyBookPage> {
         width: 200.0,
         child: Card(
           elevation: 2.0,
-          color: stateColors.clairPink,
+          color: Globals.constants.colors.clairPink,
         ),
       );
     }
@@ -418,7 +419,7 @@ class _MyBookPageState extends State<MyBookPage> {
           ),
           UnderlinedButton(
             onTap: () {
-              context.beamToNamed(DashboardContentLocation.illustrationsRoute);
+              context.beamToNamed(DashboardLocationContent.illustrationsRoute);
             },
             child: Text("illustrations_yours_browse".tr()),
           ),
@@ -446,7 +447,7 @@ class _MyBookPageState extends State<MyBookPage> {
                   "issue_unexpected".tr(),
                   style: TextStyle(
                     fontSize: 32.0,
-                    color: stateColors.primary,
+                    color: Theme.of(context).primaryColor,
                   ),
                 ),
               ),
@@ -489,7 +490,7 @@ class _MyBookPageState extends State<MyBookPage> {
     if (!_isFabVisible) {
       return FloatingActionButton(
         onPressed: fetchIllustrations,
-        backgroundColor: stateColors.primary,
+        backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,
         child: Icon(UniconsLine.refresh),
       );
@@ -503,7 +504,7 @@ class _MyBookPageState extends State<MyBookPage> {
           curve: Curves.easeOut,
         );
       },
-      backgroundColor: stateColors.primary,
+      backgroundColor: Theme.of(context).primaryColor,
       foregroundColor: Colors.white,
       child: Icon(UniconsLine.arrow_up),
     );
@@ -749,8 +750,8 @@ class _MyBookPageState extends State<MyBookPage> {
     }
 
     final Color color = _bookPage!.illustrations.isEmpty
-        ? stateColors.secondary
-        : stateColors.primary;
+        ? Theme.of(context).secondaryHeaderColor
+        : Theme.of(context).primaryColor;
 
     return Opacity(
       opacity: 0.8,
@@ -992,7 +993,7 @@ class _MyBookPageState extends State<MyBookPage> {
     );
 
     Beamer.of(context).beamToNamed(
-      DashboardContentLocation.booksRoute,
+      DashboardLocationContent.booksRoute,
     );
   }
 
@@ -1519,7 +1520,7 @@ class _MyBookPageState extends State<MyBookPage> {
               ),
               Divider(
                 thickness: 1.5,
-                color: stateColors.secondary,
+                color: Theme.of(context).secondaryHeaderColor,
               ),
             ],
           ),
@@ -1539,7 +1540,7 @@ class _MyBookPageState extends State<MyBookPage> {
             ),
             Padding(
               padding: const EdgeInsets.only(top: 24.0),
-              child: DarkElevatedButton(
+              child: DarkElevatedButton.large(
                 onPressed: Beamer.of(context).popRoute,
                 child: Text(
                   "close".tr(),
@@ -1569,8 +1570,8 @@ class _MyBookPageState extends State<MyBookPage> {
         descriptionController: _newBookDescriptionController,
         nameController: _newBookNameController,
         submitButtonValue: "rename".tr(),
-        textTitle: "book_rename".tr().toUpperCase(),
-        textSubtitle: "book_rename_description".tr(),
+        titleValue: "book_rename".tr().toUpperCase(),
+        subtitleValue: "book_rename_description".tr(),
         onNameChanged: (newValue) {
           _newBookName = newValue;
         },
@@ -1587,10 +1588,10 @@ class _MyBookPageState extends State<MyBookPage> {
   }
 
   void uploadToThisBook() async {
-    await appUploadManager.pickImageAndAddToBook(
-      context,
-      bookId: widget.bookId,
-    );
+    final uploadListNotifier = Globals.state.upload.uploadTasksList.notifier;
+    await ref
+        .read(uploadListNotifier)
+        .pickImageAndAddToBook(bookId: widget.bookId);
   }
 
   void startListenningToData(DocumentReference<Map<String, dynamic>> query) {

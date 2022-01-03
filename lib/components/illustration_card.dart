@@ -1,6 +1,6 @@
 import 'package:artbooking/actions/illustrations.dart';
-import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/enums.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:flutter/material.dart';
@@ -121,7 +121,7 @@ class _IllustrationCardState extends State<IllustrationCard>
     Color defaultColor = Colors.transparent;
 
     return Card(
-      color: widget.selected ? stateColors.primary : defaultColor,
+      color: widget.selected ? Theme.of(context).primaryColor : defaultColor,
       elevation: _elevation,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
@@ -171,7 +171,7 @@ class _IllustrationCardState extends State<IllustrationCard>
 
   Widget loadingCard() {
     return Card(
-      color: stateColors.clairPink,
+      color: Globals.constants.colors.clairPink,
       elevation: _elevation,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
@@ -179,7 +179,7 @@ class _IllustrationCardState extends State<IllustrationCard>
       clipBehavior: Clip.antiAlias,
       child: Shimmer(
         colorOpacity: 0.2,
-        color: stateColors.primary,
+        color: Theme.of(context).primaryColor,
         child: Container(),
       ),
     );
@@ -221,7 +221,7 @@ class _IllustrationCardState extends State<IllustrationCard>
         ),
         child: Icon(
           UniconsLine.check_square,
-          color: stateColors.secondary,
+          color: Theme.of(context).secondaryHeaderColor,
         ),
       ),
     );
@@ -232,7 +232,9 @@ class _IllustrationCardState extends State<IllustrationCard>
       opacity: _showPopupMenu ? 1.0 : 0.0,
       child: PopupMenuButton<IllustrationItemAction>(
         icon: MirrorAnimation<Color?>(
-          tween: stateColors.primary.tweenTo(stateColors.secondary),
+          tween: Theme.of(context)
+              .primaryColor
+              .tweenTo(Theme.of(context).secondaryHeaderColor),
           duration: 2.seconds,
           curve: Curves.decelerate,
           builder: (context, child, value) {

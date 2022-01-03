@@ -9,11 +9,33 @@ import 'package:artbooking/types/illustration/urls.dart';
 import 'package:artbooking/utils/date_helper.dart';
 
 class Illustration {
+  Illustration({
+    this.acl = const [],
+    required this.author,
+    this.styles = const [],
+    required this.createdAt,
+    this.description = '',
+    this.dimensions,
+    this.extension = '',
+    this.hasPendingCreates = false,
+    this.id = '',
+    this.license,
+    this.name = '',
+    this.stats,
+    this.size = 0,
+    this.story = '',
+    this.topics = const [],
+    this.updatedAt,
+    required this.urls,
+    this.versions = const [],
+    this.visibility,
+  });
+
   /// Access Control List managing this illustration visibility to others users.
   List<ACL> acl;
 
   /// Author's illustration.
-  Author? author;
+  final Author author;
 
   /// The time this illustration has been created.
   final DateTime createdAt;
@@ -70,28 +92,6 @@ class Illustration {
   /// Access control policy.
   /// Define who can read or write this illustration.
   ContentVisibility? visibility;
-
-  Illustration({
-    this.acl = const [],
-    this.author,
-    this.styles = const [],
-    required this.createdAt,
-    this.description = '',
-    this.dimensions,
-    this.extension = '',
-    this.hasPendingCreates = false,
-    this.id = '',
-    this.license,
-    this.name = '',
-    this.stats,
-    this.size = 0,
-    this.story = '',
-    this.topics = const [],
-    this.updatedAt,
-    required this.urls,
-    this.versions = const [],
-    this.visibility,
-  });
 
   factory Illustration.empty() {
     return Illustration(

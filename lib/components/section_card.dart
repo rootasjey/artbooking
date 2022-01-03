@@ -1,4 +1,4 @@
-import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:flutter/material.dart';
 
@@ -8,7 +8,8 @@ class SectionCard extends StatefulWidget {
     this.hoverColor = Colors.pink,
     required IconData this.iconData,
     required String this.textTitle,
-    required String this.textSubtitle, this.onTap,
+    required String this.textSubtitle,
+    this.onTap,
   }) : super(key: key);
 
   final IconData iconData;
@@ -32,7 +33,7 @@ class _SectionCardState extends State<SectionCard> {
       height: 116.0,
       child: Card(
         elevation: _elevation,
-        color: stateColors.clairPink,
+        color: Globals.constants.colors.clairPink,
         child: InkWell(
           onTap: widget.onTap,
           onHover: (isHover) {

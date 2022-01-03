@@ -1,5 +1,5 @@
 import 'package:artbooking/components/dashboard_side_menu.dart';
-import 'package:artbooking/components/upload_window.dart';
+import 'package:artbooking/components/upload_window/upload_window.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +32,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       key: _beamerKey,
                       routerDelegate: BeamerDelegate(
                         locationBuilder: BeamerLocationBuilder(beamLocations: [
-                          DashboardContentLocation(),
+                          DashboardLocationContent(),
                         ]),
                       ),
                     ),

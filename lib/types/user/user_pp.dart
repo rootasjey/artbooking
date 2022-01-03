@@ -3,18 +3,18 @@ import 'package:artbooking/types/user/user_pp_url.dart';
 import 'package:artbooking/utils/date_helper.dart';
 
 class UserPP {
-  String? ext;
+  String ext;
   int size;
   DateTime? updatedAt;
-  UserPPPath? path;
-  UserPPUrl? url;
+  UserPPPath path;
+  UserPPUrl url;
 
   UserPP({
     this.ext = '',
     this.size = 0,
     this.updatedAt,
-    this.path,
-    this.url,
+    this.path = const UserPPPath(),
+    this.url = const UserPPUrl(),
   });
 
   factory UserPP.empty() {
@@ -46,8 +46,8 @@ class UserPP {
     data['ext'] = ext;
     data['size'] = size;
     data['updatedAt'] = updatedAt!.millisecondsSinceEpoch;
-    data['path'] = path!.toJSON();
-    data['url'] = url!.toJSON();
+    data['path'] = path.toJSON();
+    data['url'] = url.toJSON();
 
     return data;
   }
@@ -69,11 +69,11 @@ class UserPP {
     this.updatedAt = DateTime.now();
 
     if (path != null) {
-      this.path = this.path!.merge(path);
+      this.path = this.path.merge(path);
     }
 
     if (url != null) {
-      this.url = this.url!.merge(url);
+      this.url = this.url.merge(url);
     }
   }
 

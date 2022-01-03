@@ -1,10 +1,10 @@
 class UserPPPath {
-  final String? edited;
-  final String? original;
+  final String edited;
+  final String original;
 
-  UserPPPath({
-    this.edited,
-    this.original,
+  const UserPPPath({
+    this.edited = '',
+    this.original = '',
   });
 
   factory UserPPPath.empty() {
@@ -26,15 +26,12 @@ class UserPPPath {
   }
 
   UserPPPath merge(UserPPPath userPPPath) {
-    final newEditedValue =
-        userPPPath.edited != null ? userPPPath.edited : this.edited;
-
-    final newOriginalValue =
-        userPPPath.original != null ? userPPPath.original : this.original;
+    final newEdited = userPPPath.edited;
+    final newOriginal = userPPPath.original;
 
     return UserPPPath(
-      edited: newEditedValue,
-      original: newOriginalValue,
+      edited: newEdited.isNotEmpty ? newEdited : this.edited,
+      original: newOriginal.isNotEmpty ? newOriginal : this.original,
     );
   }
 

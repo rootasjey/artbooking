@@ -3,17 +3,15 @@ import 'dart:async';
 import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/fade_in_y.dart';
-import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
-import 'package:artbooking/router/locations/signin_location.dart';
-import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user.dart';
+import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/user_notifier.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
@@ -29,21 +27,22 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
   bool _isCompleted = false;
 
   final _beginY = 10.0;
-  final _passwordNode = FocusNode();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _currentPasswordNode = FocusNode();
+  final _newEmailController = TextEditingController();
+  final _currentPasswordController = TextEditingController();
+  final Color _clairPink = Globals.constants.colors.clairPink;
 
-  String _emailInputValue = '';
+  String _newEmailValue = '';
   String _emailInputErrorMessage = '';
-  String _passwordInputValue = '';
+  String _currentPasswordValue = '';
 
   Timer? _emailTimer;
 
   @override
   void dispose() {
-    _passwordNode.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
+    _currentPasswordNode.dispose();
+    _newEmailController.dispose();
+    _currentPasswordController.dispose();
     super.dispose();
   }
 
@@ -225,7 +224,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
         bottom: 40.0,
       ),
       child: Card(
-        color: stateColors.clairPink,
+        color: Globals.constants.colors.clairPink,
         elevation: 2.0,
         child: InkWell(
           child: Container(
@@ -239,7 +238,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
                       padding: const EdgeInsets.only(right: 10.0),
                       child: Icon(
                         UniconsLine.envelope,
-                        color: stateColors.secondary,
+                        color: Theme.of(context).secondaryHeaderColor,
                       ),
                     ),
                     Column(
@@ -252,7 +251,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
                           ),
                         ),
                         Text(
-                          stateUser.email,
+                          Globals.state.getUserFirestore().email,
                           style: FontsUtils.mainStyle(
                             fontWeight: FontWeight.bold,
                           ),
@@ -279,13 +278,13 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
         children: <Widget>[
           TextFormField(
             autofocus: true,
-            controller: _emailController,
+            controller: _newEmailController,
             textInputAction: TextInputAction.next,
-            onFieldSubmitted: (_) => _passwordNode.requestFocus(),
+            onFieldSubmitted: (_) => _currentPasswordNode.requestFocus(),
             decoration: InputDecoration(
               border: OutlineInputBorder(),
               fillColor: Colors.white,
-              focusColor: stateColors.clairPink,
+              focusColor: _clairPink,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 8.0,
               ),
@@ -293,14 +292,14 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
             ),
             keyboardType: TextInputType.emailAddress,
             onChanged: (value) async {
-              _emailInputValue = value;
+              _newEmailValue = value;
 
               setState(() {
                 _isCheckingEmail = true;
               });
 
               final isWellFormatted =
-                  UsersActions.checkEmailFormat(_emailInputValue);
+                  UsersActions.checkEmailFormat(_newEmailValue);
 
               if (!isWellFormatted) {
                 setState(() {
@@ -311,15 +310,12 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
                 return;
               }
 
-              if (_emailTimer != null) {
-                _emailTimer!.cancel();
-                _emailTimer = null;
-              }
+              _emailTimer?.cancel();
+              _emailTimer = null;
 
               _emailTimer = Timer(1.seconds, () async {
                 final isAvailable =
-                    await (UsersActions.checkEmailAvailability(_emailInputValue)
-                        as FutureOr<bool>);
+                    await (UsersActions.checkEmailAvailability(_newEmailValue));
 
                 if (!isAvailable) {
                   setState(() {
@@ -386,12 +382,12 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           TextFormField(
-            focusNode: _passwordNode,
-            controller: _passwordController,
+            focusNode: _currentPasswordNode,
+            controller: _currentPasswordController,
             decoration: InputDecoration(
               border: OutlineInputBorder(),
               fillColor: Colors.white,
-              focusColor: stateColors.clairPink,
+              focusColor: _clairPink,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 8.0,
               ),
@@ -399,9 +395,9 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
             ),
             obscureText: true,
             onChanged: (value) {
-              _passwordInputValue = value;
+              _currentPasswordValue = value;
             },
-            onFieldSubmitted: (value) => updateEmailProcess(),
+            onFieldSubmitted: (value) => tryUpdateEmail(),
             validator: (value) {
               if (value!.isEmpty) {
                 return "password_empty_forbidden".tr();
@@ -441,7 +437,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
 
   Widget validationButton() {
     return ElevatedButton(
-      onPressed: updateEmailProcess,
+      onPressed: tryUpdateEmail,
       style: ElevatedButton.styleFrom(
         primary: Colors.black87,
       ),
@@ -466,87 +462,12 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
     );
   }
 
-  void updateEmailProcess() async {
-    if (!inputValuesOk()) {
-      return;
-    }
-
-    setState(() {
-      _isUpdating = true;
-    });
-
-    try {
-      if (!await (valuesAvailabilityCheck() as FutureOr<bool>)) {
-        setState(() => _isUpdating = false);
-
-        Snack.e(
-          context: context,
-          message: "email_not_available".tr(),
-        );
-
-        return;
-      }
-
-      final userAuth = stateUser.userAuth;
-
-      if (userAuth == null) {
-        setState(() => _isUpdating = false);
-        context.beamToNamed(SigninLocation.route);
-        return;
-      }
-
-      final credentials = EmailAuthProvider.credential(
-        email: userAuth.email!,
-        password: _passwordInputValue,
-      );
-
-      await userAuth.reauthenticateWithCredential(credentials);
-      final idToken = await userAuth.getIdToken();
-
-      final respUpdateEmail =
-          await stateUser.updateEmail(_emailInputValue, idToken);
-
-      if (!respUpdateEmail.success) {
-        final exception = respUpdateEmail.error!;
-
-        setState(() {
-          _isUpdating = false;
-        });
-
-        Snack.e(
-          context: context,
-          message: "[code: ${exception.code}] - ${exception.message}",
-        );
-
-        return;
-      }
-
-      stateUser.clearAuthCache();
-
-      setState(() {
-        _isUpdating = false;
-        _isCompleted = true;
-      });
-    } catch (error) {
-      appLogger.e(error);
-
-      setState(() {
-        _isUpdating = false;
-      });
-
-      Snack.e(
-        context: context,
-        message: "email_update_error".tr(),
-      );
-    }
+  Future<bool> checkInputsAvailbility() async {
+    return await UsersActions.checkEmailAvailability(_newEmailValue);
   }
 
-  Future<bool?> valuesAvailabilityCheck() async {
-    return await UsersActions.checkEmailAvailability(_emailInputValue);
-  }
-
-  bool inputValuesOk() {
-    if (_emailInputValue.isEmpty) {
+  bool checkInputsFormat() {
+    if (_newEmailValue.isEmpty) {
       Snack.e(
         context: context,
         message: "email_empty_forbidden".tr(),
@@ -555,7 +476,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
       return false;
     }
 
-    if (_passwordInputValue.isEmpty) {
+    if (_currentPasswordValue.isEmpty) {
       Snack.e(
         context: context,
         message: "password_empty_forbidden".tr(),
@@ -564,7 +485,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
       return false;
     }
 
-    if (!UsersActions.checkEmailFormat(_emailInputValue)) {
+    if (!UsersActions.checkEmailFormat(_newEmailValue)) {
       Snack.e(
         context: context,
         message: "email_not_validd".tr(),
@@ -576,12 +497,56 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
     return true;
   }
 
+  void tryUpdateEmail() async {
+    if (!checkInputsFormat()) {
+      return;
+    }
+
+    setState(() => _isUpdating = true);
+
+    try {
+      if (!await checkInputsAvailbility()) {
+        setState(() => _isUpdating = false);
+
+        Snack.e(
+          context: context,
+          message: "email_not_available".tr(),
+        );
+
+        return;
+      }
+
+      final UserNotifier userNotifier = Globals.state.getUserNotifier();
+      final response = await userNotifier.updateEmail(
+        newEmail: _newEmailValue,
+        password: _currentPasswordValue,
+      );
+
+      if (!response.success) {
+        throw ErrorDescription(response.error?.message ?? '');
+      }
+
+      setState(() {
+        _isUpdating = false;
+        _isCompleted = true;
+      });
+    } catch (error) {
+      appLogger.e(error);
+      setState(() => _isUpdating = false);
+
+      Snack.e(
+        context: context,
+        message: "email_update_error".tr(),
+      );
+    }
+  }
+
   void showTipsDialog() {
     showDialog(
       context: context,
       builder: (context) {
         return SimpleDialog(
-          backgroundColor: stateColors.clairPink,
+          backgroundColor: _clairPink,
           title: Text(
             "email_current".tr(),
             style: FontsUtils.mainStyle(
@@ -591,7 +556,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
           ),
           children: <Widget>[
             Divider(
-              color: stateColors.secondary,
+              color: Theme.of(context).secondaryHeaderColor,
               thickness: 1.0,
             ),
             Padding(
@@ -601,7 +566,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
               child: Opacity(
                 opacity: 0.6,
                 child: Text(
-                  stateUser.email,
+                  Globals.state.getUserFirestore().email,
                   style: FontsUtils.mainStyle(
                     fontWeight: FontWeight.bold,
                   ),

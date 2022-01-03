@@ -5,12 +5,12 @@ import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/edit_illustration_meta.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/illustration_poster.dart';
-import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/license.dart';
@@ -48,8 +48,6 @@ class _IllustrationPageState extends State<IllustrationPage> {
   /// True if data is being loaded.
   bool _isLoading = false;
 
-  Illustration? _illustration;
-
   String _newName = '';
   String _newDesc = '';
   String _newSummary = '';
@@ -62,6 +60,8 @@ class _IllustrationPageState extends State<IllustrationPage> {
 
   IllustrationLicense _newLicense = IllustrationLicense();
   ContentVisibility _newVisibility = ContentVisibility.private;
+
+  var _illustration = Illustration.empty();
 
   @override
   void initState() {
@@ -136,7 +136,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
           child: Opacity(
             opacity: 0.6,
             child: Text(
-              Jiffy(_illustration!.createdAt).fromNow(),
+              Jiffy(_illustration.createdAt).fromNow(),
               style: FontsUtils.mainStyle(
                 fontSize: 18.0,
                 fontWeight: FontWeight.w600,
@@ -155,7 +155,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
 
     return FloatingActionButton.extended(
       onPressed: showMetaDataSheet,
-      backgroundColor: stateColors.primary,
+      backgroundColor: Theme.of(context).primaryColor,
       foregroundColor: Colors.white,
       icon: Padding(
         padding: const EdgeInsets.only(left: 8.0),
@@ -177,7 +177,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
     return Row(
       children: [
         IconButton(
-          color: stateColors.primary,
+          color: Theme.of(context).primaryColor,
           onPressed: () {
             Beamer.of(context).popRoute();
           },
@@ -187,7 +187,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
           child: Opacity(
             opacity: 0.8,
             child: Text(
-              _illustration!.name,
+              _illustration.name,
               style: FontsUtils.mainStyle(
                 fontSize: 20.0,
                 fontWeight: FontWeight.w700,
@@ -251,7 +251,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
   }
 
   Widget description() {
-    if (_illustration!.description.isEmpty) {
+    if (_illustration.description.isEmpty) {
       return Container();
     }
 
@@ -260,7 +260,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
       child: Opacity(
         opacity: 0.4,
         child: Text(
-          _illustration!.description,
+          _illustration.description,
           style: FontsUtils.mainStyle(
             fontSize: 18.0,
             fontWeight: FontWeight.w600,
@@ -271,7 +271,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
   }
 
   Widget summary() {
-    if (_illustration!.story.isEmpty) {
+    if (_illustration.story.isEmpty) {
       return Container();
     }
 
@@ -281,7 +281,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
       child: Opacity(
         opacity: 0.6,
         child: Text(
-          _illustration!.story,
+          _illustration.story,
           style: FontsUtils.mainStyle(
             fontSize: 24.0,
             fontWeight: FontWeight.w200,
@@ -299,7 +299,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
       child: Column(
         children: [
           AuthorHeader(
-            authorId: _illustration!.author!.id,
+            authorId: _illustration.author.id,
             padding: const EdgeInsets.only(bottom: 60.0),
           ),
           description(),
@@ -519,11 +519,11 @@ class _IllustrationPageState extends State<IllustrationPage> {
 
   void saveNewMetadata() async {
     setState(() {
-      _illustration!.name = _newName;
-      _illustration!.description = _newDesc;
-      _illustration!.story = _newSummary;
-      _illustration!.license = _newLicense;
-      _illustration!.visibility = _newVisibility;
+      _illustration.name = _newName;
+      _illustration.description = _newDesc;
+      _illustration.story = _newSummary;
+      _illustration.license = _newLicense;
+      _illustration.visibility = _newVisibility;
     });
 
     final result = await IllustrationsActions.updateMetadata(
@@ -532,7 +532,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
       summary: _newSummary,
       license: _newLicense,
       visibility: _newVisibility,
-      illustration: _illustration!,
+      illustration: _illustration,
     );
 
     if (!result.success) {
@@ -562,7 +562,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
               ),
               children: [
                 TextSpan(
-                  text: Jiffy(_illustration!.createdAt).fromNow(),
+                  text: Jiffy(_illustration.createdAt).fromNow(),
                   style: FontsUtils.mainStyle(
                     color: Colors.black54,
                   ),
@@ -580,7 +580,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
               ),
               children: [
                 TextSpan(
-                  text: Jiffy(_illustration!.updatedAt).fromNow(),
+                  text: Jiffy(_illustration.updatedAt).fromNow(),
                   style: FontsUtils.mainStyle(
                     color: Colors.black54,
                   ),
@@ -601,7 +601,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: stateColors.clairPink,
+          backgroundColor: Globals.constants.colors.clairPink,
           title: Opacity(
             opacity: 0.6,
             child: Text(
@@ -632,7 +632,8 @@ class _IllustrationPageState extends State<IllustrationPage> {
                 children: <Widget>[
                   Divider(
                     thickness: 2.0,
-                    color: stateColors.secondary.withOpacity(0.4),
+                    color:
+                        Theme.of(context).secondaryHeaderColor.withOpacity(0.4),
                     height: 0.0,
                   ),
                   Padding(
@@ -648,7 +649,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
           ),
           actions: <Widget>[
             Center(
-              child: DarkElevatedButton(
+              child: DarkElevatedButton.large(
                 onPressed: context.beamBack,
                 child: Text("close".tr().toUpperCase()),
               ),

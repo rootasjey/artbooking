@@ -1,0 +1,319 @@
+import 'package:artbooking/actions/books.dart';
+import 'package:artbooking/actions/illustrations.dart';
+import 'package:artbooking/types/custom_upload_task.dart';
+import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/upload_state.dart';
+import 'package:artbooking/utils/app_logger.dart';
+import 'package:artbooking/utils/cloud_helper.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:easy_localization/src/public_ext.dart';
+import 'package:extended_image/extended_image.dart';
+import 'package:file_picker_cross/file_picker_cross.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mime_type/mime_type.dart';
+
+class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
+  UploadTaskListNotifier(List<CustomUploadTask> state) : super(state);
+
+  void add(CustomUploadTask customUploadTask) {
+    state = [
+      ...state,
+      customUploadTask,
+    ];
+  }
+
+  void clear() {
+    state = [];
+  }
+
+  void pauseAll() {
+    for (var customUploadTask in state) {
+      customUploadTask.task?.pause();
+    }
+  }
+
+  void resumeAll() {
+    for (var customUploadTask in state) {
+      customUploadTask.task?.resume();
+    }
+  }
+
+  void remove(CustomUploadTask customUploadTask) {
+    state = state.where((uploadTask) {
+      return uploadTask.illustrationId != customUploadTask.illustrationId;
+    }).toList();
+  }
+
+  void cancelAll() {
+    for (var customUploadTask in state) {
+      _cleanFailedTask(customUploadTask);
+    }
+  }
+
+  void cancel(CustomUploadTask customUploadTask) {
+    _cleanFailedTask(customUploadTask);
+  }
+
+  void removeDone(CustomUploadTask customUploadTask) {
+    final int amount = customUploadTask.task?.snapshot.bytesTransferred ?? 0;
+    final container = ProviderContainer();
+    container.read(uploadBytesTransferredProvider.notifier).remove(amount);
+    remove(customUploadTask);
+  }
+
+  /// A "select file/folder" window will appear. User will have to choose a file.
+  /// This file will be then read, and uploaded to firebase storage;
+  Future<List<FilePickerCross>> pickImage() async {
+    List<FilePickerCross>? pickerResult;
+
+    try {
+      pickerResult = await FilePickerCross.importMultipleFromStorage(
+        type: FileTypeCross.image,
+      );
+    } on Exception catch (_) {}
+
+    if (pickerResult == null) {
+      return [];
+    }
+
+    final List<FilePickerCross> passedFiles = pickerResult
+        .where(_checkSize)
+        .where((file) => file.path != null)
+        .toList();
+
+    for (FilePickerCross passedFile in passedFiles) {
+      _uploadIllustration(passedFile);
+    }
+
+    return passedFiles;
+  }
+
+  /// Select an image file to upload to your illustrations collection,
+  /// and add this illustration to the specified book (with its id).
+  Future<List<FilePickerCross>> pickImageAndAddToBook({
+    required String bookId,
+  }) async {
+    List<FilePickerCross>? pickerResult;
+
+    try {
+      pickerResult = await FilePickerCross.importMultipleFromStorage(
+        type: FileTypeCross.image,
+      );
+    } on Exception catch (_) {}
+
+    if (pickerResult == null) {
+      return [];
+    }
+
+    final List<FilePickerCross> passedFiles =
+        pickerResult.where(_checkSize).toList();
+
+    for (FilePickerCross passedFile in passedFiles) {
+      _uploadIllustrationToBook(
+        file: passedFile,
+        bookId: bookId,
+      );
+    }
+
+    return passedFiles;
+  }
+
+  /// Upload a file creating a Firestore document and adding a new file to
+  /// Firebase Cloud Storage. Then add this new created illustration to
+  /// an existing book.
+  Future _uploadIllustrationToBook({
+    required FilePickerCross file,
+    required String bookId,
+  }) async {
+    final customUploadTask = await _uploadIllustration(file);
+    final String illustrationId = customUploadTask.illustrationId ?? '';
+
+    if (illustrationId.isEmpty) {
+      appLogger.e(
+        "A custom task upload cannot have an empty [illustrationId] "
+        "at this step.",
+      );
+
+      return;
+    }
+
+    final response = await BooksActions.addIllustrations(
+      bookId: bookId,
+      illustrationIds: [illustrationId],
+    );
+
+    if (response.hasErrors) {
+      appLogger.e(
+        "There was an error while adding "
+        "the illustration $illustrationId.",
+      );
+    }
+  }
+
+  bool _checkSize(FilePickerCross file) {
+    if (file.length > 25 * 1024 * 1024) {
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<CustomUploadTask> _uploadIllustration(FilePickerCross file) async {
+    final String fileName =
+        file.fileName ?? "${"unknown".tr()}-${DateTime.now()}";
+
+    final customUploadTask = CustomUploadTask(
+      name: fileName,
+    );
+
+    add(customUploadTask);
+
+    final String illustrationId = await _createFirestoreDocument(fileName);
+
+    if (illustrationId.isEmpty) {
+      _cleanFailedTask(customUploadTask);
+      return customUploadTask;
+    }
+
+    customUploadTask.illustrationId = illustrationId;
+
+    return await _startStorageUpload(
+      file: file,
+      fileName: fileName,
+      filePath: file.path ?? '',
+      illustrationId: illustrationId,
+      customUploadTask: customUploadTask,
+    );
+  }
+
+  Future<String> _createFirestoreDocument(String fileName) async {
+    try {
+      final HttpsCallableResult responseResult =
+          await Cloud.illustrations("createOne").call({
+        "name": fileName,
+        "isUserAuthor": true,
+        "visibility": "public",
+      });
+
+      final bool success = responseResult.data["success"];
+
+      if (!success) {
+        throw "illustration_create_error".tr();
+      }
+
+      return responseResult.data["illustration"]?["id"] ?? '';
+    } catch (error) {
+      appLogger.e(error);
+      return '';
+    }
+  }
+
+  Future<CustomUploadTask> _startStorageUpload({
+    required FilePickerCross file,
+    required String fileName,
+    required String filePath,
+    required String illustrationId,
+    required CustomUploadTask customUploadTask,
+  }) async {
+    final String userId = Globals.state.getUserAuth()?.uid ?? '';
+
+    if (userId.isEmpty) {
+      return customUploadTask;
+    }
+
+    final lastIndexDot = fileName.lastIndexOf(".") + 1;
+    final String extension = fileName.substring(lastIndexDot);
+
+    final String cloudStorageFilePath =
+        "/users/$userId/illustrations/$illustrationId/original.$extension";
+
+    final File uploadFile = File(filePath);
+    final storage = FirebaseStorage.instance;
+
+    final UploadTask uploadTask = storage.ref(cloudStorageFilePath).putFile(
+        uploadFile,
+        SettableMetadata(
+          customMetadata: {
+            "extension": extension,
+            "firestoreId": illustrationId,
+            "userId": userId,
+            "visibility": "public",
+          },
+          contentType: mimeFromExtension(
+            extension,
+          ),
+        ));
+
+    customUploadTask.task = uploadTask;
+    final filteredState = state.where((customTask) {
+      return customTask.illustrationId != customUploadTask.illustrationId;
+    });
+
+    state = [
+      ...filteredState,
+      customUploadTask,
+    ];
+
+    try {
+      await uploadTask;
+      // _incrSuccessTasks(1);
+    } on FirebaseException catch (error) {
+      appLogger.e(error);
+      // _incrAbortedTasks(1);
+    } catch (error) {
+      appLogger.e(error);
+      // _incrAbortedTasks(1);
+    } finally {
+      state = state;
+      return customUploadTask;
+    }
+  }
+
+  void _cleanFailedTask(CustomUploadTask customUploadTask) {
+    remove(customUploadTask);
+
+    final UploadTask? task = customUploadTask.task;
+
+    if (task != null) {
+      final snapshot = task.snapshot;
+
+      final container = ProviderContainer();
+      container
+          .read(uploadBytesTransferredProvider.notifier)
+          .remove(snapshot.bytesTransferred);
+
+      task.cancel();
+      _deleteFirestoreDocument(customUploadTask);
+    }
+  }
+
+  /// Delete the Firestore document created
+  /// if the task is running or paused and was uploading the file to storage.
+  Future _deleteFirestoreDocument(CustomUploadTask customUploadTask) async {
+    final String illustrationId = customUploadTask.illustrationId ?? '';
+
+    if (illustrationId.isEmpty) {
+      return;
+    }
+
+    final state = customUploadTask.task!.snapshot.state;
+    final unfinished = state == TaskState.running || state == TaskState.paused;
+
+    if (!unfinished) {
+      return;
+    }
+
+    try {
+      final response = await IllustrationsActions.deleteOne(
+        illustrationId: illustrationId,
+      );
+
+      if (!response.success) {
+        throw "illustration_delete_error".tr();
+      }
+    } catch (error) {
+      appLogger.e(error);
+    }
+  }
+}

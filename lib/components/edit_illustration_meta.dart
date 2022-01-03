@@ -3,8 +3,8 @@ import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/select_license_panel.dart';
 import 'package:artbooking/components/sheet_header.dart';
-import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/enums.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/types/style.dart';
@@ -50,6 +50,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   final _nameTextController = TextEditingController();
   final _linkNameInputController = TextEditingController();
   final _linkValueInputController = TextEditingController();
+
+  final Color _clairPink = Globals.constants.colors.clairPink;
 
   /// Illustration's selected art styles.
   final List<String?> _selectedStyles = [];
@@ -113,7 +115,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                       child: Text(
                         "card_click_to_expand".tr(),
                         style: FontsUtils.mainStyle(
-                          color: stateColors.secondary,
+                          color: Theme.of(context).secondaryHeaderColor,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -179,12 +181,12 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                   labelText: "illustration_description_sample".tr(),
                   filled: true,
                   isDense: true,
-                  fillColor: stateColors.clairPink,
-                  focusColor: stateColors.clairPink,
+                  fillColor: _clairPink,
+                  focusColor: _clairPink,
                   border: OutlineInputBorder(
                     borderSide: BorderSide(
                       width: 2.0,
-                      color: stateColors.primary,
+                      color: Theme.of(context).primaryColor,
                     ),
                   ),
                 ),
@@ -229,12 +231,12 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                   filled: true,
                   isDense: true,
                   labelText: "illustration_story_sample".tr(),
-                  fillColor: stateColors.clairPink,
-                  focusColor: stateColors.clairPink,
+                  fillColor: _clairPink,
+                  focusColor: _clairPink,
                   border: OutlineInputBorder(
                     borderSide: BorderSide(
                       width: 2.0,
-                      color: stateColors.primary,
+                      color: Theme.of(context).primaryColor,
                     ),
                   ),
                 ),
@@ -284,7 +286,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   Widget metaValidationButton() {
     return Padding(
       padding: const EdgeInsets.only(top: 80.0),
-      child: DarkElevatedButton(
+      child: DarkElevatedButton.large(
         onPressed: Beamer.of(context).popRoute,
         child: Text("done".tr()),
       ),
@@ -317,7 +319,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                   children: [
                     Icon(
                       UniconsLine.circle,
-                      color: stateColors.secondary,
+                      color: Theme.of(context).secondaryHeaderColor,
                     ),
                     Expanded(
                       child: Padding(
@@ -351,8 +353,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         key: _presentationCard,
         elevation: 0.0,
         expandedTextColor: Colors.black,
-        baseColor: stateColors.lightBackground,
-        expandedColor: stateColors.lightBackground,
+        baseColor: Theme.of(context).backgroundColor,
+        expandedColor: Theme.of(context).backgroundColor,
         title: presentationHeader(),
         children: [
           presentationContent(),
@@ -403,7 +405,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
             IconButton(
               tooltip: "update".tr(),
               onPressed: updatePresentation,
-              color: stateColors.primary,
+              color: Theme.of(context).primaryColor,
               icon: Icon(UniconsLine.check),
             ),
           ],
@@ -429,7 +431,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         child: Text(
           "You have unsaved changes.",
           style: FontsUtils.mainStyle(
-            color: stateColors.secondary,
+            color: Theme.of(context).secondaryHeaderColor,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -464,8 +466,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       child: ExpansionTileCard(
         elevation: 0.0,
         expandedTextColor: Colors.black,
-        baseColor: stateColors.lightBackground,
-        expandedColor: stateColors.lightBackground,
+        baseColor: Theme.of(context).backgroundColor,
+        expandedColor: Theme.of(context).backgroundColor,
         title: topicsHeader(),
         children: [
           topicsContent(),
@@ -507,7 +509,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                 fontWeight: FontWeight.w600,
               ),
               labelPadding: const EdgeInsets.symmetric(horizontal: 12.0),
-              deleteIconColor: stateColors.secondary.withOpacity(0.8),
+              deleteIconColor:
+                  Theme.of(context).secondaryHeaderColor.withOpacity(0.8),
               onDeleted: () {
                 removeTopicAndUpdate(entry);
               },
@@ -548,12 +551,12 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                       labelText: "topics_label_text".tr(),
                       filled: true,
                       isDense: true,
-                      fillColor: stateColors.clairPink,
-                      focusColor: stateColors.clairPink,
+                      fillColor: _clairPink,
+                      focusColor: _clairPink,
                       border: OutlineInputBorder(
                         borderSide: BorderSide(
                           width: 2.0,
-                          color: stateColors.primary,
+                          color: Theme.of(context).primaryColor,
                         ),
                       ),
                     ),
@@ -619,8 +622,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       child: ExpansionTileCard(
         elevation: 0.0,
         expandedTextColor: Colors.black,
-        baseColor: stateColors.lightBackground,
-        expandedColor: stateColors.lightBackground,
+        baseColor: Theme.of(context).backgroundColor,
+        expandedColor: Theme.of(context).backgroundColor,
         title: stylesHeader(),
         children: [
           selectedStyles(),
@@ -638,7 +641,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
           top: 24.0,
           left: 16.0,
         ),
-        child: DarkElevatedButton(
+        child: DarkElevatedButton.large(
           onPressed: () {
             setState(() {
               _isSidePanelStylesVisible = !_isSidePanelStylesVisible;
@@ -696,7 +699,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                 ),
                 labelStyle: FontsUtils.mainStyle(fontWeight: FontWeight.w700),
                 elevation: 2.0,
-                deleteIconColor: stateColors.secondary.withOpacity(0.8),
+                deleteIconColor:
+                    Theme.of(context).secondaryHeaderColor.withOpacity(0.8),
                 labelPadding: const EdgeInsets.symmetric(horizontal: 12.0),
                 onDeleted: () {
                   removeStyleAndUpdate(style);
@@ -811,8 +815,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       child: ExpansionTileCard(
         elevation: 0.0,
         expandedTextColor: Colors.black,
-        baseColor: stateColors.lightBackground,
-        expandedColor: stateColors.lightBackground,
+        baseColor: Theme.of(context).backgroundColor,
+        expandedColor: Theme.of(context).backgroundColor,
         title: visibilityHeader(),
         children: [
           visibilityBody(),
@@ -850,7 +854,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                         child: Text(
                           "license_current".tr().toUpperCase(),
                           style: FontsUtils.mainStyle(
-                            color: stateColors.primary,
+                            color: Theme.of(context).primaryColor,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
@@ -911,8 +915,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       child: ExpansionTileCard(
         elevation: 0.0,
         expandedTextColor: Colors.black,
-        baseColor: stateColors.lightBackground,
-        expandedColor: stateColors.lightBackground,
+        baseColor: Theme.of(context).backgroundColor,
+        expandedColor: Theme.of(context).backgroundColor,
         onExpansionChanged: (isExpanded) {
           if (!isExpanded) {
             return;
@@ -937,7 +941,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
           top: 24.0,
           left: 16.0,
         ),
-        child: DarkElevatedButton(
+        child: DarkElevatedButton.large(
           onPressed: () {
             setState(() {
               _isSidePanelLicenseVisible = !_isSidePanelLicenseVisible;

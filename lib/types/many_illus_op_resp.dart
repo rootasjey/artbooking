@@ -1,4 +1,4 @@
-import 'package:artbooking/types/cloud_func_error.dart';
+import 'package:artbooking/types/cloud_function_error.dart';
 import 'package:artbooking/types/illustration_op.dart';
 import 'package:artbooking/types/user/partial_user.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -8,7 +8,7 @@ class ManyIllusOpResp {
   final int? successCount;
   final List<IllustrationOp> illustrations;
   final String message;
-  final CloudFuncError? error;
+  final CloudFunctionError? error;
   final PartialUser? user;
 
   ManyIllusOpResp({
@@ -22,7 +22,7 @@ class ManyIllusOpResp {
 
   factory ManyIllusOpResp.fromException(FirebaseFunctionsException exception) {
     return ManyIllusOpResp(
-      error: CloudFuncError.fromException(exception),
+      error: CloudFunctionError.fromException(exception),
       hasErrors: true,
       illustrations: [],
       user: PartialUser.empty(),
@@ -31,7 +31,7 @@ class ManyIllusOpResp {
 
   factory ManyIllusOpResp.empty() {
     return ManyIllusOpResp(
-      error: CloudFuncError.empty(),
+      error: CloudFunctionError.empty(),
       hasErrors: true,
       illustrations: [],
       user: PartialUser.empty(),
@@ -48,7 +48,7 @@ class ManyIllusOpResp {
       successCount: data['successCount'] ?? 0,
       hasErrors: data['hasErrors'] ?? true,
       user: PartialUser.fromJSON(data['user']),
-      error: CloudFuncError.fromJSON(data['error']),
+      error: CloudFunctionError.fromJSON(data['error']),
     );
   }
 
@@ -56,7 +56,7 @@ class ManyIllusOpResp {
     return ManyIllusOpResp(
       hasErrors: true,
       illustrations: [],
-      error: CloudFuncError.fromMessage(message),
+      error: CloudFunctionError.fromMessage(message),
       user: PartialUser(),
     );
   }

@@ -1,16 +1,12 @@
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/fade_in_y.dart';
-import 'package:artbooking/components/main_app_bar.dart';
-import 'package:artbooking/router/locations/signin_location.dart';
-import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/app_storage.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
@@ -21,19 +17,20 @@ class UpdatePasswordPage extends StatefulWidget {
 }
 
 class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
-  bool isCompleted = false;
-  bool isUpdating = false;
+  bool _isCompleted = false;
+  bool _isUpdating = false;
 
-  double beginY = 10.0;
+  double _beginY = 10.0;
 
-  final newPasswordNode = FocusNode();
+  final Color _clairPink = Globals.constants.colors.clairPink;
+  final _newPasswordNode = FocusNode();
 
-  String password = '';
-  String newPassword = '';
+  String _currentPassword = '';
+  String _newPassword = '';
 
   @override
   void dispose() {
-    newPasswordNode.dispose();
+    _newPasswordNode.dispose();
     super.dispose();
   }
 
@@ -51,11 +48,11 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
   }
 
   Widget body() {
-    if (isCompleted) {
+    if (_isCompleted) {
       return completedView();
     }
 
-    if (isUpdating) {
+    if (_isUpdating) {
       return updatingScreen();
     }
 
@@ -73,7 +70,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
                 padding: const EdgeInsets.only(top: 80.0),
                 child: Icon(
                   UniconsLine.check,
-                  color: stateColors.validation,
+                  color: Globals.constants.colors.validation,
                   size: 80.0,
                 ),
               ),
@@ -106,7 +103,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(
               fillColor: Colors.white,
-              focusColor: stateColors.clairPink,
+              focusColor: _clairPink,
               labelText: "password_current".tr(),
               border: OutlineInputBorder(),
               contentPadding: const EdgeInsets.symmetric(
@@ -114,9 +111,9 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
               ),
             ),
             onChanged: (value) {
-              password = value;
+              _currentPassword = value;
             },
-            onFieldSubmitted: (_) => newPasswordNode.requestFocus(),
+            onFieldSubmitted: (_) => _newPasswordNode.requestFocus(),
             obscureText: true,
             validator: (value) {
               if (value!.isEmpty) {
@@ -210,7 +207,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
       ),
       width: 378.0,
       child: Card(
-        color: stateColors.clairPink,
+        color: Globals.constants.colors.clairPink,
         child: ListTile(
           contentPadding: const EdgeInsets.all(16.0),
           leading: Icon(UniconsLine.question),
@@ -243,22 +240,22 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
           children: <Widget>[
             FadeInY(
               delay: 0.milliseconds,
-              beginY: beginY,
+              beginY: _beginY,
               child: helpCard(),
             ),
             FadeInY(
               delay: 100.milliseconds,
-              beginY: beginY,
+              beginY: _beginY,
               child: currentPasswordInput(),
             ),
             FadeInY(
               delay: 200.milliseconds,
-              beginY: beginY,
+              beginY: _beginY,
               child: newPasswordInput(),
             ),
             FadeInY(
               delay: 300.milliseconds,
-              beginY: beginY,
+              beginY: _beginY,
               child: validationButton(),
             ),
             Padding(
@@ -283,10 +280,10 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           TextFormField(
-            focusNode: newPasswordNode,
+            focusNode: _newPasswordNode,
             decoration: InputDecoration(
               fillColor: Colors.white,
-              focusColor: stateColors.clairPink,
+              focusColor: _clairPink,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 8.0,
               ),
@@ -299,9 +296,9 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
             ),
             obscureText: true,
             onChanged: (value) {
-              newPassword = value;
+              _newPassword = value;
             },
-            onFieldSubmitted: (value) => updatePassword(),
+            onFieldSubmitted: (value) => tryUpdatePassword(),
             validator: (value) {
               if (value!.isEmpty) {
                 return "password_empty_forbidden".tr();
@@ -349,7 +346,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
 
   Widget validationButton() {
     return ElevatedButton(
-      onPressed: updatePassword,
+      onPressed: tryUpdatePassword,
       style: ElevatedButton.styleFrom(
         primary: Colors.black87,
       ),
@@ -375,40 +372,26 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
     );
   }
 
-  void updatePassword() async {
-    if (!inputValuesOk()) {
+  void tryUpdatePassword() async {
+    if (!checkInputsFormat()) {
       return;
     }
 
-    setState(() => isUpdating = true);
+    setState(() => _isUpdating = true);
 
     try {
-      final userAuth = stateUser.userAuth;
-
-      if (userAuth == null) {
-        setState(() => isUpdating = false);
-        context.beamToNamed(SigninLocation.route);
-        return;
-      }
-
-      final credentials = EmailAuthProvider.credential(
-        email: userAuth.email!,
-        password: password,
-      );
-
-      final authResult =
-          await userAuth.reauthenticateWithCredential(credentials);
-
-      await authResult.user!.updatePassword(newPassword);
-      appStorage.setPassword(newPassword);
+      Globals.state.getUserNotifier().updatePassword(
+            currentPassword: _currentPassword,
+            newPassword: _newPassword,
+          );
 
       setState(() {
-        isUpdating = false;
-        isCompleted = true;
+        _isUpdating = false;
+        _isCompleted = true;
       });
     } catch (error) {
       appLogger.e(error);
-      setState(() => isUpdating = false);
+      setState(() => _isUpdating = false);
 
       Snack.e(
         context: context,
@@ -417,8 +400,8 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
     }
   }
 
-  bool inputValuesOk() {
-    if (password.isEmpty) {
+  bool checkInputsFormat() {
+    if (_currentPassword.isEmpty) {
       Snack.e(
         context: context,
         message: "password_empty_forbidden".tr(),
@@ -427,7 +410,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
       return false;
     }
 
-    if (newPassword.isEmpty) {
+    if (_newPassword.isEmpty) {
       Snack.e(
         context: context,
         message: "password_empty_forbidden".tr(),
@@ -444,7 +427,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
       context: context,
       builder: (context) {
         return SimpleDialog(
-          backgroundColor: stateColors.clairPink,
+          backgroundColor: _clairPink,
           title: Text(
             "password_tips".tr(),
             style: FontsUtils.mainStyle(
@@ -454,7 +437,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
           ),
           children: <Widget>[
             Divider(
-              color: stateColors.secondary,
+              color: Theme.of(context).secondaryHeaderColor,
               thickness: 1.0,
             ),
             Padding(

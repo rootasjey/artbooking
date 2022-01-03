@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:algolia/algolia.dart';
 import 'package:artbooking/components/circle_button.dart';
 import 'package:artbooking/components/fade_in_x.dart';
-import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/types/style.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
@@ -80,6 +80,9 @@ class _AddStylePanelState extends State<AddStylePanel> {
   /// Delay search after typing input.
   Timer? _searchTimer;
 
+  final Color _clairPink = Globals.constants.colors.clairPink;
+  final Color _secondaryColor = Globals.constants.colors.secondary;
+
   @override
   initState() {
     super.initState();
@@ -103,7 +106,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
       beginX: 16.0,
       child: Material(
         elevation: widget.elevation,
-        color: stateColors.clairPink,
+        color: _clairPink,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
         ),
@@ -167,7 +170,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
       child: Container(
         padding: const EdgeInsets.only(top: 20.0),
         decoration: BoxDecoration(
-          color: stateColors.clairPink,
+          color: _clairPink,
           borderRadius: BorderRadius.circular(12.0),
         ),
         child: Column(
@@ -222,7 +225,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
               width: _containerWidth,
               child: Divider(
                 thickness: 2.0,
-                color: stateColors.secondary,
+                color: _secondaryColor,
                 height: 40.0,
               ),
             ),
@@ -343,7 +346,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                     if (selected)
                       Icon(
                         UniconsLine.check,
-                        color: selected ? stateColors.secondary : null,
+                        color: selected ? _secondaryColor : null,
                       ),
                     Expanded(
                       child: Text(
@@ -351,7 +354,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                         style: FontsUtils.mainStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
-                            color: selected ? stateColors.secondary : null),
+                            color: selected ? _secondaryColor : null),
                       ),
                     ),
                   ],
@@ -390,7 +393,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                     if (selected)
                       Icon(
                         UniconsLine.check,
-                        color: selected ? stateColors.secondary : null,
+                        color: selected ? _secondaryColor : null,
                       ),
                     Expanded(
                       child: Text(
@@ -398,7 +401,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                         style: FontsUtils.mainStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
-                            color: selected ? stateColors.secondary : null),
+                            color: selected ? _secondaryColor : null),
                       ),
                     ),
                   ],
@@ -437,12 +440,12 @@ class _AddStylePanelState extends State<AddStylePanel> {
                     filled: true,
                     isDense: true,
                     labelText: "style_label_text".tr(),
-                    fillColor: stateColors.clairPink,
-                    focusColor: stateColors.clairPink,
+                    fillColor: _clairPink,
+                    focusColor: _clairPink,
                     border: OutlineInputBorder(
                       borderSide: BorderSide(
                         width: 4.0,
-                        color: stateColors.primary,
+                        color: Globals.constants.colors.primary,
                       ),
                     ),
                   ),

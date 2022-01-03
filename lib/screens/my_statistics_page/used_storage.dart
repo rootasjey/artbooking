@@ -1,0 +1,43 @@
+import 'package:artbooking/screens/my_statistics_page/text_icon.dart';
+import 'package:artbooking/utils/fonts.dart';
+import 'package:easy_localization/src/public_ext.dart';
+import 'package:flutter/material.dart';
+import 'package:unicons/unicons.dart';
+
+class UsedStorage extends StatelessWidget {
+  const UsedStorage({
+    Key? key,
+    required this.usedSpace,
+  }) : super(key: key);
+
+  final String usedSpace;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextIcon(
+      icon: Icon(
+        UniconsLine.database,
+        size: 24.0,
+      ),
+      richText: RichText(
+        text: TextSpan(
+          style: TextStyle(
+            color:
+                Theme.of(context).textTheme.bodyText1?.color?.withOpacity(0.6),
+            fontSize: 16.0,
+          ),
+          children: [
+            TextSpan(text: "space_total_used".tr()),
+            TextSpan(
+              text: " $usedSpace",
+              style: FontsUtils.mainStyle(
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

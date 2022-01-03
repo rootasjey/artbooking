@@ -2,9 +2,8 @@ import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/loading_animation.dart';
-import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/router/locations/home_location.dart';
-import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
@@ -233,7 +232,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         child: ElevatedButton(
           onPressed: sendResetLink,
           style: ElevatedButton.styleFrom(
-            primary: stateColors.primary,
+            primary: Theme.of(context).primaryColor,
             textStyle: TextStyle(
               color: Colors.white,
             ),

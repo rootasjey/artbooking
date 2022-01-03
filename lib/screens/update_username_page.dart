@@ -3,16 +3,15 @@ import 'dart:async';
 import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/fade_in_y.dart';
-import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
-import 'package:artbooking/router/locations/signin_location.dart';
-import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user.dart';
+import 'package:artbooking/types/cloud_function_response.dart';
+import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/user_notifier.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
@@ -24,33 +23,26 @@ class UpdateUsernamePage extends StatefulWidget {
 }
 
 class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
-  bool isCheckingAuth = false;
-  bool isUpdating = false;
-  bool isCheckingName = false;
-  bool isCompleted = false;
-  bool? isNameAvailable = false;
+  bool _isUpdating = false;
+  bool _isCheckingName = false;
+  bool _isCompleted = false;
+  bool _isNameAvailable = false;
 
-  final beginY = 10.0;
-  final passwordNode = FocusNode();
-  final usernameController = TextEditingController();
+  final _passwordNode = FocusNode();
+  final _usernameController = TextEditingController();
   final _pageScrollController = ScrollController();
+  final Color _clairPink = Globals.constants.colors.clairPink;
 
-  String currentUsername = '';
-  String nameErrorMessage = '';
-  String newUsername = '';
+  String _currentUsername = '';
+  String _nameErrorMessage = '';
+  String _newUsername = '';
 
-  Timer? nameTimer;
-
-  @override
-  void initState() {
-    super.initState();
-    checkAuth();
-  }
+  Timer? _nameTimer;
 
   @override
   void dispose() {
-    usernameController.dispose();
-    passwordNode.dispose();
+    _usernameController.dispose();
+    _passwordNode.dispose();
     super.dispose();
   }
 
@@ -70,11 +62,11 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
   }
 
   Widget body() {
-    if (isCompleted) {
+    if (_isCompleted) {
       return completedView();
     }
 
-    if (isUpdating) {
+    if (_isUpdating) {
       return updatingView();
     }
 
@@ -194,7 +186,7 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
         bottom: 40.0,
       ),
       child: Card(
-        color: stateColors.clairPink,
+        color: _clairPink,
         elevation: 2.0,
         child: InkWell(
           child: Container(
@@ -208,7 +200,7 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
                       padding: const EdgeInsets.only(right: 10.0),
                       child: Icon(
                         UniconsLine.envelope,
-                        color: stateColors.secondary,
+                        color: Theme.of(context).secondaryHeaderColor,
                       ),
                     ),
                     Column(
@@ -224,7 +216,7 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
                           ),
                         ),
                         Text(
-                          currentUsername,
+                          _currentUsername,
                           style: FontsUtils.mainStyle(
                             fontWeight: FontWeight.w600,
                           ),
@@ -303,10 +295,10 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
         children: <Widget>[
           TextFormField(
             autofocus: true,
-            controller: usernameController,
+            controller: _usernameController,
             decoration: InputDecoration(
               fillColor: Colors.white,
-              focusColor: stateColors.clairPink,
+              focusColor: _clairPink,
               labelText: "username_new".tr(),
               border: OutlineInputBorder(),
               contentPadding: const EdgeInsets.symmetric(
@@ -316,17 +308,17 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
             keyboardType: TextInputType.text,
             onChanged: (value) async {
               setState(() {
-                newUsername = value;
-                isCheckingName = true;
+                _newUsername = value;
+                _isCheckingName = true;
               });
 
               final isWellFormatted =
-                  UsersActions.checkUsernameFormat(newUsername);
+                  UsersActions.checkUsernameFormat(_newUsername);
 
               if (!isWellFormatted) {
                 setState(() {
-                  isCheckingName = false;
-                  nameErrorMessage = newUsername.length < 3
+                  _isCheckingName = false;
+                  _nameErrorMessage = _newUsername.length < 3
                       ? "input_minimum_char".tr()
                       : "input_valid_format".tr();
                 });
@@ -334,42 +326,40 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
                 return;
               }
 
-              if (nameTimer != null) {
-                nameTimer!.cancel();
-                nameTimer = null;
-              }
+              _nameTimer?.cancel();
+              _nameTimer = null;
 
-              nameTimer = Timer(1.seconds, () async {
-                isNameAvailable =
-                    await UsersActions.checkUsernameAvailability(newUsername);
+              _nameTimer = Timer(1.seconds, () async {
+                _isNameAvailable =
+                    await UsersActions.checkUsernameAvailability(_newUsername);
 
-                if (!isNameAvailable!) {
+                if (!_isNameAvailable) {
                   setState(() {
-                    isCheckingName = false;
-                    nameErrorMessage = "username_not_available".tr();
+                    _isCheckingName = false;
+                    _nameErrorMessage = "username_not_available".tr();
                   });
 
                   return;
                 }
 
                 setState(() {
-                  isCheckingName = false;
-                  nameErrorMessage = '';
+                  _isCheckingName = false;
+                  _nameErrorMessage = '';
                 });
               });
             },
           ),
-          if (isCheckingName)
+          if (_isCheckingName)
             Container(
               width: 230.0,
               padding: const EdgeInsets.only(left: 40.0),
               child: LinearProgressIndicator(),
             ),
-          if (nameErrorMessage.isNotEmpty)
+          if (_nameErrorMessage.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(left: 40.0, top: 5.0),
               child: Text(
-                nameErrorMessage,
+                _nameErrorMessage,
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 15.0,
@@ -383,7 +373,7 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
 
   Widget validationButton() {
     return ElevatedButton(
-      onPressed: updateUsernameProcess,
+      onPressed: tryUpdateUsername,
       style: ElevatedButton.styleFrom(
         primary: Colors.black87,
       ),
@@ -408,44 +398,13 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
     );
   }
 
-  void checkAuth() async {
-    setState(() {
-      isCheckingAuth = true;
-    });
-
-    try {
-      final userAuth = stateUser.userAuth;
-
-      setState(() {
-        isCheckingAuth = false;
-      });
-
-      if (userAuth == null) {
-        return;
-      }
-
-      final user = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userAuth.uid)
-          .get();
-
-      final data = user.data();
-
-      setState(() {
-        currentUsername = data!['name'] ?? '';
-      });
-    } catch (error) {
-      appLogger.e(error);
-    }
-  }
-
-  bool inputValuesOk() {
-    final isWellFormatted = UsersActions.checkUsernameFormat(newUsername);
+  bool checkInputsFormat() {
+    final isWellFormatted = UsersActions.checkUsernameFormat(_newUsername);
 
     if (!isWellFormatted) {
       setState(() {
-        isCheckingName = false;
-        nameErrorMessage = newUsername.length < 3
+        _isCheckingName = false;
+        _nameErrorMessage = _newUsername.length < 3
             ? "input_minimum_char".tr()
             : "input_valid_format".tr();
       });
@@ -456,53 +415,43 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
     return true;
   }
 
-  void updateUsernameProcess() async {
-    if (!inputValuesOk()) {
+  void tryUpdateUsername() async {
+    if (!checkInputsFormat()) {
       return;
     }
 
-    setState(() {
-      isUpdating = true;
-    });
+    setState(() => _isUpdating = true);
 
     try {
-      isNameAvailable =
-          await UsersActions.checkUsernameAvailability(newUsername);
+      _isNameAvailable = await UsersActions.checkUsernameAvailability(
+        _newUsername,
+      );
 
-      if (!isNameAvailable!) {
+      if (!_isNameAvailable) {
         setState(() {
-          isCompleted = false;
-          isUpdating = false;
+          _isCompleted = false;
+          _isUpdating = false;
         });
 
         Snack.e(
           context: context,
-          message: "username_not_available_args".tr(args: [newUsername]),
+          message: "username_not_available_args".tr(args: [_newUsername]),
         );
 
         return;
       }
 
-      final userAuth = stateUser.userAuth;
+      final UserNotifier userNotifier = Globals.state.getUserNotifier();
+      final CloudFunctionResponse response = await userNotifier.updateUsername(
+        _newUsername,
+      );
 
-      if (userAuth == null) {
-        setState(() {
-          isCompleted = false;
-          isUpdating = false;
-        });
-
-        context.beamToNamed(SigninLocation.route);
-        return;
-      }
-
-      final usernameUpdateResp = await stateUser.updateUsername(newUsername);
-
-      if (!usernameUpdateResp.success) {
-        final exception = usernameUpdateResp.error!;
+      if (!response.success) {
+        final exception = response.error!;
 
         setState(() {
-          isCompleted = false;
-          isUpdating = false;
+          _isCompleted = false;
+          _isUpdating = false;
         });
 
         Snack.e(
@@ -514,26 +463,22 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
       }
 
       setState(() {
-        isCompleted = true;
-        isUpdating = false;
-        currentUsername = newUsername;
-        newUsername = '';
+        _isCompleted = true;
+        _isUpdating = false;
+        _currentUsername = _newUsername;
+        _newUsername = '';
       });
-
-      stateUser.setUsername(currentUsername);
 
       Snack.s(
         context: context,
         message: "username_update_success".tr(),
       );
-
-      // Navigator.of(context).pop();
     } catch (error) {
-      debugPrint(error.toString());
+      appLogger.e(error);
 
       setState(() {
-        isCompleted = false;
-        isUpdating = false;
+        _isCompleted = false;
+        _isUpdating = false;
       });
 
       Snack.e(
@@ -548,7 +493,7 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
       context: context,
       builder: (context) {
         return SimpleDialog(
-          backgroundColor: stateColors.clairPink,
+          backgroundColor: _clairPink,
           title: Text(
             "username_current".tr(),
             style: TextStyle(
@@ -557,7 +502,7 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
           ),
           children: <Widget>[
             Divider(
-              color: stateColors.secondary,
+              color: Theme.of(context).secondaryHeaderColor,
               thickness: 1.0,
             ),
             Padding(
@@ -567,7 +512,7 @@ class _UpdateUsernamePageState extends State<UpdateUsernamePage> {
               child: Opacity(
                 opacity: 0.6,
                 child: Text(
-                  currentUsername,
+                  _currentUsername,
                   style: FontsUtils.mainStyle(
                     fontWeight: FontWeight.bold,
                   ),

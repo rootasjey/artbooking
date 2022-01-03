@@ -1,8 +1,9 @@
 import 'dart:async';
 
-import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/locations/signin_location.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
@@ -12,8 +13,6 @@ import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/loading_animation.dart';
-import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
@@ -134,9 +133,10 @@ class _SignupPageState extends State<SignupPage> {
             }
 
             _emailTimer = Timer(1.seconds, () async {
-              final isAvailable =
-                  await (UsersActions.checkEmailAvailability(_email)
-                      as FutureOr<bool>);
+              final isAvailable = await UsersActions.checkEmailAvailability(
+                _email,
+              );
+
               if (!isAvailable) {
                 setState(() {
                   _isCheckingEmail = false;
@@ -302,8 +302,9 @@ class _SignupPageState extends State<SignupPage> {
 
                 _nameTimer = Timer(1.seconds, () async {
                   final isAvailable =
-                      await (UsersActions.checkUsernameAvailability(_username)
-                          as FutureOr<bool>);
+                      await UsersActions.checkUsernameAvailability(
+                    _username,
+                  );
 
                   if (!isAvailable) {
                     setState(() {
@@ -446,7 +447,7 @@ class _SignupPageState extends State<SignupPage> {
           child: ElevatedButton(
             onPressed: () => signUpProcess(),
             style: ElevatedButton.styleFrom(
-              primary: stateColors.primary,
+              primary: Theme.of(context).primaryColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(
                   Radius.circular(7.0),
@@ -507,72 +508,49 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  void signUpProcess() async {
-    if (!inputValuesOk()) {
-      return;
+  Future<bool> checkInputs() async {
+    if (!checkInputsFormat()) {
+      return false;
     }
 
+    if (!await checkInputsAvailability()) {
+      return false;
+    }
+
+    return true;
+  }
+
+  void signUpProcess() async {
     setState(() => _isSigningUp = true);
 
-    if (!await valuesAvailabilityCheck()) {
-      setState(() {
-        _isSigningUp = false;
-      });
-
-      Snack.e(
-        context: context,
-        message: "email_not_available".tr(),
-      );
-
+    if (!await checkInputs()) {
+      setState(() => _isSigningUp = false);
       return;
     }
 
-    // ?NOTE: Triming because of TAB key on Desktop insert blank spaces.
-    _email = _email.trim();
-    _password = _password.trim();
-
     try {
-      final respCreateAcc = await UsersActions.createAccount(
+      final userNotifier = Globals.state.getUserNotifier();
+      final createAccountResponse = await userNotifier.signUp(
         email: _email,
         username: _username,
         password: _password,
       );
 
-      if (!respCreateAcc.success) {
-        final exception = respCreateAcc.error!;
-
-        setState(() => _isSigningUp = false);
-
-        Snack.e(
-          context: context,
-          message: "[code: ${exception.code}] - ${exception.message}",
-        );
-
-        return;
-      }
-
-      final userCred = await stateUser.signin(
-        email: _email,
-        password: _password,
-      );
-
       setState(() => _isSigningUp = false);
 
-      if (userCred == null) {
-        Snack.e(
-          context: context,
-          message: "account_create_error".tr(),
-        );
-
+      if (createAccountResponse.success) {
+        Beamer.of(context).beamToNamed(HomeLocation.route);
         return;
       }
 
-      // PushNotifications.linkAuthUser(respCreateAcc.user.id);
+      String message = "account_create_error".tr();
+      final error = createAccountResponse.error;
 
-      if (widget.onSignupResult != null) {
-        widget.onSignupResult!(true);
-        return;
+      if (error != null && error.code != null && error.message != null) {
+        message = "[code: ${error.code}] - ${error.message}";
       }
+
+      Snack.e(context: context, message: message);
 
       context.beamToNamed(HomeLocation.route);
     } catch (error) {
@@ -587,14 +565,17 @@ class _SignupPageState extends State<SignupPage> {
     }
   }
 
-  Future<bool> valuesAvailabilityCheck() async {
-    final isEmailOk =
-        await (UsersActions.checkEmailAvailability(_email) as FutureOr<bool>);
+  Future<bool> checkInputsAvailability() async {
+    final isEmailOk = await (UsersActions.checkEmailAvailability(_email));
     final isNameOk = await UsersActions.checkUsernameAvailability(_username);
-    return isEmailOk && isNameOk!;
+    return isEmailOk && isNameOk;
   }
 
-  bool inputValuesOk() {
+  bool checkInputsFormat() {
+    // ?NOTE: Triming because of TAB key on Desktop insert blank spaces.
+    _email = _email.trim();
+    _password = _password.trim();
+
     if (_password.isEmpty || _confirmPassword.isEmpty) {
       Snack.e(
         context: context,

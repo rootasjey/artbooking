@@ -1,9 +1,9 @@
 class Author {
   /// Author's id.
-  String? id;
+  String id;
 
   Author({
-    this.id = '',
+    required this.id,
   });
 
   factory Author.empty() {

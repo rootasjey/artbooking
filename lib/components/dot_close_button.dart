@@ -1,4 +1,3 @@
-import 'package:artbooking/state/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
@@ -35,7 +34,7 @@ class _DotCloseButtonState extends State<DotCloseButton> {
           width: 16.0,
           height: 16.0,
           decoration: BoxDecoration(
-            color: stateColors.secondary,
+            color: Theme.of(context).secondaryHeaderColor,
             shape: BoxShape.circle,
           ),
           child: Opacity(

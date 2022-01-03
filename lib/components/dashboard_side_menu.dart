@@ -2,7 +2,7 @@ import 'package:artbooking/components/side_menu_item.dart';
 import 'package:artbooking/components/underlined_button.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
-import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/utils/app_storage.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
@@ -37,20 +37,20 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
     SideMenuItem(
       iconData: UniconsLine.chart_pie,
       label: "statistics".tr(),
-      hoverColor: stateColors.activity,
-      routePath: DashboardContentLocation.statisticsRoute,
+      hoverColor: Globals.constants.colors.activity,
+      routePath: DashboardLocationContent.statisticsRoute,
     ),
     SideMenuItem(
       iconData: UniconsLine.picture,
       label: "illustrations".tr(),
-      hoverColor: stateColors.illustrations,
-      routePath: DashboardContentLocation.illustrationsRoute,
+      hoverColor: Globals.constants.colors.illustrations,
+      routePath: DashboardLocationContent.illustrationsRoute,
     ),
     SideMenuItem(
       iconData: UniconsLine.book_alt,
       label: "books".tr(),
-      hoverColor: stateColors.books,
-      routePath: DashboardContentLocation.booksRoute,
+      hoverColor: Globals.constants.colors.books,
+      routePath: DashboardLocationContent.booksRoute,
     ),
     // SideMenuItem(
     //   destination: MyGalleriesDeepRoute(),
@@ -73,8 +73,8 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
     SideMenuItem(
       iconData: UniconsLine.setting,
       label: "settings".tr(),
-      hoverColor: stateColors.settings,
-      routePath: DashboardContentLocation.settingsRoute,
+      hoverColor: Globals.constants.colors.settings,
+      routePath: DashboardLocationContent.settingsRoute,
     ),
   ];
 
@@ -109,7 +109,7 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
     }
 
     return Material(
-      color: stateColors.lightBackground,
+      color: Theme.of(context).backgroundColor,
       child: AnimatedContainer(
         duration: 500.milliseconds,
         curve: Curves.easeOutExpo,
@@ -143,8 +143,11 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
       sliver: SliverList(
           delegate: SliverChildListDelegate.fixed(
         _sidePanelItems.map((sidePanelItem) {
-          Color color = stateColors.foreground.withOpacity(0.6);
-          Color textColor = stateColors.foreground.withOpacity(0.4);
+          final Color foregroundColor =
+              Theme.of(context).textTheme.bodyText1?.color ?? Colors.white;
+
+          Color color = foregroundColor.withOpacity(0.6);
+          Color textColor = foregroundColor.withOpacity(0.4);
           FontWeight fontWeight = FontWeight.w600;
 
           final bool pathMatch = context
@@ -154,7 +157,7 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
 
           if (pathMatch) {
             color = sidePanelItem.hoverColor;
-            textColor = stateColors.foreground.withOpacity(0.6);
+            textColor = foregroundColor.withOpacity(0.6);
             fontWeight = FontWeight.w700;
           }
 

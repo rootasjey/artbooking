@@ -11,16 +11,16 @@ class UserFirestore {
   String job;
   String lang;
   String location;
-  String? name;
+  String name;
   String nameLowerCase;
-  final UserPP? pp;
+  final UserPP pp;
   String pricing;
   UserSettings? settings;
-  UserStats? stats;
-  String? summary;
-  String? uid;
+  UserStats stats;
+  String summary;
+  String uid;
   DateTime? updatedAt;
-  UserUrls? urls;
+  UserUrls urls;
 
   UserFirestore({
     this.createdAt,
@@ -31,14 +31,14 @@ class UserFirestore {
     this.lang = 'en',
     this.name = '',
     this.nameLowerCase = '',
-    this.pp,
+    required this.pp,
     this.pricing = 'free',
     this.settings,
-    this.stats,
-    this.summary,
-    this.uid,
+    required this.stats,
+    this.summary = '',
+    this.uid = '',
     this.updatedAt,
-    this.urls,
+    required this.urls,
   });
 
   factory UserFirestore.empty() {
@@ -95,11 +95,11 @@ class UserFirestore {
     data['job'] = job;
     data['lang'] = lang;
     data['location'] = location;
-    data['pp'] = pp!.toJSON();
+    data['pp'] = pp.toJSON();
     data['pricing'] = pricing;
     data['summary'] = summary;
     data['updatedAt'] = DateTime.now().millisecondsSinceEpoch;
-    data['urls'] = urls!.toJSON();
+    data['urls'] = urls.toJSON();
 
     return data;
   }
@@ -108,16 +108,16 @@ class UserFirestore {
   /// If [placeholder] is `true`, the method will return
   /// a default picture if the user hasn't set one.
   String getPP() {
-    final edited = pp!.url!.edited;
-    final original = pp!.url!.original;
+    final edited = pp.url.edited;
+    final original = pp.url.original;
     final defaultUrl =
         "https://img.icons8.com/plasticine/100/000000/flower.png";
 
-    if (edited != null && edited.isNotEmpty) {
+    if (edited.isNotEmpty) {
       return edited;
     }
 
-    if (original != null && original.isNotEmpty) {
+    if (original.isNotEmpty) {
       return original;
     }
 

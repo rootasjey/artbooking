@@ -1,4 +1,4 @@
-import 'package:artbooking/types/cloud_func_error.dart';
+import 'package:artbooking/types/cloud_function_error.dart';
 import 'package:artbooking/types/book_op.dart';
 import 'package:artbooking/types/user/partial_user.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -8,7 +8,7 @@ class ManyBooksOpResp {
   final int successCount;
   final List<BookOp> books;
   final String message;
-  final CloudFuncError error;
+  final CloudFunctionError error;
   final PartialUser user;
 
   ManyBooksOpResp({
@@ -23,7 +23,7 @@ class ManyBooksOpResp {
   factory ManyBooksOpResp.fromException(FirebaseFunctionsException exception) {
     return ManyBooksOpResp(
       books: [],
-      error: CloudFuncError.fromException(exception),
+      error: CloudFunctionError.fromException(exception),
       hasErrors: true,
       message: '',
       successCount: 0,
@@ -37,7 +37,7 @@ class ManyBooksOpResp {
       hasErrors: data['hasErrors'] ?? true,
       successCount: data['successCount'],
       user: PartialUser.fromJSON(data['user']),
-      error: CloudFuncError.fromJSON(data['error']),
+      error: CloudFunctionError.fromJSON(data['error']),
     );
   }
 
@@ -45,7 +45,7 @@ class ManyBooksOpResp {
     return ManyBooksOpResp(
       hasErrors: true,
       books: [],
-      error: CloudFuncError.fromMessage(message),
+      error: CloudFunctionError.fromMessage(message),
       user: PartialUser(),
     );
   }

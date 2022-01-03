@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
@@ -132,7 +131,7 @@ class FlashHelper {
 
         return Flash(
           controller: controller,
-          backgroundColor: stateColors.background,
+          backgroundColor: Theme.of(context).backgroundColor,
           boxShadows: [BoxShadow(blurRadius: 4)],
           barrierBlur: 1.0,
           barrierColor: Colors.black38,
@@ -507,7 +506,7 @@ class FlashHelper {
 
         return Flash(
           controller: controller,
-          backgroundColor: stateColors.background,
+          backgroundColor: Theme.of(context).backgroundColor,
           boxShadows: [BoxShadow(blurRadius: 4)],
           barrierBlur: 3.0,
           barrierColor: Colors.black38,
@@ -540,7 +539,7 @@ class FlashHelper {
                 IconButton(
                   icon: Icon(
                     UniconsLine.times,
-                    color: stateColors.secondary,
+                    color: Theme.of(context).secondaryHeaderColor,
                   ),
                   onPressed: () => controller.dismiss(),
                 ),

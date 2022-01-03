@@ -1,11 +1,11 @@
-import 'package:artbooking/components/better_avatar.dart';
+import 'package:artbooking/components/avatar/better_avatar.dart';
 import 'package:artbooking/components/form_actions_inputs.dart';
-import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/sheet_header.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
-import 'package:artbooking/state/colors.dart';
-import 'package:artbooking/state/user.dart';
+import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:artbooking/types/user/user_pp.dart';
 import 'package:artbooking/types/user/user_pp_path.dart';
 import 'package:artbooking/types/user/user_pp_url.dart';
@@ -21,7 +21,6 @@ import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -35,22 +34,13 @@ class MyProfilePage extends StatefulWidget {
 
 class _MyProfilePageState extends State<MyProfilePage> {
   bool _isUpdating = false;
-
-  TextEditingController? _textInputController;
-
   String _selectedLink = '';
-
+  var _textInputController = TextEditingController();
   var _tempUserUrls = UserUrls();
 
   @override
-  initState() {
-    super.initState();
-    _textInputController = TextEditingController();
-  }
-
-  @override
   void dispose() {
-    _textInputController!.dispose();
+    _textInputController.dispose();
     super.dispose();
   }
 
@@ -81,7 +71,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       height: 54.0,
       child: Card(
         elevation: 1.0,
-        color: stateColors.lightBackground,
+        color: Theme.of(context).backgroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(6.0),
           side: BorderSide(color: Colors.black26, width: 1.5),
@@ -135,8 +125,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       saveTextString: "done".tr(),
                       onCancel: Beamer.of(context).popRoute,
                       onValidate: () {
+                        final UserFirestore userFirestore =
+                            Globals.state.getUserFirestore();
+
                         setState(() {
-                          stateUser.userFirestore.urls!.copyFrom(_tempUserUrls);
+                          userFirestore.urls.copyFrom(_tempUserUrls);
                         });
 
                         updateUser();
@@ -161,7 +154,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
         spacing: 4.0,
         runSpacing: 4.0,
         alignment: WrapAlignment.center,
-        children: stateUser.userFirestore.urls!
+        children: Globals.state
+            .getUserFirestore()
+            .urls
             .getAvailableLinks()
             .entries
             .map((entry) {
@@ -191,63 +186,63 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }
 
   Widget avatar() {
-    return Observer(builder: (context) {
-      final String avatarUrl = getAvatarUrl();
+    final UserFirestore userFirestore = Globals.state.getUserFirestore();
+    final String avatarUrl = userFirestore.getPP();
 
-      return Padding(
-        padding: const EdgeInsets.only(top: 120.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Opacity(
-              opacity: 0.6,
-              child: IconButton(
-                tooltip: "back".tr(),
-                onPressed: Beamer.of(context).popRoute,
-                icon: Icon(UniconsLine.arrow_left),
-              ),
+    return Padding(
+      padding: const EdgeInsets.only(top: 120.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Opacity(
+            opacity: 0.6,
+            child: IconButton(
+              tooltip: "back".tr(),
+              onPressed: Beamer.of(context).popRoute,
+              icon: Icon(UniconsLine.arrow_left),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8.0,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8.0,
+            ),
+            child: BetterAvatar(
+              size: 160.0,
+              image: NetworkImage(avatarUrl),
+              colorFilter: ColorFilter.mode(
+                Colors.grey,
+                BlendMode.saturation,
               ),
-              child: BetterAvatar(
-                size: 160.0,
-                image: NetworkImage(avatarUrl),
-                colorFilter: ColorFilter.mode(
-                  Colors.grey,
-                  BlendMode.saturation,
-                ),
-                onTap: () {
-                  if (stateUser.userFirestore.pp!.url!.edited!.isEmpty) {
-                    return;
-                  }
+              onTap: () {
+                final userFirestore = Globals.state.getUserFirestore();
+                if (userFirestore.pp.url.edited.isEmpty) {
+                  return;
+                }
 
-                  NavigationStateHelper.imageToEdit =
-                      ExtendedNetworkImageProvider(
-                    stateUser.userFirestore.pp!.url!.original!,
-                    cache: true,
-                    cacheRawData: true,
-                  );
+                NavigationStateHelper.imageToEdit =
+                    ExtendedNetworkImageProvider(
+                  userFirestore.pp.url.original,
+                  cache: true,
+                  cacheRawData: true,
+                );
 
-                  context.beamToNamed(
-                    DashboardContentLocation.editProfilePictureRoute,
-                  );
-                },
-              ),
+                context.beamToNamed(
+                  DashboardLocationContent.editProfilePictureRoute,
+                );
+              },
             ),
-            Opacity(
-              opacity: 0.6,
-              child: IconButton(
-                tooltip: "pp_upload".tr(),
-                onPressed: uploadPicture,
-                icon: Icon(UniconsLine.upload),
-              ),
+          ),
+          Opacity(
+            opacity: 0.6,
+            child: IconButton(
+              tooltip: "pp_upload".tr(),
+              onPressed: uploadPicture,
+              icon: Icon(UniconsLine.upload),
             ),
-          ],
-        ),
-      );
-    });
+          ),
+        ],
+      ),
+    );
   }
 
   Widget body() {
@@ -275,7 +270,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }
 
   Widget clearInputButton(void Function(void Function() p1) childSetState) {
-    if (_textInputController!.text.isEmpty) {
+    if (_textInputController.text.isEmpty) {
       return Container(height: 36.0);
     }
 
@@ -291,7 +286,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
           child: TextButton.icon(
             onPressed: () {
               childSetState(() {
-                _textInputController!.clear();
+                _textInputController.clear();
                 _tempUserUrls.setUrl(_selectedLink, '');
               });
             },
@@ -301,7 +296,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
               child: Text("clear".tr()),
             ),
             style: TextButton.styleFrom(
-              primary: stateColors.foreground,
+              primary:
+                  Theme.of(context).textTheme.bodyText1?.color ?? Colors.white,
             ),
           ),
         ),
@@ -310,25 +306,25 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }
 
   Widget gridLinks(void Function(void Function()) childSetState) {
-    final user = stateUser.userFirestore;
+    final UserFirestore user = Globals.state.getUserFirestore();
 
     return Padding(
       padding: const EdgeInsets.only(top: 40.0),
       child: Wrap(
         spacing: 12.0,
         runSpacing: 12.0,
-        children: user.urls!.socialMap!.entries.map((entry) {
+        children: user.urls.socialMap!.entries.map((entry) {
           return SizedBox(
             width: 80.0,
             height: 80.0,
             child: Card(
-              elevation: user.urls!.socialMap![entry.key]!.isEmpty ? 0.0 : 3.0,
+              elevation: user.urls.socialMap![entry.key]!.isEmpty ? 0.0 : 3.0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6.0),
                 side: BorderSide(
                   width: 2.0,
                   color: _selectedLink == entry.key
-                      ? stateColors.primary
+                      ? Theme.of(context).primaryColor
                       : Colors.transparent,
                 ),
               ),
@@ -338,7 +334,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   onTap: () {
                     childSetState(() {
                       _selectedLink = entry.key;
-                      _textInputController!.text = user.urls!.map![entry.key]!;
+                      _textInputController.text = user.urls.map![entry.key]!;
                     });
                   },
                   child: Padding(
@@ -414,13 +410,15 @@ class _MyProfilePageState extends State<MyProfilePage> {
         childSetState(() {
           _tempUserUrls.setUrl(
             _selectedLink,
-            _textInputController!.text,
+            _textInputController.text,
           );
         });
       },
       onSubmitted: (_) {
+        final UserFirestore userFirestore = Globals.state.getUserFirestore();
+
         setState(() {
-          stateUser.userFirestore.urls!.copyFrom(_tempUserUrls);
+          userFirestore.urls.copyFrom(_tempUserUrls);
         });
 
         Beamer.of(context).popRoute();
@@ -439,7 +437,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
         child: Opacity(
           opacity: 0.6,
           child: Text(
-            stateUser.userFirestore.job,
+            Globals.state.getUserFirestore().job,
             style: TextStyle(
               fontSize: 18.0,
             ),
@@ -450,9 +448,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }
 
   Widget location() {
+    final String location = Globals.state.getUserFirestore().location;
+
     return Card(
       elevation: 1.0,
-      color: stateColors.lightBackground,
+      color: Theme.of(context).backgroundColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4.0),
         side: BorderSide(color: Colors.black26, width: 1.5),
@@ -474,9 +474,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   child: Icon(UniconsLine.location_point, size: 18.0),
                 ),
                 Text(
-                  stateUser.userFirestore.location.isEmpty
+                  location.isEmpty
                       ? "edit_location".tr().toUpperCase()
-                      : stateUser.userFirestore.location.toUpperCase(),
+                      : location.toUpperCase(),
                   style: FontsUtils.mainStyle(
                     fontSize: 14.0,
                     fontWeight: FontWeight.w700,
@@ -533,7 +533,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   children: [
                     Icon(
                       UniconsLine.circle,
-                      color: stateColors.secondary,
+                      color: Theme.of(context).secondaryHeaderColor,
                     ),
                     Expanded(
                       child: Padding(
@@ -574,7 +574,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
           child: Opacity(
             opacity: 0.6,
             child: Text(
-              stateUser.userFirestore.summary!,
+              Globals.state.getUserFirestore().summary,
               style: TextStyle(
                 fontSize: 18.0,
               ),
@@ -588,7 +588,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   Widget summaryEditButton() {
     return Card(
       elevation: 1.0,
-      color: stateColors.lightBackground,
+      color: Theme.of(context).backgroundColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4.0),
         side: BorderSide(color: Colors.black26, width: 1.5),
@@ -629,14 +629,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
       padding: const EdgeInsets.only(top: 12.0),
       child: TextButton(
         onPressed: () {
-          context.beamToNamed(DashboardContentLocation.updateUsernameRoute);
+          context.beamToNamed(DashboardLocationContent.updateUsernameRoute);
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 8.0,
           ),
           child: Text(
-            stateUser.userFirestore.name!,
+            Globals.state.getUserFirestore().name,
             style: TextStyle(
               fontSize: 32.0,
             ),
@@ -646,26 +646,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
     );
   }
 
-  String getAvatarUrl() {
-    String? avatarUrl = stateUser.userFirestore.pp!.url!.edited;
-
-    if (avatarUrl == null || avatarUrl.isEmpty) {
-      avatarUrl = stateUser.userFirestore.pp!.url!.original;
-    }
-
-    if (avatarUrl!.isEmpty) {
-      avatarUrl = "https://img.icons8.com/plasticine/100/000000/flower.png";
-    }
-
-    return avatarUrl;
-  }
-
   void showAddLink() {
-    _textInputController!.text = _selectedLink.isEmpty
-        ? ''
-        : stateUser.userFirestore.urls!.map![_selectedLink]!;
+    final UserFirestore userFirestore = Globals.state.getUserFirestore();
 
-    _tempUserUrls = UserUrls.fromJSON(stateUser.userFirestore.urls!.map);
+    _textInputController.text = _selectedLink.isEmpty
+        ? ''
+        : userFirestore.urls.map?[_selectedLink] ?? '';
+
+    _tempUserUrls = UserUrls.fromJSON(userFirestore.urls.map);
 
     showCupertinoModalBottomSheet(
       context: context,
@@ -676,9 +664,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }
 
   void showEditJob() {
-    final user = stateUser.userFirestore;
+    final UserFirestore userFirestore = Globals.state.getUserFirestore();
 
-    _textInputController!.text = user.job.isNotEmpty ? user.job : '';
+    _textInputController.text =
+        userFirestore.job.isNotEmpty ? userFirestore.job : '';
 
     showCupertinoModalBottomSheet(
       context: context,
@@ -713,14 +702,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         },
                         onSubmitted: (_) {
                           childSetState(() {
-                            user.job = _textInputController!.text;
+                            userFirestore.job = _textInputController.text;
                           });
 
                           Beamer.of(context).popRoute();
                           updateUser();
                         },
                       ),
-                      if (_textInputController!.text.isNotEmpty)
+                      if (_textInputController.text.isNotEmpty)
                         Align(
                           alignment: Alignment.topLeft,
                           child: Padding(
@@ -733,7 +722,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               child: TextButton.icon(
                                 onPressed: () {
                                   childSetState(() {
-                                    _textInputController!.clear();
+                                    _textInputController.clear();
                                   });
                                 },
                                 icon: Icon(UniconsLine.times),
@@ -742,7 +731,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                   child: Text("clear".tr()),
                                 ),
                                 style: TextButton.styleFrom(
-                                  primary: stateColors.foreground,
+                                  primary: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1
+                                          ?.color ??
+                                      Colors.white,
                                 ),
                               ),
                             ),
@@ -759,7 +752,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             onCancel: Beamer.of(context).popRoute,
                             onValidate: () {
                               setState(() {
-                                user.job = _textInputController!.text;
+                                userFirestore.job = _textInputController.text;
                               });
 
                               updateUser();
@@ -779,8 +772,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }
 
   void showEditLocation() {
-    final user = stateUser.userFirestore;
-    _textInputController!.text = user.location.isNotEmpty ? user.location : '';
+    final UserFirestore userFirestore = Globals.state.getUserFirestore();
+    _textInputController.text =
+        userFirestore.location.isNotEmpty ? userFirestore.location : '';
 
     showCupertinoModalBottomSheet(
       context: context,
@@ -815,15 +809,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         },
                         onSubmitted: (_) {
                           childSetState(() {
-                            stateUser.userFirestore.location =
-                                _textInputController!.text;
+                            userFirestore.location = _textInputController.text;
                           });
 
                           Beamer.of(context).popRoute();
                           updateUser();
                         },
                       ),
-                      if (_textInputController!.text.isNotEmpty)
+                      if (_textInputController.text.isNotEmpty)
                         Align(
                           alignment: Alignment.topLeft,
                           child: Padding(
@@ -836,7 +829,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               child: TextButton.icon(
                                 onPressed: () {
                                   childSetState(() {
-                                    _textInputController!.clear();
+                                    _textInputController.clear();
                                   });
                                 },
                                 icon: Icon(UniconsLine.times),
@@ -845,7 +838,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                   child: Text("clear".tr()),
                                 ),
                                 style: TextButton.styleFrom(
-                                  primary: stateColors.foreground,
+                                  primary: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1
+                                          ?.color ??
+                                      Colors.white,
                                 ),
                               ),
                             ),
@@ -862,8 +859,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             onCancel: Beamer.of(context).popRoute,
                             onValidate: () {
                               setState(() {
-                                stateUser.userFirestore.location =
-                                    _textInputController!.text;
+                                userFirestore.location =
+                                    _textInputController.text;
                               });
 
                               updateUser();
@@ -883,8 +880,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }
 
   void showEditSummary() {
-    final user = stateUser.userFirestore;
-    _textInputController!.text = user.summary!.isNotEmpty ? user.summary! : '';
+    final UserFirestore userFirestore = Globals.state.getUserFirestore();
+    _textInputController.text =
+        userFirestore.summary.isNotEmpty ? userFirestore.summary : '';
 
     showCupertinoModalBottomSheet(
       context: context,
@@ -920,15 +918,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         },
                         onSubmitted: (_) {
                           setState(() {
-                            stateUser.userFirestore.summary =
-                                _textInputController!.text;
+                            userFirestore.summary = _textInputController.text;
                           });
 
                           Beamer.of(context).popRoute();
                           updateUser();
                         },
                       ),
-                      if (_textInputController!.text.isNotEmpty)
+                      if (_textInputController.text.isNotEmpty)
                         Align(
                           alignment: Alignment.topLeft,
                           child: Padding(
@@ -941,7 +938,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               child: TextButton.icon(
                                 onPressed: () {
                                   childSetState(() {
-                                    _textInputController!.clear();
+                                    _textInputController.clear();
                                   });
                                 },
                                 icon: Icon(UniconsLine.times),
@@ -950,7 +947,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                   child: Text("clear".tr()),
                                 ),
                                 style: TextButton.styleFrom(
-                                  primary: stateColors.foreground,
+                                  primary: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1
+                                          ?.color ??
+                                      Colors.white,
                                 ),
                               ),
                             ),
@@ -967,8 +968,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             onCancel: Beamer.of(context).popRoute,
                             onValidate: () {
                               setState(() {
-                                stateUser.userFirestore.summary =
-                                    _textInputController!.text;
+                                userFirestore.summary =
+                                    _textInputController.text;
                               });
 
                               updateUser();
@@ -988,6 +989,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }
 
   void updateUser() async {
+    final UserFirestore userFirestore = Globals.state.getUserFirestore();
     setState(() => _isUpdating = true);
 
     try {
@@ -995,7 +997,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
       await Cloud.fun('users-updateUser').call({
         'userId': uid,
-        'updatePayload': stateUser.userFirestore.toJSON(),
+        'updatePayload': userFirestore.toJSON(),
       });
 
       setState(() => _isUpdating = false);
@@ -1056,9 +1058,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
       final snapshot = await task;
       final String downloadUrl = await snapshot.ref.getDownloadURL();
 
+      final UserFirestore userFirestore = Globals.state.getUserFirestore();
+
       setState(() {
-        stateUser.userFirestore.urls!.setUrl('image', downloadUrl);
-        stateUser.userFirestore.pp!.update(
+        userFirestore.urls.setUrl('image', downloadUrl);
+        userFirestore.pp.update(
           UserPP(
             ext: ext.replaceFirst('.', ''),
             size: choosenFile.length,

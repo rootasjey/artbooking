@@ -1,6 +1,6 @@
 import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/dot_close_button.dart';
-import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/utils/validation_shortcuts.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -45,8 +45,10 @@ class ThemedDialog extends StatelessWidget {
       onCancel: onCancel,
       onValidate: onValidate,
       child: SimpleDialog(
-        backgroundColor: stateColors.clairPink,
-        title: titleContainer(),
+        backgroundColor: Globals.constants.colors.clairPink,
+        title: titleContainer(
+          color: Theme.of(context).secondaryHeaderColor,
+        ),
         titlePadding: EdgeInsets.zero,
         contentPadding: const EdgeInsets.all(16.0),
         children: [
@@ -71,14 +73,14 @@ class ThemedDialog extends StatelessWidget {
   Widget footerButtons() {
     return Padding(
       padding: EdgeInsets.all(24.0),
-      child: DarkElevatedButton(
+      child: DarkElevatedButton.large(
         onPressed: onValidate,
         child: Text(textButtonValidation),
       ),
     );
   }
 
-  Widget titleContainer() {
+  Widget titleContainer({required Color color}) {
     return Stack(
       children: [
         closeButton(),
@@ -96,7 +98,7 @@ class ThemedDialog extends StatelessWidget {
               padding: const EdgeInsets.only(top: 16.0),
               child: Divider(
                 thickness: 1.5,
-                color: stateColors.secondary,
+                color: color,
               ),
             ),
           ],

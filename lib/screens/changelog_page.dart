@@ -1,5 +1,4 @@
-import 'package:artbooking/components/main_app_bar.dart';
-import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/types/changelog_item.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:flutter/material.dart';
@@ -167,7 +166,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
         textTitle,
         style: TextStyle(
           fontSize: 18.0,
-          color: stateColors.secondary,
+          color: Theme.of(context).secondaryHeaderColor,
           fontWeight: FontWeight.w700,
         ),
       ),

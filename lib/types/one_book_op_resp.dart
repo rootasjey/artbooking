@@ -1,11 +1,11 @@
-import 'package:artbooking/types/cloud_func_error.dart';
+import 'package:artbooking/types/cloud_function_error.dart';
 import 'package:artbooking/types/minimal_book_resp.dart';
 import 'package:artbooking/types/user/partial_user.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class OneBookOpResp {
   final MinimalBookResp book;
-  final CloudFuncError error;
+  final CloudFunctionError error;
   final String message;
   final bool success;
   final PartialUser user;
@@ -21,7 +21,7 @@ class OneBookOpResp {
   factory OneBookOpResp.empty({bool success = false}) {
     return OneBookOpResp(
       book: MinimalBookResp.empty(),
-      error: CloudFuncError.empty(),
+      error: CloudFunctionError.empty(),
       success: success,
       user: PartialUser.empty(),
     );
@@ -30,7 +30,7 @@ class OneBookOpResp {
   factory OneBookOpResp.fromException(FirebaseFunctionsException exception) {
     return OneBookOpResp(
       book: MinimalBookResp.empty(),
-      error: CloudFuncError.fromException(exception),
+      error: CloudFunctionError.fromException(exception),
       success: false,
       user: PartialUser.empty(),
     );
@@ -41,7 +41,7 @@ class OneBookOpResp {
       book: MinimalBookResp.fromJSON(data['book']),
       success: data['success'] ?? true,
       user: PartialUser.fromJSON(data['user']),
-      error: CloudFuncError.fromJSON(data['error']),
+      error: CloudFunctionError.fromJSON(data['error']),
     );
   }
 
@@ -49,7 +49,7 @@ class OneBookOpResp {
     return OneBookOpResp(
       success: false,
       book: MinimalBookResp.empty(),
-      error: CloudFuncError.fromMessage(message),
+      error: CloudFunctionError.fromMessage(message),
       user: PartialUser(),
     );
   }

@@ -3,16 +3,15 @@ import 'dart:async';
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/illustration_card.dart';
-import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/popup_menu_item_icon.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/text_rectangle_button.dart';
 import 'package:artbooking/components/themed_dialog.dart';
 import 'package:artbooking/components/user_books.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
-import 'package:artbooking/state/upload_manager.dart';
-import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/enums.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/constants.dart';
@@ -23,6 +22,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
@@ -40,12 +40,12 @@ typedef DocumentChangeMap = DocumentChange<Map<String, dynamic>>;
 /// A query document snapshot containing a map.
 typedef DocSnapMap = QueryDocumentSnapshot<Map<String, dynamic>>;
 
-class MyIllustrationsPage extends StatefulWidget {
+class MyIllustrationsPage extends ConsumerStatefulWidget {
   @override
   _MyIllustrationsPageState createState() => _MyIllustrationsPageState();
 }
 
-class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
+class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   late bool _isLoading;
   bool _descending = true;
   bool _hasNext = true;
@@ -175,7 +175,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
                   "lonely_there".tr(),
                   style: TextStyle(
                     fontSize: 32.0,
-                    color: stateColors.primary,
+                    color: Theme.of(context).primaryColor,
                   ),
                 ),
               ),
@@ -196,7 +196,9 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
               ),
               ElevatedButton.icon(
                 onPressed: () {
-                  appUploadManager.pickImage(context);
+                  final uploadListNotifier =
+                      Globals.state.upload.uploadTasksList.notifier;
+                  ref.read(uploadListNotifier).pickImage();
                 },
                 icon: Icon(UniconsLine.upload),
                 label: Padding(
@@ -220,7 +222,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
     if (!_isFabVisible) {
       return FloatingActionButton(
         onPressed: fetch,
-        backgroundColor: stateColors.primary,
+        backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,
         child: Icon(UniconsLine.refresh),
       );
@@ -234,7 +236,7 @@ class _MyIllustrationsPageState extends State<MyIllustrationsPage> {
           curve: Curves.easeOut,
         );
       },
-      backgroundColor: stateColors.primary,
+      backgroundColor: Theme.of(context).primaryColor,
       foregroundColor: Colors.white,
       child: Icon(UniconsLine.arrow_up),
     );

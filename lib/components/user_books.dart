@@ -1,6 +1,6 @@
 import 'package:artbooking/actions/books.dart';
-import 'package:artbooking/state/user.dart';
 import 'package:artbooking/types/book.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/flash_helper.dart';
@@ -232,13 +232,14 @@ class _UserBooksState extends State<UserBooks> {
 
   Future fetchBooks() async {
     isLoading = true;
+    final userAuth = Globals.state.getUserAuth();
 
     try {
       books.clear();
 
       final snapshot = await FirebaseFirestore.instance
           .collection('books')
-          .where('user.id', isEqualTo: stateUser.userAuth!.uid)
+          .where('user.id', isEqualTo: userAuth?.uid)
           .limit(limit)
           .orderBy('updatedAt', descending: true)
           .get();
@@ -282,18 +283,13 @@ class _UserBooksState extends State<UserBooks> {
   }
 
   Future fetchMoreBooks() async {
+    final userAuth = Globals.state.getUserAuth();
     isLoadingMore = true;
 
     try {
-      final userAuth = stateUser.userAuth;
-
-      if (userAuth == null) {
-        return;
-      }
-
       final snapshot = await FirebaseFirestore.instance
           .collection('books')
-          .where('user.id', isEqualTo: stateUser.userAuth!.uid)
+          .where('user.id', isEqualTo: userAuth?.uid)
           .limit(limit)
           .orderBy('updatedAt', descending: true)
           .startAfterDocument(lastDoc)

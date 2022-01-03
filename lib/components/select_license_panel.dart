@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:algolia/algolia.dart';
 import 'package:artbooking/components/circle_button.dart';
 import 'package:artbooking/components/fade_in_x.dart';
-import 'package:artbooking/state/colors.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
@@ -80,10 +80,13 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
   /// Delay search after typing input.
   Timer? _searchTimer;
 
+  Color _secondaryColor = Colors.pink;
+
   @override
   initState() {
     super.initState();
     fetchLicenses();
+    _secondaryColor = Theme.of(context).secondaryHeaderColor;
   }
 
   @override
@@ -103,7 +106,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
       beginX: 16.0,
       child: Material(
         elevation: widget.elevation,
-        color: stateColors.clairPink,
+        color: Globals.constants.colors.clairPink,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
         ),
@@ -167,7 +170,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
       child: Container(
         padding: const EdgeInsets.only(top: 20.0),
         decoration: BoxDecoration(
-          color: stateColors.clairPink,
+          color: Globals.constants.colors.clairPink,
           borderRadius: BorderRadius.circular(12.0),
         ),
         child: Column(
@@ -222,7 +225,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
               width: _containerWidth,
               child: Divider(
                 thickness: 2.0,
-                color: stateColors.secondary,
+                color: _secondaryColor,
                 height: 40.0,
               ),
             ),
@@ -359,7 +362,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                     if (selected)
                       Icon(
                         UniconsLine.check,
-                        color: selected ? stateColors.secondary : null,
+                        color: selected ? _secondaryColor : null,
                       ),
                     Expanded(
                       child: Text(
@@ -367,7 +370,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                         style: FontsUtils.mainStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
-                            color: selected ? stateColors.secondary : null),
+                            color: selected ? _secondaryColor : null),
                       ),
                     ),
                   ],
@@ -406,7 +409,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                     if (selected)
                       Icon(
                         UniconsLine.check,
-                        color: selected ? stateColors.secondary : null,
+                        color: selected ? _secondaryColor : null,
                       ),
                     Expanded(
                       child: Text(
@@ -414,7 +417,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                         style: FontsUtils.mainStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
-                            color: selected ? stateColors.secondary : null),
+                            color: selected ? _secondaryColor : null),
                       ),
                     ),
                   ],
@@ -453,12 +456,12 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                     filled: true,
                     isDense: true,
                     labelText: "license_label_text".tr(),
-                    fillColor: stateColors.clairPink,
-                    focusColor: stateColors.clairPink,
+                    fillColor: Globals.constants.colors.clairPink,
+                    focusColor: Globals.constants.colors.clairPink,
                     border: OutlineInputBorder(
                       borderSide: BorderSide(
                         width: 4.0,
-                        color: stateColors.primary,
+                        color: Globals.constants.colors.primary,
                       ),
                     ),
                   ),

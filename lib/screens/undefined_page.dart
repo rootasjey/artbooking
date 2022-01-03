@@ -1,7 +1,6 @@
 import 'package:artbooking/components/dark_elevated_button.dart';
-import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/router/locations/home_location.dart';
-import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
@@ -88,7 +87,7 @@ class _UndefinedPageState extends State<UndefinedPage> {
   Widget navButton() {
     return Padding(
       padding: const EdgeInsets.only(top: 24.0, bottom: 24.0),
-      child: DarkElevatedButton(
+      child: DarkElevatedButton.large(
         onPressed: () => context.beamToNamed(HomeLocation.route),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -115,13 +114,13 @@ class _UndefinedPageState extends State<UndefinedPage> {
             text: 'Route for ',
             style: TextStyle(
               fontSize: 18.0,
-              color: stateColors.foreground,
+              color: Theme.of(context).textTheme.bodyText1?.color,
             ),
             children: [
               TextSpan(
                 text: location,
                 style: TextStyle(
-                  color: stateColors.secondary,
+                  color: Theme.of(context).secondaryHeaderColor,
                   fontWeight: FontWeight.w700,
                 ),
               ),

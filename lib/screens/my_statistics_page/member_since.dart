@@ -1,0 +1,48 @@
+import 'package:artbooking/screens/my_statistics_page/text_icon.dart';
+import 'package:artbooking/utils/fonts.dart';
+import 'package:easy_localization/src/public_ext.dart';
+import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
+import 'package:unicons/unicons.dart';
+
+class MemberSince extends StatelessWidget {
+  const MemberSince({
+    Key? key,
+    required this.createdAt,
+  }) : super(key: key);
+
+  final DateTime? createdAt;
+
+  @override
+  Widget build(BuildContext context) {
+    if (createdAt == null) {
+      return Container();
+    }
+
+    return TextIcon(
+      icon: Icon(
+        UniconsLine.clock,
+        size: 24.0,
+      ),
+      richText: RichText(
+        text: TextSpan(
+          style: TextStyle(
+            color:
+                Theme.of(context).textTheme.bodyText1?.color?.withOpacity(0.6),
+            fontSize: 16.0,
+          ),
+          children: [
+            TextSpan(text: "member_since".tr()),
+            TextSpan(
+              text: " ${Jiffy(createdAt).format('MMMM yyyy')}",
+              style: FontsUtils.mainStyle(
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

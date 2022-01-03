@@ -1,4 +1,3 @@
-import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/utils/fonts.dart';
@@ -172,7 +171,9 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
       child: ScaleTransition(
         scale: _scaleAnimation,
         child: Card(
-          color: widget.selected ? stateColors.primary : Colors.transparent,
+          color: widget.selected
+              ? Theme.of(context).primaryColor
+              : Colors.transparent,
           elevation: _elevation,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
@@ -247,7 +248,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
         ),
         child: Icon(
           UniconsLine.check_square,
-          color: stateColors.secondary,
+          color: Theme.of(context).secondaryHeaderColor,
         ),
       ),
     );

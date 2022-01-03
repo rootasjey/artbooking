@@ -2,9 +2,9 @@ import 'dart:typed_data';
 
 import 'package:artbooking/components/form_actions_inputs.dart';
 import 'package:artbooking/components/loading_view.dart';
-import 'package:artbooking/components/main_app_bar.dart';
+import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
-import 'package:artbooking/state/user.dart';
+import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/types/user/user_pp_path.dart';
 import 'package:artbooking/types/user/user_pp_url.dart';
 import 'package:artbooking/utils/app_logger.dart';
@@ -247,18 +247,19 @@ class _EditImagePageState extends State<EditImagePage> {
   }
 
   void uploadPicture({required Uint8List imageData}) async {
-    final User? user = FirebaseAuth.instance.currentUser;
+    final User? userAuth = FirebaseAuth.instance.currentUser;
 
-    if (user == null) {
+    if (userAuth == null) {
       throw Exception("You're not connected.");
     }
 
     setState(() => _isUpdating = true);
 
-    final String ext = stateUser.userFirestore.pp!.ext!;
+    final userFirestore = Globals.state.getUserFirestore();
+    final String ext = userFirestore.pp.ext;
 
     try {
-      final String imagePath = "images/users/${user.uid}/pp/edited.$ext";
+      final String imagePath = "images/users/${userAuth.uid}/pp/edited.$ext";
 
       final UploadTask task = FirebaseStorage.instance.ref(imagePath).putData(
           imageData,
@@ -266,7 +267,7 @@ class _EditImagePageState extends State<EditImagePage> {
             contentType: mimeFromExtension(ext),
             customMetadata: {
               'extension': ext,
-              'userId': user.uid,
+              'userId': userAuth.uid,
             },
           ));
 
@@ -274,9 +275,9 @@ class _EditImagePageState extends State<EditImagePage> {
       final String downloadUrl = await snapshot.ref.getDownloadURL();
 
       setState(() {
-        stateUser.userFirestore.urls!.setUrl('image', downloadUrl);
+        userFirestore.urls.setUrl('image', downloadUrl);
 
-        stateUser.userFirestore.pp!.merge(
+        userFirestore.pp.merge(
           path: UserPPPath(edited: imagePath),
           url: UserPPUrl(edited: downloadUrl),
         );
@@ -295,11 +296,12 @@ class _EditImagePageState extends State<EditImagePage> {
     setState(() => _isUpdating = true);
 
     try {
+      final userFirestore = Globals.state.getUserFirestore();
       final String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
 
       await Cloud.fun('users-updateUser').call({
         'userId': uid,
-        'updatePayload': stateUser.userFirestore.toJSON(),
+        'updatePayload': userFirestore.toJSON(),
       });
 
       Beamer.of(context).popRoute();

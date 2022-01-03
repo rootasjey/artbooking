@@ -1,4 +1,3 @@
-import 'package:artbooking/state/colors.dart';
 import 'package:flutter/material.dart';
 
 class CreditItem extends StatefulWidget {
@@ -30,7 +29,8 @@ class _CreditItemState extends State<CreditItem> {
   void initState() {
     super.initState();
     setState(() {
-      baseColor = stateColors.foreground.withOpacity(0.6);
+      baseColor =
+          Theme.of(context).textTheme.bodyText1?.color?.withOpacity(0.6);
       hoverColor = widget.hoverColor ?? currentColor;
       currentColor = baseColor;
     });

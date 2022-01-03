@@ -1,4 +1,3 @@
-import 'package:artbooking/state/colors.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:flutter/material.dart';
 
@@ -34,6 +33,8 @@ class OutlinedTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _primaryColor = Theme.of(context).primaryColor;
+
     final BorderRadius borderRadius = BorderRadius.circular(4.0);
 
     return Column(
@@ -64,7 +65,7 @@ class OutlinedTextField extends StatelessWidget {
             style: FontsUtils.mainStyle(
               fontWeight: FontWeight.w600,
             ),
-            cursorColor: stateColors.primary,
+            cursorColor: _primaryColor,
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white,
@@ -75,21 +76,21 @@ class OutlinedTextField extends StatelessWidget {
               errorBorder: OutlineInputBorder(
                 borderRadius: borderRadius,
                 borderSide: BorderSide(
-                  color: stateColors.secondary,
+                  color: Theme.of(context).secondaryHeaderColor,
                   width: 1.5,
                 ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: borderRadius,
                 borderSide: BorderSide(
-                  color: stateColors.primary,
+                  color: _primaryColor,
                   width: 2.0,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: borderRadius,
                 borderSide: BorderSide(
-                  color: stateColors.primary,
+                  color: _primaryColor,
                   width: 2.5,
                 ),
               ),
