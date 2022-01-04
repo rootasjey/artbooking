@@ -22,6 +22,9 @@ class App extends StatelessWidget {
         fontFamily: GoogleFonts.raleway().fontFamily,
         primaryColor: Globals.constants.colors.primary,
         secondaryHeaderColor: Globals.constants.colors.secondary,
+        colorScheme: ThemeData()
+            .colorScheme
+            .copyWith(primary: Colors.deepPurple.shade700),
       ),
       dark: ThemeData(
         brightness: Brightness.dark,
@@ -30,6 +33,10 @@ class App extends StatelessWidget {
         fontFamily: GoogleFonts.raleway().fontFamily,
         primaryColor: Globals.constants.colors.primary,
         secondaryHeaderColor: Globals.constants.colors.secondary,
+        colorScheme: ThemeData().colorScheme.copyWith(
+              primary: Colors.deepPurple.shade700,
+              brightness: Brightness.dark,
+            ),
       ),
       initial: savedThemeMode ?? AdaptiveThemeMode.light,
       builder: (theme, darkTheme) {
