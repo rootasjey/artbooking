@@ -436,6 +436,7 @@
   "optional": "Optional",
   "or": "Or",
   "other": "Other",
+  "password": "Password",
   "password_choosing_good": "Choosing a good password",
   "password_choosing_good_desc": "Resist against brute-force attacks",
   "password_confirm": "Confirm password",

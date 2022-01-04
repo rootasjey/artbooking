@@ -5,6 +5,7 @@ import 'package:artbooking/components/loading_animation.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/utils/app_logger.dart';
+import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -37,7 +38,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               Column(
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.only(top: 60.0, bottom: 300.0),
+                    padding: const EdgeInsets.only(
+                      top: 100.0,
+                      bottom: 300.0,
+                    ),
                     child: SizedBox(
                       width: 320,
                       child: body(),
@@ -138,17 +142,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       delay: 100.milliseconds,
       beginY: 50.0,
       child: Padding(
-        padding: EdgeInsets.only(
-          top: 40.0,
-          left: 15.0,
-        ),
+        padding: EdgeInsets.only(top: 40.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             TextFormField(
               autofocus: true,
               decoration: InputDecoration(
-                icon: Icon(Icons.email),
+                icon: Icon(UniconsLine.envelope),
                 labelText: "email".tr(),
               ),
               keyboardType: TextInputType.emailAddress,
@@ -182,7 +183,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               right: 20.0,
             ),
             child: IconButton(
-              onPressed: Beamer.of(context).popRoute,
+              onPressed: Beamer.of(context).popBeamLocation,
               icon: Icon(UniconsLine.arrow_left),
             ),
           ),
@@ -193,15 +194,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             children: <Widget>[
               FadeInY(
                 beginY: 50.0,
-                child: Padding(
-                  padding: EdgeInsets.only(top: 10.0),
-                  child: Text(
-                    "password_forgot".tr(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 25.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+                child: Text(
+                  "password_forgot".tr(),
+                  textAlign: TextAlign.center,
+                  style: FontsUtils.mainStyle(
+                    fontSize: 25.0,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -213,6 +211,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     "password_forgot_reset_process".tr(),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 3,
+                    style: FontsUtils.mainStyle(
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
               ),
@@ -248,7 +249,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 Text("link_send".tr().toUpperCase()),
                 Padding(
                   padding: const EdgeInsets.only(left: 20.0),
-                  child: Icon(UniconsLine.envelope),
+                  child: Icon(UniconsLine.envelope_send),
                 )
               ],
             ),

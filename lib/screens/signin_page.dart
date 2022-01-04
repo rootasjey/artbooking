@@ -1,4 +1,5 @@
 import 'package:artbooking/actions/users.dart';
+import 'package:artbooking/components/dark_text_button.dart';
 
 import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
@@ -28,12 +29,12 @@ class SigninPage extends StatefulWidget {
 
 class _SigninPageState extends State<SigninPage> {
   bool _isConnecting = false;
-  String _email = '';
 
   final _passwordNode = FocusNode();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  String _email = '';
   String _password = '';
 
   @override
@@ -89,9 +90,9 @@ class _SigninPageState extends State<SigninPage> {
         header(),
         emailInput(),
         passwordInput(),
-        forgotPassword(),
+        forgotPasswordButton(),
         validationButton(),
-        noAccountButton(),
+        dontHaveAccountButton(),
       ],
     );
   }
@@ -113,7 +114,7 @@ class _SigninPageState extends State<SigninPage> {
               controller: _emailController,
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
-                icon: Icon(Icons.email),
+                icon: Icon(UniconsLine.envelope),
                 labelText: "email".tr(),
               ),
               keyboardType: TextInputType.emailAddress,
@@ -135,14 +136,12 @@ class _SigninPageState extends State<SigninPage> {
     );
   }
 
-  Widget forgotPassword() {
+  Widget forgotPasswordButton() {
     return FadeInY(
       delay: 100.milliseconds,
       beginY: 50.0,
-      child: TextButton(
-        onPressed: () {
-          context.beamToNamed(ForgotPasswordLocation.route);
-        },
+      child: DarkTextButton(
+        onPressed: () => context.beamToNamed(ForgotPasswordLocation.route),
         child: Opacity(
           opacity: 0.6,
           child: Row(
@@ -152,6 +151,7 @@ class _SigninPageState extends State<SigninPage> {
                 "password_forgot".tr(),
                 style: TextStyle(
                   decoration: TextDecoration.underline,
+                  color: Theme.of(context).textTheme.bodyText2?.color,
                 ),
               ),
             ],
@@ -173,7 +173,7 @@ class _SigninPageState extends State<SigninPage> {
               right: 20.0,
             ),
             child: IconButton(
-              onPressed: Beamer.of(context).popRoute,
+              onPressed: Beamer.of(context).popBeamLocation,
               icon: Icon(UniconsLine.arrow_left),
             ),
           ),
@@ -183,26 +183,26 @@ class _SigninPageState extends State<SigninPage> {
           children: <Widget>[
             FadeInY(
               beginY: 50.0,
-              child: Padding(
-                padding: EdgeInsets.only(bottom: 10.0),
-                child: Text(
-                  "signin".tr(),
-                  textAlign: TextAlign.center,
-                  style: FontsUtils.mainStyle(
-                    fontSize: 25.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+              child: Text(
+                "signin".tr(),
+                textAlign: TextAlign.center,
+                style: FontsUtils.mainStyle(
+                  fontSize: 25.0,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
             FadeInY(
-              delay: 300.milliseconds,
-              beginY: 50.0,
+              delay: 50.milliseconds,
+              beginY: 20.0,
               child: Opacity(
                 opacity: 0.6,
                 child: Text(
                   "signin_existing_account".tr(),
                   overflow: TextOverflow.ellipsis,
+                  style: FontsUtils.mainStyle(
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ),
             )
@@ -212,25 +212,25 @@ class _SigninPageState extends State<SigninPage> {
     );
   }
 
-  Widget noAccountButton() {
+  Widget dontHaveAccountButton() {
     return FadeInY(
       delay: 400.milliseconds,
       beginY: 50.0,
       child: Padding(
         padding: const EdgeInsets.only(top: 8.0),
-        child: TextButton(
-            onPressed: () {
-              context.beamToNamed(SignupLocation.route);
-            },
-            child: Opacity(
-              opacity: 0.6,
-              child: Text(
-                "dont_own_account".tr(),
-                style: TextStyle(
-                  decoration: TextDecoration.underline,
-                ),
+        child: DarkTextButton(
+          onPressed: () => context.beamToNamed(SignupLocation.route),
+          child: Opacity(
+            opacity: 0.6,
+            child: Text(
+              "dont_own_account".tr(),
+              style: TextStyle(
+                decoration: TextDecoration.underline,
+                color: Theme.of(context).textTheme.bodyText2?.color,
               ),
-            )),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -251,14 +251,15 @@ class _SigninPageState extends State<SigninPage> {
               focusNode: _passwordNode,
               controller: _passwordController,
               decoration: InputDecoration(
-                icon: Icon(Icons.lock_outline),
-                labelText: 'Password',
+                icon: Icon(UniconsLine.lock),
+                labelText: "password".tr(),
+                focusColor: Colors.green,
               ),
               obscureText: true,
               onChanged: (value) {
                 _password = value;
               },
-              onFieldSubmitted: (value) => signInProcess(),
+              onFieldSubmitted: (value) => trySignin(),
               validator: (value) {
                 if (value!.isEmpty) {
                   return "password_empty_forbidden".tr();
@@ -280,7 +281,7 @@ class _SigninPageState extends State<SigninPage> {
       child: Padding(
         padding: const EdgeInsets.only(top: 80.0),
         child: ElevatedButton(
-          onPressed: () => signInProcess(),
+          onPressed: trySignin,
           style: ElevatedButton.styleFrom(
             primary: Theme.of(context).primaryColor,
             shape: RoundedRectangleBorder(
@@ -297,18 +298,15 @@ class _SigninPageState extends State<SigninPage> {
               children: <Widget>[
                 Text(
                   "signin".tr().toUpperCase(),
-                  style: TextStyle(
+                  style: FontsUtils.mainStyle(
                     color: Colors.white,
                     fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 20.0),
-                  child: Icon(
-                    UniconsLine.arrow_right,
-                    color: Colors.white,
-                  ),
+                  child: Icon(UniconsLine.arrow_right),
                 )
               ],
             ),
@@ -344,7 +342,7 @@ class _SigninPageState extends State<SigninPage> {
     return true;
   }
 
-  void signInProcess() async {
+  void trySignin() async {
     if (!checkInputsFormat()) {
       return;
     }

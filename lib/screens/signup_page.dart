@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:artbooking/components/dark_text_button.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/locations/signin_location.dart';
@@ -105,7 +106,7 @@ class _SignupPageState extends State<SignupPage> {
           autofocus: true,
           textInputAction: TextInputAction.next,
           decoration: InputDecoration(
-            icon: Icon(Icons.email),
+            icon: Icon(UniconsLine.envelope),
             labelText: "email".tr(),
           ),
           keyboardType: TextInputType.emailAddress,
@@ -192,7 +193,7 @@ class _SignupPageState extends State<SignupPage> {
               right: 20.0,
             ),
             child: IconButton(
-              onPressed: Beamer.of(context).popRoute,
+              onPressed: Beamer.of(context).popBeamLocation,
               icon: Icon(UniconsLine.arrow_left),
             ),
           ),
@@ -203,24 +204,26 @@ class _SignupPageState extends State<SignupPage> {
             children: <Widget>[
               FadeInY(
                 beginY: 50.0,
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: 10.0),
-                  child: Text(
-                    "signup".tr(),
-                    textAlign: TextAlign.center,
-                    style: FontsUtils.mainStyle(
-                      fontSize: 25.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+                child: Text(
+                  "signup".tr(),
+                  textAlign: TextAlign.center,
+                  style: FontsUtils.mainStyle(
+                    fontSize: 25.0,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
               FadeInY(
-                delay: 200.milliseconds,
-                beginY: 50.0,
+                delay: 50.milliseconds,
+                beginY: 20.0,
                 child: Opacity(
                   opacity: 0.6,
-                  child: Text("account_create_new".tr()),
+                  child: Text(
+                    "account_create_new".tr(),
+                    style: FontsUtils.mainStyle(
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -269,9 +272,7 @@ class _SignupPageState extends State<SignupPage> {
             TextFormField(
               focusNode: _usernameNode,
               decoration: InputDecoration(
-                icon: Icon(
-                  Icons.person_outline,
-                ),
+                icon: Icon(UniconsLine.user),
                 labelText: "username".tr(),
               ),
               textInputAction: TextInputAction.next,
@@ -371,7 +372,7 @@ class _SignupPageState extends State<SignupPage> {
               focusNode: _passwordNode,
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
-                icon: Icon(Icons.lock_outline),
+                icon: Icon(UniconsLine.lock_open_alt),
                 labelText: "password".tr(),
               ),
               obscureText: true,
@@ -408,7 +409,7 @@ class _SignupPageState extends State<SignupPage> {
             TextFormField(
               focusNode: _confirmPasswordNode,
               decoration: InputDecoration(
-                icon: Icon(Icons.lock_outline),
+                icon: Icon(UniconsLine.lock),
                 labelText: "password_confirm".tr(),
               ),
               obscureText: true,
@@ -461,19 +462,16 @@ class _SignupPageState extends State<SignupPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    "signup".tr(),
-                    style: TextStyle(
+                    "signup".tr().toUpperCase(),
+                    style: FontsUtils.mainStyle(
                       color: Colors.white,
                       fontSize: 15.0,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0),
-                    child: Icon(
-                      Icons.arrow_forward,
-                      color: Colors.white,
-                    ),
+                    child: Icon(UniconsLine.arrow_right),
                   ),
                 ],
               ),
@@ -486,14 +484,12 @@ class _SignupPageState extends State<SignupPage> {
 
   Widget alreadyHaveAccountButton() {
     return FadeInY(
-      delay: 700.milliseconds,
-      beginY: 50.0,
+      delay: 630.milliseconds,
+      beginY: 30.0,
       child: Padding(
         padding: const EdgeInsets.only(top: 8.0),
-        child: ElevatedButton(
-          onPressed: () {
-            context.beamToNamed(SigninLocation.route);
-          },
+        child: DarkTextButton(
+          onPressed: () => context.beamToNamed(SigninLocation.route),
           child: Opacity(
             opacity: 0.6,
             child: Text(
