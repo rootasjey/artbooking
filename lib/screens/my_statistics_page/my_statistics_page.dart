@@ -6,8 +6,10 @@ import 'package:artbooking/screens/my_statistics_page/my_stats_header.dart';
 import 'package:artbooking/screens/my_statistics_page/stats_categories.dart';
 import 'package:artbooking/screens/my_statistics_page/used_storage.dart';
 import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/state.dart';
 import 'package:artbooking/types/square_stats_data.dart';
 import 'package:artbooking/types/user/stats.dart';
+import 'package:artbooking/types/user/user.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +20,11 @@ class MyActivityPage extends ConsumerWidget {
   const MyActivityPage({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(Globals.state.user);
+    final User userState = ref.watch(AppState.userProvider);
 
-    final UserFirestore userFirestore = Globals.state.getUserFirestore();
+    final UserFirestore userFirestore =
+        userState.firestoreUser ?? UserFirestore.empty();
+
     final int usedBytes = userFirestore.stats.storage.illustrations.used;
     final DateTime? createdAt = userFirestore.createdAt;
     final stats = userFirestore.stats;

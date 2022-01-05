@@ -6,8 +6,8 @@ import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/settings/account_settings.dart';
 import 'package:artbooking/screens/settings/app_settings.dart';
 import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/state.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
-import 'package:artbooking/types/globals/user_notifier.dart';
 import 'package:artbooking/types/user/user_pp.dart';
 import 'package:artbooking/types/user/user_pp_path.dart';
 import 'package:artbooking/types/user/user_pp_url.dart';
@@ -59,14 +59,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       paddingTop = widget.showAppBar ? 60.0 : 20.0;
     }
 
-    ref.watch(Globals.state.user);
+    final userState = ref.watch(AppState.userProvider);
+    final userFirestore = userState.firestoreUser;
 
-    final UserFirestore userFirestore = Globals.state.getUserFirestore();
-    final UserNotifier userNotifier = ref.read(Globals.state.user.notifier);
-
-    final String profilePicture = userNotifier.getPPUrl(
-      orElse: "https://img.icons8.com/plasticine/100/000000/flower.png",
-    );
+    final String profilePicture =
+        ref.read(AppState.userProvider.notifier).getPPUrl(
+              orElse: "https://img.icons8.com/plasticine/100/000000/flower.png",
+            );
 
     return Scaffold(
       body: NotificationListener<ScrollNotification>(
@@ -92,10 +91,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                           ),
                         ),
                       AccountSettings(
-                        isAuthenticated: userNotifier.isAuthenticated,
+                        isAuthenticated: ref
+                            .read(AppState.userProvider.notifier)
+                            .isAuthenticated,
                         profilePicture: profilePicture,
-                        email: userFirestore.email,
-                        username: userFirestore.name,
+                        email: userFirestore?.email ?? '',
+                        username: userFirestore?.name ?? '',
                         onGoToUpdateEmail: onGoToUpdateEmail,
                         onUploadProfilePicture: onUploadProfilePicture,
                         onTapProfilePicture: onTapProfilePicture,
@@ -188,14 +189,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   void onTapProfilePicture() {
-    final UserFirestore userFirestore = Globals.state.getUserFirestore();
+    final UserFirestore? userFirestore =
+        ref.read(AppState.userProvider).firestoreUser;
 
-    if (userFirestore.pp.url.edited.isEmpty) {
+    if (userFirestore == null || userFirestore.pp.url.edited.isEmpty) {
       return;
     }
 
     NavigationStateHelper.imageToEdit = ExtendedNetworkImageProvider(
-      Globals.state.getUserFirestore().pp.url.original,
+      userFirestore.pp.url.original,
       cache: true,
       cacheRawData: true,
     );
@@ -259,11 +261,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       final snapshot = await task;
       final String downloadUrl = await snapshot.ref.getDownloadURL();
 
-      final userFirestore = Globals.state.getUserFirestore();
+      final UserFirestore? userFirestore =
+          ref.read(AppState.userProvider).firestoreUser;
 
       setState(() {
-        userFirestore.urls.setUrl('image', downloadUrl);
-        userFirestore.pp.update(
+        userFirestore?.urls.setUrl('image', downloadUrl);
+        userFirestore?.pp.update(
           UserPP(
             ext: ext.replaceFirst('.', ''),
             size: choosenFile.length,
@@ -291,7 +294,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
       await Cloud.fun('users-updateUser').call({
         'userId': uid,
-        'updatePayload': Globals.state.getUserFirestore().toJSON(),
+        'updatePayload':
+            ref.read(AppState.userProvider).firestoreUser?.toJSON(),
       });
 
       setState(() => _isUpdating = false);

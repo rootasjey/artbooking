@@ -4,7 +4,8 @@ import 'package:artbooking/components/main_app_bar/main_section_mobile.dart';
 import 'package:artbooking/components/main_app_bar/user_auth_section.dart';
 import 'package:artbooking/components/main_app_bar/user_guest_section.dart';
 import 'package:artbooking/router/locations/home_location.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/state.dart';
+import 'package:artbooking/types/globals/user_notifier.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
@@ -13,13 +14,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class MainAppBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pageWidth = MediaQuery.of(context).size.width;
-    final compact = pageWidth < Constants.maxMobileWidth;
+    final double pageWidth = MediaQuery.of(context).size.width;
+    final bool compact = pageWidth < Constants.maxMobileWidth;
 
-    ref.watch(Globals.state.user);
+    ref.watch(AppState.userProvider);
+    final UserNotifier userNotifier = ref.read(AppState.userProvider.notifier);
 
-    final user = ref.read(Globals.state.user.notifier);
-    final isAuthenticated = user.isAuthenticated;
+    final String avatarURL = userNotifier.getPPUrl();
+    final String initials = userNotifier.getInitialsUsername();
 
     return SliverAppBar(
       floating: true,
@@ -41,7 +43,9 @@ class MainAppBar extends ConsumerWidget {
               context,
               ref: ref,
               compact: compact,
-              isAuthenticated: isAuthenticated,
+              isAuthenticated: userNotifier.isAuthenticated,
+              initials: initials,
+              avatarURL: avatarURL,
             ),
           ],
         ),
@@ -62,12 +66,10 @@ class MainAppBar extends ConsumerWidget {
     bool compact = false,
     bool isAuthenticated = false,
     required WidgetRef ref,
+    String initials = '',
+    String avatarURL = '',
   }) {
     if (isAuthenticated) {
-      final user = ref.read(Globals.state.user.notifier);
-      final String avatarURL = user.getPPUrl();
-      final String initials = user.getInitialsUsername();
-
       return UserAuthSection(
         compact: compact,
         avatarInitials: initials,
@@ -80,7 +82,7 @@ class MainAppBar extends ConsumerWidget {
   }
 
   void onSignOut(BuildContext context, WidgetRef ref) async {
-    final user = ref.read(Globals.state.user.notifier);
+    final user = ref.read(AppState.userProvider.notifier);
     await user.signOut();
     Beamer.of(context).beamToNamed(HomeLocation.route);
   }

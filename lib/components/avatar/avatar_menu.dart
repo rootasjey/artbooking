@@ -100,7 +100,7 @@ class AvatarMenu extends StatelessWidget {
       PopupMenuItemIcon(
         icon: Icon(UniconsLine.sign_left, color: iconColor),
         textLabel: "signout".tr(),
-        value: '/dashboard',
+        value: 'signout',
       ),
     ];
   }

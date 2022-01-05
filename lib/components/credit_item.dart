@@ -1,37 +1,38 @@
 import 'package:flutter/material.dart';
 
 class CreditItem extends StatefulWidget {
-  final Function? onTap;
-  final IconData? iconData;
-  final Color? hoverColor;
-  final double opacity;
-  final String textValue;
-
   const CreditItem({
     Key? key,
     this.onTap,
     this.hoverColor,
     this.iconData,
     this.opacity = 0.6,
+    this.baseColor = Colors.white,
     required this.textValue,
   }) : super(key: key);
+
+  final Function? onTap;
+  final IconData? iconData;
+  final Color? hoverColor;
+  final Color baseColor;
+  final double opacity;
+  final String textValue;
 
   @override
   _CreditItemState createState() => _CreditItemState();
 }
 
 class _CreditItemState extends State<CreditItem> {
-  Color? baseColor;
-  Color? currentColor;
-  Color? hoverColor;
+  Color baseColor = Colors.white.withOpacity(0.6);
+  Color currentColor = Colors.white;
+  Color hoverColor = Colors.amber;
 
   @override
   void initState() {
     super.initState();
     setState(() {
-      baseColor =
-          Theme.of(context).textTheme.bodyText1?.color?.withOpacity(0.6);
       hoverColor = widget.hoverColor ?? currentColor;
+      baseColor = widget.baseColor;
       currentColor = baseColor;
     });
   }

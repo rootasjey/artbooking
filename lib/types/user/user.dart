@@ -9,5 +9,8 @@ class User {
   /// Firestor's user.
   final UserFirestore? firestoreUser;
 
-  User({this.authUser, this.firestoreUser});
+  User({
+    this.authUser,
+    this.firestoreUser,
+  });
 }

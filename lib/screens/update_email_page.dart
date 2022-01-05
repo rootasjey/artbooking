@@ -6,22 +6,23 @@ import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/types/globals/globals.dart';
-import 'package:artbooking/types/globals/user_notifier.dart';
+import 'package:artbooking/types/globals/state.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
-class UpdateEmailPage extends StatefulWidget {
+class UpdateEmailPage extends ConsumerStatefulWidget {
   @override
   _UpdateEmailPageState createState() => _UpdateEmailPageState();
 }
 
-class _UpdateEmailPageState extends State<UpdateEmailPage> {
+class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
   bool _isCheckingEmail = false;
   bool _isUpdating = false;
   bool _isCompleted = false;
@@ -48,19 +49,22 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final String email =
+        ref.watch(AppState.userProvider).firestoreUser?.email ?? '';
+
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
           SliverEdgePadding(),
           MainAppBar(),
           header(),
-          body(),
+          body(email: email),
         ],
       ),
     );
   }
 
-  Widget body() {
+  Widget body({required String email}) {
     if (_isCompleted) {
       return completedView();
     }
@@ -69,10 +73,10 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
       return updatingView();
     }
 
-    return idleView();
+    return idleView(email: email);
   }
 
-  Widget idleView() {
+  Widget idleView({required String email}) {
     return SliverPadding(
       padding: const EdgeInsets.only(top: 60.0),
       sliver: SliverList(
@@ -84,7 +88,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
                 FadeInY(
                   delay: 0.milliseconds,
                   beginY: _beginY,
-                  child: helperCard(),
+                  child: helperCard(email: email),
                 ),
                 FadeInY(
                   delay: 100.milliseconds,
@@ -218,7 +222,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
     );
   }
 
-  Widget helperCard() {
+  Widget helperCard({required String email}) {
     return Padding(
       padding: const EdgeInsets.only(
         bottom: 40.0,
@@ -251,7 +255,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
                           ),
                         ),
                         Text(
-                          Globals.state.getUserFirestore().email,
+                          email,
                           style: FontsUtils.mainStyle(
                             fontWeight: FontWeight.bold,
                           ),
@@ -263,7 +267,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
               ],
             ),
           ),
-          onTap: showTipsDialog,
+          onTap: () => showTipsDialog(email: email),
         ),
       ),
     );
@@ -516,11 +520,11 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
         return;
       }
 
-      final UserNotifier userNotifier = Globals.state.getUserNotifier();
-      final response = await userNotifier.updateEmail(
-        newEmail: _newEmailValue,
-        password: _currentPasswordValue,
-      );
+      final response =
+          await ref.read(AppState.userProvider.notifier).updateEmail(
+                newEmail: _newEmailValue,
+                password: _currentPasswordValue,
+              );
 
       if (!response.success) {
         throw ErrorDescription(response.error?.message ?? '');
@@ -541,7 +545,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
     }
   }
 
-  void showTipsDialog() {
+  void showTipsDialog({required String email}) {
     showDialog(
       context: context,
       builder: (context) {
@@ -566,7 +570,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
               child: Opacity(
                 opacity: 0.6,
                 child: Text(
-                  Globals.state.getUserFirestore().email,
+                  email,
                   style: FontsUtils.mainStyle(
                     fontWeight: FontWeight.bold,
                   ),

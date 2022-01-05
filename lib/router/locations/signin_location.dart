@@ -1,8 +1,9 @@
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/screens/signin_page.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/state.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SigninLocation extends BeamLocation<BeamState> {
   /// Main root value for this location.
@@ -16,8 +17,16 @@ class SigninLocation extends BeamLocation<BeamState> {
         BeamGuard(
           pathPatterns: [route],
           check: (context, location) {
-            final userNotifier = Globals.state.getUserNotifier();
-            return !userNotifier.isAuthenticated;
+            final providerContainer = ProviderScope.containerOf(
+              context,
+              listen: false,
+            );
+
+            final isAuthenticated = providerContainer
+                .read(AppState.userProvider.notifier)
+                .isAuthenticated;
+
+            return !isAuthenticated;
           },
           beamToNamed: (origin, target) => HomeLocation.route,
         ),

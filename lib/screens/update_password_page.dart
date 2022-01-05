@@ -2,21 +2,23 @@ import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/state.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
-class UpdatePasswordPage extends StatefulWidget {
+class UpdatePasswordPage extends ConsumerStatefulWidget {
   @override
   _UpdatePasswordPageState createState() => _UpdatePasswordPageState();
 }
 
-class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
+class _UpdatePasswordPageState extends ConsumerState<UpdatePasswordPage> {
   bool _isCompleted = false;
   bool _isUpdating = false;
 
@@ -380,7 +382,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
     setState(() => _isUpdating = true);
 
     try {
-      Globals.state.getUserNotifier().updatePassword(
+      ref.read(AppState.userProvider.notifier).updatePassword(
             currentPassword: _currentPassword,
             newPassword: _newPassword,
           );

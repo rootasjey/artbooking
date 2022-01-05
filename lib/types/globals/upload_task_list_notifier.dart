@@ -1,7 +1,6 @@
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
-import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/types/globals/upload_state.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
@@ -9,6 +8,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:file_picker_cross/file_picker_cross.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mime_type/mime_type.dart';
@@ -216,7 +216,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     required String illustrationId,
     required CustomUploadTask customUploadTask,
   }) async {
-    final String userId = Globals.state.getUserAuth()?.uid ?? '';
+    final String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
 
     if (userId.isEmpty) {
       return customUploadTask;

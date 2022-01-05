@@ -8,17 +8,18 @@ import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/router/locations/forgot_password_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/locations/signup_location.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/state.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
-class SigninPage extends StatefulWidget {
+class SigninPage extends ConsumerStatefulWidget {
   final void Function(bool isAuthenticated)? onSigninResult;
 
   const SigninPage({Key? key, this.onSigninResult}) : super(key: key);
@@ -27,7 +28,7 @@ class SigninPage extends StatefulWidget {
   _SigninPageState createState() => _SigninPageState();
 }
 
-class _SigninPageState extends State<SigninPage> {
+class _SigninPageState extends ConsumerState<SigninPage> {
   bool _isConnecting = false;
 
   final _passwordNode = FocusNode();
@@ -350,11 +351,10 @@ class _SigninPageState extends State<SigninPage> {
     setState(() => _isConnecting = true);
 
     try {
-      final userNotifier = Globals.state.getUserNotifier();
-      final userCred = await userNotifier.signIn(
-        email: _email,
-        password: _password,
-      );
+      final userCred = await ref.read(AppState.userProvider.notifier).signIn(
+            email: _email,
+            password: _password,
+          );
 
       if (userCred == null) {
         setState(() => _isConnecting = false);

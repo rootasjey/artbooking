@@ -4,6 +4,6 @@ import 'package:artbooking/types/globals/utils.dart';
 
 class Globals {
   static GlobalsConstants constants = GlobalsConstants();
-  static GlobalsState state = GlobalsState();
+  static final GlobalsState state = GlobalsState();
   static GlobalsUtils utils = GlobalsUtils();
 }

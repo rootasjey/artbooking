@@ -2,9 +2,10 @@ import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/router/locations/home_location.dart';
-import 'package:artbooking/router/locations/signin_location.dart';
 import 'package:artbooking/types/cloud_function_response.dart';
 import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/state.dart';
+import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
@@ -12,15 +13,16 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
-class DeleteAccountPage extends StatefulWidget {
+class DeleteAccountPage extends ConsumerStatefulWidget {
   @override
   DeleteAccountPageState createState() => DeleteAccountPageState();
 }
 
-class DeleteAccountPageState extends State<DeleteAccountPage> {
+class DeleteAccountPageState extends ConsumerState<DeleteAccountPage> {
   bool _isDeleting = false;
   bool _isCompleted = false;
 
@@ -382,25 +384,23 @@ class DeleteAccountPageState extends State<DeleteAccountPage> {
     setState(() => _isDeleting = true);
 
     try {
-      final userAuth = Globals.state.getUserAuth();
-      final userNotifier = Globals.state.getUserNotifier();
-
+      final userAuth = FirebaseAuth.instance.currentUser;
       if (userAuth == null) {
-        setState(() => _isDeleting = false);
-        context.beamToNamed(SigninLocation.route);
-        return;
+        throw ErrorDescription("You are not authenticated.");
       }
 
       final credentials = EmailAuthProvider.credential(
-        email: userAuth.email!,
+        email: userAuth.email ?? '',
         password: _password,
       );
 
       await userAuth.reauthenticateWithCredential(credentials);
       final idToken = await userAuth.getIdToken();
-      final CloudFunctionResponse response = await userNotifier.deleteAccount(
-        idToken,
-      );
+
+      final CloudFunctionResponse response =
+          await ref.read(AppState.userProvider.notifier).deleteAccount(
+                idToken,
+              );
 
       if (!response.success) {
         throw ErrorDescription(
@@ -413,7 +413,7 @@ class DeleteAccountPageState extends State<DeleteAccountPage> {
         _isCompleted = true;
       });
     } catch (error) {
-      debugPrint(error.toString());
+      appLogger.e(error);
 
       setState(() {
         _isDeleting = false;

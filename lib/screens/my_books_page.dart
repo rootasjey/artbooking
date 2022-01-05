@@ -12,7 +12,6 @@ import 'package:artbooking/components/themed_dialog.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/enums.dart';
-import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/types/one_book_op_resp.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
@@ -605,12 +604,10 @@ class _MyBooksPageState extends State<MyBooksPage> {
       _books.clear();
     });
 
-    final userAuth = Globals.state.getUserAuth();
-
     try {
       final query = FirebaseFirestore.instance
           .collection('books')
-          .where('user.id', isEqualTo: userAuth?.uid)
+          .where('user.id', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
           .orderBy('createdAt', descending: _descending)
           .limit(_limit);
 

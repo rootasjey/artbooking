@@ -4,7 +4,7 @@ import 'package:artbooking/components/form_actions_inputs.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/state.dart';
 import 'package:artbooking/types/user/user_pp_path.dart';
 import 'package:artbooking/types/user/user_pp_url.dart';
 import 'package:artbooking/utils/app_logger.dart';
@@ -17,11 +17,12 @@ import 'package:extended_image/extended_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:unicons/unicons.dart';
 
 /// A widget to edit an image (crop, resize, flip, rotate).
-class EditImagePage extends StatefulWidget {
+class EditImagePage extends ConsumerStatefulWidget {
   const EditImagePage({
     Key? key,
   }) : super(key: key);
@@ -30,7 +31,7 @@ class EditImagePage extends StatefulWidget {
   _EditImagePageState createState() => _EditImagePageState();
 }
 
-class _EditImagePageState extends State<EditImagePage> {
+class _EditImagePageState extends ConsumerState<EditImagePage> {
   bool _isCropping = false;
   bool _isUpdating = false;
 
@@ -255,8 +256,8 @@ class _EditImagePageState extends State<EditImagePage> {
 
     setState(() => _isUpdating = true);
 
-    final userFirestore = Globals.state.getUserFirestore();
-    final String ext = userFirestore.pp.ext;
+    final String ext =
+        ref.read(AppState.userProvider).firestoreUser?.pp.ext ?? '';
 
     try {
       final String imagePath = "images/users/${userAuth.uid}/pp/edited.$ext";
@@ -275,12 +276,16 @@ class _EditImagePageState extends State<EditImagePage> {
       final String downloadUrl = await snapshot.ref.getDownloadURL();
 
       setState(() {
-        userFirestore.urls.setUrl('image', downloadUrl);
+        ref
+            .read(AppState.userProvider)
+            .firestoreUser
+            ?.urls
+            .setUrl('image', downloadUrl);
 
-        userFirestore.pp.merge(
-          path: UserPPPath(edited: imagePath),
-          url: UserPPUrl(edited: downloadUrl),
-        );
+        ref.read(AppState.userProvider).firestoreUser?.pp.merge(
+              path: UserPPPath(edited: imagePath),
+              url: UserPPUrl(edited: downloadUrl),
+            );
 
         _isUpdating = false;
       });
@@ -296,12 +301,12 @@ class _EditImagePageState extends State<EditImagePage> {
     setState(() => _isUpdating = true);
 
     try {
-      final userFirestore = Globals.state.getUserFirestore();
       final String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
 
       await Cloud.fun('users-updateUser').call({
         'userId': uid,
-        'updatePayload': userFirestore.toJSON(),
+        'updatePayload':
+            ref.read(AppState.userProvider).firestoreUser?.toJSON(),
       });
 
       Beamer.of(context).popRoute();

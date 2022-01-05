@@ -4,7 +4,7 @@ import 'package:artbooking/components/dark_text_button.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/locations/signin_location.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/state.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
@@ -15,19 +15,18 @@ import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/loading_animation.dart';
 import 'package:artbooking/utils/snack.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
-class SignupPage extends StatefulWidget {
-  final void Function(bool isAuthenticated)? onSignupResult;
-
-  const SignupPage({Key? key, this.onSignupResult}) : super(key: key);
+class SignupPage extends ConsumerStatefulWidget {
+  const SignupPage({Key? key}) : super(key: key);
 
   @override
   _SignupPageState createState() => _SignupPageState();
 }
 
-class _SignupPageState extends State<SignupPage> {
+class _SignupPageState extends ConsumerState<SignupPage> {
   bool _isCheckingEmail = false;
   bool _isCheckingName = false;
   bool _isSigningUp = false;
@@ -525,12 +524,13 @@ class _SignupPageState extends State<SignupPage> {
     }
 
     try {
-      final userNotifier = Globals.state.getUserNotifier();
-      final createAccountResponse = await userNotifier.signUp(
-        email: _email,
-        username: _username,
-        password: _password,
-      );
+      final createAccountResponse =
+          await ref.read(AppState.userProvider.notifier).signUp(
+                email: _email,
+                username: _username,
+                password: _password,
+              );
+      ;
 
       setState(() => _isSigningUp = false);
 

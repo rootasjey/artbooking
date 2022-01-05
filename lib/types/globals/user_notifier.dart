@@ -44,7 +44,7 @@ class UserNotifier extends StateNotifier<User> {
         ),
       );
     } catch (error) {
-      appLogger.e(error.toString());
+      appLogger.e(error);
 
       return CloudFunctionResponse(
         success: false,
@@ -58,7 +58,6 @@ class UserNotifier extends StateNotifier<User> {
 
   String getInitialsUsername() {
     final UserFirestore? firestoreUser = state.firestoreUser;
-
     if (firestoreUser == null) return '';
 
     final splittedUsernameArray = firestoreUser.name.split(' ');
@@ -78,7 +77,6 @@ class UserNotifier extends StateNotifier<User> {
 
   String getPPUrl({String orElse = ''}) {
     final UserFirestore? firestoreUser = state.firestoreUser;
-
     if (firestoreUser == null) return orElse;
 
     final editedURL = firestoreUser.pp.url.edited;
@@ -125,7 +123,7 @@ class UserNotifier extends StateNotifier<User> {
   void _onAuthData(firebase_auth.User? userEvent) {
     state = User(
       authUser: userEvent,
-      firestoreUser: state.firestoreUser,
+      firestoreUser: state.firestoreUser ?? UserFirestore.empty(),
     );
   }
 
@@ -185,6 +183,7 @@ class UserNotifier extends StateNotifier<User> {
       );
 
       state = User(authUser: authResult.user);
+      // appLogger.d("updated state: userAuth");
 
       _listenToAuthChanges();
       _listenToFirestoreChanges();
@@ -196,6 +195,7 @@ class UserNotifier extends StateNotifier<User> {
 
       return authResult.user;
     } catch (error) {
+      appLogger.e(error);
       appStorage.clearUserAuthData();
       return null;
     }
@@ -219,6 +219,7 @@ class UserNotifier extends StateNotifier<User> {
     try {
       await appStorage.clearUserAuthData();
       await firebase_auth.FirebaseAuth.instance.signOut();
+      state = User();
       return true;
     } catch (error) {
       appLogger.e(error);

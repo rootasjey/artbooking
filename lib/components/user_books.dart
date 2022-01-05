@@ -1,12 +1,12 @@
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/types/book.dart';
-import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/flash_helper.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 import 'package:supercharged/supercharged.dart';
@@ -231,15 +231,16 @@ class _UserBooksState extends State<UserBooks> {
   }
 
   Future fetchBooks() async {
-    isLoading = true;
-    final userAuth = Globals.state.getUserAuth();
+    setState(() {
+      isLoading = true;
+    });
 
     try {
       books.clear();
 
       final snapshot = await FirebaseFirestore.instance
           .collection('books')
-          .where('user.id', isEqualTo: userAuth?.uid)
+          .where('user.id', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
           .limit(limit)
           .orderBy('updatedAt', descending: true)
           .get();
@@ -283,13 +284,14 @@ class _UserBooksState extends State<UserBooks> {
   }
 
   Future fetchMoreBooks() async {
-    final userAuth = Globals.state.getUserAuth();
-    isLoadingMore = true;
+    setState(() {
+      isLoadingMore = true;
+    });
 
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection('books')
-          .where('user.id', isEqualTo: userAuth?.uid)
+          .where('user.id', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
           .limit(limit)
           .orderBy('updatedAt', descending: true)
           .startAfterDocument(lastDoc)

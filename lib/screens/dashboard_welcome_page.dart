@@ -3,45 +3,56 @@ import 'package:artbooking/components/section_card.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/types/globals/globals.dart';
-import 'package:artbooking/types/user/user_firestore.dart';
+import 'package:artbooking/types/globals/state.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
-class DashboardWelcomePage extends StatelessWidget {
+class DashboardWelcomePage extends ConsumerWidget {
   const DashboardWelcomePage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userState = ref.watch(AppState.userProvider);
+    final userFirestore = userState.firestoreUser;
+
+    String name = 'Anonymous';
+
+    if (userFirestore != null) {
+      name = userFirestore.name.isNotEmpty
+          ? userFirestore.name
+          : userFirestore.email;
+    }
+
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
           SliverEdgePadding(),
           MainAppBar(),
           header(),
-          body(context),
+          SliverList(
+            delegate: SliverChildListDelegate.fixed([
+              Padding(
+                padding: const EdgeInsets.only(left: 54.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    greetings(
+                      color: Theme.of(context).primaryColor,
+                      name: name,
+                    ),
+                    placeDescription(),
+                    sectionsList(context),
+                  ],
+                ),
+              ),
+            ]),
+          ),
         ],
       ),
-    );
-  }
-
-  Widget body(BuildContext context) {
-    return SliverList(
-      delegate: SliverChildListDelegate.fixed([
-        Padding(
-          padding: const EdgeInsets.only(left: 54.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              greetings(color: Theme.of(context).primaryColor),
-              placeDescription(),
-              sectionsList(context),
-            ],
-          ),
-        ),
-      ]),
     );
   }
 
@@ -93,13 +104,7 @@ class DashboardWelcomePage extends StatelessWidget {
     );
   }
 
-  Widget greetings({required Color color}) {
-    final UserFirestore userFirestore = Globals.state.getUserFirestore();
-
-    final username = userFirestore.name;
-    final email = userFirestore.email;
-    final name = username.isNotEmpty ? username : email;
-
+  Widget greetings({required Color color, required String name}) {
     return Text.rich(
       TextSpan(
         text: "welcome".tr(),

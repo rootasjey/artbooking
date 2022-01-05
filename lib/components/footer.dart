@@ -1,16 +1,16 @@
 import 'package:artbooking/components/app_icon.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/locations/settings_location.dart';
-import 'package:artbooking/types/globals/globals.dart';
-import 'package:artbooking/types/globals/user_notifier.dart';
+import 'package:artbooking/types/globals/state.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class Footer extends StatefulWidget {
+class Footer extends ConsumerStatefulWidget {
   final ScrollController? pageScrollController;
   final bool closeModalOnNav;
   final bool autoNavToHome;
@@ -25,7 +25,7 @@ class Footer extends StatefulWidget {
   _FooterState createState() => _FooterState();
 }
 
-class _FooterState extends State<Footer> {
+class _FooterState extends ConsumerState<Footer> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -273,9 +273,7 @@ class _FooterState extends State<Footer> {
         textLink(
           label: "settings".tr(),
           onPressed: () {
-            final UserNotifier userNotifier = Globals.state.getUserNotifier();
-
-            if (userNotifier.isAuthenticated) {
+            if (ref.read(AppState.userProvider.notifier).isAuthenticated) {
               Beamer.of(context).beamToNamed(
                 DashboardLocationContent.settingsRoute,
               );

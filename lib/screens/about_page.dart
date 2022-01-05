@@ -245,6 +245,10 @@ class _AboutPageState extends State<AboutPage> {
   }
 
   Widget creditsSection() {
+    final Color baseColor =
+        Theme.of(context).textTheme.bodyText1?.color?.withOpacity(0.6) ??
+            Colors.white;
+
     return SizedBox(
       width: maxWidth,
       child: Column(
@@ -265,6 +269,7 @@ class _AboutPageState extends State<AboutPage> {
             onTap: () => launch('https://iconscout.com/unicons'),
             iconData: UniconsLine.palette,
             hoverColor: Theme.of(context).primaryColor,
+            baseColor: baseColor,
           ),
           CreditItem(
             textValue: 'illustration_by_from'.tr(
@@ -273,12 +278,14 @@ class _AboutPageState extends State<AboutPage> {
             onTap: () => launch('https://icons8.com/'),
             iconData: UniconsLine.image,
             hoverColor: Colors.pink,
+            baseColor: baseColor,
           ),
           CreditItem(
             textValue: 'app_screenshot_credits'.tr(args: ['AppMockUp']),
             onTap: () => launch('https://app-mockup.com/'),
             iconData: UniconsLine.mobile_android,
             hoverColor: Theme.of(context).secondaryHeaderColor,
+            baseColor: baseColor,
           ),
         ],
       ),
@@ -378,37 +385,6 @@ class _AboutPageState extends State<AboutPage> {
               child: Text(
                 'the_author'.tr().toUpperCase(),
                 style: titleStyle,
-              ),
-            ),
-          ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 60.0),
-              child: OpenContainer(
-                closedColor: Colors.transparent,
-                closedElevation: 0.0,
-                closedBuilder: (context, openContainer) {
-                  return Material(
-                    elevation: 1.0,
-                    shape: CircleBorder(),
-                    clipBehavior: Clip.hardEdge,
-                    color: Colors.transparent,
-                    child: Ink.image(
-                      image: AssetImage('assets/images/jeje-profile.jpg'),
-                      fit: BoxFit.cover,
-                      width: 200.0,
-                      height: 200.0,
-                      child: InkWell(
-                        onTap: openContainer,
-                      ),
-                    ),
-                  );
-                },
-                openBuilder: (context, callback) {
-                  return ImageHero(
-                    imageProvider: AssetImage('assets/images/jeje-profile.jpg'),
-                  );
-                },
               ),
             ),
           ),

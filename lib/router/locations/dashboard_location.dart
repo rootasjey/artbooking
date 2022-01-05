@@ -13,10 +13,11 @@ import 'package:artbooking/screens/settings/settings_page.dart';
 import 'package:artbooking/screens/update_email_page.dart';
 import 'package:artbooking/screens/update_password_page.dart';
 import 'package:artbooking/screens/update_username_page.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/state.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DashboardLocation extends BeamLocation<BeamState> {
   /// Main root value for this location.
@@ -25,15 +26,22 @@ class DashboardLocation extends BeamLocation<BeamState> {
   @override
   List<String> get pathPatterns => [route];
 
-  /// Redirect to signin page ('/signin')
-  /// if the user is not authenticated.
+  /// Redirect to signin page ('/signin') if the user is not authenticated.
   @override
   List<BeamGuard> get guards => [
         BeamGuard(
           pathPatterns: [route],
           check: (context, location) {
-            final userNotifier = Globals.state.getUserNotifier();
-            return userNotifier.isAuthenticated;
+            final providerContainer = ProviderScope.containerOf(
+              context,
+              listen: false,
+            );
+
+            final isAuthenticated = providerContainer
+                .read(AppState.userProvider.notifier)
+                .isAuthenticated;
+
+            return isAuthenticated;
           },
           beamToNamed: (origin, target) => SigninLocation.route,
         ),
@@ -93,13 +101,17 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
         booksRoute,
         '$booksRoute/:bookId',
         // -> '/dashboard/books/:bookId',
+        illustrationsRoute,
         '$illustrationsRoute/:illustrationId',
         // -> '/dashboard/illustrations/:illustrationId',
+        statisticsRoute,
+        profileRoute,
         settingsRoute,
         deleteAccountRoute,
         updateEmailRoute,
         updatePasswordRoute,
         updateUsernameRoute,
+        editProfilePictureRoute,
       ];
 
   @override
