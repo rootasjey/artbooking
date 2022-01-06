@@ -23,7 +23,6 @@ import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -850,7 +849,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
       return;
     }
 
-    Cloud.fun('books-removeDeletedIllustrations').call({
+    Utilities.cloud.fun('books-removeDeletedIllustrations').call({
       'bookId': widget.bookId,
       'illustrationIds': illustrationsErrors,
     }).catchError((error, stack) {

@@ -4,7 +4,6 @@ import 'package:artbooking/components/avatar/better_avatar.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:flutter/material.dart';
 
 class AuthorHeader extends StatefulWidget {
@@ -90,12 +89,12 @@ class _AuthorHeaderState extends State<AuthorHeader> {
 
   void fetch() async {
     try {
-      final resp = await Cloud.fun('users-fetchUser').call({
+      final resp = await Utilities.cloud.fun('users-fetchUser').call({
         'userId': widget.authorId,
       });
 
       final hashMap = LinkedHashMap.from(resp.data);
-      final data = Cloud.convertFromFun(hashMap);
+      final data = Utilities.cloud.convertFromFun(hashMap);
 
       if (!mounted) {
         return;

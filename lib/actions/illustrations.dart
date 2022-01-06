@@ -1,3 +1,4 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/check_thumbnail_op_resp.dart';
 import 'package:artbooking/types/many_illus_op_resp.dart';
 import 'package:artbooking/types/one_illus_op_resp.dart';
@@ -5,7 +6,6 @@ import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class IllustrationsActions {
@@ -17,7 +17,8 @@ class IllustrationsActions {
     required String illustrationId,
   }) async {
     try {
-      final response = await Cloud.fun('illustrations-checkProperties').call({
+      final response =
+          await Utilities.cloud.fun('illustrations-checkProperties').call({
         'illustrationId': illustrationId,
       });
 
@@ -36,7 +37,8 @@ class IllustrationsActions {
     ContentVisibility visibility = ContentVisibility.private,
   }) async {
     try {
-      final response = await Cloud.fun('illustrations-createOne').call({
+      final response =
+          await Utilities.cloud.fun('illustrations-createOne').call({
         'name': name,
         'visibility': Illustration.visibilityPropToString(visibility),
       });
@@ -55,7 +57,8 @@ class IllustrationsActions {
     required String illustrationId,
   }) async {
     try {
-      final response = await Cloud.fun('illustrations-deleteOne').call({
+      final response =
+          await Utilities.cloud.fun('illustrations-deleteOne').call({
         'illustrationId': illustrationId,
       });
 
@@ -73,7 +76,8 @@ class IllustrationsActions {
     required List<String?> illustrationIds,
   }) async {
     try {
-      final response = await Cloud.fun('illustrations-deleteMany').call({
+      final response =
+          await Utilities.cloud.fun('illustrations-deleteMany').call({
         'illustrationIds': illustrationIds,
       });
 
@@ -96,7 +100,8 @@ class IllustrationsActions {
     required Illustration illustration,
   }) async {
     try {
-      final response = await Cloud.fun('illustrations-updateMetadata').call({
+      final response =
+          await Utilities.cloud.fun('illustrations-updateMetadata').call({
         'illustrationId': illustration.id,
         'name': name,
         'description': description,

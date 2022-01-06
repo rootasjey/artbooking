@@ -1,8 +1,8 @@
 import 'package:artbooking/actions/books.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/flash_helper.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -196,7 +196,7 @@ class _UserBooksState extends State<UserBooks> {
   }
 
   void createBookAndAddIllustration(BuildContext context) async {
-    FlashHelper.showProgress(
+    Utilities.flash.showProgress(
       context,
       title: "Create",
       progressId: 'create_book',
@@ -211,7 +211,7 @@ class _UserBooksState extends State<UserBooks> {
       illustrationIds: [widget.illustration.id],
     );
 
-    FlashHelper.dismissProgress(id: 'create_book');
+    Utilities.flash.dismissProgress(id: 'create_book');
 
     if (!createdList.success) {
       Snack.e(

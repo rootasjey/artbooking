@@ -13,20 +13,22 @@ class _MessageItem<T> {
   _MessageItem(this.message) : completer = Completer<Future<T>>();
 }
 
-class FlashHelper {
+class FlashUtilities {
+  const FlashUtilities();
+
   static Completer<BuildContext> _buildCompleter = Completer<BuildContext>();
   static Queue<_MessageItem> _messageQueue = Queue<_MessageItem>();
   static Completer? _previousCompleter;
   static FlashController? _previousController;
   static String _currentProgressId = '';
 
-  static void init(BuildContext context) {
+  void init(BuildContext context) {
     if (_buildCompleter.isCompleted == false) {
       _buildCompleter.complete(context);
     }
   }
 
-  static void dispose() {
+  void dispose() {
     _messageQueue.clear();
 
     if (_buildCompleter.isCompleted == false) {
@@ -35,7 +37,7 @@ class FlashHelper {
     _buildCompleter = Completer<BuildContext>();
   }
 
-  static void dismissProgress({String id = ''}) {
+  void dismissProgress({String id = ''}) {
     if (id.isEmpty) {
       _previousController?.dismiss();
       return;
@@ -46,7 +48,7 @@ class FlashHelper {
     }
   }
 
-  static Future<T?> toast<T>(String message) async {
+  Future<T?> toast<T>(String message) async {
     var context = await _buildCompleter.future;
 
     // Wait previous toast dismissed.
@@ -97,24 +99,24 @@ class FlashHelper {
     return showToast(message);
   }
 
-  static Color _backgroundColor(BuildContext context) {
+  Color _backgroundColor(BuildContext context) {
     var theme = Theme.of(context);
     return theme.dialogTheme.backgroundColor ?? theme.dialogBackgroundColor;
   }
 
-  static TextStyle _titleStyle(BuildContext context, [Color? color]) {
+  TextStyle _titleStyle(BuildContext context, [Color? color]) {
     var theme = Theme.of(context);
     return (theme.dialogTheme.titleTextStyle ?? theme.textTheme.headline6)!
         .copyWith(color: color);
   }
 
-  static TextStyle _contentStyle(BuildContext context, [Color? color]) {
+  TextStyle _contentStyle(BuildContext context, [Color? color]) {
     var theme = Theme.of(context);
     return (theme.dialogTheme.contentTextStyle ?? theme.textTheme.bodyText2)!
         .copyWith(color: color);
   }
 
-  static Future<T> groundedBottom<T>(
+  Future<T> groundedBottom<T>(
     BuildContext context, {
     String? title,
     required String? message,
@@ -179,7 +181,7 @@ class FlashHelper {
     );
   }
 
-  static Future<T> infoBar<T>(
+  Future<T> infoBar<T>(
     BuildContext context, {
     String? title,
     required String message,
@@ -206,7 +208,7 @@ class FlashHelper {
     );
   }
 
-  static Future<T> successBar<T>(
+  Future<T> successBar<T>(
     BuildContext context, {
     String? title,
     required String message,
@@ -233,7 +235,7 @@ class FlashHelper {
     );
   }
 
-  static Future<T> errorBar<T>(
+  Future<T> errorBar<T>(
     BuildContext context, {
     String? title,
     required String message,
@@ -265,7 +267,7 @@ class FlashHelper {
     );
   }
 
-  static Future<T> actionBar<T>(
+  Future<T> actionBar<T>(
     BuildContext context, {
     String? title,
     required String message,
@@ -295,7 +297,7 @@ class FlashHelper {
     );
   }
 
-  static Future<T> dialogWithChild<T>(
+  Future<T> dialogWithChild<T>(
     BuildContext context, {
     required Widget child,
   }) {
@@ -326,7 +328,7 @@ class FlashHelper {
     );
   }
 
-  static Future<T> simpleDialog<T>(
+  Future<T> simpleDialog<T>(
     BuildContext context, {
     String? title,
     required String message,
@@ -365,7 +367,7 @@ class FlashHelper {
     );
   }
 
-  static Future<T> customDialog<T>(
+  Future<T> customDialog<T>(
     BuildContext context, {
     ChildBuilder<T>? titleBuilder,
     required ChildBuilder messageBuilder,
@@ -410,7 +412,7 @@ class FlashHelper {
     );
   }
 
-  static Future<T> blockDialog<T>(
+  Future<T> blockDialog<T>(
     BuildContext context, {
     required Completer<T> dismissCompleter,
   }) {
@@ -436,7 +438,7 @@ class FlashHelper {
     return controller.show();
   }
 
-  static Future<String> inputDialog(
+  Future<String> inputDialog(
     BuildContext context, {
     String? title,
     String? message,
@@ -485,7 +487,7 @@ class FlashHelper {
     );
   }
 
-  static Future<T> showProgress<T>(
+  Future<T> showProgress<T>(
     BuildContext context, {
     String? title,
     String progressId = '',

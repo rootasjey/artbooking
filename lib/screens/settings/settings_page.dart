@@ -12,7 +12,6 @@ import 'package:artbooking/types/user/user_pp.dart';
 import 'package:artbooking/types/user/user_pp_path.dart';
 import 'package:artbooking/types/user/user_pp_url.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -239,7 +238,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     setState(() => _isUpdating = true);
 
     try {
-      final response = await Cloud.fun('users-clearProfilePicture').call();
+      final response =
+          await Utilities.cloud.fun('users-clearProfilePicture').call();
       final bool success = response.data['success'];
 
       if (!success) {
@@ -286,7 +286,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     try {
       final String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
 
-      await Cloud.fun('users-updateUser').call({
+      await Utilities.cloud.fun('users-updateUser').call({
         'userId': uid,
         'updatePayload':
             ref.read(AppState.userProvider).firestoreUser?.toJSON(),

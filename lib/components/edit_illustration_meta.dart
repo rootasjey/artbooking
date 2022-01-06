@@ -10,7 +10,6 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/types/style.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -979,7 +978,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     });
 
     try {
-      final response = await Cloud.illustrations("updateStyles").call({
+      final response =
+          await Utilities.cloud.illustrations("updateStyles").call({
         "illustrationId": widget.illustration!.id,
         "styles": _selectedStyles,
       });
@@ -1046,7 +1046,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     });
 
     try {
-      final response = await Cloud.illustrations("updateTopics").call({
+      final response =
+          await Utilities.cloud.illustrations("updateTopics").call({
         "illustrationId": widget.illustration!.id,
         "topics": _topics.keys.toList(),
       });
@@ -1235,7 +1236,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     });
 
     try {
-      final response = await Cloud.illustrations("updateStyles").call({
+      final response =
+          await Utilities.cloud.illustrations("updateStyles").call({
         "illustrationId": widget.illustration!.id,
         "styles": _selectedStyles,
       });
@@ -1292,7 +1294,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     });
 
     try {
-      final response = await Cloud.illustrations("updateTopics").call({
+      final response =
+          await Utilities.cloud.illustrations("updateTopics").call({
         "illustrationId": widget.illustration!.id,
         "topics": _topics.keys.toList(),
       });
@@ -1336,7 +1339,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     illustration.license = illustrationLicense;
 
     try {
-      final response = await Cloud.illustrations("updateLicense").call({
+      final response =
+          await Utilities.cloud.illustrations("updateLicense").call({
         "illustrationId": illustration.id,
         "license": {
           "id": illustrationLicense.id,
@@ -1371,7 +1375,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     illustration.license = IllustrationLicense.empty();
 
     try {
-      final response = await Cloud.illustrations("unsetLicense").call({
+      final response =
+          await Utilities.cloud.illustrations("unsetLicense").call({
         "illustrationId": illustration.id,
         "license": {
           "id": illustration.license!.id,
@@ -1406,7 +1411,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
     try {
       final HttpsCallableResult response =
-          await Cloud.illustrations("updatePresentation").call({
+          await Utilities.cloud.illustrations("updatePresentation").call({
         "illustrationId": illustration.id,
         "name": _nameTextController.text,
         "description": _descriptionTextController.text,
@@ -1453,7 +1458,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
     try {
       final HttpsCallableResult response =
-          await Cloud.illustrations("updateVisibility").call({
+          await Utilities.cloud.illustrations("updateVisibility").call({
         "illustrationId": illustration.id,
         "visibility": illustration.visibilityToString(),
       });

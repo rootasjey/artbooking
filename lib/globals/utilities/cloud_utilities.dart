@@ -4,9 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-class Cloud {
-  static Map<String, dynamic> convertFromFun(
-      LinkedHashMap<dynamic, dynamic> raw) {
+class CloudUtilities {
+  const CloudUtilities();
+
+  Map<String, dynamic> convertFromFun(LinkedHashMap<dynamic, dynamic> raw) {
     final hashMap = LinkedHashMap.from(raw);
 
     final Map<String, dynamic> converted = hashMap.map((key, value) {
@@ -26,7 +27,7 @@ class Cloud {
   }
 
   /// Call cloud functions related to tihs app on the right region.
-  static HttpsCallable fun(
+  HttpsCallable fun(
     String functionName, {
     HttpsCallableOptions? options,
   }) {
@@ -43,7 +44,7 @@ class Cloud {
   /// Only the suffix is necessary,
   /// e.g. if the function's name is `illustrations-updateMetadata`,
   /// You only need to specify `updateMetadata`.
-  static HttpsCallable illustrations(
+  HttpsCallable illustrations(
     String functionName, {
     HttpsCallableOptions? options,
   }) {

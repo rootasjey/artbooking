@@ -1,4 +1,6 @@
+import 'package:artbooking/globals/utilities/cloud_utilities.dart';
 import 'package:artbooking/globals/utilities/date_utilities.dart';
+import 'package:artbooking/globals/utilities/flash_utilities.dart';
 import 'package:artbooking/globals/utilities/fonts_utilities.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:artbooking/globals/utilities/storage_utilities.dart';
@@ -6,7 +8,9 @@ import 'package:artbooking/globals/utilities/language_utilities.dart';
 import 'package:artbooking/globals/utilities/size_utilities.dart';
 
 class Utilities {
+  static const cloud = const CloudUtilities();
   static const date = const DateUtilities();
+  static const flash = const FlashUtilities();
   static const fonts = const FontsUtilities();
   static const lang = const LanguageUtilities();
   static const search = const SearchUtilities();

@@ -1,8 +1,8 @@
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/actions/illustrations.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:extended_image/extended_image.dart';
@@ -203,7 +203,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
   Future<String> _createFirestoreDocument(String fileName) async {
     try {
       final HttpsCallableResult responseResult =
-          await Cloud.illustrations("createOne").call({
+          await Utilities.cloud.illustrations("createOne").call({
         "name": fileName,
         "isUserAuthor": true,
         "visibility": "public",

@@ -6,7 +6,6 @@ import 'package:artbooking/types/create_account_resp.dart';
 import 'package:artbooking/types/user/user.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -270,7 +269,7 @@ class UserNotifier extends StateNotifier<User> {
       await authUser.reauthenticateWithCredential(credentials);
       final idToken = await authUser.getIdToken();
 
-      final response = await Cloud.fun('users-updateEmail').call({
+      final response = await Utilities.cloud.fun('users-updateEmail').call({
         'newEmail': authUser.email,
         'idToken': idToken,
       });
@@ -328,7 +327,7 @@ class UserNotifier extends StateNotifier<User> {
 
   Future<CloudFunctionResponse> updateUsername(String newUsername) async {
     try {
-      final response = await Cloud.fun('users-updateUsername').call({
+      final response = await Utilities.cloud.fun('users-updateUsername').call({
         'newUsername': newUsername,
       });
 

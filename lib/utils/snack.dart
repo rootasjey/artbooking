@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/flash_helper.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
@@ -25,7 +25,7 @@ class Snack {
       );
     }
 
-    return FlashHelper.groundedBottom(
+    return Utilities.flash.groundedBottom(
       context,
       title: title,
       message: message,
@@ -54,7 +54,7 @@ class Snack {
       );
     }
 
-    return FlashHelper.groundedBottom(
+    return Utilities.flash.groundedBottom(
       context,
       title: title,
       message: message,
@@ -83,7 +83,7 @@ class Snack {
       );
     }
 
-    return FlashHelper.groundedBottom(
+    return Utilities.flash.groundedBottom(
       context,
       title: title,
       message: message,
