@@ -1,4 +1,5 @@
 import 'package:artbooking/globals/utilities/cloud_utilities.dart';
+import 'package:artbooking/globals/utilities/crop_editor_utilities.dart';
 import 'package:artbooking/globals/utilities/date_utilities.dart';
 import 'package:artbooking/globals/utilities/flash_utilities.dart';
 import 'package:artbooking/globals/utilities/fonts_utilities.dart';
@@ -10,6 +11,7 @@ import 'package:artbooking/globals/utilities/size_utilities.dart';
 
 class Utilities {
   static const cloud = const CloudUtilities();
+  static const cropEditor = const CropEditorUtilities();
   static const date = const DateUtilities();
   static const flash = const FlashUtilities();
   static const fonts = const FontsUtilities();

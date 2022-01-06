@@ -9,7 +9,6 @@ import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/types/user/user_pp_path.dart';
 import 'package:artbooking/types/user/user_pp_url.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/crop_editor_helper.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
@@ -225,7 +224,7 @@ class _EditImagePageState extends ConsumerState<EditImagePage> {
       Uint8List? fileData;
 
       if (useNativeLib) {
-        fileData = await cropImageDataWithNativeLibrary(
+        fileData = await Utilities.cropEditor.cropImageDataWithNativeLibrary(
           state: _editorKey.currentState!,
         );
       } else {
@@ -235,7 +234,7 @@ class _EditImagePageState extends ConsumerState<EditImagePage> {
         // await Future.delayed(Duration(milliseconds: 200));
 
         // If you don't want to block ui, use compute/isolate,but it costs more time.
-        fileData = await cropImageDataWithDartLibrary(
+        fileData = await Utilities.cropEditor.cropImageDataWithDartLibrary(
           state: _editorKey.currentState!,
         );
       }
