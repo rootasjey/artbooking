@@ -35,7 +35,7 @@ class ColorsConstants {
   final Color galleries = Colors.green;
 
   /// Color for settings.
-  final Color settings = Colors.lime;
+  final Color settings = Colors.teal;
 
   /// Color for profile.
   final Color profile = Colors.indigo;
