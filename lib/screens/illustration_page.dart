@@ -16,7 +16,6 @@ import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/snack.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
@@ -494,7 +493,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
       final illusData = illusSnap.data();
 
       if (!illusSnap.exists || illusData == null) {
-        Snack.e(
+        Utilities.snack.e(
           context: context,
           message: "The illustration with the id "
               "${widget.illustrationId} doesn't exist.",
@@ -536,7 +535,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
     );
 
     if (!result.success) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "Sorry, there was an error while saving your changes."
             " Try again later or contact us.",

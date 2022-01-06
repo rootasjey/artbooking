@@ -14,7 +14,6 @@ import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/loading_animation.dart';
-import 'package:artbooking/utils/snack.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
@@ -546,7 +545,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
         message = "[code: ${error.code}] - ${error.message}";
       }
 
-      Snack.e(context: context, message: message);
+      Utilities.snack.e(context: context, message: message);
 
       context.beamToNamed(HomeLocation.route);
     } catch (error) {
@@ -554,7 +553,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
       setState(() => _isSigningUp = false);
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "account_create_error".tr(),
       );
@@ -573,7 +572,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     _password = _password.trim();
 
     if (_password.isEmpty || _confirmPassword.isEmpty) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "password_empty_forbidden".tr(),
       );
@@ -582,7 +581,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     }
 
     if (_confirmPassword != _password) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "passwords_dont_match".tr(),
       );
@@ -591,7 +590,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     }
 
     if (_username.isEmpty) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "name_empty_forbidden".tr(),
       );
@@ -600,7 +599,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     }
 
     if (!UsersActions.checkEmailFormat(_email)) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "email_not_valid".tr(),
       );
@@ -609,7 +608,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     }
 
     if (!UsersActions.checkUsernameFormat(_username)) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: _username.length < 3
             ? "input_minimum_char".tr()

@@ -12,7 +12,6 @@ import 'package:artbooking/types/user/user_pp.dart';
 import 'package:artbooking/types/user/user_pp_path.dart';
 import 'package:artbooking/types/user/user_pp_url.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
@@ -207,7 +206,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
 
     if (choosenFile.length >= 5 * 1024 * 1024) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "image_size_exceeded".tr(),
       );

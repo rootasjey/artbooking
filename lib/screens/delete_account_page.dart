@@ -7,7 +7,6 @@ import 'package:artbooking/types/cloud_function_response.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -419,7 +418,7 @@ class DeleteAccountPageState extends ConsumerState<DeleteAccountPage> {
         _isDeleting = false;
       });
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: (error as PlatformException).message,
       );
@@ -428,7 +427,7 @@ class DeleteAccountPageState extends ConsumerState<DeleteAccountPage> {
 
   bool inputValuesOk() {
     if (_password.isEmpty) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "password_empty_forbidden".tr(),
       );

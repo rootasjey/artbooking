@@ -6,7 +6,6 @@ import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -261,7 +260,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   bool inputValuesOk() {
     if (email.isEmpty) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "email_empty_no_valid".tr(),
       );
@@ -270,7 +269,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     }
 
     if (!UsersActions.checkEmailFormat(email)) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "email_not_valid".tr(),
       );
@@ -302,7 +301,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
       setState(() => isLoading = false);
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "email_doesnt_exist".tr(),
       );

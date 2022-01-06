@@ -10,7 +10,6 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/types/style.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -1003,7 +1002,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         errorMessage = "styles_update_out_of_range".tr(args: [numberOfStyles!]);
       }
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: errorMessage,
       );
@@ -1014,7 +1013,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         _selectedStyles.remove(styleName);
       });
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "styles_update_fail".tr(),
       );
@@ -1025,7 +1024,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
   void addTopicAndUpdate() async {
     if (_topicInputValue.isEmpty) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "input_empty_invalid".tr(),
       );
@@ -1075,7 +1074,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         errorMessage = "topics_update_out_of_range".tr(args: [numberOfTopics!]);
       }
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: errorMessage,
       );
@@ -1086,7 +1085,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         _topics.remove(topic);
       }
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: error.toString(),
       );
@@ -1127,7 +1126,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         _links.putIfAbsent(_editingExistingLinkName, () => _linkValue);
       }
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "project_update_urls_fail".tr(),
       );
@@ -1154,7 +1153,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
       _links.putIfAbsent(entry.key, () => entry.value);
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "project_update_urls_fail".tr(),
       );
@@ -1250,7 +1249,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     } on FirebaseFunctionsException catch (error) {
       appLogger.e(error);
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: error.message,
       );
@@ -1258,7 +1257,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       appLogger.e(error);
       _selectedStyles.add(styleName);
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "styles_update_fail".tr(),
       );
@@ -1278,7 +1277,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       appLogger.e(error);
       _programmingLanguages.putIfAbsent(key, () => true);
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "project_update_prog_fail".tr(),
       );
@@ -1309,7 +1308,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       appLogger.e(error);
       _topics.putIfAbsent(entry.key, () => entry.value);
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: error.toString(),
       );
@@ -1358,7 +1357,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
       illustrationLicense = previousLicense!;
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: error.toString(),
       );
@@ -1394,7 +1393,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
       illustration.license = previousLicense;
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: error.toString(),
       );
@@ -1427,7 +1426,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     } catch (error) {
       appLogger.e(error);
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "project_update_title_fail".tr(),
       );
@@ -1472,7 +1471,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       appLogger.e(error);
       illustration.visibility = previousVisibility;
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "[${error.code}] ${error.message}",
       );
@@ -1481,7 +1480,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
       illustration.visibility = previousVisibility;
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "illustration_visibility_update_fail".tr(),
       );

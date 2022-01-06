@@ -3,7 +3,6 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -173,7 +172,7 @@ class _UserBooksState extends State<UserBooks> {
   }
 
   void addIllustrationToBook({required String bookId}) async {
-    Snack.s(
+    Utilities.snack.s(
       context: context,
       title: "Add",
       message: "The illustration has been successfully added to your book!",
@@ -185,7 +184,7 @@ class _UserBooksState extends State<UserBooks> {
     );
 
     if (response.hasErrors) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "There was an error while adding "
             "the illustration to the book.",
@@ -214,7 +213,7 @@ class _UserBooksState extends State<UserBooks> {
     Utilities.flash.dismissProgress(id: 'create_book');
 
     if (!createdList.success) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "There was and issue while creating the book. "
             "Try again later or contact us if the problem persists.",
@@ -223,7 +222,7 @@ class _UserBooksState extends State<UserBooks> {
       return;
     }
 
-    Snack.e(
+    Utilities.snack.e(
       context: context,
       title: "Create",
       message: "Your list $newBookName has been successfully created!",
@@ -276,7 +275,7 @@ class _UserBooksState extends State<UserBooks> {
         hasErrors = false;
       });
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: 'Cannot retrieve your books right now',
       );
@@ -328,7 +327,7 @@ class _UserBooksState extends State<UserBooks> {
         hasErrors = false;
       });
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: 'Cannot retrieve more books.',
       );

@@ -15,7 +15,6 @@ import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/one_book_op_resp.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -556,7 +555,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     setState(() => _isCreating = false);
 
     if (!response.success) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "book_creation_error".tr(),
       );
@@ -564,7 +563,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
       return;
     }
 
-    Snack.s(
+    Utilities.snack.s(
       context: context,
       message: "book_creation_success".tr(),
     );
@@ -588,7 +587,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     );
 
     if (response.hasErrors) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "illustrations_delete_error".tr(),
       );
@@ -801,7 +800,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
         book.description = prevDescription;
       });
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: response.error.details,
       );
@@ -877,7 +876,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
     setState(() => _books.insert(index, book));
 
-    Snack.e(
+    Utilities.snack.e(
       context: context,
       message: response.error.details,
     );

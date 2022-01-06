@@ -23,7 +23,6 @@ import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -1025,7 +1024,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
     );
 
     if (response.hasErrors) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "illustrations_delete_error".tr(),
       );
@@ -1344,7 +1343,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
     );
 
     if (response.hasErrors) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "illustrations_remove_error".tr(),
       );
@@ -1356,7 +1355,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
         );
       });
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "illustrations_remove_error".tr(),
       );
@@ -1451,7 +1450,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
         book.description = prevDescription;
       });
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: response.error.details,
       );

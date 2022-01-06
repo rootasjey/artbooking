@@ -13,7 +13,6 @@ import 'package:artbooking/globals/app_state.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/snack.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
@@ -323,7 +322,7 @@ class _SigninPageState extends ConsumerState<SigninPage> {
     _password = _password.trim();
 
     if (!UsersActions.checkEmailFormat(_email)) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "email_not_valid".tr(),
       );
@@ -332,7 +331,7 @@ class _SigninPageState extends ConsumerState<SigninPage> {
     }
 
     if (_password.isEmpty) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "password_empty_forbidden".tr(),
       );
@@ -359,7 +358,7 @@ class _SigninPageState extends ConsumerState<SigninPage> {
       if (userCred == null) {
         setState(() => _isConnecting = false);
 
-        Snack.e(
+        Utilities.snack.e(
           context: context,
           message: "account_doesnt_exist".tr(),
         );
@@ -373,7 +372,7 @@ class _SigninPageState extends ConsumerState<SigninPage> {
     } catch (error) {
       appLogger.d(error);
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "password_incorrect".tr(),
       );

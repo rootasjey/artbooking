@@ -9,7 +9,6 @@ import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -472,7 +471,7 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
 
   bool checkInputsFormat() {
     if (_newEmailValue.isEmpty) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "email_empty_forbidden".tr(),
       );
@@ -481,7 +480,7 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
     }
 
     if (_currentPasswordValue.isEmpty) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "password_empty_forbidden".tr(),
       );
@@ -490,7 +489,7 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
     }
 
     if (!UsersActions.checkEmailFormat(_newEmailValue)) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "email_not_validd".tr(),
       );
@@ -512,7 +511,7 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
       if (!await checkInputsAvailbility()) {
         setState(() => _isUpdating = false);
 
-        Snack.e(
+        Utilities.snack.e(
           context: context,
           message: "email_not_available".tr(),
         );
@@ -538,7 +537,7 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
       appLogger.e(error);
       setState(() => _isUpdating = false);
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "email_update_error".tr(),
       );

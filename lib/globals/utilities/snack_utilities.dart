@@ -4,9 +4,11 @@ import 'package:unicons/unicons.dart';
 
 /// Snack bar class.
 /// Helper to quickly dispay different snacks types.
-class Snack {
+class SnackUtilities {
+  const SnackUtilities();
+
   /// Show a snack with an error message.
-  static Future e({
+  Future e({
     required BuildContext context,
     Duration duration = const Duration(seconds: 5),
     Widget? icon,
@@ -35,7 +37,7 @@ class Snack {
   }
 
   /// Show a snack with an informative message.
-  static Future i({
+  Future i({
     required BuildContext context,
     Duration duration = const Duration(seconds: 5),
     Widget? icon,
@@ -64,7 +66,7 @@ class Snack {
   }
 
   /// Show a snack with a success message.
-  static Future s({
+  Future s({
     required BuildContext context,
     Duration duration = const Duration(seconds: 5),
     Widget? icon,

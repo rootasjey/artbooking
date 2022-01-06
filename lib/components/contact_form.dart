@@ -2,7 +2,6 @@ import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/snack.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -424,7 +423,7 @@ class _ContactFormState extends State<ContactForm> {
 
   bool areFormValuesOK() {
     if (_messageBody.isEmpty || _messageBody.length <= 3) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: getBodyErrorText(beforeSending: true),
       );
@@ -433,7 +432,7 @@ class _ContactFormState extends State<ContactForm> {
     }
 
     if (_email.isEmpty || !UsersActions.checkEmailFormat(_email)) {
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: getEmailErrorText(beforeSending: true),
       );
@@ -526,7 +525,7 @@ class _ContactFormState extends State<ContactForm> {
     } catch (error) {
       appLogger.e(error);
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "message_send_error".tr(),
       );

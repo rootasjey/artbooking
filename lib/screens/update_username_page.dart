@@ -10,7 +10,6 @@ import 'package:artbooking/types/cloud_function_response.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -434,7 +433,7 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
           _isUpdating = false;
         });
 
-        Snack.e(
+        Utilities.snack.e(
           context: context,
           message: "username_not_available_args".tr(args: [_newUsername]),
         );
@@ -455,7 +454,7 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
           _isUpdating = false;
         });
 
-        Snack.e(
+        Utilities.snack.e(
           context: context,
           message: "[code: ${exception.code}] - ${exception.message}",
         );
@@ -470,7 +469,7 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
         _newUsername = '';
       });
 
-      Snack.s(
+      Utilities.snack.s(
         context: context,
         message: "username_update_success".tr(),
       );
@@ -482,7 +481,7 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
         _isUpdating = false;
       });
 
-      Snack.e(
+      Utilities.snack.e(
         context: context,
         message: "username_update_error".tr(),
       );
