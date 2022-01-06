@@ -1,5 +1,6 @@
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/types/enums.dart';
-import 'package:artbooking/utils/storage_keys.dart';
+import 'package:artbooking/globals/constants/storage_keys_constants.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 
 class StorageUtilities {
@@ -34,54 +35,57 @@ class StorageUtilities {
   // /   First launch   /
   // / -----------------/
   bool isFirstLanch() {
-    return _localStorage!.getBool(StorageKeys.firstLaunch) ?? true;
+    return _localStorage!.getBool(Constants.storageKeys.firstLaunch) ?? true;
   }
 
   void setFirstLaunch({bool? overrideValue}) {
     if (overrideValue != null) {
-      _localStorage!.setBool(StorageKeys.firstLaunch, overrideValue);
+      _localStorage!.setBool(Constants.storageKeys.firstLaunch, overrideValue);
       return;
     }
 
-    _localStorage!.setBool(StorageKeys.firstLaunch, false);
+    _localStorage!.setBool(Constants.storageKeys.firstLaunch, false);
   }
 
   // / ---------------/
   // /      USER      /
   // /----------------/
   Future clearUserAuthData() async {
-    await _localStorage!.remove(StorageKeys.username);
-    await _localStorage!.remove(StorageKeys.email);
-    await _localStorage!.remove(StorageKeys.password);
-    await _localStorage!.remove(StorageKeys.userUid);
+    await _localStorage!.remove(Constants.storageKeys.username);
+    await _localStorage!.remove(Constants.storageKeys.email);
+    await _localStorage!.remove(Constants.storageKeys.password);
+    await _localStorage!.remove(Constants.storageKeys.userUid);
   }
 
   Map<String, String?> getCredentials() {
     final credentials = Map<String, String?>();
 
-    credentials[StorageKeys.email] =
-        _localStorage!.getString(StorageKeys.email);
-    credentials[StorageKeys.password] =
-        _localStorage!.getString(StorageKeys.password);
+    credentials[Constants.storageKeys.email] =
+        _localStorage!.getString(Constants.storageKeys.email);
+    credentials[Constants.storageKeys.password] =
+        _localStorage!.getString(Constants.storageKeys.password);
 
     return credentials;
   }
 
-  String getLang() => _localStorage!.getString(StorageKeys.lang) ?? 'en';
-  String getUserName() => _localStorage!.getString(StorageKeys.username) ?? '';
-  String getUserUid() => _localStorage!.getString(StorageKeys.userUid) ?? '';
+  String getLang() =>
+      _localStorage!.getString(Constants.storageKeys.lang) ?? 'en';
+  String getUserName() =>
+      _localStorage!.getString(Constants.storageKeys.username) ?? '';
+  String getUserUid() =>
+      _localStorage!.getString(Constants.storageKeys.userUid) ?? '';
 
   void setCredentials({required String email, required String password}) {
-    _localStorage!.setString(StorageKeys.email, email);
-    _localStorage!.setString(StorageKeys.password, password);
+    _localStorage!.setString(Constants.storageKeys.email, email);
+    _localStorage!.setString(Constants.storageKeys.password, password);
   }
 
   void setEmail(String email) {
-    _localStorage!.setString(StorageKeys.email, email);
+    _localStorage!.setString(Constants.storageKeys.email, email);
   }
 
   void setPassword(String password) {
-    _localStorage!.setString(StorageKeys.password, password);
+    _localStorage!.setString(Constants.storageKeys.password, password);
   }
 
   void setLang(String lang) => _localStorage!.setString('lang', lang);
@@ -90,19 +94,19 @@ class StorageUtilities {
   // /      Layout     /
   // / ----------------/
   DiscoverType getDiscoverType() {
-    final value = _localStorage!.getString(StorageKeys.discoverType);
+    final value = _localStorage!.getString(Constants.storageKeys.discoverType);
     return value == 'authors' ? DiscoverType.authors : DiscoverType.references;
   }
 
   List<String> getDrafts() {
     List<String> drafts =
-        _localStorage!.getStringList(StorageKeys.drafts) ?? [];
+        _localStorage!.getStringList(Constants.storageKeys.drafts) ?? [];
     return drafts;
   }
 
   ItemsLayout getItemsStyle(String pageRoute) {
-    final itemsStyle =
-        _localStorage!.getString('${StorageKeys.itemsStyle}$pageRoute');
+    final itemsStyle = _localStorage!
+        .getString('${Constants.storageKeys.itemsStyle}$pageRoute');
 
     switch (itemsStyle) {
       case StorageKeys.itemsLayoutGrid:
@@ -128,7 +132,8 @@ class StorageUtilities {
 
   /// Return the expanded state of dashboard side menu.
   bool getDashboardSideMenuExpanded() {
-    return _localStorage!.getBool(StorageKeys.dashboardSideMenuExpanded) ??
+    return _localStorage!
+            .getBool(Constants.storageKeys.dashboardSideMenuExpanded) ??
         true;
   }
 
@@ -146,7 +151,7 @@ class StorageUtilities {
   /// Set the expanded state of dashboard side menu.
   void setDashboardSideMenuExpanded(bool expanded) async {
     await _localStorage!.setBool(
-      StorageKeys.dashboardSideMenuExpanded,
+      Constants.storageKeys.dashboardSideMenuExpanded,
       expanded,
     );
   }

@@ -1,7 +1,7 @@
 import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/dot_close_button.dart';
 import 'package:artbooking/globals/constants.dart';
-import 'package:artbooking/utils/validation_shortcuts.dart';
+import 'package:artbooking/components/validation_shortcuts.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 

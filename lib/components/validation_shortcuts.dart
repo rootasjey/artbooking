@@ -1,4 +1,5 @@
-import 'package:artbooking/utils/shortcut_intents.dart';
+import 'package:artbooking/types/shortcuts_intent/enter_intent.dart';
+import 'package:artbooking/types/shortcuts_intent/escape_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
