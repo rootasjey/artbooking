@@ -1,4 +1,4 @@
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -82,7 +82,7 @@ class _LandingHeroState extends State<LandingHero> {
       padding: const EdgeInsets.only(top: 70.0),
       child: Card(
         elevation: 0.0,
-        color: Globals.constants.colors.clairPink,
+        color: Constants.colors.clairPink,
         child: ListTile(
           leading: Icon(UniconsLine.info),
           title: Opacity(

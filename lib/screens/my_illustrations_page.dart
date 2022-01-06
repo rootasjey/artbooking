@@ -11,10 +11,10 @@ import 'package:artbooking/components/themed_dialog.dart';
 import 'package:artbooking/components/user_books.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/enums.dart';
-import 'package:artbooking/types/globals/app_state.dart';
+import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
@@ -771,8 +771,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   }
 
   void showAddToBook(Illustration illustration) {
-    int flex =
-        MediaQuery.of(context).size.width < Constants.maxMobileWidth ? 5 : 3;
+    int flex = Utilities.size.isMobileSize(context) ? 5 : 3;
 
     showCustomModalBottomSheet(
       context: context,

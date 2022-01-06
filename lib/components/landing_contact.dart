@@ -1,7 +1,7 @@
 import 'package:artbooking/components/arrow_divider.dart';
 import 'package:artbooking/components/contact_form.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:flutter/material.dart';
 
@@ -13,15 +13,13 @@ class LandingContact extends StatefulWidget {
 class _LandingContactState extends State<LandingContact> {
   @override
   Widget build(BuildContext context) {
-    final viewWidth = MediaQuery.of(context).size.width;
-
     EdgeInsets padding = const EdgeInsets.only(
       top: 100.0,
       left: 120.0,
       right: 120.0,
     );
 
-    if (viewWidth < Constants.maxMobileWidth) {
+    if (Utilities.size.isMobileSize(context)) {
       padding = const EdgeInsets.only(
         top: 80.0,
         left: 20.0,

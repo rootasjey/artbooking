@@ -1,6 +1,6 @@
 import 'package:artbooking/components/bezier_painter.dart';
 import 'package:artbooking/components/roadmap_item.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -291,7 +291,7 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Globals.constants.colors.clairPink,
+          backgroundColor: Constants.colors.clairPink,
           title: Opacity(
             opacity: 0.6,
             child: Text(

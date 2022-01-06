@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:artbooking/components/circle_button.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
-import 'package:artbooking/types/globals/app_state.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -68,7 +68,7 @@ class _UploadItemCardState extends ConsumerState<UploadItemCard> {
         borderRadius: BorderRadius.zero,
       ),
       elevation: _elevation,
-      color: Globals.constants.colors.clairPink,
+      color: Constants.colors.clairPink,
       child: InkWell(
         onTap: () {},
         onHover: (isHover) {

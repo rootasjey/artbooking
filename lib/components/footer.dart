@@ -1,7 +1,7 @@
 import 'package:artbooking/components/app_icon.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/locations/settings_location.dart';
-import 'package:artbooking/types/globals/app_state.dart';
+import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';

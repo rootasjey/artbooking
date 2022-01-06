@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/edit_book_dialog/title_dialog.dart';
 import 'package:artbooking/components/outlined_text_field.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -35,7 +35,7 @@ class CreateOrEditBookDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SimpleDialog(
-      backgroundColor: Globals.constants.colors.clairPink,
+      backgroundColor: Constants.colors.clairPink,
       title: TitleDialog(
         titleValue: titleValue,
         subtitleValue: subtitleValue,

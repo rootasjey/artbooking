@@ -1,4 +1,4 @@
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:supercharged/supercharged.dart';
@@ -27,14 +27,14 @@ class ShimmerCard extends StatelessWidget {
       width: width,
       height: height,
       child: Card(
-        color: Globals.constants.colors.clairPink,
+        color: Constants.colors.clairPink,
         elevation: elevation,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
         ),
         clipBehavior: Clip.hardEdge,
         child: Shimmer(
-          color: Globals.constants.colors.primary,
+          color: Constants.colors.primary,
           duration: 2.seconds,
           child: Padding(
             padding: const EdgeInsets.all(24.0),

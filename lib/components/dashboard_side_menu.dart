@@ -2,9 +2,9 @@ import 'package:artbooking/components/side_menu_item.dart';
 import 'package:artbooking/components/underlined_button.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/constants.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/utils/app_storage.dart';
-import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -37,19 +37,19 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
     SideMenuItem(
       iconData: UniconsLine.chart_pie,
       label: "statistics".tr(),
-      hoverColor: Globals.constants.colors.activity,
+      hoverColor: Constants.colors.activity,
       routePath: DashboardLocationContent.statisticsRoute,
     ),
     SideMenuItem(
       iconData: UniconsLine.picture,
       label: "illustrations".tr(),
-      hoverColor: Globals.constants.colors.illustrations,
+      hoverColor: Constants.colors.illustrations,
       routePath: DashboardLocationContent.illustrationsRoute,
     ),
     SideMenuItem(
       iconData: UniconsLine.book_alt,
       label: "books".tr(),
-      hoverColor: Globals.constants.colors.books,
+      hoverColor: Constants.colors.books,
       routePath: DashboardLocationContent.booksRoute,
     ),
     // SideMenuItem(
@@ -73,7 +73,7 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
     SideMenuItem(
       iconData: UniconsLine.setting,
       label: "settings".tr(),
-      hoverColor: Globals.constants.colors.settings,
+      hoverColor: Constants.colors.settings,
       routePath: DashboardLocationContent.settingsRoute,
     ),
   ];
@@ -104,7 +104,7 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
 
   @override
   Widget build(BuildContext context) {
-    if (MediaQuery.of(context).size.width < Constants.maxMobileWidth) {
+    if (Utilities.size.isMobileSize(context)) {
       return Container();
     }
 

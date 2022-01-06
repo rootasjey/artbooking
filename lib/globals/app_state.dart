@@ -1,9 +1,9 @@
 import 'package:artbooking/types/custom_upload_task.dart';
-import 'package:artbooking/types/globals/show_upload_window_notifier.dart';
-import 'package:artbooking/types/globals/upload_bytes_transferred_notifier.dart';
-import 'package:artbooking/types/globals/upload_task_list_notifier.dart';
+import 'package:artbooking/globals/state/show_upload_window_notifier.dart';
+import 'package:artbooking/globals/state/upload_bytes_transferred_notifier.dart';
+import 'package:artbooking/globals/state/upload_task_list_notifier.dart';
 import 'package:artbooking/types/user/user.dart';
-import 'package:artbooking/types/globals/user_notifier.dart';
+import 'package:artbooking/globals/state/user_notifier.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

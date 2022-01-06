@@ -1,6 +1,6 @@
 import 'package:artbooking/components/footer.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
-import 'package:artbooking/utils/constants.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
@@ -72,17 +72,12 @@ class _TosPageState extends State<TosPage> {
   }
 
   Widget body() {
-    final width = MediaQuery.of(context).size.width;
-
-    double horPadding = 80.0;
-
-    if (width < Constants.maxMobileWidth) {
-      horPadding = 20.0;
-    }
+    final double horizontal =
+        Utilities.size.isMobileSize(context) ? 20.0 : 80.0;
 
     return SliverPadding(
       padding: EdgeInsets.symmetric(
-        horizontal: horPadding,
+        horizontal: horizontal,
         vertical: 60.0,
       ),
       sliver: SliverList(

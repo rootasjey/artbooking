@@ -1,5 +1,4 @@
 import 'package:artbooking/router/locations/search_location.dart';
-import 'package:artbooking/types/globals/globals.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +9,8 @@ class SearchButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Globals.constants.colors;
-    final foregroundColor = colors.getForeground(context).withOpacity(0.6);
+    final Color? foregroundColor =
+        Theme.of(context).textTheme.bodyText2?.color?.withOpacity(0.6);
 
     return Padding(
       padding: const EdgeInsets.only(

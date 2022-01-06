@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:algolia/algolia.dart';
 import 'package:artbooking/components/circle_button.dart';
 import 'package:artbooking/components/fade_in_x.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
@@ -106,7 +106,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
       beginX: 16.0,
       child: Material(
         elevation: widget.elevation,
-        color: Globals.constants.colors.clairPink,
+        color: Constants.colors.clairPink,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
         ),
@@ -170,7 +170,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
       child: Container(
         padding: const EdgeInsets.only(top: 20.0),
         decoration: BoxDecoration(
-          color: Globals.constants.colors.clairPink,
+          color: Constants.colors.clairPink,
           borderRadius: BorderRadius.circular(12.0),
         ),
         child: Column(
@@ -456,12 +456,12 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                     filled: true,
                     isDense: true,
                     labelText: "license_label_text".tr(),
-                    fillColor: Globals.constants.colors.clairPink,
-                    focusColor: Globals.constants.colors.clairPink,
+                    fillColor: Constants.colors.clairPink,
+                    focusColor: Constants.colors.clairPink,
                     border: OutlineInputBorder(
                       borderSide: BorderSide(
                         width: 4.0,
-                        color: Globals.constants.colors.primary,
+                        color: Constants.colors.primary,
                       ),
                     ),
                   ),

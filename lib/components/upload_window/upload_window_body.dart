@@ -1,6 +1,6 @@
 import 'package:artbooking/components/upload_item_card.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
-import 'package:artbooking/types/globals/app_state.dart';
+import 'package:artbooking/globals/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

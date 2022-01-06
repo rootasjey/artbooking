@@ -4,9 +4,9 @@ import 'package:artbooking/components/main_app_bar/main_section_mobile.dart';
 import 'package:artbooking/components/main_app_bar/user_auth_section.dart';
 import 'package:artbooking/components/main_app_bar/user_guest_section.dart';
 import 'package:artbooking/router/locations/home_location.dart';
-import 'package:artbooking/types/globals/app_state.dart';
-import 'package:artbooking/types/globals/user_notifier.dart';
-import 'package:artbooking/utils/constants.dart';
+import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/globals/state/user_notifier.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,8 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class MainAppBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final double pageWidth = MediaQuery.of(context).size.width;
-    final bool compact = pageWidth < Constants.maxMobileWidth;
+    final bool compact = Utilities.size.isMobileSize(context);
 
     ref.watch(AppState.userProvider);
     final UserNotifier userNotifier = ref.read(AppState.userProvider.notifier);

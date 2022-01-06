@@ -1,5 +1,5 @@
-import 'package:artbooking/types/globals/globals.dart';
-import 'package:artbooking/utils/constants.dart';
+import 'package:artbooking/globals/constants.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
@@ -41,10 +41,9 @@ class FormActionInputs extends StatelessWidget {
     double spacing = 24.0;
 
     EdgeInsets _padding = padding;
-    final isSmall =
-        MediaQuery.of(context).size.width < Constants.maxMobileWidth;
+    final isMobileSize = Utilities.size.isMobileSize(context);
 
-    if (adaptivePadding && isSmall) {
+    if (adaptivePadding && isMobileSize) {
       spacing = 12.0;
       left = 0.0;
 
@@ -91,7 +90,7 @@ class FormActionInputs extends StatelessWidget {
               child: Text(saveTextString),
             ),
             style: ElevatedButton.styleFrom(
-              primary: Globals.constants.colors.validation,
+              primary: Constants.colors.validation,
             ),
           ),
         ],

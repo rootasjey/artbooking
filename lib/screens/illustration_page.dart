@@ -8,7 +8,7 @@ import 'package:artbooking/components/illustration_poster.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:artbooking/types/enums.dart';
@@ -601,7 +601,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Globals.constants.colors.clairPink,
+          backgroundColor: Constants.colors.clairPink,
           title: Opacity(
             opacity: 0.6,
             child: Text(

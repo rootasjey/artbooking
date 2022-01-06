@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:artbooking/components/illustration_card.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/search.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:collection/collection.dart';
@@ -356,7 +356,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void copyLink(Illustration illustration) async {
-    final url = '${Constants.baseIllustrationUrl}{illustration.id}';
+    final url = '${Constants.urls.baseIllustrationUrl}{illustration.id}';
 
     await Clipboard.setData(ClipboardData(text: url));
     Snack.s(context: context, message: "copy_link_success".tr());
@@ -373,18 +373,18 @@ class _SearchPageState extends State<SearchPage> {
 
   void sharePostWeb(Illustration illustration) async {
     String? sharingText = illustration.name;
-    final url = '${Constants.baseIllustrationUrl}${illustration.id}';
+    final url = '${Constants.urls.baseIllustrationUrl}${illustration.id}';
     final hashtags = '&hashtags=artbooking';
 
     await launch(
-      '${Constants.baseTwitterShareUrl}$sharingText$hashtags&url=$url',
+      '${Constants.urls.baseTwitterShareUrl}$sharingText$hashtags&url=$url',
     );
   }
 
   void sharePostMobile(Illustration illustration) {
     final RenderBox box = context.findRenderObject() as RenderBox;
     String sharingText = illustration.name;
-    final url = '${Constants.baseIllustrationUrl}${illustration.id}';
+    final url = '${Constants.urls.baseIllustrationUrl}${illustration.id}';
 
     sharingText += ' - URL: $url';
 

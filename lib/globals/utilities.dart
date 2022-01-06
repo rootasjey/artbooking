@@ -1,11 +1,11 @@
-import 'package:artbooking/types/globals/language.dart';
-import 'package:artbooking/types/globals/size_utils.dart';
+import 'package:artbooking/globals/utilities/language_utilities.dart';
+import 'package:artbooking/globals/utilities/size_utilities.dart';
 
-class GlobalsUtils {
-  final size = SizeUtils();
-  final lang = Language();
+class Utilities {
+  static const size = const SizeUtils();
+  static const lang = const LanguageUtilities();
 
-  String getStringWithUnit(int usedBytes) {
+  static String getStringWithUnit(int usedBytes) {
     if (usedBytes < 1000) {
       return '$usedBytes bytes';
     }

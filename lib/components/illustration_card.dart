@@ -1,6 +1,6 @@
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/types/enums.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:flutter/material.dart';
@@ -171,7 +171,7 @@ class _IllustrationCardState extends State<IllustrationCard>
 
   Widget loadingCard() {
     return Card(
-      color: Globals.constants.colors.clairPink,
+      color: Constants.colors.clairPink,
       elevation: _elevation,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),

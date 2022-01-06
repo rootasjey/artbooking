@@ -1,4 +1,4 @@
-import 'package:artbooking/types/globals/app_state.dart';
+import 'package:artbooking/globals/app_state.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

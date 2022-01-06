@@ -18,12 +18,12 @@ import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/book_illustration.dart';
 import 'package:artbooking/types/enums.dart';
-import 'package:artbooking/types/globals/app_state.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/globals/constants.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
-import 'package:artbooking/utils/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
@@ -192,7 +192,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
         width: 200.0,
         child: Card(
           elevation: 2.0,
-          color: Globals.constants.colors.clairPink,
+          color: Constants.colors.clairPink,
         ),
       );
     }
@@ -1463,8 +1463,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
   }
 
   void showAddToBook(Illustration illustration) {
-    int flex =
-        MediaQuery.of(context).size.width < Constants.maxMobileWidth ? 5 : 3;
+    int flex = Utilities.size.isMobileSize(context) ? 5 : 3;
 
     showCustomModalBottomSheet(
       context: context,

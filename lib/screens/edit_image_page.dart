@@ -4,7 +4,7 @@ import 'package:artbooking/components/form_actions_inputs.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
-import 'package:artbooking/types/globals/app_state.dart';
+import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/types/user/user_pp_path.dart';
 import 'package:artbooking/types/user/user_pp_url.dart';
 import 'package:artbooking/utils/app_logger.dart';

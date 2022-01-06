@@ -1,8 +1,8 @@
 import 'package:artbooking/components/upload_window/upload_window_body.dart';
 import 'package:artbooking/components/upload_window/upload_window_header.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
-import 'package:artbooking/types/globals/app_state.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
@@ -53,7 +53,7 @@ class _UploadWindowState extends ConsumerState<UploadWindow> {
 
     return Card(
       elevation: 4.0,
-      color: Globals.constants.colors.clairPink,
+      color: Constants.colors.clairPink,
       child: AnimatedContainer(
         width: _width,
         height: _height,

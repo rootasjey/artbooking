@@ -1,6 +1,6 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:artbooking/router/app_routes.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
@@ -17,22 +17,22 @@ class App extends StatelessWidget {
     return AdaptiveTheme(
       light: ThemeData(
         brightness: Brightness.light,
-        backgroundColor: Globals.constants.colors.lightBackground,
-        scaffoldBackgroundColor: Globals.constants.colors.lightBackground,
+        backgroundColor: Constants.colors.lightBackground,
+        scaffoldBackgroundColor: Constants.colors.lightBackground,
         fontFamily: GoogleFonts.raleway().fontFamily,
-        primaryColor: Globals.constants.colors.primary,
-        secondaryHeaderColor: Globals.constants.colors.secondary,
+        primaryColor: Constants.colors.primary,
+        secondaryHeaderColor: Constants.colors.secondary,
         colorScheme: ThemeData()
             .colorScheme
             .copyWith(primary: Colors.deepPurple.shade700),
       ),
       dark: ThemeData(
         brightness: Brightness.dark,
-        backgroundColor: Globals.constants.colors.dark,
-        scaffoldBackgroundColor: Globals.constants.colors.dark,
+        backgroundColor: Constants.colors.dark,
+        scaffoldBackgroundColor: Constants.colors.dark,
         fontFamily: GoogleFonts.raleway().fontFamily,
-        primaryColor: Globals.constants.colors.primary,
-        secondaryHeaderColor: Globals.constants.colors.secondary,
+        primaryColor: Constants.colors.primary,
+        secondaryHeaderColor: Constants.colors.secondary,
         colorScheme: ThemeData().colorScheme.copyWith(
               primary: Colors.deepPurple.shade700,
               brightness: Brightness.dark,

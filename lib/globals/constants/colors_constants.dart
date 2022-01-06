@@ -14,7 +14,7 @@ class ColorsConstants {
   final Color posts = Colors.blue.shade700;
 
   /// Primary application's color.
-  Color primary = Color(0xFF796AD2);
+  final Color primary = Color(0xFF796AD2);
 
   /// Color for projects.
   final Color projects = Colors.amber;

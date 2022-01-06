@@ -1,4 +1,4 @@
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:flutter/material.dart';
 
@@ -53,7 +53,7 @@ class _SquareStatsState extends State<SquareStats> {
         width: 220.0,
         height: 220.0,
         child: Card(
-          color: Globals.constants.colors.clairPink,
+          color: Constants.colors.clairPink,
           elevation: getElevation(),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),

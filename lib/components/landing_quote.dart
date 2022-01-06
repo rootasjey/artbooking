@@ -1,5 +1,5 @@
 import 'package:artbooking/components/arrow_divider.dart';
-import 'package:artbooking/utils/constants.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -13,29 +13,22 @@ class LandingQuote extends StatefulWidget {
 }
 
 class _LandingQuoteState extends State<LandingQuote> {
-  bool _isSmallView = false;
-
   @override
   Widget build(BuildContext context) {
-    _isSmallView = false;
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
 
-    final viewWidth = MediaQuery.of(context).size.width;
-
-    EdgeInsets padding = const EdgeInsets.only(
-      top: 100.0,
-      left: 120.0,
-      right: 120.0,
-    );
-
-    if (viewWidth < Constants.maxMobileWidth) {
-      _isSmallView = true;
-
-      padding = const EdgeInsets.only(
-        top: 80.0,
-        left: 20.0,
-        right: 20.0,
-      );
-    }
+    final double fontSize = isMobileSize ? 60.0 : 90.0;
+    final EdgeInsets padding = isMobileSize
+        ? const EdgeInsets.only(
+            top: 80.0,
+            left: 20.0,
+            right: 20.0,
+          )
+        : const EdgeInsets.only(
+            top: 100.0,
+            left: 120.0,
+            right: 120.0,
+          );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,7 +42,7 @@ class _LandingQuoteState extends State<LandingQuote> {
                 "Your imagination"
                 " is the only limit.",
                 style: FontsUtils.mainStyle(
-                  fontSize: _isSmallView ? 60.0 : 90.0,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w700,
                 ),
               ),

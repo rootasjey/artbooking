@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:algolia/algolia.dart';
 import 'package:artbooking/components/circle_button.dart';
 import 'package:artbooking/components/fade_in_x.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/types/style.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
@@ -80,8 +80,8 @@ class _AddStylePanelState extends State<AddStylePanel> {
   /// Delay search after typing input.
   Timer? _searchTimer;
 
-  final Color _clairPink = Globals.constants.colors.clairPink;
-  final Color _secondaryColor = Globals.constants.colors.secondary;
+  final Color _clairPink = Constants.colors.clairPink;
+  final Color _secondaryColor = Constants.colors.secondary;
 
   @override
   initState() {
@@ -445,7 +445,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                     border: OutlineInputBorder(
                       borderSide: BorderSide(
                         width: 4.0,
-                        color: Globals.constants.colors.primary,
+                        color: Constants.colors.primary,
                       ),
                     ),
                   ),

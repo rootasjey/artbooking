@@ -1,4 +1,4 @@
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -37,7 +37,7 @@ class PopupProgressIndicator extends StatelessWidget {
                 children: [
                   Icon(
                     UniconsLine.circle,
-                    color: Globals.constants.colors.secondary,
+                    color: Constants.colors.secondary,
                   ),
                   Expanded(
                     child: Padding(

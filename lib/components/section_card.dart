@@ -1,4 +1,4 @@
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:flutter/material.dart';
 
@@ -33,7 +33,7 @@ class _SectionCardState extends State<SectionCard> {
       height: 116.0,
       child: Card(
         elevation: _elevation,
-        color: Globals.constants.colors.clairPink,
+        color: Constants.colors.clairPink,
         child: InkWell(
           onTap: widget.onTap,
           onHover: (isHover) {

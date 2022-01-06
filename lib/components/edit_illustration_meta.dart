@@ -4,7 +4,7 @@ import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/select_license_panel.dart';
 import 'package:artbooking/components/sheet_header.dart';
 import 'package:artbooking/types/enums.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/types/style.dart';
@@ -51,7 +51,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   final _linkNameInputController = TextEditingController();
   final _linkValueInputController = TextEditingController();
 
-  final Color _clairPink = Globals.constants.colors.clairPink;
+  final Color _clairPink = Constants.colors.clairPink;
 
   /// Illustration's selected art styles.
   final List<String?> _selectedStyles = [];

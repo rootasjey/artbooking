@@ -3,7 +3,8 @@ import 'package:artbooking/components/credit_item.dart';
 import 'package:artbooking/components/footer.dart';
 import 'package:artbooking/components/image_hero.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
-import 'package:artbooking/utils/constants.dart';
+import 'package:artbooking/globals/constants.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -111,8 +112,7 @@ class _AboutPageState extends State<AboutPage> {
   }
 
   Widget appIconImage() {
-    final width = MediaQuery.of(context).size.width;
-    final size = width < Constants.maxMobileWidth ? 280.0 : 380.0;
+    final size = Utilities.size.isMobileSize(context) ? 280.0 : 380.0;
 
     return Container(
       padding: const EdgeInsets.only(
@@ -330,7 +330,7 @@ class _AboutPageState extends State<AboutPage> {
             child: ListTile(
               title: Text('GitHub'),
               trailing: Icon(Icons.open_in_new),
-              onTap: () => launch(Constants.appGithubUrl),
+              onTap: () => launch(Constants.urls.appGithubUrl),
             ),
           ),
         ],

@@ -1,4 +1,6 @@
-class Language {
+class LanguageUtilities {
+  const LanguageUtilities();
+
   static const String en = 'en';
   static const String fr = 'fr';
 

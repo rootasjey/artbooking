@@ -1,6 +1,7 @@
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/types/changelog_item.dart';
-import 'package:artbooking/utils/constants.dart';
+import 'package:artbooking/globals/constants.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -125,13 +126,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-
-    double horPadding = 80.0;
-
-    if (width < Constants.maxMobileWidth) {
-      horPadding = 20.0;
-    }
+    final double horPadding = Utilities.size.isMobileSize(context) ? 20 : 80.0;
 
     return Scaffold(
       body: CustomScrollView(

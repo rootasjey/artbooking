@@ -1,6 +1,6 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:artbooking/components/popup_menu_list_tile.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/types/theme_mode_menu_item.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -30,8 +30,9 @@ class BrightnessButton extends StatelessWidget {
       ),
     ];
 
-    final colors = Globals.constants.colors;
-    final foregroundColor = colors.getForeground(context).withOpacity(0.6);
+    final foregroundColor =
+        Theme.of(context).textTheme.bodyText2?.color?.withOpacity(0.6) ??
+            Colors.white;
 
     return ValueListenableBuilder(
       valueListenable: AdaptiveTheme.of(context).modeChangeNotifier,
@@ -46,7 +47,7 @@ class BrightnessButton extends StatelessWidget {
             AdaptiveTheme.of(context).setThemeMode(selectedThemeMode);
           },
           itemBuilder: (context) {
-            final primary = Globals.constants.colors.primary;
+            final primary = Constants.colors.primary;
 
             return items.map((item) {
               final selected = mode == item.themeMode;
@@ -80,7 +81,7 @@ class BrightnessButton extends StatelessWidget {
     required bool selected,
     required Color defaultColor,
   }) {
-    final primary = Globals.constants.colors.primary;
+    final primary = Constants.colors.primary;
     return Icon(
       iconData,
       color: selected ? primary : defaultColor,
@@ -88,7 +89,7 @@ class BrightnessButton extends StatelessWidget {
   }
 
   Icon? getTrailing(bool selected) {
-    final primary = Globals.constants.colors.primary;
+    final primary = Constants.colors.primary;
 
     if (selected) {
       return Icon(

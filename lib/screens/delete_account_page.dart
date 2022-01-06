@@ -3,8 +3,8 @@ import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/types/cloud_function_response.dart';
-import 'package:artbooking/types/globals/globals.dart';
-import 'package:artbooking/types/globals/app_state.dart';
+import 'package:artbooking/globals/constants.dart';
+import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
@@ -219,7 +219,7 @@ class DeleteAccountPageState extends ConsumerState<DeleteAccountPage> {
         bottom: 40.0,
       ),
       child: Card(
-        color: Globals.constants.colors.clairPink,
+        color: Constants.colors.clairPink,
         child: ListTile(
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 32.0,
@@ -323,7 +323,7 @@ class DeleteAccountPageState extends ConsumerState<DeleteAccountPage> {
           TextFormField(
             decoration: InputDecoration(
               fillColor: Colors.white,
-              focusColor: Globals.constants.colors.clairPink,
+              focusColor: Constants.colors.clairPink,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 8.0,
               ),
@@ -444,7 +444,7 @@ class DeleteAccountPageState extends ConsumerState<DeleteAccountPage> {
       context: context,
       builder: (context) {
         return SimpleDialog(
-          backgroundColor: Globals.constants.colors.clairPink,
+          backgroundColor: Constants.colors.clairPink,
           title: Text(
             "account_deletion_after".tr(),
             style: FontsUtils.mainStyle(

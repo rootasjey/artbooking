@@ -5,8 +5,9 @@ import 'package:artbooking/screens/my_statistics_page/member_since.dart';
 import 'package:artbooking/screens/my_statistics_page/my_stats_header.dart';
 import 'package:artbooking/screens/my_statistics_page/stats_categories.dart';
 import 'package:artbooking/screens/my_statistics_page/used_storage.dart';
-import 'package:artbooking/types/globals/globals.dart';
-import 'package:artbooking/types/globals/app_state.dart';
+import 'package:artbooking/globals/constants.dart';
+import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/square_stats_data.dart';
 import 'package:artbooking/types/user/stats.dart';
 import 'package:artbooking/types/user/user.dart';
@@ -54,7 +55,7 @@ class MyActivityPage extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         UsedStorage(
-                          usedSpace: Globals.utils.getStringWithUnit(usedBytes),
+                          usedSpace: Utilities.getStringWithUnit(usedBytes),
                         ),
                         MemberSince(createdAt: createdAt),
                       ],
@@ -72,7 +73,7 @@ class MyActivityPage extends ConsumerWidget {
   List<SquareStatsData> getStatsCategories(UserStats stats) {
     return [
       SquareStatsData(
-        borderColor: Globals.constants.colors.illustrations,
+        borderColor: Constants.colors.illustrations,
         count: stats.illustrations.owned,
         icon: Icon(
           UniconsLine.picture,
@@ -82,7 +83,7 @@ class MyActivityPage extends ConsumerWidget {
         titleValue: "illustrations".tr(),
       ),
       SquareStatsData(
-        borderColor: Globals.constants.colors.books,
+        borderColor: Constants.colors.books,
         count: stats.books.owned,
         icon: Icon(
           UniconsLine.book_alt,
@@ -92,21 +93,21 @@ class MyActivityPage extends ConsumerWidget {
         titleValue: "books".tr(),
       ),
       SquareStatsData(
-        borderColor: Globals.constants.colors.galleries,
+        borderColor: Constants.colors.galleries,
         count: stats.galleries.owned,
         titleValue: "galleries".tr(),
         icon: Icon(UniconsLine.abacus),
         routePath: '',
       ),
       SquareStatsData(
-        borderColor: Globals.constants.colors.challenges,
+        borderColor: Constants.colors.challenges,
         count: stats.challenges.participating,
         titleValue: "challenges".tr(),
         icon: Icon(UniconsLine.abacus),
         routePath: '',
       ),
       SquareStatsData(
-        borderColor: Globals.constants.colors.contests,
+        borderColor: Constants.colors.contests,
         count: stats.constests.participating,
         titleValue: "contests".tr(),
         icon: Icon(UniconsLine.abacus),

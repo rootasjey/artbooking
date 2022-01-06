@@ -5,8 +5,8 @@ import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/settings/account_settings.dart';
 import 'package:artbooking/screens/settings/app_settings.dart';
-import 'package:artbooking/types/globals/globals.dart';
-import 'package:artbooking/types/globals/app_state.dart';
+import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:artbooking/types/user/user_pp.dart';
 import 'package:artbooking/types/user/user_pp_path.dart';
@@ -50,14 +50,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final largeWidth = !Globals.utils.size.isMobileSize(context);
-    final bool showBigTitle = largeWidth ? true : false;
-
-    double paddingTop = 0.0;
-
-    if (largeWidth) {
-      paddingTop = widget.showAppBar ? 60.0 : 20.0;
-    }
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+    final bool showBigTitle = isMobileSize ? false : true;
+    final double paddingTop = isMobileSize ? 0.0 : 60.0;
 
     final userState = ref.watch(AppState.userProvider);
     final userFirestore = userState.firestoreUser;

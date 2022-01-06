@@ -6,8 +6,8 @@ import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/types/cloud_function_response.dart';
-import 'package:artbooking/types/globals/globals.dart';
-import 'package:artbooking/types/globals/app_state.dart';
+import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
@@ -32,7 +32,7 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
   final _passwordNode = FocusNode();
   final _usernameController = TextEditingController();
   final _pageScrollController = ScrollController();
-  final Color _clairPink = Globals.constants.colors.clairPink;
+  final Color _clairPink = Constants.colors.clairPink;
 
   String _currentUsername = '';
   String _nameErrorMessage = '';
