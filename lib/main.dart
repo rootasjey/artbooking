@@ -2,7 +2,6 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:artbooking/app.dart';
 import 'package:artbooking/firebase_options.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/utils/search.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -27,7 +26,7 @@ void main() async {
   await GlobalConfiguration().loadFromAsset("app_settings");
   final savedThemeMode = await AdaptiveTheme.getThemeMode();
 
-  SearchHelper.init(
+  Utilities.search.init(
     applicationId: GlobalConfiguration().getValue('algolia_app_id'),
     searchApiKey: GlobalConfiguration().getValue('algolia_search_api_key'),
   );

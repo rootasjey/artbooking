@@ -1,14 +1,16 @@
 import 'package:algolia/algolia.dart';
 
 /// Algolia search helper.
-class SearchHelper {
+class SearchUtilities {
+  const SearchUtilities();
+
   static Algolia? _algolia;
 
   /// Agolia instance.
   static Algolia? get algolia => _algolia;
 
   /// Initialize algolia instance.
-  static void init({
+  void init({
     required applicationId,
     required searchApiKey,
   }) {
