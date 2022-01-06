@@ -43,10 +43,23 @@ class MyActivityPage extends ConsumerWidget {
                   StatsCategories(
                     dataList: getStatsCategories(stats),
                   ),
-                  UsedStorage(
-                    usedSpace: Globals.utils.getStringWithUnit(usedBytes),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 50.0,
+                      right: 50.0,
+                      top: 60.0,
+                      bottom: 200.0,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        UsedStorage(
+                          usedSpace: Globals.utils.getStringWithUnit(usedBytes),
+                        ),
+                        MemberSince(createdAt: createdAt),
+                      ],
+                    ),
                   ),
-                  MemberSince(createdAt: createdAt),
                 ],
               ),
             ]),
