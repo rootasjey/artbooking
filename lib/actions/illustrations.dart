@@ -5,7 +5,6 @@ import 'package:artbooking/types/one_illus_op_resp.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/license.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class IllustrationsActions {
@@ -24,10 +23,10 @@ class IllustrationsActions {
 
       return CheckUrlsOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
-      appLogger.e(exception);
+      Utilities.logger.e(exception);
       return CheckUrlsOpResp.fromException(exception);
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       return CheckUrlsOpResp.fromMessage(error.toString());
     }
   }
@@ -45,10 +44,10 @@ class IllustrationsActions {
 
       return OneIllusOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
-      appLogger.e(exception);
+      Utilities.logger.e(exception);
       return OneIllusOpResp.fromException(exception);
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       return OneIllusOpResp.fromMessage(error.toString());
     }
   }
@@ -64,10 +63,10 @@ class IllustrationsActions {
 
       return OneIllusOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
-      appLogger.e(exception);
+      Utilities.logger.e(exception);
       return OneIllusOpResp.fromException(exception);
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       return OneIllusOpResp.fromMessage(error.toString());
     }
   }
@@ -83,10 +82,10 @@ class IllustrationsActions {
 
       return ManyIllusOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
-      appLogger.e(exception);
+      Utilities.logger.e(exception);
       return ManyIllusOpResp.fromException(exception);
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       return ManyIllusOpResp.fromMessage(error.toString());
     }
   }
@@ -112,10 +111,10 @@ class IllustrationsActions {
 
       return OneIllusOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
-      appLogger.e(exception);
+      Utilities.logger.e(exception);
       return OneIllusOpResp.fromException(exception);
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       return OneIllusOpResp.fromMessage(error.toString());
     }
   }

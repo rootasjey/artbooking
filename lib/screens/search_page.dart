@@ -5,7 +5,6 @@ import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:collection/collection.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -350,7 +349,7 @@ class _SearchPageState extends State<SearchPage> {
 
       setState(() => _isSearchingPosts = false);
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       setState(() => _isSearchingPosts = false);
     }
   }

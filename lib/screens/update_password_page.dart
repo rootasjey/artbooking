@@ -4,7 +4,6 @@ import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -391,7 +390,7 @@ class _UpdatePasswordPageState extends ConsumerState<UpdatePasswordPage> {
         _isCompleted = true;
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       setState(() => _isUpdating = false);
 
       Utilities.snack.e(

@@ -6,7 +6,6 @@ import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/style.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -528,7 +527,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
         _lastDocumentSnapshot = stylesSnap.docs.last;
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     }
   }
 
@@ -566,7 +565,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
         _lastDocumentSnapshot = stylesSnap.docs.last;
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     }
   }
 
@@ -609,7 +608,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
         }
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     }
   }
 }

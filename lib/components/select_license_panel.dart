@@ -6,7 +6,6 @@ import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/illustration/license.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -544,7 +543,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
         _lastDocumentSnapshot = stylesSnap.docs.last;
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     }
   }
 
@@ -582,7 +581,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
         _lastDocumentSnapshot = stylesSnap.docs.last;
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     }
   }
 
@@ -625,7 +624,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
         }
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     }
   }
 }

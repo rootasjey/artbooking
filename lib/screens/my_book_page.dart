@@ -22,7 +22,6 @@ import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -852,7 +851,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
       'bookId': widget.bookId,
       'illustrationIds': illustrationsErrors,
     }).catchError((error, stack) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       throw error;
     });
   }
@@ -1080,7 +1079,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
             .toList();
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
 
       setState(() => _hasError = true);
     } finally {
@@ -1138,7 +1137,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
 
         setState(() => _isLoading = false);
       } catch (error) {
-        appLogger.e(error);
+        Utilities.logger.e(error);
         illustrationsErrors.add(bookIllustration.id);
       }
     }
@@ -1190,7 +1189,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
         _hasNext = _endIndex < _bookPage!.count;
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     } finally {
       setState(() => _isLoadingMore = false);
     }
@@ -1455,7 +1454,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
         message: response.error.details,
       );
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     }
   }
 
@@ -1609,7 +1608,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
         diffIllustrations();
       },
       onError: (error) {
-        appLogger.e(error);
+        Utilities.logger.e(error);
       },
     );
   }

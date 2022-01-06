@@ -3,7 +3,6 @@ import 'dart:collection';
 import 'package:artbooking/components/avatar/better_avatar.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 
 class AuthorHeader extends StatefulWidget {
@@ -102,7 +101,7 @@ class _AuthorHeaderState extends State<AuthorHeader> {
 
       setState(() => _user = UserFirestore.fromJSON(data));
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     }
   }
 }

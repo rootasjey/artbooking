@@ -5,7 +5,6 @@ import 'package:artbooking/components/loading_animation.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/home_location.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -297,7 +296,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         isCompleted = true;
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
 
       setState(() => isLoading = false);
 

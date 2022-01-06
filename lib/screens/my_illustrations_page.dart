@@ -14,7 +14,6 @@ import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -604,7 +603,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         _hasNext = snapshot.docs.length == _limit;
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -657,7 +656,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         _isLoadingMore = false;
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -820,7 +819,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         }
       },
       onError: (error) {
-        appLogger.e(error);
+        Utilities.logger.e(error);
       },
     );
   }
@@ -846,12 +845,12 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         _illustrationsList.insert(index, updatedIllustration);
       });
     } on Exception catch (error) {
-      appLogger.e(
+      Utilities.logger.e(
         "The document with the id ${documentChange.doc.id} "
         "doesn't exist in the illustrations list.",
       );
 
-      appLogger.e(error);
+      Utilities.logger.e(error);
     }
   }
 }

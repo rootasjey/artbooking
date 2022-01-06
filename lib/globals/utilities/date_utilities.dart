@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/app_logger.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Helper for date and time conversions.
@@ -26,7 +26,7 @@ class DateUtilities {
         date = DateTime.fromMillisecondsSinceEpoch(data['_seconds'] * 1000);
       }
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     }
 
     return date;

@@ -1,8 +1,8 @@
 import 'package:artbooking/actions/illustrations.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:simple_animations/simple_animations.dart';
@@ -277,7 +277,7 @@ class _IllustrationCardState extends State<IllustrationCard>
         illustrationId: illustration.id,
       );
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     }
   }
 }

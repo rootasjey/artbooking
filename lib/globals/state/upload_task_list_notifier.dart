@@ -2,7 +2,6 @@ import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:extended_image/extended_image.dart';
@@ -143,7 +142,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     final String illustrationId = customUploadTask.illustrationId ?? '';
 
     if (illustrationId.isEmpty) {
-      appLogger.e(
+      Utilities.logger.e(
         "A custom task upload cannot have an empty [illustrationId] "
         "at this step.",
       );
@@ -157,7 +156,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     );
 
     if (response.hasErrors) {
-      appLogger.e(
+      Utilities.logger.e(
         "There was an error while adding "
         "the illustration $illustrationId.",
       );
@@ -217,7 +216,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
 
       return responseResult.data["illustration"]?["id"] ?? '';
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       return '';
     }
   }
@@ -272,10 +271,10 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
       await uploadTask;
       // _incrSuccessTasks(1);
     } on FirebaseException catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       // _incrAbortedTasks(1);
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       // _incrAbortedTasks(1);
     } finally {
       state = state;
@@ -319,7 +318,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
         throw "illustration_delete_error".tr();
       }
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     }
   }
 }

@@ -12,7 +12,6 @@ import 'package:artbooking/router/locations/signup_location.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
@@ -370,7 +369,7 @@ class _SigninPageState extends ConsumerState<SigninPage> {
 
       context.beamToNamed(HomeLocation.route);
     } catch (error) {
-      appLogger.d(error);
+      Utilities.logger.d(error);
 
       Utilities.snack.e(
         context: context,

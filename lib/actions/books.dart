@@ -2,7 +2,6 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/many_books_op_resp.dart';
 import 'package:artbooking/types/many_illus_op_resp.dart';
 import 'package:artbooking/types/one_book_op_resp.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class BooksActions {
@@ -19,10 +18,10 @@ class BooksActions {
 
       return ManyIllusOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
-      appLogger.e(exception);
+      Utilities.logger.e(exception);
       return ManyIllusOpResp.fromException(exception);
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       return ManyIllusOpResp.fromMessage(error.toString());
     }
   }
@@ -41,10 +40,10 @@ class BooksActions {
 
       return OneBookOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
-      appLogger.e(exception);
+      Utilities.logger.e(exception);
       return OneBookOpResp.fromException(exception);
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       return OneBookOpResp.fromMessage(error.toString());
     }
   }
@@ -59,10 +58,10 @@ class BooksActions {
 
       return OneBookOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
-      appLogger.e(exception);
+      Utilities.logger.e(exception);
       return OneBookOpResp.fromException(exception);
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       return OneBookOpResp.fromMessage(error.toString());
     }
   }
@@ -77,10 +76,10 @@ class BooksActions {
 
       return ManyBooksOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
-      appLogger.e(exception);
+      Utilities.logger.e(exception);
       return ManyBooksOpResp.fromException(exception);
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       return ManyBooksOpResp.fromMessage(error.toString());
     }
   }
@@ -98,10 +97,10 @@ class BooksActions {
 
       return ManyIllusOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
-      appLogger.e(exception);
+      Utilities.logger.e(exception);
       return ManyIllusOpResp.fromException(exception);
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       return ManyIllusOpResp.fromMessage(error.toString());
     }
   }
@@ -120,10 +119,10 @@ class BooksActions {
 
       return OneBookOpResp.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
-      appLogger.e(exception);
+      Utilities.logger.e(exception);
       return OneBookOpResp.fromException(exception);
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       return OneBookOpResp.fromMessage(error.toString());
     }
   }

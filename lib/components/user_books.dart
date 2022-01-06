@@ -2,7 +2,6 @@ import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -268,7 +267,7 @@ class _UserBooksState extends State<UserBooks> {
         isLoading = false;
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
 
       setState(() {
         isLoading = false;
@@ -320,7 +319,7 @@ class _UserBooksState extends State<UserBooks> {
         isLoadingMore = false;
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
 
       setState(() {
         isLoadingMore = false;

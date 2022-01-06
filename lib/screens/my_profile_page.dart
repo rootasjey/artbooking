@@ -11,7 +11,6 @@ import 'package:artbooking/types/user/user_pp.dart';
 import 'package:artbooking/types/user/user_pp_path.dart';
 import 'package:artbooking/types/user/user_pp_url.dart';
 import 'package:artbooking/types/user/user_urls.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
@@ -1018,7 +1017,7 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
       setState(() => _isUpdating = false);
     } catch (error) {
       setState(() => _isUpdating = false);
-      appLogger.e(error);
+      Utilities.logger.e(error);
     }
   }
 
@@ -1094,7 +1093,7 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
 
       updateUser();
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       setState(() => _isUpdating = false);
     }
   }

@@ -5,7 +5,6 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/constants.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -51,10 +50,10 @@ class _UploadItemCardState extends ConsumerState<UploadItemCard> {
             .add(_bytesTransferred);
       },
       onError: (error) {
-        appLogger.e(error);
+        Utilities.logger.e(error);
       },
       onDone: () {
-        appLogger.d("upload complete");
+        Utilities.logger.d("upload complete");
         _taskListener?.cancel();
       },
     );

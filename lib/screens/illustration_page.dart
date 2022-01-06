@@ -15,7 +15,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/license.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
@@ -509,7 +508,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
         _isLoading = false;
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       setState(() {
         _isLoading = false;
       });

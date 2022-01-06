@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/app_logger.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
@@ -68,7 +68,7 @@ class _UnderlinedButtonState extends State<UnderlinedButton>
 
   Widget iconButton() {
     if (widget.leading == null) {
-      appLogger.w(
+      Utilities.logger.w(
         "This [UnderlinedButton] component doesn't have a [leading]"
         "widget property, so it cannot be rendered in compact form.",
       );

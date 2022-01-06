@@ -8,8 +8,12 @@ import 'package:artbooking/globals/utilities/snack_utilities.dart';
 import 'package:artbooking/globals/utilities/storage_utilities.dart';
 import 'package:artbooking/globals/utilities/language_utilities.dart';
 import 'package:artbooking/globals/utilities/size_utilities.dart';
+import 'package:logger/logger.dart';
 
 class Utilities {
+  /// Beautiful logger.
+  static Logger logger = Logger();
+
   static const cloud = const CloudUtilities();
   static const cropEditor = const CropEditorUtilities();
   static const date = const DateUtilities();

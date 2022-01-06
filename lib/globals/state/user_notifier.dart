@@ -5,7 +5,6 @@ import 'package:artbooking/types/cloud_function_response.dart';
 import 'package:artbooking/types/create_account_resp.dart';
 import 'package:artbooking/types/user/user.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -33,7 +32,7 @@ class UserNotifier extends StateNotifier<User> {
 
       return CloudFunctionResponse.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
-      appLogger.e("[code: ${exception.code}] - ${exception.message}");
+      Utilities.logger.e("[code: ${exception.code}] - ${exception.message}");
 
       return CloudFunctionResponse(
         success: false,
@@ -43,7 +42,7 @@ class UserNotifier extends StateNotifier<User> {
         ),
       );
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
 
       return CloudFunctionResponse(
         success: false,
@@ -134,7 +133,7 @@ class UserNotifier extends StateNotifier<User> {
   }
 
   void _onAuthError(error) {
-    appLogger.e(error);
+    Utilities.logger.e(error);
   }
 
   void _onFirestoreData(DocumentSnapshot<Map<String, dynamic>> docSnap) {
@@ -158,7 +157,7 @@ class UserNotifier extends StateNotifier<User> {
   }
 
   void _onFirestoreError(error) {
-    appLogger.e(error);
+    Utilities.logger.e(error);
   }
 
   Future<firebase_auth.User?> signIn({String? email, String? password}) async {
@@ -194,7 +193,7 @@ class UserNotifier extends StateNotifier<User> {
 
       return authResult.user;
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       Utilities.storage.clearUserAuthData();
       return null;
     }
@@ -209,7 +208,7 @@ class UserNotifier extends StateNotifier<User> {
         signOut();
       }
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       signOut();
     }
   }
@@ -221,7 +220,7 @@ class UserNotifier extends StateNotifier<User> {
       state = User();
       return true;
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       return false;
     }
   }
@@ -320,7 +319,7 @@ class UserNotifier extends StateNotifier<User> {
 
       return true;
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       return false;
     }
   }

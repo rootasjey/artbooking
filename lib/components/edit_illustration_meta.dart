@@ -9,7 +9,6 @@ import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/types/style.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -989,7 +988,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         throw "styles_update_fail".tr();
       }
     } on FirebaseFunctionsException catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
 
       String errorMessage = "styles_update_fail".tr();
 
@@ -1007,7 +1006,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         message: errorMessage,
       );
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
 
       setState(() {
         _selectedStyles.remove(styleName);
@@ -1057,7 +1056,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         throw "topics_update_fail".tr();
       }
     } on FirebaseFunctionsException catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
 
       for (String topic in topicsList) {
         _topics.remove(topic);
@@ -1079,7 +1078,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         message: errorMessage,
       );
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
 
       for (String topic in topicsList) {
         _topics.remove(topic);
@@ -1118,7 +1117,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     try {
       await _illustrationSnapshot.reference.update({'urls': _links});
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
 
       _links.remove(savedName);
 
@@ -1149,7 +1148,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     try {
       await _illustrationSnapshot.reference.update({'urls': _links});
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
 
       _links.putIfAbsent(entry.key, () => entry.value);
 
@@ -1177,7 +1176,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         return;
       }
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -1206,7 +1205,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         widget.illustration!.license = completeLicense;
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     }
   }
 
@@ -1247,14 +1246,14 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         throw "styles_update_fail".tr();
       }
     } on FirebaseFunctionsException catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
 
       Utilities.snack.e(
         context: context,
         message: error.message,
       );
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       _selectedStyles.add(styleName);
 
       Utilities.snack.e(
@@ -1274,7 +1273,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       await _illustrationSnapshot.reference
           .update({'programmingLanguages': _programmingLanguages});
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       _programmingLanguages.putIfAbsent(key, () => true);
 
       Utilities.snack.e(
@@ -1305,7 +1304,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         throw "topics_update_fail".tr();
       }
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       _topics.putIfAbsent(entry.key, () => entry.value);
 
       Utilities.snack.e(
@@ -1353,7 +1352,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         throw "license_update_fail".tr();
       }
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
 
       illustrationLicense = previousLicense!;
 
@@ -1389,7 +1388,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         throw "license_update_fail".tr();
       }
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
 
       illustration.license = previousLicense;
 
@@ -1424,7 +1423,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         throw "The operation couldn't succeed.";
       }
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
 
       Utilities.snack.e(
         context: context,
@@ -1468,7 +1467,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         throw "illustration_visibility_update_fail".tr();
       }
     } on FirebaseFunctionsException catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
       illustration.visibility = previousVisibility;
 
       Utilities.snack.e(
@@ -1476,7 +1475,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         message: "[${error.code}] ${error.message}",
       );
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
 
       illustration.visibility = previousVisibility;
 

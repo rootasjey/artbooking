@@ -6,7 +6,6 @@ import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/types/cloud_function_response.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/app_state.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -412,7 +411,7 @@ class DeleteAccountPageState extends ConsumerState<DeleteAccountPage> {
         _isCompleted = true;
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
 
       setState(() {
         _isDeleting = false;

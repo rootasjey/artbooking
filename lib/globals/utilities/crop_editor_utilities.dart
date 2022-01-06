@@ -3,7 +3,7 @@ import 'dart:async';
 import 'dart:isolate';
 import 'dart:typed_data';
 import 'dart:ui';
-import 'package:artbooking/utils/app_logger.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/foundation.dart';
 
 // ignore: implementation_imports
@@ -211,7 +211,7 @@ class CropEditorUtilities {
           cancelToken: key.cancelToken) as FutureOr<Response>);
       return response.bodyBytes;
     } on OperationCanceledError catch (_) {
-      appLogger.e('User cancel request ${key.url}.');
+      Utilities.logger.e('User cancel request ${key.url}.');
       return Future<Uint8List>.error(
           StateError('User cancel request ${key.url}.'));
     } catch (e) {

@@ -14,7 +14,6 @@ import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/one_book_op_resp.dart';
-import 'package:artbooking/utils/app_logger.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -634,7 +633,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
         _hasNext = snapshot.docs.length == _limit;
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -684,7 +683,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
         _hasNext = snapshot.docs.length == _limit;
       });
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -805,7 +804,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
         message: response.error.details,
       );
     } catch (error) {
-      appLogger.e(error);
+      Utilities.logger.e(error);
     }
   }
 
@@ -828,7 +827,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
         }
       },
       onError: (error) {
-        appLogger.e(error);
+        Utilities.logger.e(error);
       },
     );
   }
@@ -854,12 +853,12 @@ class _MyBooksPageState extends State<MyBooksPage> {
         _books.insert(index, updatedBook);
       });
     } on Exception catch (error) {
-      appLogger.e(
+      Utilities.logger.e(
         "The document with the id ${documentChange.doc.id} "
         "doesn't exist in the books list.",
       );
 
-      appLogger.e(error);
+      Utilities.logger.e(error);
     }
   }
 
