@@ -7,8 +7,8 @@ import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -181,7 +181,7 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
                         opacity: 0.4,
                         child: Text(
                           "settings".tr().toUpperCase(),
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w400,
                           ),
@@ -191,7 +191,7 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
                         opacity: 0.8,
                         child: Text(
                           "email_update".tr(),
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontSize: 50.0,
                             fontWeight: FontWeight.w500,
                           ),
@@ -204,7 +204,7 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
                           opacity: 0.5,
                           child: Text(
                             "email_update_description".tr(),
-                            style: FontsUtils.mainStyle(
+                            style: Utilities.fonts.style(
                               fontSize: 16.0,
                               fontWeight: FontWeight.w500,
                             ),
@@ -256,7 +256,7 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
                         ),
                         Text(
                           email,
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -454,7 +454,7 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
               padding: const EdgeInsets.all(14.0),
               child: Text(
                 "email_update".tr().toUpperCase(),
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontSize: 15.0,
                   fontWeight: FontWeight.w600,
                 ),
@@ -553,7 +553,7 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
           backgroundColor: _clairPink,
           title: Text(
             "email_current".tr(),
-            style: FontsUtils.mainStyle(
+            style: Utilities.fonts.style(
               fontSize: 14.0,
               fontWeight: FontWeight.w600,
             ),
@@ -571,7 +571,7 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
                 opacity: 0.6,
                 child: Text(
                   email,
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     fontWeight: FontWeight.bold,
                   ),
                 ),

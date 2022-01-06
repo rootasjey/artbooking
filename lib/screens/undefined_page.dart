@@ -1,7 +1,7 @@
 import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/home_location.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -58,7 +58,7 @@ class _UndefinedPageState extends State<UndefinedPage> {
                     child: Text(
                       // 'It is by getting lost that we learn.',
                       'When we are lost, what matters is to find our way back.',
-                      style: FontsUtils.mainStyle(
+                      style: Utilities.fonts.style(
                         fontSize: 18.0,
                         fontWeight: FontWeight.w600,
                       ),

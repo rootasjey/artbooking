@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 
 /// A PopupMenuItem with a leading icon.
@@ -33,7 +33,7 @@ class PopupMenuItemIcon<T> extends PopupMenuItem<T> {
                   Expanded(
                     child: Text(
                       textLabel,
-                      style: FontsUtils.mainStyle(
+                      style: Utilities.fonts.style(
                         fontWeight: FontWeight.w600,
                       ),
                     ),

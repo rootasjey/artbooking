@@ -5,11 +5,11 @@ import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/loading_animation.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/forgot_password_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/locations/signup_location.dart';
 import 'package:artbooking/globals/app_state.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:artbooking/utils/app_logger.dart';
@@ -187,7 +187,7 @@ class _SigninPageState extends ConsumerState<SigninPage> {
               child: Text(
                 "signin".tr(),
                 textAlign: TextAlign.center,
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontSize: 25.0,
                   fontWeight: FontWeight.w700,
                 ),
@@ -201,7 +201,7 @@ class _SigninPageState extends ConsumerState<SigninPage> {
                 child: Text(
                   "signin_existing_account".tr(),
                   overflow: TextOverflow.ellipsis,
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -299,7 +299,7 @@ class _SigninPageState extends ConsumerState<SigninPage> {
               children: <Widget>[
                 Text(
                   "signin".tr().toUpperCase(),
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     color: Colors.white,
                     fontSize: 15.0,
                     fontWeight: FontWeight.w700,

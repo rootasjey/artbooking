@@ -1,9 +1,9 @@
 import 'package:artbooking/components/main_app_bar/search_button.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/locations/settings_location.dart';
 import 'package:artbooking/types/button_data.dart';
 import 'package:artbooking/globals/app_state.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +22,7 @@ class MainSectionMobile extends ConsumerWidget {
           child: PopupMenuButton<String>(
             child: Text(
               "sections".toUpperCase(),
-              style: FontsUtils.mainStyle(
+              style: Utilities.fonts.style(
                 color: Colors.black,
                 fontSize: 18.0,
               ),

@@ -3,6 +3,7 @@ import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/select_license_panel.dart';
 import 'package:artbooking/components/sheet_header.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
@@ -10,7 +11,6 @@ import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/types/style.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -114,7 +114,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                       opacity: 0.7,
                       child: Text(
                         "card_click_to_expand".tr(),
-                        style: FontsUtils.mainStyle(
+                        style: Utilities.fonts.style(
                           color: Theme.of(context).secondaryHeaderColor,
                           fontWeight: FontWeight.w600,
                         ),
@@ -168,7 +168,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
               padding: const EdgeInsets.only(bottom: 8.0),
               child: Text(
                 "description".tr(),
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -217,7 +217,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
               padding: const EdgeInsets.only(bottom: 8.0),
               child: Text(
                 "story".tr(),
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -259,7 +259,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       opacity: 0.8,
       child: Text(
         textValue,
-        style: FontsUtils.mainStyle(
+        style: Utilities.fonts.style(
           fontSize: 20.0,
           fontWeight: FontWeight.w700,
         ),
@@ -277,7 +277,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         opacity: 0.6,
         child: Text(
           textValue,
-          style: FontsUtils.mainStyle(),
+          style: Utilities.fonts.style(),
         ),
       ),
     );
@@ -328,7 +328,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                           opacity: 0.6,
                           child: Text(
                             "project_updating".tr(),
-                            style: FontsUtils.mainStyle(
+                            style: Utilities.fonts.style(
                               fontSize: 14.0,
                               fontWeight: FontWeight.w600,
                             ),
@@ -430,7 +430,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         padding: const EdgeInsets.only(left: 24.0),
         child: Text(
           "You have unsaved changes.",
-          style: FontsUtils.mainStyle(
+          style: Utilities.fonts.style(
             color: Theme.of(context).secondaryHeaderColor,
             fontWeight: FontWeight.w600,
           ),
@@ -505,7 +505,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                   "${entry.key.substring(1)}",
                 ),
               ),
-              labelStyle: FontsUtils.mainStyle(
+              labelStyle: Utilities.fonts.style(
                 fontWeight: FontWeight.w600,
               ),
               labelPadding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -535,7 +535,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
               padding: const EdgeInsets.only(bottom: 8.0),
               child: Text(
                 "topics".tr(),
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -599,7 +599,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
         controller: _nameTextController,
         keyboardType: TextInputType.multiline,
         textCapitalization: TextCapitalization.sentences,
-        style: FontsUtils.mainStyle(
+        style: Utilities.fonts.style(
           fontSize: 42.0,
           fontWeight: FontWeight.w700,
         ),
@@ -697,7 +697,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                   opacity: 0.8,
                   child: Text(style!),
                 ),
-                labelStyle: FontsUtils.mainStyle(fontWeight: FontWeight.w700),
+                labelStyle: Utilities.fonts.style(fontWeight: FontWeight.w700),
                 elevation: 2.0,
                 deleteIconColor:
                     Theme.of(context).secondaryHeaderColor.withOpacity(0.8),
@@ -757,7 +757,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
             "visibility_${illustration.visibilityToString()}"
                 .tr()
                 .toUpperCase(),
-            style: FontsUtils.mainStyle(
+            style: Utilities.fonts.style(
               color: Colors.white,
               fontWeight: FontWeight.w600,
             ),
@@ -791,13 +791,13 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       child: ListTile(
         title: Text(
           titleValue,
-          style: FontsUtils.mainStyle(
+          style: Utilities.fonts.style(
             fontWeight: FontWeight.w600,
           ),
         ),
         subtitle: Text(
           subtitleValue,
-          style: FontsUtils.mainStyle(
+          style: Utilities.fonts.style(
             fontSize: 14.0,
             fontWeight: FontWeight.w500,
           ),
@@ -853,7 +853,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                         opacity: 0.6,
                         child: Text(
                           "license_current".tr().toUpperCase(),
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             color: Theme.of(context).primaryColor,
                             fontWeight: FontWeight.w800,
                           ),
@@ -865,7 +865,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                           illustration.license!.name!.isEmpty
                               ? "license_none".tr()
                               : illustration.license!.name!,
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
                           ),

@@ -5,26 +5,19 @@ import 'package:google_fonts/google_fonts.dart';
 /// Make it easier to work with online Google fonts.
 ///
 /// See https://github.com/material-foundation/google-fonts-flutter/issues/35
-class FontsUtils {
+class FontsUtilities {
+  const FontsUtilities();
+
   static String? fontFamily = GoogleFonts.nunito().fontFamily;
 
   /// Return main text style for this app.
-  static TextStyle mainStyle({
+  TextStyle style({
     FontWeight fontWeight = FontWeight.w400,
     double fontSize = 16.0,
     double? height,
     Color? color,
     TextDecoration? decoration,
   }) {
-    if (color == null) {
-      return GoogleFonts.nunito(
-        fontSize: fontSize,
-        fontWeight: fontWeight,
-        height: height,
-        decoration: decoration,
-      );
-    }
-
     return GoogleFonts.nunito(
       color: color,
       fontSize: fontSize,
@@ -34,7 +27,7 @@ class FontsUtils {
     );
   }
 
-  static TextStyle title({
+  TextStyle titleStyle({
     FontWeight fontWeight = FontWeight.w400,
     double fontSize = 16.0,
     double? height,
@@ -42,6 +35,7 @@ class FontsUtils {
     TextDecoration? decoration,
   }) {
     return GoogleFonts.pacifico(
+      color: color,
       fontSize: fontSize,
       fontWeight: fontWeight,
       height: height,

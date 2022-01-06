@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +21,7 @@ class MyStatsHeader extends StatelessWidget {
               opacity: 0.8,
               child: Text(
                 "statistics".tr().toUpperCase(),
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontSize: 30.0,
                   fontWeight: FontWeight.w800,
                 ),

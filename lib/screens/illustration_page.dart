@@ -7,6 +7,7 @@ import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/illustration_poster.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:beamer/beamer.dart';
@@ -15,7 +16,6 @@ import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -137,7 +137,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
             opacity: 0.6,
             child: Text(
               Jiffy(_illustration.createdAt).fromNow(),
-              style: FontsUtils.mainStyle(
+              style: Utilities.fonts.style(
                 fontSize: 18.0,
                 fontWeight: FontWeight.w600,
               ),
@@ -165,7 +165,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
         padding: const EdgeInsets.all(8.0),
         child: Text(
           "edit".tr(),
-          style: FontsUtils.mainStyle(
+          style: Utilities.fonts.style(
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -188,7 +188,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
             opacity: 0.8,
             child: Text(
               _illustration.name,
-              style: FontsUtils.mainStyle(
+              style: Utilities.fonts.style(
                 fontSize: 20.0,
                 fontWeight: FontWeight.w700,
               ),
@@ -261,7 +261,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
         opacity: 0.4,
         child: Text(
           _illustration.description,
-          style: FontsUtils.mainStyle(
+          style: Utilities.fonts.style(
             fontSize: 18.0,
             fontWeight: FontWeight.w600,
           ),
@@ -282,7 +282,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
         opacity: 0.6,
         child: Text(
           _illustration.story,
-          style: FontsUtils.mainStyle(
+          style: Utilities.fonts.style(
             fontSize: 24.0,
             fontWeight: FontWeight.w200,
           ),
@@ -555,7 +555,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
           Text.rich(
             TextSpan(
               text: "Created: ",
-              style: FontsUtils.mainStyle(
+              style: Utilities.fonts.style(
                 fontSize: 18.0,
                 color: Colors.black,
                 fontWeight: FontWeight.w600,
@@ -563,7 +563,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
               children: [
                 TextSpan(
                   text: Jiffy(_illustration.createdAt).fromNow(),
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     color: Colors.black54,
                   ),
                 ),
@@ -573,7 +573,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
           Text.rich(
             TextSpan(
               text: "Updated: ",
-              style: FontsUtils.mainStyle(
+              style: Utilities.fonts.style(
                 fontSize: 18.0,
                 color: Colors.black,
                 fontWeight: FontWeight.w600,
@@ -581,7 +581,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
               children: [
                 TextSpan(
                   text: Jiffy(_illustration.updatedAt).fromNow(),
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     color: Colors.black54,
                   ),
                 ),
@@ -608,7 +608,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
               title.toUpperCase(),
             ),
           ),
-          titleTextStyle: FontsUtils.mainStyle(
+          titleTextStyle: Utilities.fonts.style(
             fontSize: 14.0,
             color: Colors.black,
             fontWeight: FontWeight.w700,

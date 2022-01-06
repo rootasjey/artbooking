@@ -24,7 +24,6 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -273,7 +272,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
       opacity: 0.6,
       child: Text(
         createdAtStr,
-        style: FontsUtils.mainStyle(
+        style: Utilities.fonts.style(
           fontSize: 16.0,
           fontWeight: FontWeight.w600,
         ),
@@ -312,7 +311,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
       opacity: 0.6,
       child: Text(
         _bookPage!.description,
-        style: FontsUtils.mainStyle(
+        style: Utilities.fonts.style(
           fontSize: 16.0,
           fontWeight: FontWeight.w600,
         ),
@@ -362,7 +361,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
                 opacity: 0.6,
                 child: Text(
                   "new_start_sentence".tr().toUpperCase(),
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     fontSize: 16.0,
                     fontWeight: FontWeight.w700,
                   ),
@@ -378,7 +377,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
                   child: Text(
                     "book_no_illustrations".tr(),
                     textAlign: TextAlign.center,
-                    style: FontsUtils.mainStyle(
+                    style: Utilities.fonts.style(
                       fontSize: 16.0,
                     ),
                   ),
@@ -410,7 +409,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
                 opacity: 0.6,
                 child: Text(
                   "or".tr().toUpperCase(),
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     fontSize: 14.0,
                     fontWeight: FontWeight.w600,
                   ),
@@ -758,7 +757,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
       opacity: 0.8,
       child: Text(
         "illustrations_count".plural(_bookPage!.illustrations.length),
-        style: FontsUtils.mainStyle(
+        style: Utilities.fonts.style(
           color: color,
           fontSize: 16.0,
           fontWeight: FontWeight.w600,
@@ -774,7 +773,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
       opacity: 0.8,
       child: Text(
         bookName,
-        style: FontsUtils.mainStyle(
+        style: Utilities.fonts.style(
           fontSize: 40.0,
           fontWeight: FontWeight.w800,
         ),
@@ -813,7 +812,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
         opacity: 0.6,
         child: Text(
           updatedAtStr,
-          style: FontsUtils.mainStyle(
+          style: Utilities.fonts.style(
             fontSize: 16.0,
             fontWeight: FontWeight.w600,
           ),
@@ -873,7 +872,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
                 opacity: 0.8,
                 child: Text(
                   "book_delete".tr().toUpperCase(),
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     color: Colors.black,
                     fontWeight: FontWeight.w700,
                   ),
@@ -887,7 +886,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
                   child: Text(
                     "book_delete_description".tr(),
                     textAlign: TextAlign.center,
-                    style: FontsUtils.mainStyle(
+                    style: Utilities.fonts.style(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
                     ),
@@ -1513,7 +1512,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
                 ),
                 child: Text(
                   "Dates".toUpperCase(),
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     fontWeight: FontWeight.w600,
                   ),
                 ),

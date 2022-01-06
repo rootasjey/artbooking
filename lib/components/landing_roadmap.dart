@@ -1,7 +1,7 @@
 import 'package:artbooking/components/bezier_painter.dart';
 import 'package:artbooking/components/roadmap_item.dart';
 import 'package:artbooking/globals/constants.dart';
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -80,7 +80,7 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
   Widget title() {
     return Text(
       "roadmap".tr(),
-      style: FontsUtils.title(
+      style: Utilities.fonts.titleStyle(
         fontSize: 90.0,
         fontWeight: FontWeight.w600,
       ),
@@ -92,7 +92,7 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
       opacity: 0.4,
       child: Text(
         "roadmap_description".tr(),
-        style: FontsUtils.mainStyle(
+        style: Utilities.fonts.style(
           fontSize: 20.0,
           fontWeight: FontWeight.w600,
         ),
@@ -142,7 +142,7 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
                     children: [
                       Text(
                         _processItems[index].title!,
-                        style: FontsUtils.mainStyle(
+                        style: Utilities.fonts.style(
                           fontWeight: FontWeight.w700,
                           color: getColor(index),
                         ),
@@ -151,7 +151,7 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
                         opacity: 0.6,
                         child: Text(
                           _processItems[index].deadline!,
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontSize: 14.0,
                             fontWeight: FontWeight.w400,
                             color: getColor(index),
@@ -298,12 +298,12 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
               title!.toUpperCase(),
             ),
           ),
-          titleTextStyle: FontsUtils.mainStyle(
+          titleTextStyle: Utilities.fonts.style(
             fontSize: 14.0,
             color: Colors.black,
             fontWeight: FontWeight.w700,
           ),
-          contentTextStyle: FontsUtils.mainStyle(
+          contentTextStyle: Utilities.fonts.style(
             fontSize: 18.0,
             color: Colors.black,
             fontWeight: FontWeight.w600,
@@ -343,7 +343,7 @@ class _LandingRoadmapState extends State<LandingRoadmap> {
               style: ElevatedButton.styleFrom(
                 elevation: 0.0,
                 primary: Colors.black,
-                textStyle: FontsUtils.mainStyle(
+                textStyle: Utilities.fonts.style(
                   fontWeight: FontWeight.w600,
                 ),
                 shape: RoundedRectangleBorder(

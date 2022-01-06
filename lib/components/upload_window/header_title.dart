@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 
@@ -22,7 +22,7 @@ class HeaderTitle extends StatelessWidget {
 
     return Text(
       textValue,
-      style: FontsUtils.mainStyle(
+      style: Utilities.fonts.style(
         fontWeight: FontWeight.w600,
       ),
     );

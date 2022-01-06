@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 
 class TextRectangleButton extends StatelessWidget {
@@ -24,7 +24,7 @@ class TextRectangleButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         primary: primary,
         shape: RoundedRectangleBorder(),
-        textStyle: FontsUtils.mainStyle(
+        textStyle: Utilities.fonts.style(
           fontWeight: FontWeight.w600,
         ),
         side: BorderSide(

@@ -5,11 +5,11 @@ import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/cloud_function_response.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -139,7 +139,7 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
                         opacity: 0.4,
                         child: Text(
                           "settings".tr().toUpperCase(),
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w400,
                           ),
@@ -149,7 +149,7 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
                         opacity: 0.8,
                         child: Text(
                           "username_update".tr(),
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontSize: 50.0,
                             fontWeight: FontWeight.w500,
                           ),
@@ -162,7 +162,7 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
                           opacity: 0.5,
                           child: Text(
                             "username_update_description".tr(),
-                            style: FontsUtils.mainStyle(
+                            style: Utilities.fonts.style(
                               fontSize: 16.0,
                               fontWeight: FontWeight.w500,
                             ),
@@ -211,14 +211,14 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
                           opacity: 0.6,
                           child: Text(
                             "username_current".tr(),
-                            style: FontsUtils.mainStyle(
+                            style: Utilities.fonts.style(
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
                         Text(
                           _currentUsername,
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -387,7 +387,7 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
               padding: const EdgeInsets.all(14.0),
               child: Text(
                 "username_update".tr().toUpperCase(),
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontSize: 15.0,
                   fontWeight: FontWeight.bold,
                 ),
@@ -514,7 +514,7 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
                 opacity: 0.6,
                 child: Text(
                   _currentUsername,
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -528,7 +528,7 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
                 opacity: 0.6,
                 child: Text(
                   "username_choose_description".tr(),
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     fontWeight: FontWeight.bold,
                   ),
                 ),

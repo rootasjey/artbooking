@@ -1,10 +1,10 @@
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/section_card.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/app_state.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -71,7 +71,7 @@ class DashboardWelcomePage extends ConsumerWidget {
               opacity: 0.8,
               child: Text(
                 "dashboard".tr().toUpperCase(),
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontSize: 30.0,
                   fontWeight: FontWeight.w800,
                 ),
@@ -111,7 +111,7 @@ class DashboardWelcomePage extends ConsumerWidget {
         children: [
           TextSpan(
             text: " $name",
-            style: FontsUtils.mainStyle(
+            style: Utilities.fonts.style(
               color: color,
               fontSize: 18.0,
               fontWeight: FontWeight.w600,
@@ -119,7 +119,7 @@ class DashboardWelcomePage extends ConsumerWidget {
           ),
         ],
       ),
-      style: FontsUtils.mainStyle(
+      style: Utilities.fonts.style(
         fontSize: 18.0,
         fontWeight: FontWeight.w600,
       ),
@@ -131,7 +131,7 @@ class DashboardWelcomePage extends ConsumerWidget {
       opacity: 0.4,
       child: Text(
         "dashboard_sections_navigation".tr(),
-        style: FontsUtils.mainStyle(
+        style: Utilities.fonts.style(
           fontSize: 16.0,
           fontWeight: FontWeight.w600,
         ),

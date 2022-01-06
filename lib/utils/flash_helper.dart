@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -155,7 +155,7 @@ class FlashHelper {
               child: Text(
                 message!,
                 overflow: TextOverflow.ellipsis,
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontWeight: FontWeight.w600,
                 ),
               ),

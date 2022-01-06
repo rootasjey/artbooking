@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
@@ -25,7 +25,7 @@ class _LandingCuratedState extends State<LandingCurated> {
       children: [
         Text(
           "Curated",
-          style: FontsUtils.title(
+          style: Utilities.fonts.titleStyle(
             fontSize: 80.0,
             height: 1.0,
           ),
@@ -34,7 +34,7 @@ class _LandingCuratedState extends State<LandingCurated> {
           opacity: 0.6,
           child: Text(
             "Lastest handpicked illustrations.",
-            style: FontsUtils.mainStyle(
+            style: Utilities.fonts.style(
               fontSize: 18.0,
               fontWeight: FontWeight.w600,
             ),

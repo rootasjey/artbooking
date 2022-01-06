@@ -1,5 +1,5 @@
 import 'package:artbooking/components/dot_close_button.dart';
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 
@@ -41,7 +41,7 @@ class TitleDialog extends StatelessWidget {
                     opacity: 0.8,
                     child: Text(
                       titleValue,
-                      style: FontsUtils.mainStyle(
+                      style: Utilities.fonts.style(
                         color: Colors.black,
                         fontWeight: FontWeight.w700,
                       ),
@@ -51,7 +51,7 @@ class TitleDialog extends StatelessWidget {
                     opacity: 0.4,
                     child: Text(
                       subtitleValue,
-                      style: FontsUtils.mainStyle(
+                      style: Utilities.fonts.style(
                         color: Colors.black,
                         fontWeight: FontWeight.w700,
                       ),

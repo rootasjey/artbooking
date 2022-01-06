@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -42,14 +42,14 @@ class UpdateUsernameButton extends StatelessWidget {
                         opacity: 0.3,
                         child: Text(
                           "username".tr().toUpperCase(),
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                       Text(
                         username,
-                        style: FontsUtils.mainStyle(
+                        style: Utilities.fonts.style(
                           fontWeight: FontWeight.w600,
                         ),
                       ),

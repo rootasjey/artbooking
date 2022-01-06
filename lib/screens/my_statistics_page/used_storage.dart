@@ -1,5 +1,5 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/my_statistics_page/text_icon.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -30,7 +30,7 @@ class UsedStorage extends StatelessWidget {
             TextSpan(text: "space_total_used".tr()),
             TextSpan(
               text: " $usedSpace",
-              style: FontsUtils.mainStyle(
+              style: Utilities.fonts.style(
                 color: Theme.of(context).primaryColor,
                 fontWeight: FontWeight.w600,
               ),

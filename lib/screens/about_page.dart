@@ -5,7 +5,6 @@ import 'package:artbooking/components/image_hero.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
@@ -35,7 +34,7 @@ class _AboutPageState extends State<AboutPage> {
   );
 
   final titleOpacity = 0.9;
-  final titleStyle = FontsUtils.mainStyle(
+  final titleStyle = Utilities.fonts.style(
     fontSize: 20.0,
     fontWeight: FontWeight.w600,
   );

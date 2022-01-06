@@ -1,5 +1,5 @@
 import 'package:artbooking/globals/constants.dart';
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
@@ -46,7 +46,7 @@ class _LandingHeroState extends State<LandingHero> {
   Widget title() {
     return Text(
       "ArtBooking",
-      style: FontsUtils.title(
+      style: Utilities.fonts.titleStyle(
         fontSize: 90.0,
         fontWeight: FontWeight.w600,
       ),
@@ -58,7 +58,7 @@ class _LandingHeroState extends State<LandingHero> {
       opacity: 0.6,
       child: Text(
         "Take a deep breath of inspiration",
-        style: FontsUtils.mainStyle(
+        style: Utilities.fonts.style(
           fontSize: 18.0,
           fontWeight: FontWeight.w600,
         ),
@@ -89,7 +89,7 @@ class _LandingHeroState extends State<LandingHero> {
             opacity: 0.6,
             child: Text(
               "We're still in beta",
-              style: FontsUtils.mainStyle(),
+              style: Utilities.fonts.style(),
             ),
           ),
         ),

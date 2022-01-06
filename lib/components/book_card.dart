@@ -1,6 +1,6 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/enums.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
@@ -134,7 +134,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
                 illustration.name,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontSize: 14.0,
                   fontWeight: FontWeight.w800,
                 ),

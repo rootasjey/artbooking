@@ -1,5 +1,5 @@
 import 'package:artbooking/globals/constants.dart';
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 
 /// A card showing a statistic number, title and icon.
@@ -124,7 +124,7 @@ class _SquareStatsState extends State<SquareStats> {
           ),
           child: Text(
             "Available soon",
-            style: FontsUtils.mainStyle(
+            style: Utilities.fonts.style(
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -139,7 +139,7 @@ class _SquareStatsState extends State<SquareStats> {
       opacity: 0.9,
       child: Text(
         widget.count.toString(),
-        style: FontsUtils.mainStyle(
+        style: Utilities.fonts.style(
           color: _textColor,
           fontSize: 40.0,
           fontWeight: FontWeight.w600,
@@ -169,7 +169,7 @@ class _SquareStatsState extends State<SquareStats> {
       opacity: 0.7,
       child: Text(
         widget.textTitle,
-        style: FontsUtils.mainStyle(
+        style: Utilities.fonts.style(
           color: _textColor,
           fontSize: 20.0,
           fontWeight: FontWeight.w700,

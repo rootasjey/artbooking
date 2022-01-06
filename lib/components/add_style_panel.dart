@@ -4,9 +4,9 @@ import 'package:algolia/algolia.dart';
 import 'package:artbooking/components/circle_button.dart';
 import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/globals/constants.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/style.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/search.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -198,7 +198,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                         children: [
                           Text(
                             "styles_available".tr(),
-                            style: FontsUtils.mainStyle(
+                            style: Utilities.fonts.style(
                               fontSize: 22.0,
                               fontWeight: FontWeight.w600,
                             ),
@@ -207,7 +207,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                             opacity: 0.5,
                             child: Text(
                               "styles_subtitle".tr(),
-                              style: FontsUtils.mainStyle(
+                              style: Utilities.fonts.style(
                                 height: 1.0,
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.w600,
@@ -287,7 +287,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                       opacity: 0.8,
                       child: Text(
                         _selectedStylePreview!.name.toUpperCase(),
-                        style: FontsUtils.mainStyle(
+                        style: Utilities.fonts.style(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -303,7 +303,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                 opacity: 0.6,
                 child: Text(
                   _selectedStylePreview!.description,
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -351,7 +351,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                     Expanded(
                       child: Text(
                         style.name.toUpperCase(),
-                        style: FontsUtils.mainStyle(
+                        style: Utilities.fonts.style(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
                             color: selected ? _secondaryColor : null),
@@ -362,7 +362,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
               ),
               subtitle: Text(
                 style.description,
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -398,7 +398,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                     Expanded(
                       child: Text(
                         style.name.toUpperCase(),
-                        style: FontsUtils.mainStyle(
+                        style: Utilities.fonts.style(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
                             color: selected ? _secondaryColor : null),
@@ -409,7 +409,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
               ),
               subtitle: Text(
                 style.description,
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -485,7 +485,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
               label: Text("clear".tr()),
               style: TextButton.styleFrom(
                 primary: Colors.black54,
-                textStyle: FontsUtils.mainStyle(
+                textStyle: Utilities.fonts.style(
                   fontWeight: FontWeight.w600,
                 ),
               ),

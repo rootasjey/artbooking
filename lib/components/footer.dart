@@ -1,8 +1,8 @@
 import 'package:artbooking/components/app_icon.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/locations/settings_location.dart';
 import 'package:artbooking/globals/app_state.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -132,7 +132,7 @@ class _FooterState extends ConsumerState<Footer> {
         children: [
           TextSpan(
             text: "rootasjey ${DateTime.now().year}",
-            style: FontsUtils.mainStyle(
+            style: Utilities.fonts.style(
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -197,7 +197,7 @@ class _FooterState extends ConsumerState<Footer> {
         opacity: 0.8,
         child: Text(
           title,
-          style: FontsUtils.mainStyle(
+          style: Utilities.fonts.style(
             fontSize: 18.0,
             fontWeight: FontWeight.w700,
           ),
@@ -213,7 +213,7 @@ class _FooterState extends ConsumerState<Footer> {
   }) {
     final Widget text = Text(
       label,
-      style: FontsUtils.mainStyle(
+      style: Utilities.fonts.style(
         fontSize: 16.0,
         fontWeight: FontWeight.w400,
       ),

@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 
 /// A TextField with a predefined outlined border.
@@ -47,7 +47,7 @@ class OutlinedTextField extends StatelessWidget {
               opacity: 0.6,
               child: Text(
                 label!,
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontSize: 14.0,
                   fontWeight: FontWeight.w600,
                 ),
@@ -62,7 +62,7 @@ class OutlinedTextField extends StatelessWidget {
             textInputAction: TextInputAction.next,
             onChanged: onChanged,
             onSubmitted: onSubmitted,
-            style: FontsUtils.mainStyle(
+            style: Utilities.fonts.style(
               fontWeight: FontWeight.w600,
             ),
             cursorColor: _primaryColor,

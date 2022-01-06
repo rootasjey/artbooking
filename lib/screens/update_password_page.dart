@@ -3,8 +3,8 @@ import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/constants.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -158,7 +158,7 @@ class _UpdatePasswordPageState extends ConsumerState<UpdatePasswordPage> {
                         opacity: 0.4,
                         child: Text(
                           "settings".tr().toUpperCase(),
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w400,
                           ),
@@ -168,7 +168,7 @@ class _UpdatePasswordPageState extends ConsumerState<UpdatePasswordPage> {
                         opacity: 0.8,
                         child: Text(
                           "password_update".tr(),
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontSize: 50.0,
                             fontWeight: FontWeight.w500,
                           ),
@@ -181,7 +181,7 @@ class _UpdatePasswordPageState extends ConsumerState<UpdatePasswordPage> {
                           opacity: 0.5,
                           child: Text(
                             "password_update_description".tr(),
-                            style: FontsUtils.mainStyle(
+                            style: Utilities.fonts.style(
                               fontSize: 16.0,
                               fontWeight: FontWeight.w500,
                             ),
@@ -217,14 +217,14 @@ class _UpdatePasswordPageState extends ConsumerState<UpdatePasswordPage> {
             opacity: 0.6,
             child: Text(
               "password_choosing_good".tr(),
-              style: FontsUtils.mainStyle(
+              style: Utilities.fonts.style(
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
           subtitle: Text(
             "password_choosing_good_desc".tr(),
-            style: FontsUtils.mainStyle(
+            style: Utilities.fonts.style(
               fontSize: 14.0,
               fontWeight: FontWeight.w500,
             ),
@@ -361,7 +361,7 @@ class _UpdatePasswordPageState extends ConsumerState<UpdatePasswordPage> {
               padding: const EdgeInsets.all(14.0),
               child: Text(
                 "password_update".tr().toUpperCase(),
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontSize: 15.0,
                   fontWeight: FontWeight.bold,
                 ),
@@ -432,7 +432,7 @@ class _UpdatePasswordPageState extends ConsumerState<UpdatePasswordPage> {
           backgroundColor: _clairPink,
           title: Text(
             "password_tips".tr(),
-            style: FontsUtils.mainStyle(
+            style: Utilities.fonts.style(
               fontSize: 14.0,
               fontWeight: FontWeight.w600,
             ),

@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -27,7 +27,7 @@ class EmailButton extends StatelessWidget {
               return SimpleDialog(
                 title: Text(
                   "email".tr(),
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     fontSize: 14.0,
                   ),
                 ),
@@ -70,14 +70,14 @@ class EmailButton extends StatelessWidget {
                         opacity: 0.3,
                         child: Text(
                           "email".tr().toUpperCase(),
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
                       Text(
                         email,
-                        style: FontsUtils.mainStyle(
+                        style: Utilities.fonts.style(
                           fontWeight: FontWeight.w600,
                         ),
                       ),

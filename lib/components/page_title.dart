@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +35,7 @@ class PageTitle extends StatelessWidget {
             ),
             Text(
               textTitle,
-              style: FontsUtils.mainStyle(
+              style: Utilities.fonts.style(
                 fontSize: 80.0,
                 fontWeight: FontWeight.w700,
               ),

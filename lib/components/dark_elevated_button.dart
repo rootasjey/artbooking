@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 
 class DarkElevatedButton extends StatelessWidget {
@@ -25,7 +25,7 @@ class DarkElevatedButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         primary: Colors.black,
         shape: RoundedRectangleBorder(),
-        textStyle: FontsUtils.mainStyle(
+        textStyle: Utilities.fonts.style(
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -40,7 +40,7 @@ class DarkElevatedButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         primary: Colors.black87,
         minimumSize: Size(200.0, 0.0),
-        textStyle: FontsUtils.mainStyle(
+        textStyle: Utilities.fonts.style(
           fontWeight: FontWeight.w500,
         ),
       ),

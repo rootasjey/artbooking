@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 
 class DarkTextButton extends StatelessWidget {
@@ -21,7 +21,7 @@ class DarkTextButton extends StatelessWidget {
       ),
       style: TextButton.styleFrom(
         primary: Theme.of(context).textTheme.bodyText1?.color,
-        textStyle: FontsUtils.mainStyle(
+        textStyle: Utilities.fonts.style(
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -36,7 +36,7 @@ class DarkTextButton extends StatelessWidget {
       style: TextButton.styleFrom(
         primary: Colors.black87,
         minimumSize: Size(200.0, 0.0),
-        textStyle: FontsUtils.mainStyle(
+        textStyle: Utilities.fonts.style(
           fontWeight: FontWeight.w500,
         ),
       ),

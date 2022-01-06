@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -40,7 +40,7 @@ class DeleteAccountButton extends StatelessWidget {
             child: Text(
               "account_delete".tr(),
               textAlign: TextAlign.center,
-              style: FontsUtils.mainStyle(
+              style: Utilities.fonts.style(
                 fontWeight: FontWeight.w700,
               ),
             ),

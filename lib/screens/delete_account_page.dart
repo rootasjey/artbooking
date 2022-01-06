@@ -1,12 +1,12 @@
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/types/cloud_function_response.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -170,7 +170,7 @@ class DeleteAccountPageState extends ConsumerState<DeleteAccountPage> {
                         opacity: 0.4,
                         child: Text(
                           "settings".tr().toUpperCase(),
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w400,
                           ),
@@ -180,7 +180,7 @@ class DeleteAccountPageState extends ConsumerState<DeleteAccountPage> {
                         opacity: 0.8,
                         child: Text(
                           "account_delete".tr(),
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontSize: 50.0,
                             fontWeight: FontWeight.w500,
                           ),
@@ -193,7 +193,7 @@ class DeleteAccountPageState extends ConsumerState<DeleteAccountPage> {
                           opacity: 0.5,
                           child: Text(
                             "account_delete_description".tr(),
-                            style: FontsUtils.mainStyle(
+                            style: Utilities.fonts.style(
                               fontSize: 16.0,
                               fontWeight: FontWeight.w500,
                             ),
@@ -240,7 +240,7 @@ class DeleteAccountPageState extends ConsumerState<DeleteAccountPage> {
                   children: <Widget>[
                     Text(
                       "are_you_sure".tr(),
-                      style: FontsUtils.mainStyle(
+                      style: Utilities.fonts.style(
                         fontWeight: FontWeight.w600,
                         fontSize: 16.0,
                       ),
@@ -251,7 +251,7 @@ class DeleteAccountPageState extends ConsumerState<DeleteAccountPage> {
                         padding: const EdgeInsets.only(top: 0.0),
                         child: Text(
                           "action_irreversible".tr(),
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontWeight: FontWeight.w600,
                             fontSize: 14.0,
                           ),
@@ -364,7 +364,7 @@ class DeleteAccountPageState extends ConsumerState<DeleteAccountPage> {
               padding: const EdgeInsets.all(14.0),
               child: Text(
                 "account_delete".tr().toUpperCase(),
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontSize: 15.0,
                   fontWeight: FontWeight.bold,
                 ),
@@ -447,7 +447,7 @@ class DeleteAccountPageState extends ConsumerState<DeleteAccountPage> {
           backgroundColor: Constants.colors.clairPink,
           title: Text(
             "account_deletion_after".tr(),
-            style: FontsUtils.mainStyle(
+            style: Utilities.fonts.style(
               fontSize: 14.0,
               fontWeight: FontWeight.w600,
             ),

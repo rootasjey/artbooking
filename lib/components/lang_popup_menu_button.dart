@@ -1,5 +1,4 @@
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -37,7 +36,7 @@ class LangPopupMenuButton extends StatelessWidget {
               padding: padding,
               child: Text(
                 lang.toUpperCase(),
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontSize: 16.0,
                   fontWeight: FontWeight.w700,
                   color: Theme.of(context).textTheme.bodyText1?.color,

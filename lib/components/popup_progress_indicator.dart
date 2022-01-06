@@ -1,5 +1,5 @@
 import 'package:artbooking/globals/constants.dart';
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
@@ -46,7 +46,7 @@ class PopupProgressIndicator extends StatelessWidget {
                         opacity: 0.6,
                         child: Text(
                           message,
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontSize: 14.0,
                             fontWeight: FontWeight.w600,
                           ),

@@ -15,7 +15,6 @@ import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -306,7 +305,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
               opacity: 0.8,
               child: Text(
                 'illustrations'.tr().toUpperCase(),
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontSize: 30.0,
                   fontWeight: FontWeight.w800,
                 ),
@@ -449,7 +448,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                 opacity: 0.8,
                 child: Text(
                   "illustrations_delete".tr().toUpperCase(),
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     color: Colors.black,
                     fontWeight: FontWeight.w700,
                   ),
@@ -463,7 +462,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                   child: Text(
                     "illustrations_delete_description".tr(),
                     textAlign: TextAlign.center,
-                    style: FontsUtils.mainStyle(
+                    style: Utilities.fonts.style(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
                     ),
@@ -500,7 +499,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                 opacity: 0.8,
                 child: Text(
                   "illustration_delete".tr().toUpperCase(),
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     color: Colors.black,
                     fontWeight: FontWeight.w700,
                   ),
@@ -514,7 +513,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                   child: Text(
                     "illustration_delete_description".tr(),
                     textAlign: TextAlign.center,
-                    style: FontsUtils.mainStyle(
+                    style: Utilities.fonts.style(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
                     ),

@@ -3,9 +3,9 @@ import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/loading_animation.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -197,7 +197,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 child: Text(
                   "password_forgot".tr(),
                   textAlign: TextAlign.center,
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     fontSize: 25.0,
                     fontWeight: FontWeight.w700,
                   ),
@@ -211,7 +211,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     "password_forgot_reset_process".tr(),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 3,
-                    style: FontsUtils.mainStyle(
+                    style: Utilities.fonts.style(
                       fontWeight: FontWeight.w400,
                     ),
                   ),

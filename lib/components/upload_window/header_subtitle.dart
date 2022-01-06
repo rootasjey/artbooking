@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,7 +36,7 @@ class HeaderSubtitle extends ConsumerWidget {
       opacity: 0.6,
       child: Text(
         getWindowSubtitle(),
-        style: FontsUtils.mainStyle(
+        style: Utilities.fonts.style(
           fontWeight: FontWeight.w600,
         ),
       ),

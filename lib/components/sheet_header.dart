@@ -1,5 +1,5 @@
 import 'package:artbooking/components/circle_button.dart';
-import 'package:artbooking/utils/fonts.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -42,7 +42,7 @@ class SheetHeader extends StatelessWidget {
                 opacity: 0.4,
                 child: Text(
                   title,
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     fontSize: 14.0,
                     fontWeight: FontWeight.w600,
                   ),
@@ -51,7 +51,7 @@ class SheetHeader extends StatelessWidget {
               if (subtitle != null)
                 Text(
                   subtitle!,
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     fontSize: 18.0,
                     fontWeight: FontWeight.w500,
                   ),

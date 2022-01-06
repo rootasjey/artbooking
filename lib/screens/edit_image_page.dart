@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:artbooking/components/form_actions_inputs.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/types/user/user_pp_path.dart';
@@ -10,7 +11,6 @@ import 'package:artbooking/types/user/user_pp_url.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:artbooking/utils/crop_editor_helper.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
@@ -179,7 +179,7 @@ class _EditImagePageState extends ConsumerState<EditImagePage> {
                         opacity: 0.4,
                         child: Text(
                           "edit".tr().toUpperCase(),
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w400,
                           ),
@@ -189,7 +189,7 @@ class _EditImagePageState extends ConsumerState<EditImagePage> {
                         opacity: 0.8,
                         child: Text(
                           "pp".tr(),
-                          style: FontsUtils.mainStyle(
+                          style: Utilities.fonts.style(
                             fontSize: 50.0,
                             fontWeight: FontWeight.w500,
                           ),
@@ -201,7 +201,7 @@ class _EditImagePageState extends ConsumerState<EditImagePage> {
                           opacity: 0.5,
                           child: Text(
                             "pp_description".tr(),
-                            style: FontsUtils.mainStyle(
+                            style: Utilities.fonts.style(
                               fontSize: 16.0,
                               fontWeight: FontWeight.w500,
                             ),

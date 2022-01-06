@@ -4,9 +4,9 @@ import 'package:algolia/algolia.dart';
 import 'package:artbooking/components/circle_button.dart';
 import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/globals/constants.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/search.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -198,7 +198,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                         children: [
                           Text(
                             "licenses_available".tr(),
-                            style: FontsUtils.mainStyle(
+                            style: Utilities.fonts.style(
                               fontSize: 22.0,
                               fontWeight: FontWeight.w600,
                             ),
@@ -207,7 +207,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                             opacity: 0.5,
                             child: Text(
                               "licenses_subtitle".tr(),
-                              style: FontsUtils.mainStyle(
+                              style: Utilities.fonts.style(
                                 height: 1.0,
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.w600,
@@ -273,7 +273,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                       opacity: 0.8,
                       child: Text(
                         _selectedLicensePreview!.name!.toUpperCase(),
-                        style: FontsUtils.mainStyle(
+                        style: Utilities.fonts.style(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -289,7 +289,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                 opacity: 0.6,
                 child: Text(
                   _selectedLicensePreview!.description,
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -367,7 +367,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                     Expanded(
                       child: Text(
                         currentLicense.name!.toUpperCase(),
-                        style: FontsUtils.mainStyle(
+                        style: Utilities.fonts.style(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
                             color: selected ? _secondaryColor : null),
@@ -378,7 +378,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
               ),
               subtitle: Text(
                 currentLicense.description,
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -414,7 +414,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                     Expanded(
                       child: Text(
                         license.name!.toUpperCase(),
-                        style: FontsUtils.mainStyle(
+                        style: Utilities.fonts.style(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
                             color: selected ? _secondaryColor : null),
@@ -425,7 +425,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
               ),
               subtitle: Text(
                 license.description,
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -501,7 +501,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
               label: Text("clear".tr()),
               style: TextButton.styleFrom(
                 primary: Colors.black54,
-                textStyle: FontsUtils.mainStyle(
+                textStyle: Utilities.fonts.style(
                   fontWeight: FontWeight.w600,
                 ),
               ),

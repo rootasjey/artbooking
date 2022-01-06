@@ -2,7 +2,6 @@ import 'package:artbooking/components/arrow_divider.dart';
 import 'package:artbooking/components/contact_form.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:flutter/material.dart';
 
 class LandingContact extends StatefulWidget {
@@ -50,7 +49,7 @@ class _LandingContactState extends State<LandingContact> {
   Widget title() {
     return Text(
       "contact_keep_touch".tr(),
-      style: FontsUtils.mainStyle(
+      style: Utilities.fonts.style(
         fontSize: 80.0,
         height: 0.9,
         fontWeight: FontWeight.w800,

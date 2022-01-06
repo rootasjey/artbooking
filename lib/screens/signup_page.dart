@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:artbooking/components/dark_text_button.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/locations/signin_location.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -206,7 +206,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                 child: Text(
                   "signup".tr(),
                   textAlign: TextAlign.center,
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     fontSize: 25.0,
                     fontWeight: FontWeight.bold,
                   ),
@@ -219,7 +219,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                   opacity: 0.6,
                   child: Text(
                     "account_create_new".tr(),
-                    style: FontsUtils.mainStyle(
+                    style: Utilities.fonts.style(
                       fontWeight: FontWeight.w400,
                     ),
                   ),
@@ -462,7 +462,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                 children: <Widget>[
                   Text(
                     "signup".tr().toUpperCase(),
-                    style: FontsUtils.mainStyle(
+                    style: Utilities.fonts.style(
                       color: Colors.white,
                       fontSize: 15.0,
                       fontWeight: FontWeight.w700,

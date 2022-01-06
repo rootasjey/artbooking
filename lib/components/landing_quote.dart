@@ -1,6 +1,5 @@
 import 'package:artbooking/components/arrow_divider.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -41,7 +40,7 @@ class _LandingQuoteState extends State<LandingQuote> {
               Text(
                 "Your imagination"
                 " is the only limit.",
-                style: FontsUtils.mainStyle(
+                style: Utilities.fonts.style(
                   fontSize: fontSize,
                   fontWeight: FontWeight.w700,
                 ),
@@ -98,7 +97,7 @@ class _LandingQuoteState extends State<LandingQuote> {
               children: [
                 Text(
                   "More quotes".toUpperCase(),
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     fontSize: 14.0,
                     fontWeight: FontWeight.w600,
                   ),

@@ -9,12 +9,12 @@ import 'package:artbooking/components/popup_menu_item_icon.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/text_rectangle_button.dart';
 import 'package:artbooking/components/themed_dialog.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/one_book_op_resp.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -262,7 +262,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
                   opacity: 0.8,
                   child: Text(
                     "books".tr().toUpperCase(),
-                    style: FontsUtils.mainStyle(
+                    style: Utilities.fonts.style(
                       fontSize: 30.0,
                       fontWeight: FontWeight.w800,
                     ),
@@ -462,7 +462,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
                 opacity: 0.8,
                 child: Text(
                   "books_delete".tr().toUpperCase(),
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     color: Colors.black,
                     fontWeight: FontWeight.w700,
                   ),
@@ -476,7 +476,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
                   child: Text(
                     "books_delete_description".tr(),
                     textAlign: TextAlign.center,
-                    style: FontsUtils.mainStyle(
+                    style: Utilities.fonts.style(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
                     ),
@@ -510,7 +510,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
                 opacity: 0.8,
                 child: Text(
                   "book_delete".tr().toUpperCase(),
-                  style: FontsUtils.mainStyle(
+                  style: Utilities.fonts.style(
                     color: Colors.black,
                     fontWeight: FontWeight.w700,
                   ),
@@ -524,7 +524,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
                   child: Text(
                     "book_delete_description".tr(),
                     textAlign: TextAlign.center,
-                    style: FontsUtils.mainStyle(
+                    style: Utilities.fonts.style(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
                     ),
