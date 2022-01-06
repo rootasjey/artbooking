@@ -11,21 +11,21 @@ class GlobalsUtils {
     }
 
     if (usedBytes < 1000000) {
-      return '$usedBytes KB';
+      return '${usedBytes / 1000} KB';
     }
 
     if (usedBytes < 1000000000) {
-      return '$usedBytes MB';
+      return '${usedBytes / 1000000} MB';
     }
 
     if (usedBytes < 1000000000000) {
-      return '$usedBytes GB';
+      return '${usedBytes / 1000000000} GB';
     }
 
     if (usedBytes < 1000000000000000) {
-      return '$usedBytes TB';
+      return '${usedBytes / 1000000000000} TB';
     }
 
-    return '$usedBytes PB';
+    return '${usedBytes / 1000000000000000} PB';
   }
 }
