@@ -64,11 +64,11 @@ class _EditImagePageState extends ConsumerState<EditImagePage> {
 
     if (_isCropping) {
       child = LoadingView(
-        title: "image_cropping".tr(),
+        title: Text("image_cropping".tr()),
       );
     } else if (_isUpdating) {
       child = LoadingView(
-        title: "image_update_cloud".tr(),
+        title: Text("image_update_cloud".tr()),
       );
     } else {
       child = idleView();

@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
-import 'package:artbooking/components/loading_animation.dart';
+import 'package:artbooking/components/loading_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
@@ -84,8 +84,14 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     if (_isSigningUp) {
       return Padding(
         padding: const EdgeInsets.only(top: 80.0),
-        child: LoadingAnimation(
-          textTitle: "signup_dot".tr(),
+        child: LoadingView(
+          title: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Opacity(
+              opacity: 0.6,
+              child: Text("signup_dot".tr()),
+            ),
+          ),
         ),
       );
     }

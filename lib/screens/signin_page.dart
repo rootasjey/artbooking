@@ -3,7 +3,7 @@ import 'package:artbooking/components/dark_text_button.dart';
 
 import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
-import 'package:artbooking/components/loading_animation.dart';
+import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/forgot_password_location.dart';
@@ -75,8 +75,14 @@ class _SigninPageState extends ConsumerState<SigninPage> {
 
   Widget body() {
     if (_isConnecting) {
-      return LoadingAnimation(
-        textTitle: "signin_dot".tr(),
+      return LoadingView(
+        title: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Opacity(
+            opacity: 0.6,
+            child: Text("signin_dot".tr()),
+          ),
+        ),
       );
     }
 

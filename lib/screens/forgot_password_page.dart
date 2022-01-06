@@ -1,7 +1,7 @@
 import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/components/fade_in_y.dart';
-import 'package:artbooking/components/loading_animation.dart';
+import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/home_location.dart';
@@ -62,8 +62,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     if (isLoading) {
       return Padding(
         padding: const EdgeInsets.only(top: 80.0),
-        child: LoadingAnimation(
-          textTitle: "email_sending".tr(),
+        child: LoadingView(
+          title: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Opacity(
+              opacity: 0.6,
+              child: Text("email_sending".tr()),
+            ),
+          ),
         ),
       );
     }

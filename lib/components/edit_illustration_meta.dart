@@ -133,7 +133,15 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
   Widget body() {
     if (_isLoading) {
-      return LoadingView();
+      return LoadingView(
+        title: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Opacity(
+            opacity: 0.6,
+            child: Text("loading".tr()),
+          ),
+        ),
+      );
     }
 
     return Padding(
