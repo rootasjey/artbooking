@@ -1,7 +1,7 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:artbooking/app.dart';
 import 'package:artbooking/firebase_options.dart';
-import 'package:artbooking/utils/app_storage.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/utils/search.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -22,7 +22,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await appStorage.initialize();
+  await Utilities.storage.initialize();
   await EasyLocalization.ensureInitialized();
   await GlobalConfiguration().loadFromAsset("app_settings");
   final savedThemeMode = await AdaptiveTheme.getThemeMode();

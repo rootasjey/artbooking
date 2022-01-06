@@ -1,8 +1,8 @@
 import 'dart:async';
 
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/home_page.dart';
 import 'package:artbooking/screens/signin_page.dart';
-import 'package:artbooking/utils/app_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -134,7 +134,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
         accountPVModel(),
       ],
       onDone: () {
-        appStorage.setFirstLaunch();
+        Utilities.storage.setFirstLaunch();
 
         if (widget.isDesktop) {
           return Navigator.of(context).pop();
@@ -326,7 +326,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           ? Container()
           : ElevatedButton(
               onPressed: () {
-                appStorage.setFirstLaunch();
+                Utilities.storage.setFirstLaunch();
 
                 if (widget.isDesktop) {
                   Navigator.of(context).pop();

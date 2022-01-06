@@ -4,7 +4,6 @@ import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/utils/app_storage.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -83,7 +82,7 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
     super.initState();
     _addAdminMenuItems();
 
-    _isExpanded = appStorage.getDashboardSideMenuExpanded();
+    _isExpanded = Utilities.storage.getDashboardSideMenuExpanded();
 
     // NOTE: Beamer state isn't ready on 1st frame
     // probably because [SidePanelMenu] appears before the Beamer widget.
@@ -282,7 +281,7 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
   void _toggleSideMenu() {
     setState(() {
       _isExpanded = !_isExpanded;
-      appStorage.setDashboardSideMenuExpanded(_isExpanded);
+      Utilities.storage.setDashboardSideMenuExpanded(_isExpanded);
     });
   }
 }

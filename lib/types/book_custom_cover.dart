@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/date_helper.dart';
+import 'package:artbooking/globals/utilities.dart';
 
 class BookCustomCover {
   final String url;
@@ -23,7 +23,7 @@ class BookCustomCover {
 
     return BookCustomCover(
       url: data['url'] ?? '',
-      updatedAt: DateHelper.fromFirestore(data['updatedAt']),
+      updatedAt: Utilities.date.fromFirestore(data['updatedAt']),
     );
   }
 }

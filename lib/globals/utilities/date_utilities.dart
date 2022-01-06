@@ -2,11 +2,13 @@ import 'package:artbooking/utils/app_logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Helper for date and time conversions.
-class DateHelper {
+class DateUtilities {
+  const DateUtilities();
+
   /// Parse a date from Firestore.
   /// The raw value can be a int, Timestamp or a Map.
   /// Return a valida date and the currect date if it fails to parse ra‹ value.
-  static DateTime fromFirestore(dynamic data) {
+  DateTime fromFirestore(dynamic data) {
     DateTime date = DateTime.now();
 
     if (data == null) {

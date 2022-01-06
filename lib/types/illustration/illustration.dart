@@ -1,3 +1,4 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/acl.dart';
 import 'package:artbooking/types/author.dart';
 import 'package:artbooking/types/enums.dart';
@@ -6,7 +7,6 @@ import 'package:artbooking/types/illustration/license.dart';
 import 'package:artbooking/types/illustration/stats.dart';
 import 'package:artbooking/types/illustration/version.dart';
 import 'package:artbooking/types/illustration/urls.dart';
-import 'package:artbooking/utils/date_helper.dart';
 
 class Illustration {
   Illustration({
@@ -121,7 +121,7 @@ class Illustration {
     return Illustration(
       author: Author.fromJSON(data['user']),
       styles: parseStyles(data['styles']),
-      createdAt: DateHelper.fromFirestore(data['createdAt']),
+      createdAt: Utilities.date.fromFirestore(data['createdAt']),
       description: data['description'] ?? '',
       dimensions: Dimensions.fromJSON(data['dimensions']),
       extension: data['extension'] ?? '',
@@ -133,7 +133,7 @@ class Illustration {
       size: data['size'] ?? 0,
       story: data['story'] ?? '',
       topics: parseTopics(data['topics']),
-      updatedAt: DateHelper.fromFirestore(data['updatedAt']),
+      updatedAt: Utilities.date.fromFirestore(data['updatedAt']),
       urls: Urls.fromJSON(data['urls']),
       versions: [],
       visibility: parseVisibility(data['visibility']),

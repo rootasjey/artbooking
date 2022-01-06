@@ -1,8 +1,8 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/book_cover.dart';
 import 'package:artbooking/types/book_illustration.dart';
 import 'package:artbooking/types/book_urls.dart';
 import 'package:artbooking/types/enums.dart';
-import 'package:artbooking/utils/date_helper.dart';
 
 class Book {
   /// Number of illustrations in this book.
@@ -84,7 +84,7 @@ class Book {
     return Book(
       count: data['count'] ?? 0,
       cover: BookCover.fromJSON(data['cover']),
-      createdAt: DateHelper.fromFirestore(data['createdAt']),
+      createdAt: Utilities.date.fromFirestore(data['createdAt']),
       description: data['description'] ?? '',
       id: data['id'] ?? '',
       illustrations: parseIllustrations(data['illustrations']),
@@ -94,7 +94,7 @@ class Book {
       layoutOrientationMobile:
           parseOrientation(data['layoutOrientationMobile']),
       name: data['name'] ?? '',
-      updatedAt: DateHelper.fromFirestore(data['updatedAt']),
+      updatedAt: Utilities.date.fromFirestore(data['updatedAt']),
       urls: BookUrls.fromJSON(data['urls']),
       visibility: parseStringVisibility(data['visibility']),
     );

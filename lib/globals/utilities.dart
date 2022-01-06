@@ -1,9 +1,13 @@
+import 'package:artbooking/globals/utilities/date_utilities.dart';
+import 'package:artbooking/globals/utilities/storage_utilities.dart';
 import 'package:artbooking/globals/utilities/language_utilities.dart';
 import 'package:artbooking/globals/utilities/size_utilities.dart';
 
 class Utilities {
-  static const size = const SizeUtils();
+  static const date = const DateUtilities();
   static const lang = const LanguageUtilities();
+  static const size = const SizeUtils();
+  static const storage = const StorageUtilities();
 
   static String getStringWithUnit(int usedBytes) {
     if (usedBytes < 1000) {

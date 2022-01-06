@@ -1,11 +1,11 @@
 import 'package:artbooking/actions/users.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/cloud_function_error.dart';
 import 'package:artbooking/types/cloud_function_response.dart';
 import 'package:artbooking/types/create_account_resp.dart';
 import 'package:artbooking/types/user/user.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:artbooking/utils/app_logger.dart';
-import 'package:artbooking/utils/app_storage.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -164,7 +164,7 @@ class UserNotifier extends StateNotifier<User> {
 
   Future<firebase_auth.User?> signIn({String? email, String? password}) async {
     try {
-      final credentialsMap = appStorage.getCredentials();
+      final credentialsMap = Utilities.storage.getCredentials();
 
       email = email ?? credentialsMap['email'];
       password = password ?? credentialsMap['password'];
@@ -188,7 +188,7 @@ class UserNotifier extends StateNotifier<User> {
       _listenToAuthChanges();
       _listenToFirestoreChanges();
 
-      appStorage.setCredentials(
+      Utilities.storage.setCredentials(
         email: email,
         password: password,
       );
@@ -196,7 +196,7 @@ class UserNotifier extends StateNotifier<User> {
       return authResult.user;
     } catch (error) {
       appLogger.e(error);
-      appStorage.clearUserAuthData();
+      Utilities.storage.clearUserAuthData();
       return null;
     }
   }
@@ -217,7 +217,7 @@ class UserNotifier extends StateNotifier<User> {
 
   Future<bool> signOut() async {
     try {
-      await appStorage.clearUserAuthData();
+      await Utilities.storage.clearUserAuthData();
       await firebase_auth.FirebaseAuth.instance.signOut();
       state = User();
       return true;
@@ -317,7 +317,7 @@ class UserNotifier extends StateNotifier<User> {
       }
 
       await authResult.user?.updatePassword(newPassword);
-      appStorage.setPassword(newPassword);
+      Utilities.storage.setPassword(newPassword);
 
       return true;
     } catch (error) {

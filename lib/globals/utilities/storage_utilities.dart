@@ -1,9 +1,10 @@
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/utils/storage_keys.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
-import 'package:flutter/material.dart';
 
-class AppStorage {
+class StorageUtilities {
+  const StorageUtilities();
+
   static LocalStorageInterface? _localStorage;
 
   // / --------------- /
@@ -67,11 +68,6 @@ class AppStorage {
   }
 
   String getLang() => _localStorage!.getString(StorageKeys.lang) ?? 'en';
-
-  bool isQuotidianNotifActive() {
-    return _localStorage!.getBool('is_quotidian_notif_active') ?? true;
-  }
-
   String getUserName() => _localStorage!.getString(StorageKeys.username) ?? '';
   String getUserUid() => _localStorage!.getString(StorageKeys.userUid) ?? '';
 
@@ -89,41 +85,6 @@ class AppStorage {
   }
 
   void setLang(String lang) => _localStorage!.setString('lang', lang);
-
-  void setQuotidianNotif(bool active) {
-    _localStorage!.setBool('is_quotidian_notif_active', active);
-  }
-
-  void setUserName(String userName) =>
-      _localStorage!.setString('username', userName);
-
-  void setUserUid(String userName) =>
-      _localStorage!.setString('user_uid', userName);
-
-  // / -------------------/
-  // /     Brightness     /
-  // / -------------------/
-  bool getAutoBrightness() {
-    return _localStorage!.getBool(StorageKeys.autoBrightness) ?? true;
-  }
-
-  Brightness getBrightness() {
-    final brightness =
-        _localStorage!.getString(StorageKeys.brightness) == 'dark'
-            ? Brightness.dark
-            : Brightness.light;
-
-    return brightness;
-  }
-
-  void setAutoBrightness(bool value) {
-    _localStorage!.setBool(StorageKeys.autoBrightness, value);
-  }
-
-  void setBrightness(Brightness? brightness) {
-    final strBrightness = brightness == Brightness.dark ? 'dark' : 'light';
-    _localStorage!.setString(StorageKeys.brightness, strBrightness);
-  }
 
   // / ----------------/
   // /      Layout     /
@@ -200,5 +161,3 @@ class AppStorage {
     _localStorage!.setBool(key, descending);
   }
 }
-
-final appStorage = AppStorage();

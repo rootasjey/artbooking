@@ -248,12 +248,12 @@ class _AddStylePanelState extends State<AddStylePanel> {
         ),
         clipBehavior: Clip.antiAlias,
         child: Ink.image(
-          image: NetworkImage(_selectedStylePreview!.urls!.image!),
+          image: NetworkImage(_selectedStylePreview!.urls.image),
           width: 300.0,
           height: 260.0,
           fit: BoxFit.cover,
           child: InkWell(
-            onTap: () => launch(_selectedStylePreview!.urls!.image!),
+            onTap: () => launch(_selectedStylePreview!.urls.image),
           ),
         ),
       );
@@ -286,7 +286,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                     child: Opacity(
                       opacity: 0.8,
                       child: Text(
-                        _selectedStylePreview!.name!.toUpperCase(),
+                        _selectedStylePreview!.name.toUpperCase(),
                         style: FontsUtils.mainStyle(
                           fontWeight: FontWeight.w600,
                         ),
@@ -302,7 +302,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
               child: Opacity(
                 opacity: 0.6,
                 child: Text(
-                  _selectedStylePreview!.description!,
+                  _selectedStylePreview!.description,
                   style: FontsUtils.mainStyle(
                     fontWeight: FontWeight.w500,
                   ),
@@ -310,8 +310,8 @@ class _AddStylePanelState extends State<AddStylePanel> {
               ),
             ),
             TextButton(
-              onPressed: () => launch(_selectedStylePreview!.urls!.wikipedia!),
-              child: Text(_selectedStylePreview!.urls!.wikipedia!),
+              onPressed: () => launch(_selectedStylePreview!.urls.wikipedia),
+              child: Text(_selectedStylePreview!.urls.wikipedia),
               style: TextButton.styleFrom(
                 primary: Colors.black54,
               ),
@@ -350,7 +350,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                       ),
                     Expanded(
                       child: Text(
-                        style.name!.toUpperCase(),
+                        style.name.toUpperCase(),
                         style: FontsUtils.mainStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
@@ -361,7 +361,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                 ),
               ),
               subtitle: Text(
-                style.description!,
+                style.description,
                 style: FontsUtils.mainStyle(
                   fontWeight: FontWeight.w600,
                 ),
@@ -397,7 +397,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                       ),
                     Expanded(
                       child: Text(
-                        style.name!.toUpperCase(),
+                        style.name.toUpperCase(),
                         style: FontsUtils.mainStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
@@ -408,7 +408,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
                 ),
               ),
               subtitle: Text(
-                style.description!,
+                style.description,
                 style: FontsUtils.mainStyle(
                   fontWeight: FontWeight.w600,
                 ),

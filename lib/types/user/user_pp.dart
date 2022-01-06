@@ -1,6 +1,6 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/user/user_pp_path.dart';
 import 'package:artbooking/types/user/user_pp_url.dart';
-import 'package:artbooking/utils/date_helper.dart';
 
 class UserPP {
   String ext;
@@ -34,7 +34,7 @@ class UserPP {
 
     return UserPP(
       ext: data['ext'],
-      updatedAt: DateHelper.fromFirestore(data['updatedAt']),
+      updatedAt: Utilities.date.fromFirestore(data['updatedAt']),
       path: UserPPPath.fromJSON(data['path']),
       url: UserPPUrl.fromJSON(data['url']),
     );

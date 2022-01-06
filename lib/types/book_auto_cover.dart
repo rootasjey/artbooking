@@ -1,4 +1,4 @@
-import 'package:artbooking/utils/date_helper.dart';
+import 'package:artbooking/globals/utilities.dart';
 
 class BookAutoCover {
   final String id;
@@ -26,7 +26,7 @@ class BookAutoCover {
     return BookAutoCover(
       id: data['id'] ?? '',
       url: data['url'] ?? '',
-      updatedAt: DateHelper.fromFirestore(data['updatedAt']),
+      updatedAt: Utilities.date.fromFirestore(data['updatedAt']),
     );
   }
 }

@@ -2,13 +2,13 @@
 class StyleUrls {
   /// An image representation of this art style.
   /// Note that this is one example among many.
-  final String? image;
+  final String image;
 
   /// Wikipedia link about this art style.
   /// You may find useful information.
-  final String? wikipedia;
+  final String wikipedia;
 
-  StyleUrls({
+  const StyleUrls({
     this.image = '',
     this.wikipedia = '',
   });

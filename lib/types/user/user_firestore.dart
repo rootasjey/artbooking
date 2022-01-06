@@ -1,8 +1,8 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/user/stats.dart';
 import 'package:artbooking/types/user/settings.dart';
 import 'package:artbooking/types/user/user_urls.dart';
 import 'package:artbooking/types/user/user_pp.dart';
-import 'package:artbooking/utils/date_helper.dart';
 
 class UserFirestore {
   DateTime? createdAt;
@@ -66,7 +66,7 @@ class UserFirestore {
     }
 
     return UserFirestore(
-      createdAt: DateHelper.fromFirestore(data['createdAt']),
+      createdAt: Utilities.date.fromFirestore(data['createdAt']),
       email: data['email'] ?? '',
       id: data['id'] ?? '',
       job: data['job'] ?? 'Uknown',
@@ -78,7 +78,7 @@ class UserFirestore {
       pricing: data['pricing'] ?? 'free',
       stats: UserStats.fromJSON(data['stats']),
       summary: data['summary'] ?? '',
-      updatedAt: DateHelper.fromFirestore(data['updatedAt']),
+      updatedAt: Utilities.date.fromFirestore(data['updatedAt']),
       urls: UserUrls.fromJSON(data['urls']),
     );
   }

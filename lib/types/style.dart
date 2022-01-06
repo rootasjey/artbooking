@@ -1,20 +1,20 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/style_urls.dart';
-import 'package:artbooking/utils/date_helper.dart';
 
 /// Art style.
 class Style {
-  final String? name;
-  final String? description;
+  final String name;
+  final String description;
   final DateTime? createdAt;
   final DateTime? updatedAt;
-  final StyleUrls? urls;
+  final StyleUrls urls;
 
   Style({
     this.name = '',
     this.description = '',
     this.createdAt,
     this.updatedAt,
-    this.urls,
+    this.urls = const StyleUrls(),
   });
 
   factory Style.empty() {
@@ -27,10 +27,10 @@ class Style {
 
   factory Style.fromJSON(Map<String, dynamic> data) {
     return Style(
-      createdAt: DateHelper.fromFirestore(data['createdAt']),
+      createdAt: Utilities.date.fromFirestore(data['createdAt']),
       description: data['description'],
       name: data['name'],
-      updatedAt: DateHelper.fromFirestore(data['updatedAt']),
+      updatedAt: Utilities.date.fromFirestore(data['updatedAt']),
       urls: StyleUrls.fromJSON(data['urls']),
     );
   }
