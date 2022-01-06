@@ -8,7 +8,7 @@ import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/router/locations/forgot_password_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/locations/signup_location.dart';
-import 'package:artbooking/types/globals/state.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';

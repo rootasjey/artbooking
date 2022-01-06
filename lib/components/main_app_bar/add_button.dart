@@ -1,4 +1,4 @@
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +12,7 @@ class UploadButton extends ConsumerWidget {
     return IconButton(
       tooltip: "upload".tr(),
       onPressed: () {
-        ref.read(Globals.state.upload.uploadTasksList.notifier).pickImage();
+        ref.read(AppState.uploadTaskListProvider.notifier).pickImage();
       },
       icon: Icon(
         UniconsLine.plus,

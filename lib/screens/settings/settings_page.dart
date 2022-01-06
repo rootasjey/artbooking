@@ -6,7 +6,7 @@ import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/settings/account_settings.dart';
 import 'package:artbooking/screens/settings/app_settings.dart';
 import 'package:artbooking/types/globals/globals.dart';
-import 'package:artbooking/types/globals/state.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:artbooking/types/user/user_pp.dart';
 import 'package:artbooking/types/user/user_pp_path.dart';

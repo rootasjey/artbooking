@@ -1,6 +1,6 @@
 import 'package:artbooking/components/upload_item_card.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -36,13 +36,25 @@ class UploadWindowBody extends ConsumerWidget {
               return UploadItemCard(
                 customUploadTask: customUploadTask,
                 onCancel: () {
+                  final int bytesTransferred =
+                      customUploadTask.task?.snapshot.bytesTransferred ?? 0;
+
                   ref
-                      .read(Globals.state.upload.uploadTasksList.notifier)
+                      .read(AppState.uploadBytesTransferredProvider.notifier)
+                      .remove(bytesTransferred);
+                  ref
+                      .read(AppState.uploadTaskListProvider.notifier)
                       .cancel(customUploadTask);
                 },
                 onDone: () {
+                  final int totalBytes =
+                      customUploadTask.task?.snapshot.totalBytes ?? 0;
+
                   ref
-                      .read(Globals.state.upload.uploadTasksList.notifier)
+                      .read(AppState.uploadBytesTransferredProvider.notifier)
+                      .remove(totalBytes);
+                  ref
+                      .read(AppState.uploadTaskListProvider.notifier)
                       .removeDone(customUploadTask);
                 },
               );

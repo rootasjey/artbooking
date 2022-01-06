@@ -4,7 +4,7 @@ import 'package:artbooking/components/main_app_bar/main_section_mobile.dart';
 import 'package:artbooking/components/main_app_bar/user_auth_section.dart';
 import 'package:artbooking/components/main_app_bar/user_guest_section.dart';
 import 'package:artbooking/router/locations/home_location.dart';
-import 'package:artbooking/types/globals/state.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:artbooking/types/globals/user_notifier.dart';
 import 'package:artbooking/utils/constants.dart';
 import 'package:beamer/beamer.dart';

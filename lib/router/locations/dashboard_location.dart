@@ -13,7 +13,7 @@ import 'package:artbooking/screens/settings/settings_page.dart';
 import 'package:artbooking/screens/update_email_page.dart';
 import 'package:artbooking/screens/update_password_page.dart';
 import 'package:artbooking/screens/update_username_page.dart';
-import 'package:artbooking/types/globals/state.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';

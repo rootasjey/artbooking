@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:artbooking/components/circle_button.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
@@ -45,10 +46,9 @@ class _UploadItemCardState extends ConsumerState<UploadItemCard> {
         _bytesTransferred = snapshot.bytesTransferred;
         _totalBytes = snapshot.totalBytes;
 
-        final uploadBytesTransferredNotifier =
-            Globals.state.upload.uploadBytesTransFerred.notifier;
-
-        ref.read(uploadBytesTransferredNotifier).add(_bytesTransferred);
+        ref
+            .read(AppState.uploadBytesTransferredProvider.notifier)
+            .add(_bytesTransferred);
       },
       onError: (error) {
         appLogger.e(error);

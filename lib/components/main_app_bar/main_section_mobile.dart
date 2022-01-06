@@ -2,7 +2,7 @@ import 'package:artbooking/components/main_app_bar/search_button.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/locations/settings_location.dart';
 import 'package:artbooking/types/button_data.dart';
-import 'package:artbooking/types/globals/state.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';

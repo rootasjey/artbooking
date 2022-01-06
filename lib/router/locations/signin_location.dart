@@ -1,6 +1,6 @@
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/screens/signin_page.dart';
-import 'package:artbooking/types/globals/state.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

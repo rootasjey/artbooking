@@ -4,7 +4,7 @@ import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/sheet_header.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
-import 'package:artbooking/types/globals/state.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:artbooking/types/user/user_pp.dart';
 import 'package:artbooking/types/user/user_pp_path.dart';

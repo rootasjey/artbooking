@@ -1,7 +1,6 @@
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
-import 'package:artbooking/types/globals/upload_state.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/cloud_helper.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -15,6 +14,23 @@ import 'package:mime_type/mime_type.dart';
 
 class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
   UploadTaskListNotifier(List<CustomUploadTask> state) : super(state);
+
+  int get abortedTaskCount => state.where((uploadTask) {
+        return uploadTask.task?.snapshot.state == TaskState.canceled ||
+            uploadTask.task?.snapshot.state == TaskState.error;
+      }).length;
+
+  int get successTaskCount => state.where((uploadTask) {
+        return uploadTask.task?.snapshot.state == TaskState.success;
+      }).length;
+
+  int get runningTaskCount => state.where((uploadTask) {
+        return uploadTask.task?.snapshot.state == TaskState.running;
+      }).length;
+
+  int get pausedTaskCount => state.where((uploadTask) {
+        return uploadTask.task?.snapshot.state == TaskState.paused;
+      }).length;
 
   void add(CustomUploadTask customUploadTask) {
     state = [
@@ -56,9 +72,6 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
   }
 
   void removeDone(CustomUploadTask customUploadTask) {
-    final int amount = customUploadTask.task?.snapshot.bytesTransferred ?? 0;
-    final container = ProviderContainer();
-    container.read(uploadBytesTransferredProvider.notifier).remove(amount);
     remove(customUploadTask);
   }
 
@@ -276,13 +289,6 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     final UploadTask? task = customUploadTask.task;
 
     if (task != null) {
-      final snapshot = task.snapshot;
-
-      final container = ProviderContainer();
-      container
-          .read(uploadBytesTransferredProvider.notifier)
-          .remove(snapshot.bytesTransferred);
-
       task.cancel();
       _deleteFirestoreDocument(customUploadTask);
     }

@@ -11,7 +11,7 @@ import 'package:artbooking/components/themed_dialog.dart';
 import 'package:artbooking/components/user_books.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/enums.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/constants.dart';
@@ -196,9 +196,9 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
               ),
               ElevatedButton.icon(
                 onPressed: () {
-                  final uploadListNotifier =
-                      Globals.state.upload.uploadTasksList.notifier;
-                  ref.read(uploadListNotifier).pickImage();
+                  ref
+                      .read(AppState.uploadTaskListProvider.notifier)
+                      .pickImage();
                 },
                 icon: Icon(UniconsLine.upload),
                 label: Padding(

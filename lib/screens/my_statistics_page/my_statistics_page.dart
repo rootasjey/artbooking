@@ -6,7 +6,7 @@ import 'package:artbooking/screens/my_statistics_page/my_stats_header.dart';
 import 'package:artbooking/screens/my_statistics_page/stats_categories.dart';
 import 'package:artbooking/screens/my_statistics_page/used_storage.dart';
 import 'package:artbooking/types/globals/globals.dart';
-import 'package:artbooking/types/globals/state.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:artbooking/types/square_stats_data.dart';
 import 'package:artbooking/types/user/stats.dart';
 import 'package:artbooking/types/user/user.dart';

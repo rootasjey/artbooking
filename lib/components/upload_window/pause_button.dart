@@ -1,5 +1,5 @@
 import 'package:artbooking/components/circle_button.dart';
-import 'package:artbooking/types/globals/globals.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,7 +21,7 @@ class PauseButton extends ConsumerWidget {
 
     return CircleButton(
       onTap: () {
-        ref.read(Globals.state.upload.uploadTasksList.notifier).pauseAll();
+        ref.read(AppState.uploadTaskListProvider.notifier).pauseAll();
       },
       radius: 16.0,
       tooltip: "pause".tr(),

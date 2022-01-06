@@ -1,8 +1,8 @@
 import 'package:artbooking/components/upload_window/upload_window_body.dart';
 import 'package:artbooking/components/upload_window/upload_window_header.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:artbooking/types/globals/globals.dart';
-import 'package:artbooking/types/globals/upload_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
@@ -30,25 +30,26 @@ class _UploadWindowState extends ConsumerState<UploadWindow> {
 
   @override
   Widget build(BuildContext context) {
-    final UploadState uploadState = Globals.state.upload;
-
-    final int percent = ref.watch(uploadState.uploadPercentage);
-    final int abortedTaskCount = ref.watch(uploadState.abortedTaskCount);
-    final int successTaskCount = ref.watch(uploadState.successTaskCount);
-    final int runningTaskCount = ref.watch(uploadState.runningTaskCount);
-    final int pausedTaskCount = ref.watch(uploadState.pausedTaskCount);
-
-    final bool hasUncompletedTasks =
-        runningTaskCount > 0 && pausedTaskCount > 0;
-
-    final showUploadWindow = ref.watch(Globals.state.upload.showUploadWindow);
-    final List<CustomUploadTask> uploadTaskList = ref.watch(
-      uploadState.uploadTasksList,
-    );
+    final bool showUploadWindow = ref.watch(AppState.showUploadWindowProvider);
 
     if (!showUploadWindow) {
       return Container();
     }
+
+    final List<CustomUploadTask> uploadTaskList = ref.watch(
+      AppState.uploadTaskListProvider,
+    );
+
+    final taskListNotifier = AppState.uploadTaskListProvider.notifier;
+    final int abortedTaskCount = ref.read(taskListNotifier).abortedTaskCount;
+    final int successTaskCount = ref.read(taskListNotifier).successTaskCount;
+    final int runningTaskCount = ref.read(taskListNotifier).runningTaskCount;
+    final int pausedTaskCount = ref.read(taskListNotifier).pausedTaskCount;
+
+    final bool hasUncompletedTasks =
+        runningTaskCount > 0 && pausedTaskCount > 0;
+
+    final int percent = ref.watch(AppState.uploadPercentageProvider);
 
     return Card(
       elevation: 4.0,

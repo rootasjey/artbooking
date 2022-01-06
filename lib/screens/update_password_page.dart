@@ -2,7 +2,7 @@ import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/fade_in_y.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/types/globals/globals.dart';
-import 'package:artbooking/types/globals/state.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:artbooking/utils/snack.dart';

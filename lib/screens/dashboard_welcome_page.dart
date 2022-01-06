@@ -3,7 +3,7 @@ import 'package:artbooking/components/section_card.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/types/globals/globals.dart';
-import 'package:artbooking/types/globals/state.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';

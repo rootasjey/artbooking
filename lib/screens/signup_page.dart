@@ -4,7 +4,7 @@ import 'package:artbooking/components/dark_text_button.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/locations/signin_location.dart';
-import 'package:artbooking/types/globals/state.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:artbooking/utils/app_logger.dart';
 import 'package:artbooking/utils/fonts.dart';
 import 'package:beamer/beamer.dart';

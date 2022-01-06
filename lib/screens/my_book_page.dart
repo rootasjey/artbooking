@@ -18,6 +18,7 @@ import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/book.dart';
 import 'package:artbooking/types/book_illustration.dart';
 import 'package:artbooking/types/enums.dart';
+import 'package:artbooking/types/globals/app_state.dart';
 import 'package:artbooking/types/globals/globals.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/utils/app_logger.dart';
@@ -1588,9 +1589,8 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
   }
 
   void uploadToThisBook() async {
-    final uploadListNotifier = Globals.state.upload.uploadTasksList.notifier;
     await ref
-        .read(uploadListNotifier)
+        .read(AppState.uploadTaskListProvider.notifier)
         .pickImageAndAddToBook(bookId: widget.bookId);
   }
 
