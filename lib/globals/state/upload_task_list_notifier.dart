@@ -61,12 +61,17 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
 
   void cancelAll() {
     for (var customUploadTask in state) {
-      _cleanFailedTask(customUploadTask);
+      if (customUploadTask.task?.snapshot.state != TaskState.success) {
+        _cleanTask(customUploadTask);
+        continue;
+      }
+
+      removeDone(customUploadTask);
     }
   }
 
   void cancel(CustomUploadTask customUploadTask) {
-    _cleanFailedTask(customUploadTask);
+    _cleanTask(customUploadTask);
   }
 
   void removeDone(CustomUploadTask customUploadTask) {
@@ -183,7 +188,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     final String illustrationId = await _createFirestoreDocument(fileName);
 
     if (illustrationId.isEmpty) {
-      _cleanFailedTask(customUploadTask);
+      _cleanTask(customUploadTask);
       return customUploadTask;
     }
 
@@ -254,9 +259,9 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
         ));
 
     customUploadTask.task = uploadTask;
-    final filteredState = state.where((customTask) {
+    final List<CustomUploadTask> filteredState = state.where((customTask) {
       return customTask.illustrationId != customUploadTask.illustrationId;
-    });
+    }).toList();
 
     state = [
       ...filteredState,
@@ -265,20 +270,20 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
 
     try {
       await uploadTask;
-      // _incrSuccessTasks(1);
     } on FirebaseException catch (error) {
       Utilities.logger.e(error);
-      // _incrAbortedTasks(1);
     } catch (error) {
       Utilities.logger.e(error);
-      // _incrAbortedTasks(1);
     } finally {
       state = state;
       return customUploadTask;
     }
   }
 
-  void _cleanFailedTask(CustomUploadTask customUploadTask) {
+  /// Remove the target task from state,
+  /// Cancel upload (if it can), delete corresponding Firestore document,
+  /// and Firebase storage file (if it has been created).
+  void _cleanTask(CustomUploadTask customUploadTask) {
     remove(customUploadTask);
 
     final UploadTask? task = customUploadTask.task;
