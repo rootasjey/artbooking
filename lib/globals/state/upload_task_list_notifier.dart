@@ -285,13 +285,8 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
   /// and Firebase storage file (if it has been created).
   void _cleanTask(CustomUploadTask customUploadTask) {
     remove(customUploadTask);
-
-    final UploadTask? task = customUploadTask.task;
-
-    if (task != null) {
-      task.cancel();
-      _deleteFirestoreDocument(customUploadTask);
-    }
+    _deleteFirestoreDocument(customUploadTask);
+    customUploadTask.task?.cancel();
   }
 
   /// Delete the Firestore document created
@@ -300,13 +295,6 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     final String illustrationId = customUploadTask.illustrationId ?? '';
 
     if (illustrationId.isEmpty) {
-      return;
-    }
-
-    final state = customUploadTask.task!.snapshot.state;
-    final unfinished = state == TaskState.running || state == TaskState.paused;
-
-    if (!unfinished) {
       return;
     }
 
