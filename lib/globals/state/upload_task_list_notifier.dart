@@ -275,7 +275,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
-      state = state;
+      state = [...state];
       return customUploadTask;
     }
   }
