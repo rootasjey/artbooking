@@ -36,7 +36,6 @@ class UploadWindowHeader extends ConsumerWidget {
               children: [
                 HeaderTitle(
                   remainingTaskCount: remainingTaskCount,
-                  hasUncompletedTasks: hasUncompletedTask,
                 ),
                 HeaderSubtitle(
                   percent: percent,

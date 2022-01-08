@@ -1,5 +1,6 @@
 import 'package:artbooking/components/upload_window/upload_window_body.dart';
 import 'package:artbooking/components/upload_window/upload_window_header.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/constants.dart';
@@ -47,7 +48,7 @@ class _UploadWindowState extends ConsumerState<UploadWindow> {
     final int pausedTaskCount = ref.read(taskListNotifier).pausedTaskCount;
 
     final bool hasUncompletedTasks =
-        runningTaskCount > 0 && pausedTaskCount > 0;
+        runningTaskCount > 0 || pausedTaskCount > 0;
 
     final int percent = ref.watch(AppState.uploadPercentageProvider);
 
