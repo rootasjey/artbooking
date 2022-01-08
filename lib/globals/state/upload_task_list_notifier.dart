@@ -4,7 +4,6 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/src/public_ext.dart';
-import 'package:extended_image/extended_image.dart';
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -193,7 +192,6 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     return await _startStorageUpload(
       file: file,
       fileName: fileName,
-      filePath: file.path ?? '',
       illustrationId: illustrationId,
       customUploadTask: customUploadTask,
     );
@@ -224,7 +222,6 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
   Future<CustomUploadTask> _startStorageUpload({
     required FilePickerCross file,
     required String fileName,
-    required String filePath,
     required String illustrationId,
     required CustomUploadTask customUploadTask,
   }) async {
@@ -240,11 +237,10 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     final String cloudStorageFilePath =
         "/users/$userId/illustrations/$illustrationId/original.$extension";
 
-    final File uploadFile = File(filePath);
     final storage = FirebaseStorage.instance;
 
-    final UploadTask uploadTask = storage.ref(cloudStorageFilePath).putFile(
-        uploadFile,
+    final UploadTask uploadTask = storage.ref(cloudStorageFilePath).putData(
+        file.toUint8List(),
         SettableMetadata(
           customMetadata: {
             "extension": extension,
