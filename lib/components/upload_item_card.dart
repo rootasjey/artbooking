@@ -178,9 +178,10 @@ class _UploadItemCardState extends ConsumerState<UploadItemCard> {
       return Container();
     }
 
-    final customUploadTask = widget.customUploadTask;
+    final uploadTask = widget.customUploadTask.task;
+    final bool isDone = uploadTask?.snapshot.state == TaskState.success;
 
-    if (customUploadTask.task == null) {
+    if (!isDone) {
       return CircleButton(
         tooltip: "cancel".tr(),
         radius: 16.0,
@@ -193,34 +194,15 @@ class _UploadItemCardState extends ConsumerState<UploadItemCard> {
       );
     }
 
-    final state = customUploadTask.task!.snapshot.state;
-
-    if (state == TaskState.running) {
-      return CircleButton(
-        tooltip: "cancel".tr(),
-        radius: 16.0,
-        onTap: widget.onCancel,
-        icon: Icon(
-          UniconsLine.times,
-          size: 16.0,
-          color: Colors.black87,
-        ),
-      );
-    }
-
-    if (state == TaskState.success) {
-      return CircleButton(
-        onTap: widget.onDone,
-        tooltip: "done".tr(),
-        radius: 16.0,
-        icon: Icon(
-          UniconsLine.check,
-          size: 16.0,
-          color: Colors.black87,
-        ),
-      );
-    }
-
-    return Container();
+    return CircleButton(
+      onTap: widget.onDone,
+      tooltip: "done".tr(),
+      radius: 16.0,
+      icon: Icon(
+        UniconsLine.check,
+        size: 16.0,
+        color: Colors.black87,
+      ),
+    );
   }
 }
