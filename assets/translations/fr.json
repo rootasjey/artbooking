@@ -36,7 +36,7 @@
   "advices_personalized": "Conseils personnalisés",
   "advices_personalized_description": "Nous serons disponibles pour toutes questions ou aide. Vous pouvez nous contacter par email, téléphone ou messagerie instantannée.",
   "advertising": "Publicité",
-  "avertising_content": "Les applications web et mobiles peuvent contenir de la publicité afin de générer des revenues. Les publicitaires peuvent ainsi collecter des données personnelles supplémentaires sur votre navigation et vos préférences. Nous ne controllons pas cette partie de la collecte de données.",
+  "advertising_content": "Les applications web et mobiles peuvent contenir de la publicité afin de générer des revenues. Les publicitaires peuvent ainsi collecter des données personnelles supplémentaires sur votre navigation et vos préférences. Nous ne controllons pas cette partie de la collecte de données.",
   "all_settings": "Tous les paramètres",
   "analytics": "analytiques",
   "analytics_content": "Les applications web et mobiles collectent des statistiques d'usage afin d'améliorer nos services. Cependant, vos données personnelles ne sont jamais volontairement partagées ou monétisées avec des tiers.",
@@ -48,6 +48,7 @@
   "app_type_question": "Quel type d'application voulez-vous ?",
   "apps": "Applications",
   "are_you_sure": "Êtes-vous sûr(e) ?",
+  "artworks": "Œures d'art",
   "audience": {
     "small": "Moins de 10 000 visiteurs par mois",
     "medium": "Entre 10  000 et 100 000 visiteurs par mois",

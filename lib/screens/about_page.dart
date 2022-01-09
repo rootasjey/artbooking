@@ -1,6 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:artbooking/components/credit_item.dart';
-import 'package:artbooking/components/footer.dart';
+import 'package:artbooking/components/footer/footer.dart';
 import 'package:artbooking/components/image_hero.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/globals/constants.dart';

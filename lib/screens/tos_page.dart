@@ -1,4 +1,4 @@
-import 'package:artbooking/components/footer.dart';
+import 'package:artbooking/components/footer/footer.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:beamer/beamer.dart';
@@ -48,7 +48,7 @@ class _TosPageState extends State<TosPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         titleBlock(text: 'avertising'.tr()),
-        textSuperBlock(text: 'avertising_content'.tr()),
+        textSuperBlock(text: 'advertising_content'.tr()),
       ],
     );
   }

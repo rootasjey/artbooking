@@ -1,4 +1,4 @@
-import 'package:artbooking/components/footer.dart';
+import 'package:artbooking/components/footer/footer.dart';
 import 'package:artbooking/components/landing_contact.dart';
 import 'package:artbooking/components/landing_curated.dart';
 import 'package:artbooking/components/landing_hero.dart';
