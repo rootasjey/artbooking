@@ -1262,6 +1262,7 @@ async function generateImageThumbs(
   const uploadResponses = await Promise.all(uploadPromises);
 
   // 5. Clean up the tmp/thumbs from file system.
+  await fs.emptyDir(workingDir)
   await fs.remove(workingDir);
 
   // 6. Retrieve thumbnail urls.
