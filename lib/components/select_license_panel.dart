@@ -81,6 +81,8 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
 
   Color _secondaryColor = Colors.pink;
 
+  final _panelScrollController = ScrollController();
+
   @override
   initState() {
     super.initState();
@@ -135,6 +137,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
       child: NotificationListener<ScrollNotification>(
         onNotification: onNotification,
         child: CustomScrollView(
+          controller: _panelScrollController,
           slivers: [
             SliverPadding(
               padding: const EdgeInsets.only(top: 0.0),
