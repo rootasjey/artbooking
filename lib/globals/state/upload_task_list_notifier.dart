@@ -13,6 +13,18 @@ import 'package:mime_type/mime_type.dart';
 class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
   UploadTaskListNotifier(List<CustomUploadTask> state) : super(state);
 
+  /// Return number of tasks which are either in 1st phase
+  /// (Firestor doc creation) or in an uploading/paused state.
+  /// This property can be used to update the UI (showing a progress bar)
+  /// immediately after selecting a file, and not when the file upload starts.
+  /// Which is usally several seconds later.
+  int get pendingTaskCount => state.where((customTask) {
+        final task = customTask.task;
+        return task == null ||
+            task.snapshot.state == TaskState.running ||
+            task.snapshot.state == TaskState.paused;
+      }).length;
+
   int get abortedTaskCount => state.where((uploadTask) {
         return uploadTask.task?.snapshot.state == TaskState.canceled ||
             uploadTask.task?.snapshot.state == TaskState.error;
