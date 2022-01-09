@@ -1,6 +1,7 @@
 import 'package:artbooking/components/add_style_panel.dart';
 import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
+import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/components/select_license_panel.dart';
 import 'package:artbooking/components/sheet_header.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -123,7 +124,14 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
               ),
             ),
           ),
-          popupProgressIndicator(),
+          Positioned(
+            top: 40.0,
+            right: 24.0,
+            child: PopupProgressIndicator(
+              show: _isSaving,
+              message: "${"illustration_updating".tr()}...",
+            ),
+          ),
           stylesSidePanel(),
           licenseSidePanel(),
         ],
@@ -294,59 +302,6 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       child: DarkElevatedButton.large(
         onPressed: Beamer.of(context).popRoute,
         child: Text("done".tr()),
-      ),
-    );
-  }
-
-  Widget popupProgressIndicator() {
-    if (!_isSaving) {
-      return Container();
-    }
-
-    return Positioned(
-      top: 40.0,
-      right: 24.0,
-      child: SizedBox(
-        width: 240.0,
-        child: Card(
-          elevation: 4.0,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                height: 4.0,
-                child: LinearProgressIndicator(),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      UniconsLine.circle,
-                      color: Theme.of(context).secondaryHeaderColor,
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Opacity(
-                          opacity: 0.6,
-                          child: Text(
-                            "project_updating".tr(),
-                            style: Utilities.fonts.style(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

@@ -330,6 +330,7 @@
   "illustration_story_dot": "Histoire derrière cette illustration...",
   "illustration_story_sample": "Cette illustration a été faite entre 14h et 15h...",
   "illustration_title_dot": "Titre de l'illustration...",
+  "illustration_updating": "Mise à jour de l'illustration",
   "illustration_upload_aborted_count": {
     "zero": "{} abandonée.",
     "one": "{} abandonée.",
