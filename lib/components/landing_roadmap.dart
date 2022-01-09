@@ -16,47 +16,46 @@ class LandingRoadmap extends StatefulWidget {
 }
 
 class _LandingRoadmapState extends State<LandingRoadmap> {
-  int _processIndex = 1;
+  int _processIndex = 0;
 
-  final _processes = [
-    'Idea',
-    'Upload illustration',
-    'Manage books',
+  final List<String> _processes = [
     'Profile page',
+    'Book layout',
+    'Mobile version',
     'Version 1.0',
+    'Challenges',
   ];
 
   final _processItems = [
     RoadmapItemData(
-      title: "Idea",
-      iconData: UniconsLine.lightbulb,
-      deadline: "2019",
-      summary:
-          "My friend and me had this idea of an app to post our illustrations.",
-    ),
-    RoadmapItemData(
-      title: "Upload illustration",
-      iconData: UniconsLine.upload,
-      deadline: "2021",
-      summary: "Upload one or more illustrations to the platform.",
-    ),
-    RoadmapItemData(
-      title: "Manage books",
-      iconData: UniconsLine.book,
-      deadline: "2021",
-      summary: "Create, upade and delete books",
-    ),
-    RoadmapItemData(
       title: "Profile page",
       iconData: UniconsLine.user,
-      deadline: "2021",
-      summary: "Add the ability for an user to update their information.",
+      deadline: "January 2022",
+      summary: "Display an artist information, artworks, and books.",
+    ),
+    RoadmapItemData(
+      title: "Book layout",
+      iconData: UniconsLine.book,
+      deadline: "January 2022",
+      summary: "Customize a book and how illustration are stacked.",
+    ),
+    RoadmapItemData(
+      title: "Mobile version",
+      iconData: UniconsLine.mobile_android,
+      deadline: "February 2022",
+      summary: "Adapt the app to mobile + build.",
     ),
     RoadmapItemData(
       title: "Version 1.0",
       iconData: UniconsLine.rocket,
-      deadline: "November 2021",
+      deadline: "March 2022",
       summary: "Release the app to the Web & Mobile with core features.",
+    ),
+    RoadmapItemData(
+      title: "Challenges",
+      iconData: UniconsLine.dumbbell,
+      deadline: "May 2022",
+      summary: "Create challenges.",
     ),
   ];
 
