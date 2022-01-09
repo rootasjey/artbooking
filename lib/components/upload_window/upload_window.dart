@@ -1,6 +1,5 @@
 import 'package:artbooking/components/upload_window/upload_window_body.dart';
 import 'package:artbooking/components/upload_window/upload_window_header.dart';
-import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/constants.dart';
@@ -28,6 +27,8 @@ class _UploadWindowState extends ConsumerState<UploadWindow> {
 
   double _maxWidth = 360.0;
   double _maxHeight = 300.0;
+
+  ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +78,7 @@ class _UploadWindowState extends ConsumerState<UploadWindow> {
             });
           },
           child: SingleChildScrollView(
+            controller: _scrollController,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
