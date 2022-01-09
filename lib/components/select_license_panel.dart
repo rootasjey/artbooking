@@ -85,7 +85,6 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
   initState() {
     super.initState();
     fetchLicenses();
-    _secondaryColor = Theme.of(context).secondaryHeaderColor;
   }
 
   @override
@@ -100,6 +99,8 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
     if (!widget.isVisible) {
       return Container();
     }
+
+    _secondaryColor = Theme.of(context).secondaryHeaderColor;
 
     return FadeInX(
       beginX: 16.0,
