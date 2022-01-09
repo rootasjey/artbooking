@@ -47,9 +47,7 @@ class _UploadWindowState extends ConsumerState<UploadWindow> {
     final int successTaskCount = ref.read(taskListNotifier).successTaskCount;
     final int runningTaskCount = ref.read(taskListNotifier).runningTaskCount;
     final int pausedTaskCount = ref.read(taskListNotifier).pausedTaskCount;
-
-    final bool hasUncompletedTasks =
-        runningTaskCount > 0 || pausedTaskCount > 0;
+    final int pendingTaskCount = ref.read(taskListNotifier).pendingTaskCount;
 
     final int percent = ref.watch(AppState.uploadPercentageProvider);
 
@@ -83,9 +81,9 @@ class _UploadWindowState extends ConsumerState<UploadWindow> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 UploadWindowHeader(
+                  pendingTaskCount: pendingTaskCount,
                   runningTaskCount: runningTaskCount,
                   successTaskCount: successTaskCount,
-                  hasUncompletedTask: hasUncompletedTasks,
                   abortedTaskCount: abortedTaskCount,
                   pausedTaskCount: pausedTaskCount,
                   percent: percent,

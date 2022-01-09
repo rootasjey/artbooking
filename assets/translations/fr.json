@@ -344,7 +344,13 @@
     "other": "{} envoyées."
   },
   "illustration_upload_error": "Désolés, nous avons rencontré une erreur durant le transfert de votre illustration. Veuillez réessayer plus tard.",
-  "illustration_uploading_files": "Transfert de {} fichier...",
+  "illustration_uploading_files": {
+    "zero": "Aucun transfert de fichier.",
+    "one": "Transfert de {} fichier...",
+    "two": "Transfert de {} fichiers...",
+    "many": "Transfert de {} fichiers...",
+    "other": "Transfert de {} fichiers..."
+  },
   "illustration_visibility_choose": "Modifier la visibilité",
   "illustration_visibility_description": "Définissez qui peut voir, modifier ou partager votre illustration.",
   "illustration_visibility_update_fail": "Nous n'avons pas pu mettre à jour la visibilité de votre illustration.",

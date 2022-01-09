@@ -5,16 +5,16 @@ import 'package:flutter/material.dart';
 class HeaderTitle extends StatelessWidget {
   const HeaderTitle({
     Key? key,
-    required this.remainingTaskCount,
+    required this.pendingTaskCount,
   }) : super(key: key);
 
-  final int remainingTaskCount;
+  final int pendingTaskCount;
 
   @override
   Widget build(BuildContext context) {
-    final String textValue = remainingTaskCount > 0
-        ? "illustration_uploading_files".tr(
-            args: [remainingTaskCount.toString()],
+    final String textValue = pendingTaskCount > 0
+        ? "illustration_uploading_files".plural(
+            pendingTaskCount,
           )
         : "All done.";
 

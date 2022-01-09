@@ -344,7 +344,13 @@
     "other": "{} uploaded."
   },
   "illustration_upload_error": "Sorry, there was an issue while uploading your illustration. Please try again later.",
-  "illustration_uploading_files": "Uploading {} files...",
+  "illustration_uploading_files": {
+    "zero": "Uploading no file.",
+    "one": "Uploading {} file...",
+    "two": "Uploading {} files...",
+    "many": "Uploading {} files...",
+    "other": "Uploading {} files..."
+  },
   "illustration_visibility_choose": "Update visibility",
   "illustration_visibility_description": "Define who can view, edit or share your illustration.",
   "illustration_visibility_update_fail": "Sorry, we couldn't update your illustration visibility",

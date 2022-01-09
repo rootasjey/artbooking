@@ -7,25 +7,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class UploadWindowHeader extends ConsumerWidget {
   const UploadWindowHeader({
     Key? key,
-    required this.percent,
     required this.abortedTaskCount,
-    required this.successTaskCount,
-    required this.runningTaskCount,
     required this.pausedTaskCount,
-    required this.hasUncompletedTask,
+    required this.pendingTaskCount,
+    required this.percent,
+    required this.runningTaskCount,
+    required this.successTaskCount,
   }) : super(key: key);
 
-  final int percent;
   final int abortedTaskCount;
-  final int successTaskCount;
-  final int runningTaskCount;
   final int pausedTaskCount;
-  final bool hasUncompletedTask;
+  final int pendingTaskCount;
+  final int percent;
+  final int runningTaskCount;
+  final int successTaskCount;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final int remainingTaskCount = runningTaskCount + pausedTaskCount;
-
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Row(
@@ -35,23 +33,23 @@ class UploadWindowHeader extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 HeaderTitle(
-                  remainingTaskCount: remainingTaskCount,
+                  pendingTaskCount: pendingTaskCount,
                 ),
                 HeaderSubtitle(
-                  percent: percent,
-                  successTaskCount: successTaskCount,
-                  runningTaskCount: runningTaskCount,
-                  hasUncompletedTasks: hasUncompletedTask,
-                  pausedTaskCount: pausedTaskCount,
                   abortedTaskCount: abortedTaskCount,
+                  pausedTaskCount: pausedTaskCount,
+                  pendingTaskCount: pendingTaskCount,
+                  percent: percent,
+                  runningTaskCount: runningTaskCount,
+                  successTaskCount: successTaskCount,
                 ),
               ],
             ),
           ),
           HeaderButtons(
             runningTaskCount: runningTaskCount,
-            hasUncompletedTask: hasUncompletedTask,
             pausedTaskCount: pausedTaskCount,
+            pendingTaskCount: pendingTaskCount,
           ),
         ],
       ),

@@ -6,20 +6,20 @@ import 'package:flutter/material.dart';
 class HeaderButtons extends StatelessWidget {
   const HeaderButtons({
     Key? key,
-    required this.hasUncompletedTask,
     required this.runningTaskCount,
     required this.pausedTaskCount,
+    required this.pendingTaskCount,
   }) : super(key: key);
 
-  final bool hasUncompletedTask;
   final int runningTaskCount;
   final int pausedTaskCount;
+  final int pendingTaskCount;
 
   @override
   Widget build(BuildContext context) {
     Widget pauseResumeButton = Container();
 
-    if (hasUncompletedTask) {
+    if (pendingTaskCount > 0) {
       final bool allTaskPaused = runningTaskCount == 0;
 
       if (allTaskPaused) {

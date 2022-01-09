@@ -11,7 +11,7 @@ class HeaderSubtitle extends ConsumerWidget {
     required this.successTaskCount,
     required this.runningTaskCount,
     required this.pausedTaskCount,
-    required this.hasUncompletedTasks,
+    required this.pendingTaskCount,
   }) : super(key: key);
 
   final int percent;
@@ -19,11 +19,11 @@ class HeaderSubtitle extends ConsumerWidget {
   final int successTaskCount;
   final int runningTaskCount;
   final int pausedTaskCount;
-  final bool hasUncompletedTasks;
+  final int pendingTaskCount;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (percent == 0 && hasUncompletedTasks) {
+    if (percent == 0 && pendingTaskCount > 0) {
       return SizedBox(
         width: 200.0,
         child: LinearProgressIndicator(
@@ -44,7 +44,7 @@ class HeaderSubtitle extends ConsumerWidget {
   }
 
   String getWindowSubtitle() {
-    if (!hasUncompletedTasks) {
+    if (pendingTaskCount == 0) {
       String text = "illustration_upload_count".plural(
         successTaskCount,
       );
