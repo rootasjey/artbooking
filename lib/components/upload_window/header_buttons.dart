@@ -36,7 +36,9 @@ class HeaderButtons extends StatelessWidget {
     return Row(
       children: [
         pauseResumeButton,
-        CancelButton(),
+        CancelButton(
+          pendingTaskCount: pendingTaskCount,
+        ),
       ],
     );
   }

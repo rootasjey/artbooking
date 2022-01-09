@@ -53,7 +53,6 @@ class _UploadItemCardState extends ConsumerState<UploadItemCard> {
         Utilities.logger.e(error);
       },
       onDone: () {
-        Utilities.logger.d("upload complete");
         _taskListener?.cancel();
       },
     );
@@ -86,7 +85,7 @@ class _UploadItemCardState extends ConsumerState<UploadItemCard> {
                 child: Row(
                   children: [
                     nameAndProgress(),
-                    percentage(),
+                    percentageAndButton(),
                   ],
                 ),
               ),
@@ -97,7 +96,32 @@ class _UploadItemCardState extends ConsumerState<UploadItemCard> {
     );
   }
 
+  Widget nameWidget() {
+    return Opacity(
+      opacity: 0.8,
+      child: Text(
+        widget.customUploadTask.name,
+        style: Utilities.fonts.style(
+          fontSize: 18.0,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+
   Widget nameAndProgress() {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          nameWidget(),
+          progressBar(),
+        ],
+      ),
+    );
+  }
+
+  Widget progressBar() {
     final customUploadTask = widget.customUploadTask;
 
     double progress = _bytesTransferred / _totalBytes;
@@ -110,35 +134,26 @@ class _UploadItemCardState extends ConsumerState<UploadItemCard> {
       progress = 0;
     }
 
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Opacity(
-            opacity: 0.8,
-            child: Text(
-              customUploadTask.name,
-              style: Utilities.fonts.style(
-                fontSize: 18.0,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          Container(
-            width: 200.0,
-            padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 2.0,
-              color: Theme.of(context).secondaryHeaderColor,
-            ),
-          ),
-        ],
+    if (progress == 1.0) {
+      return Container();
+    }
+
+    return Container(
+      width: 200.0,
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: LinearProgressIndicator(
+        value: progress,
+        minHeight: 2.0,
+        color: Theme.of(context).secondaryHeaderColor,
       ),
     );
   }
 
   Widget percentage() {
+    if (_isHover) {
+      return Container();
+    }
+
     final double progress = _bytesTransferred / _totalBytes;
     double percent = progress * 100;
 
@@ -153,22 +168,26 @@ class _UploadItemCardState extends ConsumerState<UploadItemCard> {
       percent = 0;
     }
 
+    return Padding(
+      padding: const EdgeInsets.only(left: 12.0),
+      child: Opacity(
+        opacity: 0.6,
+        child: Text(
+          "${percent.round()}%",
+          style: Utilities.fonts.style(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget percentageAndButton() {
     return Wrap(
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         actionButton(),
-        Padding(
-          padding: const EdgeInsets.only(left: 12.0),
-          child: Opacity(
-            opacity: 0.6,
-            child: Text(
-              "${percent.round()}%",
-              style: Utilities.fonts.style(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
+        percentage(),
       ],
     );
   }

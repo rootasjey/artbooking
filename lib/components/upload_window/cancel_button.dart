@@ -6,7 +6,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
 class CancelButton extends ConsumerWidget {
-  const CancelButton({Key? key}) : super(key: key);
+  const CancelButton({
+    Key? key,
+    required this.pendingTaskCount,
+  }) : super(key: key);
+
+  final int pendingTaskCount;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -17,7 +22,7 @@ class CancelButton extends ConsumerWidget {
           ref.read(AppState.uploadTaskListProvider.notifier).cancelAll();
           ref.read(AppState.uploadBytesTransferredProvider.notifier).clear();
         },
-        tooltip: "cancel".tr(),
+        tooltip: pendingTaskCount == 0 ? "close".tr() : "cancel".tr(),
         radius: 16.0,
         icon: Icon(
           UniconsLine.times,
