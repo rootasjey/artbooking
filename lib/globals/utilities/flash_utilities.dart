@@ -60,16 +60,15 @@ class FlashUtilities {
 
     _previousCompleter = Completer();
 
-    Future<T> showToast(String message) {
+    Future<T?> showToast(String message) {
       return showFlash<T>(
         context: context,
         builder: (context, controller) {
-          return Flash.dialog(
+          return Flash<T>.dialog(
             controller: controller,
             alignment: const Alignment(0, 0.5),
             margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-            enableDrag: false,
             backgroundColor: Colors.black87,
             child: DefaultTextStyle(
               style: const TextStyle(fontSize: 16.0, color: Colors.white),
@@ -116,7 +115,7 @@ class FlashUtilities {
         .copyWith(color: color);
   }
 
-  Future<T> groundedBottom<T>(
+  Future<T?> groundedBottom<T>(
     BuildContext context, {
     String? title,
     required String? message,
@@ -138,7 +137,6 @@ class FlashUtilities {
           barrierBlur: 1.0,
           barrierColor: Colors.black38,
           barrierDismissible: true,
-          style: FlashStyle.grounded,
           position: FlashPosition.bottom,
           child: FlashBar(
             icon: icon,
@@ -152,7 +150,7 @@ class FlashUtilities {
                     ),
                   )
                 : null,
-            message: Opacity(
+            content: Opacity(
               opacity: 0.5,
               child: Text(
                 message!,
@@ -181,7 +179,7 @@ class FlashUtilities {
     );
   }
 
-  Future<T> infoBar<T>(
+  Future<T?> infoBar<T>(
     BuildContext context, {
     String? title,
     required String message,
@@ -199,16 +197,16 @@ class FlashUtilities {
             title: title == null
                 ? null
                 : Text(title, style: _titleStyle(context, Colors.white)),
-            message: Text(message, style: _contentStyle(context, Colors.white)),
+            content: Text(message, style: _contentStyle(context, Colors.white)),
             icon: Icon(Icons.info_outline, color: Colors.green[300]),
-            leftBarIndicatorColor: Colors.green[300],
+            indicatorColor: Colors.green[300],
           ),
         );
       },
     );
   }
 
-  Future<T> successBar<T>(
+  Future<T?> successBar<T>(
     BuildContext context, {
     String? title,
     required String message,
@@ -226,16 +224,16 @@ class FlashUtilities {
             title: title == null
                 ? null
                 : Text(title, style: _titleStyle(context, Colors.white)),
-            message: Text(message, style: _contentStyle(context, Colors.white)),
+            content: Text(message, style: _contentStyle(context, Colors.white)),
             icon: Icon(Icons.check_circle, color: Colors.blue[300]),
-            leftBarIndicatorColor: Colors.blue[300],
+            indicatorColor: Colors.blue[300],
           ),
         );
       },
     );
   }
 
-  Future<T> errorBar<T>(
+  Future<T?> errorBar<T>(
     BuildContext context, {
     String? title,
     required String message,
@@ -255,11 +253,11 @@ class FlashUtilities {
               title: title == null
                   ? null
                   : Text(title, style: _titleStyle(context, Colors.white)),
-              message:
+              content:
                   Text(message, style: _contentStyle(context, Colors.white)),
               primaryAction: primaryAction?.call(context, controller, setState),
               icon: Icon(Icons.warning, color: Colors.red[300]),
-              leftBarIndicatorColor: Colors.red[300],
+              indicatorColor: Colors.red[300],
             ),
           );
         });
@@ -267,7 +265,7 @@ class FlashUtilities {
     );
   }
 
-  Future<T> actionBar<T>(
+  Future<T?> actionBar<T>(
     BuildContext context, {
     String? title,
     required String message,
@@ -287,7 +285,7 @@ class FlashUtilities {
               title: title == null
                   ? null
                   : Text(title, style: _titleStyle(context, Colors.white)),
-              message:
+              content:
                   Text(message, style: _contentStyle(context, Colors.white)),
               primaryAction: primaryAction.call(context, controller, setState),
             ),
@@ -297,7 +295,7 @@ class FlashUtilities {
     );
   }
 
-  Future<T> dialogWithChild<T>(
+  Future<T?> dialogWithChild<T>(
     BuildContext context, {
     required Widget child,
   }) {
@@ -308,7 +306,6 @@ class FlashUtilities {
         return Flash.dialog(
           controller: controller,
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          enableDrag: true,
           margin: const EdgeInsets.only(
             left: 120.0,
             right: 120.0,
@@ -317,7 +314,7 @@ class FlashUtilities {
             Radius.circular(8.0),
           ),
           child: FlashBar(
-            message: Container(
+            content: Container(
               height: MediaQuery.of(context).size.height - 100.0,
               padding: const EdgeInsets.all(60.0),
               child: child,
@@ -328,7 +325,7 @@ class FlashUtilities {
     );
   }
 
-  Future<T> simpleDialog<T>(
+  Future<T?> simpleDialog<T>(
     BuildContext context, {
     String? title,
     required String message,
@@ -351,7 +348,7 @@ class FlashUtilities {
                 title: title == null
                     ? null
                     : Text(title, style: _titleStyle(context)),
-                message:
+                content:
                     Text(message, style: _contentStyle(context, messageColor)),
                 actions: <Widget>[
                   if (negativeAction != null)
@@ -367,7 +364,7 @@ class FlashUtilities {
     );
   }
 
-  Future<T> customDialog<T>(
+  Future<T?> customDialog<T>(
     BuildContext context, {
     ChildBuilder<T>? titleBuilder,
     required ChildBuilder messageBuilder,
@@ -394,7 +391,7 @@ class FlashUtilities {
                   style: _titleStyle(context),
                   child: childTitle,
                 ),
-                message: DefaultTextStyle(
+                content: DefaultTextStyle(
                   style: _contentStyle(context),
                   child: messageBuilder.call(context, controller, setState),
                 ),
@@ -412,13 +409,13 @@ class FlashUtilities {
     );
   }
 
-  Future<T> blockDialog<T>(
+  Future<T?> blockDialog<T>(
     BuildContext context, {
     required Completer<T> dismissCompleter,
   }) {
     var controller = FlashController<T>(
       context,
-      (context, FlashController<T> controller) {
+      builder: (context, FlashController<T> controller) {
         return Flash.dialog(
           controller: controller,
           barrierDismissible: false,
@@ -438,7 +435,7 @@ class FlashUtilities {
     return controller.show();
   }
 
-  Future<String> inputDialog(
+  Future<String?> inputDialog(
     BuildContext context, {
     String? title,
     String? message,
@@ -462,7 +459,7 @@ class FlashUtilities {
             title: title == null
                 ? null
                 : Text(title, style: TextStyle(fontSize: 24.0)),
-            message: Column(
+            content: Column(
               children: [
                 if (message != null) Text(message),
                 Form(
@@ -473,7 +470,7 @@ class FlashUtilities {
                 ),
               ],
             ),
-            leftBarIndicatorColor: theme.primaryColor,
+            indicatorColor: theme.primaryColor,
             primaryAction: IconButton(
               onPressed: () {
                 var message = editingController.text;
@@ -487,7 +484,7 @@ class FlashUtilities {
     );
   }
 
-  Future<T> showProgress<T>(
+  Future<T?> showProgress<T>(
     BuildContext context, {
     String? title,
     String progressId = '',
@@ -513,7 +510,6 @@ class FlashUtilities {
           barrierBlur: 3.0,
           barrierColor: Colors.black38,
           barrierDismissible: true,
-          style: FlashStyle.grounded,
           position: FlashPosition.top,
           child: FlashBar(
             icon: icon,
@@ -527,7 +523,7 @@ class FlashUtilities {
                     ),
                   )
                 : null,
-            message: Opacity(
+            content: Opacity(
               opacity: 0.5,
               child: Text(
                 message,
