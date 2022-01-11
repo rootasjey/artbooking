@@ -2,15 +2,15 @@ import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/screens/licenses/license_urls_section.dart';
+import 'package:artbooking/screens/licenses/license_usage_section.dart';
 import 'package:artbooking/types/illustration/license.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:unicons/unicons.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class LicensePage extends StatefulWidget {
   const LicensePage({Key? key, required this.licenseId}) : super(key: key);
@@ -40,6 +40,9 @@ class _LicensePageState extends State<LicensePage> {
           MainAppBar(),
           header(),
           body(),
+          SliverEdgePadding(
+            padding: const EdgeInsets.only(bottom: 200),
+          ),
         ],
       ),
     );
@@ -106,54 +109,19 @@ class _LicensePageState extends State<LicensePage> {
         ),
       ),
       datesWidget(),
-      urlsWidget(),
-    ];
-  }
-
-  Widget urlsWidget() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 42.0),
-      child: Wrap(
-        spacing: 16.0,
-        runSpacing: 16.0,
-        children: [
-          if (_license.urls.website.isNotEmpty)
-            SizedBox(
-              width: 100.0,
-              height: 100.0,
-              child: Card(
-                child: InkWell(
-                  onTap: () => launch(_license.urls.website),
-                  child: Opacity(
-                    opacity: 0.6,
-                    child: Icon(
-                      UniconsLine.globe,
-                      size: 42.0,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          if (_license.urls.wikipedia.isNotEmpty)
-            SizedBox(
-              width: 100.0,
-              height: 100.0,
-              child: Card(
-                child: InkWell(
-                  onTap: () => launch(_license.urls.wikipedia),
-                  child: Opacity(
-                    opacity: 0.6,
-                    child: Icon(
-                      FontAwesomeIcons.wikipediaW,
-                      size: 42.0,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-        ],
+      Padding(
+        padding: const EdgeInsets.only(top: 42.0),
+        child: LicenseUsageSection(
+          usage: _license.usage,
+        ),
       ),
-    );
+      Padding(
+        padding: const EdgeInsets.only(top: 42.0),
+        child: LicenseUrlSection(
+          urls: _license.urls,
+        ),
+      ),
+    ];
   }
 
   Widget datesWidget() {
@@ -170,7 +138,7 @@ class _LicensePageState extends State<LicensePage> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
-                    child: Icon(UniconsLine.clock),
+                    child: Icon(UniconsLine.play),
                   ),
                   Text(
                     "created ${Jiffy(_license.createdAt).fromNow()}",
@@ -186,7 +154,7 @@ class _LicensePageState extends State<LicensePage> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(right: 8.0),
-                  child: Icon(UniconsLine.clock_nine),
+                  child: Icon(UniconsLine.arrow_circle_up),
                 ),
                 Text(
                   "updated ${Jiffy(_license.updatedAt).fromNow()}",

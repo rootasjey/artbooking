@@ -13,7 +13,7 @@ class LicenseUsage {
     this.view = false,
   });
 
-  /// remix, transform, and build upon the material
+  /// Remix, transform, and build upon the material
   /// for any purpose, even commercially.
   final bool adapt;
 
@@ -29,7 +29,7 @@ class LicenseUsage {
   /// Can be used in other open source projects.
   final bool oss;
 
-  ///Can be used for personal use (e.g. wallpaper).
+  /// Can be used for personal use (e.g. wallpaper).
   final bool personal;
 
   /// Can be freely printed.
@@ -38,7 +38,7 @@ class LicenseUsage {
   /// Can sell outside of the official app by another individual.
   final bool sell;
 
-  /// copy and redistribute the material in any medium or format.
+  /// Copy and redistribute the material in any medium or format.
   final bool share;
 
   /// Can view this illustration.
@@ -78,8 +78,8 @@ class LicenseUsage {
     );
   }
 
-  Map<String, bool?> toJSON() {
-    final data = Map<String, bool?>();
+  Map<String, bool> toJSON() {
+    final data = Map<String, bool>();
 
     data['commercial'] = commercial;
     data['adapt'] = adapt;
