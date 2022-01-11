@@ -4,6 +4,8 @@ import 'package:artbooking/screens/dashboard_page.dart';
 import 'package:artbooking/screens/delete_account_page.dart';
 import 'package:artbooking/screens/edit_image_page.dart';
 import 'package:artbooking/screens/illustration_page.dart';
+import 'package:artbooking/screens/licenses/license_page.dart';
+import 'package:artbooking/screens/licenses/licenses_page.dart';
 import 'package:artbooking/screens/my_book_page.dart';
 import 'package:artbooking/screens/my_statistics_page/my_statistics_page.dart';
 import 'package:artbooking/screens/my_books_page.dart';
@@ -96,6 +98,9 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
   static const String updateUsernameRoute =
       '/dashboard/settings/update/username';
 
+  static const String licensesRoute = '$route/licenses';
+  static const String licenseRoute = '$licensesRoute/:licenseId';
+
   @override
   List<String> get pathPatterns => [
         booksRoute,
@@ -112,6 +117,8 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
         updatePasswordRoute,
         updateUsernameRoute,
         editProfilePictureRoute,
+        licensesRoute,
+        licenseRoute,
       ];
 
   @override
@@ -209,6 +216,22 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
           child: EditImagePage(),
           key: ValueKey('$editProfilePictureRoute'),
           title: "Edit Profile Picture",
+          type: BeamPageType.fadeTransition,
+        ),
+      if (state.pathPatternSegments.contains('licenses'))
+        BeamPage(
+          child: LicensesPage(),
+          key: ValueKey('$licensesRoute'),
+          title: 'Licenses',
+          type: BeamPageType.fadeTransition,
+        ),
+      if (state.pathPatternSegments.contains(':licenseId'))
+        BeamPage(
+          child: LicensePage(
+            licenseId: state.pathParameters['licenseId'] ?? '',
+          ),
+          key: ValueKey('$licenseRoute'),
+          title: 'License',
           type: BeamPageType.fadeTransition,
         ),
     ];

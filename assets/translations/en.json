@@ -396,6 +396,7 @@
   "license_update_fail": "Sorry, we couldn't update your license. Please try again later.",
   "license_select": "Select a license",
   "license_hide_panel": "Hide license panel",
+  "licenses": "Licenses",
   "licenses_available": "Available licenses",
   "licenses_subtitle": "Tap to select or unselect a license. Long tap for more information.",
   "light": "Light",

@@ -1,48 +1,48 @@
 /// Part of the license specifing what you can do the artwork.
 class LicenseUsage {
+  const LicenseUsage({
+    this.commercial = false,
+    this.adapt = false,
+    this.foss = false,
+    this.free = false,
+    this.oss = false,
+    this.personal = false,
+    this.print = false,
+    this.sell = false,
+    this.share = false,
+    this.view = false,
+  });
+
   /// remix, transform, and build upon the material
   /// for any purpose, even commercially.
-  final bool? adapt;
+  final bool adapt;
 
   /// Can be used in commercial projects & products.
-  final bool? commercial;
+  final bool commercial;
 
   /// Can be used in other free and open source projects.
-  final bool? foss;
+  final bool foss;
 
   /// Can be used in other free softwares and projects.
-  final bool? free;
+  final bool free;
 
   /// Can be used in other open source projects.
-  final bool? oss;
+  final bool oss;
 
   ///Can be used for personal use (e.g. wallpaper).
-  final bool? personal;
+  final bool personal;
 
   /// Can be freely printed.
-  final bool? print;
+  final bool print;
 
   /// Can sell outside of the official app by another individual.
-  final bool? sell;
+  final bool sell;
 
   /// copy and redistribute the material in any medium or format.
-  final bool? share;
+  final bool share;
 
   /// Can view this illustration.
-  final bool? view;
-
-  LicenseUsage({
-    this.commercial,
-    this.adapt,
-    this.foss,
-    this.free,
-    this.oss,
-    this.personal,
-    this.print,
-    this.sell,
-    this.share,
-    this.view,
-  });
+  final bool view;
 
   factory LicenseUsage.empty() {
     return LicenseUsage(
@@ -65,16 +65,16 @@ class LicenseUsage {
     }
 
     return LicenseUsage(
-      commercial: data['commercial'],
-      adapt: data['adapt'],
-      foss: data['foss'],
-      free: data['free'],
-      oss: data['oss'],
-      personal: data['personal'],
-      print: data['print'],
-      sell: data['sell'],
-      share: data['share'],
-      view: data['view'],
+      commercial: data['commercial'] ?? false,
+      adapt: data['adapt'] ?? false,
+      foss: data['foss'] ?? false,
+      free: data['free'] ?? false,
+      oss: data['oss'] ?? false,
+      personal: data['personal'] ?? false,
+      print: data['print'] ?? false,
+      sell: data['sell'] ?? false,
+      share: data['share'] ?? false,
+      view: data['view'] ?? false,
     );
   }
 

@@ -21,7 +21,7 @@ import 'package:unicons/unicons.dart';
 import 'package:verbal_expressions/verbal_expressions.dart';
 
 class EditIllustrationMeta extends StatefulWidget {
-  final Illustration? illustration;
+  final Illustration illustration;
 
   const EditIllustrationMeta({
     Key? key,
@@ -103,7 +103,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                   SheetHeader(
                     title: "illustration_name_metadata".tr(
                       args: [
-                        widget.illustration!.name,
+                        widget.illustration.name,
                       ],
                     ),
                     tooltip: "close".tr(),
@@ -129,7 +129,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
             right: 24.0,
             child: PopupProgressIndicator(
               show: _isSaving,
-              message: "${"illustration_updating".tr()}...",
+              message: '${"illustration_updating".tr()}...',
             ),
           ),
           stylesSidePanel(),
@@ -699,7 +699,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   }
 
   Widget visibilityCurrentButton() {
-    final illustration = widget.illustration!;
+    final illustration = widget.illustration;
 
     return Material(
       color: Colors.black87,
@@ -786,7 +786,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   }
 
   Widget licenseCurrent() {
-    final illustration = widget.illustration!;
+    final illustration = widget.illustration;
 
     return Align(
       alignment: Alignment.topLeft,
@@ -822,9 +822,9 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                       Opacity(
                         opacity: 0.8,
                         child: Text(
-                          illustration.license!.name!.isEmpty
+                          illustration.license!.name.isEmpty
                               ? "license_none".tr()
-                              : illustration.license!.name!,
+                              : illustration.license!.name,
                           style: Utilities.fonts.style(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
@@ -833,7 +833,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
                       ),
                     ],
                   ),
-                  illustration.license!.name!.isEmpty
+                  illustration.license!.name.isEmpty
                       ? Container()
                       : Opacity(
                           opacity: 0.8,
@@ -923,7 +923,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       right: 24.0,
       child: SelectLicensePanel(
         isVisible: _isSidePanelLicenseVisible,
-        selectedLicense: widget.illustration!.license,
+        selectedLicense: widget.illustration.license,
         onClose: () {
           setState(() => _isSidePanelLicenseVisible = false);
         },
@@ -941,7 +941,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     try {
       final response =
           await Utilities.cloud.illustrations("updateStyles").call({
-        "illustrationId": widget.illustration!.id,
+        "illustrationId": widget.illustration.id,
         "styles": _selectedStyles,
       });
 
@@ -1009,7 +1009,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     try {
       final response =
           await Utilities.cloud.illustrations("updateTopics").call({
-        "illustrationId": widget.illustration!.id,
+        "illustrationId": widget.illustration.id,
         "topics": _topics.keys.toList(),
       });
 
@@ -1132,7 +1132,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
       _illustrationSnapshot = await FirebaseFirestore.instance
           .collection("illustrations")
-          .doc(widget.illustration!.id)
+          .doc(widget.illustration.id)
           .get();
 
       if (!_illustrationSnapshot.exists) {
@@ -1146,14 +1146,14 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   }
 
   void fetchIllustrationLicense() async {
-    if (widget.illustration!.license!.id!.isEmpty) {
+    if (widget.illustration.license!.id.isEmpty) {
       return;
     }
 
     try {
       final licenseSnap = await FirebaseFirestore.instance
           .collection("licenses")
-          .doc(widget.illustration!.license!.id)
+          .doc(widget.illustration.license!.id)
           .get();
 
       if (!licenseSnap.exists) {
@@ -1165,7 +1165,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
       setState(() {
         final completeLicense = IllustrationLicense.fromJSON(data);
-        widget.illustration!.license = completeLicense;
+        widget.illustration.license = completeLicense;
       });
     } catch (error) {
       Utilities.logger.e(error);
@@ -1173,7 +1173,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   }
 
   void populateFields() {
-    final illustration = widget.illustration!;
+    final illustration = widget.illustration;
 
     _initialName = illustration.name;
     _initialDescription = illustration.description;
@@ -1187,7 +1187,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       _topics.putIfAbsent(key, () => true);
     });
 
-    _selectedStyles.addAll(widget.illustration!.styles);
+    _selectedStyles.addAll(widget.illustration.styles);
   }
 
   void removeStyleAndUpdate(String? styleName) async {
@@ -1199,7 +1199,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     try {
       final response =
           await Utilities.cloud.illustrations("updateStyles").call({
-        "illustrationId": widget.illustration!.id,
+        "illustrationId": widget.illustration.id,
         "styles": _selectedStyles,
       });
 
@@ -1257,7 +1257,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     try {
       final response =
           await Utilities.cloud.illustrations("updateTopics").call({
-        "illustrationId": widget.illustration!.id,
+        "illustrationId": widget.illustration.id,
         "topics": _topics.keys.toList(),
       });
 
@@ -1295,7 +1295,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   void selectLicenseAndUpdate(IllustrationLicense illustrationLicense) async {
     setState(() => _isSaving = true);
 
-    final illustration = widget.illustration!;
+    final illustration = widget.illustration;
     final previousLicense = illustration.license;
     illustration.license = illustrationLicense;
 
@@ -1331,7 +1331,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   void unselectLicenseAndUpdate() async {
     setState(() => _isSaving = true);
 
-    final illustration = widget.illustration!;
+    final illustration = widget.illustration;
     final previousLicense = illustration.license;
     illustration.license = IllustrationLicense.empty();
 
@@ -1368,7 +1368,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     _presentationCard.currentState!.collapse();
     setState(() => _isSaving = true);
 
-    final illustration = widget.illustration!;
+    final illustration = widget.illustration;
 
     try {
       final HttpsCallableResult response =
@@ -1409,8 +1409,8 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   }
 
   void updateVisibility(ContentVisibility visibility) async {
-    final illustration = widget.illustration!;
-    final previousVisibility = widget.illustration!.visibility;
+    final illustration = widget.illustration;
+    final previousVisibility = widget.illustration.visibility;
 
     setState(() {
       _isSaving = true;

@@ -396,6 +396,7 @@
   "license_select": "Sélectionner une licence",
   "license_hide_panel": "Masquer le panneau de licence",
   "license_update_fail": "Nous sommes désolés, nous n'avons pas pu mettre à jour votre licence. Veuillez réessayer plus tard.",
+  "licenses": "Licenses disponibles",
   "licenses_available": "License disponibles",
   "licenses_subtitle": "Tapoter pour sélectionner ou désélectionner une licence. Faites un appui long pour plus d'informations.",
   "light": "Clair",

@@ -1,10 +1,10 @@
 class CreatedBy {
-  /// User's id.
-  final String? id;
-
-  CreatedBy({
+  const CreatedBy({
     this.id = '',
   });
+
+  /// User's id.
+  final String id;
 
   /// Create an empty instance.
   factory CreatedBy.empty() {

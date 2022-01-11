@@ -1,5 +1,11 @@
 /// Related urls to this license.
 class LicenseUrls {
+  const LicenseUrls({
+    this.image = '',
+    this.wikipedia = '',
+    this.website = '',
+  });
+
   /// License logo or image.
   final String image;
 
@@ -8,12 +14,6 @@ class LicenseUrls {
 
   /// Official website of this license.
   final String website;
-
-  LicenseUrls({
-    this.image = '',
-    this.wikipedia = '',
-    this.website = '',
-  });
 
   /// Create an empty instance of this class.
   factory LicenseUrls.empty() {

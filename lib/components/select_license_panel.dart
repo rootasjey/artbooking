@@ -70,8 +70,8 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
   /// Maximum container's width.
   final double _containerWidth = 400.0;
 
-  /// Maximum styles to fetch in one request.
-  int _limitStyles = 10;
+  /// Maximum licenses to fetch in one request.
+  int _limit = 10;
 
   /// Selected style for image preview.
   IllustrationLicense? _selectedLicensePreview;
@@ -275,7 +275,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                     child: Opacity(
                       opacity: 0.8,
                       child: Text(
-                        _selectedLicensePreview!.name!.toUpperCase(),
+                        _selectedLicensePreview!.name.toUpperCase(),
                         style: Utilities.fonts.style(
                           fontWeight: FontWeight.w600,
                         ),
@@ -312,9 +312,9 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
         spacing: 12.0,
         runSpacing: 12.0,
         children: [
-          if (_selectedLicensePreview!.urls!.wikipedia.isNotEmpty)
+          if (_selectedLicensePreview!.urls.wikipedia.isNotEmpty)
             OutlinedButton(
-              onPressed: () => launch(_selectedLicensePreview!.urls!.wikipedia),
+              onPressed: () => launch(_selectedLicensePreview!.urls.wikipedia),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text("wikipedia"),
@@ -323,9 +323,9 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                 primary: Colors.black54,
               ),
             ),
-          if (_selectedLicensePreview!.urls!.website.isNotEmpty)
+          if (_selectedLicensePreview!.urls.website.isNotEmpty)
             OutlinedButton(
-              onPressed: () => launch(_selectedLicensePreview!.urls!.website),
+              onPressed: () => launch(_selectedLicensePreview!.urls.website),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text("website"),
@@ -369,7 +369,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                       ),
                     Expanded(
                       child: Text(
-                        currentLicense.name!.toUpperCase(),
+                        currentLicense.name.toUpperCase(),
                         style: Utilities.fonts.style(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
@@ -416,7 +416,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                       ),
                     Expanded(
                       child: Text(
-                        license.name!.toUpperCase(),
+                        license.name.toUpperCase(),
                         style: Utilities.fonts.style(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
@@ -515,18 +515,18 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
     );
   }
 
-  /// 1st fetch
+  /// Fetch license on Firestore.
   void fetchLicenses() async {
     _availableLicenses.clear();
 
     try {
-      final stylesSnap = await FirebaseFirestore.instance
+      final snapshot = await FirebaseFirestore.instance
           .collection('licenses')
-          .limit(_limitStyles)
+          .limit(_limit)
           .orderBy('name', descending: true)
           .get();
 
-      if (stylesSnap.size == 0) {
+      if (snapshot.size == 0) {
         setState(() {
           _hasNext = false;
         });
@@ -534,7 +534,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
         return;
       }
 
-      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in stylesSnap.docs) {
+      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
         final data = doc.data();
         data['id'] = doc.id;
 
@@ -543,27 +543,27 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
       }
 
       setState(() {
-        _hasNext = _limitStyles == stylesSnap.size;
-        _lastDocumentSnapshot = stylesSnap.docs.last;
+        _hasNext = _limit == snapshot.size;
+        _lastDocumentSnapshot = snapshot.docs.last;
       });
     } catch (error) {
       Utilities.logger.e(error);
     }
   }
 
-  /// 2nd + more fetches
-  void fetchMoreStyles() async {
+  /// Fetch more licenses on Firestore.
+  void fetchLicensesMore() async {
     _isLoadingMore = true;
 
     try {
-      final stylesSnap = await FirebaseFirestore.instance
+      final snapshot = await FirebaseFirestore.instance
           .collection('licenses')
-          .limit(_limitStyles)
+          .limit(_limit)
           .orderBy('name', descending: true)
           .startAfterDocument(_lastDocumentSnapshot!)
           .get();
 
-      if (stylesSnap.size == 0) {
+      if (snapshot.size == 0) {
         setState(() {
           _hasNext = false;
           _lastDocumentSnapshot = null;
@@ -572,7 +572,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
         return;
       }
 
-      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in stylesSnap.docs) {
+      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
         final data = doc.data();
         data['id'] = doc.id;
 
@@ -581,8 +581,8 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
       }
 
       setState(() {
-        _hasNext = _limitStyles == stylesSnap.size;
-        _lastDocumentSnapshot = stylesSnap.docs.last;
+        _hasNext = _limit == snapshot.size;
+        _lastDocumentSnapshot = snapshot.docs.last;
       });
     } catch (error) {
       Utilities.logger.e(error);
@@ -596,7 +596,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
     }
 
     if (_hasNext && !_isLoadingMore && _lastDocumentSnapshot != null) {
-      fetchMoreStyles();
+      fetchLicensesMore();
     }
 
     return false;
@@ -609,7 +609,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
       final AlgoliaQuery query = await SearchUtilities.algolia!
           .index("licenses")
           .query(_searchTextController.text)
-          .setHitsPerPage(_limitStyles)
+          .setHitsPerPage(_limit)
           .setPage(0);
 
       final AlgoliaQuerySnapshot snapshot = await query.getObjects();

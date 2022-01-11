@@ -1,17 +1,20 @@
 import 'package:artbooking/components/side_menu_item.dart';
 import 'package:artbooking/components/underlined_button.dart';
+import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
 /// User's dashboard side menu.
-class DashboardSideMenu extends StatefulWidget {
+class DashboardSideMenu extends ConsumerStatefulWidget {
   const DashboardSideMenu({
     Key? key,
     required this.beamerKey,
@@ -23,7 +26,7 @@ class DashboardSideMenu extends StatefulWidget {
   _DashboardSideMenuState createState() => _DashboardSideMenuState();
 }
 
-class _DashboardSideMenuState extends State<DashboardSideMenu> {
+class _DashboardSideMenuState extends ConsumerState<DashboardSideMenu> {
   late BeamerDelegate _beamerDelegate;
 
   /// True if the side menu is expanded showing icons and labels.
@@ -31,55 +34,9 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
   /// Default to true.
   bool _isExpanded = true;
 
-  final _sidePanelItems = <SideMenuItem>[
-    SideMenuItem(
-      iconData: UniconsLine.chart_pie,
-      label: "statistics".tr(),
-      hoverColor: Constants.colors.activity,
-      routePath: DashboardLocationContent.statisticsRoute,
-    ),
-    SideMenuItem(
-      iconData: UniconsLine.picture,
-      label: "illustrations".tr(),
-      hoverColor: Constants.colors.illustrations,
-      routePath: DashboardLocationContent.illustrationsRoute,
-    ),
-    SideMenuItem(
-      iconData: UniconsLine.book_alt,
-      label: "books".tr(),
-      hoverColor: Constants.colors.books,
-      routePath: DashboardLocationContent.booksRoute,
-    ),
-    // SideMenuItem(
-    //   destination: MyGalleriesDeepRoute(),
-    //   iconData: UniconsLine.images,
-    //   label: 'Galleries',
-    //   hoverColor: Colors.pink.shade200,
-    // ),
-    // SideMenuItem(
-    //   destination: MyChallengesDeepRoute(),
-    //   iconData: UniconsLine.dumbbell,
-    //   label: 'Challenges',
-    //   hoverColor: Colors.green,
-    // ),
-    // SideMenuItem(
-    //   destination: MyContestsDeepRoute(),
-    //   iconData: UniconsLine.trophy,
-    //   label: 'Contests',
-    //   hoverColor: Colors.yellow.shade800,
-    // ),
-    SideMenuItem(
-      iconData: UniconsLine.setting,
-      label: "settings".tr(),
-      hoverColor: Constants.colors.settings,
-      routePath: DashboardLocationContent.settingsRoute,
-    ),
-  ];
-
   @override
   void initState() {
     super.initState();
-    _addAdminMenuItems();
 
     _isExpanded = Utilities.storage.getDashboardSideMenuExpanded();
 
@@ -133,6 +90,15 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
   }
 
   Widget bodySidePanel() {
+    final UserFirestore? userFirestore =
+        ref.watch(AppState.userProvider).firestoreUser;
+
+    bool isAdmin = false;
+
+    if (userFirestore != null) {
+      isAdmin = userFirestore.rights.isAdmin;
+    }
+
     return SliverPadding(
       padding: EdgeInsets.only(
         left: _isExpanded ? 20.0 : 16.0,
@@ -140,7 +106,7 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
       ),
       sliver: SliverList(
           delegate: SliverChildListDelegate.fixed(
-        _sidePanelItems.map((sidePanelItem) {
+        getItemList(isAdmin: isAdmin).map((sidePanelItem) {
           final Color foregroundColor =
               Theme.of(context).textTheme.bodyText1?.color ?? Colors.white;
 
@@ -246,33 +212,69 @@ class _DashboardSideMenuState extends State<DashboardSideMenu> {
     );
   }
 
-  void _addAdminMenuItems() async {
-    // if (!stateUser.canManageQuotes) {
-    //   return;
-    // }
+  List<SideMenuItem> getItemList({required bool isAdmin}) {
+    return [
+      ...getBaseItemList(),
+      if (isAdmin) ...getAdminItemList(),
+    ];
+  }
 
-    // _sideMenuItems.addAll([
-    //   SideMenuItem(
-    //     destination: AdminDeepRoute(
-    //       children: [
-    //         AdminTempDeepRoute(
-    //           children: [
-    //             AdminTempQuotesRoute(),
-    //           ],
-    //         )
-    //       ],
-    //     ),
-    //     iconData: UniconsLine.clock_two,
-    //     label: 'Admin Temp Quotes',
-    //     hoverColor: Colors.red,
-    //   ),
-    //   SideMenuItem(
-    //     destination: AdminDeepRoute(children: [QuotidiansRoute()]),
-    //     iconData: UniconsLine.sunset,
-    //     label: 'Quotidians',
-    //     hoverColor: Colors.red,
-    //   ),
-    // ]);
+  List<SideMenuItem> getBaseItemList() {
+    return [
+      SideMenuItem(
+        iconData: UniconsLine.chart_pie,
+        label: "statistics".tr(),
+        hoverColor: Constants.colors.activity,
+        routePath: DashboardLocationContent.statisticsRoute,
+      ),
+      SideMenuItem(
+        iconData: UniconsLine.picture,
+        label: "illustrations".tr(),
+        hoverColor: Constants.colors.illustrations,
+        routePath: DashboardLocationContent.illustrationsRoute,
+      ),
+      SideMenuItem(
+        iconData: UniconsLine.book_alt,
+        label: "books".tr(),
+        hoverColor: Constants.colors.books,
+        routePath: DashboardLocationContent.booksRoute,
+      ),
+      // SideMenuItem(
+      //   destination: MyGalleriesDeepRoute(),
+      //   iconData: UniconsLine.images,
+      //   label: 'Galleries',
+      //   hoverColor: Colors.pink.shade200,
+      // ),
+      // SideMenuItem(
+      //   destination: MyChallengesDeepRoute(),
+      //   iconData: UniconsLine.dumbbell,
+      //   label: 'Challenges',
+      //   hoverColor: Colors.green,
+      // ),
+      // SideMenuItem(
+      //   destination: MyContestsDeepRoute(),
+      //   iconData: UniconsLine.trophy,
+      //   label: 'Contests',
+      //   hoverColor: Colors.yellow.shade800,
+      // ),
+      SideMenuItem(
+        iconData: UniconsLine.setting,
+        label: "settings".tr(),
+        hoverColor: Constants.colors.settings,
+        routePath: DashboardLocationContent.settingsRoute,
+      ),
+    ];
+  }
+
+  List<SideMenuItem> getAdminItemList() {
+    return [
+      SideMenuItem(
+        iconData: UniconsLine.document_info,
+        label: "licenses".tr(),
+        hoverColor: Colors.brown.shade300,
+        routePath: DashboardLocationContent.licensesRoute,
+      ),
+    ];
   }
 
   void _setStateListener() => setState(() {});

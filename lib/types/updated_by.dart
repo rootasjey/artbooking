@@ -1,10 +1,10 @@
 class UpdatedBy {
-  /// User's id.
-  final String? id;
-
-  UpdatedBy({
+  const UpdatedBy({
     this.id = '',
   });
+
+  /// User's id.
+  final String id;
 
   /// Create an empty instance.
   factory UpdatedBy.empty() {
@@ -20,7 +20,7 @@ class UpdatedBy {
     }
 
     return UpdatedBy(
-      id: data['id'],
+      id: data['id'] ?? '',
     );
   }
 }

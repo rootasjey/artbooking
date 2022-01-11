@@ -8,32 +8,50 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Describe how an artwork can be used.
 class IllustrationLicense {
+  IllustrationLicense({
+    this.abbreviation = '',
+    this.createdAt,
+    this.createdBy = const CreatedBy(),
+    this.description = '',
+    this.from = '',
+    required this.id,
+    this.licenseUpdatedAt,
+    required this.name,
+    this.notice = '',
+    this.terms,
+    this.updatedAt,
+    this.updatedBy = const UpdatedBy(),
+    this.urls = const LicenseUrls(),
+    this.usage = const LicenseUsage(),
+    this.version = '1.0',
+  });
+
   /// The license short name.
-  final String? abbreviation;
+  final String abbreviation;
 
   /// When this entry was created in Firestore.
   final DateTime? createdAt;
 
-  final CreatedBy? createdBy;
+  final CreatedBy createdBy;
 
   /// Information about this license.
   final String description;
 
   /// Tell if this license has been created by an artist
   /// or by the platform's staff.
-  final String? from;
+  final String from;
 
   /// License's id.
-  final String? id;
+  final String id;
 
   /// License's term of service & privacy policy update.
   final DateTime? licenseUpdatedAt;
 
   /// License's name.
-  final String? name;
+  final String name;
 
   /// Additional information about this license usage.
-  final String? notice;
+  final String notice;
 
   /// Restrictions related to usage.
   final LicenseTerms? terms;
@@ -41,34 +59,16 @@ class IllustrationLicense {
   /// When this entry was last updated in Firestore.
   final DateTime? updatedAt;
 
-  final UpdatedBy? updatedBy;
+  final UpdatedBy updatedBy;
 
   /// If [custom] is true, defined what is permitted and is not.
-  final LicenseUsage? usage;
+  final LicenseUsage usage;
 
   /// License's urls.
-  final LicenseUrls? urls;
+  final LicenseUrls urls;
 
   /// If this license has a specific version.
-  final String? version;
-
-  IllustrationLicense({
-    this.abbreviation,
-    this.createdAt,
-    this.createdBy,
-    this.description = '',
-    this.from = '',
-    this.id,
-    this.licenseUpdatedAt,
-    this.name,
-    this.notice,
-    this.terms,
-    this.updatedAt,
-    this.updatedBy,
-    this.urls,
-    this.usage,
-    this.version,
-  });
+  final String version;
 
   factory IllustrationLicense.empty() {
     return IllustrationLicense(
@@ -121,8 +121,8 @@ class IllustrationLicense {
     data['name'] = name;
     data['notice'] = notice;
     data['terms'] = terms!.toJSON();
-    data['urls'] = urls!.toJSON();
-    data['usage'] = usage!.toJSON();
+    data['urls'] = urls.toJSON();
+    data['usage'] = usage.toJSON();
     data['updatedAt'] = Timestamp.fromDate(updatedAt!);
     data['version'] = version;
 

@@ -56,7 +56,7 @@ class _IllustrationPageState extends State<IllustrationPage> {
   TextEditingController? _descController;
   TextEditingController? _summaryController;
 
-  IllustrationLicense _newLicense = IllustrationLicense();
+  IllustrationLicense _newLicense = IllustrationLicense.empty();
   ContentVisibility _newVisibility = ContentVisibility.private;
 
   var _illustration = Illustration.empty();

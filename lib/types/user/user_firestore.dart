@@ -1,27 +1,11 @@
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/user/stats.dart';
 import 'package:artbooking/types/user/settings.dart';
+import 'package:artbooking/types/user/user_rights.dart';
 import 'package:artbooking/types/user/user_urls.dart';
 import 'package:artbooking/types/user/user_pp.dart';
 
 class UserFirestore {
-  DateTime? createdAt;
-  String email;
-  final String id;
-  String job;
-  String lang;
-  String location;
-  String name;
-  String nameLowerCase;
-  final UserPP pp;
-  String pricing;
-  UserSettings? settings;
-  UserStats stats;
-  String summary;
-  String uid;
-  DateTime? updatedAt;
-  UserUrls urls;
-
   UserFirestore({
     this.createdAt,
     this.email = '',
@@ -39,7 +23,26 @@ class UserFirestore {
     this.uid = '',
     this.updatedAt,
     required this.urls,
+    required this.rights,
   });
+
+  DateTime? createdAt;
+  String email;
+  final String id;
+  String job;
+  String lang;
+  String location;
+  String name;
+  String nameLowerCase;
+  final UserPP pp;
+  String pricing;
+  UserSettings? settings;
+  UserStats stats;
+  String summary;
+  String uid;
+  DateTime? updatedAt;
+  UserUrls urls;
+  UserRights rights;
 
   factory UserFirestore.empty() {
     return UserFirestore(
@@ -57,6 +60,7 @@ class UserFirestore {
       stats: UserStats.empty(),
       updatedAt: DateTime.now(),
       urls: UserUrls.empty(),
+      rights: UserRights(),
     );
   }
 
@@ -80,6 +84,7 @@ class UserFirestore {
       summary: data['summary'] ?? '',
       updatedAt: Utilities.date.fromFirestore(data['updatedAt']),
       urls: UserUrls.fromJSON(data['urls']),
+      rights: UserRights.fromJSON(data['rights']),
     );
   }
 
@@ -100,6 +105,7 @@ class UserFirestore {
     data['summary'] = summary;
     data['updatedAt'] = DateTime.now().millisecondsSinceEpoch;
     data['urls'] = urls.toJSON();
+    data['rights'] = rights.toJSON();
 
     return data;
   }
