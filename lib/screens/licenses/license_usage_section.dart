@@ -167,37 +167,33 @@ class LicenseUsageSection extends StatelessWidget {
       context: context,
       builder: (context) {
         return ThemedDialog(
-          // focusNode: _focusNode,
-          title: Column(
-            children: [
-              Opacity(
-                opacity: 0.8,
+          centerTitle: false,
+          title: Opacity(
+            opacity: 0.8,
+            child: Text(
+              "${usageString.toUpperCase()} : $usageInfoStr",
+              style: Utilities.fonts.style(
+                color: Colors.black,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          body: Container(
+            width: 300.0,
+            padding: const EdgeInsets.all(12.0),
+            child: SingleChildScrollView(
+              child: Opacity(
+                opacity: 0.4,
                 child: Text(
-                  "${usageString.toUpperCase()} : $usageInfoStr",
+                  "license_usages.$usageString".tr(),
                   style: Utilities.fonts.style(
                     color: Colors.black,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
-              Container(
-                width: 300.0,
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Opacity(
-                  opacity: 0.4,
-                  child: Text(
-                    "license_usages.$usageString".tr(),
-                    textAlign: TextAlign.center,
-                    style: Utilities.fonts.style(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-          body: SingleChildScrollView(),
           textButtonValidation: "close".tr(),
           onValidate: Beamer.of(context).popRoute,
           onCancel: Beamer.of(context).popRoute,
