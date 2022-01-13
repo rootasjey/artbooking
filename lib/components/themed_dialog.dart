@@ -15,6 +15,7 @@ class ThemedDialog extends StatelessWidget {
     required this.textButtonValidation,
     this.onValidate,
     this.focusNode,
+    this.centerTitle = true,
   }) : super(key: key);
 
   /// Trigger when the user tap on close button
@@ -37,6 +38,9 @@ class ThemedDialog extends StatelessWidget {
 
   /// Dialog body. Can be a [SingleChildScrollView] for example.
   final Widget body;
+
+  /// If true, center dialog's title.
+  final bool centerTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -85,11 +89,14 @@ class ThemedDialog extends StatelessWidget {
       children: [
         closeButton(),
         Column(
+          crossAxisAlignment: centerTitle
+              ? CrossAxisAlignment.center
+              : CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.only(
                 top: 24.0,
-                left: 24.0,
+                left: 32.0,
                 right: 24.0,
               ),
               child: title,
