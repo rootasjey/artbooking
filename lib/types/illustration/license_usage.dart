@@ -1,6 +1,6 @@
 /// Part of the license specifing what you can do the artwork.
 class LicenseUsage {
-  const LicenseUsage({
+  LicenseUsage({
     this.commercial = false,
     this.adapt = false,
     this.foss = false,
@@ -15,34 +15,34 @@ class LicenseUsage {
 
   /// Remix, transform, and build upon the material
   /// for any purpose, even commercially.
-  final bool adapt;
+  bool adapt;
 
   /// Can be used in commercial projects & products.
-  final bool commercial;
+  bool commercial;
 
   /// Can be used in other free and open source projects.
-  final bool foss;
+  bool foss;
 
   /// Can be used in other free softwares and projects.
-  final bool free;
+  bool free;
 
   /// Can be used in other open source projects.
-  final bool oss;
+  bool oss;
 
   /// Can be used for personal use (e.g. wallpaper).
-  final bool personal;
+  bool personal;
 
   /// Can be freely printed.
-  final bool print;
+  bool print;
 
   /// Can sell outside of the official app by another individual.
-  final bool sell;
+  bool sell;
 
   /// Copy and redistribute the material in any medium or format.
-  final bool share;
+  bool share;
 
   /// Can view this illustration.
-  final bool view;
+  bool view;
 
   factory LicenseUsage.empty() {
     return LicenseUsage(

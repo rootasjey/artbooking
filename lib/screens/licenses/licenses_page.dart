@@ -4,11 +4,14 @@ import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/screens/licenses/edit_license_page.dart';
 import 'package:artbooking/types/illustration/license.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:unicons/unicons.dart';
 
 class LicensesPage extends StatefulWidget {
   const LicensesPage({Key? key}) : super(key: key);
@@ -31,7 +34,7 @@ class _LicensesPageState extends State<LicensesPage> {
   final List<IllustrationLicense> _availableLicenses = [];
 
   /// Search results.
-  final List<IllustrationLicense> _suggestionsLicenses = [];
+  // final List<IllustrationLicense> _suggestionsLicenses = [];
 
   /// Search controller.
   final _searchTextController = TextEditingController();
@@ -58,6 +61,11 @@ class _LicensesPageState extends State<LicensesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: openNewLicenseDialog,
+        child: Icon(UniconsLine.plus),
+        backgroundColor: Theme.of(context).secondaryHeaderColor,
+      ),
       body: CustomScrollView(
         slivers: <Widget>[
           SliverEdgePadding(),
@@ -245,5 +253,14 @@ class _LicensesPageState extends State<LicensesPage> {
     }
 
     return false;
+  }
+
+  void openNewLicenseDialog() async {
+    await showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => EditLicensePage(
+        licenseId: '',
+      ),
+    );
   }
 }

@@ -21,8 +21,8 @@ class IllustrationLicense {
     this.terms,
     this.updatedAt,
     this.updatedBy = const UpdatedBy(),
-    this.urls = const LicenseUrls(),
-    this.usage = const LicenseUsage(),
+    required this.urls,
+    required this.usage,
     this.version = '1.0',
   });
 
