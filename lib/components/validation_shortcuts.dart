@@ -14,6 +14,8 @@ class ValidationShortcuts extends StatelessWidget {
     this.onValidate,
     this.onCancel,
     this.focusNode,
+    this.spaceActive = true,
+    this.autofocus = true,
   }) : super(key: key);
 
   final Widget child;
@@ -21,18 +23,32 @@ class ValidationShortcuts extends StatelessWidget {
   final Function()? onCancel;
   final FocusNode? focusNode;
 
+  /// If true, space bar will submit this dialog (as well as 'enter').
+  final bool spaceActive;
+
+  /// If true, this component will try to request focus on load.
+  final bool autofocus;
+
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
       focusNode?.requestFocus();
     });
 
+    Map<LogicalKeySet, Intent> shortcuts = {
+      LogicalKeySet(LogicalKeyboardKey.enter): const EnterIntent(),
+      LogicalKeySet(LogicalKeyboardKey.escape): const EscapeIntent(),
+    };
+
+    if (spaceActive) {
+      shortcuts.putIfAbsent(
+        LogicalKeySet(LogicalKeyboardKey.space),
+        () => const EnterIntent(),
+      );
+    }
+
     return Shortcuts(
-      shortcuts: {
-        LogicalKeySet(LogicalKeyboardKey.enter): const EnterIntent(),
-        LogicalKeySet(LogicalKeyboardKey.space): const EnterIntent(),
-        LogicalKeySet(LogicalKeyboardKey.escape): const EscapeIntent(),
-      },
+      shortcuts: shortcuts,
       child: Actions(
         actions: {
           EnterIntent: CallbackAction<EnterIntent>(
@@ -47,7 +63,7 @@ class ValidationShortcuts extends StatelessWidget {
           ),
         },
         child: Focus(
-          autofocus: true,
+          autofocus: autofocus,
           focusNode: focusNode,
           child: child,
         ),

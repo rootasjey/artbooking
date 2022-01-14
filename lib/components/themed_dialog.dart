@@ -16,6 +16,8 @@ class ThemedDialog extends StatelessWidget {
     this.onValidate,
     this.focusNode,
     this.centerTitle = true,
+    this.spaceActive = true,
+    this.autofocus = true,
   }) : super(key: key);
 
   /// Trigger when the user tap on close button
@@ -42,12 +44,20 @@ class ThemedDialog extends StatelessWidget {
   /// If true, center dialog's title.
   final bool centerTitle;
 
+  /// If true, space bar will submit this dialog (as well as 'enter').
+  final bool spaceActive;
+
+  /// If true, this dialog will try to request focus on load.
+  final bool autofocus;
+
   @override
   Widget build(BuildContext context) {
     return ValidationShortcuts(
+      autofocus: autofocus,
       focusNode: focusNode,
       onCancel: onCancel,
       onValidate: onValidate,
+      spaceActive: spaceActive,
       child: SimpleDialog(
         backgroundColor: Constants.colors.clairPink,
         title: titleContainer(
