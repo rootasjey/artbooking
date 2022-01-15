@@ -96,6 +96,7 @@ class _EditLicensePageState extends State<EditLicensePage> {
           ),
           EditLicensePageUrls(
             urls: _license.urls,
+            onValueChange: onUsageValueChange,
           ),
           validationButton(),
         ],

@@ -14,9 +14,11 @@ class EditLicensePageUrls extends StatelessWidget {
   const EditLicensePageUrls({
     Key? key,
     required this.urls,
+    this.onValueChange,
   }) : super(key: key);
 
   final LicenseUrls urls;
+  final Function()? onValueChange;
 
   @override
   Widget build(BuildContext context) {
@@ -45,15 +47,22 @@ class EditLicensePageUrls extends StatelessWidget {
               SquareLink(
                 onTap: () async {
                   final DialogReturnValue<String> dialogReturnValue =
-                      await onEditUrl(context, 'website');
+                      await onEditUrl(
+                    context,
+                    dialogTitle: 'website',
+                    initialValue: urls.website,
+                  );
 
                   if (dialogReturnValue.validated) {
                     urls.website = dialogReturnValue.value;
+                    onValueChange?.call();
                   }
                 },
+                checked: urls.website.isNotEmpty,
                 icon: Icon(
                   UniconsLine.globe,
                   size: 42.0,
+                  color: getIconColor(context, urls.website.isNotEmpty),
                 ),
                 text: Text(
                   "website",
@@ -66,15 +75,22 @@ class EditLicensePageUrls extends StatelessWidget {
               SquareLink(
                 onTap: () async {
                   final DialogReturnValue<String> dialogReturnValue =
-                      await onEditUrl(context, 'wikipedia');
+                      await onEditUrl(
+                    context,
+                    dialogTitle: 'wikipedia',
+                    initialValue: urls.wikipedia,
+                  );
 
                   if (dialogReturnValue.validated) {
                     urls.wikipedia = dialogReturnValue.value;
+                    onValueChange?.call();
                   }
                 },
+                checked: urls.wikipedia.isNotEmpty,
                 icon: Icon(
                   FontAwesomeIcons.wikipediaW,
                   size: 36.0,
+                  color: getIconColor(context, urls.wikipedia.isNotEmpty),
                 ),
                 text: Text(
                   "wikipedia",
@@ -92,10 +108,12 @@ class EditLicensePageUrls extends StatelessWidget {
   }
 
   Future<DialogReturnValue<String>> onEditUrl(
-    BuildContext context,
-    String urlName,
-  ) async {
+    BuildContext context, {
+    required String dialogTitle,
+    String initialValue = '',
+  }) async {
     var _nameTextController = TextEditingController();
+    _nameTextController.text = initialValue;
     var _validated = false;
 
     await showDialog(
@@ -121,7 +139,7 @@ class EditLicensePageUrls extends StatelessWidget {
                   ),
                   children: [
                     TextSpan(
-                      text: urlName.toUpperCase(),
+                      text: dialogTitle.toUpperCase(),
                       style: Utilities.fonts.style(
                         color: Theme.of(context).textTheme.bodyText2?.color,
                         fontWeight: FontWeight.w700,
@@ -130,13 +148,6 @@ class EditLicensePageUrls extends StatelessWidget {
                   ],
                 ),
               ),
-              // child: Text(
-              //   "EDIT URL: ${urlName.toUpperCase()}",
-              //   style: Utilities.fonts.style(
-              //     color: Colors.black,
-              //     fontWeight: FontWeight.w600,
-              //   ),
-              // ),
             ),
           ),
           body: Container(
@@ -188,5 +199,9 @@ class EditLicensePageUrls extends StatelessWidget {
       validated: _validated,
       value: _nameTextController.text,
     );
+  }
+
+  Color? getIconColor(BuildContext context, bool isActive) {
+    return isActive ? Theme.of(context).primaryColor : null;
   }
 }
