@@ -4,7 +4,6 @@ import 'package:artbooking/types/illustration/license_terms.dart';
 import 'package:artbooking/types/illustration/license_urls.dart';
 import 'package:artbooking/types/illustration/license_usage.dart';
 import 'package:artbooking/types/updated_by.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Describe how an artwork can be used.
 class IllustrationLicense {
@@ -18,7 +17,7 @@ class IllustrationLicense {
     this.licenseUpdatedAt,
     required this.name,
     this.notice = '',
-    this.terms,
+    required this.terms,
     this.updatedAt,
     this.updatedBy = const UpdatedBy(),
     required this.urls,
@@ -39,7 +38,7 @@ class IllustrationLicense {
 
   /// Tell if this license has been created by an artist
   /// or by the platform's staff.
-  final String from;
+  String from;
 
   /// License's id.
   final String id;
@@ -54,7 +53,7 @@ class IllustrationLicense {
   final String notice;
 
   /// Restrictions related to usage.
-  final LicenseTerms? terms;
+  final LicenseTerms terms;
 
   /// When this entry was last updated in Firestore.
   final DateTime? updatedAt;
@@ -76,7 +75,7 @@ class IllustrationLicense {
       createdAt: DateTime.now(),
       createdBy: CreatedBy.empty(),
       description: '',
-      from: '',
+      from: 'user',
       id: '',
       licenseUpdatedAt: DateTime.now(),
       name: '',
@@ -89,13 +88,14 @@ class IllustrationLicense {
       version: '',
     );
   }
+
   factory IllustrationLicense.fromJSON(Map<String, dynamic> data) {
     return IllustrationLicense(
       abbreviation: data['abbreviation'] ?? '',
       createdAt: Utilities.date.fromFirestore(data['createdAt']),
       createdBy: CreatedBy.fromJSON(data['createdBy']),
       description: data['description'] ?? '',
-      from: data['from'],
+      from: data['from'] ?? 'user',
       id: data['id'] ?? '',
       licenseUpdatedAt: Utilities.date.fromFirestore(data['licenseUpdatedAt']),
       name: data['name'] ?? '',
@@ -113,17 +113,14 @@ class IllustrationLicense {
     final data = Map<String, dynamic>();
 
     data['abbreviation'] = abbreviation;
-    data['createdAt'] = Timestamp.fromDate(createdAt!);
     data['description'] = description;
     data['from'] = from;
     data['id'] = id;
-    data['licenseUpdatedAt'] = Timestamp.fromDate(licenseUpdatedAt!);
     data['name'] = name;
     data['notice'] = notice;
-    data['terms'] = terms!.toJSON();
+    data['terms'] = terms.toJSON();
     data['urls'] = urls.toJSON();
     data['usage'] = usage.toJSON();
-    data['updatedAt'] = Timestamp.fromDate(updatedAt!);
     data['version'] = version;
 
     return data;

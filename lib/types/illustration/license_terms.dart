@@ -1,5 +1,12 @@
 /// Restrictions related to usage.
 class LicenseTerms {
+  /// Create a new license instance.
+  LicenseTerms({
+    this.attribution = false,
+    this.noAdditionalRestriction = false,
+    this.shareAlike = false,
+  });
+
   /// You must give appropriate credit, provide a link to the license, and indicate if changes were made.
   final bool attribution;
 
@@ -7,14 +14,7 @@ class LicenseTerms {
   final bool noAdditionalRestriction;
 
   /// Require that anyone who use the work - licensees - make that new work available under the same license terms.
-  final bool? shareAlike;
-
-  /// Create a new license instance.
-  LicenseTerms({
-    this.attribution = false,
-    this.noAdditionalRestriction = false,
-    this.shareAlike,
-  });
+  final bool shareAlike;
 
   /// Create an empty license instance.
   factory LicenseTerms.empty() {
