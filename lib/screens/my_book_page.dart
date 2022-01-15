@@ -21,6 +21,8 @@ import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/types/firestore/document_map.dart';
+import 'package:artbooking/types/firestore/doc_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -32,13 +34,6 @@ import 'package:jiffy/jiffy.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
-
-/// A Firestore document query reference.
-typedef DocumentMap = DocumentReference<Map<String, dynamic>>;
-
-/// A stream subscription returning a map withing a query snapshot.
-typedef SnapshotStreamSubscription
-    = StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>;
 
 /// A Map with [String] as key and [Illustration] as value.
 typedef MapStringIllustration = Map<String, Illustration>;
@@ -121,10 +116,10 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
   ];
 
   /// Listens to book's updates.
-  SnapshotStreamSubscription? _bookStreamSubscription;
+  DocSnapshotStreamSubscription? _bookStreamSubscription;
 
   /// Listens to illustrations' updates.
-  final Map<String, SnapshotStreamSubscription> _illustrationSubs = {};
+  final Map<String, DocSnapshotStreamSubscription> _illustrationSubs = {};
 
   /// String separator to generate unique key for illustrations.
   final String _keySeparator = '--';
@@ -1617,7 +1612,8 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
   /// this method will listen to Firestore events in order to update
   /// the associated data in the map [_illustrations].
   void waitForThumbnail(String illustrationKey, DocumentMap query) {
-    final SnapshotStreamSubscription illustrationSub = query.snapshots().listen(
+    final DocSnapshotStreamSubscription illustrationSub =
+        query.snapshots().listen(
       (snapshot) {
         final Map<String, dynamic>? data = snapshot.data();
 
@@ -1641,7 +1637,7 @@ class _MyBookPageState extends ConsumerState<MyBookPage> {
         });
 
         if (_illustrationSubs.containsKey(illustration.id)) {
-          final SnapshotStreamSubscription? targetSub =
+          final DocSnapshotStreamSubscription? targetSub =
               _illustrationSubs[illustration.id];
 
           targetSub?.cancel();

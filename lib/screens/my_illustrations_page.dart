@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/animated_app_icon.dart';
 import 'package:artbooking/components/illustration_card.dart';
@@ -13,6 +11,10 @@ import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/types/firestore/doc_snap_map.dart';
+import 'package:artbooking/types/firestore/document_change_map.dart';
+import 'package:artbooking/types/firestore/query_map.dart';
+import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -23,19 +25,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
-
-/// A stream subscription returning a map withing a query snapshot.
-typedef SnapshotStreamSubscription
-    = StreamSubscription<QuerySnapshot<Map<String, dynamic>>>;
-
-/// A query containing a map.
-typedef QueryMap = Query<Map<String, dynamic>>;
-
-/// A document change containing a map.
-typedef DocumentChangeMap = DocumentChange<Map<String, dynamic>>;
-
-/// A query document snapshot containing a map.
-typedef DocSnapMap = QueryDocumentSnapshot<Map<String, dynamic>>;
 
 class MyIllustrationsPage extends ConsumerStatefulWidget {
   @override
@@ -75,7 +64,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   ScrollController _scrollController = ScrollController();
 
-  SnapshotStreamSubscription? _streamSubscription;
+  QuerySnapshotStreamSubscription? _streamSubscription;
 
   @override
   initState() {
