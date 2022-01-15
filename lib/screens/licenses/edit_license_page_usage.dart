@@ -85,6 +85,7 @@ class EditLicensePageUsage extends StatelessWidget {
 
                   if (dialogReturnValue.validated) {
                     usage.commercial = dialogReturnValue.value;
+                    onValueChange?.call();
                   }
                 },
                 checked: usage.commercial,
@@ -112,6 +113,7 @@ class EditLicensePageUsage extends StatelessWidget {
 
                   if (dialogReturnValue.validated) {
                     usage.free = dialogReturnValue.value;
+                    onValueChange?.call();
                   }
                 },
                 checked: usage.free,
@@ -139,6 +141,7 @@ class EditLicensePageUsage extends StatelessWidget {
 
                   if (dialogReturnValue.validated) {
                     usage.oss = dialogReturnValue.value;
+                    onValueChange?.call();
                   }
                 },
                 checked: usage.oss,
@@ -166,6 +169,7 @@ class EditLicensePageUsage extends StatelessWidget {
 
                   if (dialogReturnValue.validated) {
                     usage.personal = dialogReturnValue.value;
+                    onValueChange?.call();
                   }
                 },
                 checked: usage.personal,
@@ -193,6 +197,7 @@ class EditLicensePageUsage extends StatelessWidget {
 
                   if (dialogReturnValue.validated) {
                     usage.print = dialogReturnValue.value;
+                    onValueChange?.call();
                   }
                 },
                 checked: usage.print,
@@ -220,6 +225,7 @@ class EditLicensePageUsage extends StatelessWidget {
 
                   if (dialogReturnValue.validated) {
                     usage.sell = dialogReturnValue.value;
+                    onValueChange?.call();
                   }
                 },
                 checked: usage.sell,
@@ -247,6 +253,7 @@ class EditLicensePageUsage extends StatelessWidget {
 
                   if (dialogReturnValue.validated) {
                     usage.share = dialogReturnValue.value;
+                    onValueChange?.call();
                   }
                 },
                 checked: usage.share,
@@ -274,6 +281,7 @@ class EditLicensePageUsage extends StatelessWidget {
 
                   if (dialogReturnValue.validated) {
                     usage.view = dialogReturnValue.value;
+                    onValueChange?.call();
                   }
                 },
                 checked: usage.view,
