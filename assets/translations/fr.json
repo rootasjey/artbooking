@@ -390,6 +390,7 @@
   "learn_more": "En savoir plus",
   "license": "Licence",
   "license_create": "Créer une nouvelle licence.",
+  "license_create_error": "Ops. Nous sommes désolés, nous n'avons pas pu créer votre nouvelle licence.Veuillez réessayer ultérieurement.",
   "license_current": "Licence actuelle",
   "license_current_remove": "Enlever la licence actuelle.",
   "license_description_sample": "Cette licence autorise les autres à distrubuer, remixer, adapter, et même construire par-dessus votre œuvre...",

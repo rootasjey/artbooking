@@ -390,6 +390,7 @@
   "learn_more": "Learn more",
   "license": "License",
   "license_create": "Create a new license.",
+  "license_create_error": "Ops. We're sorry, there was an issue while creating your license. Please try again later.",
   "license_current": "Current license",
   "license_current_remove": "Remove current license",
   "license_description_sample": "This license lets others distribute, remix, adapt, and build upon your work, ...",
