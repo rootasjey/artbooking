@@ -16,6 +16,10 @@ class LicenseUrlSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (urls.website.isEmpty && urls.wikipedia.isEmpty) {
+      return Container();
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
