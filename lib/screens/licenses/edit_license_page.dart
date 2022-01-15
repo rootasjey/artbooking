@@ -1,11 +1,11 @@
 import 'package:artbooking/components/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
-import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/licenses/edit_license_page_header.dart';
 import 'package:artbooking/screens/licenses/edit_license_page_urls.dart';
 import 'package:artbooking/screens/licenses/edit_license_page_usage.dart';
+import 'package:artbooking/screens/licenses/edit_license_page_text_inputs.dart';
 import 'package:artbooking/types/illustration/license.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,9 +29,6 @@ class _EditLicensePageState extends State<EditLicensePage> {
   bool _isLoading = false;
 
   var _license = IllustrationLicense.empty();
-  var _nameTextController = TextEditingController();
-  var _descriptionTextController = TextEditingController();
-  final _clairPink = Constants.colors.clairPink;
 
   @override
   void initState() {
@@ -89,7 +86,10 @@ class _EditLicensePageState extends State<EditLicensePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          presentationSection(),
+          EditLicensePageTextInputs(
+            license: _license,
+            onValueChange: onUsageValueChange,
+          ),
           EditLicensePageUsage(
             usage: _license.usage,
             onValueChange: onUsageValueChange,
@@ -109,87 +109,10 @@ class _EditLicensePageState extends State<EditLicensePage> {
       padding: const EdgeInsets.only(left: 16.0, top: 80.0),
       child: DarkElevatedButton.large(
         onPressed: tryUpdateLicense,
-        child: Text("create".tr()),
-      ),
-    );
-  }
-
-  Widget presentationSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        nameInput(),
-        descriptionInput(),
-      ],
-    );
-  }
-
-  Widget descriptionInput() {
-    return Align(
-      alignment: Alignment.topLeft,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 20.0, left: 12.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Text(
-                "description".tr(),
-                style: Utilities.fonts.style(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 300.0,
-              child: TextFormField(
-                controller: _descriptionTextController,
-                decoration: InputDecoration(
-                  labelText: "illustration_description_sample".tr(),
-                  filled: true,
-                  isDense: true,
-                  fillColor: _clairPink,
-                  focusColor: _clairPink,
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: 2.0,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
-                ),
-                onChanged: (value) {
-                  setState(() {});
-                },
-                onFieldSubmitted: (value) {
-                  tryUpdateLicense();
-                },
-              ),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 64.0),
+          child: Text("create".tr()),
         ),
-      ),
-    );
-  }
-
-  Widget nameInput() {
-    return Container(
-      width: 700.0,
-      child: TextField(
-        autofocus: true,
-        controller: _nameTextController,
-        keyboardType: TextInputType.multiline,
-        textCapitalization: TextCapitalization.sentences,
-        style: Utilities.fonts.style(
-          fontSize: 42.0,
-          fontWeight: FontWeight.w700,
-        ),
-        decoration: InputDecoration(
-          hintText: "license_title_dot".tr(),
-          border: OutlineInputBorder(borderSide: BorderSide.none),
-        ),
-        onSubmitted: (value) => tryUpdateLicense(),
       ),
     );
   }
@@ -229,7 +152,6 @@ class _EditLicensePageState extends State<EditLicensePage> {
   }
 
   void tryUpdateLicense() async {
-    Utilities.logger.i('website: ${_license.urls.website}');
     Beamer.of(context).popRoute();
   }
 
