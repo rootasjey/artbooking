@@ -80,8 +80,8 @@ enum Visibility {
 }
 
 enum LicenseFrom {
-  app = 'app',
-  author = 'author',
+  staff = 'staff',
+  user = 'user',
 }
 
 interface CheckPropertiesParams {

@@ -8,17 +8,18 @@ import { allowedLicenseFromValues, cloudRegions } from './utils';
 const firestore = adminApp.firestore();
 
 /**
- * Create one license for an artwork.
+ * Create one license (to apply to an illustration/artwork).
  * The created license must either be global (available to all users)
  * or to a specific user (only avaliable to them).
- * NOTE: Only admin can create global license.
+ * NOTE: Only staff members can create global licenses.
  */
 export const createOne = functions
   .region(cloudRegions.eu)
   .https
   .onCall(async (params: CreateOneLicenseParams, context) => {
     const userAuth = context.auth;
-    const { from, license } = params;
+    const { license } = params;
+    const from: string = license?.from
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -27,14 +28,23 @@ export const createOne = functions
       );
     }
 
+    if (typeof license !== 'object') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called with a valid [license] argument. ` +
+        `You provided ${license}.`
+      )
+    }
+
     if (typeof from !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called with a valid [from] parameter ` +
+        `The function must be called with a valid [license.from] parameter ` +
         `which tells if the license is created by a staff member (and is available for all users) ` +
         `or if it's created by an author (and is user specific).` +
         `The property [from] must be a string ` +
-        `among these values: ${allowedLicenseFromValues.join(", ")}`,
+        `among these values: ${allowedLicenseFromValues.join(", ")}. ` +
+        `You provided ${from} which is not valid.`,
       );
     }
 
@@ -46,19 +56,20 @@ export const createOne = functions
       );
     }
 
-    if (from === 'app') {
-      await checkIfAdmin(userAuth.uid);
+    if (from === 'staff') {
+      await canManageLicense(userAuth.uid);
     }
 
     const formatedLicense = formatLicense(license);
+    formatedLicense.createdBy.id = userAuth.uid;
 
-    const docCreated = from === 'app' 
+    const createdLicense = from === 'staff' 
       ? await createLicenseInApp(formatedLicense)
       : await createLicenseInUser(formatedLicense, userAuth.uid);
 
     return {
       license: {
-        id: docCreated.id
+        id: createdLicense.id
       },
       success: true,
     };
@@ -90,7 +101,8 @@ export const deleteOne = functions
         `which tells if the license is created by a staff member (and is available for all users) ` +
         `or if it's created by an author (and is user specific).` +
         `The property [from] must be a string ` +
-        `among these values: ${allowedLicenseFromValues.join(", ")}`,
+        `among these values: ${allowedLicenseFromValues.join(", ")}. `, +
+        `You provided ${from} which is not valid.`,
       );
     }
 
@@ -102,7 +114,7 @@ export const deleteOne = functions
       );
     }
     
-    from === 'app'
+    from === 'staff'
      ? await deleteOneAppLicense(licenseId, userAuth.uid)
      : await deleteOneUserLicense(licenseId, userAuth.uid);
 
@@ -124,7 +136,8 @@ export const updateOne = functions
   .https
   .onCall(async (params: CreateOneLicenseParams, context) => {
     const userAuth = context.auth;
-    const { from, license } = params;
+    const { license } = params;
+    const from: string = license?.from ?? ''
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -140,7 +153,8 @@ export const updateOne = functions
         `which tells if the license is created by a staff member (and is available for all users) ` +
         `or if it's created by an author (and is user specific).` +
         `The property [from] must be a string ` +
-        `among these values: ${allowedLicenseFromValues.join(", ")}`,
+        `among these values: ${allowedLicenseFromValues.join(", ")}. ` +
+        `You provided ${from} which is not valid.`,
       );
     }
 
@@ -152,23 +166,22 @@ export const updateOne = functions
       );
     }
 
-    if (from === 'app') {
-      await checkIfAdmin(userAuth.uid);
+    if (from === 'staff') {
+      await canManageLicense(userAuth.uid);
     }
 
     const formatedLicense = formatLicense(license);
-
     const licenseId = formatedLicense.id;
 
     if (!licenseId) {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The updateOne(...) functionmust be called with a [license] parameter ` +
+        `The updateOne(...) function must be called with a [license] parameter ` +
         `whis is an existing license. The license you provided doesn't have a valid [id] value.`,
       )
     }
 
-    from === 'app' 
+    from === 'staff' 
       ? await updateLicenseInApp(formatedLicense)
       : await updateLicenseInUser(formatedLicense, userAuth.uid);
 
@@ -239,9 +252,9 @@ async function updateLicenseInUser(formatedLicense: License, userId: string) {
 }
 
 /**
- * Return true if the passed user's id belong to an admin.
+ * Return true if the target user can manage staff licenses.
  */
-async function checkIfAdmin(userId: string) {
+async function canManageLicense(userId: string) {
   const userSnap = await firestore
     .collection('users')
     .doc(userId)
@@ -249,7 +262,7 @@ async function checkIfAdmin(userId: string) {
 
   const userData = userSnap.data();
 
-  if (!userSnap.exists || !userData) {
+  if (!userSnap.exists || !userData) {
     throw new functions.https.HttpsError(
       'not-found',
       `User's data for the id [${userId}] not found. ` + 
@@ -258,9 +271,9 @@ async function checkIfAdmin(userId: string) {
   }
 
   const rights = userData['rights'];
-  const userAdmin = rights['user:admin'];
+  const manageLicenseRight: boolean = rights['user:managelicense'];
 
-  if (!userAdmin) {
+  if (!manageLicenseRight) {
     throw new functions.https.HttpsError(
       'permission-denied',
       `You don't have the permission to perform this action with the user [${userId}].`,
@@ -275,7 +288,7 @@ async function checkIfAdmin(userId: string) {
  * @param userId User performing the deletion.
  */
 async function deleteOneAppLicense(licenseId: string, userId: string) {
-  await checkIfAdmin(userId);
+  await canManageLicense(userId);
   await firestore
     .collection('licenses')
     .doc(licenseId)
@@ -309,7 +322,7 @@ function formatLicense(data: License): License {
       id: '',
     },
     description: '',
-    from: LicenseFrom.app,
+    from: "user" as LicenseFrom.user,
     id: '',
     licenseUpdatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
     name: '',
@@ -356,9 +369,7 @@ function formatLicense(data: License): License {
 
   if (typeof data.createdBy !== 'object') {
     data.createdBy = { id: '' };
-  }
-
-  if (typeof data.createdBy.id === 'string') {
+  } else if (typeof data.createdBy?.id === 'string') {
     wellFormatedLicense.createdBy.id = data.createdBy.id;
   }
 
@@ -389,20 +400,20 @@ function formatLicense(data: License): License {
       attribution: false,
       noAdditionalRestriction: false,
     };
-  }
-  
-  if (typeof data.terms.attribution === 'boolean') {
-    wellFormatedLicense.terms.attribution = data.terms.attribution;
-  }
+  } else {
+    if (typeof data.terms.attribution === 'boolean') {
+      wellFormatedLicense.terms.attribution = data.terms.attribution;
+    }
 
-  if (typeof data.terms.noAdditionalRestriction === 'boolean') {
-    wellFormatedLicense.terms.noAdditionalRestriction = data.terms.noAdditionalRestriction;
+    if (typeof data.terms.noAdditionalRestriction === 'boolean') {
+      wellFormatedLicense.terms.noAdditionalRestriction = data.terms.noAdditionalRestriction;
+    }
   }
 
   // USAGE
   // -----
-  if (!data.usage) {
-    return data;
+  if (!data.usage || typeof data.usage !== 'object') {
+    return wellFormatedLicense;
   }
 
   if (typeof data.usage.adapt === 'boolean') {
@@ -449,16 +460,18 @@ function formatLicense(data: License): License {
     wellFormatedLicense.usage.view = data.usage.view;
   }
 
+  // UPDATED BY
+  // ----------
   if (typeof data.updatedBy !== 'object') {
     data.updatedBy = { id: '' };
-  }
-
-  if (typeof data.updatedBy.id === 'string') {
-    wellFormatedLicense.updatedBy.id = data.updatedBy.id;
-  }
-
-  if (typeof data.version === 'string') {
-    wellFormatedLicense.version = data.version;
+  } else {
+    if (typeof data.updatedBy.id === 'string') {
+      wellFormatedLicense.updatedBy.id = data.updatedBy.id;
+    }
+  
+    if (typeof data.version === 'string') {
+      wellFormatedLicense.version = data.version;
+    }
   }
 
   return wellFormatedLicense;
