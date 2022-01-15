@@ -35,7 +35,7 @@ class IllustrationLicense {
   final CreatedBy createdBy;
 
   /// Information about this license.
-  final String description;
+  String description;
 
   /// Tell if this license has been created by an artist
   /// or by the platform's staff.
@@ -48,7 +48,7 @@ class IllustrationLicense {
   final DateTime? licenseUpdatedAt;
 
   /// License's name.
-  final String name;
+  String name;
 
   /// Additional information about this license usage.
   final String notice;
