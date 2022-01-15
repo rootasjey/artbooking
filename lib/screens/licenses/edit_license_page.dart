@@ -6,10 +6,13 @@ import 'package:artbooking/screens/licenses/edit_license_page_header.dart';
 import 'package:artbooking/screens/licenses/edit_license_page_urls.dart';
 import 'package:artbooking/screens/licenses/edit_license_page_usage.dart';
 import 'package:artbooking/screens/licenses/edit_license_page_text_inputs.dart';
+import 'package:artbooking/types/cloud_functions/license_response.dart';
 import 'package:artbooking/types/illustration/license.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/src/public_ext.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 
 class EditLicensePage extends StatefulWidget {
@@ -108,7 +111,7 @@ class _EditLicensePageState extends State<EditLicensePage> {
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, top: 80.0),
       child: DarkElevatedButton.large(
-        onPressed: tryUpdateLicense,
+        onPressed: _isSaving ? null : tryCreateOrUpdateLicense,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 64.0),
           child: Text("create".tr()),
@@ -151,9 +154,46 @@ class _EditLicensePageState extends State<EditLicensePage> {
     }
   }
 
-  void tryUpdateLicense() async {
-    Beamer.of(context).popRoute();
+  void tryCreateOrUpdateLicense() {
+    if (widget.licenseId.isEmpty) {
+      tryCreateLicense();
+      return;
+    }
+
+    tryUpdateLicense();
   }
+
+  void tryCreateLicense() async {
+    if (_isSaving) {
+      return;
+    }
+
+    setState(() => _isSaving = true);
+
+    try {
+      _license.from = 'staff';
+      final HttpsCallableResult<dynamic> response =
+          await Utilities.cloud.fun("licenses-createOne").call({
+        "license": _license.toJSON(),
+      });
+
+      final data = CloudFunctionsLicenseResponse.fromJSON(response.data);
+
+      if (data.success) {
+        Beamer.of(context).popRoute();
+        return;
+      }
+
+      context.showErrorBar(content: Text("license_create_error".tr()));
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _isSaving = false);
+    }
+  }
+
+  void tryUpdateLicense() async {}
 
   void onUsageValueChange() {
     setState(() {});

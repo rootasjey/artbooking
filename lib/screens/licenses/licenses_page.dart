@@ -72,7 +72,11 @@ class _LicensesPageState extends State<LicensesPage> {
           MainAppBar(),
           header(),
           SliverPadding(
-            padding: const EdgeInsets.only(left: 54.0, right: 30.0),
+            padding: const EdgeInsets.only(
+              left: 54.0,
+              right: 30.0,
+              bottom: 300.0,
+            ),
             sliver: SliverList(
               delegate: SliverChildListDelegate.fixed([
                 ...sectionList(context),
