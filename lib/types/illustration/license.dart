@@ -9,7 +9,7 @@ import 'package:artbooking/types/updated_by.dart';
 class IllustrationLicense {
   IllustrationLicense({
     this.abbreviation = '',
-    this.createdAt,
+    required this.createdAt,
     this.createdBy = const CreatedBy(),
     this.description = '',
     this.from = '',
@@ -18,7 +18,7 @@ class IllustrationLicense {
     required this.name,
     this.notice = '',
     required this.terms,
-    this.updatedAt,
+    required this.updatedAt,
     this.updatedBy = const UpdatedBy(),
     required this.urls,
     required this.usage,
@@ -29,7 +29,7 @@ class IllustrationLicense {
   final String abbreviation;
 
   /// When this entry was created in Firestore.
-  final DateTime? createdAt;
+  final DateTime createdAt;
 
   final CreatedBy createdBy;
 
@@ -56,7 +56,7 @@ class IllustrationLicense {
   final LicenseTerms terms;
 
   /// When this entry was last updated in Firestore.
-  final DateTime? updatedAt;
+  final DateTime updatedAt;
 
   final UpdatedBy updatedBy;
 
