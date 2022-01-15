@@ -14,14 +14,14 @@
   },
   "main": "lib/index.js",
   "dependencies": {
-    "@google-cloud/storage": "5.16.1",
+    "@google-cloud/storage": "5.17.0",
     "algoliasearch": "4.12.0",
     "deep-equal": "2.0.5",
     "firebase-admin": "10.0.1",
     "firebase-functions": "3.16.0",
-    "firebase-tools": "10.0.1",
+    "firebase-tools": "10.1.0",
     "fs-extra": "10.0.0",
-    "image-size": "1.0.0",
+    "image-size": "1.0.1",
     "sharp": "0.29.3"
   },
   "devDependencies": {
