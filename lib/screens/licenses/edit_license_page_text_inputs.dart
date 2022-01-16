@@ -26,6 +26,13 @@ class _EditLicensePageTextInputsState extends State<EditLicensePageTextInputs> {
   var _descriptionTextController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _nameTextController.text = widget.license.name;
+    _descriptionTextController.text = widget.license.description;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

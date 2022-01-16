@@ -13,6 +13,7 @@ import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/illustration/license.dart';
+import 'package:artbooking/types/illustration/license_from.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
@@ -212,6 +213,7 @@ class _LicensesPageState extends State<LicensesPage> {
                       context: context,
                       builder: (context) => EditLicensePage(
                         licenseId: license.id,
+                        from: LicenseFrom.staff,
                       ),
                     );
                     break;
@@ -357,6 +359,7 @@ class _LicensesPageState extends State<LicensesPage> {
       context: context,
       builder: (context) => EditLicensePage(
         licenseId: '',
+        from: LicenseFrom.staff,
       ),
     );
   }

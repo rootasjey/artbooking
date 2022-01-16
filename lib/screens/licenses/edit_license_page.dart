@@ -8,6 +8,7 @@ import 'package:artbooking/screens/licenses/edit_license_page_usage.dart';
 import 'package:artbooking/screens/licenses/edit_license_page_text_inputs.dart';
 import 'package:artbooking/types/cloud_functions/license_response.dart';
 import 'package:artbooking/types/illustration/license.dart';
+import 'package:artbooking/types/illustration/license_from.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -19,9 +20,11 @@ class EditLicensePage extends StatefulWidget {
   const EditLicensePage({
     Key? key,
     required this.licenseId,
+    required this.from,
   }) : super(key: key);
 
   final String licenseId;
+  final LicenseFrom from;
 
   @override
   _EditLicensePageState createState() => _EditLicensePageState();
@@ -36,6 +39,7 @@ class _EditLicensePageState extends State<EditLicensePage> {
   @override
   void initState() {
     super.initState();
+    _license.setFrom(widget.from);
     tryFetchLicense();
   }
 
@@ -114,7 +118,9 @@ class _EditLicensePageState extends State<EditLicensePage> {
         onPressed: _isSaving ? null : tryCreateOrUpdateLicense,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 64.0),
-          child: Text("create".tr()),
+          child: Text(
+            widget.licenseId.isEmpty ? "create".tr() : "update".tr(),
+          ),
         ),
       ),
     );
@@ -125,9 +131,7 @@ class _EditLicensePageState extends State<EditLicensePage> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       final snapshot = await FirebaseFirestore.instance
@@ -141,16 +145,11 @@ class _EditLicensePageState extends State<EditLicensePage> {
       }
 
       data['id'] = snapshot.id;
-
-      setState(() {
-        _license = IllustrationLicense.fromJSON(data);
-      });
+      setState(() => _license = IllustrationLicense.fromJSON(data));
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
@@ -171,7 +170,6 @@ class _EditLicensePageState extends State<EditLicensePage> {
     setState(() => _isSaving = true);
 
     try {
-      _license.from = 'staff';
       final HttpsCallableResult<dynamic> response =
           await Utilities.cloud.fun("licenses-createOne").call({
         "license": _license.toJSON(),
@@ -193,7 +191,37 @@ class _EditLicensePageState extends State<EditLicensePage> {
     }
   }
 
-  void tryUpdateLicense() async {}
+  void tryUpdateLicense() async {
+    if (_isSaving) {
+      return;
+    }
+
+    setState(() => _isSaving = true);
+
+    try {
+      Utilities.logger.i(
+        "(update) wiki: ${_license.urls.wikipedia}",
+      );
+      final HttpsCallableResult<dynamic> response =
+          await Utilities.cloud.fun("licenses-updateOne").call({
+        "license": _license.toJSON(),
+      });
+
+      final data = CloudFunctionsLicenseResponse.fromJSON(response.data);
+
+      if (data.success) {
+        Beamer.of(context).popRoute();
+        return;
+      }
+
+      context.showErrorBar(content: Text("license_update_fail".tr()));
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _isSaving = false);
+    }
+  }
 
   void onUsageValueChange() {
     setState(() {});
