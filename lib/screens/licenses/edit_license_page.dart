@@ -78,6 +78,7 @@ class _EditLicensePageState extends State<EditLicensePage> {
   Widget body() {
     if (_isLoading) {
       return LoadingView(
+        sliver: false,
         title: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Opacity(

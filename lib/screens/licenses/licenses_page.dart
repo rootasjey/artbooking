@@ -1,13 +1,12 @@
 import 'dart:async';
 
-import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
-import 'package:artbooking/components/popup_menu_item_icon.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/themed_dialog.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/screens/licenses/edit_license_page.dart';
+import 'package:artbooking/screens/licenses/licenses_page_header.dart';
+import 'package:artbooking/screens/licenses/licenses_page_body.dart';
 import 'package:artbooking/types/cloud_functions/license_response.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
@@ -21,8 +20,6 @@ import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:unicons/unicons.dart';
-
-enum LicenseItemAction { edit, delete }
 
 class LicensesPage extends StatefulWidget {
   const LicensesPage({Key? key}) : super(key: key);
@@ -54,7 +51,7 @@ class _LicensesPageState extends State<LicensesPage> {
   final _searchTextController = TextEditingController();
 
   /// Maximum licenses to fetch in one request.
-  int _limit = 10;
+  int _limit = 20;
 
   QuerySnapshotStreamSubscription? _streamSubscription;
 
@@ -87,181 +84,32 @@ class _LicensesPageState extends State<LicensesPage> {
         slivers: <Widget>[
           SliverEdgePadding(),
           MainAppBar(),
-          header(),
-          body(),
+          LicensesPageHeader(),
+          LicensesPageBody(
+              licenses: _licenses,
+              isLoading: _isLoading,
+              onDeleteLicense: (targetLicense, targetIndex) {
+                showDeleteConfirmDialog(targetLicense, targetIndex);
+              },
+              onEditLicense: (targetLicense, targetIndex) {
+                showCupertinoModalBottomSheet(
+                  context: context,
+                  builder: (context) => EditLicensePage(
+                    licenseId: targetLicense.id,
+                    from: LicenseFrom.staff,
+                  ),
+                );
+              })
         ],
       ),
     );
-  }
-
-  Widget header() {
-    return SliverPadding(
-      padding: const EdgeInsets.only(
-        top: 60.0,
-        left: 74.0,
-        bottom: 24.0,
-      ),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
-          Opacity(
-            opacity: 0.8,
-            child: Text(
-              "licenses".tr().toUpperCase(),
-              style: Utilities.fonts.style(
-                fontSize: 30.0,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-          Opacity(
-            opacity: 0.4,
-            child: Text(
-              "You can visualize, add, remove, edit licenses here.",
-              style: Utilities.fonts.style(
-                fontSize: 16.0,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ]),
-      ),
-    );
-  }
-
-  Widget body() {
-    if (_isLoading) {
-      return loadingView();
-    }
-
-    return idleView();
-  }
-
-  Widget idleView() {
-    return SliverPadding(
-      padding: const EdgeInsets.only(
-        left: 54.0,
-        right: 30.0,
-        bottom: 300.0,
-      ),
-      sliver: SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final license = _licenses.elementAt(index);
-
-            return licenseCardItem(license, index);
-          },
-          childCount: _licenses.length,
-        ),
-      ),
-    );
-  }
-
-  Widget licenseCardItem(License license, int index) {
-    return Card(
-      elevation: 0.0,
-      color: Theme.of(context).backgroundColor,
-      child: InkWell(
-        onTap: () {
-          final route = DashboardLocationContent.licenseRoute
-              .replaceFirst(':licenseId', license.id);
-
-          Beamer.of(context).beamToNamed(route, data: {
-            'licenseId': license.id,
-          });
-        },
-        child: Row(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Opacity(
-                      opacity: 0.8,
-                      child: Text(
-                        license.name,
-                        style: Utilities.fonts.style(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4.0),
-                      child: Opacity(
-                        opacity: 0.6,
-                        child: Text(
-                          license.description,
-                          style: Utilities.fonts.style(),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            PopupMenuButton(
-              icon: Icon(UniconsLine.ellipsis_v),
-              onSelected: (value) {
-                switch (value) {
-                  case LicenseItemAction.delete:
-                    showDeleteConfirmDialog(license, index);
-                    break;
-                  case LicenseItemAction.edit:
-                    showCupertinoModalBottomSheet(
-                      context: context,
-                      builder: (context) => EditLicensePage(
-                        licenseId: license.id,
-                        from: LicenseFrom.staff,
-                      ),
-                    );
-                    break;
-                  default:
-                }
-              },
-              itemBuilder: itemBuilder,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget loadingView() {
-    return LoadingView(
-      title: Text(
-        "licenses_loading".tr(),
-        style: Utilities.fonts.style(
-          fontSize: 32.0,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
-  List<PopupMenuEntry<LicenseItemAction>> itemBuilder(
-    BuildContext context,
-  ) {
-    return [
-      PopupMenuItemIcon(
-        icon: Icon(UniconsLine.edit),
-        textLabel: "edit".tr(),
-        value: LicenseItemAction.edit,
-      ),
-      PopupMenuItemIcon(
-        icon: Icon(UniconsLine.trash),
-        textLabel: "delete".tr(),
-        value: LicenseItemAction.delete,
-      ),
-    ];
   }
 
   /// Fetch license on Firestore.
   void fetchLicenses() async {
     setState(() {
       _licenses.clear();
-      _isLoading = false;
+      _isLoading = true;
     });
 
     try {
@@ -302,7 +150,7 @@ class _LicensesPageState extends State<LicensesPage> {
   }
 
   /// Fetch more licenses on Firestore.
-  void fetchLicenseMore() async {
+  void fetchLicensesMore() async {
     setState(() {
       _isLoadingMore = true;
     });
@@ -348,7 +196,7 @@ class _LicensesPageState extends State<LicensesPage> {
     }
 
     if (_hasNext && !_isLoadingMore && _lastDocumentSnapshot != null) {
-      fetchLicenseMore();
+      fetchLicensesMore();
     }
 
     return false;
@@ -475,9 +323,7 @@ class _LicensesPageState extends State<LicensesPage> {
   }
 
   void tryDeleteLicense(License license, int index) async {
-    setState(() {
-      _licenses.removeAt(index);
-    });
+    setState(() => _licenses.removeAt(index));
 
     try {
       final response = await Utilities.cloud.fun('licenses-deleteOne').call({
@@ -486,7 +332,6 @@ class _LicensesPageState extends State<LicensesPage> {
       });
 
       final data = CloudFunctionsLicenseResponse.fromJSON(response.data);
-
       if (data.success) {
         return;
       }
@@ -495,9 +340,7 @@ class _LicensesPageState extends State<LicensesPage> {
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
-      setState(() {
-        _licenses.insert(index, license);
-      });
+      setState(() => _licenses.insert(index, license));
     }
   }
 

@@ -54,7 +54,13 @@ class _LicensePageState extends State<LicensePage> {
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed(
           [
-            if (_isLoading) ...loadingView() else ...idleView(),
+            if (_isLoading)
+              LoadingView(
+                sliver: false,
+                title: Text("Loading license"),
+              )
+            else
+              ...idleView(),
           ],
         ),
       ),
@@ -124,14 +130,6 @@ class _LicensePageState extends State<LicensePage> {
           urls: _license.urls,
         ),
       ),
-    ];
-  }
-
-  List<Widget> loadingView() {
-    return [
-      LoadingView(
-        title: Text("Loding license"),
-      )
     ];
   }
 
