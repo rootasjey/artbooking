@@ -67,7 +67,9 @@ class _EditLicensePageState extends State<EditLicensePage> {
             right: 24.0,
             child: PopupProgressIndicator(
               show: _isSaving,
-              message: '${"license_updating".tr()}...',
+              message: widget.licenseId.isEmpty
+                  ? '${"license_creating".tr()}...'
+                  : '${"license_updating".tr()}...',
             ),
           ),
         ],
