@@ -1,29 +1,33 @@
 import 'package:artbooking/types/cloud_functions/minimal_object_id.dart';
 
-class CloudFunctionsLicenseResponse {
-  const CloudFunctionsLicenseResponse({
+/// Cloud function response after performing an action on a license.
+class LicenseResponse {
+  const LicenseResponse({
     required this.success,
     required this.license,
   });
 
+  /// True if the operation was successful.
   final bool success;
+
+  /// Target license.
   final MinimalObjectId license;
 
-  factory CloudFunctionsLicenseResponse.empty() {
-    return CloudFunctionsLicenseResponse(
+  factory LicenseResponse.empty() {
+    return LicenseResponse(
       success: false,
       license: MinimalObjectId.empty(),
     );
   }
 
-  factory CloudFunctionsLicenseResponse.fromJSON(Map<String, dynamic>? data) {
+  factory LicenseResponse.fromJSON(Map<String, dynamic>? data) {
     if (data == null) {
-      return CloudFunctionsLicenseResponse.empty();
+      return LicenseResponse.empty();
     }
 
-    return CloudFunctionsLicenseResponse(
+    return LicenseResponse(
       success: data['success'] ?? false,
-      license: MinimalObjectId.fromJson(data['license']),
+      license: MinimalObjectId.fromJSON(data['license']),
     );
   }
 }

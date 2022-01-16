@@ -1,18 +1,18 @@
-import 'package:artbooking/types/share_urls.dart';
+import 'package:artbooking/types/illustration/share_urls.dart';
 import 'package:artbooking/types/illustration/thumbnail_urls.dart';
 
 class Urls {
-  String original;
-  ShareUrls share;
-  String storage;
-  ThumbnailUrls thumbnails;
-
   Urls({
     this.original = '',
     this.storage = '',
     required this.thumbnails,
     required this.share,
   });
+
+  String original;
+  ShareUrls share;
+  String storage;
+  ThumbnailUrls thumbnails;
 
   factory Urls.empty() {
     return Urls(

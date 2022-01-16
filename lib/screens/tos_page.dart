@@ -1,5 +1,5 @@
 import 'package:artbooking/components/footer/footer.dart';
-import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
+import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -30,7 +30,7 @@ class _TosPageState extends State<TosPage> {
         child: CustomScrollView(
           controller: _pageScrollController,
           slivers: [
-            MainAppBar(),
+            ApplicationBar(),
             body(),
             SliverList(
               delegate: SliverChildListDelegate.fixed([

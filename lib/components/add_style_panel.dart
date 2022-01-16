@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:algolia/algolia.dart';
-import 'package:artbooking/components/circle_button.dart';
-import 'package:artbooking/components/fade_in_x.dart';
+import 'package:artbooking/components/buttons/circle_button.dart';
+import 'package:artbooking/components/animations/fade_in_x.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/types/style.dart';
+import 'package:artbooking/types/art_style/art_style.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -26,7 +26,7 @@ class AddStylePanel extends StatefulWidget {
   final void Function()? onClose;
 
   /// This callback when an item is tapped.
-  final void Function(Style style, bool selected)? toggleStyleAndUpdate;
+  final void Function(ArtStyle style, bool selected)? toggleStyleAndUpdate;
 
   /// The panel elevation.
   final double elevation;
@@ -59,10 +59,10 @@ class _AddStylePanelState extends State<AddStylePanel> {
   DocumentSnapshot<Object>? _lastDocumentSnapshot;
 
   /// All available art styles.
-  final List<Style> _availableStyles = [];
+  final List<ArtStyle> _availableStyles = [];
 
   /// Search results.
-  final List<Style> _suggestionsStyles = [];
+  final List<ArtStyle> _suggestionsStyles = [];
 
   /// Search controller.
   final _searchTextController = TextEditingController();
@@ -74,7 +74,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
   int _limitStyles = 10;
 
   /// Selected style for image preview.
-  Style? _selectedStylePreview;
+  ArtStyle? _selectedStylePreview;
 
   /// Delay search after typing input.
   Timer? _searchTimer;
@@ -518,7 +518,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final style = Style.fromJSON(data);
+        final style = ArtStyle.fromJSON(data);
         _availableStyles.add(style);
       }
 
@@ -556,7 +556,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final style = Style.fromJSON(data);
+        final style = ArtStyle.fromJSON(data);
         _availableStyles.add(style);
       }
 
@@ -603,7 +603,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
           final data = hit.data;
           data['id'] = hit.objectID;
 
-          final style = Style.fromJSON(data);
+          final style = ArtStyle.fromJSON(data);
           _suggestionsStyles.add(style);
         }
       });

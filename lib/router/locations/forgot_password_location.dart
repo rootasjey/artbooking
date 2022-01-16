@@ -1,4 +1,4 @@
-import 'package:artbooking/screens/forgot_password_page.dart';
+import 'package:artbooking/screens/settings/settings_page_forgot_password.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/widgets.dart';
 
@@ -13,7 +13,7 @@ class ForgotPasswordLocation extends BeamLocation<BeamState> {
   List<BeamPage> buildPages(BuildContext context, BeamState state) {
     return [
       BeamPage(
-        child: ForgotPasswordPage(),
+        child: SettingsPageForgotPassword(),
         key: ValueKey(route),
         title: "Forgot Password",
         type: BeamPageType.fadeTransition,

@@ -4,7 +4,7 @@ import 'package:artbooking/types/license/license_from.dart';
 import 'package:artbooking/types/license/license_terms.dart';
 import 'package:artbooking/types/license/license_urls.dart';
 import 'package:artbooking/types/license/license_usage.dart';
-import 'package:artbooking/types/updated_by.dart';
+import 'package:artbooking/types/license/license_updated_by.dart';
 
 /// Describe how an artwork can be used.
 class License {
@@ -20,7 +20,7 @@ class License {
     this.notice = '',
     required this.terms,
     required this.updatedAt,
-    this.updatedBy = const UpdatedBy(),
+    this.updatedBy = const LicenseUpdatedBy(),
     required this.urls,
     required this.usage,
     this.version = '1.0',
@@ -59,7 +59,7 @@ class License {
   /// When this entry was last updated in Firestore.
   final DateTime updatedAt;
 
-  final UpdatedBy updatedBy;
+  final LicenseUpdatedBy updatedBy;
 
   /// If [custom] is true, defined what is permitted and is not.
   final LicenseUsage usage;
@@ -83,7 +83,7 @@ class License {
       notice: '',
       terms: LicenseTerms.empty(),
       updatedAt: DateTime.now(),
-      updatedBy: UpdatedBy.empty(),
+      updatedBy: LicenseUpdatedBy.empty(),
       urls: LicenseUrls.empty(),
       usage: LicenseUsage.empty(),
       version: '',
@@ -103,7 +103,7 @@ class License {
       notice: data['notice'] ?? '',
       terms: LicenseTerms.fromJSON(data['terms']),
       updatedAt: Utilities.date.fromFirestore(data['updatedAt']),
-      updatedBy: UpdatedBy.fromJSON(data['updatedBy']),
+      updatedBy: LicenseUpdatedBy.fromJSON(data['updatedBy']),
       urls: LicenseUrls.fromJSON(data['urls']),
       usage: LicenseUsage.fromJSON(data['usage']),
       version: data['version'] ?? '',

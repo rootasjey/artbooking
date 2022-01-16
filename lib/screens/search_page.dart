@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:artbooking/components/illustration_card.dart';
-import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
+import 'package:artbooking/components/cards/illustration_card.dart';
+import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
@@ -95,7 +95,7 @@ class _SearchPageState extends State<SearchPage> {
       child: CustomScrollView(
         controller: _scrollController,
         slivers: <Widget>[
-          MainAppBar(),
+          ApplicationBar(),
           SliverPadding(
             padding: const EdgeInsets.symmetric(
               horizontal: 100.0,

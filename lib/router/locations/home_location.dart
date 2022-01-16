@@ -1,4 +1,4 @@
-import 'package:artbooking/screens/home_page.dart';
+import 'package:artbooking/screens/home/home_page.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/widgets.dart';
 

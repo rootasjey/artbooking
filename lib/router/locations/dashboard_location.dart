@@ -1,20 +1,20 @@
 import 'package:artbooking/router/locations/signin_location.dart';
-import 'package:artbooking/screens/dashboard_welcome_page.dart';
-import 'package:artbooking/screens/dashboard_page.dart';
-import 'package:artbooking/screens/delete_account_page.dart';
-import 'package:artbooking/screens/edit_image_page.dart';
-import 'package:artbooking/screens/illustration_page.dart';
-import 'package:artbooking/screens/licenses/license_page.dart';
-import 'package:artbooking/screens/licenses/licenses_page.dart';
-import 'package:artbooking/screens/my_book_page.dart';
-import 'package:artbooking/screens/my_statistics_page/my_statistics_page.dart';
-import 'package:artbooking/screens/my_books_page.dart';
-import 'package:artbooking/screens/my_illustrations_page.dart';
-import 'package:artbooking/screens/my_profile_page.dart';
+import 'package:artbooking/screens/dashboard/dashboard_page_welcome.dart';
+import 'package:artbooking/screens/dashboard/dashboard_page.dart';
+import 'package:artbooking/screens/settings/settings_page_delete_account.dart';
+import 'package:artbooking/screens/illustrations/edit/edit_illustration_page_image.dart';
+import 'package:artbooking/screens/illustrations/illustration_page.dart';
+import 'package:artbooking/screens/licenses/one/license_page.dart';
+import 'package:artbooking/screens/licenses/many/licenses_page.dart';
+import 'package:artbooking/screens/dashboard/dashboard_page_book.dart';
+import 'package:artbooking/screens/activity/activity_page.dart';
+import 'package:artbooking/screens/dashboard/dashboard_page_books.dart';
+import 'package:artbooking/screens/dashboard/dashboard_page_illustrations.dart';
+import 'package:artbooking/screens/dashboard/dashboard_page_profile.dart';
 import 'package:artbooking/screens/settings/settings_page.dart';
-import 'package:artbooking/screens/update_email_page.dart';
-import 'package:artbooking/screens/update_password_page.dart';
-import 'package:artbooking/screens/update_username_page.dart';
+import 'package:artbooking/screens/settings/settings_page_update_email.dart';
+import 'package:artbooking/screens/settings/settings_page_update_password.dart';
+import 'package:artbooking/screens/settings/settings_page_update_username.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -125,14 +125,14 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
   List<BeamPage> buildPages(BuildContext context, BeamState state) {
     return [
       BeamPage(
-        child: DashboardWelcomePage(),
+        child: DashboardPageWelcome(),
         key: ValueKey(route),
         title: "dashboard".tr(),
         type: BeamPageType.fadeTransition,
       ),
       if (state.pathPatternSegments.contains('statistics'))
         BeamPage(
-          child: MyActivityPage(),
+          child: ActivityPage(),
           key: ValueKey(statisticsRoute),
           title: "statistics".tr(),
           type: BeamPageType.fadeTransition,
@@ -146,7 +146,7 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
         ),
       if (state.pathPatternSegments.contains(':bookId'))
         BeamPage(
-          child: MyBookPage(
+          child: DashboardPageBook(
             bookId: state.pathParameters['bookId']!,
           ),
           key: ValueKey('$booksRoute/one'),
@@ -178,42 +178,42 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
         ),
       if (isDeleteAccount(state.pathPatternSegments))
         BeamPage(
-          child: DeleteAccountPage(),
+          child: SettingsPageDeleteAccount(),
           key: ValueKey('$deleteAccountRoute'),
           title: "Delete account",
           type: BeamPageType.fadeTransition,
         ),
       if (isUpdateEmail(state.pathPatternSegments))
         BeamPage(
-          child: UpdateEmailPage(),
+          child: SettingsPageUpdateEmail(),
           key: ValueKey('$updateEmailRoute'),
           title: "Update email",
           type: BeamPageType.fadeTransition,
         ),
       if (isUpdatePassword(state.pathPatternSegments))
         BeamPage(
-          child: UpdatePasswordPage(),
+          child: SettingsPageUpdatePassword(),
           key: ValueKey('$updatePasswordRoute'),
           title: "Update password",
           type: BeamPageType.fadeTransition,
         ),
       if (isUpdateUsername(state.pathPatternSegments))
         BeamPage(
-          child: UpdateUsernamePage(),
+          child: SettingsPageUpdateUsername(),
           key: ValueKey('$updateUsernameRoute'),
           title: "Update username",
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains('profile'))
         BeamPage(
-          child: MyProfilePage(),
+          child: DashboardPageProfile(),
           key: ValueKey('$editProfilePictureRoute'),
           title: "My Profile",
           type: BeamPageType.fadeTransition,
         ),
       if (isEditPictureProfile(state.pathPatternSegments))
         BeamPage(
-          child: EditImagePage(),
+          child: EditIllustrationPageImage(),
           key: ValueKey('$editProfilePictureRoute'),
           title: "Edit Profile Picture",
           type: BeamPageType.fadeTransition,

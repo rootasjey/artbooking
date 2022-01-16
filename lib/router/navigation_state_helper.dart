@@ -1,4 +1,4 @@
-import 'package:artbooking/types/book.dart';
+import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:flutter/widgets.dart';
 

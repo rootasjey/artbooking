@@ -1,4 +1,4 @@
-import 'package:artbooking/components/animated_app_icon.dart';
+import 'package:artbooking/components/icons/animated_app_icon.dart';
 import 'package:flutter/material.dart';
 
 class LoadingView extends StatelessWidget {

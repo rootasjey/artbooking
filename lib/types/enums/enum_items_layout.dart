@@ -1,0 +1,4 @@
+enum EnumItemsLayout {
+  list,
+  grid,
+}

@@ -1,8 +1,8 @@
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/types/check_thumbnail_op_resp.dart';
-import 'package:artbooking/types/many_illus_op_resp.dart';
-import 'package:artbooking/types/one_illus_op_resp.dart';
-import 'package:artbooking/types/enums.dart';
+import 'package:artbooking/types/cloud_functions/check_urls_response.dart';
+import 'package:artbooking/types/cloud_functions/illustrations_response.dart';
+import 'package:artbooking/types/cloud_functions/illustration_response.dart';
+import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -12,7 +12,7 @@ class IllustrationsActions {
   /// If the document has missing properties, try to populate them from storage file.
   /// If there's no corresponding storage file, delete the firestore document.
   /// (The missing values may be due to a cloud function execution error)
-  static Future<CheckUrlsOpResp> checkProperties({
+  static Future<CheckPropertiesResponse> checkProperties({
     required String illustrationId,
   }) async {
     try {
@@ -21,19 +21,19 @@ class IllustrationsActions {
         'illustrationId': illustrationId,
       });
 
-      return CheckUrlsOpResp.fromJSON(response.data);
+      return CheckPropertiesResponse.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       Utilities.logger.e(exception);
-      return CheckUrlsOpResp.fromException(exception);
+      return CheckPropertiesResponse.fromException(exception);
     } catch (error) {
       Utilities.logger.e(error);
-      return CheckUrlsOpResp.fromMessage(error.toString());
+      return CheckPropertiesResponse.fromMessage(error.toString());
     }
   }
 
-  static Future<OneIllusOpResp> createOne({
+  static Future<IllustrationResponse> createOne({
     required String name,
-    ContentVisibility visibility = ContentVisibility.private,
+    EnumContentVisibility visibility = EnumContentVisibility.private,
   }) async {
     try {
       final response =
@@ -42,17 +42,17 @@ class IllustrationsActions {
         'visibility': Illustration.visibilityPropToString(visibility),
       });
 
-      return OneIllusOpResp.fromJSON(response.data);
+      return IllustrationResponse.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       Utilities.logger.e(exception);
-      return OneIllusOpResp.fromException(exception);
+      return IllustrationResponse.fromException(exception);
     } catch (error) {
       Utilities.logger.e(error);
-      return OneIllusOpResp.fromMessage(error.toString());
+      return IllustrationResponse.fromMessage(error.toString());
     }
   }
 
-  static Future<OneIllusOpResp> deleteOne({
+  static Future<IllustrationResponse> deleteOne({
     required String illustrationId,
   }) async {
     try {
@@ -61,17 +61,17 @@ class IllustrationsActions {
         'illustrationId': illustrationId,
       });
 
-      return OneIllusOpResp.fromJSON(response.data);
+      return IllustrationResponse.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       Utilities.logger.e(exception);
-      return OneIllusOpResp.fromException(exception);
+      return IllustrationResponse.fromException(exception);
     } catch (error) {
       Utilities.logger.e(error);
-      return OneIllusOpResp.fromMessage(error.toString());
+      return IllustrationResponse.fromMessage(error.toString());
     }
   }
 
-  static Future<ManyIllusOpResp> deleteMany({
+  static Future<IllustrationsResponse> deleteMany({
     required List<String?> illustrationIds,
   }) async {
     try {
@@ -80,22 +80,22 @@ class IllustrationsActions {
         'illustrationIds': illustrationIds,
       });
 
-      return ManyIllusOpResp.fromJSON(response.data);
+      return IllustrationsResponse.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       Utilities.logger.e(exception);
-      return ManyIllusOpResp.fromException(exception);
+      return IllustrationsResponse.fromException(exception);
     } catch (error) {
       Utilities.logger.e(error);
-      return ManyIllusOpResp.fromMessage(error.toString());
+      return IllustrationsResponse.fromMessage(error.toString());
     }
   }
 
-  static Future<OneIllusOpResp> updateMetadata({
+  static Future<IllustrationResponse> updateMetadata({
     String? name,
     String? description,
     String? summary,
     required License license,
-    ContentVisibility visibility = ContentVisibility.private,
+    EnumContentVisibility visibility = EnumContentVisibility.private,
     required Illustration illustration,
   }) async {
     try {
@@ -109,13 +109,13 @@ class IllustrationsActions {
         'visibility': Illustration.visibilityPropToString(visibility),
       });
 
-      return OneIllusOpResp.fromJSON(response.data);
+      return IllustrationResponse.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       Utilities.logger.e(exception);
-      return OneIllusOpResp.fromException(exception);
+      return IllustrationResponse.fromException(exception);
     } catch (error) {
       Utilities.logger.e(error);
-      return OneIllusOpResp.fromMessage(error.toString());
+      return IllustrationResponse.fromMessage(error.toString());
     }
   }
 }

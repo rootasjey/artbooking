@@ -1,5 +1,5 @@
 import 'package:artbooking/actions/users.dart';
-import 'package:artbooking/components/animated_app_icon.dart';
+import 'package:artbooking/components/icons/animated_app_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';

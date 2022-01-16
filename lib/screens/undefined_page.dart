@@ -1,5 +1,5 @@
-import 'package:artbooking/components/dark_elevated_button.dart';
-import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
+import 'package:artbooking/components/buttons/dark_elevated_button.dart';
+import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:beamer/beamer.dart';
@@ -17,7 +17,7 @@ class _UndefinedPageState extends State<UndefinedPage> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          MainAppBar(),
+          ApplicationBar(),
           SliverPadding(
             padding: const EdgeInsets.only(top: 60.0),
             sliver: SliverList(

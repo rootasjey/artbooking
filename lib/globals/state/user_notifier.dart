@@ -1,8 +1,8 @@
 import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/types/cloud_function_error.dart';
-import 'package:artbooking/types/cloud_function_response.dart';
-import 'package:artbooking/types/create_account_resp.dart';
+import 'package:artbooking/types/cloud_functions/cloud_functions_error.dart';
+import 'package:artbooking/types/cloud_functions/cloud_functions_response.dart';
+import 'package:artbooking/types/cloud_functions/create_account_response.dart';
 import 'package:artbooking/types/user/user.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,7 +17,7 @@ class UserNotifier extends StateNotifier<User> {
     signInOnAppStart();
   }
 
-  Future<CloudFunctionResponse> deleteAccount(String idToken) async {
+  Future<CloudFunctionsResponse> deleteAccount(String idToken) async {
     try {
       final callable = FirebaseFunctions.instanceFor(
         app: Firebase.app(),
@@ -30,13 +30,13 @@ class UserNotifier extends StateNotifier<User> {
 
       signOut();
 
-      return CloudFunctionResponse.fromJSON(response.data);
+      return CloudFunctionsResponse.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       Utilities.logger.e("[code: ${exception.code}] - ${exception.message}");
 
-      return CloudFunctionResponse(
+      return CloudFunctionsResponse(
         success: false,
-        error: CloudFunctionError(
+        error: CloudFunctionsError(
           code: exception.details['code'],
           message: exception.details['message'],
         ),
@@ -44,9 +44,9 @@ class UserNotifier extends StateNotifier<User> {
     } catch (error) {
       Utilities.logger.e(error);
 
-      return CloudFunctionResponse(
+      return CloudFunctionsResponse(
         success: false,
-        error: CloudFunctionError(
+        error: CloudFunctionsError(
           code: '',
           message: error.toString(),
         ),
@@ -225,7 +225,7 @@ class UserNotifier extends StateNotifier<User> {
     }
   }
 
-  Future<CreateAccountResp> signUp({
+  Future<CreateAccountResponse> signUp({
     required email,
     required username,
     required password,
@@ -247,7 +247,7 @@ class UserNotifier extends StateNotifier<User> {
     return createAccountResponse;
   }
 
-  Future<CloudFunctionResponse> updateEmail({
+  Future<CloudFunctionsResponse> updateEmail({
     required String password,
     required String newEmail,
   }) async {
@@ -275,11 +275,11 @@ class UserNotifier extends StateNotifier<User> {
 
       await signIn(email: authUser.email);
 
-      return CloudFunctionResponse.fromJSON(response.data);
+      return CloudFunctionsResponse.fromJSON(response.data);
     } catch (error) {
-      return CloudFunctionResponse(
+      return CloudFunctionsResponse(
         success: false,
-        error: CloudFunctionError(
+        error: CloudFunctionsError(
           code: '',
           message: error.toString(),
         ),
@@ -324,17 +324,17 @@ class UserNotifier extends StateNotifier<User> {
     }
   }
 
-  Future<CloudFunctionResponse> updateUsername(String newUsername) async {
+  Future<CloudFunctionsResponse> updateUsername(String newUsername) async {
     try {
       final response = await Utilities.cloud.fun('users-updateUsername').call({
         'newUsername': newUsername,
       });
 
-      return CloudFunctionResponse.fromJSON(response.data);
+      return CloudFunctionsResponse.fromJSON(response.data);
     } catch (error) {
-      return CloudFunctionResponse(
+      return CloudFunctionsResponse(
         success: false,
-        error: CloudFunctionError(
+        error: CloudFunctionsError(
           code: '',
           message: error.toString(),
         ),

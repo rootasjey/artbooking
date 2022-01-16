@@ -1,7 +1,7 @@
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/acl.dart';
 import 'package:artbooking/types/author.dart';
-import 'package:artbooking/types/enums.dart';
+import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/illustration/dimensions.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:artbooking/types/illustration/stats.dart';
@@ -28,7 +28,7 @@ class Illustration {
     this.updatedAt,
     required this.urls,
     this.versions = const [],
-    this.visibility,
+    this.visibility = EnumContentVisibility.private,
   });
 
   /// Access Control List managing this illustration visibility to others users.
@@ -91,7 +91,7 @@ class Illustration {
 
   /// Access control policy.
   /// Define who can read or write this illustration.
-  ContentVisibility? visibility;
+  EnumContentVisibility visibility;
 
   factory Illustration.empty() {
     return Illustration(
@@ -113,7 +113,7 @@ class Illustration {
       updatedAt: DateTime.now(),
       urls: Urls.empty(),
       versions: const [],
-      visibility: ContentVisibility.private,
+      visibility: EnumContentVisibility.private,
     );
   }
 
@@ -206,39 +206,39 @@ class Illustration {
     return results;
   }
 
-  static ContentVisibility parseVisibility(String? stringVisiblity) {
+  static EnumContentVisibility parseVisibility(String? stringVisiblity) {
     switch (stringVisiblity) {
       case 'acl':
-        return ContentVisibility.acl;
+        return EnumContentVisibility.acl;
       case 'private':
-        return ContentVisibility.private;
+        return EnumContentVisibility.private;
       case 'public':
-        return ContentVisibility.public;
+        return EnumContentVisibility.public;
       default:
-        return ContentVisibility.private;
+        return EnumContentVisibility.private;
     }
   }
 
   String visibilityToString() {
     switch (visibility) {
-      case ContentVisibility.acl:
+      case EnumContentVisibility.acl:
         return 'acl';
-      case ContentVisibility.private:
+      case EnumContentVisibility.private:
         return 'private';
-      case ContentVisibility.public:
+      case EnumContentVisibility.public:
         return 'public';
       default:
         return 'private';
     }
   }
 
-  static String visibilityPropToString(ContentVisibility visibility) {
+  static String visibilityPropToString(EnumContentVisibility visibility) {
     switch (visibility) {
-      case ContentVisibility.acl:
+      case EnumContentVisibility.acl:
         return 'acl';
-      case ContentVisibility.private:
+      case EnumContentVisibility.private:
         return 'private';
-      case ContentVisibility.public:
+      case EnumContentVisibility.public:
         return 'public';
       default:
         return 'private';

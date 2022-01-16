@@ -1,10 +1,10 @@
 class Author {
-  /// Author's id.
-  String id;
-
   Author({
     required this.id,
   });
+
+  /// Author's id.
+  String id;
 
   factory Author.empty() {
     return Author(

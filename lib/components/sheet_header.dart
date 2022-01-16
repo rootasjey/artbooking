@@ -1,4 +1,4 @@
-import 'package:artbooking/components/circle_button.dart';
+import 'package:artbooking/components/buttons/circle_button.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';

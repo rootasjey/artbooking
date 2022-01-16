@@ -1,5 +1,6 @@
 import 'package:artbooking/globals/constants.dart';
-import 'package:artbooking/types/enums.dart';
+import 'package:artbooking/types/enums/enum_discover_type.dart';
+import 'package:artbooking/types/enums/enum_items_layout.dart';
 import 'package:artbooking/globals/constants/storage_keys_constants.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 
@@ -93,9 +94,11 @@ class StorageUtilities {
   // / ----------------/
   // /      Layout     /
   // / ----------------/
-  DiscoverType getDiscoverType() {
+  EnumDiscoverType getDiscoverType() {
     final value = _localStorage!.getString(Constants.storageKeys.discoverType);
-    return value == 'authors' ? DiscoverType.authors : DiscoverType.references;
+    return value == 'authors'
+        ? EnumDiscoverType.authors
+        : EnumDiscoverType.references;
   }
 
   List<String> getDrafts() {
@@ -104,17 +107,17 @@ class StorageUtilities {
     return drafts;
   }
 
-  ItemsLayout getItemsStyle(String pageRoute) {
+  EnumItemsLayout getItemsStyle(String pageRoute) {
     final itemsStyle = _localStorage!
         .getString('${Constants.storageKeys.itemsStyle}$pageRoute');
 
     switch (itemsStyle) {
       case StorageKeys.itemsLayoutGrid:
-        return ItemsLayout.grid;
+        return EnumItemsLayout.grid;
       case StorageKeys.itemsLayoutList:
-        return ItemsLayout.list;
+        return EnumItemsLayout.list;
       default:
-        return ItemsLayout.list;
+        return EnumItemsLayout.list;
     }
   }
 
@@ -137,14 +140,14 @@ class StorageUtilities {
         true;
   }
 
-  void saveDiscoverType(DiscoverType discoverType) {
+  void saveDiscoverType(EnumDiscoverType discoverType) {
     final value =
-        discoverType == DiscoverType.authors ? 'authors' : 'references';
+        discoverType == EnumDiscoverType.authors ? 'authors' : 'references';
 
     _localStorage!.setString('discover_type', value);
   }
 
-  void saveItemsStyle({String? pageRoute, ItemsLayout? style}) {
+  void saveItemsStyle({String? pageRoute, EnumItemsLayout? style}) {
     _localStorage!.setString('items_style_$pageRoute', style.toString());
   }
 

@@ -1,5 +1,5 @@
-import 'package:artbooking/components/dark_elevated_button.dart';
-import 'package:artbooking/components/dot_close_button.dart';
+import 'package:artbooking/components/buttons/dark_elevated_button.dart';
+import 'package:artbooking/components/buttons/dot_close_button.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/components/validation_shortcuts.dart';
 import 'package:easy_localization/easy_localization.dart';

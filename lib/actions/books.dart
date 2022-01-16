@@ -1,11 +1,11 @@
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/types/many_books_op_resp.dart';
-import 'package:artbooking/types/many_illus_op_resp.dart';
-import 'package:artbooking/types/one_book_op_resp.dart';
+import 'package:artbooking/types/cloud_functions/books_response.dart';
+import 'package:artbooking/types/cloud_functions/illustrations_response.dart';
+import 'package:artbooking/types/cloud_functions/book_response.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class BooksActions {
-  static Future<ManyIllusOpResp> addIllustrations({
+  static Future<IllustrationsResponse> addIllustrations({
     required String bookId,
     required List<String> illustrationIds,
   }) async {
@@ -16,17 +16,17 @@ class BooksActions {
         'illustrationIds': illustrationIds,
       });
 
-      return ManyIllusOpResp.fromJSON(response.data);
+      return IllustrationsResponse.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       Utilities.logger.e(exception);
-      return ManyIllusOpResp.fromException(exception);
+      return IllustrationsResponse.fromException(exception);
     } catch (error) {
       Utilities.logger.e(error);
-      return ManyIllusOpResp.fromMessage(error.toString());
+      return IllustrationsResponse.fromMessage(error.toString());
     }
   }
 
-  static Future<OneBookOpResp> createOne({
+  static Future<BookResponse> createOne({
     required String name,
     String description = '',
     List<String?> illustrationIds = const [],
@@ -38,17 +38,17 @@ class BooksActions {
         'illustrationIds': illustrationIds,
       });
 
-      return OneBookOpResp.fromJSON(response.data);
+      return BookResponse.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       Utilities.logger.e(exception);
-      return OneBookOpResp.fromException(exception);
+      return BookResponse.fromException(exception);
     } catch (error) {
       Utilities.logger.e(error);
-      return OneBookOpResp.fromMessage(error.toString());
+      return BookResponse.fromMessage(error.toString());
     }
   }
 
-  static Future<OneBookOpResp> deleteOne({
+  static Future<BookResponse> deleteOne({
     required String? bookId,
   }) async {
     try {
@@ -56,17 +56,17 @@ class BooksActions {
         'bookId': bookId,
       });
 
-      return OneBookOpResp.fromJSON(response.data);
+      return BookResponse.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       Utilities.logger.e(exception);
-      return OneBookOpResp.fromException(exception);
+      return BookResponse.fromException(exception);
     } catch (error) {
       Utilities.logger.e(error);
-      return OneBookOpResp.fromMessage(error.toString());
+      return BookResponse.fromMessage(error.toString());
     }
   }
 
-  static Future<ManyBooksOpResp> deleteMany({
+  static Future<BooksResponse> deleteMany({
     required List<String?> bookIds,
   }) async {
     try {
@@ -74,17 +74,17 @@ class BooksActions {
         'bookIds': bookIds,
       });
 
-      return ManyBooksOpResp.fromJSON(response.data);
+      return BooksResponse.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       Utilities.logger.e(exception);
-      return ManyBooksOpResp.fromException(exception);
+      return BooksResponse.fromException(exception);
     } catch (error) {
       Utilities.logger.e(error);
-      return ManyBooksOpResp.fromMessage(error.toString());
+      return BooksResponse.fromMessage(error.toString());
     }
   }
 
-  static Future<ManyIllusOpResp> removeIllustrations({
+  static Future<IllustrationsResponse> removeIllustrations({
     required String? bookId,
     required List<String?> illustrationIds,
   }) async {
@@ -95,18 +95,18 @@ class BooksActions {
         'illustrationIds': illustrationIds,
       });
 
-      return ManyIllusOpResp.fromJSON(response.data);
+      return IllustrationsResponse.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       Utilities.logger.e(exception);
-      return ManyIllusOpResp.fromException(exception);
+      return IllustrationsResponse.fromException(exception);
     } catch (error) {
       Utilities.logger.e(error);
-      return ManyIllusOpResp.fromMessage(error.toString());
+      return IllustrationsResponse.fromMessage(error.toString());
     }
   }
 
   /// Rename one book with a new name and a new description.
-  static Future<OneBookOpResp> renameOne(
+  static Future<BookResponse> renameOne(
       {required String name,
       String description = '',
       required String bookId}) async {
@@ -117,13 +117,13 @@ class BooksActions {
         'bookId': bookId,
       });
 
-      return OneBookOpResp.fromJSON(response.data);
+      return BookResponse.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       Utilities.logger.e(exception);
-      return OneBookOpResp.fromException(exception);
+      return BookResponse.fromException(exception);
     } catch (error) {
       Utilities.logger.e(error);
-      return OneBookOpResp.fromMessage(error.toString());
+      return BookResponse.fromMessage(error.toString());
     }
   }
 }

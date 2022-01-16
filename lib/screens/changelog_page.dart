@@ -1,4 +1,4 @@
-import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
+import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/types/changelog_item.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -131,7 +131,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          MainAppBar(),
+          ApplicationBar(),
           SliverPadding(
             padding: EdgeInsets.symmetric(
               horizontal: horPadding,

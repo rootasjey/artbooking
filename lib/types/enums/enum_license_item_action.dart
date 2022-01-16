@@ -1,0 +1,1 @@
+enum EnumLicenseItemAction { edit, delete }

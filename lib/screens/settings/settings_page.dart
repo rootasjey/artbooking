@@ -1,10 +1,10 @@
-import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
-import 'package:artbooking/components/page_title.dart';
+import 'package:artbooking/components/application_bar/application_bar.dart';
+import 'package:artbooking/components/texts/page_title.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
-import 'package:artbooking/screens/settings/account_settings.dart';
-import 'package:artbooking/screens/settings/app_settings.dart';
+import 'package:artbooking/screens/settings/settings_page_account.dart';
+import 'package:artbooking/screens/settings/settings_page_app.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
@@ -65,7 +65,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             CustomScrollView(
               controller: _pageScrollController,
               slivers: <Widget>[
-                if (widget.showAppBar) MainAppBar(),
+                if (widget.showAppBar) ApplicationBar(),
                 SliverPadding(
                   padding: EdgeInsets.only(
                     top: paddingTop,
@@ -81,7 +81,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                           ),
                         ),
-                      AccountSettings(
+                      SettingsPageAccount(
                         isAuthenticated: ref
                             .read(AppState.userProvider.notifier)
                             .isAuthenticated,
@@ -95,7 +95,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         onGoToUpdateUsername: onGoToUpdateUsername,
                         onGoToDeleteAccount: onGoToDeleteAccount,
                       ),
-                      AppSettings(),
+                      SettingsPageApp(),
                     ]),
                   ),
                 ),

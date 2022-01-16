@@ -1,1 +1,0 @@
-enum LicenseItemAction { edit, delete }

@@ -1,5 +1,5 @@
 import 'package:artbooking/components/avatar/adaptive_user_avatar.dart';
-import 'package:artbooking/components/popup_menu_item_icon.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/locations/search_location.dart';
 import 'package:beamer/beamer.dart';

@@ -1,7 +1,7 @@
-import 'package:artbooking/components/popup_menu_item_icon.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/license/license.dart';
-import 'package:artbooking/types/license_item_action.dart';
+import 'package:artbooking/types/enums/enum_license_item_action.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -86,10 +86,10 @@ class LicenseCardItem extends StatelessWidget {
       icon: Icon(UniconsLine.ellipsis_v),
       onSelected: (value) {
         switch (value) {
-          case LicenseItemAction.delete:
+          case EnumLicenseItemAction.delete:
             onDelete?.call(license, index);
             break;
-          case LicenseItemAction.edit:
+          case EnumLicenseItemAction.edit:
             onEdit?.call(license, index);
             break;
           default:
@@ -99,19 +99,19 @@ class LicenseCardItem extends StatelessWidget {
     );
   }
 
-  List<PopupMenuEntry<LicenseItemAction>> itemBuilder(
+  List<PopupMenuEntry<EnumLicenseItemAction>> itemBuilder(
     BuildContext context,
   ) {
     return [
       PopupMenuItemIcon(
         icon: Icon(UniconsLine.edit),
         textLabel: "edit".tr(),
-        value: LicenseItemAction.edit,
+        value: EnumLicenseItemAction.edit,
       ),
       PopupMenuItemIcon(
         icon: Icon(UniconsLine.trash),
         textLabel: "delete".tr(),
-        value: LicenseItemAction.delete,
+        value: EnumLicenseItemAction.delete,
       ),
     ];
   }

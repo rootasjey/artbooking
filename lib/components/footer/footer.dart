@@ -1,7 +1,7 @@
-import 'package:artbooking/components/footer/sections/about_us_section.dart';
-import 'package:artbooking/components/footer/sections/artworks_section.dart';
-import 'package:artbooking/components/footer/sections/legal_section.dart';
-import 'package:artbooking/components/footer/sections/user_section.dart';
+import 'package:artbooking/components/footer/sections/footer_about_us.dart';
+import 'package:artbooking/components/footer/sections/footer_artworks.dart';
+import 'package:artbooking/components/footer/sections/footer_legal.dart';
+import 'package:artbooking/components/footer/sections/footer_user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -42,10 +42,10 @@ class _FooterState extends ConsumerState<Footer> {
             thickness: 1.0,
             color: Colors.black38,
           ),
-          LegalSection(),
-          ArtworksSection(),
-          UserSection(),
-          AboutUsSection(),
+          FooterLegal(),
+          FooterArtworks(),
+          FooterUser(),
+          FooterAboutUs(),
         ],
       ),
     );

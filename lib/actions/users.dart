@@ -1,6 +1,6 @@
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:artbooking/types/cloud_function_error.dart';
-import 'package:artbooking/types/create_account_resp.dart';
+import 'package:artbooking/types/cloud_functions/cloud_functions_error.dart';
+import 'package:artbooking/types/cloud_functions/create_account_response.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +28,7 @@ class UsersActions {
   }
 
   /// Create a new account.
-  static Future<CreateAccountResp> createAccount({
+  static Future<CreateAccountResponse> createAccount({
     /*required*/ required String email,
     required String username,
     required String password,
@@ -45,20 +45,20 @@ class UsersActions {
         'email': email,
       });
 
-      return CreateAccountResp.fromJSON(response.data);
+      return CreateAccountResponse.fromJSON(response.data);
     } on FirebaseFunctionsException catch (exception) {
       debugPrint("[code: ${exception.code}] - ${exception.message}");
-      return CreateAccountResp(
+      return CreateAccountResponse(
         success: false,
-        error: CloudFunctionError(
+        error: CloudFunctionsError(
           code: exception.code,
-          message: exception.message,
+          message: exception.message ?? '',
         ),
       );
     } catch (error) {
-      return CreateAccountResp(
+      return CreateAccountResponse(
         success: false,
-        error: CloudFunctionError(
+        error: CloudFunctionsError(
           code: '',
           message: error.toString(),
         ),

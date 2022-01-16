@@ -1,5 +1,5 @@
 import 'package:artbooking/router/locations/home_location.dart';
-import 'package:artbooking/screens/signup_page.dart';
+import 'package:artbooking/screens/connection/signup_page.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/widgets.dart';

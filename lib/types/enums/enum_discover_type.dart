@@ -1,0 +1,4 @@
+enum EnumDiscoverType {
+  authors,
+  references,
+}
