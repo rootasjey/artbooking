@@ -1,17 +1,27 @@
 import 'dart:async';
 
+import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/main_app_bar/main_app_bar.dart';
+import 'package:artbooking/components/popup_menu_item_icon.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
+import 'package:artbooking/components/themed_dialog.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/screens/licenses/edit_license_page.dart';
+import 'package:artbooking/types/cloud_functions/license_response.dart';
+import 'package:artbooking/types/firestore/document_change_map.dart';
+import 'package:artbooking/types/firestore/query_map.dart';
+import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/illustration/license.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
+import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:unicons/unicons.dart';
+
+enum LicenseItemAction { edit, delete }
 
 class LicensesPage extends StatefulWidget {
   const LicensesPage({Key? key}) : super(key: key);
@@ -27,11 +37,14 @@ class _LicensesPageState extends State<LicensesPage> {
   /// True if loading more style from Firestore.
   bool _isLoadingMore = false;
 
+  bool _descending = true;
+  bool _isLoading = false;
+
   /// Last fetched document snapshot. Used for pagination.
   DocumentSnapshot<Object>? _lastDocumentSnapshot;
 
-  /// All available art styles.
-  final List<IllustrationLicense> _availableLicenses = [];
+  /// Staff's available licenses.
+  final List<IllustrationLicense> _licenses = [];
 
   /// Search results.
   // final List<IllustrationLicense> _suggestionsLicenses = [];
@@ -41,6 +54,8 @@ class _LicensesPageState extends State<LicensesPage> {
 
   /// Maximum licenses to fetch in one request.
   int _limit = 10;
+
+  QuerySnapshotStreamSubscription? _streamSubscription;
 
   /// Delay search after typing input.
   Timer? _searchTimer;
@@ -55,6 +70,7 @@ class _LicensesPageState extends State<LicensesPage> {
   void dispose() {
     _searchTimer?.cancel();
     _searchTextController.dispose();
+    _streamSubscription?.cancel();
     super.dispose();
   }
 
@@ -71,18 +87,7 @@ class _LicensesPageState extends State<LicensesPage> {
           SliverEdgePadding(),
           MainAppBar(),
           header(),
-          SliverPadding(
-            padding: const EdgeInsets.only(
-              left: 54.0,
-              right: 30.0,
-              bottom: 300.0,
-            ),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate.fixed([
-                ...sectionList(context),
-              ]),
-            ),
-          ),
+          body(),
         ],
       ),
     );
@@ -122,68 +127,154 @@ class _LicensesPageState extends State<LicensesPage> {
     );
   }
 
-  List<Widget> sectionList(BuildContext context) {
-    return _availableLicenses.map(
-      (IllustrationLicense license) {
-        return Card(
-          elevation: 0.0,
-          color: Theme.of(context).backgroundColor,
-          child: InkWell(
-            onTap: () => Beamer.of(context).beamToNamed(
-              DashboardLocationContent.licenseRoute
-                  .replaceFirst(':licenseId', license.id),
-              data: {
-                'licenseId': license.id,
-              },
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Opacity(
-                    opacity: 0.8,
-                    child: Text(
-                      license.name,
-                      style: Utilities.fonts.style(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: Opacity(
-                      opacity: 0.6,
+  Widget body() {
+    if (_isLoading) {
+      return loadingView();
+    }
+
+    return idleView();
+  }
+
+  Widget idleView() {
+    return SliverPadding(
+      padding: const EdgeInsets.only(
+        left: 54.0,
+        right: 30.0,
+        bottom: 300.0,
+      ),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final license = _licenses.elementAt(index);
+
+            return licenseCardItem(license, index);
+          },
+          childCount: _licenses.length,
+        ),
+      ),
+    );
+  }
+
+  Widget licenseCardItem(IllustrationLicense license, int index) {
+    return Card(
+      elevation: 0.0,
+      color: Theme.of(context).backgroundColor,
+      child: InkWell(
+        onTap: () {
+          final route = DashboardLocationContent.licenseRoute
+              .replaceFirst(':licenseId', license.id);
+
+          Beamer.of(context).beamToNamed(route, data: {
+            'licenseId': license.id,
+          });
+        },
+        child: Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Opacity(
+                      opacity: 0.8,
                       child: Text(
-                        license.description,
-                        style: Utilities.fonts.style(),
+                        license.name,
+                        style: Utilities.fonts.style(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      child: Opacity(
+                        opacity: 0.6,
+                        child: Text(
+                          license.description,
+                          style: Utilities.fonts.style(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      },
-    ).toList();
+            PopupMenuButton(
+              icon: Icon(UniconsLine.ellipsis_v),
+              onSelected: (value) {
+                switch (value) {
+                  case LicenseItemAction.delete:
+                    showDeleteConfirmDialog(license, index);
+                    break;
+                  case LicenseItemAction.edit:
+                    showCupertinoModalBottomSheet(
+                      context: context,
+                      builder: (context) => EditLicensePage(
+                        licenseId: license.id,
+                      ),
+                    );
+                    break;
+                  default:
+                }
+              },
+              itemBuilder: itemBuilder,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget loadingView() {
+    return LoadingView(
+      title: Text(
+        "licenses_loading".tr(),
+        style: Utilities.fonts.style(
+          fontSize: 32.0,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  List<PopupMenuEntry<LicenseItemAction>> itemBuilder(
+    BuildContext context,
+  ) {
+    return [
+      PopupMenuItemIcon(
+        icon: Icon(UniconsLine.edit),
+        textLabel: "edit".tr(),
+        value: LicenseItemAction.edit,
+      ),
+      PopupMenuItemIcon(
+        icon: Icon(UniconsLine.trash),
+        textLabel: "delete".tr(),
+        value: LicenseItemAction.delete,
+      ),
+    ];
   }
 
   /// Fetch license on Firestore.
   void fetchLicenses() async {
-    _availableLicenses.clear();
+    setState(() {
+      _licenses.clear();
+      _isLoading = false;
+    });
 
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final query = await FirebaseFirestore.instance
           .collection('licenses')
-          .limit(_limit)
-          .orderBy('name', descending: true)
-          .get();
+          .orderBy('createdAt', descending: _descending)
+          .limit(_limit);
+
+      startListenningToCollection(query);
+      final snapshot = await query.get();
 
       if (snapshot.size == 0) {
         setState(() {
           _hasNext = false;
+          _isLoading = false;
         });
 
         return;
@@ -194,7 +285,7 @@ class _LicensesPageState extends State<LicensesPage> {
         data['id'] = doc.id;
 
         final license = IllustrationLicense.fromJSON(data);
-        _availableLicenses.add(license);
+        _licenses.add(license);
       }
 
       setState(() {
@@ -203,6 +294,8 @@ class _LicensesPageState extends State<LicensesPage> {
       });
     } catch (error) {
       Utilities.logger.e(error);
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
@@ -234,7 +327,7 @@ class _LicensesPageState extends State<LicensesPage> {
         data['id'] = doc.id;
 
         final license = IllustrationLicense.fromJSON(data);
-        _availableLicenses.add(license);
+        _licenses.add(license);
       }
 
       setState(() {
@@ -266,5 +359,172 @@ class _LicensesPageState extends State<LicensesPage> {
         licenseId: '',
       ),
     );
+  }
+
+  void showDeleteConfirmDialog(IllustrationLicense license, int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return ThemedDialog(
+          spaceActive: false,
+          centerTitle: false,
+          autofocus: true,
+          title: Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Opacity(
+              opacity: 0.8,
+              child: Text(
+                "license_delete".tr().toUpperCase(),
+                style: Utilities.fonts.style(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+          body: Container(
+            width: 300.0,
+            padding: const EdgeInsets.all(12.0),
+            child: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Text.rich(
+                  TextSpan(
+                    text: "license_delete_are_you_sure".tr(),
+                    style: Utilities.fonts.style(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: license.name,
+                        style: Utilities.fonts.style(
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context).secondaryHeaderColor,
+                        ),
+                      ),
+                      TextSpan(text: " ?"),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          textButtonValidation: "delete".tr(),
+          onValidate: () {
+            tryDeleteLicense(license, index);
+            Beamer.of(context).popRoute();
+          },
+          onCancel: Beamer.of(context).popRoute,
+        );
+      },
+    );
+  }
+
+  /// Listen to the last Firestore query of this page.
+  void startListenningToCollection(QueryMap query) {
+    _streamSubscription = query.snapshots().skip(1).listen(
+      (snapshot) {
+        for (DocumentChangeMap documentChange in snapshot.docChanges) {
+          switch (documentChange.type) {
+            case DocumentChangeType.added:
+              addStreamingDoc(documentChange);
+              break;
+            case DocumentChangeType.modified:
+              updateStreamingDoc(documentChange);
+              break;
+            case DocumentChangeType.removed:
+              removeStreamingDoc(documentChange);
+              break;
+          }
+        }
+      },
+      onError: (error) {
+        Utilities.logger.e(error);
+      },
+    );
+  }
+
+  /// Fire when a new document has been created in Firestore.
+  /// Add the corresponding document in the UI.
+  void addStreamingDoc(DocumentChangeMap documentChange) {
+    final data = documentChange.doc.data();
+
+    if (data == null) {
+      return;
+    }
+
+    setState(() {
+      data['id'] = documentChange.doc.id;
+      final illustration = IllustrationLicense.fromJSON(data);
+      _licenses.insert(0, illustration);
+    });
+  }
+
+  /// Fire when a new document has been delete from Firestore.
+  /// Delete the corresponding document from the UI.
+  void removeStreamingDoc(DocumentChangeMap documentChange) {
+    setState(() {
+      _licenses.removeWhere(
+        (license) => license.id == documentChange.doc.id,
+      );
+    });
+  }
+
+  void tryDeleteLicense(IllustrationLicense license, int index) async {
+    setState(() {
+      _licenses.removeAt(index);
+    });
+
+    try {
+      final response = await Utilities.cloud.fun('licenses-deleteOne').call({
+        'licenseId': license.id,
+        'from': 'staff',
+      });
+
+      final data = CloudFunctionsLicenseResponse.fromJSON(response.data);
+
+      if (data.success) {
+        return;
+      }
+
+      throw ErrorDescription("license_delete_failed".tr());
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+      setState(() {
+        _licenses.insert(index, license);
+      });
+    }
+  }
+
+  /// Fire when a new document has been updated in Firestore.
+  /// Update the corresponding document in the UI.
+  void updateStreamingDoc(DocumentChangeMap documentChange) {
+    try {
+      final data = documentChange.doc.data();
+      if (data == null) {
+        return;
+      }
+
+      final int index = _licenses.indexWhere(
+        (illustration) => illustration.id == documentChange.doc.id,
+      );
+
+      data['id'] = documentChange.doc.id;
+      final updatedIllustration = IllustrationLicense.fromJSON(data);
+
+      setState(() {
+        _licenses.removeAt(index);
+        _licenses.insert(index, updatedIllustration);
+      });
+    } on Exception catch (error) {
+      Utilities.logger.e(
+        "The document with the id ${documentChange.doc.id} "
+        "doesn't exist in the illustrations list.",
+      );
+
+      Utilities.logger.e(error);
+    }
   }
 }
