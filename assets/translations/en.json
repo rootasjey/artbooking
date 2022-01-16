@@ -420,6 +420,7 @@
   },
   "licenses": "Licenses",
   "licenses_available": "Available licenses",
+  "licenses_loading": "Loading licenses",
   "licenses_subtitle": "Tap to select or unselect a license. Long tap for more information.",
   "light": "Light",
   "like": "Like",

@@ -420,6 +420,7 @@
   },
   "licenses": "Licenses disponibles",
   "licenses_available": "License disponibles",
+  "licenses_loading": "Chargement des licences",
   "licenses_subtitle": "Tapoter pour sélectionner ou désélectionner une licence. Faites un appui long pour plus d'informations.",
   "light": "Clair",
   "like": "J'aime",
