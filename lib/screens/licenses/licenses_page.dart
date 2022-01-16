@@ -12,8 +12,8 @@ import 'package:artbooking/types/cloud_functions/license_response.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
-import 'package:artbooking/types/illustration/license.dart';
-import 'package:artbooking/types/illustration/license_from.dart';
+import 'package:artbooking/types/license/license.dart';
+import 'package:artbooking/types/license/license_from.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
@@ -45,7 +45,7 @@ class _LicensesPageState extends State<LicensesPage> {
   DocumentSnapshot<Object>? _lastDocumentSnapshot;
 
   /// Staff's available licenses.
-  final List<IllustrationLicense> _licenses = [];
+  final List<License> _licenses = [];
 
   /// Search results.
   // final List<IllustrationLicense> _suggestionsLicenses = [];
@@ -156,7 +156,7 @@ class _LicensesPageState extends State<LicensesPage> {
     );
   }
 
-  Widget licenseCardItem(IllustrationLicense license, int index) {
+  Widget licenseCardItem(License license, int index) {
     return Card(
       elevation: 0.0,
       color: Theme.of(context).backgroundColor,
@@ -286,7 +286,7 @@ class _LicensesPageState extends State<LicensesPage> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final license = IllustrationLicense.fromJSON(data);
+        final license = License.fromJSON(data);
         _licenses.add(license);
       }
 
@@ -328,7 +328,7 @@ class _LicensesPageState extends State<LicensesPage> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final license = IllustrationLicense.fromJSON(data);
+        final license = License.fromJSON(data);
         _licenses.add(license);
       }
 
@@ -364,7 +364,7 @@ class _LicensesPageState extends State<LicensesPage> {
     );
   }
 
-  void showDeleteConfirmDialog(IllustrationLicense license, int index) {
+  void showDeleteConfirmDialog(License license, int index) {
     showDialog(
       context: context,
       builder: (context) {
@@ -459,7 +459,7 @@ class _LicensesPageState extends State<LicensesPage> {
 
     setState(() {
       data['id'] = documentChange.doc.id;
-      final illustration = IllustrationLicense.fromJSON(data);
+      final illustration = License.fromJSON(data);
       _licenses.insert(0, illustration);
     });
   }
@@ -474,7 +474,7 @@ class _LicensesPageState extends State<LicensesPage> {
     });
   }
 
-  void tryDeleteLicense(IllustrationLicense license, int index) async {
+  void tryDeleteLicense(License license, int index) async {
     setState(() {
       _licenses.removeAt(index);
     });
@@ -515,7 +515,7 @@ class _LicensesPageState extends State<LicensesPage> {
       );
 
       data['id'] = documentChange.doc.id;
-      final updatedIllustration = IllustrationLicense.fromJSON(data);
+      final updatedIllustration = License.fromJSON(data);
 
       setState(() {
         _licenses.removeAt(index);

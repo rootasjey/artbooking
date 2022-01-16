@@ -1,6 +1,6 @@
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/types/illustration/license.dart';
+import 'package:artbooking/types/license/license.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 
@@ -11,7 +11,7 @@ class EditLicensePageTextInputs extends StatefulWidget {
     this.onValueChange,
   }) : super(key: key);
 
-  final IllustrationLicense license;
+  final License license;
   final Function()? onValueChange;
 
   @override

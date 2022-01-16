@@ -5,7 +5,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/licenses/license_page_dates.dart';
 import 'package:artbooking/screens/licenses/license_urls_section.dart';
 import 'package:artbooking/screens/licenses/license_usage_section.dart';
-import 'package:artbooking/types/illustration/license.dart';
+import 'package:artbooking/types/license/license.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
@@ -23,7 +23,7 @@ class LicensePage extends StatefulWidget {
 
 class _LicensePageState extends State<LicensePage> {
   bool _isLoading = false;
-  var _license = IllustrationLicense.empty();
+  var _license = License.empty();
 
   @override
   void initState() {
@@ -158,7 +158,7 @@ class _LicensePageState extends State<LicensePage> {
       data['id'] = snapshot.id;
 
       setState(() {
-        _license = IllustrationLicense.fromJSON(data);
+        _license = License.fromJSON(data);
       });
     } catch (error) {
       Utilities.logger.e(error);

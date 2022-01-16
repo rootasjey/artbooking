@@ -7,8 +7,8 @@ import 'package:artbooking/screens/licenses/edit_license_page_urls.dart';
 import 'package:artbooking/screens/licenses/edit_license_page_usage.dart';
 import 'package:artbooking/screens/licenses/edit_license_page_text_inputs.dart';
 import 'package:artbooking/types/cloud_functions/license_response.dart';
-import 'package:artbooking/types/illustration/license.dart';
-import 'package:artbooking/types/illustration/license_from.dart';
+import 'package:artbooking/types/license/license.dart';
+import 'package:artbooking/types/license/license_from.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -34,7 +34,7 @@ class _EditLicensePageState extends State<EditLicensePage> {
   bool _isSaving = false;
   bool _isLoading = false;
 
-  var _license = IllustrationLicense.empty();
+  var _license = License.empty();
 
   @override
   void initState() {
@@ -145,7 +145,7 @@ class _EditLicensePageState extends State<EditLicensePage> {
       }
 
       data['id'] = snapshot.id;
-      setState(() => _license = IllustrationLicense.fromJSON(data));
+      setState(() => _license = License.fromJSON(data));
     } catch (error) {
       Utilities.logger.e(error);
     } finally {

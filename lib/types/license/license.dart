@@ -1,14 +1,14 @@
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/created_by.dart';
-import 'package:artbooking/types/illustration/license_from.dart';
-import 'package:artbooking/types/illustration/license_terms.dart';
-import 'package:artbooking/types/illustration/license_urls.dart';
-import 'package:artbooking/types/illustration/license_usage.dart';
+import 'package:artbooking/types/license/license_from.dart';
+import 'package:artbooking/types/license/license_terms.dart';
+import 'package:artbooking/types/license/license_urls.dart';
+import 'package:artbooking/types/license/license_usage.dart';
 import 'package:artbooking/types/updated_by.dart';
 
 /// Describe how an artwork can be used.
-class IllustrationLicense {
-  IllustrationLicense({
+class License {
+  License({
     this.abbreviation = '',
     required this.createdAt,
     this.createdBy = const CreatedBy(),
@@ -70,8 +70,8 @@ class IllustrationLicense {
   /// If this license has a specific version.
   final String version;
 
-  factory IllustrationLicense.empty() {
-    return IllustrationLicense(
+  factory License.empty() {
+    return License(
       abbreviation: '',
       createdAt: DateTime.now(),
       createdBy: CreatedBy.empty(),
@@ -90,8 +90,8 @@ class IllustrationLicense {
     );
   }
 
-  factory IllustrationLicense.fromJSON(Map<String, dynamic> data) {
-    return IllustrationLicense(
+  factory License.fromJSON(Map<String, dynamic> data) {
+    return License(
       abbreviation: data['abbreviation'] ?? '',
       createdAt: Utilities.date.fromFirestore(data['createdAt']),
       createdBy: CreatedBy.fromJSON(data['createdBy']),

@@ -5,7 +5,7 @@ import 'package:artbooking/components/circle_button.dart';
 import 'package:artbooking/components/fade_in_x.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/types/illustration/license.dart';
+import 'package:artbooking/types/license/license.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -17,7 +17,7 @@ import 'package:url_launcher/url_launcher.dart';
 /// A side panel to add art style to an illustration.
 class SelectLicensePanel extends StatefulWidget {
   /// Aleady selected styles for the illustration.
-  final IllustrationLicense? selectedLicense;
+  final License? selectedLicense;
 
   /// True if the panel is visible.
   final bool isVisible;
@@ -26,7 +26,7 @@ class SelectLicensePanel extends StatefulWidget {
   final void Function()? onClose;
 
   /// This callback when an item is tapped.
-  final void Function(IllustrationLicense, bool)? toggleLicenseAndUpdate;
+  final void Function(License, bool)? toggleLicenseAndUpdate;
 
   /// The panel elevation.
   final double elevation;
@@ -59,10 +59,10 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
   DocumentSnapshot<Object>? _lastDocumentSnapshot;
 
   /// All available art styles.
-  final List<IllustrationLicense> _availableLicenses = [];
+  final List<License> _availableLicenses = [];
 
   /// Search results.
-  final List<IllustrationLicense> _suggestionsLicenses = [];
+  final List<License> _suggestionsLicenses = [];
 
   /// Search controller.
   final _searchTextController = TextEditingController();
@@ -74,7 +74,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
   int _limit = 10;
 
   /// Selected style for image preview.
-  IllustrationLicense? _selectedLicensePreview;
+  License? _selectedLicensePreview;
 
   /// Delay search after typing input.
   Timer? _searchTimer;
@@ -538,7 +538,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final license = IllustrationLicense.fromJSON(data);
+        final license = License.fromJSON(data);
         _availableLicenses.add(license);
       }
 
@@ -576,7 +576,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final license = IllustrationLicense.fromJSON(data);
+        final license = License.fromJSON(data);
         _availableLicenses.add(license);
       }
 
@@ -623,7 +623,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
           final data = hit.data;
           data['id'] = hit.objectID;
 
-          final license = IllustrationLicense.fromJSON(data);
+          final license = License.fromJSON(data);
           _suggestionsLicenses.add(license);
         }
       });

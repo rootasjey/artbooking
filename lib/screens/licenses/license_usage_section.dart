@@ -1,7 +1,7 @@
 import 'package:artbooking/components/themed_dialog.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/licenses/square_link.dart';
-import 'package:artbooking/types/illustration/license_usage.dart';
+import 'package:artbooking/types/license/license_usage.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';

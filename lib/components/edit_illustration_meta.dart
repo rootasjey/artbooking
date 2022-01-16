@@ -8,7 +8,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
-import 'package:artbooking/types/illustration/license.dart';
+import 'package:artbooking/types/license/license.dart';
 import 'package:artbooking/types/style.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -1164,7 +1164,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
       data['id'] = licenseSnap.id;
 
       setState(() {
-        final completeLicense = IllustrationLicense.fromJSON(data);
+        final completeLicense = License.fromJSON(data);
         widget.illustration.license = completeLicense;
       });
     } catch (error) {
@@ -1280,7 +1280,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
   }
 
   void toggleLicenseAndUpdate(
-    IllustrationLicense illustrationLicense,
+    License illustrationLicense,
     bool selected,
   ) async {
     if (selected) {
@@ -1292,7 +1292,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
     setState(() => _isSidePanelLicenseVisible = false);
   }
 
-  void selectLicenseAndUpdate(IllustrationLicense illustrationLicense) async {
+  void selectLicenseAndUpdate(License illustrationLicense) async {
     setState(() => _isSaving = true);
 
     final illustration = widget.illustration;
@@ -1333,7 +1333,7 @@ class _EditIllustrationMetaState extends State<EditIllustrationMeta> {
 
     final illustration = widget.illustration;
     final previousLicense = illustration.license;
-    illustration.license = IllustrationLicense.empty();
+    illustration.license = License.empty();
 
     try {
       final response =

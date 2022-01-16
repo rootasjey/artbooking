@@ -1,6 +1,6 @@
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/licenses/square_link.dart';
-import 'package:artbooking/types/illustration/license_urls.dart';
+import 'package:artbooking/types/license/license_urls.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:unicons/unicons.dart';

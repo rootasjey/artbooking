@@ -4,7 +4,7 @@ import 'package:artbooking/types/many_illus_op_resp.dart';
 import 'package:artbooking/types/one_illus_op_resp.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
-import 'package:artbooking/types/illustration/license.dart';
+import 'package:artbooking/types/license/license.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class IllustrationsActions {
@@ -94,7 +94,7 @@ class IllustrationsActions {
     String? name,
     String? description,
     String? summary,
-    required IllustrationLicense license,
+    required License license,
     ContentVisibility visibility = ContentVisibility.private,
     required Illustration illustration,
   }) async {

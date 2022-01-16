@@ -3,7 +3,7 @@ import 'package:artbooking/types/acl.dart';
 import 'package:artbooking/types/author.dart';
 import 'package:artbooking/types/enums.dart';
 import 'package:artbooking/types/illustration/dimensions.dart';
-import 'package:artbooking/types/illustration/license.dart';
+import 'package:artbooking/types/license/license.dart';
 import 'package:artbooking/types/illustration/stats.dart';
 import 'package:artbooking/types/illustration/version.dart';
 import 'package:artbooking/types/illustration/urls.dart';
@@ -60,7 +60,7 @@ class Illustration {
   String id;
 
   /// Specifies how this illustration can be used.
-  IllustrationLicense? license;
+  License? license;
 
   /// This illustration's name.
   String name;
@@ -104,7 +104,7 @@ class Illustration {
       extension: '',
       hasPendingCreates: false,
       id: '',
-      license: IllustrationLicense.empty(),
+      license: License.empty(),
       name: '',
       stats: IllustrationStats.empty(),
       size: 0,
@@ -127,7 +127,7 @@ class Illustration {
       extension: data['extension'] ?? '',
       hasPendingCreates: data['hasPendingCreates'] ?? false,
       id: data['id'] ?? '',
-      license: IllustrationLicense.fromJSON(data['license']),
+      license: License.fromJSON(data['license']),
       name: data['name'] ?? '',
       stats: IllustrationStats.fromJSON(data['stats']),
       size: data['size'] ?? 0,
