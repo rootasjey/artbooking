@@ -1,5 +1,4 @@
 import 'package:artbooking/components/application_bar/application_bar_search_button.dart';
-import 'package:artbooking/components/buttons/underlined_button.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/locations/settings_location.dart';
@@ -17,16 +16,14 @@ class ApplicationBarMiddleDesktop extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bodyTextColor = Theme.of(context).textTheme.bodyText1!.color!;
-    final underlineColor = bodyTextColor.withOpacity(0.8);
 
     return Wrap(
       spacing: 12.0,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         ...getData().map(
-          (buttonData) => UnderlinedButton(
-            onTap: () => onTap(context, buttonData.routePath, ref),
-            underlineColor: underlineColor,
+          (buttonData) => TextButton(
+            onPressed: () => onTap(context, buttonData.routePath, ref),
             child: Opacity(
               opacity: 0.8,
               child: Text(

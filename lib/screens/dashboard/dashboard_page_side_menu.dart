@@ -1,5 +1,5 @@
+import 'package:artbooking/components/buttons/text_icon_button.dart';
 import 'package:artbooking/types/side_menu_item.dart';
-import 'package:artbooking/components/buttons/underlined_button.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
@@ -44,8 +44,10 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
     // probably because [SidePanelMenu] appears before the Beamer widget.
     // So we use [addPostFrameCallback] to access the state in the next frame.
     WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-      if (widget.beamerKey.currentState != null) {
-        _beamerDelegate = widget.beamerKey.currentState!.routerDelegate;
+      final BeamerState? currentState = widget.beamerKey.currentState;
+
+      if (currentState != null) {
+        _beamerDelegate = currentState.routerDelegate;
         _beamerDelegate.addListener(_setStateListener);
       }
     });
@@ -132,10 +134,9 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
                 left: _isExpanded ? 24.0 : 0.0,
                 top: 32.0,
               ),
-              child: UnderlinedButton(
+              child: TextButtonIcon(
                 compact: !_isExpanded,
                 tooltip: sidePanelItem.label,
-                hoverColor: Colors.transparent,
                 leading: Padding(
                   padding: const EdgeInsets.only(right: 16.0),
                   child: Icon(
@@ -271,7 +272,7 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
       SideMenuItem(
         iconData: UniconsLine.document_info,
         label: "licenses".tr(),
-        hoverColor: Colors.brown.shade300,
+        hoverColor: Colors.amber.shade800,
         routePath: DashboardLocationContent.licensesRoute,
       ),
     ];

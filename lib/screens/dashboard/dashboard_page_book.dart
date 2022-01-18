@@ -11,7 +11,6 @@ import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/texts/text_divider.dart';
 import 'package:artbooking/components/buttons/text_rectangle_button.dart';
 import 'package:artbooking/components/themed_dialog.dart';
-import 'package:artbooking/components/buttons/underlined_button.dart';
 import 'package:artbooking/components/add_to_book_panel.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
@@ -409,8 +408,8 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
               ),
             ),
           ),
-          UnderlinedButton(
-            onTap: () {
+          TextButton(
+            onPressed: () {
               context.beamToNamed(DashboardLocationContent.illustrationsRoute);
             },
             child: Text("illustrations_yours_browse".tr()),
