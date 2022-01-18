@@ -50,11 +50,14 @@ class LicensePageBody extends StatelessWidget {
               ),
             ),
           ),
-          Text(
-            license.name,
-            style: Utilities.fonts.style(
-              fontSize: 32.0,
-              fontWeight: FontWeight.w700,
+          Hero(
+            tag: license.name,
+            child: Text(
+              license.name,
+              style: Utilities.fonts.style(
+                fontSize: 32.0,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
           Opacity(

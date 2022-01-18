@@ -50,13 +50,16 @@ class LicenseCardItem extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Opacity(
-                      opacity: 0.8,
-                      child: Text(
-                        license.name,
-                        style: Utilities.fonts.style(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.w600,
+                    Hero(
+                      tag: license.name,
+                      child: Opacity(
+                        opacity: 0.8,
+                        child: Text(
+                          license.name,
+                          style: Utilities.fonts.style(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
@@ -66,7 +69,9 @@ class LicenseCardItem extends StatelessWidget {
                         opacity: 0.6,
                         child: Text(
                           license.description,
-                          style: Utilities.fonts.style(),
+                          style: Utilities.fonts.style(
+                            fontSize: 14.0,
+                          ),
                         ),
                       ),
                     ),
