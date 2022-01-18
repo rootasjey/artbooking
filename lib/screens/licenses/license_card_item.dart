@@ -82,6 +82,10 @@ class LicenseCardItem extends StatelessWidget {
   }
 
   Widget popupMenuButton(License license, int index) {
+    if (onDelete == null && onEdit == null) {
+      return Container();
+    }
+
     return PopupMenuButton(
       icon: Icon(UniconsLine.ellipsis_v),
       onSelected: (value) {
@@ -103,16 +107,18 @@ class LicenseCardItem extends StatelessWidget {
     BuildContext context,
   ) {
     return [
-      PopupMenuItemIcon(
-        icon: Icon(UniconsLine.edit),
-        textLabel: "edit".tr(),
-        value: EnumLicenseItemAction.edit,
-      ),
-      PopupMenuItemIcon(
-        icon: Icon(UniconsLine.trash),
-        textLabel: "delete".tr(),
-        value: EnumLicenseItemAction.delete,
-      ),
+      if (onDelete != null)
+        PopupMenuItemIcon(
+          icon: Icon(UniconsLine.trash),
+          textLabel: "delete".tr(),
+          value: EnumLicenseItemAction.delete,
+        ),
+      if (onEdit != null)
+        PopupMenuItemIcon(
+          icon: Icon(UniconsLine.edit),
+          textLabel: "edit".tr(),
+          value: EnumLicenseItemAction.edit,
+        ),
     ];
   }
 }

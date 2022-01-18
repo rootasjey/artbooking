@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/themed_dialog.dart';
+import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page_header.dart';
@@ -13,22 +14,24 @@ import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:artbooking/types/license/license_from.dart';
+import 'package:artbooking/types/user/user.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:unicons/unicons.dart';
 
-class LicensesPage extends StatefulWidget {
+class LicensesPage extends ConsumerStatefulWidget {
   const LicensesPage({Key? key}) : super(key: key);
 
   @override
-  State<LicensesPage> createState() => _LicensesPageState();
+  ConsumerState<LicensesPage> createState() => _LicensesPageState();
 }
 
-class _LicensesPageState extends State<LicensesPage> {
+class _LicensesPageState extends ConsumerState<LicensesPage> {
   /// True if there're more data to fetch.
   bool _hasNext = false;
 
@@ -74,32 +77,23 @@ class _LicensesPageState extends State<LicensesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final User user = ref.watch(AppState.userProvider);
+    final bool canManageLicense =
+        user.firestoreUser?.rights.canManageLicense ?? false;
+
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: openNewLicenseDialog,
-        child: Icon(UniconsLine.plus),
-        backgroundColor: Theme.of(context).secondaryHeaderColor,
-      ),
+      floatingActionButton: fab(canManageLicense),
       body: CustomScrollView(
         slivers: <Widget>[
           SliverEdgePadding(),
           ApplicationBar(),
           LicensesPageHeader(),
           LicensesPageBody(
-              licenses: _licenses,
-              isLoading: _isLoading,
-              onDeleteLicense: (targetLicense, targetIndex) {
-                showDeleteConfirmDialog(targetLicense, targetIndex);
-              },
-              onEditLicense: (targetLicense, targetIndex) {
-                showCupertinoModalBottomSheet(
-                  context: context,
-                  builder: (context) => EditLicensePage(
-                    licenseId: targetLicense.id,
-                    from: LicenseFrom.staff,
-                  ),
-                );
-              })
+            licenses: _licenses,
+            isLoading: _isLoading,
+            onDeleteLicense: canManageLicense ? onDeleteLicense : null,
+            onEditLicense: canManageLicense ? onEditLicense : null,
+          )
         ],
       ),
     );
@@ -372,5 +366,31 @@ class _LicensesPageState extends State<LicensesPage> {
 
       Utilities.logger.e(error);
     }
+  }
+
+  void onDeleteLicense(targetLicense, targetIndex) {
+    showDeleteConfirmDialog(targetLicense, targetIndex);
+  }
+
+  onEditLicense(targetLicense, targetIndex) {
+    showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => EditLicensePage(
+        licenseId: targetLicense.id,
+        from: LicenseFrom.staff,
+      ),
+    );
+  }
+
+  Widget? fab(bool canManageLicense) {
+    if (!canManageLicense) {
+      return null;
+    }
+
+    return FloatingActionButton(
+      onPressed: openNewLicenseDialog,
+      child: Icon(UniconsLine.plus),
+      backgroundColor: Theme.of(context).secondaryHeaderColor,
+    );
   }
 }
