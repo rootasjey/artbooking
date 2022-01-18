@@ -17,11 +17,13 @@ class LicensePageBody extends StatelessWidget {
     this.isDeleting = false,
     this.onEditLicense,
     this.onDeleteLicense,
+    required this.canManageLicense,
   }) : super(key: key);
 
   final License license;
   final bool isLoading;
   final bool isDeleting;
+  final bool canManageLicense;
   final Function()? onEditLicense;
   final Function()? onDeleteLicense;
 
@@ -34,6 +36,8 @@ class LicensePageBody extends StatelessWidget {
   }
 
   Widget idleView() {
+    final bool isPending = isLoading || isDeleting;
+
     return SliverList(
       delegate: SliverChildListDelegate.fixed(
         [
@@ -79,26 +83,27 @@ class LicensePageBody extends StatelessWidget {
               urls: license.urls,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 24.0),
-            child: Wrap(
-              spacing: 20.0,
-              children: [
-                TextRectangleButton(
-                  onPressed: onEditLicense,
-                  icon: Icon(UniconsLine.edit),
-                  label: Text('edit'.tr()),
-                  primary: Colors.black38,
-                ),
-                TextRectangleButton(
-                  onPressed: onDeleteLicense,
-                  icon: Icon(UniconsLine.trash),
-                  label: Text('delete'.tr()),
-                  primary: Colors.black38,
-                ),
-              ],
+          if (canManageLicense)
+            Padding(
+              padding: const EdgeInsets.only(top: 24.0),
+              child: Wrap(
+                spacing: 20.0,
+                children: [
+                  TextRectangleButton(
+                    onPressed: isPending ? null : onEditLicense,
+                    icon: Icon(UniconsLine.edit),
+                    label: Text('edit'.tr()),
+                    primary: Colors.black38,
+                  ),
+                  TextRectangleButton(
+                    onPressed: isPending ? null : onDeleteLicense,
+                    icon: Icon(UniconsLine.trash),
+                    label: Text('delete'.tr()),
+                    primary: Colors.black38,
+                  ),
+                ],
+              ),
             ),
-          ),
         ],
       ),
     );

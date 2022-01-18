@@ -3,10 +3,13 @@ import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/themed_dialog.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page.dart';
 import 'package:artbooking/screens/licenses/one/license_page_body.dart';
 import 'package:artbooking/screens/licenses/one/license_page_header.dart';
 import 'package:artbooking/types/cloud_functions/license_response.dart';
+import 'package:artbooking/types/firestore/doc_snapshot_stream_subscription.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:artbooking/types/license/license_from.dart';
 import 'package:artbooking/types/user/user.dart';
@@ -36,12 +39,21 @@ class LicensePage extends ConsumerStatefulWidget {
 class _LicensePageState extends ConsumerState<LicensePage> {
   bool _isDeleting = false;
   bool _isLoading = false;
+
+  DocSnapshotStreamSubscription? _streamSubscription;
+
   var _license = License.empty();
 
   @override
   void initState() {
     super.initState();
     fetchLicense();
+  }
+
+  @override
+  void dispose() {
+    _streamSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -63,6 +75,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
             license: _license,
             onEditLicense: onEditLicense,
             onDeleteLicense: onDeleteLicense,
+            canManageLicense: canManageLicense,
           ),
           SliverEdgePadding(
             padding: const EdgeInsets.only(bottom: 200),
@@ -88,21 +101,20 @@ class _LicensePageState extends ConsumerState<LicensePage> {
     setState(() => _isLoading = true);
 
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final query = FirebaseFirestore.instance
           .collection('licenses')
-          .doc(widget.licenseId)
-          .get();
+          .doc(widget.licenseId);
 
-      if (!snapshot.exists) {
+      final docSnapshot = await query.get();
+      final data = docSnapshot.data();
+
+      if (!docSnapshot.exists || data == null) {
         return;
       }
 
-      final data = snapshot.data();
-      if (data == null) {
-        return;
-      }
+      startListeningToDocument(query);
 
-      data['id'] = snapshot.id;
+      data['id'] = docSnapshot.id;
       setState(() => _license = License.fromJSON(data));
     } catch (error) {
       Utilities.logger.e(error);
@@ -206,5 +218,24 @@ class _LicensePageState extends ConsumerState<LicensePage> {
     } finally {
       setState(() => _isDeleting = false);
     }
+  }
+
+  void startListeningToDocument(DocumentReference<Map<String, dynamic>> query) {
+    _streamSubscription = query.snapshots().skip(1).listen((docSnapshot) {
+      final Json? data = docSnapshot.data();
+
+      if (!docSnapshot.exists || data == null) {
+        context.canBeamBack
+            ? Beamer.of(context).popRoute()
+            : Beamer.of(context).beamToNamed(HomeLocation.route);
+
+        return;
+      }
+
+      setState(() {
+        data['id'] = docSnapshot.id;
+        _license = License.fromJSON(data);
+      });
+    });
   }
 }

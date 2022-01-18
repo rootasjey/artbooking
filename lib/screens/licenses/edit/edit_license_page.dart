@@ -202,9 +202,6 @@ class _EditLicensePageState extends State<EditLicensePage> {
     setState(() => _isSaving = true);
 
     try {
-      Utilities.logger.i(
-        "(update) wiki: ${_license.urls.wikipedia}",
-      );
       final HttpsCallableResult<dynamic> response =
           await Utilities.cloud.fun("licenses-updateOne").call({
         "license": _license.toJSON(),

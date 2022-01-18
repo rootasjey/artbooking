@@ -114,7 +114,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
           .orderBy('createdAt', descending: _descending)
           .limit(_limit);
 
-      startListenningToCollection(query);
+      startListeningToCollection(query);
       final snapshot = await query.get();
 
       if (snapshot.size == 0) {
@@ -269,7 +269,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   }
 
   /// Listen to the last Firestore query of this page.
-  void startListenningToCollection(QueryMap query) {
+  void startListeningToCollection(QueryMap query) {
     _streamSubscription = query.snapshots().skip(1).listen(
       (snapshot) {
         for (DocumentChangeMap documentChange in snapshot.docChanges) {
@@ -345,7 +345,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   void updateStreamingDoc(DocumentChangeMap documentChange) {
     try {
       final data = documentChange.doc.data();
-      if (data == null) {
+      if (data == null || !documentChange.doc.exists) {
         return;
       }
 
