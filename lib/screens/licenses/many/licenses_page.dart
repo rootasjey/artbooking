@@ -5,6 +5,7 @@ import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/themed_dialog.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page_header.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page_body.dart';
@@ -91,6 +92,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
           LicensesPageBody(
             licenses: _licenses,
             isLoading: _isLoading,
+            onTap: onTapLicense,
             onDeleteLicense: canManageLicense ? onDeleteLicense : null,
             onEditLicense: canManageLicense ? onEditLicense : null,
           )
@@ -372,7 +374,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     showDeleteConfirmDialog(targetLicense, targetIndex);
   }
 
-  onEditLicense(targetLicense, targetIndex) {
+  void onEditLicense(targetLicense, targetIndex) {
     showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => EditLicensePage(
@@ -392,5 +394,16 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
       child: Icon(UniconsLine.plus),
       backgroundColor: Theme.of(context).secondaryHeaderColor,
     );
+  }
+
+  void onTapLicense(License license) {
+    final route = DashboardLocationContent.licenseRoute
+        .replaceFirst(':licenseId', license.id);
+
+    Beamer.of(context).beamToNamed(route, data: {
+      'licenseId': license.id,
+    }, routeState: {
+      'from': 'staff',
+    });
   }
 }

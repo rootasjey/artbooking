@@ -1,9 +1,7 @@
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/screens/licenses/license_card_item.dart';
 import 'package:artbooking/types/license/license.dart';
-import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 
@@ -14,12 +12,14 @@ class LicensesPageBody extends StatelessWidget {
     required this.isLoading,
     this.onDeleteLicense,
     this.onEditLicense,
+    this.onTap,
   }) : super(key: key);
 
   final List<License> licenses;
   final bool isLoading;
   final Function(License, int)? onDeleteLicense;
   final Function(License, int)? onEditLicense;
+  final Function(License)? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -51,14 +51,7 @@ class LicensesPageBody extends StatelessWidget {
               key: ValueKey(license.id),
               index: index,
               license: license,
-              onTap: (tappedLicense) {
-                final route = DashboardLocationContent.licenseRoute
-                    .replaceFirst(':licenseId', license.id);
-
-                Beamer.of(context).beamToNamed(route, data: {
-                  'licenseId': license.id,
-                });
-              },
+              onTap: onTap,
               onDelete: onDeleteLicense,
               onEdit: onEditLicense,
             );

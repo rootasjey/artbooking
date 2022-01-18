@@ -16,6 +16,7 @@ import 'package:artbooking/screens/settings/settings_page_update_email.dart';
 import 'package:artbooking/screens/settings/settings_page_update_password.dart';
 import 'package:artbooking/screens/settings/settings_page_update_username.dart';
 import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/types/license/license_from.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
@@ -228,6 +229,7 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
       if (state.pathPatternSegments.contains(':licenseId'))
         BeamPage(
           child: LicensePage(
+            from: getLicenseFrom(state.routeState),
             licenseId: state.pathParameters['licenseId'] ?? '',
           ),
           key: ValueKey('$licenseRoute'),
@@ -235,6 +237,16 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
           type: BeamPageType.fadeTransition,
         ),
     ];
+  }
+
+  LicenseFrom getLicenseFrom(Object? routeState) {
+    final mapState = routeState as Map<String, dynamic>;
+
+    if (mapState['from'] == 'staff') {
+      return LicenseFrom.staff;
+    }
+
+    return LicenseFrom.user;
   }
 
   /// True if the path match the delete account page.
