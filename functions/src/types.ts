@@ -79,7 +79,7 @@ enum Visibility {
   unlisted = 'inlisted',
 }
 
-enum LicenseFrom {
+enum EnumLicenseType {
   staff = 'staff',
   user = 'user',
 }
@@ -108,12 +108,6 @@ interface CreateIllustrationParams {
 }
 
 interface CreateOneLicenseParams {
-  /**
-   * Tell if the license is from the platform or the author.
-   * This property is mandatory to know where to find the license from its id.
-   */
-  from: LicenseFrom,
-  
   /** License's data. */
   license: License;
 }
@@ -160,7 +154,7 @@ interface DeleteOneLicenseParams {
    * Tell if the license is from the platform or the author.
    * This property is mandatory to know where to find the license from its id.
    */
-  from: LicenseFrom,
+  type: EnumLicenseType,
 
   /** License to delete. */
   licenseId: string;
@@ -203,7 +197,7 @@ interface License {
   description: string;
 
   /** Tell if this license has been created by an artist or by the platform's staff. */
-  from: LicenseFrom,
+  type: EnumLicenseType,
 
   /** License's id. */
   id: string;
@@ -436,7 +430,7 @@ interface UpdateIllusLicenseParams {
      * Tell if the license is from the platform or the author.
      * This property is mandatory to know where to find the license from its id.
      */
-    from: LicenseFrom,
+    from: EnumLicenseType,
     
     /**
      * Match an existing license id if not empty.

@@ -3,7 +3,7 @@ import * as functions from 'firebase-functions';
 import * as fs from 'fs-extra';
 
 import { adminApp } from './adminApp';
-import { allowedLicenseFromValues, cloudRegions } from './utils';
+import { allowedLicenseFromValues as allowedLicenseTypes, cloudRegions } from './utils';
 
 const firestore = adminApp.firestore();
 
@@ -19,7 +19,7 @@ export const createOne = functions
   .onCall(async (params: CreateOneLicenseParams, context) => {
     const userAuth = context.auth;
     const { license } = params;
-    const from: string = license?.from
+    const type: string = license?.type
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -36,36 +36,36 @@ export const createOne = functions
       )
     }
 
-    if (typeof from !== 'string') {
+    if (typeof type !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called with a valid [license.from] parameter ` +
+        `The function must be called with a valid [license.type] parameter ` +
         `which tells if the license is created by a staff member (and is available for all users) ` +
         `or if it's created by an author (and is user specific).` +
-        `The property [from] must be a string ` +
-        `among these values: ${allowedLicenseFromValues.join(", ")}. ` +
-        `You provided ${from} which is not valid.`,
+        `The property [type] must be a string ` +
+        `among these values: ${allowedLicenseTypes.join(", ")}. ` +
+        `You provided ${type} which is not valid.`,
       );
     }
 
-    if (!allowedLicenseFromValues.includes(from)) {
+    if (!allowedLicenseTypes.includes(type)) {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The value provided for [from] parameter is not valid. ` +
-        `Allowed values are: ${allowedLicenseFromValues.join(", ")}`,
+        `The value provided for [type] parameter is not valid. ` +
+        `Allowed values are: ${allowedLicenseTypes.join(", ")}`,
       );
     }
 
-    if (from === 'staff') {
+    if (type === 'staff') {
       await canManageLicense(userAuth.uid);
     }
 
     const formatedLicense = formatLicense(license);
     formatedLicense.createdBy.id = userAuth.uid;
 
-    const createdLicense = from === 'staff' 
-      ? await createLicenseInApp(formatedLicense)
-      : await createLicenseInUser(formatedLicense, userAuth.uid);
+    const createdLicense = type === 'staff' 
+      ? await createStaffLicense(formatedLicense)
+      : await createUserLicense(formatedLicense, userAuth.uid);
 
     return {
       license: {
@@ -85,7 +85,7 @@ export const deleteOne = functions
   .https
   .onCall(async (params: DeleteOneLicenseParams, context) => {
     const userAuth = context.auth;
-    const { from, licenseId } = params;
+    const { type, licenseId } = params;
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -94,29 +94,29 @@ export const deleteOne = functions
       );
     }
 
-    if (typeof from !== 'string') {
+    if (typeof type !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called with a valid [from] parameter ` +
+        `The function must be called with a valid [type] parameter ` +
         `which tells if the license is created by a staff member (and is available for all users) ` +
         `or if it's created by an author (and is user specific).` +
-        `The property [from] must be a string ` +
-        `among these values: ${allowedLicenseFromValues.join(", ")}. `, +
-        `You provided ${from} which is not valid.`,
+        `The property [type] must be a string ` +
+        `among these values: ${allowedLicenseTypes.join(", ")}. `, +
+        `You provided ${type} which is not valid.`,
       );
     }
 
-    if (!allowedLicenseFromValues.includes(from)) {
+    if (!allowedLicenseTypes.includes(type)) {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The value provided for [from] parameter is not valid. ` +
-        `Allowed values are: ${allowedLicenseFromValues.join(", ")}`,
+        `The value provided for [type] parameter is not valid. ` +
+        `Allowed values are: ${allowedLicenseTypes.join(", ")}`,
       );
     }
     
-    from === 'staff'
-     ? await deleteOneAppLicense(licenseId, userAuth.uid)
-     : await deleteOneUserLicense(licenseId, userAuth.uid);
+    type === 'staff'
+     ? await deleteStaffLicense(licenseId, userAuth.uid)
+     : await deleteUserLicense(licenseId, userAuth.uid);
 
     return {
       license: {
@@ -137,7 +137,7 @@ export const updateOne = functions
   .onCall(async (params: CreateOneLicenseParams, context) => {
     const userAuth = context.auth;
     const { license } = params;
-    const from: string = license?.from
+    const type: string = license?.type
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -146,32 +146,35 @@ export const updateOne = functions
       );
     }
 
-    if (typeof from !== 'string') {
+    if (typeof type !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called with a valid [from] parameter ` +
+        `The function must be called with a valid [type] parameter ` +
         `which tells if the license is created by a staff member (and is available for all users) ` +
         `or if it's created by an author (and is user specific).` +
-        `The property [from] must be a string ` +
-        `among these values: ${allowedLicenseFromValues.join(", ")}. ` +
-        `You provided ${from} which is not valid.`,
+        `The property [type] must be a string ` +
+        `among these values: ${allowedLicenseTypes.join(", ")}. ` +
+        `You provided ${type} which is not valid.`,
       );
     }
 
-    if (!allowedLicenseFromValues.includes(from)) {
+    if (!allowedLicenseTypes.includes(type)) {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The value provided for [from] parameter is not valid. ` +
-        `Allowed values are: ${allowedLicenseFromValues.join(", ")}`,
+        `The value provided for [type] parameter is not valid. ` +
+        `Allowed values are: ${allowedLicenseTypes.join(", ")}`,
       );
     }
 
-    if (from === 'staff') {
+    if (type === 'staff') {
       await canManageLicense(userAuth.uid);
     }
 
     const formatedLicense = formatLicense(license);
     const licenseId = formatedLicense.id;
+    
+    formatedLicense.updatedBy.id = userAuth.uid;
+    formatedLicense.updatedAt = adminApp.firestore.FieldValue.serverTimestamp()
 
     if (!licenseId) {
       throw new functions.https.HttpsError(
@@ -182,7 +185,7 @@ export const updateOne = functions
       )
     }
 
-    from === 'staff' 
+    type === 'staff' 
       ? await updateStaffLicense(formatedLicense)
       : await updateUserLicense(formatedLicense, userAuth.uid);
 
@@ -204,7 +207,7 @@ export const updateOne = functions
  * @param formatedLicense License's data to create.
  * @returns Created license.
  */
-async function createLicenseInApp(formatedLicense: License) {
+async function createStaffLicense(formatedLicense: License) {
   return await firestore
     .collection('licenses')
     .add(formatedLicense);
@@ -216,7 +219,7 @@ async function createLicenseInApp(formatedLicense: License) {
  * @param userId User performing the creation.
  * @returns Created license.
  */
-async function createLicenseInUser(formatedLicense: License, userId: string) {
+async function createUserLicense(formatedLicense: License, userId: string) {
   return await firestore
     .collection('users')
     .doc(userId)
@@ -312,7 +315,7 @@ async function canManageLicense(userId: string) {
  * @param licenseId License to delete from app.
  * @param userId User performing the deletion.
  */
-async function deleteOneAppLicense(licenseId: string, userId: string) {
+async function deleteStaffLicense(licenseId: string, userId: string) {
   await canManageLicense(userId);
   await firestore
     .collection('licenses')
@@ -325,7 +328,7 @@ async function deleteOneAppLicense(licenseId: string, userId: string) {
  * @param licenseId License to delete from the user's context.
  * @param userId User performing the deletion.
  */
-async function deleteOneUserLicense(licenseId: string, userId: string) {
+async function deleteUserLicense(licenseId: string, userId: string) {
   await firestore
     .collection('users')
     .doc(userId)
@@ -347,7 +350,7 @@ function formatLicense(data: License): License {
       id: '',
     },
     description: '',
-    from: "user" as LicenseFrom.user,
+    type: "user" as EnumLicenseType.user,
     id: '',
     licenseUpdatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
     name: '',
@@ -392,6 +395,10 @@ function formatLicense(data: License): License {
     wellFormatedLicense.abbreviation = data.abbreviation;
   }
 
+  if (data.createdAt) {
+    wellFormatedLicense.createdAt = data.createdAt;
+  }
+
   if (typeof data.createdBy !== 'object') {
     data.createdBy = { id: '' };
   } else if (typeof data.createdBy?.id === 'string') {
@@ -407,8 +414,8 @@ function formatLicense(data: License): License {
     wellFormatedLicense.description = data.description;
   }
 
-  if (typeof data.from === 'string') {
-    wellFormatedLicense.from = data.from;
+  if (typeof data.type === 'string') {
+    wellFormatedLicense.type = data.type;
   }
 
   if (typeof data.id === 'string') {
