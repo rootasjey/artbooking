@@ -61,7 +61,7 @@ class LicensesPageBody extends StatelessWidget {
             Opacity(
               opacity: 0.6,
               child: Text(
-                "You have no personal license yet.\nYou can create one if you want.",
+                "license_empty".tr(),
                 style: Utilities.fonts.style(
                   fontSize: 26.0,
                   fontWeight: FontWeight.w500,
@@ -74,7 +74,7 @@ class LicensesPageBody extends StatelessWidget {
                 alignment: Alignment.topLeft,
                 child: DarkElevatedButton(
                   onPressed: onCreateLicense,
-                  child: Text("Create a personal license"),
+                  child: Text("license_personal_create".tr()),
                 ),
               ),
             ),
