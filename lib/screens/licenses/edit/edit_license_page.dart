@@ -1,22 +1,27 @@
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
+import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page_header.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page_urls.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page_usage.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page_text_inputs.dart';
 import 'package:artbooking/types/cloud_functions/license_response.dart';
+import 'package:artbooking/types/firestore/document_map.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/license/license.dart';
-import 'package:artbooking/types/license/license_from.dart';
+import 'package:artbooking/types/enums/license_from.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class EditLicensePage extends StatefulWidget {
+class EditLicensePage extends ConsumerStatefulWidget {
   const EditLicensePage({
     Key? key,
     required this.licenseId,
@@ -24,13 +29,13 @@ class EditLicensePage extends StatefulWidget {
   }) : super(key: key);
 
   final String licenseId;
-  final LicenseFrom from;
+  final EnumLicenseCreatedBy from;
 
   @override
   _EditLicensePageState createState() => _EditLicensePageState();
 }
 
-class _EditLicensePageState extends State<EditLicensePage> {
+class _EditLicensePageState extends ConsumerState<EditLicensePage> {
   bool _isSaving = false;
   bool _isLoading = false;
 
@@ -129,6 +134,22 @@ class _EditLicensePageState extends State<EditLicensePage> {
     );
   }
 
+  DocumentMap getLicenseQuery() {
+    if (widget.from == EnumLicenseCreatedBy.staff) {
+      return FirebaseFirestore.instance
+          .collection('licenses')
+          .doc(widget.licenseId);
+    }
+
+    final String? uid = ref.read(AppState.userProvider).authUser?.uid;
+
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('licenses')
+        .doc(widget.licenseId);
+  }
+
   void tryFetchLicense() async {
     if (widget.licenseId.isEmpty) {
       return;
@@ -137,12 +158,10 @@ class _EditLicensePageState extends State<EditLicensePage> {
     setState(() => _isLoading = true);
 
     try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('licenses')
-          .doc(widget.licenseId)
-          .get();
+      final DocumentMap query = getLicenseQuery();
+      final DocumentSnapshotMap snapshot = await query.get();
 
-      final data = snapshot.data();
+      final Json? data = snapshot.data();
       if (!snapshot.exists || data == null) {
         return;
       }

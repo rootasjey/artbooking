@@ -9,9 +9,10 @@ import 'package:artbooking/screens/licenses/one/license_page_body.dart';
 import 'package:artbooking/screens/licenses/one/license_page_header.dart';
 import 'package:artbooking/types/cloud_functions/license_response.dart';
 import 'package:artbooking/types/firestore/doc_snapshot_stream_subscription.dart';
+import 'package:artbooking/types/firestore/document_map.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/license/license.dart';
-import 'package:artbooking/types/license/license_from.dart';
+import 'package:artbooking/types/enums/license_from.dart';
 import 'package:artbooking/types/user/user.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -30,7 +31,7 @@ class LicensePage extends ConsumerStatefulWidget {
   }) : super(key: key);
 
   final String licenseId;
-  final LicenseFrom from;
+  final EnumLicenseCreatedBy from;
 
   @override
   ConsumerState<LicensePage> createState() => _LicensePageState();
@@ -97,13 +98,27 @@ class _LicensePageState extends ConsumerState<LicensePage> {
     );
   }
 
+  DocumentMap getLicenseQuery() {
+    if (widget.from == EnumLicenseCreatedBy.staff) {
+      return FirebaseFirestore.instance
+          .collection('licenses')
+          .doc(widget.licenseId);
+    }
+
+    final String? uid = ref.read(AppState.userProvider).authUser?.uid;
+
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('licenses')
+        .doc(widget.licenseId);
+  }
+
   void fetchLicense() async {
     setState(() => _isLoading = true);
 
     try {
-      final query = FirebaseFirestore.instance
-          .collection('licenses')
-          .doc(widget.licenseId);
+      final query = getLicenseQuery();
 
       final docSnapshot = await query.get();
       final data = docSnapshot.data();

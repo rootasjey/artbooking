@@ -1,9 +1,11 @@
+import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/licenses/license_card_item.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
+import 'package:unicons/unicons.dart';
 
 class LicensesPageBody extends StatelessWidget {
   const LicensesPageBody({
@@ -13,12 +15,14 @@ class LicensesPageBody extends StatelessWidget {
     this.onDeleteLicense,
     this.onEditLicense,
     this.onTap,
+    this.onCreateLicense,
   }) : super(key: key);
 
   final List<License> licenses;
   final bool isLoading;
   final Function(License, int)? onDeleteLicense;
   final Function(License, int)? onEditLicense;
+  final Function()? onCreateLicense;
   final Function(License)? onTap;
 
   @override
@@ -32,6 +36,49 @@ class LicensesPageBody extends StatelessWidget {
             fontSize: 32.0,
             fontWeight: FontWeight.w600,
           ),
+        ),
+      );
+    }
+
+    if (licenses.isEmpty) {
+      return SliverPadding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 80.0,
+          vertical: 69.0,
+        ),
+        sliver: SliverList(
+          delegate: SliverChildListDelegate.fixed([
+            Align(
+              alignment: Alignment.topLeft,
+              child: Opacity(
+                opacity: 0.6,
+                child: Icon(
+                  UniconsLine.no_entry,
+                  size: 80.0,
+                ),
+              ),
+            ),
+            Opacity(
+              opacity: 0.6,
+              child: Text(
+                "You have no personal license yet.\nYou can create one if you want.",
+                style: Utilities.fonts.style(
+                  fontSize: 26.0,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: DarkElevatedButton(
+                  onPressed: onCreateLicense,
+                  child: Text("Create a personal license"),
+                ),
+              ),
+            ),
+          ]),
         ),
       );
     }

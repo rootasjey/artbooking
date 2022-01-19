@@ -1,6 +1,6 @@
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/created_by.dart';
-import 'package:artbooking/types/license/license_from.dart';
+import 'package:artbooking/types/enums/license_from.dart';
 import 'package:artbooking/types/license/license_terms.dart';
 import 'package:artbooking/types/license/license_urls.dart';
 import 'package:artbooking/types/license/license_usage.dart';
@@ -13,7 +13,7 @@ class License {
     required this.createdAt,
     this.createdBy = const CreatedBy(),
     this.description = '',
-    this.from = LicenseFrom.user,
+    this.from = EnumLicenseCreatedBy.user,
     required this.id,
     this.licenseUpdatedAt,
     required this.name,
@@ -39,7 +39,7 @@ class License {
 
   /// Tell if this license has been created by an artist
   /// or by the platform's staff.
-  LicenseFrom from;
+  EnumLicenseCreatedBy from;
 
   /// License's id.
   final String id;
@@ -76,7 +76,7 @@ class License {
       createdAt: DateTime.now(),
       createdBy: CreatedBy.empty(),
       description: '',
-      from: LicenseFrom.user,
+      from: EnumLicenseCreatedBy.user,
       id: '',
       licenseUpdatedAt: DateTime.now(),
       name: '',
@@ -110,26 +110,26 @@ class License {
     );
   }
 
-  void setFrom(LicenseFrom newFrom) {
+  void setFrom(EnumLicenseCreatedBy newFrom) {
     this.from = newFrom;
   }
 
-  static LicenseFrom convertStringToFrom(String fromString) {
+  static EnumLicenseCreatedBy convertStringToFrom(String fromString) {
     switch (fromString) {
       case 'staff':
-        return LicenseFrom.staff;
+        return EnumLicenseCreatedBy.staff;
       case 'user':
-        return LicenseFrom.user;
+        return EnumLicenseCreatedBy.user;
       default:
-        return LicenseFrom.user;
+        return EnumLicenseCreatedBy.user;
     }
   }
 
   String convertFromToString() {
     switch (from) {
-      case LicenseFrom.staff:
+      case EnumLicenseCreatedBy.staff:
         return 'staff';
-      case LicenseFrom.user:
+      case EnumLicenseCreatedBy.user:
         return 'user';
       default:
         return 'user';
