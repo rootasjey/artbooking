@@ -52,7 +52,7 @@ class DashboardPageBook extends ConsumerStatefulWidget {
 
 class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   /// The book displayed on this page.
-  Book? _bookPage;
+  Book _book = Book.empty();
 
   /// True if the page is loading.
   bool _isLoading = false;
@@ -81,7 +81,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   final _illustrations = MapStringIllustration();
   final _keyboardFocusNode = FocusNode();
 
-  /// Illustrations' ids matching [_bookPage.illustrations].
+  /// Illustrations' ids matching [_book.illustrations].
   /// Generated keys instead of simple ids due to possible duplicates.
   List<String> _currentIllusKeys = [];
 
@@ -123,22 +123,20 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   /// String separator to generate unique key for illustrations.
   final String _keySeparator = '--';
 
-  TextEditingController? _newBookNameController;
-  TextEditingController? _newBookDescriptionController;
   String _newBookName = '';
   String _newBookDescription = '';
+
+  var _newBookNameController = TextEditingController();
+  var _newBookDescriptionController = TextEditingController();
 
   @override
   initState() {
     super.initState();
 
-    _newBookNameController = TextEditingController();
-    _newBookDescriptionController = TextEditingController();
-
     Book? bookFromNav = NavigationStateHelper.book;
 
     if (bookFromNav != null && bookFromNav.id == widget.bookId) {
-      _bookPage = bookFromNav;
+      _book = bookFromNav;
       fetchIllustrationsAndListenToUpdates();
     } else {
       fetchBookAndIllustrations();
@@ -148,8 +146,8 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   @override
   void dispose() {
     _bookStreamSubscription?.cancel();
-    _newBookNameController?.dispose();
-    _newBookDescriptionController?.dispose();
+    _newBookNameController.dispose();
+    _newBookDescriptionController.dispose();
     super.dispose();
   }
 
@@ -176,7 +174,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   }
 
   Widget bookCoverCard() {
-    if (_bookPage == null) {
+    if (_book.id.isEmpty) {
       return SizedBox(
         height: 260.0,
         width: 200.0,
@@ -188,7 +186,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
     }
 
     return Hero(
-      tag: _bookPage!.id,
+      tag: _book.id,
       child: SizedBox(
         height: 260.0,
         width: 200.0,
@@ -199,7 +197,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
           ),
           clipBehavior: Clip.antiAlias,
           child: Ink.image(
-            image: NetworkImage(_bookPage!.getCoverUrl()),
+            image: NetworkImage(_book.getCoverUrl()),
             height: 260.0,
             width: 200.0,
             fit: BoxFit.cover,
@@ -235,11 +233,11 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   }
 
   Widget createdAt() {
-    if (_bookPage == null) {
+    if (_book.id.isEmpty) {
       return Container();
     }
 
-    final DateTime? createdAt = _bookPage!.createdAt;
+    final DateTime? createdAt = _book.createdAt;
 
     if (createdAt == null) {
       return Container();
@@ -250,12 +248,12 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
     if (DateTime.now().difference(createdAt).inDays > 60) {
       createdAtStr = "date_created_at".tr(
         args: [
-          Jiffy(_bookPage!.createdAt).yMMMMEEEEd,
+          Jiffy(_book.createdAt).yMMMMEEEEd,
         ],
       );
     } else {
       createdAtStr = "date_created_ago".tr(
-        args: [Jiffy(_bookPage!.createdAt).fromNow()],
+        args: [Jiffy(_book.createdAt).fromNow()],
       );
     }
 
@@ -294,14 +292,14 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   }
 
   Widget description() {
-    if (_bookPage == null) {
+    if (_book.id.isEmpty) {
       return Container();
     }
 
     return Opacity(
       opacity: 0.6,
       child: Text(
-        _bookPage!.description,
+        _book.description,
         style: Utilities.fonts.style(
           fontSize: 16.0,
           fontWeight: FontWeight.w600,
@@ -736,18 +734,18 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   }
 
   Widget stats() {
-    if (_bookPage == null) {
+    if (_book.id.isEmpty) {
       return Container();
     }
 
-    final Color color = _bookPage!.illustrations.isEmpty
+    final Color color = _book.illustrations.isEmpty
         ? Theme.of(context).secondaryHeaderColor
         : Theme.of(context).primaryColor;
 
     return Opacity(
       opacity: 0.8,
       child: Text(
-        "illustrations_count".plural(_bookPage!.illustrations.length),
+        "illustrations_count".plural(_book.illustrations.length),
         style: Utilities.fonts.style(
           color: color,
           fontSize: 16.0,
@@ -758,7 +756,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   }
 
   Widget title() {
-    final bookName = _bookPage != null ? _bookPage!.name : 'My book';
+    final bookName = _book.id.isNotEmpty ? _book.name : 'My book';
 
     return Opacity(
       opacity: 0.8,
@@ -773,11 +771,11 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   }
 
   Widget updatedAt({bool clickable = true}) {
-    if (_bookPage == null) {
+    if (_book.id.isEmpty) {
       return Container();
     }
 
-    final DateTime? updatedAt = _bookPage!.updatedAt;
+    final DateTime? updatedAt = _book.updatedAt;
 
     if (updatedAt == null) {
       return Container();
@@ -788,12 +786,12 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
     if (DateTime.now().difference(updatedAt).inDays > 60) {
       updatedAtStr = "date_updated_at".tr(
         args: [
-          Jiffy(_bookPage!.updatedAt).yMMMMEEEEd,
+          Jiffy(_book.updatedAt).yMMMMEEEEd,
         ],
       );
     } else {
       updatedAtStr = "date_updated_ago".tr(
-        args: [Jiffy(_bookPage!.updatedAt).fromNow()],
+        args: [Jiffy(_book.updatedAt).fromNow()],
       );
     }
 
@@ -974,13 +972,13 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   /// Delete the currevent viewing book
   /// and navigate back to the preview location or MyBooksPage.
   void deleteBook() async {
-    if (_bookPage == null) {
+    if (_book.id.isEmpty) {
       return;
     }
 
     // Will delete the book in background.
     BooksActions.deleteOne(
-      bookId: _bookPage!.id,
+      bookId: _book.id,
     );
 
     Beamer.of(context).beamToNamed(
@@ -989,7 +987,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   }
 
   void deleteManyIllustrations() async {
-    if (_bookPage == null) {
+    if (_book.id.isEmpty) {
       return;
     }
 
@@ -1012,7 +1010,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
     });
 
     final response = await BooksActions.removeIllustrations(
-      bookId: _bookPage!.id,
+      bookId: _book.id,
       illustrationIds: illustrationIds,
     );
 
@@ -1029,7 +1027,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   /// Get a differenciation of illustrations in this book
   /// and add or remove illustration accordingly.
   void diffIllustrations() {
-    if (_bookPage == null) {
+    if (_book.id.isEmpty) {
       return;
     }
 
@@ -1067,8 +1065,8 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
       startListenningToData(query);
 
       setState(() {
-        _bookPage = Book.fromJSON(bookData);
-        _currentIllusKeys = _bookPage!.illustrations
+        _book = Book.fromJSON(bookData);
+        _currentIllusKeys = _book.illustrations
             .map((bookIllustration) => generateKey(bookIllustration))
             .toList();
       });
@@ -1083,11 +1081,11 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
 
   /// Fetch an range of illustrations of a book.
   void fetchIllustrations() async {
-    if (_bookPage == null) {
+    if (_book.id.isEmpty) {
       return;
     }
 
-    final illustrationsBook = _bookPage!.illustrations;
+    final illustrationsBook = _book.illustrations;
 
     setState(() {
       _isLoading = true;
@@ -1149,7 +1147,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   }
 
   void fetchIllustrationsMore() async {
-    if (!_hasNext || _bookPage == null || _isLoadingMore) {
+    if (!_hasNext || _book.id.isEmpty || _isLoadingMore) {
       return;
     }
 
@@ -1157,7 +1155,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
     _endIndex = _endIndex + _limit;
     _isLoadingMore = true;
 
-    final range = _bookPage!.illustrations.getRange(_startIndex, _endIndex);
+    final range = _book.illustrations.getRange(_startIndex, _endIndex);
 
     try {
       for (var bookIllustration in range) {
@@ -1180,7 +1178,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
         );
       }
       setState(() {
-        _hasNext = _endIndex < _bookPage!.count;
+        _hasNext = _endIndex < _book.count;
       });
     } catch (error) {
       Utilities.logger.e(error);
@@ -1197,7 +1195,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
     return "$id$_keySeparator${createdAt.millisecondsSinceEpoch}";
   }
 
-  /// Find new values in [_bookPage.illustrations]
+  /// Find new values in [_book.illustrations]
   /// that weren't there before the update.
   /// -------------------------------------------
   /// For each id in the new data:
@@ -1331,7 +1329,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
     }
 
     final response = await BooksActions.removeIllustrations(
-      bookId: _bookPage!.id,
+      bookId: _book.id,
       illustrationIds: [illustration.id],
     );
 
@@ -1371,9 +1369,14 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
 
   void navigateToIllustrationPage(Illustration illustration) {
     NavigationStateHelper.illustration = illustration;
+    final String route = DashboardLocationContent.illustrationBookRoute
+        .replaceFirst(":bookId", _book.id)
+        .replaceFirst(":illustrationId", illustration.id);
+
     Beamer.of(context).beamToNamed(
-      "dashboard/illustrations/${illustration.id}",
+      route,
       data: {
+        "bookId": _book.id,
         "illustrationId": illustration.id,
       },
     );
@@ -1544,15 +1547,15 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   }
 
   void showRenameBookDialog() {
-    if (_bookPage == null) {
+    if (_book.id.isEmpty) {
       return;
     }
 
-    _newBookNameController!.text = _bookPage!.name;
-    _newBookDescriptionController!.text = _bookPage!.description;
+    _newBookNameController.text = _book.name;
+    _newBookDescriptionController.text = _book.description;
 
-    _newBookName = _bookPage!.name;
-    _newBookDescription = _bookPage!.description;
+    _newBookName = _book.name;
+    _newBookDescription = _book.description;
 
     showDialog(
       context: context,
@@ -1570,7 +1573,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
         },
         onCancel: Beamer.of(context).popRoute,
         onSubmitted: (value) {
-          renameBook(_bookPage!);
+          renameBook(_book);
           Beamer.of(context).popRoute();
         },
       ),
@@ -1593,8 +1596,8 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
 
         setState(() {
           bookData['id'] = snapshot.id;
-          _bookPage = Book.fromJSON(bookData);
-          _currentIllusKeys = _bookPage!.illustrations
+          _book = Book.fromJSON(bookData);
+          _currentIllusKeys = _book.illustrations
               .map((bookIllustration) => generateKey(bookIllustration))
               .toList();
         });

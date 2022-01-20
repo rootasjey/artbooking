@@ -1,3 +1,4 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/signin_location.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page_welcome.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page.dart';
@@ -68,36 +69,42 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
   static const String route = '/dashboard';
 
   /// Books route value for this location.
-  static const String booksRoute = '/dashboard/books';
+  static const String booksRoute = '$route/books';
+
+  /// Book route value for this location.
+  static const String bookRoute = '$booksRoute/:bookId';
 
   /// Illustrations route value for this location.
-  static const String illustrationsRoute = '/dashboard/illustrations';
+  static const String illustrationsRoute = '$route/illustrations';
+
+  /// Illustration route value for this location.
+  static const String illustrationRoute = '$illustrationsRoute/:illustrationId';
+
+  static const String illustrationBookRoute = '$bookRoute/:illustrationId/';
 
   /// Profile route value for this location.
-  static const String profileRoute = '/dashboard/profile';
+  static const String profileRoute = '$route/profile';
 
   /// Profile route value for this location.
-  static const String editProfilePictureRoute = '/dashboard/profile/edit/pp';
+  static const String editProfilePictureRoute = '$route/profile/edit/pp';
 
   /// Settings route value for this location.
-  static const String settingsRoute = '/dashboard/settings';
+  static const String settingsRoute = '$route/settings';
 
   /// Delete account route value for this location.
-  static const String deleteAccountRoute = '/dashboard/settings/delete/account';
+  static const String deleteAccountRoute = '$route/settings/delete/account';
 
   /// Statistics route value for this location.
-  static const String statisticsRoute = '/dashboard/statistics';
+  static const String statisticsRoute = '$route/statistics';
 
   /// Update email route value for this location.
-  static const String updateEmailRoute = '/dashboard/settings/update/email';
+  static const String updateEmailRoute = '$route/settings/update/email';
 
   /// Update password route value for this location.
-  static const String updatePasswordRoute =
-      '/dashboard/settings/update/password';
+  static const String updatePasswordRoute = '$route/settings/update/password';
 
   /// Update username route value for this location.
-  static const String updateUsernameRoute =
-      '/dashboard/settings/update/username';
+  static const String updateUsernameRoute = '$route/settings/update/username';
 
   static const String licensesRoute = '$route/licenses';
   static const String licenseRoute = '$licensesRoute/:licenseId';
@@ -105,11 +112,10 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
   @override
   List<String> get pathPatterns => [
         booksRoute,
-        '$booksRoute/:bookId',
-        // -> '/dashboard/books/:bookId',
+        bookRoute,
         illustrationsRoute,
-        '$illustrationsRoute/:illustrationId',
-        // -> '/dashboard/illustrations/:illustrationId',
+        illustrationRoute,
+        illustrationBookRoute,
         statisticsRoute,
         profileRoute,
         settingsRoute,

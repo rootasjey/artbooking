@@ -16,6 +16,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -25,16 +26,12 @@ class IllustrationPage extends StatefulWidget {
   /// Illustration's id, used if direct navigation by url.
   final String illustrationId;
 
-  /// Illustration object, used if navigation from a previous page.
-  final Illustration? illustration;
-
   /// True if navigating from dashboard.
   final bool? fromDashboard;
 
   const IllustrationPage({
     Key? key,
     required this.illustrationId,
-    this.illustration,
     this.fromDashboard = false,
   }) : super(key: key);
 
@@ -52,22 +49,18 @@ class _IllustrationPageState extends State<IllustrationPage> {
 
   bool _isEditModeOn = false;
 
-  TextEditingController? _nameController;
-  TextEditingController? _descController;
-  TextEditingController? _summaryController;
-
   License _newLicense = License.empty();
   EnumContentVisibility _newVisibility = EnumContentVisibility.private;
 
   var _illustration = Illustration.empty();
 
+  var _nameController = TextEditingController();
+  var _descController = TextEditingController();
+  var _summaryController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
-
-    _nameController = TextEditingController();
-    _descController = TextEditingController();
-    _summaryController = TextEditingController();
 
     Illustration? illustrationFromNav = NavigationStateHelper.illustration;
 
@@ -81,9 +74,9 @@ class _IllustrationPageState extends State<IllustrationPage> {
 
   @override
   void dispose() {
-    _nameController?.dispose();
-    _descController?.dispose();
-    _summaryController?.dispose();
+    _nameController.dispose();
+    _descController.dispose();
+    _summaryController.dispose();
 
     super.dispose();
   }
@@ -492,10 +485,10 @@ class _IllustrationPageState extends State<IllustrationPage> {
       final illusData = illusSnap.data();
 
       if (!illusSnap.exists || illusData == null) {
-        Utilities.snack.e(
-          context: context,
-          message: "The illustration with the id "
-              "${widget.illustrationId} doesn't exist.",
+        context.showErrorBar(
+          content: Text(
+            "The illustration with the id ${widget.illustrationId} doesn't exist.",
+          ),
         );
 
         return;

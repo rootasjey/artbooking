@@ -5,6 +5,7 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 import 'package:supercharged/supercharged.dart';
@@ -172,10 +173,10 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
   }
 
   void addIllustrationToBook({required String bookId}) async {
-    Utilities.snack.s(
-      context: context,
-      title: "Add",
-      message: "The illustration has been successfully added to your book!",
+    context.showSuccessBar(
+      icon: Icon(UniconsLine.plus),
+      content:
+          Text("The illustration has been successfully added to your book."),
     );
 
     final response = await BooksActions.addIllustrations(
@@ -184,10 +185,11 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
     );
 
     if (response.hasErrors) {
-      Utilities.snack.e(
-        context: context,
-        message: "There was an error while adding "
-            "the illustration to the book.",
+      context.showErrorBar(
+        icon: Icon(UniconsLine.exclamation_triangle),
+        content: Text(
+          "There was an error while adding the illustration to the book.",
+        ),
       );
 
       return;
@@ -213,19 +215,19 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
     Utilities.flash.dismissProgress(id: 'create_book');
 
     if (!createdList.success) {
-      Utilities.snack.e(
-        context: context,
-        message: "There was and issue while creating the book. "
-            "Try again later or contact us if the problem persists.",
+      context.showErrorBar(
+        content: Text(
+          "There was and issue while creating the book. "
+          "Try again later or contact us if the problem persists.",
+        ),
       );
 
       return;
     }
 
-    Utilities.snack.e(
-      context: context,
-      title: "Create",
-      message: "Your list $newBookName has been successfully created!",
+    context.showSuccessBar(
+      icon: Icon(UniconsLine.check),
+      content: Text("Your list $newBookName has been successfully created."),
     );
   }
 
@@ -275,9 +277,8 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
         hasErrors = false;
       });
 
-      Utilities.snack.e(
-        context: context,
-        message: 'Cannot retrieve your books right now',
+      context.showErrorBar(
+        content: Text("Cannot retrieve your books right now"),
       );
     }
   }
@@ -327,9 +328,8 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
         hasErrors = false;
       });
 
-      Utilities.snack.e(
-        context: context,
-        message: 'Cannot retrieve more books.',
+      context.showErrorBar(
+        content: Text("Cannot retrieve more books"),
       );
     }
   }
