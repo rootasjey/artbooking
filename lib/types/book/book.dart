@@ -7,6 +7,24 @@ import 'package:artbooking/types/enums/enum_book_layout_orientation.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 
 class Book {
+  Book({
+    this.count = 0,
+    required this.cover,
+    this.createdAt,
+    this.description = '',
+    this.id = '',
+    this.illustrations = const [],
+    this.layout = EnumBookLayout.grid,
+    this.layoutMobile = EnumBookLayout.verticalList,
+    this.layoutOrientation = EnumBookLayoutOrientation.vertical,
+    this.layoutOrientationMobile = EnumBookLayoutOrientation.vertical,
+    this.matrice = const [[]],
+    this.name = '',
+    this.updatedAt,
+    required this.urls,
+    this.visibility = EnumContentVisibility.private,
+  });
+
   /// Number of illustrations in this book.
   final int count;
 
@@ -64,23 +82,12 @@ class Book {
   /// Control if other people can view this book.
   final EnumContentVisibility visibility;
 
-  Book({
-    this.count = 0,
-    required this.cover,
-    this.createdAt,
-    this.description = '',
-    this.id = '',
-    this.illustrations = const [],
-    this.layout = EnumBookLayout.grid,
-    this.layoutMobile = EnumBookLayout.verticalList,
-    this.layoutOrientation = EnumBookLayoutOrientation.vertical,
-    this.layoutOrientationMobile = EnumBookLayoutOrientation.vertical,
-    this.matrice = const [[]],
-    this.name = '',
-    this.updatedAt,
-    required this.urls,
-    this.visibility = EnumContentVisibility.private,
-  });
+  factory Book.empty() {
+    return Book(
+      cover: BookCover.empty(),
+      urls: BookUrls.empty(),
+    );
+  }
 
   factory Book.fromJSON(Map<String, dynamic> data) {
     return Book(
