@@ -1,6 +1,6 @@
 import 'package:artbooking/components/buttons/dark_outlined_button.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/types/enums/license_from.dart';
+import 'package:artbooking/types/enums/enum_license_type.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 
@@ -11,8 +11,8 @@ class LicensesPageHeader extends StatelessWidget {
     this.onChangedTab,
   }) : super(key: key);
 
-  final EnumLicenseCreatedBy selectedTab;
-  final Function(EnumLicenseCreatedBy)? onChangedTab;
+  final EnumLicenseType selectedTab;
+  final Function(EnumLicenseType)? onChangedTab;
 
   @override
   Widget build(BuildContext context) {
@@ -51,12 +51,12 @@ class LicensesPageHeader extends StatelessWidget {
               runSpacing: 12.0,
               children: [
                 DarkOutlinedButton(
-                  selected: EnumLicenseCreatedBy.staff == selectedTab,
+                  selected: EnumLicenseType.staff == selectedTab,
                   onPressed: onChangedTab != null ? onPressedStaff : null,
                   child: Text("staff".tr().toUpperCase()),
                 ),
                 DarkOutlinedButton(
-                  selected: EnumLicenseCreatedBy.user == selectedTab,
+                  selected: EnumLicenseType.user == selectedTab,
                   onPressed:
                       onChangedTab != null ? onPressedUser : onPressedUser,
                   child: Text("user".tr().toUpperCase()),
@@ -70,10 +70,10 @@ class LicensesPageHeader extends StatelessWidget {
   }
 
   void onPressedStaff() {
-    onChangedTab?.call(EnumLicenseCreatedBy.staff);
+    onChangedTab?.call(EnumLicenseType.staff);
   }
 
   void onPressedUser() {
-    onChangedTab?.call(EnumLicenseCreatedBy.user);
+    onChangedTab?.call(EnumLicenseType.user);
   }
 }

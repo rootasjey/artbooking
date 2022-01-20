@@ -12,7 +12,7 @@ import 'package:artbooking/types/firestore/doc_snapshot_stream_subscription.dart
 import 'package:artbooking/types/firestore/document_map.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/license/license.dart';
-import 'package:artbooking/types/enums/license_from.dart';
+import 'package:artbooking/types/enums/enum_license_type.dart';
 import 'package:artbooking/types/user/user.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,11 +27,11 @@ class LicensePage extends ConsumerStatefulWidget {
   const LicensePage({
     Key? key,
     required this.licenseId,
-    required this.from,
+    required this.type,
   }) : super(key: key);
 
   final String licenseId;
-  final EnumLicenseCreatedBy from;
+  final EnumLicenseType type;
 
   @override
   ConsumerState<LicensePage> createState() => _LicensePageState();
@@ -99,7 +99,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
   }
 
   DocumentMap getLicenseQuery() {
-    if (widget.from == EnumLicenseCreatedBy.staff) {
+    if (widget.type == EnumLicenseType.staff) {
       return FirebaseFirestore.instance
           .collection('licenses')
           .doc(widget.licenseId);
@@ -147,7 +147,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
       context: context,
       builder: (context) => EditLicensePage(
         licenseId: _license.id,
-        from: widget.from,
+        type: _license.type,
       ),
     );
   }
@@ -218,7 +218,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
     try {
       final response = await Utilities.cloud.fun('licenses-deleteOne').call({
         'licenseId': license.id,
-        'from': 'staff',
+        'type': license.typeToString(),
       });
 
       final data = LicenseResponse.fromJSON(response.data);

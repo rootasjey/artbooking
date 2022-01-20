@@ -1,6 +1,6 @@
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/created_by.dart';
-import 'package:artbooking/types/enums/license_from.dart';
+import 'package:artbooking/types/enums/enum_license_type.dart';
 import 'package:artbooking/types/license/license_terms.dart';
 import 'package:artbooking/types/license/license_urls.dart';
 import 'package:artbooking/types/license/license_usage.dart';
@@ -13,12 +13,12 @@ class License {
     required this.createdAt,
     this.createdBy = const CreatedBy(),
     this.description = '',
-    this.from = EnumLicenseCreatedBy.user,
     required this.id,
     this.licenseUpdatedAt,
     required this.name,
     this.notice = '',
     required this.terms,
+    this.type = EnumLicenseType.user,
     required this.updatedAt,
     this.updatedBy = const LicenseUpdatedBy(),
     required this.urls,
@@ -39,7 +39,7 @@ class License {
 
   /// Tell if this license has been created by an artist
   /// or by the platform's staff.
-  EnumLicenseCreatedBy from;
+  EnumLicenseType type;
 
   /// License's id.
   final String id;
@@ -76,12 +76,12 @@ class License {
       createdAt: DateTime.now(),
       createdBy: CreatedBy.empty(),
       description: '',
-      from: EnumLicenseCreatedBy.user,
       id: '',
       licenseUpdatedAt: DateTime.now(),
       name: '',
       notice: '',
       terms: LicenseTerms.empty(),
+      type: EnumLicenseType.user,
       updatedAt: DateTime.now(),
       updatedBy: LicenseUpdatedBy.empty(),
       urls: LicenseUrls.empty(),
@@ -96,12 +96,12 @@ class License {
       createdAt: Utilities.date.fromFirestore(data['createdAt']),
       createdBy: CreatedBy.fromJSON(data['createdBy']),
       description: data['description'] ?? '',
-      from: convertStringToFrom(data['from']),
       id: data['id'] ?? '',
       licenseUpdatedAt: Utilities.date.fromFirestore(data['licenseUpdatedAt']),
       name: data['name'] ?? '',
       notice: data['notice'] ?? '',
       terms: LicenseTerms.fromJSON(data['terms']),
+      type: convertStringToType(data['type'] ?? ''),
       updatedAt: Utilities.date.fromFirestore(data['updatedAt']),
       updatedBy: LicenseUpdatedBy.fromJSON(data['updatedBy']),
       urls: LicenseUrls.fromJSON(data['urls']),
@@ -110,26 +110,26 @@ class License {
     );
   }
 
-  void setFrom(EnumLicenseCreatedBy newFrom) {
-    this.from = newFrom;
+  void setType(EnumLicenseType newFrom) {
+    this.type = newFrom;
   }
 
-  static EnumLicenseCreatedBy convertStringToFrom(String fromString) {
-    switch (fromString) {
+  static EnumLicenseType convertStringToType(String typeString) {
+    switch (typeString) {
       case 'staff':
-        return EnumLicenseCreatedBy.staff;
+        return EnumLicenseType.staff;
       case 'user':
-        return EnumLicenseCreatedBy.user;
+        return EnumLicenseType.user;
       default:
-        return EnumLicenseCreatedBy.user;
+        return EnumLicenseType.user;
     }
   }
 
   String convertFromToString() {
-    switch (from) {
-      case EnumLicenseCreatedBy.staff:
+    switch (type) {
+      case EnumLicenseType.staff:
         return 'staff';
-      case EnumLicenseCreatedBy.user:
+      case EnumLicenseType.user:
         return 'user';
       default:
         return 'user';
@@ -141,15 +141,19 @@ class License {
 
     data['abbreviation'] = abbreviation;
     data['description'] = description;
-    data['from'] = convertFromToString();
     data['id'] = id;
     data['name'] = name;
     data['notice'] = notice;
     data['terms'] = terms.toJSON();
+    data['type'] = convertFromToString();
     data['urls'] = urls.toJSON();
     data['usage'] = usage.toJSON();
     data['version'] = version;
 
     return data;
+  }
+
+  String typeToString() {
+    return type == EnumLicenseType.staff ? 'staff' : 'user';
   }
 }

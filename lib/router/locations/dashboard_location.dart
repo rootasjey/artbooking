@@ -16,7 +16,7 @@ import 'package:artbooking/screens/settings/settings_page_update_email.dart';
 import 'package:artbooking/screens/settings/settings_page_update_password.dart';
 import 'package:artbooking/screens/settings/settings_page_update_username.dart';
 import 'package:artbooking/globals/app_state.dart';
-import 'package:artbooking/types/enums/license_from.dart';
+import 'package:artbooking/types/enums/enum_license_type.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
@@ -229,7 +229,7 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
       if (state.pathPatternSegments.contains(':licenseId'))
         BeamPage(
           child: LicensePage(
-            from: getLicenseFrom(state.routeState),
+            type: getLicenseType(state.routeState),
             licenseId: state.pathParameters['licenseId'] ?? '',
           ),
           key: ValueKey('$licenseRoute'),
@@ -239,14 +239,14 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
     ];
   }
 
-  EnumLicenseCreatedBy getLicenseFrom(Object? routeState) {
+  EnumLicenseType getLicenseType(Object? routeState) {
     final mapState = routeState as Map<String, dynamic>;
 
-    if (mapState['from'] == 'staff') {
-      return EnumLicenseCreatedBy.staff;
+    if (mapState['type'] == 'staff') {
+      return EnumLicenseType.staff;
     }
 
-    return EnumLicenseCreatedBy.user;
+    return EnumLicenseType.user;
   }
 
   /// True if the path match the delete account page.

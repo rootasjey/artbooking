@@ -14,7 +14,7 @@ import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/license/license.dart';
-import 'package:artbooking/types/enums/license_from.dart';
+import 'package:artbooking/types/enums/enum_license_type.dart';
 import 'package:artbooking/types/user/user.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -63,7 +63,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   Timer? _searchTimer;
 
   /// Selected tab to show license (staff or user).
-  var _selectedTab = EnumLicenseCreatedBy.staff;
+  var _selectedTab = EnumLicenseType.staff;
 
   @override
   initState() {
@@ -85,9 +85,8 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     final bool canManageStaffLicense =
         user.firestoreUser?.rights.canManageLicense ?? false;
 
-    final bool canManageLicense = _selectedTab == EnumLicenseCreatedBy.staff
-        ? canManageStaffLicense
-        : true;
+    final bool canManageLicense =
+        _selectedTab == EnumLicenseType.staff ? canManageStaffLicense : true;
 
     return Scaffold(
       floatingActionButton: fab(canManageLicense),
@@ -103,6 +102,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
             licenses: _licenses,
             isLoading: _isLoading,
             onTap: onTapLicense,
+            selectedTab: _selectedTab,
             onDeleteLicense: canManageLicense ? onDeleteLicense : null,
             onEditLicense: canManageLicense ? onEditLicense : null,
             onCreateLicense: openNewLicenseDialog,
@@ -318,7 +318,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
       context: context,
       builder: (context) => EditLicensePage(
         licenseId: '',
-        from: _selectedTab,
+        type: _selectedTab,
       ),
     );
   }
@@ -439,7 +439,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     try {
       final response = await Utilities.cloud.fun('licenses-deleteOne').call({
         'licenseId': license.id,
-        'from': 'staff',
+        'type': license.typeToString(),
       });
 
       final data = LicenseResponse.fromJSON(response.data);
@@ -494,7 +494,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
       context: context,
       builder: (context) => EditLicensePage(
         licenseId: targetLicense.id,
-        from: targetLicense.from,
+        type: targetLicense.type,
       ),
     );
   }
@@ -518,20 +518,20 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     Beamer.of(context).beamToNamed(route, data: {
       'licenseId': license.id,
     }, routeState: {
-      'from': license.from == EnumLicenseCreatedBy.staff ? 'staff' : 'user',
+      'type': license.typeToString(),
     });
   }
 
-  void onChangedTab(EnumLicenseCreatedBy newLicenseTab) {
+  void onChangedTab(EnumLicenseType newLicenseTab) {
     setState(() {
       _selectedTab = newLicenseTab;
     });
 
     switch (newLicenseTab) {
-      case EnumLicenseCreatedBy.staff:
+      case EnumLicenseType.staff:
         fetchStaffLicenses();
         break;
-      case EnumLicenseCreatedBy.user:
+      case EnumLicenseType.user:
         fetchUserLicenses();
         break;
       default:

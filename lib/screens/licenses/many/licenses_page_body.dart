@@ -2,6 +2,7 @@ import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/licenses/license_card_item.dart';
+import 'package:artbooking/types/enums/enum_license_type.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ class LicensesPageBody extends StatelessWidget {
     this.onEditLicense,
     this.onTap,
     this.onCreateLicense,
+    required this.selectedTab,
   }) : super(key: key);
 
   final List<License> licenses;
@@ -24,6 +26,7 @@ class LicensesPageBody extends StatelessWidget {
   final Function(License, int)? onEditLicense;
   final Function()? onCreateLicense;
   final Function(License)? onTap;
+  final EnumLicenseType selectedTab;
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +64,9 @@ class LicensesPageBody extends StatelessWidget {
             Opacity(
               opacity: 0.6,
               child: Text(
-                "license_empty".tr(),
+                selectedTab == EnumLicenseType.staff
+                    ? "license_staff_empty_create".tr()
+                    : "license_personal_empty_create".tr(),
                 style: Utilities.fonts.style(
                   fontSize: 26.0,
                   fontWeight: FontWeight.w500,
@@ -74,7 +79,11 @@ class LicensesPageBody extends StatelessWidget {
                 alignment: Alignment.topLeft,
                 child: DarkElevatedButton(
                   onPressed: onCreateLicense,
-                  child: Text("license_personal_create".tr()),
+                  child: Text(
+                    selectedTab == EnumLicenseType.staff
+                        ? "license_staff_create".tr()
+                        : "license_personal_create".tr(),
+                  ),
                 ),
               ),
             ),
