@@ -4,10 +4,13 @@ import 'package:algolia/algolia.dart';
 class SearchUtilities {
   const SearchUtilities();
 
-  static Algolia? _algolia;
+  static Algolia _algolia = Algolia.init(
+    applicationId: '',
+    apiKey: '',
+  );
 
   /// Agolia instance.
-  static Algolia? get algolia => _algolia;
+  static Algolia get algolia => _algolia;
 
   /// Initialize algolia instance.
   void init({

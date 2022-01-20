@@ -586,7 +586,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
     _suggestionsStyles.clear();
 
     try {
-      final AlgoliaQuery query = await SearchUtilities.algolia!
+      final AlgoliaQuery query = await SearchUtilities.algolia
           .index("styles")
           .query(_searchTextController.text)
           .setHitsPerPage(_limitStyles)

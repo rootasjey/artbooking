@@ -4,7 +4,7 @@ import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/components/sheet_header.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/screens/illustrations/edit/edit_illustration_page_license.dart';
+import 'package:artbooking/screens/licenses/selection_panel/select_license_panel.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
@@ -16,17 +16,18 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 import 'package:verbal_expressions/verbal_expressions.dart';
 
 class EditIllustrationPage extends StatefulWidget {
-  final Illustration illustration;
-
   const EditIllustrationPage({
     Key? key,
     required this.illustration,
   }) : super(key: key);
+
+  final Illustration illustration;
 
   @override
   _EditIllustrationPageState createState() => _EditIllustrationPageState();
@@ -36,7 +37,7 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
   bool _isLoading = false;
   bool _isSaving = false;
   bool _isSidePanelStylesVisible = false;
-  bool _isSidePanelLicenseVisible = false;
+  bool _showLicensesPanel = false;
 
   bool _isEditingExistingLink = false;
 
@@ -822,9 +823,9 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
                       Opacity(
                         opacity: 0.8,
                         child: Text(
-                          illustration.license!.name.isEmpty
+                          illustration.license.name.isEmpty
                               ? "license_none".tr()
-                              : illustration.license!.name,
+                              : illustration.license.name,
                           style: Utilities.fonts.style(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
@@ -833,7 +834,7 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
                       ),
                     ],
                   ),
-                  illustration.license!.name.isEmpty
+                  illustration.license.name.isEmpty
                       ? Container()
                       : Opacity(
                           opacity: 0.8,
@@ -904,7 +905,7 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
         child: DarkElevatedButton.large(
           onPressed: () {
             setState(() {
-              _isSidePanelLicenseVisible = !_isSidePanelLicenseVisible;
+              _showLicensesPanel = !_showLicensesPanel;
             });
           },
           child: Text(
@@ -921,12 +922,10 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
     return Positioned(
       top: 100.0,
       right: 24.0,
-      child: EditIllustrationLicenses(
-        isVisible: _isSidePanelLicenseVisible,
+      child: SelectLicensePanel(
+        isVisible: _showLicensesPanel,
         selectedLicense: widget.illustration.license,
-        onClose: () {
-          setState(() => _isSidePanelLicenseVisible = false);
-        },
+        onClose: () => setState(() => _showLicensesPanel = false),
         toggleLicenseAndUpdate: toggleLicenseAndUpdate,
       ),
     );
@@ -1146,14 +1145,14 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
   }
 
   void fetchIllustrationLicense() async {
-    if (widget.illustration.license!.id.isEmpty) {
+    if (widget.illustration.license.id.isEmpty) {
       return;
     }
 
     try {
       final licenseSnap = await FirebaseFirestore.instance
           .collection("licenses")
-          .doc(widget.illustration.license!.id)
+          .doc(widget.illustration.license.id)
           .get();
 
       if (!licenseSnap.exists) {
@@ -1280,7 +1279,7 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
   }
 
   void toggleLicenseAndUpdate(
-    License illustrationLicense,
+    License license,
     bool selected,
   ) async {
     if (selected) {
@@ -1288,24 +1287,24 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
       return;
     }
 
-    selectLicenseAndUpdate(illustrationLicense);
-    setState(() => _isSidePanelLicenseVisible = false);
+    selectLicenseAndUpdate(license);
+    setState(() => _showLicensesPanel = false);
   }
 
-  void selectLicenseAndUpdate(License illustrationLicense) async {
+  void selectLicenseAndUpdate(License license) async {
     setState(() => _isSaving = true);
 
     final illustration = widget.illustration;
     final previousLicense = illustration.license;
-    illustration.license = illustrationLicense;
+    illustration.license = license;
 
     try {
       final response =
           await Utilities.cloud.illustrations("updateLicense").call({
         "illustrationId": illustration.id,
         "license": {
-          "id": illustrationLicense.id,
-          "type": illustrationLicense.type,
+          "id": license.id,
+          "type": license.typeToString(),
         },
       });
 
@@ -1315,13 +1314,14 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
         throw "license_update_fail".tr();
       }
     } catch (error) {
-      Utilities.logger.e(error);
+      context.showErrorBar(
+        content: Text(error.toString()),
+      );
 
-      illustrationLicense = previousLicense!;
+      license = previousLicense;
 
-      Utilities.snack.e(
-        context: context,
-        message: error.toString(),
+      context.showErrorBar(
+        content: Text(error.toString()),
       );
     } finally {
       setState(() => _isSaving = false);
@@ -1340,8 +1340,8 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
           await Utilities.cloud.illustrations("unsetLicense").call({
         "illustrationId": illustration.id,
         "license": {
-          "id": illustration.license!.id,
-          "from": illustration.license!.type,
+          "id": illustration.license.id,
+          "from": illustration.license.type,
         },
       });
 
@@ -1453,7 +1453,7 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
 
   void onTapLicenseCurrent() {
     setState(() {
-      _isSidePanelLicenseVisible = !_isSidePanelLicenseVisible;
+      _showLicensesPanel = !_showLicensesPanel;
     });
   }
 }

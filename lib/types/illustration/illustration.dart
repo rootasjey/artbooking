@@ -19,7 +19,7 @@ class Illustration {
     this.extension = '',
     this.hasPendingCreates = false,
     this.id = '',
-    this.license,
+    required this.license,
     this.name = '',
     this.stats,
     this.size = 0,
@@ -60,7 +60,7 @@ class Illustration {
   String id;
 
   /// Specifies how this illustration can be used.
-  License? license;
+  License license;
 
   /// This illustration's name.
   String name;
