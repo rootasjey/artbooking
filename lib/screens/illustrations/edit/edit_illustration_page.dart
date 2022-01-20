@@ -15,7 +15,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -39,25 +38,17 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
   bool _isSidePanelStylesVisible = false;
   bool _showLicensesPanel = false;
 
-  bool _isEditingExistingLink = false;
-
-  late DocumentSnapshot _illustrationSnapshot;
-
   final _descriptionTextController = TextEditingController();
   final _topicsTextController = TextEditingController();
   final _storyTextController = TextEditingController();
   final _nameTextController = TextEditingController();
-  final _linkNameInputController = TextEditingController();
-  final _linkValueInputController = TextEditingController();
 
   final Color _clairPink = Constants.colors.clairPink;
 
   /// Illustration's selected art styles.
   final List<String?> _selectedStyles = [];
 
-  final _programmingLanguages = Map<String, bool>();
   final _topics = Map<String, bool>();
-  final _links = Map<String, String>();
 
   final GlobalKey<ExpansionTileCardState> _presentationCard = GlobalKey();
 
@@ -65,10 +56,7 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
     ..digit()
     ..oneOrMore();
 
-  String _editingExistingLinkName = '';
   String _jwt = '';
-  String _linkName = '';
-  String _linkValue = '';
   String _topicInputValue = '';
 
   /// Illustration's name after page loading.
@@ -87,7 +75,6 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
   void initState() {
     super.initState();
     populateFields();
-    fetchIllustration();
   }
 
   @override
@@ -143,6 +130,7 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
   Widget body() {
     if (_isLoading) {
       return LoadingView(
+        sliver: false,
         title: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Opacity(
@@ -963,9 +951,8 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
         errorMessage = "styles_update_out_of_range".tr(args: [numberOfStyles!]);
       }
 
-      Utilities.snack.e(
-        context: context,
-        message: errorMessage,
+      context.showErrorBar(
+        content: Text(errorMessage),
       );
     } catch (error) {
       Utilities.logger.e(error);
@@ -974,9 +961,8 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
         _selectedStyles.remove(styleName);
       });
 
-      Utilities.snack.e(
-        context: context,
-        message: "styles_update_fail".tr(),
+      context.showErrorBar(
+        content: Text("styles_update_fail".tr()),
       );
     } finally {
       setState(() => _isSaving = false);
@@ -985,9 +971,8 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
 
   void addTopicAndUpdate() async {
     if (_topicInputValue.isEmpty) {
-      Utilities.snack.e(
-        context: context,
-        message: "input_empty_invalid".tr(),
+      context.showErrorBar(
+        content: Text("input_empty_invalid".tr()),
       );
 
       return;
@@ -1024,7 +1009,8 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
         _topics.remove(topic);
       }
 
-      String? errorMessage = error.message;
+      String errorMessage = error.message ??
+          'There was an issue while adding topics to your illustration.';
 
       if (error.code == "out-of-range") {
         final matches = _numberRegex.toRegExp().allMatches(error.message!);
@@ -1035,9 +1021,8 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
         errorMessage = "topics_update_out_of_range".tr(args: [numberOfTopics!]);
       }
 
-      Utilities.snack.e(
-        context: context,
-        message: errorMessage,
+      context.showErrorBar(
+        content: Text(errorMessage),
       );
     } catch (error) {
       Utilities.logger.e(error);
@@ -1046,101 +1031,11 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
         _topics.remove(topic);
       }
 
-      Utilities.snack.e(
-        context: context,
-        message: error.toString(),
+      context.showErrorBar(
+        content: Text(error.toString()),
       );
     } finally {
       setState(() => _isSaving = false);
-    }
-  }
-
-  void addLinkAndUpdate() async {
-    _linkNameInputController.text = '';
-    _linkValueInputController.text = '';
-
-    /// To clear input label text while keeping the last value
-    /// if request fails.
-    final savedName = _linkName;
-
-    final wasEditingExistingLink = _isEditingExistingLink;
-
-    if (_isEditingExistingLink) {
-      _links.remove(_editingExistingLinkName);
-    }
-
-    setState(() {
-      _links[savedName] = _linkValue;
-      _linkName = '';
-      _isSaving = true;
-      _isEditingExistingLink = false;
-    });
-
-    try {
-      await _illustrationSnapshot.reference.update({'urls': _links});
-    } catch (error) {
-      Utilities.logger.e(error);
-
-      _links.remove(savedName);
-
-      if (wasEditingExistingLink) {
-        _links.putIfAbsent(_editingExistingLinkName, () => _linkValue);
-      }
-
-      Utilities.snack.e(
-        context: context,
-        message: "project_update_urls_fail".tr(),
-      );
-    } finally {
-      setState(() => _isSaving = false);
-    }
-  }
-
-  void deleteUrlAndUpdate(MapEntry<String, String> entry) async {
-    setState(() {
-      _linkName = '';
-      _linkValue = '';
-      _linkNameInputController.clear();
-      _linkValueInputController.clear();
-
-      _links.remove(entry.key);
-      _isSaving = true;
-    });
-
-    try {
-      await _illustrationSnapshot.reference.update({'urls': _links});
-    } catch (error) {
-      Utilities.logger.e(error);
-
-      _links.putIfAbsent(entry.key, () => entry.value);
-
-      Utilities.snack.e(
-        context: context,
-        message: "project_update_urls_fail".tr(),
-      );
-    } finally {
-      setState(() => _isSaving = false);
-    }
-  }
-
-  void fetchIllustration() async {
-    setState(() => _isLoading = true);
-
-    try {
-      _jwt = await FirebaseAuth.instance.currentUser!.getIdToken();
-
-      _illustrationSnapshot = await FirebaseFirestore.instance
-          .collection("illustrations")
-          .doc(widget.illustration.id)
-          .get();
-
-      if (!_illustrationSnapshot.exists) {
-        return;
-      }
-    } catch (error) {
-      Utilities.logger.e(error);
-    } finally {
-      setState(() => _isLoading = false);
     }
   }
 
@@ -1210,37 +1105,18 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
     } on FirebaseFunctionsException catch (error) {
       Utilities.logger.e(error);
 
-      Utilities.snack.e(
-        context: context,
-        message: error.message,
+      final String message =
+          error.message ?? 'There was an issue while removing styles.';
+
+      context.showErrorBar(
+        content: Text(message),
       );
     } catch (error) {
       Utilities.logger.e(error);
       _selectedStyles.add(styleName);
 
-      Utilities.snack.e(
-        context: context,
-        message: "styles_update_fail".tr(),
-      );
-    } finally {
-      setState(() => _isSaving = false);
-    }
-  }
-
-  void removeProLangAndUpdate(String key) async {
-    _programmingLanguages.remove(key);
-    setState(() => _isSaving = true);
-
-    try {
-      await _illustrationSnapshot.reference
-          .update({'programmingLanguages': _programmingLanguages});
-    } catch (error) {
-      Utilities.logger.e(error);
-      _programmingLanguages.putIfAbsent(key, () => true);
-
-      Utilities.snack.e(
-        context: context,
-        message: "project_update_prog_fail".tr(),
+      context.showErrorBar(
+        content: Text("styles_update_fail".tr()),
       );
     } finally {
       setState(() => _isSaving = false);
@@ -1269,9 +1145,8 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
       Utilities.logger.e(error);
       _topics.putIfAbsent(entry.key, () => entry.value);
 
-      Utilities.snack.e(
-        context: context,
-        message: error.toString(),
+      context.showErrorBar(
+        content: Text(error.toString()),
       );
     } finally {
       setState(() => _isSaving = false);
@@ -1339,10 +1214,6 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
       final response =
           await Utilities.cloud.illustrations("unsetLicense").call({
         "illustrationId": illustration.id,
-        "license": {
-          "id": illustration.license.id,
-          "from": illustration.license.type,
-        },
       });
 
       final bool success = response.data["success"];
@@ -1355,9 +1226,8 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
 
       illustration.license = previousLicense;
 
-      Utilities.snack.e(
-        context: context,
-        message: error.toString(),
+      context.showErrorBar(
+        content: Text(error.toString()),
       );
     } finally {
       setState(() => _isSaving = false);
@@ -1388,9 +1258,8 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
     } catch (error) {
       Utilities.logger.e(error);
 
-      Utilities.snack.e(
-        context: context,
-        message: "project_update_title_fail".tr(),
+      context.showErrorBar(
+        content: Text("project_update_title_fail".tr()),
       );
 
       _presentationCard.currentState!.expand();
@@ -1433,18 +1302,16 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
       Utilities.logger.e(error);
       illustration.visibility = previousVisibility;
 
-      Utilities.snack.e(
-        context: context,
-        message: "[${error.code}] ${error.message}",
+      context.showErrorBar(
+        content: Text("[${error.code}] ${error.message}"),
       );
     } catch (error) {
       Utilities.logger.e(error);
 
       illustration.visibility = previousVisibility;
 
-      Utilities.snack.e(
-        context: context,
-        message: "illustration_visibility_update_fail".tr(),
+      context.showErrorBar(
+        content: Text("illustration_visibility_update_fail".tr()),
       );
     } finally {
       setState(() => _isSaving = false);

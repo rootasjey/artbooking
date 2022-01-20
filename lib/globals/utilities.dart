@@ -4,7 +4,6 @@ import 'package:artbooking/globals/utilities/date_utilities.dart';
 import 'package:artbooking/globals/utilities/flash_utilities.dart';
 import 'package:artbooking/globals/utilities/fonts_utilities.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
-import 'package:artbooking/globals/utilities/snack_utilities.dart';
 import 'package:artbooking/globals/utilities/storage_utilities.dart';
 import 'package:artbooking/globals/utilities/language_utilities.dart';
 import 'package:artbooking/globals/utilities/size_utilities.dart';
@@ -22,7 +21,6 @@ class Utilities {
   static const lang = const LanguageUtilities();
   static const search = const SearchUtilities();
   static const size = const SizeUtils();
-  static const snack = const SnackUtilities();
   static const storage = const StorageUtilities();
 
   static String getStringWithUnit(int usedBytes) {

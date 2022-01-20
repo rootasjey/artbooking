@@ -20,6 +20,7 @@ import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
@@ -543,17 +544,15 @@ class _MyBooksPageState extends State<MyBooksPage> {
     setState(() => _isCreating = false);
 
     if (!response.success) {
-      Utilities.snack.e(
-        context: context,
-        message: "book_creation_error".tr(),
+      context.showErrorBar(
+        content: Text("book_creation_error".tr()),
       );
 
       return;
     }
 
-    Utilities.snack.s(
-      context: context,
-      message: "book_creation_success".tr(),
+    context.showSuccessBar(
+      content: Text("book_creation_success".tr()),
     );
   }
 
@@ -575,9 +574,8 @@ class _MyBooksPageState extends State<MyBooksPage> {
     );
 
     if (response.hasErrors) {
-      Utilities.snack.e(
-        context: context,
-        message: "illustrations_delete_error".tr(),
+      context.showErrorBar(
+        content: Text("illustrations_delete_error".tr()),
       );
 
       _books.addAll(copyItems);
@@ -788,9 +786,8 @@ class _MyBooksPageState extends State<MyBooksPage> {
         book.description = prevDescription;
       });
 
-      Utilities.snack.e(
-        context: context,
-        message: response.error.details,
+      context.showErrorBar(
+        content: Text(response.error.details),
       );
     } catch (error) {
       Utilities.logger.e(error);
@@ -864,9 +861,8 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
     setState(() => _books.insert(index, book));
 
-    Utilities.snack.e(
-      context: context,
-      message: response.error.details,
+    context.showErrorBar(
+      content: Text(response.error.details),
     );
   }
 

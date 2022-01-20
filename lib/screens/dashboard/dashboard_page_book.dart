@@ -26,6 +26,7 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -1015,9 +1016,8 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
     );
 
     if (response.hasErrors) {
-      Utilities.snack.e(
-        context: context,
-        message: "illustrations_delete_error".tr(),
+      context.showErrorBar(
+        content: Text("illustrations_delete_error".tr()),
       );
 
       _illustrations.addAll(duplicatedItems);
@@ -1334,9 +1334,8 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
     );
 
     if (response.hasErrors) {
-      Utilities.snack.e(
-        context: context,
-        message: "illustrations_remove_error".tr(),
+      context.showErrorBar(
+        content: Text("illustrations_remove_error".tr()),
       );
 
       setState(() {
@@ -1346,9 +1345,8 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
         );
       });
 
-      Utilities.snack.e(
-        context: context,
-        message: "illustrations_remove_error".tr(),
+      context.showErrorBar(
+        content: Text("illustrations_remove_error".tr()),
       );
 
       return;
@@ -1446,9 +1444,8 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
         book.description = prevDescription;
       });
 
-      Utilities.snack.e(
-        context: context,
-        message: response.error.details,
+      context.showErrorBar(
+        content: Text(response.error.details),
       );
     } catch (error) {
       Utilities.logger.e(error);

@@ -527,10 +527,9 @@ class _IllustrationPageState extends State<IllustrationPage> {
     );
 
     if (!result.success) {
-      Utilities.snack.e(
-        context: context,
-        message: "Sorry, there was an error while saving your changes."
-            " Try again later or contact us.",
+      context.showErrorBar(
+        content: Text("Sorry, there was an error while saving your changes."
+            " Try again later or contact us."),
       );
 
       fetchIllustration();

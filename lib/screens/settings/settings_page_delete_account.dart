@@ -9,6 +9,7 @@ import 'package:artbooking/globals/app_state.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -402,7 +403,7 @@ class DeleteAccountPageState extends ConsumerState<SettingsPageDeleteAccount> {
 
       if (!response.success) {
         throw ErrorDescription(
-          "We cannot delete your account right now. Try again later.",
+          "We could not delete your account right now. Try again later.",
         );
       }
 
@@ -417,18 +418,19 @@ class DeleteAccountPageState extends ConsumerState<SettingsPageDeleteAccount> {
         _isDeleting = false;
       });
 
-      Utilities.snack.e(
-        context: context,
-        message: (error as PlatformException).message,
+      final String message = (error as PlatformException).message ??
+          "We could not delete your account right now. Try again later.";
+
+      context.showErrorBar(
+        content: Text(message),
       );
     }
   }
 
   bool inputValuesOk() {
     if (_password.isEmpty) {
-      Utilities.snack.e(
-        context: context,
-        message: "password_empty_forbidden".tr(),
+      context.showErrorBar(
+        content: Text("password_empty_forbidden".tr()),
       );
 
       return false;

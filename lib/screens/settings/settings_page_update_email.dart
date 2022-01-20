@@ -10,6 +10,7 @@ import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
@@ -470,27 +471,24 @@ class _UpdateEmailPageState extends ConsumerState<SettingsPageUpdateEmail> {
 
   bool checkInputsFormat() {
     if (_newEmailValue.isEmpty) {
-      Utilities.snack.e(
-        context: context,
-        message: "email_empty_forbidden".tr(),
+      context.showErrorBar(
+        content: Text("email_empty_forbidden".tr()),
       );
 
       return false;
     }
 
     if (_currentPasswordValue.isEmpty) {
-      Utilities.snack.e(
-        context: context,
-        message: "password_empty_forbidden".tr(),
+      context.showErrorBar(
+        content: Text("password_empty_forbidden".tr()),
       );
 
       return false;
     }
 
     if (!UsersActions.checkEmailFormat(_newEmailValue)) {
-      Utilities.snack.e(
-        context: context,
-        message: "email_not_validd".tr(),
+      context.showErrorBar(
+        content: Text("email_not_validd".tr()),
       );
 
       return false;
@@ -510,9 +508,8 @@ class _UpdateEmailPageState extends ConsumerState<SettingsPageUpdateEmail> {
       if (!await checkInputsAvailbility()) {
         setState(() => _isUpdating = false);
 
-        Utilities.snack.e(
-          context: context,
-          message: "email_not_available".tr(),
+        context.showErrorBar(
+          content: Text("email_not_available".tr()),
         );
 
         return;
@@ -536,9 +533,8 @@ class _UpdateEmailPageState extends ConsumerState<SettingsPageUpdateEmail> {
       Utilities.logger.e(error);
       setState(() => _isUpdating = false);
 
-      Utilities.snack.e(
-        context: context,
-        message: "email_update_error".tr(),
+      context.showErrorBar(
+        content: Text("email_update_error".tr()),
       );
     }
   }

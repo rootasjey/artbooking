@@ -20,6 +20,7 @@ import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -539,9 +540,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     );
 
     if (response.hasErrors) {
-      Utilities.snack.e(
-        context: context,
-        message: "illustrations_delete_error".tr(),
+      context.showErrorBar(
+        content: Text("illustrations_delete_error".tr()),
       );
 
       _illustrationsList.addAll(duplicatedItems);

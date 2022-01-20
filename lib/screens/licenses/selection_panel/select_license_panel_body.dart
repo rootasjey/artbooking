@@ -57,11 +57,9 @@ class SelectLicensePanelBody extends StatelessWidget {
               licenses: licenses,
               selectedLicenseId: selectedLicense.id,
               toggleLicenseAndUpdate: toggleLicenseAndUpdate,
-              onShowLicensePreview: onTogglePreview != null
-                  ? () {
-                      onTogglePreview?.call(!showLicenseInfo);
-                    }
-                  : null,
+              onShowLicensePreview: () => onTogglePreview?.call(
+                !showLicenseInfo,
+              ),
             ),
           ],
         ),

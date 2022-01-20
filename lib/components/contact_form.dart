@@ -3,6 +3,7 @@ import 'package:artbooking/components/icons/animated_app_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -422,18 +423,16 @@ class _ContactFormState extends State<ContactForm> {
 
   bool areFormValuesOK() {
     if (_messageBody.isEmpty || _messageBody.length <= 3) {
-      Utilities.snack.e(
-        context: context,
-        message: getBodyErrorText(beforeSending: true),
+      context.showErrorBar(
+        content: Text(getBodyErrorText(beforeSending: true) ?? ''),
       );
 
       return false;
     }
 
     if (_email.isEmpty || !UsersActions.checkEmailFormat(_email)) {
-      Utilities.snack.e(
-        context: context,
-        message: getEmailErrorText(beforeSending: true),
+      context.showErrorBar(
+        content: Text(getEmailErrorText(beforeSending: true) ?? ''),
       );
 
       return false;
@@ -524,9 +523,8 @@ class _ContactFormState extends State<ContactForm> {
     } catch (error) {
       Utilities.logger.e(error);
 
-      Utilities.snack.e(
-        context: context,
-        message: "message_send_error".tr(),
+      context.showErrorBar(
+        content: Text("message_send_error".tr()),
       );
     }
   }

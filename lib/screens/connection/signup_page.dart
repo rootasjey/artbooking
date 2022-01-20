@@ -8,6 +8,7 @@ import 'package:artbooking/router/locations/signin_location.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/animations/fade_in_x.dart';
@@ -550,7 +551,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
         message = "[code: ${error.code}] - ${error.message}";
       }
 
-      Utilities.snack.e(context: context, message: message);
+      context.showErrorBar(content: Text(message));
 
       context.beamToNamed(HomeLocation.route);
     } catch (error) {
@@ -558,9 +559,8 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
       setState(() => _isSigningUp = false);
 
-      Utilities.snack.e(
-        context: context,
-        message: "account_create_error".tr(),
+      context.showErrorBar(
+        content: Text("account_create_error".tr()),
       );
     }
   }
@@ -577,47 +577,42 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     _password = _password.trim();
 
     if (_password.isEmpty || _confirmPassword.isEmpty) {
-      Utilities.snack.e(
-        context: context,
-        message: "password_empty_forbidden".tr(),
+      context.showErrorBar(
+        content: Text("password_empty_forbidden".tr()),
       );
 
       return false;
     }
 
     if (_confirmPassword != _password) {
-      Utilities.snack.e(
-        context: context,
-        message: "passwords_dont_match".tr(),
+      context.showErrorBar(
+        content: Text("passwords_dont_match".tr()),
       );
 
       return false;
     }
 
     if (_username.isEmpty) {
-      Utilities.snack.e(
-        context: context,
-        message: "name_empty_forbidden".tr(),
+      context.showErrorBar(
+        content: Text("name_empty_forbidden".tr()),
       );
 
       return false;
     }
 
     if (!UsersActions.checkEmailFormat(_email)) {
-      Utilities.snack.e(
-        context: context,
-        message: "email_not_valid".tr(),
+      context.showErrorBar(
+        content: Text("email_not_valid".tr()),
       );
 
       return false;
     }
 
     if (!UsersActions.checkUsernameFormat(_username)) {
-      Utilities.snack.e(
-        context: context,
-        message: _username.length < 3
+      context.showErrorBar(
+        content: Text(_username.length < 3
             ? "input_minimum_char".tr()
-            : "input_valid_format".tr(),
+            : "input_valid_format".tr()),
       );
 
       return false;

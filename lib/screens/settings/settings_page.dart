@@ -17,6 +17,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mime_type/mime_type.dart';
@@ -205,9 +206,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
 
     if (choosenFile.length >= 5 * 1024 * 1024) {
-      Utilities.snack.e(
-        context: context,
-        message: "image_size_exceeded".tr(),
+      context.showErrorBar(
+        content: Text("image_size_exceeded".tr()),
       );
 
       return;

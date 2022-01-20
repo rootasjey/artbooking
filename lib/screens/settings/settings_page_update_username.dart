@@ -11,6 +11,7 @@ import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
@@ -433,9 +434,8 @@ class _UpdateUsernamePageState
           _isUpdating = false;
         });
 
-        Utilities.snack.e(
-          context: context,
-          message: "username_not_available_args".tr(args: [_newUsername]),
+        context.showErrorBar(
+          content: Text("username_not_available_args".tr(args: [_newUsername])),
         );
 
         return;
@@ -454,9 +454,8 @@ class _UpdateUsernamePageState
           _isUpdating = false;
         });
 
-        Utilities.snack.e(
-          context: context,
-          message: "[code: ${exception.code}] - ${exception.message}",
+        context.showErrorBar(
+          content: Text("[code: ${exception.code}] - ${exception.message}"),
         );
 
         return;
@@ -469,9 +468,8 @@ class _UpdateUsernamePageState
         _newUsername = '';
       });
 
-      Utilities.snack.s(
-        context: context,
-        message: "username_update_success".tr(),
+      context.showSuccessBar(
+        content: Text("username_update_success".tr()),
       );
     } catch (error) {
       Utilities.logger.e(error);
@@ -481,9 +479,8 @@ class _UpdateUsernamePageState
         _isUpdating = false;
       });
 
-      Utilities.snack.e(
-        context: context,
-        message: "username_update_error".tr(),
+      context.showErrorBar(
+        content: Text("username_update_error".tr()),
       );
     }
   }

@@ -8,6 +8,7 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:collection/collection.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -358,7 +359,7 @@ class _SearchPageState extends State<SearchPage> {
     final url = '${Constants.urls.baseIllustrationUrl}{illustration.id}';
 
     await Clipboard.setData(ClipboardData(text: url));
-    Utilities.snack.s(context: context, message: "copy_link_success".tr());
+    context.showSuccessBar(content: Text("copy_link_success".tr()));
   }
 
   void sharePost(Illustration illustration) {

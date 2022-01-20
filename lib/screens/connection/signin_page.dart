@@ -12,6 +12,7 @@ import 'package:artbooking/router/locations/signup_location.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
@@ -327,18 +328,16 @@ class _SigninPageState extends ConsumerState<SigninPage> {
     _password = _password.trim();
 
     if (!UsersActions.checkEmailFormat(_email)) {
-      Utilities.snack.e(
-        context: context,
-        message: "email_not_valid".tr(),
+      context.showErrorBar(
+        content: Text("email_not_valid".tr()),
       );
 
       return false;
     }
 
     if (_password.isEmpty) {
-      Utilities.snack.e(
-        context: context,
-        message: "password_empty_forbidden".tr(),
+      context.showErrorBar(
+        content: Text("password_empty_forbidden".tr()),
       );
 
       return false;
@@ -363,9 +362,8 @@ class _SigninPageState extends ConsumerState<SigninPage> {
       if (userCred == null) {
         setState(() => _isConnecting = false);
 
-        Utilities.snack.e(
-          context: context,
-          message: "account_doesnt_exist".tr(),
+        context.showErrorBar(
+          content: Text("account_doesnt_exist".tr()),
         );
 
         return;
@@ -377,9 +375,8 @@ class _SigninPageState extends ConsumerState<SigninPage> {
     } catch (error) {
       Utilities.logger.d(error);
 
-      Utilities.snack.e(
-        context: context,
-        message: "password_incorrect".tr(),
+      context.showErrorBar(
+        content: Text("password_incorrect".tr()),
       );
 
       setState(() => _isConnecting = false);

@@ -6,6 +6,7 @@ import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
@@ -394,27 +395,24 @@ class _UpdatePasswordPageState
       Utilities.logger.e(error);
       setState(() => _isUpdating = false);
 
-      Utilities.snack.e(
-        context: context,
-        message: "password_update_error".tr(),
+      context.showErrorBar(
+        content: Text("password_update_error".tr()),
       );
     }
   }
 
   bool checkInputsFormat() {
     if (_currentPassword.isEmpty) {
-      Utilities.snack.e(
-        context: context,
-        message: "password_empty_forbidden".tr(),
+      context.showErrorBar(
+        content: Text("password_empty_forbidden".tr()),
       );
 
       return false;
     }
 
     if (_newPassword.isEmpty) {
-      Utilities.snack.e(
-        context: context,
-        message: "password_empty_forbidden".tr(),
+      context.showErrorBar(
+        content: Text("password_empty_forbidden".tr()),
       );
 
       return false;

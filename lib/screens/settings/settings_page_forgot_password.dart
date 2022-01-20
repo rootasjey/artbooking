@@ -8,6 +8,7 @@ import 'package:artbooking/router/locations/home_location.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
@@ -267,18 +268,16 @@ class _SettingsPageForgotPasswordState
 
   bool inputValuesOk() {
     if (email.isEmpty) {
-      Utilities.snack.e(
-        context: context,
-        message: "email_empty_no_valid".tr(),
+      context.showErrorBar(
+        content: Text("email_empty_no_valid".tr()),
       );
 
       return false;
     }
 
     if (!UsersActions.checkEmailFormat(email)) {
-      Utilities.snack.e(
-        context: context,
-        message: "email_not_valid".tr(),
+      context.showErrorBar(
+        content: Text("email_not_valid".tr()),
       );
 
       return false;
@@ -308,9 +307,8 @@ class _SettingsPageForgotPasswordState
 
       setState(() => isLoading = false);
 
-      Utilities.snack.e(
-        context: context,
-        message: "email_doesnt_exist".tr(),
+      context.showErrorBar(
+        content: Text("email_doesnt_exist".tr()),
       );
     }
   }
