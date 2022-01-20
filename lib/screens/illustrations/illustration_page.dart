@@ -472,6 +472,10 @@ class _IllustrationPageState extends State<IllustrationPage> {
   }
 
   void fetchIllustration({bool silent = false}) async {
+    if (!mounted) {
+      return;
+    }
+
     setState(() {
       _isLoading = !silent;
     });
@@ -502,6 +506,10 @@ class _IllustrationPageState extends State<IllustrationPage> {
       });
     } catch (error) {
       Utilities.logger.e(error);
+
+      if (!mounted) {
+        return;
+      }
       setState(() {
         _isLoading = false;
       });
