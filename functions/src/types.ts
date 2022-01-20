@@ -430,7 +430,7 @@ interface UpdateIllusLicenseParams {
      * Tell if the license is from the platform or the author.
      * This property is mandatory to know where to find the license from its id.
      */
-    from: EnumLicenseType,
+    type: EnumLicenseType,
     
     /**
      * Match an existing license id if not empty.

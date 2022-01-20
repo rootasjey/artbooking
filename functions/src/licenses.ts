@@ -3,7 +3,7 @@ import * as functions from 'firebase-functions';
 import * as fs from 'fs-extra';
 
 import { adminApp } from './adminApp';
-import { allowedLicenseFromValues as allowedLicenseTypes, cloudRegions } from './utils';
+import { allowedLicenseTypes as allowedLicenseTypes, cloudRegions } from './utils';
 
 const firestore = adminApp.firestore();
 

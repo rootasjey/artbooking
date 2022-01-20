@@ -8,7 +8,7 @@ import { join, dirname } from 'path';
 import * as sharp from 'sharp';
 
 import { adminApp } from './adminApp';
-import { allowedLicenseFromValues, cloudRegions } from './utils';
+import { allowedLicenseTypes, cloudRegions } from './utils';
 
 import https = require('https');
 import { ISizeCalculationResult } from 'image-size/dist/types/interface';
@@ -201,7 +201,7 @@ export const createOne = functions
         extension: '',
         hasPendingCreates: true,
         license: {
-          from: '',
+          type: '',
           id: '',
         },
         name: name,
@@ -635,7 +635,7 @@ export const unsetLicense = functions
 
     await illusSnap.ref.update({
       license: {
-        from: '',
+        type: '',
         id: '',
       },
     });
@@ -750,7 +750,7 @@ export const updateLicense = functions
 
     await illusSnap.ref.update({
       license: {
-        from: license.from ?? '',
+        type: license.type ?? '',
         id: license.id ?? '',
       },
     });
@@ -1113,7 +1113,7 @@ function checkIllustrationLicenseFormat(data: any) {
     throw new functions.https.HttpsError(
       'invalid-argument',
       `The license data you provided is not an object. You provided a ${typeof data}. ` +
-      `You must specify an object, and it should have a [from] property which is a string, ` + 
+      `You must specify an object, and it should have a [type] property which is a string, ` + 
       `and an [id] property referencing an existing license in database.`,
     )
   }
@@ -1128,24 +1128,24 @@ function checkIllustrationLicenseFormat(data: any) {
     )
   }
 
-  if (typeof data.from !== 'string') {
+  if (typeof data.type !== 'string') {
     throw new functions.https.HttpsError(
       'invalid-argument',
-      `The license data you provided has the property [license.from] = ${data.from} - ` +
+      `The license data you provided has the property [license.type] = ${data.type} - ` +
       `which is not an string. ` +
-      `The property [from] must be a string ` + 
-      `among these values: ${allowedLicenseFromValues.join(", ")}`,
+      `The property [type] must be a string ` + 
+      `among these values: ${allowedLicenseTypes.join(", ")}`,
     )
   }
 
-  if (allowedLicenseFromValues.includes(data.from)) {
+  if (allowedLicenseTypes.includes(data.type)) {
     return;
   }
 
   throw new functions.https.HttpsError(
     'invalid-argument',
-    `The value provided for [from] parameter is not valid. ` +
-    `Allowed values are: ${allowedLicenseFromValues.join(", ")}`,
+    `The value provided for [type] parameter is not valid. ` +
+    `Allowed values are: ${allowedLicenseTypes.join(", ")}`,
   );
 }
 
@@ -1160,7 +1160,7 @@ function checkVisibilityValue(visibility: string) {
     case "acl":
     case "private":
     case "public":
-    case "unulisted":
+    case "unlisted":
       isAllowed = true;
       break;
     default:
