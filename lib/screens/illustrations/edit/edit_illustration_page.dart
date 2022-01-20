@@ -1305,7 +1305,7 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
         "illustrationId": illustration.id,
         "license": {
           "id": illustrationLicense.id,
-          "from": illustrationLicense.type,
+          "type": illustrationLicense.type,
         },
       });
 
