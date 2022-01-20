@@ -5,15 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SelectLicensePanelPreview extends StatelessWidget {
-  const SelectLicensePanelPreview({
+class SelectLicensePanelMoreInfo extends StatelessWidget {
+  const SelectLicensePanelMoreInfo({
     Key? key,
-    required this.selectedLicensePreview,
     this.onBack,
+    required this.license,
   }) : super(key: key);
 
-  final License selectedLicensePreview;
   final Function()? onBack;
+  final License license;
 
   @override
   Widget build(BuildContext context) {
@@ -28,22 +28,25 @@ class SelectLicensePanelPreview extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 40.0),
+              padding: const EdgeInsets.only(left: 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
                     tooltip: "back".tr(),
                     onPressed: onBack,
-                    icon: Icon(UniconsLine.arrow_left),
+                    icon: Opacity(
+                      opacity: 0.6,
+                      child: Icon(UniconsLine.arrow_left),
+                    ),
                   ),
                   Expanded(
                     child: Opacity(
                       opacity: 0.8,
                       child: Text(
-                        selectedLicensePreview.name.toUpperCase(),
+                        license.name.toUpperCase(),
                         style: Utilities.fonts.style(
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
@@ -52,11 +55,11 @@ class SelectLicensePanelPreview extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Opacity(
                 opacity: 0.6,
                 child: Text(
-                  selectedLicensePreview.description,
+                  license.description,
                   style: Utilities.fonts.style(
                     fontWeight: FontWeight.w500,
                   ),
@@ -72,14 +75,14 @@ class SelectLicensePanelPreview extends StatelessWidget {
 
   Widget linksPreview() {
     return Padding(
-      padding: const EdgeInsets.only(left: 24.0),
+      padding: const EdgeInsets.only(top: 24.0, left: 24.0),
       child: Wrap(
         spacing: 12.0,
         runSpacing: 12.0,
         children: [
-          if (selectedLicensePreview.urls.wikipedia.isNotEmpty)
+          if (license.urls.wikipedia.isNotEmpty)
             OutlinedButton(
-              onPressed: () => launch(selectedLicensePreview.urls.wikipedia),
+              onPressed: () => launch(license.urls.wikipedia),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text("wikipedia"),
@@ -88,9 +91,9 @@ class SelectLicensePanelPreview extends StatelessWidget {
                 primary: Colors.black54,
               ),
             ),
-          if (selectedLicensePreview.urls.website.isNotEmpty)
+          if (license.urls.website.isNotEmpty)
             OutlinedButton(
-              onPressed: () => launch(selectedLicensePreview.urls.website),
+              onPressed: () => launch(license.urls.website),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text("website"),

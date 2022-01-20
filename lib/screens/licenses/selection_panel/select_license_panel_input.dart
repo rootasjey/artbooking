@@ -9,14 +9,25 @@ class SelectLicensePanelInput extends StatelessWidget {
     Key? key,
     this.onInputChanged,
     this.onSearchLicense,
+    this.searchInputValue = '',
   }) : super(key: key);
 
   final Function(String)? onInputChanged;
   final Function()? onSearchLicense;
+  final String searchInputValue;
 
   @override
   Widget build(BuildContext context) {
-    final searchTextController = TextEditingController();
+    final searchInput = TextEditingController();
+    final searchInputFocus = FocusNode();
+
+    if (searchInputValue.isNotEmpty) {
+      searchInput.text = searchInputValue;
+      searchInput.selection = TextSelection(
+        baseOffset: searchInputValue.length,
+        extentOffset: searchInputValue.length,
+      );
+    }
 
     return SliverPadding(
       padding: const EdgeInsets.all(24.0),
@@ -32,7 +43,8 @@ class SelectLicensePanelInput extends StatelessWidget {
                     width: 300.0,
                     child: TextFormField(
                       autofocus: true,
-                      controller: searchTextController,
+                      controller: searchInput,
+                      focusNode: searchInputFocus,
                       decoration: InputDecoration(
                         filled: true,
                         isDense: true,
@@ -47,12 +59,6 @@ class SelectLicensePanelInput extends StatelessWidget {
                         ),
                       ),
                       onChanged: (value) {
-                        // _searchTimer?.cancel();
-
-                        // _searchTimer = Timer(
-                        //   500.milliseconds,
-                        //   searchLicense,
-                        // );
                         onInputChanged?.call(value);
                       },
                     ),
@@ -62,9 +68,8 @@ class SelectLicensePanelInput extends StatelessWidget {
                     child: Opacity(
                       opacity: 0.6,
                       child: IconButton(
-                        tooltip: "styles_search".tr(),
+                        tooltip: "license_find".tr(),
                         icon: Icon(UniconsLine.search),
-                        // onPressed: searchLicense,
                         onPressed: onSearchLicense,
                       ),
                     ),
@@ -75,11 +80,9 @@ class SelectLicensePanelInput extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 6.0),
                 child: TextButton.icon(
                   onPressed: () {
-                    searchTextController.clear();
-                    // setState(() {
-                    //   _searchTextController.clear();
-                    // });
-                    onInputChanged?.call(searchTextController.text);
+                    searchInput.clear();
+                    onInputChanged?.call(searchInput.text);
+                    searchInputFocus.requestFocus();
                   },
                   icon: Icon(UniconsLine.times),
                   label: Text("clear".tr()),

@@ -121,7 +121,17 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
             ),
           ),
           stylesSidePanel(),
-          licenseSidePanel(),
+          Positioned(
+            top: 100.0,
+            right: 24.0,
+            child: SelectLicensePanel(
+              elevation: 8.0,
+              isVisible: _showLicensesPanel,
+              selectedLicense: widget.illustration.license,
+              onClose: () => setState(() => _showLicensesPanel = false),
+              toggleLicenseAndUpdate: toggleLicenseAndUpdate,
+            ),
+          ),
         ],
       ),
     );
@@ -902,19 +912,6 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
                 : "license_select".tr(),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget licenseSidePanel() {
-    return Positioned(
-      top: 100.0,
-      right: 24.0,
-      child: SelectLicensePanel(
-        isVisible: _showLicensesPanel,
-        selectedLicense: widget.illustration.license,
-        onClose: () => setState(() => _showLicensesPanel = false),
-        toggleLicenseAndUpdate: toggleLicenseAndUpdate,
       ),
     );
   }

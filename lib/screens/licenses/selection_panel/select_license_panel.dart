@@ -9,7 +9,9 @@ import 'package:artbooking/screens/licenses/selection_panel/select_license_panel
 import 'package:artbooking/types/license/license.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:supercharged_dart/supercharged_dart.dart';
 
 /// A side panel to add art style to an illustration.
 class SelectLicensePanel extends StatefulWidget {
@@ -55,17 +57,16 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
   /// Last fetched document snapshot. Useful for pagination.
   DocumentSnapshot<Object>? _lastDocumentSnapshot;
 
+  /// Maximum container's width.
+  final double _containerWidth = 400.0;
+
   /// All available art styles.
   final List<License> _staffLicenses = [];
 
   /// Search results.
   final List<License> _searchResultLicenses = [];
 
-  /// Search controller.
-  final _searchTextController = TextEditingController();
-
-  /// Maximum container's width.
-  final double _containerWidth = 400.0;
+  final _panelScrollController = ScrollController();
 
   /// Maximum licenses to fetch in one request.
   int _limit = 10;
@@ -73,24 +74,24 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
   /// Selected style for image preview.
   License _selectedLicense = License.empty();
 
-  /// Delay search after typing input.
-  Timer? _searchTimer;
-
-  final _panelScrollController = ScrollController();
+  /// License we want to show information preview.
+  License _moreInfoLicense = License.empty();
 
   String _searchInputValue = '';
+
+  /// Delay search after typing input.
+  Timer? _searchTimer;
 
   @override
   initState() {
     super.initState();
-    _selectedLicense = widget.selectedLicense;
     fetchLicenses();
   }
 
   @override
   void dispose() {
     _searchTimer?.cancel();
-    _searchTextController.dispose();
+    _panelScrollController.dispose();
     super.dispose();
   }
 
@@ -116,9 +117,9 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // content(),
               SelectLicensePanelBody(
                 showLicenseInfo: _showLicenseInfo,
+                moreInfoLicense: _moreInfoLicense,
                 selectedLicense: _selectedLicense,
                 licenses: _searchInputValue.isEmpty
                     ? _staffLicenses
@@ -129,7 +130,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
                 searchInputValue: _searchInputValue,
                 onTogglePreview: onToggleLicenseInfo,
                 onSearchLicense: onSearchLicense,
-                toggleLicenseAndUpdate: onToggleLicense,
+                toggleLicenseAndUpdate: widget.toggleLicenseAndUpdate,
               ),
               SelectLicensePanelHeader(
                 onClose: widget.onClose,
@@ -235,13 +236,14 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
     try {
       final AlgoliaQuery query = await SearchUtilities.algolia
           .index("licenses")
-          .query(_searchTextController.text)
+          .query(_searchInputValue)
           .setHitsPerPage(_limit)
           .setPage(0);
 
       final AlgoliaQuerySnapshot snapshot = await query.getObjects();
 
       if (snapshot.empty) {
+        setState(() {});
         return;
       }
 
@@ -256,20 +258,26 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
       });
     } catch (error) {
       Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
     }
   }
 
   void onInputChanged(String newSearchInputValue) {
+    _searchInputValue = newSearchInputValue;
+    _searchTimer?.cancel();
+
+    _searchTimer = Timer(
+      500.milliseconds,
+      onSearchLicense,
+    );
+  }
+
+  void onToggleLicenseInfo(bool visible, License? license) {
     setState(() {
-      _searchInputValue + newSearchInputValue;
+      _showLicenseInfo = visible;
+      if (license != null) {
+        _moreInfoLicense = license;
+      }
     });
-  }
-
-  void onToggleLicenseInfo(bool visible) {
-    _showLicenseInfo = visible;
-  }
-
-  void onToggleLicense(License license, bool selected) {
-    widget.toggleLicenseAndUpdate?.call(license, selected);
   }
 }
