@@ -264,11 +264,6 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
         hoverColor: Constants.colors.settings,
         routePath: DashboardLocationContent.settingsRoute,
       ),
-    ];
-  }
-
-  List<SideMenuItem> getAdminItemList() {
-    return [
       SideMenuItem(
         iconData: UniconsLine.document_info,
         label: "licenses".tr(),
@@ -276,6 +271,10 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
         routePath: DashboardLocationContent.licensesRoute,
       ),
     ];
+  }
+
+  List<SideMenuItem> getAdminItemList() {
+    return [];
   }
 
   void _setStateListener() => setState(() {});
