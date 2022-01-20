@@ -2,19 +2,22 @@ import 'dart:async';
 
 import 'package:algolia/algolia.dart';
 import 'package:artbooking/components/animations/fade_in_x.dart';
+import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/licenses/selection_panel/select_license_panel_body.dart';
 import 'package:artbooking/screens/licenses/selection_panel/select_license_panel_header.dart';
+import 'package:artbooking/types/enums/enum_license_type.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged_dart/supercharged_dart.dart';
 
 /// A side panel to add art style to an illustration.
-class SelectLicensePanel extends StatefulWidget {
+class SelectLicensePanel extends ConsumerStatefulWidget {
   /// Return an panel widget showing art styles.
   const SelectLicensePanel({
     Key? key,
@@ -44,11 +47,14 @@ class SelectLicensePanel extends StatefulWidget {
   _SelectLicensePanelState createState() => _SelectLicensePanelState();
 }
 
-class _SelectLicensePanelState extends State<SelectLicensePanel> {
+class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
   /// True if there're more data to fetch.
   bool _hasNext = false;
 
-  /// True if loading more style from Firestore.
+  /// True if loading licenses.
+  bool _isLoading = false;
+
+  /// True if loading more licenses.
   bool _isLoadingMore = false;
 
   /// True if the style's image is visible.
@@ -60,8 +66,11 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
   /// Maximum container's width.
   final double _containerWidth = 400.0;
 
-  /// All available art styles.
+  /// Staff licenses.
   final List<License> _staffLicenses = [];
+
+  /// The current authenticated user licenses.
+  final List<License> _userLicenses = [];
 
   /// Search results.
   final List<License> _searchResultLicenses = [];
@@ -82,10 +91,12 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
   /// Delay search after typing input.
   Timer? _searchTimer;
 
+  var _selectedTab = EnumLicenseType.staff;
+
   @override
   initState() {
     super.initState();
-    fetchLicenses();
+    fetchStaffLicenses();
   }
 
   @override
@@ -118,12 +129,13 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
             fit: StackFit.expand,
             children: [
               SelectLicensePanelBody(
+                isLoading: _isLoading,
+                selectedTab: _selectedTab,
+                onChangedTab: onChangedTab,
                 showLicenseInfo: _showLicenseInfo,
                 moreInfoLicense: _moreInfoLicense,
                 selectedLicense: _selectedLicense,
-                licenses: _searchInputValue.isEmpty
-                    ? _staffLicenses
-                    : _searchResultLicenses,
+                licenses: getLicensesDataList(),
                 onScrollNotification: onScrollNotification,
                 panelScrollController: _panelScrollController,
                 onInputChanged: onInputChanged,
@@ -143,9 +155,12 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
     );
   }
 
-  /// Fetch license on Firestore.
-  void fetchLicenses() async {
-    _staffLicenses.clear();
+  /// Fetch staff license on Firestore.
+  void fetchStaffLicenses() async {
+    setState(() {
+      _staffLicenses.clear();
+      _isLoading = true;
+    });
 
     try {
       final snapshot = await FirebaseFirestore.instance
@@ -157,6 +172,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
       if (snapshot.size == 0) {
         setState(() {
           _hasNext = false;
+          _isLoading = false;
         });
 
         return;
@@ -176,11 +192,15 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
       });
     } catch (error) {
       Utilities.logger.e(error);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
   /// Fetch more licenses on Firestore.
-  void fetchLicensesMore() async {
+  void fetchStaffLicensesMore() async {
     _isLoadingMore = true;
 
     try {
@@ -217,6 +237,103 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
     }
   }
 
+  /// Fetch user's license on Firestore.
+  void fetchUserLicenses() async {
+    setState(() {
+      _lastDocumentSnapshot = null;
+      _userLicenses.clear();
+      _isLoading = true;
+    });
+
+    try {
+      final String? uid = ref.read(AppState.userProvider).authUser?.uid;
+
+      final query = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('licenses')
+          .orderBy('createdAt', descending: true)
+          .limit(_limit);
+
+      final snapshot = await query.get();
+
+      if (snapshot.size == 0) {
+        setState(() {
+          _hasNext = false;
+          _isLoading = false;
+        });
+
+        return;
+      }
+
+      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
+        final data = doc.data();
+        data['id'] = doc.id;
+
+        final license = License.fromJSON(data);
+        _userLicenses.add(license);
+      }
+
+      setState(() {
+        _hasNext = _limit == snapshot.size;
+        _lastDocumentSnapshot = snapshot.docs.last;
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  /// Fetch more user's licenses on Firestore.
+  void fetchUserLicensesMore() async {
+    setState(() => _isLoadingMore = true);
+
+    try {
+      final String? uid = ref.read(AppState.userProvider).authUser?.uid;
+
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('licenses')
+          .limit(_limit)
+          .orderBy('name', descending: true)
+          .startAfterDocument(_lastDocumentSnapshot!)
+          .get();
+
+      if (snapshot.size == 0) {
+        setState(() {
+          _hasNext = false;
+          _isLoadingMore = false;
+          _lastDocumentSnapshot = null;
+        });
+
+        return;
+      }
+
+      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
+        final data = doc.data();
+        data['id'] = doc.id;
+
+        final license = License.fromJSON(data);
+        _userLicenses.add(license);
+      }
+
+      setState(() {
+        _hasNext = _limit == snapshot.size;
+        _lastDocumentSnapshot = snapshot.docs.last;
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _isLoadingMore = false);
+    }
+  }
+
   /// On scroll notification
   bool onScrollNotification(ScrollNotification notification) {
     if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
@@ -224,7 +341,7 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
     }
 
     if (_hasNext && !_isLoadingMore && _lastDocumentSnapshot != null) {
-      fetchLicensesMore();
+      fetchStaffLicensesMore();
     }
 
     return false;
@@ -279,5 +396,33 @@ class _SelectLicensePanelState extends State<SelectLicensePanel> {
         _moreInfoLicense = license;
       }
     });
+  }
+
+  void onChangedTab(EnumLicenseType newSelectedTab) {
+    setState(() {
+      _selectedTab = newSelectedTab;
+    });
+
+    switch (newSelectedTab) {
+      case EnumLicenseType.staff:
+        fetchStaffLicenses();
+        break;
+      case EnumLicenseType.user:
+        fetchUserLicenses();
+        break;
+      default:
+    }
+  }
+
+  List<License> getLicensesDataList() {
+    if (_searchInputValue.isNotEmpty) {
+      return _searchResultLicenses;
+    }
+
+    if (_selectedTab == EnumLicenseType.staff) {
+      return _staffLicenses;
+    }
+
+    return _userLicenses;
   }
 }

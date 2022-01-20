@@ -3,10 +3,14 @@ import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/components/sheet_header.dart';
+import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/licenses/selection_panel/select_license_panel.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/globals/constants.dart';
+import 'package:artbooking/types/enums/enum_license_type.dart';
+import 'package:artbooking/types/firestore/document_map.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:artbooking/types/art_style/art_style.dart';
@@ -17,10 +21,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 import 'package:verbal_expressions/verbal_expressions.dart';
 
-class EditIllustrationPage extends StatefulWidget {
+class EditIllustrationPage extends ConsumerStatefulWidget {
   const EditIllustrationPage({
     Key? key,
     required this.illustration,
@@ -32,7 +37,7 @@ class EditIllustrationPage extends StatefulWidget {
   _EditIllustrationPageState createState() => _EditIllustrationPageState();
 }
 
-class _EditIllustrationPageState extends State<EditIllustrationPage> {
+class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
   bool _isLoading = false;
   bool _isSaving = false;
   bool _isSidePanelStylesVisible = false;
@@ -1036,16 +1041,31 @@ class _EditIllustrationPageState extends State<EditIllustrationPage> {
     }
   }
 
+  DocumentMap getLicenseQuery() {
+    final License license = widget.illustration.license;
+
+    if (license.type == EnumLicenseType.staff) {
+      return FirebaseFirestore.instance.collection("licenses").doc(license.id);
+    }
+
+    final String? uid = ref.read(AppState.userProvider).authUser?.uid;
+
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection("licenses")
+        .doc(license.id);
+  }
+
   void fetchIllustrationLicense() async {
-    if (widget.illustration.license.id.isEmpty) {
+    final License license = widget.illustration.license;
+
+    if (license.id.isEmpty) {
       return;
     }
 
     try {
-      final licenseSnap = await FirebaseFirestore.instance
-          .collection("licenses")
-          .doc(widget.illustration.license.id)
-          .get();
+      final DocumentSnapshotMap licenseSnap = await getLicenseQuery().get();
 
       if (!licenseSnap.exists) {
         return;

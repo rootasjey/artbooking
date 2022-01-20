@@ -1,6 +1,8 @@
 import 'package:artbooking/screens/licenses/selection_panel/select_license_panel_input.dart';
 import 'package:artbooking/screens/licenses/selection_panel/select_license_panel_list.dart';
 import 'package:artbooking/screens/licenses/selection_panel/select_license_panel_more_info.dart';
+import 'package:artbooking/screens/licenses/selection_panel/select_license_panel_tabs.dart';
+import 'package:artbooking/types/enums/enum_license_type.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:flutter/material.dart';
 
@@ -18,8 +20,12 @@ class SelectLicensePanelBody extends StatelessWidget {
     required this.licenses,
     this.toggleLicenseAndUpdate,
     required this.moreInfoLicense,
+    required this.selectedTab,
+    this.onChangedTab,
+    required this.isLoading,
   }) : super(key: key);
 
+  final bool isLoading;
   final bool showLicenseInfo;
   final bool Function(ScrollNotification)? onScrollNotification;
 
@@ -34,6 +40,9 @@ class SelectLicensePanelBody extends StatelessWidget {
 
   final ScrollController? panelScrollController;
   final String searchInputValue;
+
+  final EnumLicenseType selectedTab;
+  final Function(EnumLicenseType)? onChangedTab;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +60,10 @@ class SelectLicensePanelBody extends StatelessWidget {
         child: CustomScrollView(
           controller: panelScrollController,
           slivers: [
+            SelectLicensePanelTabs(
+              selectedTab: selectedTab,
+              onChangedTab: onChangedTab,
+            ),
             SelectLicensePanelInput(
               onInputChanged: onInputChanged,
               onSearchLicense: onSearchLicense,
@@ -58,6 +71,8 @@ class SelectLicensePanelBody extends StatelessWidget {
             ),
             SelectLicensePanelList(
               licenses: licenses,
+              isLoading: isLoading,
+              searchON: searchInputValue.isNotEmpty,
               selectedLicenseId: selectedLicense.id,
               toggleLicenseAndUpdate: toggleLicenseAndUpdate,
               onShowLicensePreview: (license) => onTogglePreview?.call(

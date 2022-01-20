@@ -1,5 +1,8 @@
+import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/types/license/license.dart';
+import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -11,8 +14,12 @@ class SelectLicensePanelList extends StatelessWidget {
     required this.selectedLicenseId,
     this.toggleLicenseAndUpdate,
     this.onShowLicensePreview,
+    this.searchON = false,
+    required this.isLoading,
   }) : super(key: key);
 
+  final bool isLoading;
+  final bool searchON;
   final Function(License, bool)? toggleLicenseAndUpdate;
   final Function(License)? onShowLicensePreview;
   final List<License> licenses;
@@ -20,6 +27,10 @@ class SelectLicensePanelList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return SliverList(delegate: SliverChildListDelegate.fixed([]));
+    }
+
     if (licenses.isEmpty) {
       return SliverPadding(
         padding: const EdgeInsets.all(24.0),
@@ -37,7 +48,9 @@ class SelectLicensePanelList extends StatelessWidget {
               child: Opacity(
                 opacity: 0.6,
                 child: Text(
-                  "license_search_result_empty".tr(),
+                  searchON
+                      ? "license_search_result_empty".tr()
+                      : "license_personal_empty_create".tr(),
                   textAlign: TextAlign.center,
                   style: Utilities.fonts.style(
                     fontSize: 24.0,
@@ -46,6 +59,18 @@ class SelectLicensePanelList extends StatelessWidget {
                 ),
               ),
             ),
+            if (!searchON)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Center(
+                  child: DarkElevatedButton(
+                    onPressed: () => Beamer.of(context).beamToNamed(
+                      DashboardLocationContent.licensesRoute,
+                    ),
+                    child: Text("license_personal_create".tr()),
+                  ),
+                ),
+              ),
           ]),
         ),
       );
