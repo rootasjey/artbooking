@@ -15,7 +15,7 @@ class Illustration {
     this.styles = const [],
     required this.createdAt,
     this.description = '',
-    this.dimensions,
+    required this.dimensions,
     this.extension = '',
     this.hasPendingCreates = false,
     this.id = '',
@@ -44,7 +44,7 @@ class Illustration {
   String description;
 
   /// This Illustration's dimensions.
-  Dimensions? dimensions;
+  final Dimensions dimensions;
 
   /// File's extension.
   String extension;

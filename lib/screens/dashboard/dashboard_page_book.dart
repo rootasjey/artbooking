@@ -247,7 +247,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
     String createdAtStr = "";
 
     if (DateTime.now().difference(createdAt).inDays > 60) {
-      createdAtStr = "date_created_at".tr(
+      createdAtStr = "date_created_on".tr(
         args: [
           Jiffy(_book.createdAt).yMMMMEEEEd,
         ],
@@ -785,7 +785,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
     String updatedAtStr = "";
 
     if (DateTime.now().difference(updatedAt).inDays > 60) {
-      updatedAtStr = "date_updated_at".tr(
+      updatedAtStr = "date_updated_on".tr(
         args: [
           Jiffy(_book.updatedAt).yMMMMEEEEd,
         ],
