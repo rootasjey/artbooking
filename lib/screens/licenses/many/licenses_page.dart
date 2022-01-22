@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:artbooking/components/application_bar/application_bar.dart';
-import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/themed_dialog.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -92,7 +91,6 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
       floatingActionButton: fab(canManageLicense),
       body: CustomScrollView(
         slivers: <Widget>[
-          SliverEdgePadding(),
           ApplicationBar(),
           LicensesPageHeader(
             selectedTab: _selectedTab,

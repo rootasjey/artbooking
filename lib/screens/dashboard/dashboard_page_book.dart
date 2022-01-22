@@ -7,7 +7,6 @@ import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/cards/illustration_card.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
-import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/components/texts/text_divider.dart';
 import 'package:artbooking/components/buttons/text_rectangle_button.dart';
 import 'package:artbooking/components/themed_dialog.dart';
@@ -161,7 +160,6 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
         child: CustomScrollView(
           controller: _scrollController,
           slivers: <Widget>[
-            SliverEdgePadding(),
             ApplicationBar(),
             header(),
             body(),

@@ -4,7 +4,6 @@ import 'package:artbooking/actions/users.dart';
 import 'package:artbooking/components/icons/animated_app_icon.dart';
 import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
-import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/cloud_functions/cloud_functions_response.dart';
 import 'package:artbooking/globals/app_state.dart';
@@ -53,7 +52,6 @@ class _UpdateUsernamePageState
       body: CustomScrollView(
         controller: _pageScrollController,
         slivers: <Widget>[
-          SliverEdgePadding(),
           ApplicationBar(),
           header(),
           body(),

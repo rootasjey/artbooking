@@ -1,6 +1,5 @@
 import 'package:artbooking/components/footer/footer.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
-import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/screens/home/home_page_contact.dart';
 import 'package:artbooking/screens/home/home_page_curated.dart';
 import 'package:artbooking/screens/home/home_page_hero.dart';
@@ -42,9 +41,6 @@ class _HomePageState extends State<HomePage> {
               child: CustomScrollView(
                 controller: _scrollController,
                 slivers: [
-                  SliverEdgePadding(
-                    padding: const EdgeInsets.only(top: 30.0),
-                  ),
                   ApplicationBar(),
                   SliverList(
                     delegate: SliverChildListDelegate.fixed([

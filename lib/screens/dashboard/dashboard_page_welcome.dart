@@ -1,6 +1,5 @@
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page_card.dart';
-import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/globals/constants.dart';
@@ -30,7 +29,6 @@ class DashboardPageWelcome extends ConsumerWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
-          SliverEdgePadding(),
           ApplicationBar(),
           header(),
           SliverList(

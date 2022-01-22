@@ -12,6 +12,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ApplicationBar extends ConsumerWidget {
+  ApplicationBar({this.padding = const EdgeInsets.only(top: 30.0)});
+
+  final EdgeInsets padding;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bool compact = Utilities.size.isMobileSize(context);
@@ -22,31 +26,34 @@ class ApplicationBar extends ConsumerWidget {
     final String avatarURL = userNotifier.getPPUrl();
     final String initials = userNotifier.getInitialsUsername();
 
-    return SliverAppBar(
-      floating: true,
-      snap: true,
-      pinned: true,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      automaticallyImplyLeading: false,
-      title: Padding(
-        padding: EdgeInsets.only(
-          left: compact ? 0.0 : 80.0,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.max,
-          children: <Widget>[
-            AppIcon(size: 32.0),
-            mainSection(compact),
-            userSection(
-              context,
-              ref: ref,
-              compact: compact,
-              isAuthenticated: userNotifier.isAuthenticated,
-              initials: initials,
-              avatarURL: avatarURL,
-            ),
-          ],
+    return SliverPadding(
+      padding: padding,
+      sliver: SliverAppBar(
+        floating: true,
+        snap: true,
+        pinned: true,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        automaticallyImplyLeading: false,
+        title: Padding(
+          padding: EdgeInsets.only(
+            left: compact ? 0.0 : 80.0,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              AppIcon(size: 32.0),
+              mainSection(compact),
+              userSection(
+                context,
+                ref: ref,
+                compact: compact,
+                isAuthenticated: userNotifier.isAuthenticated,
+                initials: initials,
+                avatarURL: avatarURL,
+              ),
+            ],
+          ),
         ),
       ),
     );

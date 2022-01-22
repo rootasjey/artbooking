@@ -1,5 +1,4 @@
 import 'package:artbooking/components/application_bar/application_bar.dart';
-import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/screens/activity/activity_page_member_since.dart';
 import 'package:artbooking/screens/activity/activity_page_header.dart';
@@ -33,7 +32,6 @@ class ActivityPage extends ConsumerWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
-          SliverEdgePadding(),
           ApplicationBar(),
           ActivityPageHeader(),
           SliverList(

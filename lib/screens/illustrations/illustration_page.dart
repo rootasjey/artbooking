@@ -2,7 +2,6 @@ import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/screens/illustrations/edit/edit_illustration_page.dart';
 import 'package:artbooking/screens/illustrations/illustration_page_body.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
-import 'package:artbooking/components/sliver_edge_padding.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/illustrations/illustration_page_fab.dart';
@@ -69,7 +68,6 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
             NotificationListener(
               child: CustomScrollView(
                 slivers: [
-                  SliverEdgePadding(),
                   ApplicationBar(),
                   IllustrationPageBody(
                     isLoading: _isLoading,

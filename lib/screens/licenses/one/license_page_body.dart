@@ -30,7 +30,12 @@ class LicensePageBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.all(60.0),
+      padding: const EdgeInsets.only(
+        top: 60.0,
+        left: 60.0,
+        right: 60.0,
+        bottom: 260.0,
+      ),
       sliver: isLoading || isDeleting ? loadingView() : idleView(),
     );
   }
