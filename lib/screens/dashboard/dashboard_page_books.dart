@@ -210,10 +210,10 @@ class _MyBooksPageState extends State<MyBooksPage> {
   Widget fab() {
     if (!_isFabVisible) {
       return FloatingActionButton(
-        onPressed: fetchManyBooks,
+        onPressed: showBookCreationDialog,
         backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,
-        child: Icon(UniconsLine.refresh),
+        child: Icon(UniconsLine.plus),
       );
     }
 

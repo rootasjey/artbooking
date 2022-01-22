@@ -60,7 +60,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   int _limit = 20;
 
-  Map<String?, Illustration> _multiSelectedItems = Map();
+  Map<String, Illustration> _multiSelectedItems = Map();
 
   ScrollController _scrollController = ScrollController();
 
@@ -93,11 +93,6 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
               ApplicationBar(),
               header(),
               body(),
-              SliverPadding(
-                padding: const EdgeInsets.only(
-                  bottom: 100.0,
-                ),
-              ),
             ],
           ),
         ),
@@ -110,7 +105,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       return SliverList(
         delegate: SliverChildListDelegate.fixed([
           Padding(
-            padding: const EdgeInsets.only(top: 100.0),
+            padding: const EdgeInsets.symmetric(vertical: 100.0),
             child: AnimatedAppIcon(
               textTitle: "illustrations_loading".tr(),
             ),
@@ -146,6 +141,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       padding: const EdgeInsets.only(
         top: 40.0,
         left: 50.0,
+        bottom: 100.0,
       ),
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
@@ -206,10 +202,12 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   Widget fab() {
     if (!_isFabVisible) {
       return FloatingActionButton(
-        onPressed: fetch,
+        onPressed: () {
+          ref.read(AppState.uploadTaskListProvider.notifier).pickImage();
+        },
         backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,
-        child: Icon(UniconsLine.refresh),
+        child: Icon(UniconsLine.upload),
       );
     }
 
@@ -231,7 +229,12 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     final selectionMode = _forceMultiSelect || _multiSelectedItems.isNotEmpty;
 
     return SliverPadding(
-      padding: const EdgeInsets.all(40.0),
+      padding: const EdgeInsets.only(
+        top: 40.0,
+        left: 40.0,
+        right: 40.0,
+        bottom: 100.0,
+      ),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 300.0,
