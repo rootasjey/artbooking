@@ -1,12 +1,8 @@
-import 'package:artbooking/components/buttons/dark_elevated_button.dart';
-import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/screens/licenses/edit/edit_license_page_body.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page_header.dart';
-import 'package:artbooking/screens/licenses/edit/edit_license_page_urls.dart';
-import 'package:artbooking/screens/licenses/edit/edit_license_page_usage.dart';
-import 'package:artbooking/screens/licenses/edit/edit_license_page_text_inputs.dart';
 import 'package:artbooking/types/cloud_functions/license_response.dart';
 import 'package:artbooking/types/firestore/document_map.dart';
 import 'package:artbooking/types/firestore/document_snapshot_map.dart';
@@ -62,7 +58,16 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
                     licenseId: _license.id,
                     licenseName: _license.name,
                   ),
-                  body(),
+                  EditLicensePageBody(
+                    license: _license,
+                    isLoading: _isLoading,
+                    isSaving: _isSaving,
+                    isNewLicense: widget.licenseId.isEmpty,
+                    onValidate: tryCreateOrUpdateLicense,
+                    onUsageValueChange: onUsageValueChanged,
+                    onDescriptionChanged: onDescriptionChanged,
+                    onTitleChanged: onTitleChanged,
+                  ),
                 ],
               ),
             ),
@@ -78,58 +83,6 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget body() {
-    if (_isLoading) {
-      return LoadingView(
-        sliver: false,
-        title: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Opacity(
-            opacity: 0.6,
-            child: Text("loading".tr()),
-          ),
-        ),
-      );
-    }
-
-    return Padding(
-      padding: EdgeInsets.only(top: 90.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          EditLicensePageTextInputs(
-            license: _license,
-            onValueChange: onUsageValueChange,
-          ),
-          EditLicensePageUsage(
-            usage: _license.usage,
-            onValueChange: onUsageValueChange,
-          ),
-          EditLicensePageUrls(
-            urls: _license.urls,
-            onValueChange: onUsageValueChange,
-          ),
-          validationButton(),
-        ],
-      ),
-    );
-  }
-
-  Widget validationButton() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16.0, top: 80.0),
-      child: DarkElevatedButton.large(
-        onPressed: _isSaving ? null : tryCreateOrUpdateLicense,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 64.0),
-          child: Text(
-            widget.licenseId.isEmpty ? "create".tr() : "update".tr(),
-          ),
-        ),
       ),
     );
   }
@@ -242,7 +195,15 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
     }
   }
 
-  void onUsageValueChange() {
+  void onUsageValueChanged() {
     setState(() {});
+  }
+
+  void onDescriptionChanged(String newDescription) {
+    _license.description = newDescription;
+  }
+
+  void onTitleChanged(String newName) {
+    _license.name = newName;
   }
 }
