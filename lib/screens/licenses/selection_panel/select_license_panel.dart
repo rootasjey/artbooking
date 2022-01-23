@@ -24,7 +24,7 @@ class SelectLicensePanel extends ConsumerStatefulWidget {
     required this.selectedLicense,
     this.isVisible = false,
     this.onClose,
-    this.toggleLicenseAndUpdate,
+    this.onToggleLicenseAndUpdate,
     this.elevation = 4.0,
   }) : super(key: key);
 
@@ -38,7 +38,7 @@ class SelectLicensePanel extends ConsumerStatefulWidget {
   final void Function()? onClose;
 
   /// This callback when an item is tapped.
-  final void Function(License, bool)? toggleLicenseAndUpdate;
+  final void Function(License, bool)? onToggleLicenseAndUpdate;
 
   /// The panel elevation.
   final double elevation;
@@ -142,7 +142,7 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
                 searchInputValue: _searchInputValue,
                 onTogglePreview: onToggleLicenseInfo,
                 onSearchLicense: onSearchLicense,
-                toggleLicenseAndUpdate: widget.toggleLicenseAndUpdate,
+                toggleLicenseAndUpdate: widget.onToggleLicenseAndUpdate,
               ),
               SelectLicensePanelHeader(
                 onClose: widget.onClose,

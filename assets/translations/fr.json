@@ -691,6 +691,8 @@
   "summary_subtitle": "Veuillez écrire votre résumé",
   "summary_update_fail": "Nous sommes désolés, une erreur est survenue durant la mise à jour du résumé. Veuillez réessayer ultérieurement.",
   "system": "Système",
+  "text_field_counter_caracters": "{} caractères ",
+  "text_field_counter_unsaved_changes": "• Modifications non sauvegardées",
   "thank_you_exclamation": "Merci !",
   "thank_you_newsletter": "Merci pour avoir souscrit à la newsletter. À bientôt 👋",
   "the_author": "Les auteurs",

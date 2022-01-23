@@ -26,7 +26,7 @@ class AddStylePanel extends StatefulWidget {
   final void Function()? onClose;
 
   /// This callback when an item is tapped.
-  final void Function(ArtStyle style, bool selected)? toggleStyleAndUpdate;
+  final void Function(ArtStyle style, bool selected)? onToggleStyleAndUpdate;
 
   /// The panel elevation.
   final double elevation;
@@ -37,7 +37,7 @@ class AddStylePanel extends StatefulWidget {
     this.selectedStyles,
     this.isVisible = false,
     this.onClose,
-    this.toggleStyleAndUpdate,
+    this.onToggleStyleAndUpdate,
     this.elevation = 4.0,
   }) : super(key: key);
 
@@ -331,7 +331,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
             final selected = widget.selectedStyles!.contains(style.name);
 
             return ListTile(
-              onTap: () => widget.toggleStyleAndUpdate!(style, selected),
+              onTap: () => widget.onToggleStyleAndUpdate?.call(style, selected),
               onLongPress: () {
                 setState(() {
                   _selectedStylePreview = style;
@@ -384,7 +384,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
             final selected = widget.selectedStyles!.contains(style.name);
 
             return ListTile(
-              onTap: () => widget.toggleStyleAndUpdate!(style, selected),
+              onTap: () => widget.onToggleStyleAndUpdate?.call(style, selected),
               title: Opacity(
                 opacity: 0.8,
                 child: Row(
