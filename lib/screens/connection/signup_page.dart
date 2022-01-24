@@ -86,6 +86,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
       return Padding(
         padding: const EdgeInsets.only(top: 80.0),
         child: LoadingView(
+          sliver: false,
           title: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Opacity(

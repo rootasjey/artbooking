@@ -77,6 +77,7 @@ class _SigninPageState extends ConsumerState<SigninPage> {
   Widget body() {
     if (_isConnecting) {
       return LoadingView(
+        sliver: false,
         title: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Opacity(
