@@ -1,7 +1,10 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:artbooking/app.dart';
 import 'package:artbooking/firebase_options.dart';
+import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/globals/state/user_notifier.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/types/user/user.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -30,6 +33,21 @@ void main() async {
     applicationId: GlobalConfiguration().getValue('algolia_app_id'),
     searchApiKey: GlobalConfiguration().getValue('algolia_search_api_key'),
   );
+
+  // Try re-authenticate w/ blocking call.
+  // We want to avoid UI flickering from guest -> authenticated
+  // if the user was already connected.
+  final authUser = await Utilities.getFireAuthUser();
+  if (authUser != null) {
+    final firestoreUser = await Utilities.getFirestoreUser(authUser.uid);
+
+    AppState.userProvider = StateNotifierProvider<UserNotifier, User>(
+      (ref) => UserNotifier(User(
+        authUser: authUser,
+        firestoreUser: firestoreUser,
+      )),
+    );
+  }
 
   setPathUrlStrategy();
 

@@ -1,3 +1,4 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/signin_location.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page_welcome.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page.dart';
@@ -24,10 +25,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DashboardLocation extends BeamLocation<BeamState> {
   /// Main root value for this location.
-  static const String route = '/dashboard/*';
+  static const String route = '/dashboard';
+  static const String routeWildCard = '/dashboard/*';
 
   @override
-  List<String> get pathPatterns => [route];
+  List<String> get pathPatterns => [routeWildCard];
 
   /// Redirect to signin page ('/signin') if the user is not authenticated.
   @override
@@ -56,7 +58,7 @@ class DashboardLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: DashboardPage(),
         key: ValueKey(route),
-        title: "Dashboard",
+        title: Utilities.getPageTitle("Dashboard"),
         type: BeamPageType.fadeTransition,
       ),
     ];

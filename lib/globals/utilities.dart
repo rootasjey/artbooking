@@ -7,6 +7,9 @@ import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:artbooking/globals/utilities/storage_utilities.dart';
 import 'package:artbooking/globals/utilities/language_utilities.dart';
 import 'package:artbooking/globals/utilities/size_utilities.dart';
+import 'package:artbooking/types/user/user_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
 
 class Utilities {
@@ -45,5 +48,42 @@ class Utilities {
     }
 
     return '${usedBytes / 1000000000000000} PB';
+  }
+
+  static Future<User?> getFireAuthUser() async {
+    final credentialsMap = Utilities.storage.getCredentials();
+
+    final String email = credentialsMap['email'] ?? '';
+    final String password = credentialsMap['password'] ?? '';
+
+    if (email.isEmpty || password.isEmpty) {
+      return Future.value(null);
+    }
+
+    final firebaseAuthInstance = FirebaseAuth.instance;
+    final authResult = await firebaseAuthInstance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    return authResult.user;
+  }
+
+  static Future<UserFirestore?> getFirestoreUser(String userId) async {
+    final docSnapshot =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
+    final data = docSnapshot.data();
+    if (!docSnapshot.exists || data == null) {
+      return null;
+    }
+
+    data['id'] = docSnapshot.id;
+    return UserFirestore.fromJSON(data);
+  }
+
+  static String getPageTitle(String trailingText) {
+    final base = "ArtBooking •";
+    return "$base $trailingText";
   }
 }

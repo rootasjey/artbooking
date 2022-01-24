@@ -1,3 +1,4 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/undefined_page.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/widgets.dart';
@@ -15,7 +16,7 @@ class UndefinedLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: UndefinedPage(),
         key: ValueKey(route),
-        title: "404",
+        title: Utilities.getPageTitle("404"),
         type: BeamPageType.fadeTransition,
       ),
     ];
