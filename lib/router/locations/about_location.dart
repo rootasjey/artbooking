@@ -1,5 +1,7 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/about/about_page.dart';
 import 'package:beamer/beamer.dart';
+import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/widgets.dart';
 
 class AboutLocation extends BeamLocation<BeamState> {
@@ -15,7 +17,7 @@ class AboutLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: AboutPage(),
         key: ValueKey(route),
-        title: "About",
+        title: Utilities.getPageTitle("about".tr()),
         type: BeamPageType.fadeTransition,
       ),
     ];

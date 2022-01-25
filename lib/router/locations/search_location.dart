@@ -1,5 +1,7 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/search_page.dart';
 import 'package:beamer/beamer.dart';
+import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/widgets.dart';
 
 class SearchLocation extends BeamLocation<BeamState> {
@@ -15,7 +17,7 @@ class SearchLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: SearchPage(),
         key: ValueKey(route),
-        title: "Search",
+        title: Utilities.getPageTitle("search".tr()),
         type: BeamPageType.fadeTransition,
       ),
     ];

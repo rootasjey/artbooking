@@ -1,5 +1,7 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/changelog_page.dart';
 import 'package:beamer/beamer.dart';
+import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/widgets.dart';
 
 class ChangelogLocation extends BeamLocation<BeamState> {
@@ -15,7 +17,7 @@ class ChangelogLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: ChangelogPage(),
         key: ValueKey(route),
-        title: "Changelog",
+        title: Utilities.getPageTitle("changelog".tr()),
         type: BeamPageType.fadeTransition,
       ),
     ];

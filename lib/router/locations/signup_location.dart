@@ -1,7 +1,9 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/screens/connection/signup_page.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:beamer/beamer.dart';
+import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,7 +40,7 @@ class SignupLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: SignupPage(),
         key: ValueKey(route),
-        title: "Signup",
+        title: Utilities.getPageTitle("signup".tr()),
         type: BeamPageType.fadeTransition,
       ),
     ];

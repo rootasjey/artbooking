@@ -1,5 +1,7 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/contact_page.dart';
 import 'package:beamer/beamer.dart';
+import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/widgets.dart';
 
 class ContactLocation extends BeamLocation<BeamState> {
@@ -15,7 +17,7 @@ class ContactLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: ContactPage(),
         key: ValueKey(route),
-        title: "Contact",
+        title: Utilities.getPageTitle("contact".tr()),
         type: BeamPageType.fadeTransition,
       ),
     ];

@@ -58,7 +58,7 @@ class DashboardLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: DashboardPage(),
         key: ValueKey(route),
-        title: Utilities.getPageTitle("Dashboard"),
+        title: Utilities.getPageTitle("dashboard".tr()),
         type: BeamPageType.fadeTransition,
       ),
     ];
@@ -135,21 +135,21 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
       BeamPage(
         child: DashboardPageWelcome(),
         key: ValueKey(route),
-        title: "dashboard".tr(),
+        title: Utilities.getPageTitle("dashboard".tr()),
         type: BeamPageType.fadeTransition,
       ),
       if (state.pathPatternSegments.contains('statistics'))
         BeamPage(
           child: ActivityPage(),
           key: ValueKey(statisticsRoute),
-          title: "statistics".tr(),
+          title: Utilities.getPageTitle("statistics".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains('books'))
         BeamPage(
           child: MyBooksPage(),
           key: ValueKey(booksRoute),
-          title: "My Books",
+          title: Utilities.getPageTitle("books_my".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains(':bookId'))
@@ -158,14 +158,14 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
             bookId: state.pathParameters['bookId']!,
           ),
           key: ValueKey('$booksRoute/one'),
-          title: "Book",
+          title: Utilities.getPageTitle("book".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains('illustrations'))
         BeamPage(
           child: MyIllustrationsPage(),
           key: ValueKey(illustrationsRoute),
-          title: "My Illustrations",
+          title: Utilities.getPageTitle("illustrations_my".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains(':illustrationId'))
@@ -174,63 +174,63 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
             illustrationId: state.pathParameters['illustrationId']!,
           ),
           key: ValueKey('$illustrationsRoute/one'),
-          title: "Illustration",
+          title: Utilities.getPageTitle("illustration".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains('settings'))
         BeamPage(
           child: SettingsPage(),
           key: ValueKey('$settingsRoute'),
-          title: "Settings",
+          title: Utilities.getPageTitle("settings".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (isDeleteAccount(state.pathPatternSegments))
         BeamPage(
           child: SettingsPageDeleteAccount(),
           key: ValueKey('$deleteAccountRoute'),
-          title: "Delete account",
+          title: Utilities.getPageTitle("account_delete".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (isUpdateEmail(state.pathPatternSegments))
         BeamPage(
           child: SettingsPageUpdateEmail(),
           key: ValueKey('$updateEmailRoute'),
-          title: "Update email",
+          title: Utilities.getPageTitle("email_update".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (isUpdatePassword(state.pathPatternSegments))
         BeamPage(
           child: SettingsPageUpdatePassword(),
           key: ValueKey('$updatePasswordRoute'),
-          title: "Update password",
+          title: Utilities.getPageTitle("password_update".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (isUpdateUsername(state.pathPatternSegments))
         BeamPage(
           child: SettingsPageUpdateUsername(),
           key: ValueKey('$updateUsernameRoute'),
-          title: "Update username",
+          title: Utilities.getPageTitle("username_update".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains('profile'))
         BeamPage(
           child: DashboardPageProfile(),
           key: ValueKey('$editProfilePictureRoute'),
-          title: "My Profile",
+          title: Utilities.getPageTitle("profile_my".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (isEditPictureProfile(state.pathPatternSegments))
         BeamPage(
           child: EditIllustrationPageImage(),
           key: ValueKey('$editProfilePictureRoute'),
-          title: "Edit Profile Picture",
+          title: Utilities.getPageTitle("profile_picture_edit".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains('licenses'))
         BeamPage(
           child: LicensesPage(),
           key: ValueKey('$licensesRoute'),
-          title: 'Licenses',
+          title: Utilities.getPageTitle("licenses".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains(':licenseId'))
@@ -240,7 +240,7 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
             licenseId: state.pathParameters['licenseId'] ?? '',
           ),
           key: ValueKey('$licenseRoute'),
-          title: 'License',
+          title: Utilities.getPageTitle("license".tr()),
           type: BeamPageType.fadeTransition,
         ),
     ];
