@@ -159,6 +159,19 @@ export const createAccount = functions
         name: username,
         nameLowerCase: username.toLowerCase(),
         pricing: 'free',
+        profilePicture: {
+          ext: '',
+          path: {
+            edited: '',
+            original: '',
+          },
+          size: 0,
+          updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
+          url: {
+            edited: '',
+            original: '',
+          },
+        },
         rights: {
           'user:managedata': false,
         },
@@ -349,6 +362,72 @@ export const fetchUser = functions
     return formatUserData(userDataWithId);
   });
 
+/**
+ * Create user's public information from private fields.
+ */
+export const onCreatePublicInfo = functions
+  .region(cloudRegions.eu)
+  .firestore
+  .document('users/{userId}')
+  .onCreate(async (snapshot, context) => {
+    const data = snapshot.data();
+    const userAuth = context.auth;
+    
+    if (!userAuth) {
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
+    }
+
+    return await adminApp.firestore()
+      .collection('users')
+      .doc(userAuth.uid)
+      .collection('public')
+      .doc('basic')
+      .create({
+        name: data.name,
+        profilePicture: data.profilePicture,
+        urls: data.urls,
+      });
+  })
+
+/**
+ * Keep public user's information in-sync with privated fields.
+ * Fired after document change for an user.
+ */
+export const onUpdatePublicInfo = functions
+  .region(cloudRegions.eu)
+  .firestore
+  .document('users/{userId}')
+  .onUpdate(async (change, context) => {
+    const afterData = change.after.data();
+    const shouldUpdate = shouldUpdatePublicInfo(change);
+
+    if (!shouldUpdate) {
+      return false;
+    }
+
+    const userAuth = context.auth;
+    
+    if (!userAuth) {
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
+    }
+
+    return await adminApp.firestore()
+      .collection('users')
+      .doc(userAuth.uid)
+      .collection('public')
+      .doc('basic')
+      .update({
+        name: afterData.name,
+        profilePicture: afterData.profilePicture,
+        urls: afterData.urls,
+      });
+  })
 
 /**
  * Update an user's email in Firebase auth and in Firestore.
@@ -560,6 +639,41 @@ async function isUserExistsByUsername(nameLowerCase: string) {
   return true;
 }
 
+  /**
+   * Return true if an user's field value has changed among public information.
+   * (e.g. name, profile picture, urls).
+   * @param change Firestore document updated.
+   * @returns True if a public value has changed.
+   */
+   function shouldUpdatePublicInfo(change: functions.Change<functions.firestore.QueryDocumentSnapshot>): boolean {
+    const beforeData = change.before.data();
+    const afterData = change.after.data();
+  
+    if (beforeData.name !== afterData.name) {
+      return true;
+    }
+  
+    const beforeProfilePicture = beforeData.profilePicture;
+    const afterProfilePicture = afterData.profilePicture;
+  
+    for (const [key, value] of Object.entries(beforeProfilePicture)) {
+      if (value !== afterProfilePicture[key]) {
+        return true;
+      }
+    }
+  
+    const beforeUrls = beforeData.urls;
+    const afterUrls = afterData.urls;
+  
+    for (const [key, value] of Object.entries(beforeUrls)) {
+      if (value !== afterUrls[key]) {
+        return true;
+      }
+    }
+  
+    return false;
+  }
+  
 function validateEmailFormat(email: string) {
   const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(email);
