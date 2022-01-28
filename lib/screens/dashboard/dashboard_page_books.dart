@@ -490,7 +490,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
       builder: (context) {
         return DeleteDialog(
           titleValue: "book_delete".tr().toUpperCase(),
-          descrptionValue: "book_delete_description".tr(),
+          descriptionValue: "book_delete_description".tr(),
           onValidate: () => deleteBook(book, index),
         );
       },

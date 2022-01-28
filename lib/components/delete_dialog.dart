@@ -9,13 +9,13 @@ class DeleteDialog extends StatelessWidget {
     Key? key,
     this.focusNode,
     required this.titleValue,
-    required this.descrptionValue,
+    required this.descriptionValue,
     this.onValidate,
   }) : super(key: key);
 
   final FocusNode? focusNode;
   final String titleValue;
-  final String descrptionValue;
+  final String descriptionValue;
   final void Function()? onValidate;
 
   @override
@@ -40,7 +40,7 @@ class DeleteDialog extends StatelessWidget {
             child: Opacity(
               opacity: 0.4,
               child: Text(
-                descrptionValue,
+                descriptionValue,
                 textAlign: TextAlign.center,
                 style: Utilities.fonts.style(
                   color: Colors.black,
