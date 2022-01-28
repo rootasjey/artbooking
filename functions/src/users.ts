@@ -548,6 +548,50 @@ export const updateUsername = functions
     };
   });
 
+/**
+ * Update user's urls (mostly external social links).
+ */
+export const updateUrls = functions
+  .region(cloudRegions.eu)
+  .https
+  .onCall(async (data, context) => {
+    const userAuth = context.auth;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
+    }
+
+    const urls = data.urls;
+
+    if (typeof urls !== 'object') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `You provided a wrong argument type for [urls]. ` +
+        `The function should be called with a [urls] argument wich is an object or map of urls.`,
+      );
+    }
+
+    for (const [key, value] of Object.entries(urls)) {
+      if (typeof key !== 'string' || typeof value !== 'string') {
+        throw new functions.https.HttpsError(
+          'invalid-argument',
+          `The [urls] argument is not a map of (string, string) for (key, value). ` +
+          `${key} has a type of ${typeof key}. ${value} has a type of ${typeof value}`,
+        );
+      }
+    }
+
+    return await adminApp.firestore()
+      .collection('users')
+      .doc(userAuth.uid)
+      .update({
+        urls
+      });
+  })
+
 // ----------------
 // HELPER FUNCTIONS
 // ----------------
@@ -639,40 +683,40 @@ async function isUserExistsByUsername(nameLowerCase: string) {
   return true;
 }
 
-  /**
-   * Return true if an user's field value has changed among public information.
-   * (e.g. name, profile picture, urls).
-   * @param change Firestore document updated.
-   * @returns True if a public value has changed.
-   */
-   function shouldUpdatePublicInfo(change: functions.Change<functions.firestore.QueryDocumentSnapshot>): boolean {
-    const beforeData = change.before.data();
-    const afterData = change.after.data();
-  
-    if (beforeData.name !== afterData.name) {
+/**
+ * Return true if an user's field value has changed among public information.
+ * (e.g. name, profile picture, urls).
+ * @param change Firestore document updated.
+ * @returns True if a public value has changed.
+ */
+function shouldUpdatePublicInfo(change: functions.Change<functions.firestore.QueryDocumentSnapshot>): boolean {
+  const beforeData = change.before.data();
+  const afterData = change.after.data();
+
+  if (beforeData.name !== afterData.name) {
+    return true;
+  }
+
+  const beforeProfilePicture = beforeData.profilePicture;
+  const afterProfilePicture = afterData.profilePicture;
+
+  for (const [key, value] of Object.entries(beforeProfilePicture)) {
+    if (value !== afterProfilePicture[key]) {
       return true;
     }
-  
-    const beforeProfilePicture = beforeData.profilePicture;
-    const afterProfilePicture = afterData.profilePicture;
-  
-    for (const [key, value] of Object.entries(beforeProfilePicture)) {
-      if (value !== afterProfilePicture[key]) {
-        return true;
-      }
-    }
-  
-    const beforeUrls = beforeData.urls;
-    const afterUrls = afterData.urls;
-  
-    for (const [key, value] of Object.entries(beforeUrls)) {
-      if (value !== afterUrls[key]) {
-        return true;
-      }
-    }
-  
-    return false;
   }
+
+  const beforeUrls = beforeData.urls;
+  const afterUrls = afterData.urls;
+
+  for (const [key, value] of Object.entries(beforeUrls)) {
+    if (value !== afterUrls[key]) {
+      return true;
+    }
+  }
+
+  return false;
+}
   
 function validateEmailFormat(email: string) {
   const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
