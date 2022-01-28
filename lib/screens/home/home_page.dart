@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage> {
         _scrollController.animateTo(
           0.0,
           duration: 500.milliseconds,
-          curve: Curves.bounceIn,
+          curve: Curves.decelerate,
         );
       },
       backgroundColor: Theme.of(context).secondaryHeaderColor,
