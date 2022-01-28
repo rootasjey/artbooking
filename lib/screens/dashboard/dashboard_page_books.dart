@@ -1,4 +1,5 @@
 import 'package:artbooking/actions/books.dart';
+import 'package:artbooking/components/delete_dialog.dart';
 import 'package:artbooking/components/icons/animated_app_icon.dart';
 import 'package:artbooking/components/cards/book_card.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page_edit_book_dialog.dart';
@@ -62,8 +63,8 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
   ScrollController _scrollController = ScrollController();
 
-  TextEditingController? _newBookNameController;
-  TextEditingController? _newBookDescriptionController;
+  final _newBookNameController = TextEditingController();
+  final _newBookDescriptionController = TextEditingController();
   String _newBookName = '';
   String _newBookDescription = '';
 
@@ -72,14 +73,13 @@ class _MyBooksPageState extends State<MyBooksPage> {
   @override
   initState() {
     super.initState();
-    _newBookNameController = TextEditingController();
-    _newBookDescriptionController = TextEditingController();
     fetchManyBooks();
   }
 
   @override
   void dispose() {
-    _newBookNameController?.dispose();
+    _newBookNameController.dispose();
+    _newBookDescriptionController.dispose();
     _streamSubscription?.cancel();
     _focusNode.dispose();
     super.dispose();
@@ -488,44 +488,10 @@ class _MyBooksPageState extends State<MyBooksPage> {
     showDialog(
       context: context,
       builder: (context) {
-        return ThemedDialog(
-          focusNode: _focusNode,
-          title: Column(
-            children: [
-              Opacity(
-                opacity: 0.8,
-                child: Text(
-                  "book_delete".tr().toUpperCase(),
-                  style: Utilities.fonts.style(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Container(
-                width: 300.0,
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Opacity(
-                  opacity: 0.4,
-                  child: Text(
-                    "book_delete_description".tr(),
-                    textAlign: TextAlign.center,
-                    style: Utilities.fonts.style(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          body: SingleChildScrollView(),
-          textButtonValidation: "delete".tr(),
-          onCancel: Beamer.of(context).popRoute,
-          onValidate: () {
-            deleteBook(book, index);
-            Beamer.of(context).popRoute();
-          },
+        return DeleteDialog(
+          titleValue: "book_delete".tr().toUpperCase(),
+          descrptionValue: "book_delete_description".tr(),
+          onValidate: () => deleteBook(book, index),
         );
       },
     );
@@ -729,8 +695,8 @@ class _MyBooksPageState extends State<MyBooksPage> {
   }
 
   void showRenameBookDialog(Book book) {
-    _newBookNameController!.text = book.name;
-    _newBookDescriptionController!.text = book.description;
+    _newBookNameController.text = book.name;
+    _newBookDescriptionController.text = book.description;
 
     _newBookName = book.name;
     _newBookDescription = book.description;
