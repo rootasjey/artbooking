@@ -21,13 +21,14 @@ void main() async {
   });
 
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   await Utilities.storage.initialize();
   await EasyLocalization.ensureInitialized();
-  await GlobalConfiguration().loadFromAsset("app_settings");
-  final savedThemeMode = await AdaptiveTheme.getThemeMode();
+  await GlobalConfiguration().loadFromAsset('app_settings');
 
   Utilities.search.init(
     applicationId: GlobalConfiguration().getValue('algolia_app_id'),
@@ -50,6 +51,8 @@ void main() async {
   }
 
   setPathUrlStrategy();
+
+  final savedThemeMode = await AdaptiveTheme.getThemeMode();
 
   return runApp(
     ProviderScope(
