@@ -37,7 +37,11 @@ class UserStats {
     );
   }
 
-  factory UserStats.fromJSON(Map<String, dynamic> data) {
+  factory UserStats.fromJSON(Map<String, dynamic>? data) {
+    if (data == null) {
+      return UserStats.empty();
+    }
+
     return UserStats(
       books: UserBooksStats.fromJSON(data['books']),
       challenges: UserChallengesStats.fromJSON(data['challenges']),
