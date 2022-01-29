@@ -100,6 +100,8 @@ flutter:
     - assets/images/app_icon/animation.gif
     - assets/images/default-avatar.png
     - assets/images/gummy-canvas.png
+    - assets/images/avatar_female.png
+    - assets/images/avatar_male.png
     - assets/translations/
     - assets/cfg/
 
