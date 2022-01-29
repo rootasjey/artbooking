@@ -1,12 +1,11 @@
 import 'package:artbooking/components/application_bar/application_bar.dart';
-import 'package:artbooking/components/texts/page_title.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
-import 'package:artbooking/screens/settings/settings_page_account.dart';
-import 'package:artbooking/screens/settings/settings_page_app.dart';
+import 'package:artbooking/screens/settings/settings_page_empty.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/screens/settings/settings_page_body.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:artbooking/types/user/profile_picture.dart';
 import 'package:artbooking/types/string_map.dart';
@@ -46,17 +45,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isMobileSize = Utilities.size.isMobileSize(context);
-    final bool showBigTitle = isMobileSize ? false : true;
-    final double paddingTop = isMobileSize ? 0.0 : 60.0;
-
     final userState = ref.watch(AppState.userProvider);
     final userFirestore = userState.firestoreUser;
 
-    final String profilePicture =
-        ref.read(AppState.userProvider.notifier).getPPUrl(
-              orElse: "https://img.icons8.com/plasticine/100/000000/flower.png",
-            );
+    if (userFirestore == null) {
+      return SettingsPageEmpty(
+        scrollController: _pageScrollController,
+      );
+    }
 
     return Scaffold(
       body: NotificationListener<ScrollNotification>(
@@ -65,39 +61,17 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             CustomScrollView(
               controller: _pageScrollController,
               slivers: <Widget>[
-                if (widget.showAppBar) ApplicationBar(),
-                SliverPadding(
-                  padding: EdgeInsets.only(
-                    top: paddingTop,
-                    bottom: 300.0,
-                  ),
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      if (showBigTitle)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 40.0),
-                          child: PageTitle(
-                            textTitle: "settings".tr(),
-                            mainAxisAlignment: MainAxisAlignment.center,
-                          ),
-                        ),
-                      SettingsPageAccount(
-                        isAuthenticated: ref
-                            .read(AppState.userProvider.notifier)
-                            .isAuthenticated,
-                        profilePicture: profilePicture,
-                        email: userFirestore?.email ?? '',
-                        username: userFirestore?.name ?? '',
-                        onGoToUpdateEmail: onGoToUpdateEmail,
-                        onUploadProfilePicture: onUploadProfilePicture,
-                        onTapProfilePicture: onTapProfilePicture,
-                        onGoToUpdatePassword: onGoToUpdatePasssword,
-                        onGoToUpdateUsername: onGoToUpdateUsername,
-                        onGoToDeleteAccount: onGoToDeleteAccount,
-                      ),
-                      SettingsPageApp(),
-                    ]),
-                  ),
+                ApplicationBar(),
+                SettingsPageBody(
+                  userFirestore: userFirestore,
+                  onEditLocation: onEditLocation,
+                  onEditPicture: onEditPicture,
+                  onEditSummary: onEditSummary,
+                  onGoToDeleteAccount: onGoToDeleteAccount,
+                  onGoToUpdateEmail: onGoToUpdateEmail,
+                  onGoToUpdatePasssword: onGoToUpdatePasssword,
+                  onGoToUpdateUsername: onGoToUpdateUsername,
+                  onUploadPicture: onUploadProfilePicture,
                 ),
               ],
             ),
@@ -154,6 +128,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       ],
     );
   }
+
+  void onEditLocation() {}
+
+  void onEditPicture() {}
+
+  void onEditSummary() {}
 
   void onGoToDeleteAccount() {
     Beamer.of(context).beamToNamed(

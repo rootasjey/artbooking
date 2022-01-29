@@ -184,7 +184,7 @@ class _EditImagePageState extends ConsumerState<EditIllustrationPageImage> {
                       Opacity(
                         opacity: 0.8,
                         child: Text(
-                          "pp".tr(),
+                          "profile_picture".tr(),
                           style: Utilities.fonts.style(
                             fontSize: 50.0,
                             fontWeight: FontWeight.w500,
@@ -196,7 +196,7 @@ class _EditImagePageState extends ConsumerState<EditIllustrationPageImage> {
                         child: Opacity(
                           opacity: 0.5,
                           child: Text(
-                            "pp_description".tr(),
+                            "profile_picture_description".tr(),
                             style: Utilities.fonts.style(
                               fontSize: 16.0,
                               fontWeight: FontWeight.w500,

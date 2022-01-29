@@ -37,7 +37,6 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
   @override
   void initState() {
     super.initState();
-
     _isExpanded = Utilities.storage.getDashboardSideMenuExpanded();
 
     // NOTE: Beamer state isn't ready on 1st frame
@@ -286,9 +285,14 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
   void _setStateListener() => setState(() {});
 
   void _toggleSideMenu() {
+    final bool newIsExpanded = !_isExpanded;
     setState(() {
-      _isExpanded = !_isExpanded;
+      _isExpanded = newIsExpanded;
       Utilities.storage.setDashboardSideMenuExpanded(_isExpanded);
     });
+
+    ref
+        .read(AppState.dashboardSideMenuOpenProvider.notifier)
+        .setVisibility(newIsExpanded);
   }
 }

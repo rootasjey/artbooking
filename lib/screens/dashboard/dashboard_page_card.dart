@@ -9,9 +9,11 @@ class DashbordPageCard extends StatefulWidget {
     required IconData this.iconData,
     required String this.textTitle,
     required String this.textSubtitle,
+    this.compact = false,
     this.onTap,
   }) : super(key: key);
 
+  final bool compact;
   final IconData iconData;
   final String textTitle;
   final String textSubtitle;
@@ -29,7 +31,7 @@ class _DashbordPageCardState extends State<DashbordPageCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 300.0,
+      width: widget.compact ? 200.0 : 300.0,
       height: 116.0,
       child: Card(
         elevation: _elevation,

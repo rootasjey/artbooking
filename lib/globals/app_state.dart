@@ -1,3 +1,4 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
 import 'package:artbooking/globals/state/show_upload_window_notifier.dart';
 import 'package:artbooking/globals/state/upload_bytes_transferred_notifier.dart';
@@ -14,6 +15,7 @@ class AppState {
   static final uploadTotalBytesProvider = _uploadTotalBytesProvider;
   static final uploadPercentageProvider = _uploadPercentageProvider;
   static final showUploadWindowProvider = _showUploadWindowProvider;
+  static final dashboardSideMenuOpenProvider = _dashboardSideMenuOpen;
 }
 
 // User
@@ -65,4 +67,10 @@ final _showUploadWindowProvider =
     StateNotifierProvider<ShowUploadWindowNotifier, bool>((ref) {
   final bool shouldShow = ref.watch(_uploadTaskListProvider).isNotEmpty;
   return ShowUploadWindowNotifier(shouldShow);
+});
+
+final _dashboardSideMenuOpen =
+    StateNotifierProvider<ShowUploadWindowNotifier, bool>((ref) {
+  final expanded = Utilities.storage.getDashboardSideMenuExpanded();
+  return ShowUploadWindowNotifier(expanded);
 });
