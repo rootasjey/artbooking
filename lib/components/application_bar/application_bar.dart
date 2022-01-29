@@ -20,10 +20,10 @@ class ApplicationBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bool compact = Utilities.size.isMobileSize(context);
 
-    ref.watch(AppState.userProvider);
+    final userProvider = ref.watch(AppState.userProvider);
     final UserNotifier userNotifier = ref.read(AppState.userProvider.notifier);
 
-    final String avatarURL = userNotifier.getPPUrl();
+    final String? avatarUrl = userProvider.firestoreUser?.getProfilePicture();
     final String initials = userNotifier.getInitialsUsername();
 
     return SliverPadding(
@@ -50,7 +50,7 @@ class ApplicationBar extends ConsumerWidget {
                 compact: compact,
                 isAuthenticated: userNotifier.isAuthenticated,
                 initials: initials,
-                avatarURL: avatarURL,
+                avatarUrl: avatarUrl ?? '',
               ),
             ],
           ),
@@ -73,13 +73,13 @@ class ApplicationBar extends ConsumerWidget {
     bool isAuthenticated = false,
     required WidgetRef ref,
     String initials = '',
-    String avatarURL = '',
+    String avatarUrl = '',
   }) {
     if (isAuthenticated) {
       return ApplicationBarAuthUser(
         compact: compact,
         avatarInitials: initials,
-        avatarURL: avatarURL,
+        avatarURL: avatarUrl,
         onSignOut: () => onSignOut(context, ref),
       );
     }
