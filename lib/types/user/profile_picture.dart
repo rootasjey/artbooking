@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:math';
 
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/string_map.dart';
 
 class ProfilePicture {
@@ -9,7 +11,20 @@ class ProfilePicture {
     this.updatedAt,
     required this.path,
     required this.url,
-  });
+  }) {
+    if (url.original.isEmpty) {
+      this.url = StringMap(
+        original: _sampleAvatars.elementAt(
+          Random().nextInt(_sampleAvatars.length),
+        ),
+      );
+    }
+  }
+
+  static const List<String> _sampleAvatars = [
+    "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Favatar_female.png?alt=media&token=24de34ec-71a6-44d0-8324-50c77e848dee",
+    "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Favatar_male.png?alt=media&token=326302d9-912d-4923-9bec-94c6bb9892ae",
+  ];
 
   /// Picture extension.
   String ext;
@@ -44,19 +59,40 @@ class ProfilePicture {
     };
   }
 
+  factory ProfilePicture.empty() {
+    return ProfilePicture(
+      ext: '',
+      size: 0,
+      updatedAt: DateTime.now(),
+      path: StringMap.empty(),
+      url: StringMap(
+        original: _sampleAvatars.elementAt(
+          Random().nextInt(_sampleAvatars.length),
+        ),
+      ),
+    );
+  }
+
   factory ProfilePicture.fromMap(Map<String, dynamic>? map) {
     if (map == null) {
       return ProfilePicture.empty();
     }
 
+    StringMap url = StringMap.fromMap(map['url']);
+    if (url.original.isEmpty) {
+      url = StringMap(
+        original: _sampleAvatars.elementAt(
+          Random().nextInt(_sampleAvatars.length),
+        ),
+      );
+    }
+
     return ProfilePicture(
       ext: map['ext'] ?? '',
       size: map['size']?.toInt() ?? 0,
-      updatedAt: map['updatedAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['updatedAt'])
-          : null,
+      updatedAt: Utilities.date.fromFirestore(map['updatedAt']),
       path: StringMap.fromMap(map['path']),
-      url: StringMap.fromMap(map['url']),
+      url: url,
     );
   }
 
@@ -67,7 +103,8 @@ class ProfilePicture {
 
   @override
   String toString() {
-    return 'ProfilePicture(ext: $ext, size: $size, updatedAt: $updatedAt, path: $path, url: $url)';
+    return 'ProfilePicture(ext: $ext, size: $size, updatedAt: $updatedAt, '
+        'path: $path, url: $url)';
   }
 
   @override
@@ -122,15 +159,5 @@ class ProfilePicture {
     updatedAt = userPP.updatedAt;
     path = userPP.path;
     url = userPP.url;
-  }
-
-  factory ProfilePicture.empty() {
-    return ProfilePicture(
-      ext: '',
-      size: 0,
-      updatedAt: DateTime.now(),
-      path: StringMap.empty(),
-      url: StringMap.empty(),
-    );
   }
 }

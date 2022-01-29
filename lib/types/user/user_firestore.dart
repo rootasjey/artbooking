@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/user/profile_picture.dart';
@@ -86,11 +85,6 @@ class UserFirestore {
       rights: rights ?? this.rights,
     );
   }
-
-  static const List<String> _sampleAvatars = [
-    "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Favatar_female.png?alt=media&token=24de34ec-71a6-44d0-8324-50c77e848dee",
-    "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Favatar_male.png?alt=media&token=326302d9-912d-4923-9bec-94c6bb9892ae",
-  ];
 
   Map<String, dynamic> toMap({bool withAllFields = false}) {
     Map<String, dynamic> map = Map();
@@ -227,17 +221,11 @@ class UserFirestore {
   String getProfilePicture() {
     final edited = profilePicture.url.edited;
     final original = profilePicture.url.original;
-    final defaultUrl =
-        _sampleAvatars.elementAt(Random().nextInt(_sampleAvatars.length));
 
     if (edited.isNotEmpty) {
       return edited;
     }
 
-    if (original.isNotEmpty) {
-      return original;
-    }
-
-    return defaultUrl;
+    return original;
   }
 }
