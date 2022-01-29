@@ -371,23 +371,25 @@ export const onCreatePublicInfo = functions
   .document('users/{userId}')
   .onCreate(async (snapshot, context) => {
     const data = snapshot.data();
-    const userAuth = context.auth;
+    const userId: string = context.params.userId;
     
-    if (!userAuth) {
+    if (typeof userId !== 'string') {
       throw new functions.https.HttpsError(
         'unauthenticated',
-        `The function must be called from an authenticated user.`,
+        `There was an issue with the user's id. Its value: [${userId}].`,
       );
     }
 
     return await adminApp.firestore()
       .collection('users')
-      .doc(userAuth.uid)
+      .doc(userId)
       .collection('public')
       .doc('basic')
       .create({
+        location: data.location,
         name: data.name,
         profilePicture: data.profilePicture,
+        summary: data.summary,
         urls: data.urls,
       });
   })
@@ -401,30 +403,31 @@ export const onUpdatePublicInfo = functions
   .firestore
   .document('users/{userId}')
   .onUpdate(async (change, context) => {
-    const afterData = change.after.data();
     const shouldUpdate = shouldUpdatePublicInfo(change);
-
     if (!shouldUpdate) {
       return false;
     }
 
-    const userAuth = context.auth;
+    const afterData = change.after.data();
+    const userId: string = context.params.userId;
     
-    if (!userAuth) {
+    if (typeof userId !== 'string') {
       throw new functions.https.HttpsError(
         'unauthenticated',
-        `The function must be called from an authenticated user.`,
+        `There was an issue with the user's id. Its value: [${userId}].`,
       );
     }
 
     return await adminApp.firestore()
       .collection('users')
-      .doc(userAuth.uid)
+      .doc(userId)
       .collection('public')
       .doc('basic')
       .update({
+        location: afterData.location,
         name: afterData.name,
         profilePicture: afterData.profilePicture,
+        summary: afterData.summary,
         urls: afterData.urls,
       });
   })
