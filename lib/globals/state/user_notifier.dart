@@ -75,10 +75,10 @@ class UserNotifier extends StateNotifier<User> {
     final UserFirestore? firestoreUser = state.firestoreUser;
     if (firestoreUser == null) return orElse;
 
-    final editedURL = firestoreUser.pp.url.edited;
+    final editedURL = firestoreUser.profilePicture.url.edited;
     if (editedURL.isNotEmpty) return editedURL;
 
-    final originalURL = firestoreUser.pp.url.original;
+    final originalURL = firestoreUser.profilePicture.url.original;
     if (originalURL.isNotEmpty) return originalURL;
 
     return orElse;
@@ -139,7 +139,7 @@ class UserNotifier extends StateNotifier<User> {
     if (userData == null) return;
 
     userData.putIfAbsent('id', () => docSnap.id);
-    final firestoreUser = UserFirestore.fromJSON(userData);
+    final firestoreUser = UserFirestore.fromMap(userData);
 
     state = User(
       authUser: state.authUser,

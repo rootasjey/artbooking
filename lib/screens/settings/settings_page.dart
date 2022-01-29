@@ -8,9 +8,8 @@ import 'package:artbooking/screens/settings/settings_page_app.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
-import 'package:artbooking/types/user/user_pp.dart';
-import 'package:artbooking/types/user/user_pp_path.dart';
-import 'package:artbooking/types/user/user_pp_url.dart';
+import 'package:artbooking/types/user/profile_picture.dart';
+import 'package:artbooking/types/string_map.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
@@ -184,12 +183,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final UserFirestore? userFirestore =
         ref.read(AppState.userProvider).firestoreUser;
 
-    if (userFirestore == null || userFirestore.pp.url.edited.isEmpty) {
+    if (userFirestore == null ||
+        userFirestore.profilePicture.url.edited.isEmpty) {
       return;
     }
 
     NavigationStateHelper.imageToEdit = ExtendedNetworkImageProvider(
-      userFirestore.pp.url.original,
+      userFirestore.profilePicture.url.original,
       cache: true,
       cacheRawData: true,
     );
@@ -258,13 +258,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
       setState(() {
         userFirestore?.urls.setUrl('image', downloadUrl);
-        userFirestore?.pp.update(
-          UserPP(
+        userFirestore?.profilePicture.update(
+          ProfilePicture(
             ext: ext.replaceFirst('.', ''),
             size: choosenFile.length,
             updatedAt: DateTime.now(),
-            path: UserPPPath(original: imagePath),
-            url: UserPPUrl(original: downloadUrl),
+            path: StringMap(original: imagePath),
+            url: StringMap(original: downloadUrl),
           ),
         );
 
@@ -286,8 +286,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
       await Utilities.cloud.fun('users-updateUser').call({
         'userId': uid,
-        'updatePayload':
-            ref.read(AppState.userProvider).firestoreUser?.toJSON(),
+        'updatePayload': ref.read(AppState.userProvider).firestoreUser?.toMap(),
       });
 
       setState(() => _isUpdating = false);

@@ -79,7 +79,7 @@ class Utilities {
     }
 
     data['id'] = docSnapshot.id;
-    return UserFirestore.fromJSON(data);
+    return UserFirestore.fromMap(data);
   }
 
   static String getPageTitle(String trailingText) {

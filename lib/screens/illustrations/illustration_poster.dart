@@ -186,7 +186,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
         return;
       }
 
-      setState(() => _user = UserFirestore.fromJSON(data));
+      setState(() => _user = UserFirestore.fromMap(data));
     } catch (error) {
       Utilities.logger.e(error);
     }

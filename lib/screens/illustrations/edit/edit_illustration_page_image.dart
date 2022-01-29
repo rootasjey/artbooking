@@ -6,8 +6,7 @@ import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/globals/app_state.dart';
-import 'package:artbooking/types/user/user_pp_path.dart';
-import 'package:artbooking/types/user/user_pp_url.dart';
+import 'package:artbooking/types/string_map.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
@@ -254,7 +253,7 @@ class _EditImagePageState extends ConsumerState<EditIllustrationPageImage> {
     setState(() => _isUpdating = true);
 
     final String ext =
-        ref.read(AppState.userProvider).firestoreUser?.pp.ext ?? '';
+        ref.read(AppState.userProvider).firestoreUser?.profilePicture.ext ?? '';
 
     try {
       final String imagePath = "images/users/${userAuth.uid}/pp/edited.$ext";
@@ -279,9 +278,9 @@ class _EditImagePageState extends ConsumerState<EditIllustrationPageImage> {
             ?.urls
             .setUrl('image', downloadUrl);
 
-        ref.read(AppState.userProvider).firestoreUser?.pp.merge(
-              path: UserPPPath(edited: imagePath),
-              url: UserPPUrl(edited: downloadUrl),
+        ref.read(AppState.userProvider).firestoreUser?.profilePicture.merge(
+              path: StringMap(edited: imagePath),
+              url: StringMap(edited: downloadUrl),
             );
 
         _isUpdating = false;
@@ -302,8 +301,7 @@ class _EditImagePageState extends ConsumerState<EditIllustrationPageImage> {
 
       await Utilities.cloud.fun('users-updateUser').call({
         'userId': uid,
-        'updatePayload':
-            ref.read(AppState.userProvider).firestoreUser?.toJSON(),
+        'updatePayload': ref.read(AppState.userProvider).firestoreUser?.toMap(),
       });
 
       Beamer.of(context).popRoute();

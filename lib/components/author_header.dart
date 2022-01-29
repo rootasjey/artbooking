@@ -30,10 +30,10 @@ class _AuthorHeaderState extends State<AuthorHeader> {
 
   @override
   Widget build(BuildContext context) {
-    final userPP = _user.getPP();
+    final profilePicture = _user.getProfilePicture();
 
-    final avatarUrl = userPP.isNotEmpty
-        ? userPP
+    final avatarUrl = profilePicture.isNotEmpty
+        ? profilePicture
         : "https://img.icons8.com/plasticine/100/000000/flower.png";
 
     return Padding(
@@ -99,7 +99,7 @@ class _AuthorHeaderState extends State<AuthorHeader> {
         return;
       }
 
-      setState(() => _user = UserFirestore.fromJSON(data));
+      setState(() => _user = UserFirestore.fromMap(data));
     } catch (error) {
       Utilities.logger.e(error);
     }

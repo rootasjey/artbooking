@@ -289,7 +289,7 @@ class _ProfilePageHeroState extends State<ProfilePageHero> {
 
       mapData["id"] = snapshot.id;
       setState(() {
-        _userFirestore = UserFirestore.fromJSON(mapData);
+        _userFirestore = UserFirestore.fromMap(mapData);
       });
     } catch (error) {
       Utilities.logger.e(error);
