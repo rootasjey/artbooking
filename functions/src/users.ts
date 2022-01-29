@@ -552,6 +552,43 @@ export const updateUsername = functions
   });
 
 /**
+ * Update user's summary, location.
+ */
+export const updatePublicStrings = functions
+  .region(cloudRegions.eu)
+  .https
+  .onCall(async (data, context) => {
+    const userAuth = context.auth;
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
+    }
+
+    const summary: string = data.summary;
+    const location: string = data.location;
+
+    if (typeof summary !== 'string' || typeof location !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `You provided a wrong argument type for [summary] or [location]. ` +
+        `Both arguments should be string, but their value are: ` +
+        `summary (${typeof summary}): ${summary}, location (${typeof location}): ${location}.`,
+      );
+    }
+
+    return await adminApp.firestore()
+      .collection('users')
+      .doc(userAuth.uid)
+      .update({
+        location,
+        summary,
+      });
+  })
+
+/**
  * Update user's urls (mostly external social links).
  */
 export const updateUrls = functions
