@@ -492,7 +492,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
       context: context,
       builder: (context) => EditLicensePage(
         licenseId: targetLicense.id,
-        type: targetLicense.type,
+        type: targetLicense.dataTypes,
       ),
     );
   }

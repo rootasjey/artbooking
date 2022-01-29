@@ -259,6 +259,12 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
       //   hoverColor: Colors.yellow.shade800,
       // ),
       SideMenuItem(
+        iconData: UniconsLine.user,
+        label: "profile_my".tr(),
+        hoverColor: Constants.colors.galleries,
+        routePath: DashboardLocationContent.profileRoute,
+      ),
+      SideMenuItem(
         iconData: UniconsLine.setting,
         label: "settings".tr(),
         hoverColor: Constants.colors.settings,

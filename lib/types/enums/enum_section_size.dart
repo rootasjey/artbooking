@@ -1,0 +1,4 @@
+enum EnumSectionSize {
+  large,
+  medium,
+}

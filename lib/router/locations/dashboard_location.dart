@@ -2,6 +2,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/signin_location.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page_welcome.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page.dart';
+import 'package:artbooking/screens/dashboard/profile/profile_page.dart';
 import 'package:artbooking/screens/settings/settings_page_delete_account.dart';
 import 'package:artbooking/screens/illustrations/edit/edit_illustration_page_image.dart';
 import 'package:artbooking/screens/illustrations/illustration_page.dart';
@@ -11,7 +12,6 @@ import 'package:artbooking/screens/dashboard/dashboard_page_book.dart';
 import 'package:artbooking/screens/activity/activity_page.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page_books.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page_illustrations.dart';
-import 'package:artbooking/screens/dashboard/dashboard_page_profile.dart';
 import 'package:artbooking/screens/settings/settings_page.dart';
 import 'package:artbooking/screens/settings/settings_page_update_email.dart';
 import 'package:artbooking/screens/settings/settings_page_update_password.dart';
@@ -214,7 +214,9 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
         ),
       if (state.pathPatternSegments.contains('profile'))
         BeamPage(
-          child: DashboardPageProfile(),
+          child: ProfilePage(
+            userId: state.pathParameters["userId"] ?? '',
+          ),
           key: ValueKey('$editProfilePictureRoute'),
           title: Utilities.getPageTitle("profile_my".tr()),
           type: BeamPageType.fadeTransition,
