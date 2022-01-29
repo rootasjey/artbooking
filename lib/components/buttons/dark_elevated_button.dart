@@ -1,3 +1,4 @@
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 
@@ -51,6 +52,39 @@ class DarkElevatedButton extends StatelessWidget {
           vertical: 12.0,
         ),
         child: child,
+      ),
+    );
+  }
+
+  static Widget icon({
+    required IconData iconData,
+    required String labelValue,
+    Function()? onPressed,
+    Color? background,
+    Color? foreground,
+  }) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Padding(
+        padding: const EdgeInsets.only(left: 8.0),
+        child: Icon(
+          iconData,
+          color: foreground,
+        ),
+      ),
+      label: Padding(
+        padding: const EdgeInsets.only(right: 8.0),
+        child: Text(
+          labelValue,
+          style: Utilities.fonts.style(
+            color: foreground,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      style: ElevatedButton.styleFrom(
+        primary: background ?? Constants.colors.clairPink,
+        minimumSize: Size(200.0, 60.0),
       ),
     );
   }
