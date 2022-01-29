@@ -81,7 +81,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   final _illustrations = MapStringIllustration();
   final _keyboardFocusNode = FocusNode();
 
-  /// Illustrations' ids matching [_book.illustrations].
+  /// Illustrations' ids matching [book.illustrations].
   /// Generated keys instead of simple ids due to possible duplicates.
   List<String> _currentIllusKeys = [];
 
@@ -1193,7 +1193,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
     return "$id$_keySeparator${createdAt.millisecondsSinceEpoch}";
   }
 
-  /// Find new values in [_book.illustrations]
+  /// Find new values in [book.illustrations]
   /// that weren't there before the update.
   /// -------------------------------------------
   /// For each id in the new data:
