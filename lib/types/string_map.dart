@@ -40,7 +40,11 @@ class StringMap {
     return StringMap();
   }
 
-  factory StringMap.fromMap(Map<String, dynamic> map) {
+  factory StringMap.fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return StringMap.empty();
+    }
+
     return StringMap(
       edited: map['edited'] ?? '',
       original: map['original'] ?? '',
