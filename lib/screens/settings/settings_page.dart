@@ -7,9 +7,11 @@ import 'package:artbooking/screens/settings/settings_page_empty.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/settings/settings_page_body.dart';
+import 'package:artbooking/screens/settings/settings_page_header.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:artbooking/types/user/profile_picture.dart';
 import 'package:artbooking/types/string_map.dart';
+import 'package:artbooking/types/user/user_urls.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
@@ -62,6 +64,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               controller: _pageScrollController,
               slivers: <Widget>[
                 ApplicationBar(),
+                SettingsPageHeader(),
                 SettingsPageBody(
                   userFirestore: userFirestore,
                   onEditLocation: onEditLocation,
@@ -72,6 +75,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   onGoToUpdatePasssword: onGoToUpdatePasssword,
                   onGoToUpdateUsername: onGoToUpdateUsername,
                   onUploadPicture: onUploadProfilePicture,
+                  onUrlChanged: onUrlChanged,
                 ),
               ],
             ),
@@ -265,6 +269,25 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     } catch (error) {
       Utilities.logger.e(error);
       setState(() => _isUpdating = false);
+    }
+  }
+
+  void onUrlChanged(UserUrls userUrls) async {
+    setState(() {
+      _isUpdating = true;
+    });
+
+    try {
+      await Utilities.cloud.fun("users-updateUrls").call({
+        "urls": userUrls.toMap(),
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() {
+        _isUpdating = false;
+      });
     }
   }
 
