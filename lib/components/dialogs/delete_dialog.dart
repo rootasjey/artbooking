@@ -1,4 +1,4 @@
-import 'package:artbooking/components/themed_dialog.dart';
+import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';

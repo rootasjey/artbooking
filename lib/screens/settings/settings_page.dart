@@ -2,7 +2,7 @@ import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
-import 'package:artbooking/screens/dashboard/dashboard_page_edit_book_dialog.dart';
+import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/screens/settings/settings_page_empty.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -100,7 +100,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
     showDialog(
       context: context,
-      builder: (context) => DashboardPageEditBookDialog.singleInput(
+      builder: (context) => InputDialog.singleInput(
         nameController: _locationController,
         label: "location".tr(),
         submitButtonValue: "location_update".tr(),
@@ -128,7 +128,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
     showDialog(
       context: context,
-      builder: (context) => DashboardPageEditBookDialog.singleInput(
+      builder: (context) => InputDialog.singleInput(
         nameController: _summaryController,
         maxLines: null,
         label: "summary".tr(),

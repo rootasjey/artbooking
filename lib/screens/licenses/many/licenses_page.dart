@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:artbooking/components/application_bar/application_bar.dart';
-import 'package:artbooking/components/themed_dialog.dart';
+import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';

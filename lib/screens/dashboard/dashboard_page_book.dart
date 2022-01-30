@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/components/icons/animated_app_icon.dart';
-import 'package:artbooking/screens/dashboard/dashboard_page_edit_book_dialog.dart';
+import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/cards/illustration_card.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/texts/text_divider.dart';
 import 'package:artbooking/components/buttons/text_rectangle_button.dart';
-import 'package:artbooking/components/themed_dialog.dart';
+import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/add_to_book_panel.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
@@ -1554,7 +1554,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
 
     showDialog(
       context: context,
-      builder: (context) => DashboardPageEditBookDialog(
+      builder: (context) => InputDialog(
         descriptionController: _newBookDescriptionController,
         nameController: _newBookNameController,
         submitButtonValue: "rename".tr(),

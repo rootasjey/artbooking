@@ -7,9 +7,9 @@ import 'package:artbooking/globals/constants.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-/// A dialog to create/edit a new book.
-class DashboardPageEditBookDialog extends StatelessWidget {
-  const DashboardPageEditBookDialog({
+/// A dialog which has one or multiple inputs.
+class InputDialog extends StatelessWidget {
+  const InputDialog({
     Key? key,
     required this.titleValue,
     required this.subtitleValue,

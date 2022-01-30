@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'package:artbooking/components/themed_dialog.dart';
+import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/illustrations/illustration_poster_actions.dart';
 import 'package:artbooking/screens/illustrations/illustration_poster_description.dart';

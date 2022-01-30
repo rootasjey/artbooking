@@ -1,9 +1,9 @@
-import 'package:artbooking/components/delete_dialog.dart';
+import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/screens/dashboard/dashboard_page_edit_book_dialog.dart';
+import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/screens/dashboard/profile/profile_page_body.dart';
 import 'package:artbooking/screens/dashboard/profile/profile_page_empty.dart';
 import 'package:artbooking/screens/dashboard/profile/profile_page_error.dart';
@@ -179,7 +179,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
     showDialog(
       context: context,
-      builder: (context) => DashboardPageEditBookDialog(
+      builder: (context) => InputDialog(
         descriptionController: _descriptionController,
         nameController: _nameController,
         submitButtonValue: "rename".tr(),
