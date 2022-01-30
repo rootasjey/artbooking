@@ -110,22 +110,31 @@ class InputDialog extends StatelessWidget {
   }
 
   static Widget singleInput({
-    Key? key,
-    required String titleValue,
-    required String subtitleValue,
-    TextEditingController? nameController,
-    void Function(String)? onNameChanged,
-    void Function(String)? onSubmitted,
-    required void Function() onCancel,
-    int? maxLines = 1,
-    Size sizeContaints = const Size(300.0, 45.0),
-    submitButtonValue = '',
-    String? label,
+    final Key? key,
+    required final String titleValue,
+    required final String subtitleValue,
+    final TextEditingController? nameController,
+    final void Function(String)? onNameChanged,
+    final void Function(String)? onSubmitted,
+    required final void Function() onCancel,
+    final int? maxLines = 1,
+    final Size sizeContaints = const Size(300.0, 45.0),
+    final String submitButtonValue = '',
+    final String? label,
+    String? hintText,
+    final TextInputAction? textInputAction,
+    final void Function(String)? onSubmitInput,
   }) {
-    String hintText = "book_create_hint_texts.${Random().nextInt(9)}".tr();
-
-    if (nameController != null && nameController.text.isNotEmpty) {
+    if (hintText == null &&
+        nameController != null &&
+        nameController.text.isNotEmpty) {
       hintText = nameController.text;
+    }
+
+    if (hintText == null) {
+      final String generatedHintText =
+          "book_create_hint_texts.${Random().nextInt(9)}".tr();
+      hintText = generatedHintText;
     }
 
     final String buttonTextValue =
@@ -156,6 +165,8 @@ class InputDialog extends StatelessWidget {
               onChanged: onNameChanged,
               maxLines: maxLines,
               sizeContaints: sizeContaints,
+              textInputAction: textInputAction,
+              onSubmitted: onSubmitInput,
             ),
           ),
         ),
