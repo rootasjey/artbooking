@@ -2,6 +2,7 @@ import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
+import 'package:artbooking/screens/dashboard/dashboard_page_edit_book_dialog.dart';
 import 'package:artbooking/screens/settings/settings_page_empty.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -19,7 +20,6 @@ import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mime_type/mime_type.dart';
-import 'package:unicons/unicons.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({
@@ -89,51 +89,61 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
   }
 
-  Widget deleteAccountButton() {
-    return Column(
-      children: <Widget>[
-        Container(
-          padding: const EdgeInsets.all(10.0),
-          width: 90.0,
-          height: 90.0,
-          child: Card(
-            elevation: 4.0,
-            child: InkWell(
-              onTap: () => context.beamToNamed(
-                DashboardLocationContent.deleteAccountRoute,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Opacity(
-                  opacity: 0.6,
-                  child: Icon(UniconsLine.trash),
-                ),
-              ),
-            ),
-          ),
-        ),
-        SizedBox(
-          width: 80.0,
-          child: Opacity(
-            opacity: 0.8,
-            child: Text(
-              "account_delete".tr(),
-              textAlign: TextAlign.center,
-              style: Utilities.fonts.style(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        )
-      ],
+  void onEditLocation() {
+    final _locationController = TextEditingController();
+
+    final userFirestore = ref.read(AppState.userProvider).firestoreUser;
+
+    if (userFirestore != null) {
+      _locationController.text = userFirestore.location;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => DashboardPageEditBookDialog.singleInput(
+        nameController: _locationController,
+        label: "location".tr(),
+        submitButtonValue: "location_update".tr(),
+        subtitleValue: "location_update_description".tr(),
+        titleValue: "location_use_new".tr().toUpperCase(),
+        onCancel: Beamer.of(context).popRoute,
+        onSubmitted: (value) {
+          tryUpdateLocation(_locationController.text);
+          Beamer.of(context).popRoute();
+        },
+      ),
     );
   }
 
-  void onEditLocation() {}
-
   void onEditPicture() {}
 
-  void onEditSummary() {}
+  void onEditSummary() {
+    final _summaryController = TextEditingController();
+
+    final userFirestore = ref.read(AppState.userProvider).firestoreUser;
+
+    if (userFirestore != null) {
+      _summaryController.text = userFirestore.summary;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => DashboardPageEditBookDialog.singleInput(
+        nameController: _summaryController,
+        maxLines: null,
+        label: "summary".tr(),
+        sizeContaints: const Size.fromHeight(140.0),
+        submitButtonValue: "summary_update".tr(),
+        subtitleValue: "summary_update_description".tr(),
+        titleValue: "summary_use_new".tr().toUpperCase(),
+        onCancel: Beamer.of(context).popRoute,
+        onSubmitted: (value) {
+          tryUpdateSummary(_summaryController.text);
+          Beamer.of(context).popRoute();
+        },
+      ),
+    );
+  }
 
   void onGoToDeleteAccount() {
     Beamer.of(context).beamToNamed(
@@ -255,6 +265,52 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     } catch (error) {
       Utilities.logger.e(error);
       setState(() => _isUpdating = false);
+    }
+  }
+
+  void tryUpdateLocation(String location) async {
+    setState(() {
+      _isUpdating = true;
+    });
+
+    try {
+      final userFirestore = ref.read(AppState.userProvider).firestoreUser;
+      final String summary = userFirestore?.summary ?? '';
+
+      await Utilities.cloud.fun("users-updatePublicStrings").call({
+        "location": location,
+        "summary": summary,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() {
+        _isUpdating = false;
+      });
+    }
+  }
+
+  void tryUpdateSummary(String summary) async {
+    setState(() {
+      _isUpdating = true;
+    });
+
+    try {
+      final userFirestore = ref.read(AppState.userProvider).firestoreUser;
+      final String location = userFirestore?.location ?? '';
+
+      await Utilities.cloud.fun("users-updatePublicStrings").call({
+        "location": location,
+        "summary": summary,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() {
+        _isUpdating = false;
+      });
     }
   }
 
