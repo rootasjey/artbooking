@@ -13,7 +13,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
 class UserNotifier extends StateNotifier<User> {
-  UserNotifier(User state) : super(state) {}
+  UserNotifier(User state) : super(state) {
+    _listenToAuthChanges();
+    _listenToFirestoreChanges();
+  }
 
   Future<CloudFunctionsResponse> deleteAccount(String idToken) async {
     try {
