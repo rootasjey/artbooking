@@ -104,7 +104,72 @@ class DashboardPageEditBookDialog extends StatelessWidget {
         controller: nameController,
         hintText: hintText,
         onChanged: onNameChanged,
+        textInputAction: TextInputAction.next,
       ),
+    );
+  }
+
+  static Widget singleInput({
+    Key? key,
+    required String titleValue,
+    required String subtitleValue,
+    TextEditingController? nameController,
+    void Function(String)? onNameChanged,
+    void Function(String)? onSubmitted,
+    required void Function() onCancel,
+    int? maxLines = 1,
+    Size sizeContaints = const Size(300.0, 45.0),
+    submitButtonValue = '',
+    String? label,
+  }) {
+    String hintText = "book_create_hint_texts.${Random().nextInt(9)}".tr();
+
+    if (nameController != null && nameController.text.isNotEmpty) {
+      hintText = nameController.text;
+    }
+
+    final String buttonTextValue =
+        submitButtonValue.isNotEmpty ? submitButtonValue : "create".tr();
+
+    return SimpleDialog(
+      key: key,
+      backgroundColor: Constants.colors.clairPink,
+      title: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: 400.0),
+        child: TitleDialog(
+          titleValue: titleValue,
+          subtitleValue: subtitleValue,
+          onCancel: onCancel,
+        ),
+      ),
+      titlePadding: EdgeInsets.zero,
+      contentPadding: const EdgeInsets.all(16.0),
+      children: [
+        ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 400.0),
+          child: Padding(
+            padding: EdgeInsets.all(26.0),
+            child: OutlinedTextField(
+              label: label,
+              controller: nameController,
+              hintText: hintText,
+              onChanged: onNameChanged,
+              maxLines: maxLines,
+              sizeContaints: sizeContaints,
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(24.0),
+          child: DarkElevatedButton.large(
+            onPressed: () {
+              final String value = nameController?.text ?? '';
+              onSubmitted?.call(value);
+            },
+            child: Text(buttonTextValue),
+          ),
+        ),
+      ],
     );
   }
 }
