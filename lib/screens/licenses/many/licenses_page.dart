@@ -487,12 +487,12 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     showDeleteConfirmDialog(targetLicense, targetIndex);
   }
 
-  void onEditLicense(targetLicense, targetIndex) {
+  void onEditLicense(License targetLicense, int targetIndex) {
     showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => EditLicensePage(
         licenseId: targetLicense.id,
-        type: targetLicense.dataTypes,
+        type: targetLicense.type,
       ),
     );
   }

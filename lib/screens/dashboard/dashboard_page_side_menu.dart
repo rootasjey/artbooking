@@ -286,6 +286,7 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
 
   void _toggleSideMenu() {
     final bool newIsExpanded = !_isExpanded;
+
     setState(() {
       _isExpanded = newIsExpanded;
       Utilities.storage.setDashboardSideMenuExpanded(_isExpanded);
