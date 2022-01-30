@@ -107,29 +107,51 @@ class UserUrls {
     );
   }
 
+  static const artbookingString = 'artbooking';
+  static const artstationString = 'artstation';
+  static const behanceString = 'behance';
+  static const deviantartString = 'deviantart';
+  static const discordString = 'discord';
+  static const dribbbleString = 'dribbble';
+  static const facebookString = 'facebook';
+  static const githubString = 'github';
+  static const instagramString = 'instagram';
+  static const linkedinString = 'linkedin';
+  static const otherString = 'other';
+  static const patreonString = 'patreon';
+  static const profilePictureString = 'profilePicture';
+  static const tiktokString = 'tiktok';
+  static const tipeeeString = 'tipeee';
+  static const tumblrString = 'tumblr';
+  static const twitchString = 'twitch';
+  static const twitterString = 'twitter';
+  static const websiteString = 'website';
+  static const wikipediaString = 'wikipedia';
+  static const youtubeString = 'youtube';
+
   Map<String, dynamic> toMap() {
     return {
-      'artbooking': artbooking,
-      'artstation': artstation,
-      'behance': behance,
-      'deviantart': deviantart,
-      'discord': discord,
-      'dribbble': dribbble,
-      'facebook': facebook,
-      'github': github,
-      'instagram': instagram,
-      'linkedin': linkedin,
-      'other': other,
-      'patreon': patreon,
-      'profilePicture': profilePicture,
-      'tiktok': tiktok,
-      'tipeee': tipeee,
-      'tumblr': tumblr,
-      'twitch': twitch,
-      'twitter': twitter,
-      'website': website,
-      'wikipedia': wikipedia,
-      'youtube': youtube,
+      artbookingString: artbooking,
+      artstationString: artstation,
+      behanceString: behance,
+      deviantartString: deviantart,
+      discordString: discord,
+      dribbbleString: dribbble,
+      facebookString: facebook,
+      githubString: github,
+      instagramString: instagram,
+      linkedinString: linkedin,
+      otherString: other,
+      patreonString: patreon,
+      profilePictureString: profilePicture,
+      tiktokString: tiktok,
+      tipeeeString: tipeee,
+      tumblrString: tumblr,
+      twitchString: twitch,
+      twitterString: twitter,
+      websiteString: website,
+      wikipediaString: wikipedia,
+      youtubeString: youtube,
     };
   }
 
@@ -198,67 +220,67 @@ class UserUrls {
     socialMap[key] = value;
 
     switch (key) {
-      case "artbooking":
+      case artbookingString:
         artbooking = value;
         break;
-      case "artstation":
+      case artstationString:
         artstation = value;
         break;
-      case "behance":
+      case behanceString:
         behance = value;
         break;
-      case "deviantart":
+      case deviantartString:
         deviantart = value;
         break;
-      case "discord":
+      case discordString:
         discord = value;
         break;
-      case "dribbble":
+      case dribbbleString:
         dribbble = value;
         break;
-      case "facebook":
+      case facebookString:
         facebook = value;
         break;
-      case "github":
+      case githubString:
         github = value;
         break;
-      case "instagram":
+      case instagramString:
         instagram = value;
         break;
-      case "linkedin":
+      case linkedinString:
         linkedin = value;
         break;
-      case "other":
+      case otherString:
         other = value;
         break;
-      case "patreon":
+      case patreonString:
         patreon = value;
         break;
-      case "profilePicture":
+      case profilePictureString:
         profilePicture = value;
         break;
-      case "tiktok":
+      case tiktokString:
         tiktok = value;
         break;
-      case "tipeee":
+      case tipeeeString:
         tipeee = value;
         break;
-      case "tumblr":
+      case tumblrString:
         tumblr = value;
         break;
-      case "twitch":
+      case twitchString:
         twitch = value;
         break;
-      case "twitter":
+      case twitterString:
         twitter = value;
         break;
-      case "website":
+      case websiteString:
         website = value;
         break;
-      case "wikipedia":
+      case wikipediaString:
         wikipedia = value;
         break;
-      case "youtube":
+      case youtubeString:
         youtube = value;
         break;
       default:
@@ -282,29 +304,29 @@ class UserUrls {
     });
 
     return UserUrls(
-      artbooking: map['artbooking'] ?? '',
-      artstation: map['artstation'] ?? '',
-      behance: map['behance'] ?? '',
-      deviantart: map['deviantart'] ?? '',
-      discord: map['discord'] ?? '',
-      dribbble: map['dribbble'] ?? '',
-      facebook: map['facebook'] ?? '',
-      github: map['github'] ?? '',
-      instagram: map['instagram'] ?? '',
-      linkedin: map['linkedin'] ?? '',
+      artbooking: map[artbookingString] ?? '',
+      artstation: map[artstationString] ?? '',
+      behance: map[behanceString] ?? '',
+      deviantart: map[deviantartString] ?? '',
+      discord: map[discordString] ?? '',
+      dribbble: map[dribbbleString] ?? '',
+      facebook: map[facebookString] ?? '',
+      github: map[githubString] ?? '',
+      instagram: map[instagramString] ?? '',
+      linkedin: map[linkedinString] ?? '',
       map: dataMap,
       socialMap: socialMap,
-      other: map['other'] ?? '',
-      patreon: map['patreon'] ?? '',
-      profilePicture: map['profilePicture'] ?? '',
-      tiktok: map['tiktok'] ?? '',
-      tipeee: map['tipeee'] ?? '',
-      tumblr: map['tumblr'] ?? '',
-      twitch: map['twitch'] ?? '',
-      twitter: map['twitter'] ?? '',
-      website: map['website'] ?? '',
-      wikipedia: map['wikipedia'] ?? '',
-      youtube: map['youtube'] ?? '',
+      other: map[otherString] ?? '',
+      patreon: map[patreonString] ?? '',
+      profilePicture: map[profilePictureString] ?? '',
+      tiktok: map[tiktokString] ?? '',
+      tipeee: map[tipeeeString] ?? '',
+      tumblr: map[tumblrString] ?? '',
+      twitch: map[twitchString] ?? '',
+      twitter: map[twitterString] ?? '',
+      website: map[websiteString] ?? '',
+      wikipedia: map[wikipediaString] ?? '',
+      youtube: map[youtubeString] ?? '',
     );
   }
 
@@ -315,7 +337,13 @@ class UserUrls {
 
   @override
   String toString() {
-    return 'UserUrls(artbooking: $artbooking, artstation: $artstation, behance: $behance, deviantart: $deviantart, discord: $discord, dribbble: $dribbble, facebook: $facebook, github: $github, instagram: $instagram, linkedin: $linkedin, other: $other, patreon: $patreon, profilePicture: $profilePicture, tiktok: $tiktok, tipeee: $tipeee, tumblr: $tumblr, twitch: $twitch, twitter: $twitter, website: $website, wikipedia: $wikipedia, youtube: $youtube)';
+    return 'UserUrls(artbooking: $artbooking, artstation: $artstation, '
+        'behance: $behance, deviantart: $deviantart, discord: $discord, '
+        'dribbble: $dribbble, facebook: $facebook, github: $github, '
+        'instagram: $instagram, linkedin: $linkedin, other: $other, '
+        'patreon: $patreon, profilePicture: $profilePicture, tiktok: $tiktok, '
+        'tipeee: $tipeee, tumblr: $tumblr, twitch: $twitch, twitter: $twitter, '
+        'website: $website, wikipedia: $wikipedia, youtube: $youtube)';
   }
 
   @override
