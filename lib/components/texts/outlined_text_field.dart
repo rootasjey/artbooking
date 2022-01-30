@@ -11,7 +11,14 @@ class OutlinedTextField extends StatelessWidget {
     this.onChanged,
     this.onSubmitted,
     this.sizeContaints = const Size(300.0, 45.0),
+    this.autofocus = true,
+    this.maxLines = 1,
+    this.textInputAction,
   }) : super(key: key);
+
+  final bool autofocus;
+
+  final int? maxLines;
 
   /// The label will be displayed on top of the input.
   final String? label;
@@ -30,6 +37,8 @@ class OutlinedTextField extends StatelessWidget {
 
   /// Maximum size for the input.
   final Size sizeContaints;
+
+  final TextInputAction? textInputAction;
 
   @override
   Widget build(BuildContext context) {
@@ -57,9 +66,10 @@ class OutlinedTextField extends StatelessWidget {
         ConstrainedBox(
           constraints: BoxConstraints.tight(sizeContaints),
           child: TextField(
-            autofocus: true,
+            autofocus: autofocus,
             controller: controller,
-            textInputAction: TextInputAction.next,
+            maxLines: maxLines,
+            textInputAction: textInputAction,
             onChanged: onChanged,
             onSubmitted: onSubmitted,
             style: Utilities.fonts.style(
@@ -70,8 +80,9 @@ class OutlinedTextField extends StatelessWidget {
               filled: true,
               fillColor: Colors.white,
               hintText: hintText,
-              contentPadding: const EdgeInsets.symmetric(
+              contentPadding: EdgeInsets.symmetric(
                 horizontal: 8.0,
+                vertical: maxLines == null ? 8.0 : 0.0,
               ),
               errorBorder: OutlineInputBorder(
                 borderRadius: borderRadius,
