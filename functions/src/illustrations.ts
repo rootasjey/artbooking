@@ -450,7 +450,12 @@ export const onStorageUpload = functions
     const customMetadata = objectMeta.metadata;
     if (!customMetadata) { return; }
 
-    const { firestoreId, userId, visibility } = customMetadata;
+    const { firestoreId, userId, visibility, target } = customMetadata;
+    
+    if (target === 'profilePicture') {
+      return await setUserProfilePicture(objectMeta);
+    }
+
     if (!firestoreId || !userId) { return; }
 
     const filepath = objectMeta.name || '';
@@ -1309,4 +1314,70 @@ async function getDimensionsFromUrl(url: string): Promise<ISizeCalculationResult
       });
     });
   })
+}
+
+/**
+ * Update user's `profilePicture` field with newly upload image.
+ * @param objectMeta Firebase Storage object metadta.
+ * @returns Promise
+ */
+async function setUserProfilePicture(objectMeta: functions.storage.ObjectMetadata) {
+  const customMetadata = objectMeta.metadata;
+  if (!customMetadata) { return; }
+
+  const filepath = objectMeta.name || '';
+  const filename = filepath.split('/').pop() || '';
+  const storageUrl = filepath;
+
+  const endIndex: number = filepath.indexOf('/profile')
+  const userId = filepath.substring(6, endIndex)
+  
+  if (!userId) { 
+    throw new functions.https.HttpsError(
+      'not-found',
+      `We didn't find the target user: ${userId}.`
+    );
+  }
+
+  // Exit if thumbnail or not an image file.
+  const contentType = objectMeta.contentType || '';
+
+  if (!contentType.includes('image')) {
+    console.info(`Exiting function => existing image or non-file image: ${filepath}`);
+    return false;
+  }
+
+  const imageFile = adminApp.storage()
+  .bucket()
+  .file(storageUrl);
+
+  if (!await imageFile.exists()) {
+    console.error('file does not exist')
+    return;
+  }
+
+  await imageFile.makePublic()
+
+  const extension = objectMeta.metadata?.extension ||
+  filename.substring(filename.lastIndexOf('.'));
+
+  return await adminApp.firestore()
+    .collection('users')
+    .doc(userId)
+    .update({
+      profilePicture: {
+        extension,
+        path: {
+          edited: '',
+          original: filepath,
+        },
+        size: parseFloat(objectMeta.size),
+        updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
+        url: {
+          edited: '',
+          original: imageFile.publicUrl(),
+          storage: storageUrl,
+        },
+      },
+    });
 }
