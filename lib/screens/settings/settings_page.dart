@@ -9,8 +9,6 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/settings/settings_page_body.dart';
 import 'package:artbooking/screens/settings/settings_page_header.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
-import 'package:artbooking/types/user/profile_picture.dart';
-import 'package:artbooking/types/string_map.dart';
 import 'package:artbooking/types/user/user_urls.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -194,81 +192,60 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   void onUploadProfilePicture() async {
-    FilePickerCross choosenFile = await FilePickerCross.importFromStorage(
-      type: FileTypeCross.image,
-      fileExtension: 'jpg,jpeg,png,gif',
-    );
-
-    if (choosenFile.length >= 5 * 1024 * 1024) {
-      context.showErrorBar(
-        content: Text("image_size_exceeded".tr()),
-      );
-
-      return;
-    }
-
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      throw Exception("user_not_connected".tr());
-    }
-
-    final fileName = choosenFile.fileName;
-    if (fileName == null) {
-      return;
-    }
-
-    final ext = fileName.substring(fileName.lastIndexOf('.'));
-
-    final metadata = SettableMetadata(
-      contentType: mime(fileName),
-      customMetadata: {
-        'extension': ext,
-        'userId': user.uid,
-      },
-    );
-
-    setState(() => _isUpdating = true);
-
     try {
-      final response =
-          await Utilities.cloud.fun('users-clearProfilePicture').call();
-      final bool success = response.data['success'];
+      final FilePickerCross choosenFile =
+          await FilePickerCross.importFromStorage(
+        type: FileTypeCross.image,
+        fileExtension: 'jpg,jpeg,png,gif',
+      ).catchError((error) {
+        Utilities.logger.i("Probably cancelled file picker or denied right.");
+        return Future<FilePickerCross>.error(error);
+      });
 
-      if (!success) {
-        throw "Error while calling cloud function.";
+      if (choosenFile.length >= 5 * 1024 * 1024) {
+        context.showErrorBar(
+          content: Text("image_size_exceeded".tr()),
+        );
+
+        return;
       }
 
-      final imagePath = "images/users/${user.uid}/pp/original$ext";
+      setState(() => _isUpdating = true);
+
+      final authUser = ref.read(AppState.userProvider).authUser;
+      if (authUser == null) {
+        throw Exception("user_not_connected".tr());
+      }
+
+      final fileName = choosenFile.fileName;
+      if (fileName == null) {
+        return;
+      }
+
+      final ext = fileName.substring(fileName.lastIndexOf('.'));
+
+      final metadata = SettableMetadata(
+        contentType: mime(fileName),
+        customMetadata: {
+          'extension': ext,
+          'userId': authUser.uid,
+          'target': 'profilePicture',
+        },
+      );
+
+      final imagePath = "users/${authUser.uid}/profile/picture/original$ext";
 
       final task = FirebaseStorage.instance
           .ref(imagePath)
           .putData(choosenFile.toUint8List(), metadata);
 
-      final snapshot = await task;
-      final String downloadUrl = await snapshot.ref.getDownloadURL();
-
-      final UserFirestore? userFirestore =
-          ref.read(AppState.userProvider).firestoreUser;
-
-      setState(() {
-        userFirestore?.urls.setUrl('image', downloadUrl);
-        userFirestore?.profilePicture.update(
-          ProfilePicture(
-            ext: ext.replaceFirst('.', ''),
-            size: choosenFile.length,
-            updatedAt: DateTime.now(),
-            path: StringMap(original: imagePath),
-            url: StringMap(original: downloadUrl),
-          ),
-        );
-
-        _isUpdating = false;
-      });
-
-      updateUser();
+      await task;
     } catch (error) {
       Utilities.logger.e(error);
-      setState(() => _isUpdating = false);
+    } finally {
+      setState(() {
+        _isUpdating = false;
+      });
     }
   }
 
