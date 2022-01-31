@@ -450,17 +450,19 @@ export const onStorageUpload = functions
     const customMetadata = objectMeta.metadata;
     if (!customMetadata) { return; }
 
-    const { firestoreId, userId, visibility, target } = customMetadata;
+    const { firestoreId, visibility, target } = customMetadata;
     
     if (target === 'profilePicture') {
       return await setUserProfilePicture(objectMeta);
     }
-
-    if (!firestoreId || !userId) { return; }
-
+    
     const filepath = objectMeta.name || '';
     const filename = filepath.split('/').pop() || '';
     const storageUrl = filepath;
+    
+    const endIndex: number = filepath.indexOf('/illustrations')
+    const userId = filepath.substring(6, endIndex)
+    if (!firestoreId || !userId) { return; }
 
     // Exit if thumbnail or not an image file.
     const contentType = objectMeta.contentType || '';
@@ -468,6 +470,20 @@ export const onStorageUpload = functions
     if (filename.includes('thumb@') || !contentType.includes('image')) {
       console.info(`Exiting function => existing image or non-file image: ${filepath}`);
       return false;
+    }
+
+    // Check if same user as firestore illustration
+    const illustrationDoc = await firestore
+      .collection('illustrations')
+      .doc(firestoreId)
+      .get();
+
+    const illustrationData = illustrationDoc.data()
+    if (!illustrationData || illustrationData.user.id !== userId) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        `It seems that the user ${userId} is trying to access a forbidden document.`,
+      )
     }
 
     const imageFile = adminApp.storage()
@@ -500,9 +516,7 @@ export const onStorageUpload = functions
     const { height, width } = dimensions;
 
     // Save new properties to Firestore.
-    await firestore
-      .collection('illustrations')
-      .doc(firestoreId)
+    await illustrationDoc.ref
       .update({
         dimensions: {
           height,
@@ -530,7 +544,7 @@ export const onStorageUpload = functions
     let storageIllustrationsUsed: number = userData.stats.storage.illustrations.used;
     storageIllustrationsUsed += parseFloat(objectMeta.size);
 
-    return userDoc
+    return await userDoc
       .ref
       .update({
         'stats.storage.illustrations.used': storageIllustrationsUsed,
