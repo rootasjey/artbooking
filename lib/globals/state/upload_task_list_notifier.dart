@@ -252,7 +252,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     final String extension = fileName.substring(lastIndexDot);
 
     final String cloudStorageFilePath =
-        "/users/$userId/illustrations/$illustrationId/original.$extension";
+        "users/$userId/illustrations/$illustrationId/original.$extension";
 
     final storage = FirebaseStorage.instance;
 
