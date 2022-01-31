@@ -73,6 +73,16 @@ export function sendNotification(notificationData: any) {
 }
 
 /**
+ * Return a random integer between [min] and [max].
+ * @param min Minimum value (included)
+ * @param max Maximum value (included)
+ * @returns A random integer
+ */
+export function randomIntFromInterval(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+/**
  * Check and return the passed value.
  * If the passed value is unknown, return a default one.
  * @param visibilityParam - Visibility value. Accepted values: acl, private, public, unlisted.

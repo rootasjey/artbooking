@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 
 import { adminApp } from './adminApp';
-import { checkUserIsSignedIn, cloudRegions } from './utils';
+import { checkUserIsSignedIn, cloudRegions, randomIntFromInterval } from './utils';
 
 const firebaseTools = require('firebase-tools');
 const firestore = adminApp.firestore();
@@ -169,7 +169,7 @@ export const createAccount = functions
           updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
           url: {
             edited: '',
-            original: '',
+            original: getRandomProfilePictureLink(),
           },
         },
         rights: {
@@ -680,6 +680,23 @@ function formatUserData(userData: any) {
     updatedAt: userData.updatedAt,
     urls: userData.urls,
   };
+}
+
+/**
+ * Return a random profile picture url (pre-defined images).
+ * @returns A random profile picture url.
+ */
+function getRandomProfilePictureLink(): string {
+  const sampleAvatars = [
+    "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Favatars%2Favatar_woman_0.png?alt=media&token=d6ab47e3-709f-449a-a6c6-b53f854ec0fb",
+    "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Favatars%2Favatar_man_2.png?alt=media&token=9a4cc0ce-b12f-4095-a49e-9a38ed44d5de",
+    "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Favatars%2Favatar_man_1.png?alt=media&token=1d405ba5-7ec3-4058-ba59-6360c4dfc200",
+    "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Favatars%2Favatar_man_0.png?alt=media&token=2c8edef3-5e6f-4b84-a52b-2c9034951e20",
+    "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Favatars%2Favatar_woman_2.png?alt=media&token=a6f889d9-0ca1-4aa7-8aa5-f137d6fca138",
+    "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Favatars%2Favatar_woman_1.png?alt=media&token=2ef023f4-53c8-466b-93e4-70f58e6067bb",
+  ]
+
+  return sampleAvatars[randomIntFromInterval(0, sampleAvatars.length -1)]
 }
 
 async function isUserExistsByEmail(email: string) {
