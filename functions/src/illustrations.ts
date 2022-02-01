@@ -1327,7 +1327,7 @@ async function getDimensionsFromUrl(url: string): Promise<ISizeCalculationResult
         }
       });
     });
-  })
+  });
 }
 
 /**
@@ -1353,7 +1353,7 @@ async function setUserProfilePicture(objectMeta: functions.storage.ObjectMetadat
     );
   }
 
-  // Exit if thumbnail or not an image file.
+  // Exit if not an image file.
   const contentType = objectMeta.contentType || '';
 
   if (!contentType.includes('image')) {
@@ -1375,17 +1375,52 @@ async function setUserProfilePicture(objectMeta: functions.storage.ObjectMetadat
   const extension = objectMeta.metadata?.extension ||
   filename.substring(filename.lastIndexOf('.'));
 
+  // Dimensions calculation
+  // -----------------------------
+  const bucket = gcs.bucket(objectMeta.bucket);
+
+  const workingDir = join(tmpdir(), 'thumbs');
+  const tmpFilePath = join(workingDir, filename);
+
+  // 1. Ensure directory exists.
+  await fs.ensureDir(workingDir);
+
+  // 2. Download source file.
+  await bucket.file(filepath).download({
+    destination: tmpFilePath,
+  });
+
+  // 2.1. Try calculate dimensions.
+  let dimensions: ISizeCalculationResult = { height: 0, width: 0 };
+
+  try {
+    dimensions = sizeOf.imageSize(tmpFilePath);
+  } catch (error) {
+    console.error(error);
+  }
+
+  // 5. Clean up the tmp/thumbs from file system.
+  await fs.emptyDir(workingDir)
+  await fs.remove(workingDir);
+  // -----------------------------
+  // ---> End dimensions calculation
+
   return await adminApp.firestore()
     .collection('users')
     .doc(userId)
     .update({
       profilePicture: {
+        dimensions: {
+          height: dimensions.height ?? 0,
+          width: dimensions.width ?? 0,
+        },
         extension,
         path: {
           edited: '',
           original: filepath,
         },
         size: parseFloat(objectMeta.size),
+        type: dimensions.type ?? '',
         updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
         url: {
           edited: '',
