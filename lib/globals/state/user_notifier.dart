@@ -3,6 +3,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/cloud_functions/cloud_functions_error.dart';
 import 'package:artbooking/types/cloud_functions/cloud_functions_response.dart';
 import 'package:artbooking/types/cloud_functions/create_account_response.dart';
+import 'package:artbooking/types/dialog_return_value.dart';
 import 'package:artbooking/types/user/user.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -287,7 +288,7 @@ class UserNotifier extends StateNotifier<User> {
     }
   }
 
-  Future<bool> updatePassword({
+  Future<DialogReturnValue<String>> updatePassword({
     required String currentPassword,
     required String newPassword,
   }) async {
@@ -310,17 +311,17 @@ class UserNotifier extends StateNotifier<User> {
 
       if (authResult.user == null) {
         throw ErrorDescription(
-          "you entered a wrong password or the user doesn't exist anymore.",
+          "You entered a wrong password or the user doesn't exist anymore.",
         );
       }
 
       await authResult.user?.updatePassword(newPassword);
       Utilities.storage.setPassword(newPassword);
 
-      return true;
+      return DialogReturnValue(validated: true, value: '');
     } catch (error) {
       Utilities.logger.e(error);
-      return false;
+      return DialogReturnValue(validated: false, value: error.toString());
     }
   }
 

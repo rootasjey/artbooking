@@ -3,7 +3,7 @@ import 'package:artbooking/router/locations/signin_location.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page_welcome.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page.dart';
 import 'package:artbooking/screens/dashboard/profile/profile_page.dart';
-import 'package:artbooking/screens/settings/settings_page_delete_account.dart';
+import 'package:artbooking/screens/settings/delete_account/delete_account_page.dart';
 import 'package:artbooking/screens/illustrations/illustration_page.dart';
 import 'package:artbooking/screens/licenses/one/license_page.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page.dart';
@@ -12,9 +12,9 @@ import 'package:artbooking/screens/activity/activity_page.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page_books.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page_illustrations.dart';
 import 'package:artbooking/screens/settings/settings_page.dart';
-import 'package:artbooking/screens/settings/settings_page_update_email.dart';
-import 'package:artbooking/screens/settings/settings_page_update_password.dart';
-import 'package:artbooking/screens/settings/settings_page_update_username.dart';
+import 'package:artbooking/screens/settings/update_email/update_email_page.dart';
+import 'package:artbooking/screens/settings/update_password/update_password_page.dart';
+import 'package:artbooking/screens/settings/update_username/update_username_page.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/types/enums/enum_license_type.dart';
 import 'package:beamer/beamer.dart';
@@ -188,21 +188,21 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
         ),
       if (isUpdateEmail(state.pathPatternSegments))
         BeamPage(
-          child: SettingsPageUpdateEmail(),
+          child: UpdateEmailPage(),
           key: ValueKey('$updateEmailRoute'),
           title: Utilities.getPageTitle("email_update".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (isUpdatePassword(state.pathPatternSegments))
         BeamPage(
-          child: SettingsPageUpdatePassword(),
+          child: UpdatePasswordPage(),
           key: ValueKey('$updatePasswordRoute'),
           title: Utilities.getPageTitle("password_update".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (isUpdateUsername(state.pathPatternSegments))
         BeamPage(
-          child: SettingsPageUpdateUsername(),
+          child: UpdateUsernamePage(),
           key: ValueKey('$updateUsernameRoute'),
           title: Utilities.getPageTitle("username_update".tr()),
           type: BeamPageType.fadeTransition,

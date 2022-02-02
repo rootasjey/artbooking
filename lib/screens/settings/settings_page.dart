@@ -167,7 +167,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     try {
       final String imagePath =
           "users/${uid}/profile/picture/original.$extension";
-      // final imagePath = "users/${authUser.uid}/profile/picture/original$extension";
 
       final metadata = SettableMetadata(
         contentType: mimeFromExtension(extension),

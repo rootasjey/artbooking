@@ -13,6 +13,7 @@
   "account_delete_description": "Well, we're sad but we say goodbye. We will slowly delete your illustrations. Some of your data may stay like challenges or contests.",
   "account_delete_error": "We could not delete your account right now. Maybe your password is not correct. Try again later.",
   "account_delete_successfull": "Your account has been successfuly deleted!",
+  "account_deleting": "Deleting your account (data & other stuff)",
   "account_deletion_after": "What happens after?",
   "account_deletion_point_1": "Your personal data will be deleted",
   "account_deletion_point_2": "Your contest, challenges will stay on the platform",

@@ -13,6 +13,7 @@
   "account_delete_description": "On est triste mais on vous dit aurevoir. Nous supprimerons au fur et à mesure vos illustrations. Certaines de vos données risquent de rester sur la plateforme, telles que vos challenges et concours.",
   "account_delete_error": "Nous n'avons pas pu supprimer voter compte. Le mot de passe est peut-être incorrecte. Veuillez réessayer ultérieurement.",
   "account_delete_successfull": "Votre compte a été supprimé avec succès !",
+  "account_deleting": "Suppression de votre compte (données & autres goodies)",
   "account_deletion_after": "Que se passera-t-il après ?",
   "account_deletion_point_1": "Vos données personnelles seront supprimées",
   "account_deletion_point_2": "Vos challenges et concours resterons sur la plateforme",
