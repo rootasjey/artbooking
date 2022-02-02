@@ -1331,14 +1331,24 @@ async function getDimensionsFromUrl(url: string): Promise<ISizeCalculationResult
 }
 
 /**
+ * Generate a long lived persistant Firebase Storage download URL.
+ * @param bucket Bucket name.
+ * @param pathToFile File's path.
+ * @param downloadToken File's download token.
+ * @returns Firebase Storage download url.
+ */
+const createPersistentDownloadUrl = (bucket: string, pathToFile: string, downloadToken: string) => {
+  return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(
+    pathToFile
+  )}?alt=media&token=${downloadToken}`;
+};
+
+/**
  * Update user's `profilePicture` field with newly upload image.
  * @param objectMeta Firebase Storage object metadta.
  * @returns Promise
  */
 async function setUserProfilePicture(objectMeta: functions.storage.ObjectMetadata) {
-  const customMetadata = objectMeta.metadata;
-  if (!customMetadata) { return; }
-
   const filepath = objectMeta.name || '';
   const filename = filepath.split('/').pop() || '';
   const storageUrl = filepath;
@@ -1366,17 +1376,92 @@ async function setUserProfilePicture(objectMeta: functions.storage.ObjectMetadat
   .file(storageUrl);
 
   if (!await imageFile.exists()) {
-    console.error('file does not exist')
-    return;
+    throw new functions.https.HttpsError(
+      'not-found',
+      `This file doesn't not exist. filename: ${filename} | filepath: ${filepath}.`
+    );
   }
 
   await imageFile.makePublic()
 
   const extension = objectMeta.metadata?.extension ||
-  filename.substring(filename.lastIndexOf('.'));
+  filename.substring(filename.lastIndexOf('.')).replace('.', '');
 
-  // Dimensions calculation
-  // -----------------------------
+  const downloadToken = objectMeta.metadata?.firebaseStorageDownloadTokens ?? '';
+
+  const firebaseDownloadUrl = createPersistentDownloadUrl(
+    objectMeta.bucket, 
+    filepath, downloadToken,
+  );
+
+  const dimensions: ISizeCalculationResult = await getDimensionsFromStorage(
+    objectMeta, 
+    filename, 
+    filepath,
+  );
+
+  const directoryPath: string = `users/${userId}/profile/picture/`
+  await cleanProfilePictureDir(directoryPath, filepath)
+
+  return await adminApp.firestore()
+    .collection('users')
+    .doc(userId)
+    .update({
+      profilePicture: {
+        dimensions: {
+          height: dimensions.height ?? 0,
+          width: dimensions.width ?? 0,
+        },
+        extension,
+        path: {
+          edited: '',
+          original: filepath,
+        },
+        size: parseFloat(objectMeta.size),
+        type: dimensions.type ?? '',
+        updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
+        url: {
+          edited: '',
+          original: firebaseDownloadUrl,
+          storage: storageUrl,
+        },
+      },
+    });
+}
+
+/**
+ * Clean profile picture directory (from Cloud Storage).
+ * @param directoryPath Directory to clean.
+ * @param filePathToKeep File's path to NOT delete.
+ */
+async function cleanProfilePictureDir(directoryPath: string, filePathToKeep: string) {
+  const dir = await adminApp.storage()
+  .bucket()
+  .getFiles({
+    directory: directoryPath,
+  });
+
+  const files = dir[0];
+
+  for await (const file of files) {
+    if (file.name !== filePathToKeep) {
+      await file.delete();
+    }
+  }
+}
+
+/**
+ * Calculate image dimensions.
+ * @param objectMeta Storage object uploaded.
+ * @param filename File's name.
+ * @param filepath File's path.
+ * @returns Return image dimensions.
+ */
+async function getDimensionsFromStorage(
+  objectMeta: functions.storage.ObjectMetadata,
+  filename: string,
+  filepath: string,
+) {
   const bucket = gcs.bucket(objectMeta.bucket);
 
   const workingDir = join(tmpdir(), 'thumbs');
@@ -1402,31 +1487,6 @@ async function setUserProfilePicture(objectMeta: functions.storage.ObjectMetadat
   // 5. Clean up the tmp/thumbs from file system.
   await fs.emptyDir(workingDir)
   await fs.remove(workingDir);
-  // -----------------------------
-  // ---> End dimensions calculation
 
-  return await adminApp.firestore()
-    .collection('users')
-    .doc(userId)
-    .update({
-      profilePicture: {
-        dimensions: {
-          height: dimensions.height ?? 0,
-          width: dimensions.width ?? 0,
-        },
-        extension,
-        path: {
-          edited: '',
-          original: filepath,
-        },
-        size: parseFloat(objectMeta.size),
-        type: dimensions.type ?? '',
-        updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
-        url: {
-          edited: '',
-          original: imageFile.publicUrl(),
-          storage: storageUrl,
-        },
-      },
-    });
+  return dimensions;
 }
