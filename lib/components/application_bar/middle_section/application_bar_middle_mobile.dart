@@ -2,7 +2,7 @@ import 'package:artbooking/components/application_bar/application_bar_search_but
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/locations/settings_location.dart';
-import 'package:artbooking/types/button_data.dart';
+import 'package:artbooking/types/app_bar_button_data.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';
@@ -50,17 +50,17 @@ class ApplicationBarMiddleMobile extends ConsumerWidget {
   }
 
   /// Return buttons' data.
-  List<ButtonData> getData() {
+  List<AppBarButtonData> getData() {
     return [
-      ButtonData(
+      AppBarButtonData(
         textValue: "illustrations".tr().toUpperCase(),
         routePath: '/illustrations',
       ),
-      ButtonData(
+      AppBarButtonData(
         textValue: "books".tr().toUpperCase(),
         routePath: '/books',
       ),
-      ButtonData(
+      AppBarButtonData(
         textValue: "contests".tr().toUpperCase(),
         routePath: '/contests',
       ),

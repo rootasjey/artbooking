@@ -220,12 +220,12 @@ class UserFirestore {
   /// a default picture if the user hasn't set one.
   String getProfilePicture() {
     final edited = profilePicture.url.edited;
-    final original = profilePicture.url.original;
 
     if (edited.isNotEmpty) {
       return edited;
     }
 
+    final original = profilePicture.url.original;
     return original;
   }
 }

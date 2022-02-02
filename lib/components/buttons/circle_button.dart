@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 
 /// An alternative to IconButton.
 class CircleButton extends StatelessWidget {
+  CircleButton({
+    this.onTap,
+    required this.icon,
+    this.radius = 20.0,
+    this.elevation = 0.0,
+    this.backgroundColor = Colors.black12,
+    this.tooltip,
+  });
+
   /// Tap callback.
   final VoidCallback? onTap;
 
@@ -18,15 +27,6 @@ class CircleButton extends StatelessWidget {
 
   final double elevation;
 
-  CircleButton({
-    this.onTap,
-    required this.icon,
-    this.radius = 20.0,
-    this.elevation = 0.0,
-    this.backgroundColor = Colors.black12,
-    this.tooltip = "Close",
-  });
-
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -35,7 +35,7 @@ class CircleButton extends StatelessWidget {
       color: Colors.transparent,
       elevation: elevation,
       child: Tooltip(
-        message: tooltip!,
+        message: tooltip,
         child: Ink(
           child: InkWell(
             onTap: onTap,

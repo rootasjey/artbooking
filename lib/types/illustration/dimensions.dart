@@ -1,5 +1,5 @@
 class Dimensions {
-  Dimensions({
+  const Dimensions({
     this.height = 0,
     this.width = 0,
   });
@@ -17,13 +17,19 @@ class Dimensions {
     );
   }
 
-  factory Dimensions.fromJSON(Map<String, dynamic> data) {
+  factory Dimensions.fromJSON(Map<String, dynamic>? data) {
+    if (data == null) {
+      return Dimensions.empty();
+    }
+
     return Dimensions(
       height: data['height'] ?? 0,
       width: data['width'] ?? 0,
     );
   }
 
+  /// Return a width based on the passed height
+  /// and depending on this image's width.
   double getRelativeWidth(double fromHeight) {
     final double factor = fromHeight / height;
     return (width * factor).truncateToDouble();

@@ -1,20 +1,21 @@
+import 'dart:typed_data';
+
+import 'package:animations/animations.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
-import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
+import 'package:artbooking/screens/edit_image/edit_image_page.dart';
 import 'package:artbooking/screens/settings/settings_page_empty.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/settings/settings_page_body.dart';
 import 'package:artbooking/screens/settings/settings_page_header.dart';
-import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:artbooking/types/user/user_urls.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:file_picker_cross/file_picker_cross.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +67,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 SettingsPageBody(
                   userFirestore: userFirestore,
                   onEditLocation: onEditLocation,
-                  onEditPicture: onEditPicture,
+                  onEditPicture: onGoToEditProfilePicture,
                   onEditSummary: onEditSummary,
                   onGoToDeleteAccount: onGoToDeleteAccount,
                   onGoToUpdateEmail: onGoToUpdateEmail,
@@ -117,7 +118,77 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
   }
 
-  void onEditPicture() {}
+  void onGoToEditProfilePicture() {
+    final firestoreUser = ref.read(AppState.userProvider).firestoreUser;
+    if (firestoreUser == null) {
+      throw Exception("user_not_connected".tr());
+    }
+
+    Navigator.of(context).push(
+      PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) {
+        return EditImagePage(
+          onSave: onSaveEditedProfilePicture,
+          dimensions: firestoreUser.profilePicture.dimensions,
+          imageToEdit: ExtendedNetworkImageProvider(
+            firestoreUser.profilePicture.url.original,
+            cache: true,
+            cacheRawData: true,
+            cacheMaxAge: const Duration(seconds: 3),
+          ),
+        );
+      }, transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeScaleTransition(
+          animation: animation,
+          child: child,
+        );
+      }),
+    );
+  }
+
+  void onSaveEditedProfilePicture(Uint8List? editedImageData) async {
+    if (editedImageData == null) {
+      return;
+    }
+
+    setState(() => _isUpdating = true);
+
+    final firestoreUser = ref.read(AppState.userProvider).firestoreUser;
+    if (firestoreUser == null) {
+      throw Exception("user_not_connected".tr());
+    }
+
+    final String extension =
+        firestoreUser.profilePicture.extension.replaceFirst(".", "");
+    final String uid = firestoreUser.uid;
+
+    try {
+      final String imagePath =
+          "users/${uid}/profile/picture/original.$extension";
+      // final imagePath = "users/${authUser.uid}/profile/picture/original$extension";
+
+      final metadata = SettableMetadata(
+        contentType: mimeFromExtension(extension),
+        customMetadata: {
+          'extension': extension,
+          'userId': uid,
+          'target': 'profilePicture',
+        },
+      );
+
+      final UploadTask task = FirebaseStorage.instance.ref(imagePath).putData(
+            editedImageData,
+            metadata,
+          );
+
+      await task;
+    } catch (error) {
+      Utilities.logger.e(error);
+    } finally {
+      setState(() {
+        _isUpdating = false;
+      });
+    }
+  }
 
   void onEditSummary() {
     final _summaryController = TextEditingController();
@@ -171,25 +242,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
   }
 
-  void onTapProfilePicture() {
-    final UserFirestore? userFirestore =
-        ref.read(AppState.userProvider).firestoreUser;
-
-    if (userFirestore == null ||
-        userFirestore.profilePicture.url.edited.isEmpty) {
-      return;
-    }
-
-    NavigationStateHelper.imageToEdit = ExtendedNetworkImageProvider(
-      userFirestore.profilePicture.url.original,
-      cache: true,
-      cacheRawData: true,
-    );
-
-    Beamer.of(context).beamToNamed(
-      DashboardLocationContent.editProfilePictureRoute,
-    );
-  }
+  void onTapProfilePicture() {}
 
   void onUploadProfilePicture() async {
     try {
@@ -222,18 +275,20 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         return;
       }
 
-      final ext = fileName.substring(fileName.lastIndexOf('.'));
+      final extension =
+          fileName.substring(fileName.lastIndexOf('.')).replaceFirst('.', '');
 
       final metadata = SettableMetadata(
         contentType: mime(fileName),
         customMetadata: {
-          'extension': ext,
+          'extension': extension,
           'userId': authUser.uid,
           'target': 'profilePicture',
         },
       );
 
-      final imagePath = "users/${authUser.uid}/profile/picture/original$ext";
+      final imagePath =
+          "users/${authUser.uid}/profile/picture/original.$extension";
 
       final task = FirebaseStorage.instance
           .ref(imagePath)
@@ -311,24 +366,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       setState(() {
         _isUpdating = false;
       });
-    }
-  }
-
-  void updateUser() async {
-    setState(() => _isUpdating = true);
-
-    try {
-      final String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-
-      await Utilities.cloud.fun('users-updateUser').call({
-        'userId': uid,
-        'updatePayload': ref.read(AppState.userProvider).firestoreUser?.toMap(),
-      });
-
-      setState(() => _isUpdating = false);
-    } catch (error) {
-      setState(() => _isUpdating = false);
-      Utilities.logger.e(error);
     }
   }
 }

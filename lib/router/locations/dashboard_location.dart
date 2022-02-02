@@ -4,7 +4,6 @@ import 'package:artbooking/screens/dashboard/dashboard_page_welcome.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page.dart';
 import 'package:artbooking/screens/dashboard/profile/profile_page.dart';
 import 'package:artbooking/screens/settings/settings_page_delete_account.dart';
-import 'package:artbooking/screens/illustrations/edit/edit_illustration_page_image.dart';
 import 'package:artbooking/screens/illustrations/illustration_page.dart';
 import 'package:artbooking/screens/licenses/one/license_page.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page.dart';
@@ -86,9 +85,6 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
   /// Profile route value for this location.
   static const String profileRoute = '$route/profile';
 
-  /// Profile route value for this location.
-  static const String editProfilePictureRoute = '$route/profile/edit/pp';
-
   /// Settings route value for this location.
   static const String settingsRoute = '$route/settings';
 
@@ -124,7 +120,6 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
         updateEmailRoute,
         updatePasswordRoute,
         updateUsernameRoute,
-        editProfilePictureRoute,
         licensesRoute,
         licenseRoute,
       ];
@@ -217,15 +212,8 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
           child: ProfilePage(
             userId: state.pathParameters["userId"] ?? '',
           ),
-          key: ValueKey('$editProfilePictureRoute'),
+          key: ValueKey('$profileRoute'),
           title: Utilities.getPageTitle("profile_my".tr()),
-          type: BeamPageType.fadeTransition,
-        ),
-      if (isEditPictureProfile(state.pathPatternSegments))
-        BeamPage(
-          child: EditIllustrationPageImage(),
-          key: ValueKey('$editProfilePictureRoute'),
-          title: Utilities.getPageTitle("profile_picture_edit".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains('licenses'))
@@ -280,12 +268,5 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
   bool isUpdateUsername(List<String> pathBlueprintSegments) {
     return pathBlueprintSegments.contains('update') &&
         pathBlueprintSegments.contains('username');
-  }
-
-  /// True if the path match the delete account page.
-  bool isEditPictureProfile(List<String> pathBlueprintSegments) {
-    return pathBlueprintSegments.contains('profile') &&
-        pathBlueprintSegments.contains('edit') &&
-        pathBlueprintSegments.contains('pp');
   }
 }
