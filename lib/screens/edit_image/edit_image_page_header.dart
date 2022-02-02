@@ -44,7 +44,9 @@ class EditImagePageHeader extends StatelessWidget {
                     Opacity(
                       opacity: 0.8,
                       child: Text(
-                        isProcessing ? "Applying changes..." : "edit".tr(),
+                        isProcessing
+                            ? "${'changes_applying'.tr()}..."
+                            : "edit".tr(),
                         style: Utilities.fonts.style(
                           fontSize: 24.0,
                           fontWeight: FontWeight.w700,

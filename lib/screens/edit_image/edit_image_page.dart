@@ -63,7 +63,7 @@ class _EditImagePageState extends ConsumerState<EditImagePage> {
         },
       ),
       ButtonData(
-        textValue: "flip_v".tr(),
+        textValue: "flip_h".tr(),
         icon: Icon(UniconsLine.flip_v),
         onTap: () {
           _editorKey.currentState?.flip();
