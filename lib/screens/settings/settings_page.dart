@@ -36,6 +36,7 @@ class SettingsPage extends ConsumerStatefulWidget {
 
 class _SettingsPageState extends ConsumerState<SettingsPage> {
   bool _isUpdating = false;
+  final String heroTag = "profilePicture";
   final _pageScrollController = ScrollController();
 
   @override
@@ -65,6 +66,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 ApplicationBar(),
                 SettingsPageHeader(),
                 SettingsPageBody(
+                  profilePictureHeroTag: heroTag,
                   userFirestore: userFirestore,
                   onEditLocation: onEditLocation,
                   onEditPicture: onGoToEditProfilePicture,
@@ -127,6 +129,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     Navigator.of(context).push(
       PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) {
         return EditImagePage(
+          heroTag: heroTag,
           onSave: onSaveEditedProfilePicture,
           dimensions: firestoreUser.profilePicture.dimensions,
           imageToEdit: ExtendedNetworkImageProvider(
@@ -171,7 +174,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         customMetadata: {
           'extension': extension,
           'userId': uid,
-          'target': 'profilePicture',
+          'target': heroTag,
         },
       );
 

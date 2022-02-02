@@ -17,6 +17,7 @@ class SettingsPageBody extends StatelessWidget {
     this.onEditLocation,
     this.onEditSummary,
     this.onUrlChanged,
+    this.profilePictureHeroTag = '',
   }) : super(key: key);
 
   final UserFirestore userFirestore;
@@ -30,6 +31,7 @@ class SettingsPageBody extends StatelessWidget {
   final void Function()? onEditLocation;
   final void Function()? onEditSummary;
   final void Function(UserUrls)? onUrlChanged;
+  final String profilePictureHeroTag;
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +45,7 @@ class SettingsPageBody extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SettingsPageBodyLeft(
+              profilePictureHeroTag: profilePictureHeroTag,
               profilePictureUrl: userFirestore.getProfilePicture(),
               onEditPicture: onEditPicture,
               onUploadPicture: onUploadPicture,

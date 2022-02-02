@@ -14,6 +14,7 @@ class SettingsPageBodyLeft extends StatelessWidget {
     this.onUploadPicture,
     required this.urls,
     this.onUrlChanged,
+    this.profilePictureHeroTag = '',
   }) : super(key: key);
 
   final void Function()? onEditPicture;
@@ -21,6 +22,7 @@ class SettingsPageBodyLeft extends StatelessWidget {
   final void Function(UserUrls)? onUrlChanged;
   final String profilePictureUrl;
   final UserUrls urls;
+  final String profilePictureHeroTag;
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +35,12 @@ class SettingsPageBodyLeft extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 24.0),
-            child: BetterAvatar(
-              image: NetworkImage(
-                profilePictureUrl,
+            child: Hero(
+              tag: profilePictureHeroTag,
+              child: BetterAvatar(
+                image: NetworkImage(
+                  profilePictureUrl,
+                ),
               ),
             ),
           ),

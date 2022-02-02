@@ -19,8 +19,8 @@ class EditImagePage extends ConsumerStatefulWidget {
     required this.imageToEdit,
     this.onSave,
     this.useNativeLib = false,
-    // required this.width,
     required this.dimensions,
+    this.heroTag = '',
   }) : super(key: key);
 
   /// Image object. Should be defined is navigating from another page.
@@ -28,8 +28,8 @@ class EditImagePage extends ConsumerStatefulWidget {
   final ImageProvider<Object> imageToEdit;
   final void Function(Uint8List?)? onSave;
   final bool useNativeLib;
-  // final int width;
   final Dimensions dimensions;
+  final Object heroTag;
 
   @override
   _EditImagePageState createState() => _EditImagePageState();
@@ -112,20 +112,23 @@ class _EditImagePageState extends ConsumerState<EditImagePage> {
                       EditImagePageHeader(
                         isProcessing: _isProcessing,
                       ),
-                      ExtendedImage(
-                        width: imageWidth,
-                        height: relativeHeight,
-                        image: widget.imageToEdit,
-                        fit: BoxFit.contain,
-                        mode: ExtendedImageMode.editor,
-                        extendedImageEditorKey: _editorKey,
-                        initEditorConfigHandler: (state) {
-                          return EditorConfig(
-                            maxScale: 8.0,
-                            cropRectPadding: const EdgeInsets.all(20.0),
-                            hitTestSize: 20.0,
-                          );
-                        },
+                      Hero(
+                        tag: widget.heroTag,
+                        child: ExtendedImage(
+                          width: imageWidth,
+                          height: relativeHeight,
+                          image: widget.imageToEdit,
+                          fit: BoxFit.contain,
+                          mode: ExtendedImageMode.editor,
+                          extendedImageEditorKey: _editorKey,
+                          initEditorConfigHandler: (state) {
+                            return EditorConfig(
+                              maxScale: 8.0,
+                              cropRectPadding: const EdgeInsets.all(20.0),
+                              hitTestSize: 20.0,
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),
