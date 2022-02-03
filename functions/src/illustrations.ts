@@ -244,6 +244,7 @@ export const createOne = functions
         user: {
           id: userAuth.token.uid,
         },
+        version: 0,
         visibility: visibility,
       });
 
@@ -515,6 +516,16 @@ export const onStorageUpload = functions
 
     const { height, width } = dimensions;
 
+    const downloadToken = objectMeta.metadata?.firebaseStorageDownloadTokens ?? '';
+    const firebaseDownloadUrl = createPersistentDownloadUrl(
+      objectMeta.bucket,
+      filepath, downloadToken,
+    );
+
+    let version: number = illustrationData.version ?? 0;
+    if (typeof version !== 'number') { version = 0 }
+    version += 1;
+
     // Save new properties to Firestore.
     await illustrationDoc.ref
       .update({
@@ -526,11 +537,19 @@ export const onStorageUpload = functions
         hasPendingCreates: false,
         size: parseFloat(objectMeta.size),
         urls: {
-          original: imageFile.publicUrl(),
+          original: firebaseDownloadUrl,
           storage: storageUrl,
           thumbnails,
         },
+        version,
       });
+
+    // Skip update used storage if we're updating the image file
+    // (crop, rotate, flip).
+    if (version > 1) {
+      return true;
+    }
+    
 
     // Update used storage.
     const userDoc = await firestore
