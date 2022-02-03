@@ -5,6 +5,13 @@ const env = functions.config();
 
 export const allowedLicenseTypes = ["staff", "user"];
 
+export const BOOKS_COLLECTION_NAME = 'books'
+export const ILLUSTRATIONS_COLLECTION_NAME = 'illustrations'
+export const LICENSES_COLLECTION_NAME = 'licenses'
+export const STATISTICS_COLLECTION_NAME = 'statistics'
+export const STORAGES_DOCUMENT_NAME = 'storages'
+export const USERS_COLLECTION_NAME = 'users'
+
 export const cloudRegions = {
   eu: 'europe-west3'
 };

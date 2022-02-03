@@ -8,7 +8,7 @@ import { join, dirname } from 'path';
 import * as sharp from 'sharp';
 
 import { adminApp } from './adminApp';
-import { allowedLicenseTypes, cloudRegions } from './utils';
+import { allowedLicenseTypes, cloudRegions, ILLUSTRATIONS_COLLECTION_NAME, STATISTICS_COLLECTION_NAME, STORAGES_DOCUMENT_NAME, USERS_COLLECTION_NAME } from './utils';
 
 import https = require('https');
 import { ISizeCalculationResult } from 'image-size/dist/types/interface';
@@ -52,7 +52,7 @@ export const checkProperties = functions
     }
 
     const illustrationSnap = await firestore
-      .collection('illustrations')
+      .collection(ILLUSTRATIONS_COLLECTION_NAME)
       .doc(illustrationId)
       .get();
 
@@ -189,7 +189,7 @@ export const createOne = functions
     checkVisibilityValue(visibility);
 
     const illustrationSnap = await firestore
-      .collection('illustrations')
+      .collection(ILLUSTRATIONS_COLLECTION_NAME)
       .add({
         author,
         createdAt: adminApp.firestore.Timestamp.now(),
@@ -282,7 +282,7 @@ export const deleteOne = functions
     }
 
     const illustrationSnap = await firestore
-      .collection('illustrations')
+      .collection(ILLUSTRATIONS_COLLECTION_NAME)
       .doc(illustrationId)
       .get();
 
@@ -358,7 +358,7 @@ export const deleteMany = functions
     for await (const illustrationId of illustrationIds) {
       try {
         const illustrationSnap = await firestore
-          .collection('illustrations')
+          .collection(ILLUSTRATIONS_COLLECTION_NAME)
           .doc(illustrationId)
           .get();
 
@@ -475,7 +475,7 @@ export const onStorageUpload = functions
 
     // Check if same user as firestore illustration
     const illustrationDoc = await firestore
-      .collection('illustrations')
+      .collection(ILLUSTRATIONS_COLLECTION_NAME)
       .doc(firestoreId)
       .get();
 
@@ -552,25 +552,27 @@ export const onStorageUpload = functions
       return true;
     }
     
-
-    // Update used storage.
-    const userDoc = await firestore
-      .collection('users')
+    // Update user's storage.
+    const statsQuery = firestore
+      .collection(USERS_COLLECTION_NAME)
       .doc(userId)
-      .get();
+      .collection(STATISTICS_COLLECTION_NAME)
+      .doc(STORAGES_DOCUMENT_NAME)
 
-    const userData = userDoc.data();
-    if (!userData) { return false; }
+    const statsSnapshot = await statsQuery.get()
 
-    let storageIllustrationsUsed: number = userData.stats.storage.illustrations.used;
-    storageIllustrationsUsed += parseFloat(objectMeta.size);
+    const statisticsData = statsSnapshot.data()
+    if (!statisticsData) { return }
 
-    return await userDoc
-      .ref
-      .update({
-        'stats.storage.illustrations.used': storageIllustrationsUsed,
+    let used: number = statisticsData.illustrations.used ?? 0
+    used = parseFloat(objectMeta.size)
+
+    return await statsQuery.update({
+      illustrations: {
+        used,
         updatedAt: adminApp.firestore.Timestamp.now(),
-      });
+      },
+    })
   });
 
 /**
@@ -600,7 +602,7 @@ export const setUserAuthor = functions
     }
 
     const illustrationSnap = await firestore
-      .collection('illustrations')
+      .collection(ILLUSTRATIONS_COLLECTION_NAME)
       .doc(illustrationId)
       .get();
 
@@ -653,7 +655,7 @@ export const unsetLicense = functions
     const { illustrationId } = data;
 
     const illusSnap = await firestore
-      .collection('illustrations')
+      .collection(ILLUSTRATIONS_COLLECTION_NAME)
       .doc(illustrationId)
       .get();
 
@@ -716,7 +718,7 @@ export const unsetUserAuthor = functions
     }
 
     const illustrationSnap = await firestore
-      .collection('illustrations')
+      .collection(ILLUSTRATIONS_COLLECTION_NAME)
       .doc(illustrationId)
       .get();
 
@@ -770,7 +772,7 @@ export const updateLicense = functions
     checkIllustrationLicenseFormat(license);
 
     const illusSnap = await firestore
-      .collection('illustrations')
+      .collection(ILLUSTRATIONS_COLLECTION_NAME)
       .doc(illustrationId)
       .get();
 
@@ -832,7 +834,7 @@ export const updatePresentation = functions
     } = data;
 
     const illustrationSnap = await firestore
-      .collection('illustrations')
+      .collection(ILLUSTRATIONS_COLLECTION_NAME)
       .doc(illustrationId)
       .get();
 
@@ -911,7 +913,7 @@ export const updateStyles = functions
 
 
     const illustrationSnap = await firestore
-      .collection('illustrations')
+      .collection(ILLUSTRATIONS_COLLECTION_NAME)
       .doc(illustrationId)
       .get();
 
@@ -994,7 +996,7 @@ export const updateTopics = functions
     }
     
     const illustrationSnap = await firestore
-      .collection('illustrations')
+      .collection(ILLUSTRATIONS_COLLECTION_NAME)
       .doc(illustrationId)
       .get();
 
@@ -1071,7 +1073,7 @@ export const updateVisibility = functions
     checkVisibilityValue(visibility);
 
     const illustrationSnap = await firestore
-      .collection('illustrations')
+      .collection(ILLUSTRATIONS_COLLECTION_NAME)
       .doc(illustrationId)
       .get();
 
@@ -1449,7 +1451,7 @@ async function setUserProfilePicture(objectMeta: functions.storage.ObjectMetadat
   await cleanProfilePictureDir(directoryPath, filepath)
 
   return await adminApp.firestore()
-    .collection('users')
+    .collection(USERS_COLLECTION_NAME)
     .doc(userId)
     .update({
       profilePicture: {

@@ -3,7 +3,7 @@ import * as functions from 'firebase-functions';
 import * as fs from 'fs-extra';
 
 import { adminApp } from './adminApp';
-import { allowedLicenseTypes as allowedLicenseTypes, cloudRegions } from './utils';
+import { allowedLicenseTypes as allowedLicenseTypes, cloudRegions, LICENSES_COLLECTION_NAME, USERS_COLLECTION_NAME } from './utils';
 
 const firestore = adminApp.firestore();
 
@@ -209,7 +209,7 @@ export const updateOne = functions
  */
 async function createStaffLicense(formatedLicense: License) {
   return await firestore
-    .collection('licenses')
+    .collection(LICENSES_COLLECTION_NAME)
     .add(formatedLicense);
 }
 
@@ -221,9 +221,9 @@ async function createStaffLicense(formatedLicense: License) {
  */
 async function createUserLicense(formatedLicense: License, userId: string) {
   return await firestore
-    .collection('users')
+    .collection(USERS_COLLECTION_NAME)
     .doc(userId)
-    .collection('licenses')
+    .collection(LICENSES_COLLECTION_NAME)
     .add(formatedLicense);
 }
 
@@ -235,7 +235,7 @@ async function createUserLicense(formatedLicense: License, userId: string) {
  */
 async function updateStaffLicense(formatedLicense: License) {
   const doc = firestore
-  .collection('licenses')
+  .collection(LICENSES_COLLECTION_NAME)
   .doc(formatedLicense.id);
 
   const snapshot = await doc.get();
@@ -260,9 +260,9 @@ async function updateStaffLicense(formatedLicense: License) {
  */
 async function updateUserLicense(formatedLicense: License, userId: string) {
   const doc = firestore
-  .collection('users')
+  .collection(USERS_COLLECTION_NAME)
     .doc(userId)
-    .collection('licenses')
+    .collection(LICENSES_COLLECTION_NAME)
     .doc(formatedLicense.id)
 
   const snapshot = await doc.get();
@@ -284,7 +284,7 @@ async function updateUserLicense(formatedLicense: License, userId: string) {
  */
 async function canManageLicense(userId: string) {
   const userSnap = await firestore
-    .collection('users')
+    .collection(USERS_COLLECTION_NAME)
     .doc(userId)
     .get();
 
@@ -318,7 +318,7 @@ async function canManageLicense(userId: string) {
 async function deleteStaffLicense(licenseId: string, userId: string) {
   await canManageLicense(userId);
   await firestore
-    .collection('licenses')
+    .collection(LICENSES_COLLECTION_NAME)
     .doc(licenseId)
     .delete();
 }
@@ -330,9 +330,9 @@ async function deleteStaffLicense(licenseId: string, userId: string) {
  */
 async function deleteUserLicense(licenseId: string, userId: string) {
   await firestore
-    .collection('users')
+    .collection(USERS_COLLECTION_NAME)
     .doc(userId)
-    .collection('licenses')
+    .collection(LICENSES_COLLECTION_NAME)
     .doc(licenseId)
     .delete();
 }

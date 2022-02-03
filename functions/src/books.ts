@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import { adminApp } from './adminApp';
-import { checkOrGetDefaultVisibility, cloudRegions } from './utils';
+import { BOOKS_COLLECTION_NAME, checkOrGetDefaultVisibility, cloudRegions } from './utils';
 
 const firebaseTools = require('firebase-tools');
 const firestore = adminApp.firestore();
@@ -42,7 +42,7 @@ export const addIllustrations = functions
     const minimalIllustrations = await createBookIllustrations(illustrationIds);
 
     const bookSnap = await firestore
-      .collection('books')
+      .collection(BOOKS_COLLECTION_NAME)
       .doc(bookId)
       .get();
 
@@ -128,7 +128,7 @@ export const createOne = functions
     const autoCover = await getAutoCover(bookIllustrations);
 
     const addedBook = await firestore
-      .collection('books')
+      .collection(BOOKS_COLLECTION_NAME)
       .add({
         createdAt: adminApp.firestore.FieldValue.serverTimestamp(),
         count: 0,
@@ -192,7 +192,7 @@ export const deleteOne = functions
     }
 
     const bookSnap = await firestore
-      .collection('books')
+      .collection(BOOKS_COLLECTION_NAME)
       .doc(bookId)
       .get();
 
@@ -250,7 +250,7 @@ export const deleteMany = functions
     for await (const bookId of bookIds) {
       try { // Some deletion may fail.
         const bookSnap = await firestore
-          .collection('books')
+          .collection(BOOKS_COLLECTION_NAME)
           .doc(bookId)
           .get();
 
@@ -375,7 +375,7 @@ export const removeDeletedIllustrations = functions
     }
 
     const bookSnap = await firestore
-      .collection('books')
+      .collection(BOOKS_COLLECTION_NAME)
       .doc(bookId)
       .get();
 
@@ -463,7 +463,7 @@ export const removeIllustrations = functions
     }
 
     const bookSnap = await firestore
-      .collection('books')
+      .collection(BOOKS_COLLECTION_NAME)
       .doc(bookId)
       .get();
       
@@ -535,7 +535,7 @@ export const renameOne = functions
     } = params;
 
     const bookSnap = await firestore
-      .collection('books')
+      .collection(BOOKS_COLLECTION_NAME)
       .doc(bookId)
       .get();
 
@@ -602,7 +602,7 @@ export const setCover = functions
     }
 
     const bookSnap = await firestore
-      .collection('books')
+      .collection(BOOKS_COLLECTION_NAME)
       .doc(bookId)
       .get();
 
@@ -675,7 +675,7 @@ export const updateMetadata = functions
     } = params;
 
     const bookSnap = await firestore
-      .collection('books')
+      .collection(BOOKS_COLLECTION_NAME)
       .doc(bookId)
       .get();
 
@@ -755,7 +755,7 @@ export const updateIllustrationPosition = functions
     }
 
     const bookSnap = await firestore
-      .collection('books')
+      .collection(BOOKS_COLLECTION_NAME)
       .doc(bookId)
       .get();
       

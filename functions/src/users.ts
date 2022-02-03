@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 
 import { adminApp } from './adminApp';
-import { checkUserIsSignedIn, cloudRegions, randomIntFromInterval } from './utils';
+import { checkUserIsSignedIn, cloudRegions, ILLUSTRATIONS_COLLECTION_NAME, randomIntFromInterval, STATISTICS_COLLECTION_NAME, STORAGES_DOCUMENT_NAME, USERS_COLLECTION_NAME } from './utils';
 
 const firebaseTools = require('firebase-tools');
 const firestore = adminApp.firestore();
@@ -15,45 +15,85 @@ export const updateUserLists = functions
   .https
   .onRequest(async ({}, res) => {
     // The app has very few users right now (less than 20).
-    const userSnapshot = firestore
-      .collection('users')
-      .limit(100)
-      .get();
+    // const userSnapshot = await firestore
+    //   .collection(USERS_COLLECTION_NAME)
+    //   .limit(100)
+    //   .get();
 
-    // For each user
-    (await userSnapshot).docs.forEach(async (userDoc) => {
-      // Get all lists
-      const listsSnapshot = await firestore
-        .collection(`users/${userDoc.id}/lists`)
-        .get();
+    // for await (const user of userSnapshot.docs) {
+    //   await createUserStatisticsCollection(user.id);
+    //   const data = user.data()
+    //   const stats = data.stats
 
-      // For each list
-      for await (const listDoc of listsSnapshot.docs) {
-        // Get all quotes
-        const quotesSnap = await firestore
-          .collection(`users/${userDoc.id}/lists/${listDoc.id}/quotes`)
-          .get();
+    //   const statsCollection = adminApp.firestore()
+    //     .collection(USERS_COLLECTION_NAME)
+    //     .doc(user.id)
+    //     .collection(STATISTICS_COLLECTION_NAME);
 
-        // For each quote
-        for await (const quoteDoc of quotesSnap.docs) {
-          const quoteData = quoteDoc.data();
+    //   const { books, illustrations, storage } = stats
 
-          // Check if the quote has the `quoteId` prop.
-          // If this prop. exists, it uses the old data model 
-          // so it must be updated.
-          if (quoteData.quoteId) {
-            // Add a new quote doc with the right id and the same data.
-            await firestore
-              .collection(`users/${userDoc.id}/lists/${listDoc.id}/quotes`)
-              .doc(quoteDoc.id)
-              .set(quoteDoc.data());
+    //   await statsCollection
+    //   .doc('books')
+    //   .update({
+    //     created: books.created,
+    //     deleted: books.deleted,
+    //     liked: 0,
+    //     owned: books.owned,
+    //     updatedAt: adminApp.firestore.Timestamp.now(),
+    //   })
 
-            // Delete the old quote doc.
-            await quoteDoc.ref.delete();
-          }
-        }
-      }
-    });
+    //   await statsCollection
+    //   .doc(ILLUSTRATIONS_COLLECTION_NAME)
+    //   .update({
+    //     created: illustrations.created,
+    //     deleted: illustrations.deleted,
+    //     liked: 0,
+    //     owned: illustrations.owned,
+    //     updated: illustrations.updated,
+    //     updatedAt: adminApp.firestore.Timestamp.now(),
+    //   })
+
+    //   await statsCollection
+    //   .doc(STORAGES_DOCUMENT_NAME)
+    //   .update({ // all number values are in bytes
+    //     illustrations: {
+    //       total: storage.illustrations.total,
+    //       used: storage.illustrations.used,
+    //       updatedAt: adminApp.firestore.Timestamp.now(),
+    //     },
+    //     videos: {
+    //       total: 0,
+    //       used: 0,
+    //       updatedAt: adminApp.firestore.Timestamp.now(),
+    //     },
+    //   })
+    // }
+
+    // const appBookStats = await firestore
+    //   .collection('stats')
+    //   .doc('books')
+    //   .get();
+
+    // const appBookData = appBookStats.data();
+    // if (appBookData) {
+    //   await firestore
+    //     .collection(STATISTICS_COLLECTION_NAME)
+    //     .doc('books')
+    //     .create(appBookData)
+    // }
+
+    // const appIllustrationStats = await firestore
+    //   .collection('stats')
+    //   .doc(ILLUSTRATIONS_COLLECTION_NAME)
+    //   .get();
+
+    // const appIllustrationData = appIllustrationStats.data();
+    // if (appIllustrationData) {
+    //   await firestore
+    //     .collection(STATISTICS_COLLECTION_NAME)
+    //     .doc(ILLUSTRATIONS_COLLECTION_NAME)
+    //     .create(appIllustrationData)
+    // }
 
     res.status(200).send('done');
   });
@@ -111,7 +151,7 @@ export const checkUsernameAvailability = functions
     }
 
     const nameSnap = await firestore
-      .collection('users')
+      .collection(USERS_COLLECTION_NAME)
       .where('nameLowerCase', '==', name.toLowerCase())
       .limit(1)
       .get();
@@ -150,7 +190,7 @@ export const createAccount = functions
       });
 
     await adminApp.firestore()
-      .collection('users')
+      .collection(USERS_COLLECTION_NAME)
       .doc(userRecord.uid)
       .set({
         createdAt: adminApp.firestore.Timestamp.now(),
@@ -174,70 +214,10 @@ export const createAccount = functions
         },
         rights: {
           'user:managedata': false,
-        },
-        settings: {
-          notifications: {
-            email: {
-              tempQuotes: true,
-              quotidians: false,
-            },
-            push: {
-              quotidians: true,
-              tempQuotes: true,
-            }
-          },
-        },
-        stats: {
-          books: {
-            created: 0,
-            deleted: 0,
-            fav: 0,
-            owned: 0,
-          },
-          challenges: {
-            created: 0,
-            deleted: 0,
-            entered: 0,
-            owned: 0,
-            participating: 0,
-            won: 0,
-          },
-          contests: {
-            created: 0,
-            deleted: 0,
-            entered: 0,
-            owned: 0,
-            participating: 0,
-            won: 0,
-          },
-          galleries: {
-            created: 0,
-            deleted: 0,
-            entered: 0,
-            opened: 0,
-            owned: 0,
-          },
-          illustrations: {
-            created: 0,
-            deleted: 0,
-            fav: 0,
-            owned: 0,
-            updated: 0,
-          },
-          notifications: {
-            total: 0,
-            unread: 0,
-          },
-          storage: { // all number values are in bytes
-            illustrations: {
-              total: 0,
-              used: 0,
-            },
-            videos: {
-              total: 0,
-              used: 0,
-            },
-          },
+          'user:managelicenses': false,
+          'user:manageartstyles': false,
+          'user:managesections': false,
+          'user:manageusers': false,
         },
         updatedAt: adminApp.firestore.Timestamp.now(),
         urls: {
@@ -260,6 +240,8 @@ export const createAccount = functions
         },
         uid: userRecord.uid,
       });
+
+    await createUserStatisticsCollection(userRecord.uid)
 
     return {
       user: {
@@ -289,7 +271,7 @@ export const deleteAccount = functions
     await checkUserIsSignedIn(context, idToken);
 
     const userSnap = await firestore
-      .collection('users')
+      .collection(USERS_COLLECTION_NAME)
       .doc(userAuth.uid)
       .get();
 
@@ -339,7 +321,7 @@ export const fetchUser = functions
     }
 
     const userSnap = await firestore
-      .collection('users')
+      .collection(USERS_COLLECTION_NAME)
       .doc(userId)
       .get();
 
@@ -381,7 +363,7 @@ export const onCreatePublicInfo = functions
     }
 
     return await adminApp.firestore()
-      .collection('users')
+      .collection(USERS_COLLECTION_NAME)
       .doc(userId)
       .collection('public')
       .doc('basic')
@@ -419,7 +401,7 @@ export const onUpdatePublicInfo = functions
     }
 
     return await adminApp.firestore()
-      .collection('users')
+      .collection(USERS_COLLECTION_NAME)
       .doc(userId)
       .collection('public')
       .doc('basic')
@@ -480,7 +462,7 @@ export const updateEmail = functions
       });
 
     await firestore
-      .collection('users')
+      .collection(USERS_COLLECTION_NAME)
       .doc(userAuth.uid)
       .update({
         email: newEmail,
@@ -538,7 +520,7 @@ export const updateUsername = functions
       });
 
     await firestore
-      .collection('users')
+      .collection(USERS_COLLECTION_NAME)
       .doc(userAuth.uid)
       .update({
         name: newUsername,
@@ -580,7 +562,7 @@ export const updatePublicStrings = functions
     }
 
     return await adminApp.firestore()
-      .collection('users')
+      .collection(USERS_COLLECTION_NAME)
       .doc(userAuth.uid)
       .update({
         location,
@@ -625,7 +607,7 @@ export const updateUrls = functions
     }
 
     return await adminApp.firestore()
-      .collection('users')
+      .collection(USERS_COLLECTION_NAME)
       .doc(userAuth.uid)
       .update({
         urls
@@ -656,6 +638,89 @@ function checkCreateAccountData(data: any) {
   }
 
   return true;
+}
+
+/**
+ * Create user's statistics sub-collection.
+ * @param userUid User's id.
+ */
+ async function createUserStatisticsCollection(userUid: string) {
+  const statsCollection = adminApp.firestore()
+  .collection(USERS_COLLECTION_NAME)
+  .doc(userUid)
+  .collection(STATISTICS_COLLECTION_NAME);
+
+  await statsCollection
+    .doc('books')
+    .create({
+      created: 0,
+      deleted: 0,
+      liked: 0,
+      owned: 0,
+    })
+
+  await statsCollection
+    .doc('challenges')
+    .create({
+      created: 0,
+      deleted: 0,
+      entered: 0,
+      owned: 0,
+      participating: 0,
+      won: 0,
+    })
+
+  await statsCollection
+    .doc('contests')
+    .create({
+      created: 0,
+      deleted: 0,
+      entered: 0,
+      owned: 0,
+      participating: 0,
+      won: 0,
+    })
+
+  await statsCollection
+    .doc('galleries')
+    .create({
+      created: 0,
+      deleted: 0,
+      entered: 0,
+      opened: 0,
+      owned: 0,
+    })
+
+  await statsCollection
+    .doc(ILLUSTRATIONS_COLLECTION_NAME)
+    .create({
+      created: 0,
+      deleted: 0,
+      liked: 0,
+      owned: 0,
+      updated: 0,
+    })
+
+  await statsCollection
+    .doc('notifications')
+    .create({
+      total: 0,
+      unread: 0,
+    })
+
+
+  await statsCollection
+  .doc(STORAGES_DOCUMENT_NAME)
+  .create({ // all number values are in bytes
+    illustrations: {
+      total: 0,
+      used: 0,
+    },
+    videos: {
+      total: 0,
+      used: 0,
+    },
+  })
 }
 
 /**
@@ -701,7 +766,7 @@ function getRandomProfilePictureLink(): string {
 
 async function isUserExistsByEmail(email: string) {
   const emailSnapshot = await firestore
-    .collection('users')
+    .collection(USERS_COLLECTION_NAME)
     .where('email', '==', email)
     .limit(1)
     .get();
@@ -728,7 +793,7 @@ async function isUserExistsByEmail(email: string) {
 
 async function isUserExistsByUsername(nameLowerCase: string) {
   const nameSnapshot = await firestore
-    .collection('users')
+    .collection(USERS_COLLECTION_NAME)
     .where('nameLowerCase', '==', nameLowerCase)
     .limit(1)
     .get();
