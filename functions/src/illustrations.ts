@@ -519,7 +519,8 @@ export const onStorageUpload = functions
     const downloadToken = objectMeta.metadata?.firebaseStorageDownloadTokens ?? '';
     const firebaseDownloadUrl = createPersistentDownloadUrl(
       objectMeta.bucket,
-      filepath, downloadToken,
+      filepath, 
+      downloadToken,
     );
 
     let version: number = illustrationData.version ?? 0;
@@ -541,6 +542,7 @@ export const onStorageUpload = functions
           storage: storageUrl,
           thumbnails,
         },
+        updatedAt: adminApp.firestore.Timestamp.now(),
         version,
       });
 
@@ -676,6 +678,7 @@ export const unsetLicense = functions
         type: '',
         id: '',
       },
+      updatedAt: adminApp.firestore.Timestamp.now(),
     });
 
     return {
@@ -735,7 +738,8 @@ export const unsetUserAuthor = functions
     }
 
     await illustrationSnap.ref.update({
-      author: { id: '' }
+      author: { id: '' },
+      updatedAt: adminApp.firestore.Timestamp.now(),
     });
 
     return {
@@ -791,6 +795,7 @@ export const updateLicense = functions
         type: license.type ?? '',
         id: license.id ?? '',
       },
+      updatedAt: adminApp.firestore.Timestamp.now(),
     });
 
     return {
@@ -851,6 +856,7 @@ export const updatePresentation = functions
       description,
       name,
       story,
+      updatedAt: adminApp.firestore.Timestamp.now(),
     });
 
     return {
@@ -931,7 +937,10 @@ export const updateStyles = functions
       stylesMap[style] = true;
     }
 
-    await illustrationSnap.ref.update({ styles: stylesMap });;
+    await illustrationSnap.ref.update({ 
+      styles: stylesMap, 
+      updatedAt: adminApp.firestore.Timestamp.now(),
+    });
 
     return { 
       illustration: {
@@ -1011,7 +1020,10 @@ export const updateTopics = functions
       topicsMap[topic] = true;
     }
 
-    await illustrationSnap.ref.update({ topics: topicsMap });
+    await illustrationSnap.ref.update({ 
+      topics: topicsMap,
+      updatedAt: adminApp.firestore.Timestamp.now(),
+    });
 
     return {
       illustration: {
@@ -1079,7 +1091,10 @@ export const updateVisibility = functions
       );
     }
 
-    await illustrationSnap.ref.update({ visibility });
+    await illustrationSnap.ref.update({ 
+      visibility, 
+      updatedAt: adminApp.firestore.Timestamp.now(),
+    });
 
     return {
       illustration: {
@@ -1304,12 +1319,22 @@ async function generateImageThumbs(
   await fs.remove(workingDir);
 
   // 6. Retrieve thumbnail urls.
-  for (const upResp of uploadResponses) {
+  for await (const upResp of uploadResponses) {
     const upFile = upResp[0];
     let key = upFile.name.split('/').pop() || '';
     key = key.substring(0, key.lastIndexOf('.')).replace('thumb@', 't');
 
-    thumbnails[key] = upFile.publicUrl();
+    const metadataResponse = await upFile.getMetadata();
+    const metadata = metadataResponse[0];
+    
+    const downloadToken = metadata.metadata?.firebaseStorageDownloadTokens ?? '';
+    const firebaseDownloadUrl = createPersistentDownloadUrl(
+      objectMeta.bucket, 
+      filepath, 
+      downloadToken,
+    );
+      
+    thumbnails[key] = firebaseDownloadUrl;
   }
 
   return { dimensions, thumbnails };
@@ -1410,7 +1435,8 @@ async function setUserProfilePicture(objectMeta: functions.storage.ObjectMetadat
 
   const firebaseDownloadUrl = createPersistentDownloadUrl(
     objectMeta.bucket, 
-    filepath, downloadToken,
+    filepath, 
+    downloadToken,
   );
 
   const dimensions: ISizeCalculationResult = await getDimensionsFromStorage(
