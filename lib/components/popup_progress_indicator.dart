@@ -4,14 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
 class PopupProgressIndicator extends StatelessWidget {
-  final bool show;
-  final String message;
-
   const PopupProgressIndicator({
     Key? key,
     this.show = true,
     required this.message,
+    this.onClose,
   }) : super(key: key);
+
+  final bool show;
+  final void Function()? onClose;
+  final String message;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +56,14 @@ class PopupProgressIndicator extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (onClose != null)
+                    Opacity(
+                      opacity: 0.6,
+                      child: IconButton(
+                        onPressed: onClose,
+                        icon: Icon(UniconsLine.times),
+                      ),
+                    ),
                 ],
               ),
             ),
