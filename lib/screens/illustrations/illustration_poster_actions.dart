@@ -8,11 +8,18 @@ class IllustrationPosterActions extends StatelessWidget {
     this.onLike,
     this.onShare,
     this.onEdit,
+    this.onEditImage,
+    this.updatingImage = false,
   }) : super(key: key);
+
+  /// True if the image is being updated
+  /// after a transformation (crop, rotate, flip).
+  final bool updatingImage;
 
   final Function()? onLike;
   final Function()? onShare;
   final Function()? onEdit;
+  final Function()? onEditImage;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +49,11 @@ class IllustrationPosterActions extends StatelessWidget {
               tooltip: "edit".tr(),
               icon: Icon(UniconsLine.edit),
               onPressed: onEdit,
+            ),
+            IconButton(
+              tooltip: "edit_image".tr(),
+              icon: Icon(UniconsLine.crop_alt),
+              onPressed: updatingImage ? null : onEditImage,
             ),
           ],
         ),

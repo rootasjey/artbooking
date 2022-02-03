@@ -20,13 +20,31 @@ class IllustrationPoster extends StatefulWidget {
     this.onTapUser,
     this.onLike,
     this.onShare,
-    this.onEdit,
+    this.onShowEditMetadataPanel,
+    this.onGoToEditImagePage,
+    this.updatingImage = false,
   }) : super(key: key);
 
-  final Function()? onEdit;
+  /// True if the image is being updated
+  /// after a transformation (crop, rotate, flip).
+  final bool updatingImage;
+
+  /// Edit metadata (title, description, license, ...).
+  final Function()? onShowEditMetadataPanel;
+
+  /// Fired on crop, rotate, or flip image.
+  final Function()? onGoToEditImagePage;
+
+  /// Fired when an user likes this illustration.
   final Function()? onLike;
+
+  /// Fired when an user wants to share this illustration.
   final Function()? onShare;
+
+  /// Callback when tapping on this illustration's owner.
   final void Function(UserFirestore)? onTapUser;
+
+  /// This component's data.
   final Illustration illustration;
 
   @override
@@ -34,14 +52,20 @@ class IllustrationPoster extends StatefulWidget {
 }
 
 class _IllustrationPosterState extends State<IllustrationPoster> {
+  /// Illustration image url.
   String _imageUrl = '';
+
+  /// Illustration image version.
+  /// When version changes, image url is fetched.
+  int _version = -1;
+
+  /// Illustration's owner.
   var _user = UserFirestore.empty();
 
   @override
   initState() {
     super.initState();
     _imageUrl = widget.illustration.getThumbnail();
-    fetchHighResImage();
     fetchAuthor();
   }
 
@@ -53,6 +77,11 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
     final double maxWidth = illustration.dimensions.getRelativeWidth(
       maxHeight,
     );
+
+    if (_version != illustration.version) {
+      _version = illustration.version;
+      fetchHighResImage();
+    }
 
     return Column(
       children: [
@@ -127,7 +156,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
               child: Opacity(
                 opacity: 0.6,
                 child: Text(
-                  Jiffy(illustration.createdAt).fromNow(),
+                  Jiffy(illustration.updatedAt).fromNow(),
                   style: Utilities.fonts.style(
                     fontSize: 14.0,
                     fontWeight: FontWeight.w600,
@@ -138,7 +167,9 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
           ],
         ),
         IllustrationPosterActions(
-          onEdit: widget.onEdit,
+          updatingImage: widget.updatingImage,
+          onEdit: widget.onShowEditMetadataPanel,
+          onEditImage: widget.onGoToEditImagePage,
           onLike: widget.onLike,
           onShare: widget.onShare,
         ),

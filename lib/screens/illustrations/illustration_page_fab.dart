@@ -7,11 +7,11 @@ class IllustrationPageFab extends StatelessWidget {
   const IllustrationPageFab({
     Key? key,
     required this.isVisible,
-    this.onEdit,
+    this.onShowEditMetadataPanel,
   }) : super(key: key);
 
   final bool isVisible;
-  final Function()? onEdit;
+  final Function()? onShowEditMetadataPanel;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class IllustrationPageFab extends StatelessWidget {
     }
 
     return FloatingActionButton.extended(
-      onPressed: onEdit,
+      onPressed: onShowEditMetadataPanel,
       backgroundColor: Theme.of(context).primaryColor,
       foregroundColor: Colors.white,
       icon: Padding(

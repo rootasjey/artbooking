@@ -12,13 +12,17 @@ class IllustrationPageBody extends StatelessWidget {
     required this.illustration,
     this.onLike,
     this.onShare,
-    this.onEdit,
+    this.onShowEditMetadataPanel,
+    this.onGoToEditImagePage,
+    this.updatingImage = false,
   }) : super(key: key);
 
   final bool isLoading;
+  final bool updatingImage;
   final Function()? onLike;
   final Function()? onShare;
-  final Function()? onEdit;
+  final Function()? onShowEditMetadataPanel;
+  final Function()? onGoToEditImagePage;
   final Illustration illustration;
 
   @override
@@ -55,7 +59,9 @@ class IllustrationPageBody extends StatelessWidget {
           IllustrationPageHeader(),
           IllustrationPoster(
             illustration: illustration,
-            onEdit: onEdit,
+            updatingImage: updatingImage,
+            onShowEditMetadataPanel: onShowEditMetadataPanel,
+            onGoToEditImagePage: onGoToEditImagePage,
             onLike: onLike,
             onShare: onShare,
           ),
