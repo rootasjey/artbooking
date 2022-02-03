@@ -6,8 +6,10 @@ import 'package:artbooking/screens/illustrations/illustration_poster_actions.dar
 import 'package:artbooking/screens/illustrations/illustration_poster_description.dart';
 import 'package:artbooking/screens/illustrations/illustration_poster_story.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
@@ -204,7 +206,47 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
     );
   }
 
+  /// Fetch this illustration's author from its id.
   void fetchAuthor() async {
+    final success = await fetchAuthorFast();
+
+    if (success) {
+      return;
+    }
+
+    fetchAuthorSlow();
+  }
+
+  /// Fetch author from Firestore doc public data (fast).
+  Future<bool> fetchAuthorFast() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(widget.illustration.author.id)
+          .collection("public")
+          .doc("basic")
+          .get();
+
+      final Json? data = snapshot.data();
+
+      if (!snapshot.exists || data == null) {
+        return false;
+      }
+
+      setState(() {
+        _user = UserFirestore.fromMap(data);
+      });
+
+      return true;
+    } catch (error) {
+      Utilities.logger.e(error);
+      return false;
+    }
+  }
+
+  /// Fetch author from Cloud Function (slower).
+  /// NOTE: Delete migration done.
+  void fetchAuthorSlow() async {
     try {
       final resp = await Utilities.cloud.fun('users-fetchUser').call({
         'userId': widget.illustration.author.id,
