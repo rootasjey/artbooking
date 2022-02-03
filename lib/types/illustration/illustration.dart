@@ -25,8 +25,9 @@ class Illustration {
     this.size = 0,
     this.story = '',
     this.topics = const [],
-    this.updatedAt,
+    required this.updatedAt,
     required this.urls,
+    this.version = 0,
     this.versions = const [],
     this.visibility = EnumContentVisibility.private,
   });
@@ -81,10 +82,12 @@ class Illustration {
   List<String> topics;
 
   /// Last time this illustration was updated.
-  final DateTime? updatedAt;
+  final DateTime updatedAt;
 
   /// This illustration's urls.
   Urls urls;
+
+  final int version;
 
   /// All available file versions of this illusration.
   List<IllustrationVersion> versions;
@@ -112,6 +115,7 @@ class Illustration {
       topics: const [],
       updatedAt: DateTime.now(),
       urls: Urls.empty(),
+      version: 0,
       versions: const [],
       visibility: EnumContentVisibility.private,
     );
@@ -135,6 +139,7 @@ class Illustration {
       topics: parseTopics(data['topics']),
       updatedAt: Utilities.date.fromFirestore(data['updatedAt']),
       urls: Urls.fromJSON(data['urls']),
+      version: data['version'] ?? 0,
       versions: [],
       visibility: parseVisibility(data['visibility']),
     );
