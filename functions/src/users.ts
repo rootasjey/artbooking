@@ -1,7 +1,20 @@
 import * as functions from 'firebase-functions';
 
 import { adminApp } from './adminApp';
-import { checkUserIsSignedIn, cloudRegions, ILLUSTRATIONS_COLLECTION_NAME, randomIntFromInterval, STATISTICS_COLLECTION_NAME, STORAGES_DOCUMENT_NAME, USERS_COLLECTION_NAME } from './utils';
+import { 
+  BASE_DOCUMENT_NAME, 
+  BOOKS_COLLECTION_NAME, 
+  BOOK_STATISTICS_COLLECTION_NAME, 
+  checkUserIsSignedIn, 
+  cloudRegions, 
+  ILLUSTRATIONS_COLLECTION_NAME, 
+  ILLUSTRATION_STATISTICS_COLLECTION_NAME, 
+  randomIntFromInterval, 
+  STATISTICS_COLLECTION_NAME, 
+  STORAGES_DOCUMENT_NAME, 
+  USERS_COLLECTION_NAME, 
+  USER_STATISTICS_COLLECTION_NAME 
+} from './utils';
 
 const firebaseTools = require('firebase-tools');
 const firestore = adminApp.firestore();
@@ -343,6 +356,117 @@ export const fetchUser = functions
 
     return formatUserData(userDataWithId);
   });
+
+const LIKE_ILLUSTRATION_TYPE = 'illustration';
+const LIKE_BOOK_TYPE = 'book';
+
+/**
+ * When an user likes something (illustration, book).
+ */
+export const onLike = functions
+  .region(cloudRegions.eu)
+  .firestore
+  .document('users/{userId}/user_likes/{likeId}')
+  .onCreate(async (likeSnapshot, context) => {
+    const data = likeSnapshot.data();
+    const { type, targetId } = data;
+
+    // Check fields availability.
+    if (!data || !type || !targetId) {
+      return await likeSnapshot.ref.delete();
+    }
+
+    if (type !== LIKE_ILLUSTRATION_TYPE && type !== LIKE_BOOK_TYPE) {
+      return await likeSnapshot.ref.delete();
+    }
+
+    if (targetId !== likeSnapshot.id) {
+      return await likeSnapshot.ref.delete();
+    }
+
+    // Check fields match right values
+    if (type === LIKE_ILLUSTRATION_TYPE) {
+      const illustrationSnapshot = await firestore
+        .collection(ILLUSTRATIONS_COLLECTION_NAME)
+        .doc(likeSnapshot.id)
+        .get();
+
+      if (!illustrationSnapshot.exists) {
+        return await likeSnapshot.ref.delete();
+      }
+    }
+
+    if (type === LIKE_BOOK_TYPE) {
+      const bookSnapshot = await firestore
+        .collection(BOOKS_COLLECTION_NAME)
+        .doc(likeSnapshot.id)
+        .get();
+
+      if (!bookSnapshot.exists) {
+        return await likeSnapshot.ref.delete();
+      }
+    }
+
+    const userId: string = context.params.userId;
+    await incrementUserLikeCount(userId, type);
+    await incrementDocumentLikeCount(likeSnapshot.id, type);
+
+    return await likeSnapshot.ref.update({
+      created_at: adminApp.firestore.FieldValue.serverTimestamp(),
+    });
+  })
+
+/**
+ * When an user un-likes something (illustration, book).
+ */
+export const onUnLike = functions
+  .region(cloudRegions.eu)
+  .firestore
+  .document('users/{userId}/user_likes/{likeId}')
+  .onDelete(async (likeSnapshot, context) => {
+    const data = likeSnapshot.data();
+    const { type, targetId } = data;
+
+    // Check fields availability.
+    if (!data || !type || !targetId) {
+      return;
+    }
+
+    if (type !== LIKE_ILLUSTRATION_TYPE && type !== LIKE_BOOK_TYPE) {
+      return;
+    }
+
+    if (targetId !== likeSnapshot.id) {
+      return;
+    }
+
+    // Check fields match right values
+    if (type === LIKE_ILLUSTRATION_TYPE) {
+      const illustrationSnapshot = await firestore
+        .collection(ILLUSTRATIONS_COLLECTION_NAME)
+        .doc(likeSnapshot.id)
+        .get();
+
+      if (!illustrationSnapshot.exists) {
+        return;
+      }
+    }
+
+    if (type === LIKE_BOOK_TYPE) {
+      const bookSnapshot = await firestore
+        .collection(BOOKS_COLLECTION_NAME)
+        .doc(likeSnapshot.id)
+        .get();
+
+      if (!bookSnapshot.exists) {
+        return;
+      }
+    }
+
+    const userId: string = context.params.userId;
+    await decrementUserLikeCount(userId, type);
+    await decrementDocumentLikeCount(likeSnapshot.id, type)
+  })
 
 /**
  * Create user's public information from private fields.
@@ -724,6 +848,102 @@ function checkCreateAccountData(data: any) {
 }
 
 /**
+ * Decrement of 1 the likes count of an illustration or a book.
+ * @param userId User's id.
+ * @param likeType Should be equals to 'book' or 'illustration'.
+ * @returns void.
+ */
+async function decrementUserLikeCount(userId:string, likeType: string) {
+  const docName = likeType === 'books' 
+  ? BOOKS_COLLECTION_NAME
+  : ILLUSTRATIONS_COLLECTION_NAME;
+
+  const snapshot = await firestore
+    .collection(USERS_COLLECTION_NAME)
+    .doc(userId)
+    .collection(USER_STATISTICS_COLLECTION_NAME)
+    .doc(docName)
+    .get();
+
+  const data = snapshot.data();
+  if (!snapshot.exists || !data) { return; }
+
+  let liked: number = data.liked;
+  liked = typeof liked === 'number' ? liked - 1: 0;
+  liked = Math.max(0, liked);
+
+  snapshot.ref.update({
+    liked,
+    updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+  });
+}
+
+/**
+ * Decrement of 1 the likes count of an illustration or a book.
+ * @param documentId Illustration's id or book's id.
+ * @param likeType Should be equals to 'book' or 'illustration'.
+ * @returns void.
+ */
+async function decrementDocumentLikeCount(documentId:string, likeType: string) {
+  const collectionName: string = likeType === 'book' 
+    ? BOOKS_COLLECTION_NAME
+    : ILLUSTRATIONS_COLLECTION_NAME;
+
+  const statsCollectionName = likeType === 'book'
+    ? BOOK_STATISTICS_COLLECTION_NAME
+    : ILLUSTRATION_STATISTICS_COLLECTION_NAME;
+
+  const snapshot = await firestore
+    .collection(collectionName)
+    .doc(documentId)
+    .collection(statsCollectionName)
+    .doc(BASE_DOCUMENT_NAME)
+    .get();
+
+  const data = snapshot.data();
+  if (!snapshot.exists || !data) { return; }
+
+  let likes: number = data.likes;
+  likes = typeof likes === 'number' ? likes - 1 : 0;
+  likes = Math.max(0, likes);
+
+  await snapshot.ref.update({ 
+    likes,
+    updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+  });
+}
+
+/**
+ * Increment of 1 the likes count of an illustration or a book.
+ * @param userId User's id.
+ * @param likeType Should be equals to 'book' or 'illustration'.
+ * @returns void.
+ */
+ async function incrementUserLikeCount(userId:string, likeType: string) {
+  const docName = likeType === 'books' 
+  ? BOOKS_COLLECTION_NAME
+  : ILLUSTRATIONS_COLLECTION_NAME;
+
+  const snapshot = await firestore
+    .collection(USERS_COLLECTION_NAME)
+    .doc(userId)
+    .collection(USER_STATISTICS_COLLECTION_NAME)
+    .doc(docName)
+    .get();
+
+  const data = snapshot.data();
+  if (!snapshot.exists || !data) { return; }
+
+  let liked: number = data.liked;
+  liked = typeof liked === 'number' ? liked + 1: 1;
+
+  snapshot.ref.update({
+    liked,
+    updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+  });
+}
+
+/**
  * Take a raw Firestore data object and return formated data.
  * @param userData User's data.
  * @returns Return a formated data to consume.
@@ -762,6 +982,40 @@ function getRandomProfilePictureLink(): string {
   ]
 
   return sampleAvatars[randomIntFromInterval(0, sampleAvatars.length -1)]
+}
+
+/**
+ * Increment of 1 the likes count of an illustration or a book.
+ * @param documentId Illustration's id or book's id.
+ * @param likeType Should be equals to 'book' or 'illustration'.
+ * @returns void.
+ */
+ async function incrementDocumentLikeCount(documentId:string, likeType: string) {
+  const collectionName: string = likeType === 'book' 
+    ? BOOKS_COLLECTION_NAME
+    : ILLUSTRATIONS_COLLECTION_NAME;
+
+  const statsCollectionName: string = likeType === 'book'
+    ? BOOK_STATISTICS_COLLECTION_NAME
+    : ILLUSTRATION_STATISTICS_COLLECTION_NAME;
+
+  const snapshot = await firestore
+    .collection(collectionName)
+    .doc(documentId)
+    .collection(statsCollectionName)
+    .doc(BASE_DOCUMENT_NAME)
+    .get();
+
+  const data = snapshot.data();
+  if (!data) { return; }
+
+  let likes: number = data.likes;
+  likes = typeof likes === 'number' ? likes + 1 : 1;
+
+  await snapshot.ref.update({ 
+    likes,
+    updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+  });
 }
 
 async function isUserExistsByEmail(email: string) {

@@ -8,7 +8,15 @@ import { join, dirname } from 'path';
 import * as sharp from 'sharp';
 
 import { adminApp } from './adminApp';
-import { allowedLicenseTypes, cloudRegions, ILLUSTRATIONS_COLLECTION_NAME, STATISTICS_COLLECTION_NAME, STORAGES_DOCUMENT_NAME, USERS_COLLECTION_NAME } from './utils';
+import { 
+  allowedLicenseTypes, 
+  cloudRegions, 
+  ILLUSTRATIONS_COLLECTION_NAME, 
+  ILLUSTRATION_STATISTICS_COLLECTION_NAME, 
+  STATISTICS_COLLECTION_NAME, 
+  STORAGES_DOCUMENT_NAME, 
+  USERS_COLLECTION_NAME 
+} from './utils';
 
 import https = require('https');
 import { ISizeCalculationResult } from 'image-size/dist/types/interface';
@@ -206,12 +214,6 @@ export const createOne = functions
         },
         name: name,
         size: 0, // File's ize in bytes
-        stats: {
-          downloads: 0,
-          fav: 0,
-          shares: 0,
-          views: 0,
-        },
         story: '',
         styles: {},
         timelapse: {
@@ -248,6 +250,8 @@ export const createOne = functions
         visibility: visibility,
       });
 
+    await createStatsCollection(illustrationSnap.id);
+    
     return {
       illustration: {
         id: illustrationSnap.id,
@@ -1229,6 +1233,33 @@ function checkVisibilityValue(visibility: string) {
       `Invalide [visibility] value. Allowed values are: [acl], [private], [public], [unlisted].`,
     );
   }
+}
+
+/**
+ * Create illustration's stats sub-collection
+ * @param illustrationId Illustration's id.
+ * @returns void.
+ */
+ async function createStatsCollection(illustrationId: string) {
+  const snapshot = await firestore
+    .collection(ILLUSTRATIONS_COLLECTION_NAME)
+    .doc(illustrationId)
+    .get();
+
+  if (!snapshot.exists) {
+    return;
+  }
+
+  await snapshot.ref
+    .collection(ILLUSTRATION_STATISTICS_COLLECTION_NAME)
+    .doc('base')
+    .create({
+      downloads: 0,
+      illustration_id: illustrationId,
+      likes: 0,
+      shares: 0,
+      views: 0,
+    });
 }
 
 /**

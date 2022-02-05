@@ -5,10 +5,14 @@ const env = functions.config();
 
 export const allowedLicenseTypes = ["staff", "user"];
 
+export const BASE_DOCUMENT_NAME = 'base'
 export const BOOKS_COLLECTION_NAME = 'books'
 export const ILLUSTRATIONS_COLLECTION_NAME = 'illustrations'
 export const LICENSES_COLLECTION_NAME = 'licenses'
 export const STATISTICS_COLLECTION_NAME = 'statistics'
+export const USER_STATISTICS_COLLECTION_NAME = 'user_statistics'
+export const ILLUSTRATION_STATISTICS_COLLECTION_NAME = 'illustration_statistics'
+export const BOOK_STATISTICS_COLLECTION_NAME = 'book_statistics'
 export const STORAGES_DOCUMENT_NAME = 'storages'
 export const USERS_COLLECTION_NAME = 'users'
 

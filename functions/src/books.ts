@@ -1,6 +1,11 @@
 import * as functions from 'firebase-functions';
 import { adminApp } from './adminApp';
-import { BOOKS_COLLECTION_NAME, checkOrGetDefaultVisibility, cloudRegions } from './utils';
+import { 
+  BOOKS_COLLECTION_NAME, 
+  BOOK_STATISTICS_COLLECTION_NAME, 
+  checkOrGetDefaultVisibility, 
+  cloudRegions 
+} from './utils';
 
 const firebaseTools = require('firebase-tools');
 const firestore = adminApp.firestore();
@@ -157,6 +162,8 @@ export const createOne = functions
         },
         visibility: checkOrGetDefaultVisibility(visibility),
       });
+
+    await createStatsCollection(addedBook.id)
 
     return {
       book: {
@@ -1007,6 +1014,34 @@ async function createBookIllustrations(ids: string[]) {
 
   return arrayResult;
 }
+
+/**
+ * Create book's stats sub-collection
+ * @param bookId book's id.
+ * @returns void.
+ */
+ async function createStatsCollection(bookId: string) {
+  const snapshot = await firestore
+    .collection(BOOKS_COLLECTION_NAME)
+    .doc(bookId)
+    .get();
+
+  if (!snapshot.exists) {
+    return;
+  }
+
+  await snapshot.ref
+    .collection(BOOK_STATISTICS_COLLECTION_NAME)
+    .doc('base')
+    .create({
+      book_id: bookId,
+      downloads: 0,
+      likes: 0,
+      shares: 0,
+      views: 0,
+    });
+}
+
 async function getAutoCover(bookIllustrations: BookIllustration[]) {
   const autoCover = {
     updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
