@@ -1,5 +1,7 @@
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/home/home_page.dart';
+import 'package:artbooking/screens/illustrations/illustration_page.dart';
+import 'package:artbooking/screens/illustrations/illustrations_page.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/widgets.dart';
@@ -7,9 +9,15 @@ import 'package:flutter/widgets.dart';
 class HomeLocation extends BeamLocation<BeamState> {
   /// Main root value for this location.
   static const String route = '/';
+  static const String illustrationsRoute = '/illustrations';
+  static const String illustrationRoute = '/illustrations/:illustrationId';
 
   @override
-  List<String> get pathPatterns => [route];
+  List<String> get pathPatterns => [
+        route,
+        illustrationsRoute,
+        illustrationRoute,
+      ];
 
   @override
   List<BeamPage> buildPages(BuildContext context, BeamState state) {
@@ -20,6 +28,22 @@ class HomeLocation extends BeamLocation<BeamState> {
         title: Utilities.getPageTitle("home".tr()),
         type: BeamPageType.fadeTransition,
       ),
+      if (state.pathPatternSegments.contains("illustrations"))
+        BeamPage(
+          child: IllustrationsPage(),
+          key: ValueKey(illustrationsRoute),
+          title: Utilities.getPageTitle("illustrations".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
+      if (state.pathPatternSegments.contains(':illustrationId'))
+        BeamPage(
+          child: IllustrationPage(
+            illustrationId: state.pathParameters['illustrationId']!,
+          ),
+          key: ValueKey(illustrationRoute),
+          title: Utilities.getPageTitle("illustration".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
     ];
   }
 }
