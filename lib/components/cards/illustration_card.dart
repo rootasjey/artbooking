@@ -157,11 +157,12 @@ class _IllustrationCardState extends State<IllustrationCard>
           child: Stack(
             children: [
               multiSelectIndicator(),
-              Positioned(
-                bottom: 10.0,
-                right: 10.0,
-                child: popupMenuButton(),
-              ),
+              if (widget.popupMenuEntries.isNotEmpty)
+                Positioned(
+                  bottom: 10.0,
+                  right: 10.0,
+                  child: popupMenuButton(),
+                ),
             ],
           ),
         ),
