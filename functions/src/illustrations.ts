@@ -8,14 +8,16 @@ import { join, dirname } from 'path';
 import * as sharp from 'sharp';
 
 import { adminApp } from './adminApp';
-import { 
-  allowedLicenseTypes, 
-  cloudRegions, 
-  ILLUSTRATIONS_COLLECTION_NAME, 
-  ILLUSTRATION_STATISTICS_COLLECTION_NAME, 
-  STATISTICS_COLLECTION_NAME, 
-  STORAGES_DOCUMENT_NAME, 
-  USERS_COLLECTION_NAME 
+import {
+  allowedLicenseTypes,
+  ART_MOVEMENTS_COLLECTION_NAME,
+  BASE_DOCUMENT_NAME,
+  cloudRegions,
+  ILLUSTRATIONS_COLLECTION_NAME,
+  ILLUSTRATION_STATISTICS_COLLECTION_NAME,
+  STORAGES_DOCUMENT_NAME,
+  USERS_COLLECTION_NAME,
+  USER_STATISTICS_COLLECTION_NAME
 } from './utils';
 
 import https = require('https');
@@ -42,7 +44,7 @@ export const checkProperties = functions
   .https
   .onCall(async (params: CheckPropertiesParams, context) => {
     const userAuth = context.auth;
-    const { illustrationId } = params;
+    const { illustration_id } = params;
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -51,42 +53,41 @@ export const checkProperties = functions
       );
     }
 
-    if (typeof illustrationId !== 'string') {
+    if (typeof illustration_id !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called with a valid [illustrationId] argument (string)
+        `The function must be called with a valid [illustration_id] argument (string)
          which is the illustration's id to delete.`,
       );
     }
 
-    const illustrationSnap = await firestore
+    const illustrationSnapshot = await firestore
       .collection(ILLUSTRATIONS_COLLECTION_NAME)
-      .doc(illustrationId)
+      .doc(illustration_id)
       .get();
 
-    const illustrationData = illustrationSnap.data();
-
-    if (!illustrationSnap.exists || !illustrationData) {
+    const illustrationData = illustrationSnapshot.data();
+    if (!illustrationSnapshot.exists || !illustrationData) {
       throw new functions.https.HttpsError(
         'not-found',
-        `The illustration id [${illustrationId}] doesn't exist.`,
+        `The illustration id [${illustration_id}] doesn't exist.`,
       );
     }
 
-    const urls = illustrationData.urls;
-    const illusDataWidth = illustrationData.dimensions.width;
-    const illusDataHeight = illustrationData.dimensions.height;
+    const links = illustrationData.links;
+    const illustrationWidth = illustrationData.dimensions.width;
+    const illustrationHeight = illustrationData.dimensions.height;
 
-    const dimensionsAreNumbers = typeof illusDataWidth === 'number' && typeof illusDataHeight === 'number';
-    const dimensionsAreStrictlyPositive = illusDataWidth > 0 && illusDataHeight > 0;
+    const dimensionsAreNumbers = typeof illustrationWidth === 'number' && typeof illustrationHeight === 'number';
+    const dimensionsAreStrictlyPositive = illustrationWidth > 0 && illustrationHeight > 0;
     const dimensionsAreOK = dimensionsAreNumbers && dimensionsAreStrictlyPositive;
 
-    if (urls.original && urls.storage && dimensionsAreOK) {
+    if (links.original && links.storage && dimensionsAreOK) {
       return {
         success: false,
         message: `Nothing to change. Everything is up-to-date.`,
         illustration: {
-          id: illustrationId,
+          id: illustration_id,
         },
       };
     }
@@ -94,19 +95,19 @@ export const checkProperties = functions
     const dir = await adminApp.storage()
       .bucket()
       .getFiles({
-        directory: `users/${userAuth.uid}/illustrations/${illustrationId}`
+        directory: `users/${userAuth.uid}/illustrations/${illustration_id}`
       });
 
     let storagePath: string = '';
     const files = dir[0];
 
     if (!files || files.length === 0) {
-      await illustrationSnap.ref.delete();
+      await illustrationSnapshot.ref.delete();
 
       return {
         success: false,
         illustration: {
-          id: illustrationId,
+          id: illustration_id,
         },
       };
     }
@@ -124,41 +125,45 @@ export const checkProperties = functions
     };
 
     /** Image's original url from Firebase Storage. */
-    let originalUrl = '';
+    let originalLink = '';
+    const downloadToken = metadata.metadata?.firebaseStorageDownloadTokens ?? '';
 
     for await (const file of files) {
       const atIndex = file.name.lastIndexOf('@');
       const dotIndex = file.name.lastIndexOf('.');
       const sizeStr = file.name.substring(atIndex + 1, dotIndex);
 
+      const bucketName = file.bucket.name
+      const link = createPersistentDownloadUrl(bucketName, file.name, downloadToken)
+
       if (atIndex > -1) { // thumbnails
-        thumbnails[`t${sizeStr}`] = file.publicUrl();
+        thumbnails[`t${sizeStr}`] = link;
       } else { // original image
-        originalUrl = file.publicUrl();
+        originalLink = link
         storagePath = file.name || '';
       }
     }
 
-    const { height, width, type: extension } = await getDimensionsFromUrl(originalUrl);
+    const { height, width, type: extension } = await getDimensionsFromUrl(originalLink);
 
-    await illustrationSnap.ref.update({
+    await illustrationSnapshot.ref.update({
       dimensions: {
-        height: height,
-        width: width,
+        height,
+        width,
       },
-      extension: extension,
-      size: parseFloat(metadata.size),
-      urls: {
-        original: originalUrl,
+      extension,
+      links: {
+        original: originalLink,
         storage: storagePath,
         thumbnails,
       },
+      size: parseFloat(metadata.size),
     });
 
     return {
       success: true,
       illustration: {
-        id: illustrationId,
+        id: illustration_id,
       },
     };
   });
@@ -171,7 +176,7 @@ export const createOne = functions
   .https
   .onCall(async (params: CreateIllustrationParams, context) => {
     const userAuth = context.auth;
-    const { name, visibility, isUserAuthor } = params;
+    const { name, visibility } = params;
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -188,46 +193,23 @@ export const createOne = functions
       );
     }
 
-    const author: any = {};
-
-    if (isUserAuthor) {
-      author.id = userAuth.token.uid;
-    }
-
     checkVisibilityValue(visibility);
-
     const illustrationSnap = await firestore
       .collection(ILLUSTRATIONS_COLLECTION_NAME)
       .add({
-        author,
-        createdAt: adminApp.firestore.Timestamp.now(),
+        art_movements: {},
+        created_at: adminApp.firestore.Timestamp.now(),
         description: '',
         dimensions: {
           height: 0,
           width: 0,
         },
         extension: '',
-        hasPendingCreates: true,
         license: {
-          type: '',
           id: '',
+          type: '',
         },
-        name: name,
-        size: 0, // File's ize in bytes
-        story: '',
-        styles: {},
-        timelapse: {
-          createdAt: null,
-          description: '',
-          name: '',
-          updatedAt: null,
-          urls: {
-            original: '', // video or gif format
-          },
-        },
-        topics: {},
-        updatedAt: adminApp.firestore.Timestamp.now(),
-        urls: {
+        links: {
           original: '',
           share: {
             read: '',
@@ -243,14 +225,26 @@ export const createOne = functions
             t2400: '',
           },
         },
-        user: {
-          id: userAuth.token.uid,
+        lore: '',
+        name: name,
+        size: 0, // File's ize in bytes
+        timelapse: {
+          created_at: null,
+          description: '',
+          links: {
+            original: '', // video or gif format
+          },
+          name: '',
+          updated_at: null,
         },
+        topics: {},
+        updated_at: adminApp.firestore.Timestamp.now(),
+        user_id: userAuth.uid,
         version: 0,
         visibility: visibility,
       });
 
-    await createStatsCollection(illustrationSnap.id);
+    await createStatsCollection(illustrationSnap.id, userAuth.uid);
     
     return {
       illustration: {
@@ -268,7 +262,7 @@ export const deleteOne = functions
   .https
   .onCall(async (params: DeleteIllustrationParams, context) => {
     const userAuth = context.auth;
-    const { illustrationId } = params;
+    const { illustration_id } = params;
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -277,29 +271,28 @@ export const deleteOne = functions
       );
     }
 
-    if (typeof illustrationId !== 'string') {
+    if (typeof illustration_id !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument', 
-        `The function must be called with a valid [illustrationId] argument (string)
-         which is the illustration's id to delete.`,
+        `The function must be called with a valid [illustration_id] argument (string) ` +
+         ` which is the illustration's id to delete.`,
         );
     }
 
     const illustrationSnap = await firestore
       .collection(ILLUSTRATIONS_COLLECTION_NAME)
-      .doc(illustrationId)
+      .doc(illustration_id)
       .get();
 
     const illustrationData = illustrationSnap.data();
-
     if (!illustrationSnap.exists || !illustrationData) {
       throw new functions.https.HttpsError(
         'not-found',
-        `The illustration id [${illustrationId}] doesn't exist.`,
+        `The illustration id [${illustration_id}] doesn't exist.`,
       );
     }
 
-    if (illustrationData.user.id !== userAuth.uid) {
+    if (illustrationData.user_id !== userAuth.uid) {
       throw new functions.https.HttpsError(
         'permission-denied',
         `You don't have the permission to edit this illustration.`,
@@ -310,11 +303,10 @@ export const deleteOne = functions
     const dir = await adminApp.storage()
       .bucket()
       .getFiles({
-        directory: `users/${userAuth.uid}/illustrations/${illustrationId}`
+        directory: `users/${userAuth.uid}/illustrations/${illustration_id}`
       });
 
     const files = dir[0];
-
     for await (const file of files) {
       await file.delete();
     }
@@ -323,7 +315,7 @@ export const deleteOne = functions
 
     return {
       illustration: {
-        id: illustrationId,
+        id: illustration_id,
       },
       success: true,
     };
@@ -338,7 +330,7 @@ export const deleteMany = functions
   .https
   .onCall(async (params: DeleteMultipleIllustrationsParams, context) => {
     const userAuth = context.auth;
-    const { illustrationIds } = params;
+    const { illustration_ids } = params;
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -347,11 +339,11 @@ export const deleteMany = functions
       );
     }
 
-    if (!Array.isArray(illustrationIds) || illustrationIds.length === 0) {
+    if (!Array.isArray(illustration_ids) || illustration_ids.length === 0) {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called  with a valid [illustrationIds]
-         which is an array of illustrations string id to delete.`,
+        `The function must be called  with a valid [illustration_ids] ` +
+         `which is an array of illustrations string id to delete.`,
       );
     }
 
@@ -359,20 +351,22 @@ export const deleteMany = functions
     let successCount = 0;
     const itemsProcessed = [];
     
-    for await (const illustrationId of illustrationIds) {
+    for await (const illustration_id of illustration_ids) {
       try {
-        const illustrationSnap = await firestore
+        const illustrationSnapshot = await firestore
           .collection(ILLUSTRATIONS_COLLECTION_NAME)
-          .doc(illustrationId)
+          .doc(illustration_id)
           .get();
 
-        const illustrationData = illustrationSnap.data();
-        let errorMessage = `The illustration [${illustrationIds}] doesn't exist.`;
+        const illustrationData = illustrationSnapshot.data();
+        let errorMessage = '';
 
-        if (!illustrationSnap.exists || !illustrationData) {
+        if (!illustrationSnapshot.exists || !illustrationData) {
+          errorMessage = `The illustration [${illustration_ids}] doesn't exist.`
+
           itemsProcessed.push({
             illustration: {
-              id: illustrationId,
+              id: illustration_id,
             },
             success: false,
             errorMessage,
@@ -384,13 +378,13 @@ export const deleteMany = functions
           )
         }
 
-        if (illustrationData.user.id !== userAuth.uid) {
-          errorMessage = `You don't have the permission 
-            to delete the illustration [${illustrationId}].`;
+        if (illustrationData.user_id !== userAuth.uid) {
+          errorMessage = `You don't have the permission ` +
+            `to delete the illustration ${illustration_id}.`;
 
           itemsProcessed.push({
             illustration: {
-              id: illustrationId,
+              id: illustration_id,
             },
             success: false,
             errorMessage,
@@ -406,28 +400,26 @@ export const deleteMany = functions
         const dir = await adminApp.storage()
           .bucket()
           .getFiles({
-            directory: `users/${userAuth.uid}/illustrations/${illustrationId}`
+            directory: `users/${userAuth.uid}/illustrations/${illustration_id}`
           });
 
         const files = dir[0];
-
         for await (const file of files) {
           await file.delete();
         }
 
-        await illustrationSnap.ref.delete();
-
+        await illustrationSnapshot.ref.delete();
         successCount++;
 
         itemsProcessed.push({
           illustration: {
-            id: illustrationId,
+            id: illustration_id,
           },
           success: true,
         });
 
       } catch (error) {
-        console.error(`Error while deleting illustration [${illustrationId}]`);
+        console.error(`Error while deleting illustration [${illustration_id}]`);
         console.error(error);
       }
     }
@@ -435,7 +427,7 @@ export const deleteMany = functions
     return {
       items: itemsProcessed,
       successCount,
-      hasErrors: successCount === illustrationIds.length,
+      hasErrors: successCount === illustration_ids.length,
     };
   });
 
@@ -456,8 +448,7 @@ export const onStorageUpload = functions
     if (!customMetadata) { return; }
 
     const { firestoreId, visibility, target } = customMetadata;
-    
-    if (target === 'profilePicture') {
+    if (target === 'profile_picture') {
       return await setUserProfilePicture(objectMeta);
     }
     
@@ -478,13 +469,13 @@ export const onStorageUpload = functions
     }
 
     // Check if same user as firestore illustration
-    const illustrationDoc = await firestore
+    const illustrationSnapshot = await firestore
       .collection(ILLUSTRATIONS_COLLECTION_NAME)
       .doc(firestoreId)
       .get();
 
-    const illustrationData = illustrationDoc.data()
-    if (!illustrationData || illustrationData.user.id !== userId) {
+    const illustrationData = illustrationSnapshot.data()
+    if (!illustrationSnapshot.exists || !illustrationData || illustrationData.user_id !== userId) {
       throw new functions.https.HttpsError(
         'permission-denied',
         `It seems that the user ${userId} is trying to access a forbidden document.`,
@@ -532,21 +523,20 @@ export const onStorageUpload = functions
     version += 1;
 
     // Save new properties to Firestore.
-    await illustrationDoc.ref
+    await illustrationSnapshot.ref
       .update({
         dimensions: {
           height,
           width,
         },
         extension,
-        hasPendingCreates: false,
-        size: parseFloat(objectMeta.size),
-        urls: {
+        links: {
           original: firebaseDownloadUrl,
           storage: storageUrl,
           thumbnails,
         },
-        updatedAt: adminApp.firestore.Timestamp.now(),
+        size: parseFloat(objectMeta.size),
+        updated_at: adminApp.firestore.Timestamp.now(),
         version,
       });
 
@@ -557,24 +547,27 @@ export const onStorageUpload = functions
     }
     
     // Update user's storage.
-    const statsQuery = firestore
+    // ----------------------
+    const statsSnapshot = await firestore
       .collection(USERS_COLLECTION_NAME)
       .doc(userId)
-      .collection(STATISTICS_COLLECTION_NAME)
+      .collection(USER_STATISTICS_COLLECTION_NAME)
       .doc(STORAGES_DOCUMENT_NAME)
-
-    const statsSnapshot = await statsQuery.get()
+      .get()
 
     const statisticsData = statsSnapshot.data()
-    if (!statisticsData) { return }
+    if (!statsSnapshot.exists || !statisticsData) { 
+      return 
+    }
 
     let used: number = statisticsData.illustrations.used ?? 0
-    used = parseFloat(objectMeta.size)
+    if (typeof used !== 'number') { used = 0 }
+    used += parseFloat(objectMeta.size)
 
-    return await statsQuery.update({
+    return await statsSnapshot.ref.update({
       illustrations: {
         used,
-        updatedAt: adminApp.firestore.Timestamp.now(),
+        updated_at: adminApp.firestore.Timestamp.now(),
       },
     })
   });
@@ -595,19 +588,18 @@ export const setUserAuthor = functions
       );
     }
 
-    const { illustrationId } = data;
-
-    if (!illustrationId || typeof illustrationId !== 'string') {
+    const { illustration_id } = data;
+    if (!illustration_id || typeof illustration_id !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `You must provid a valid argument for [illustrationId]
-         which is illustration to update.`,
+        `You must provid a valid argument for [illustration_id] ` +
+         `which is illustration to update.`,
       )
     }
 
     const illustrationSnap = await firestore
       .collection(ILLUSTRATIONS_COLLECTION_NAME)
-      .doc(illustrationId)
+      .doc(illustration_id)
       .get();
 
     const illustrationData = illustrationSnap.data();
@@ -620,7 +612,7 @@ export const setUserAuthor = functions
       );
     }
 
-    if (illustrationData.user.id !== userAuth.uid) {
+    if (illustrationData.user_id !== userAuth.uid) {
       throw new functions.https.HttpsError(
         'permission-denied', 
         `You don't have the permission to update this illustration.`,
@@ -634,7 +626,7 @@ export const setUserAuthor = functions
 
     return {
       illustration: {
-        id: illustrationId,
+        id: illustration_id,
       },
       success: true,
     }
@@ -656,40 +648,40 @@ export const unsetLicense = functions
       );
     }
 
-    const { illustrationId } = data;
+    const { illustration_id } = data;
 
-    const illusSnap = await firestore
+    const illusSnapshot = await firestore
       .collection(ILLUSTRATIONS_COLLECTION_NAME)
-      .doc(illustrationId)
+      .doc(illustration_id)
       .get();
 
-    const illustrationData = illusSnap.data();
-
-    if (!illusSnap.exists || !illustrationData) {
+    const illustrationData = illusSnapshot.data();
+    if (!illusSnapshot.exists || !illustrationData) {
       throw new functions.https.HttpsError(
         'not-found',
-        `Sorry we didn't find the illustration you're trying to update. It may have been deleted.`
+        `Sorry we didn't find the illustration ${illustration_id}. ` +
+        `It may have been deleted.`,
       )
     }
 
-    if (illustrationData.user.id !== userAuth.uid) {
+    if (illustrationData.user_id !== userAuth.uid) {
       throw new functions.https.HttpsError(
         'permission-denied',
         `You don't have the permission to edit this illustration.`,
       );
     }
 
-    await illusSnap.ref.update({
+    await illusSnapshot.ref.update({
       license: {
-        type: '',
         id: '',
+        type: '',
       },
-      updatedAt: adminApp.firestore.Timestamp.now(),
+      updated_at: adminApp.firestore.Timestamp.now(),
     });
 
     return {
       illustration: {
-        id: illustrationId,
+        id: illustration_id,
       },
       success: true,
     };
@@ -711,19 +703,19 @@ export const unsetUserAuthor = functions
       );
     }
 
-    const { illustrationId } = data;
+    const { illustration_id } = data;
 
-    if (!illustrationId || typeof illustrationId !== 'string') {
+    if (!illustration_id || typeof illustration_id !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `You must provid a valid argument for [illustrationId]
+        `You must provid a valid argument for [illustration_id]
          which is illustration to update.`,
       )
     }
 
     const illustrationSnap = await firestore
       .collection(ILLUSTRATIONS_COLLECTION_NAME)
-      .doc(illustrationId)
+      .doc(illustration_id)
       .get();
 
     const illustrationData = illustrationSnap.data();
@@ -736,7 +728,7 @@ export const unsetUserAuthor = functions
       );
     }
 
-    if (illustrationData.user.id !== userAuth.uid) {
+    if (illustrationData.user_id !== userAuth.uid) {
       throw new functions.https.HttpsError(
         'permission-denied',
         `You don't have the permission to update this illustration.`,
@@ -744,13 +736,12 @@ export const unsetUserAuthor = functions
     }
 
     await illustrationSnap.ref.update({
-      author: { id: '' },
-      updatedAt: adminApp.firestore.Timestamp.now(),
+      updated_at: adminApp.firestore.Timestamp.now(),
     });
 
     return {
       illustration: {
-        id: illustrationId,
+        id: illustration_id,
       },
       success: true,
     }
@@ -772,41 +763,41 @@ export const updateLicense = functions
       );
     }
 
-    const { illustrationId, license } = data;
+    const { illustration_id, license } = data;
     checkIllustrationLicenseFormat(license);
 
-    const illusSnap = await firestore
+    const illustrationSnapshot = await firestore
       .collection(ILLUSTRATIONS_COLLECTION_NAME)
-      .doc(illustrationId)
+      .doc(illustration_id)
       .get();
 
-    const illustrationData = illusSnap.data();
-
-    if (!illusSnap.exists || !illustrationData) {
+    const illustrationData = illustrationSnapshot.data();
+    if (!illustrationSnapshot.exists || !illustrationData) {
       throw new functions.https.HttpsError(
         'not-found',
-        `Sorry we didn't find the illustration you're trying to update. It may have been deleted.`
+        `Sorry we didn't find the illustration `+
+        `you're trying to update. It may have been deleted.`,
       )
     }
 
-    if (illustrationData.user.id !== userAuth.uid) {
+    if (illustrationData.user_id !== userAuth.uid) {
       throw new functions.https.HttpsError(
         'permission-denied',
         `You don't have the permission to edit this illustration.`,
       );
     }
 
-    await illusSnap.ref.update({
+    await illustrationSnapshot.ref.update({
       license: {
-        type: license.type ?? '',
         id: license.id ?? '',
+        type: license.type ?? '',
       },
-      updatedAt: adminApp.firestore.Timestamp.now(),
+      updated_at: adminApp.firestore.Timestamp.now(),
     });
 
     return {
       illustration: {
-        id: illustrationId,
+        id: illustration_id,
       },
       success: true,
     };
@@ -832,52 +823,51 @@ export const updatePresentation = functions
 
     const { 
       description,
-      illustrationId,
+      illustration_id,
       name,
-      story,
+      lore,
     } = data;
 
-    const illustrationSnap = await firestore
+    const illustrationSnapshot = await firestore
       .collection(ILLUSTRATIONS_COLLECTION_NAME)
-      .doc(illustrationId)
+      .doc(illustration_id)
       .get();
 
-    const illustrationData = illustrationSnap.data();
-
-    if (!illustrationSnap.exists || !illustrationData) {
+    const illustrationData = illustrationSnapshot.data();
+    if (!illustrationSnapshot.exists || !illustrationData) {
       throw new functions.https.HttpsError(
         'not-found',
-        `The illustration [${illustrationId}] doesn't exist.`,
+        `The illustration [${illustration_id}] doesn't exist.`,
       );
     }
 
-    if (illustrationData.user.id !== userAuth.uid) {
+    if (illustrationData.user_id !== userAuth.uid) {
       throw new functions.https.HttpsError(
         'permission-denied',
         `You don't have the permission to edit this illustration.`,
       );
     }
 
-    await illustrationSnap.ref.update({
+    await illustrationSnapshot.ref.update({
       description,
       name,
-      story,
-      updatedAt: adminApp.firestore.Timestamp.now(),
+      lore,
+      updated_at: adminApp.firestore.Timestamp.now(),
     });
 
     return {
       illustration: {
-        id: illustrationId,
+        id: illustration_id,
       },
       success: true,
     }
   });
 
 /**
- * Update illustration's styles.
- * Styles are pre-defined (by the app) and are limited to 5.
+ * Update illustration's art movements.
+ * Art movements are pre-defined (by staff) and are limited to 5.
  */
-export const updateStyles = functions
+export const updateArtMovements = functions
   .region(cloudRegions.eu)
   .https
   .onCall(async (data: UpdateIllusStylesParams, context) => {
@@ -890,67 +880,72 @@ export const updateStyles = functions
       );
     }
     
-    const { styles, illustrationId } = data;
+    const { art_movements: art_movements_data, illustration_id } = data;
     
-    if (typeof illustrationId !== 'string') {
+    if (typeof illustration_id !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument', 
-        `The function must be called  with a valid [illustrationId]
+        `The function must be called  with a valid [illustration_id]
          argument which is the illustration's id.`,
       );
     }
     
-    if (!Array.isArray(styles)) {
+    if (!Array.isArray(art_movements_data)) {
       throw new functions.https.HttpsError(
         'invalid-argument', 
-        `The function must be called  with a valid [styles]
+        `The function must be called  with a valid [art_movements]
          argument which is an array of string.`,
       );
     }
     
-    if (styles.length > 5) {
+    if (art_movements_data.length > 5) {
       throw new functions.https.HttpsError(
         'out-of-range',
-        `Please use no more than 5 styles. You provided ${styles.length} styles.`
+        `Please use no more than 5 art_movements. ` +
+        `You provided ${art_movements_data.length} art_movements.`,
       )
     }
 
-
-    const illustrationSnap = await firestore
+    const illustrationSnapshot = await firestore
       .collection(ILLUSTRATIONS_COLLECTION_NAME)
-      .doc(illustrationId)
+      .doc(illustration_id)
       .get();
 
-    const docData = illustrationSnap.data();
-
-    if (!illustrationSnap.exists || !docData) {
+    const illustrationData = illustrationSnapshot.data();
+    if (!illustrationSnapshot.exists || !illustrationData) {
       throw new functions.https.HttpsError(
         'not-found',
-        `The illustration [${illustrationId}] doesn't exist.`,
+        `The illustration [${illustration_id}] doesn't exist.`,
       );
     }
 
-    if (docData.user.id !== userAuth.uid) {
+    if (illustrationData.user_id !== userAuth.uid) {
       throw new functions.https.HttpsError(
         'permission-denied',
         `You don't have the permission to update this illustration.`,
       );
     }
 
-    const stylesMap: Record<string, boolean> = {};
+    const art_movements: Record<string, boolean> = {};
+    for await (const art_movement of art_movements_data) {
+      const artMovementSnapshot = await firestore
+        .collection(ART_MOVEMENTS_COLLECTION_NAME)
+        .doc(art_movement)
+        .get()
 
-    for (const style of styles) {
-      stylesMap[style] = true;
+      if (artMovementSnapshot.exists) {
+        art_movements[art_movement] = true;
+      }
     }
 
-    await illustrationSnap.ref.update({ 
-      styles: stylesMap, 
-      updatedAt: adminApp.firestore.Timestamp.now(),
+    await illustrationSnapshot.ref.update({ 
+      art_movements,
+      updated_at: adminApp.firestore.Timestamp.now(),
     });
 
     return { 
       illustration: {
-        id: illustrationId,
+        id: illustration_id,
       }, 
       success: true, 
     };
@@ -973,14 +968,13 @@ export const updateTopics = functions
       );
     }
 
-    const { topics, illustrationId } = data;
+    const { topics, illustration_id } = data;
 
-
-    if (typeof illustrationId !== 'string') {
+    if (typeof illustration_id !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called  with a valid [illustrationId]
-         argument which is the illustration's id.`,
+        `The function must be called  with a valid [illustration_id] ` +
+         `argument which is the illustration's id.`,
       );
     }
 
@@ -999,21 +993,20 @@ export const updateTopics = functions
       )
     }
     
-    const illustrationSnap = await firestore
+    const illustrationSnapshot = await firestore
       .collection(ILLUSTRATIONS_COLLECTION_NAME)
-      .doc(illustrationId)
+      .doc(illustration_id)
       .get();
 
-    const illustrationData = illustrationSnap.data();
-
-    if (!illustrationSnap.exists || !illustrationData) {
+    const illustrationData = illustrationSnapshot.data();
+    if (!illustrationSnapshot.exists || !illustrationData) {
       throw new functions.https.HttpsError(
         'not-found',
-        `The illustration id [${illustrationId}] doesn't exist.`,
+        `The illustration id [${illustration_id}] doesn't exist.`,
       );
     }
 
-    if (illustrationData.user.id !== userAuth.uid) {
+    if (illustrationData.user_id !== userAuth.uid) {
       throw new functions.https.HttpsError(
         'permission-denied',
         `You don't have the permission to edit this illustration.`,
@@ -1021,19 +1014,18 @@ export const updateTopics = functions
     }
 
     const topicsMap: Record<string, boolean> = {};
-    
     for (const topic of topics) {
       topicsMap[topic] = true;
     }
 
-    await illustrationSnap.ref.update({ 
+    await illustrationSnapshot.ref.update({ 
       topics: topicsMap,
-      updatedAt: adminApp.firestore.Timestamp.now(),
+      updated_at: adminApp.firestore.Timestamp.now(),
     });
 
     return {
       illustration: {
-        id: illustrationId,
+        id: illustration_id,
       },
       success: true,
     }
@@ -1056,13 +1048,13 @@ export const updateVisibility = functions
       );
     }
 
-    const { illustrationId, visibility } = data;
+    const { illustration_id, visibility } = data;
 
-    if (typeof illustrationId !== 'string') {
+    if (typeof illustration_id !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called  with a valid [illustrationId]
-         argument which is the illustration's id.`,
+        `The function must be called  with a valid [illustration_id] `+
+         `argument which is the illustration's id.`,
       );
     }
 
@@ -1076,35 +1068,35 @@ export const updateVisibility = functions
 
     checkVisibilityValue(visibility);
 
-    const illustrationSnap = await firestore
+    const illustrationSnapshot = await firestore
       .collection(ILLUSTRATIONS_COLLECTION_NAME)
-      .doc(illustrationId)
+      .doc(illustration_id)
       .get();
 
-    const illustrationData = illustrationSnap.data();
+    const illustrationData = illustrationSnapshot.data();
 
-    if (!illustrationSnap.exists || !illustrationData) {
+    if (!illustrationSnapshot.exists || !illustrationData) {
       throw new functions.https.HttpsError(
         'not-found',
-        `The illustration id [${illustrationId}] doesn't exist.`,
+        `The illustration id [${illustration_id}] doesn't exist.`,
       );
     }
 
-    if (illustrationData.user.id !== userAuth.uid) {
+    if (illustrationData.user_id !== userAuth.uid) {
       throw new functions.https.HttpsError(
         'permission-denied',
         `You don't have the permission to edit this illustration.`,
       );
     }
 
-    await illustrationSnap.ref.update({ 
+    await illustrationSnapshot.ref.update({ 
       visibility, 
-      updatedAt: adminApp.firestore.Timestamp.now(),
+      updated_at: adminApp.firestore.Timestamp.now(),
     });
 
     return {
       illustration: {
-        id: illustrationId,
+        id: illustration_id,
       },
       success: true,
     }
@@ -1123,46 +1115,46 @@ function checkUpdatePresentationParams(data: UpdateIllusPresentationParams) {
     throw new functions.https.HttpsError(
       'invalid-argument', 
       `The function must be called with valid
-       [description], [illustrationId], [name], [story] parameters.`,
+       [description], [illustration_id], [name], [lore] parameters.`,
     );
   }
 
   const { 
     description,
-    illustrationId,
+    illustration_id,
     name,
-    story,
+    lore,
   } = data;
 
   if (typeof description !== 'string') {
     throw new functions.https.HttpsError(
       'invalid-argument', 
       `The function must be called with a valid
-       [description] parameter which is the image's description.`,
+       [description] parameter which is the illustration's description.`,
       );
   }
 
-  if (typeof illustrationId !== 'string') {
+  if (typeof illustration_id !== 'string') {
     throw new functions.https.HttpsError(
       'invalid-argument', 
-      `The function must be called with a valid [iillustrationIdd]
-       parameter which is the image's id.`,
+      `The function must be called with a valid [illustration_id] ` +
+       `parameter which is the illustration's id.`,
     );
   }
 
   if (typeof name !== 'string') {
     throw new functions.https.HttpsError(
       'invalid-argument', 
-      `The function must be called with a valid [name]
-       parameter which is the image's name.`,
+      `The function must be called with a valid [name] ` +
+       `parameter which is the illustration's name.`,
     );
   }
 
-  if (typeof story !== 'string') {
+  if (typeof lore !== 'string') {
     throw new functions.https.HttpsError(
       'invalid-argument', 
-      `The function must be called with a valid [license]
-       parameter which is the image's license.`,
+      `The function must be called with a valid [lore] ` +
+       `parameter which is the illustration's lore.`,
       );
   }
 }
@@ -1219,7 +1211,7 @@ function checkVisibilityValue(visibility: string) {
     case "acl":
     case "private":
     case "public":
-    case "unlisted":
+    case "archived":
       isAllowed = true;
       break;
     default:
@@ -1230,7 +1222,7 @@ function checkVisibilityValue(visibility: string) {
   if (!isAllowed) {
     throw new functions.https.HttpsError(
       'invalid-argument',
-      `Invalide [visibility] value. Allowed values are: [acl], [private], [public], [unlisted].`,
+      `Invalide [visibility] value. Allowed values are: [acl], [private], [public], [archived].`,
     );
   }
 }
@@ -1240,7 +1232,7 @@ function checkVisibilityValue(visibility: string) {
  * @param illustrationId Illustration's id.
  * @returns void.
  */
- async function createStatsCollection(illustrationId: string) {
+ async function createStatsCollection(illustrationId: string, user_id: string) {
   const snapshot = await firestore
     .collection(ILLUSTRATIONS_COLLECTION_NAME)
     .doc(illustrationId)
@@ -1252,13 +1244,15 @@ function checkVisibilityValue(visibility: string) {
 
   await snapshot.ref
     .collection(ILLUSTRATION_STATISTICS_COLLECTION_NAME)
-    .doc('base')
+    .doc(BASE_DOCUMENT_NAME)
     .create({
       downloads: 0,
       illustration_id: illustrationId,
       likes: 0,
       shares: 0,
       views: 0,
+      user_id: '',
+      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
     });
 }
 
@@ -1442,7 +1436,6 @@ async function setUserProfilePicture(objectMeta: functions.storage.ObjectMetadat
 
   // Exit if not an image file.
   const contentType = objectMeta.contentType || '';
-
   if (!contentType.includes('image')) {
     console.info(`Exiting function => existing image or non-file image: ${filepath}`);
     return false;
@@ -1460,7 +1453,6 @@ async function setUserProfilePicture(objectMeta: functions.storage.ObjectMetadat
   }
 
   await imageFile.makePublic()
-
   const extension = objectMeta.metadata?.extension ||
   filename.substring(filename.lastIndexOf('.')).replace('.', '');
 
@@ -1485,24 +1477,20 @@ async function setUserProfilePicture(objectMeta: functions.storage.ObjectMetadat
     .collection(USERS_COLLECTION_NAME)
     .doc(userId)
     .update({
-      profilePicture: {
+      profile_icture: {
         dimensions: {
           height: dimensions.height ?? 0,
           width: dimensions.width ?? 0,
         },
         extension,
-        path: {
-          edited: '',
-          original: filepath,
-        },
-        size: parseFloat(objectMeta.size),
-        type: dimensions.type ?? '',
-        updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
-        url: {
+        links: {
           edited: '',
           original: firebaseDownloadUrl,
           storage: storageUrl,
         },
+        size: parseFloat(objectMeta.size),
+        type: dimensions.type ?? '',
+        updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
       },
     });
 }

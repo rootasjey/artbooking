@@ -4,109 +4,593 @@ import { adminApp } from './adminApp';
 import { 
   BASE_DOCUMENT_NAME, 
   BOOKS_COLLECTION_NAME, 
+  BOOK_LIKED_BY_COLLECTION_NAME, 
   BOOK_STATISTICS_COLLECTION_NAME, 
+  CHALLENGES_COLLECTION_NAME, 
   checkUserIsSignedIn, 
   cloudRegions, 
+  CONTESTS_COLLECTION_NAME, 
+  GALLERIES_COLLECTION_NAME, 
   ILLUSTRATIONS_COLLECTION_NAME, 
+  ILLUSTRATION_LIKED_BY_COLLECTION_NAME, 
   ILLUSTRATION_STATISTICS_COLLECTION_NAME, 
+  LICENSES_COLLECTION_NAME, 
+  LIKE_BOOK_TYPE, 
+  LIKE_ILLUSTRATION_TYPE, 
+  NOTIFICATIONS_DOCUMENT_NAME, 
   randomIntFromInterval, 
   STATISTICS_COLLECTION_NAME, 
   STORAGES_DOCUMENT_NAME, 
   USERS_COLLECTION_NAME, 
+  USER_LICENSES_COLLECTION_NAME, 
+  USER_PAGES_COLLECTION_NAME, 
+  USER_PUBLIC_FIELDS_COLLECTION_NAME, 
   USER_STATISTICS_COLLECTION_NAME 
 } from './utils';
 
 const firebaseTools = require('firebase-tools');
 const firestore = adminApp.firestore();
 
+const LIKE_DOC_PATH = 'users/{user_id}/user_likes/{like_id}'
+
 /**
  * Update list.quote doc to use same id
  * Must be used after app updates (mobile & web).
  */
-export const updateUserLists = functions
+export const migration = functions
   .region(cloudRegions.eu)
   .https
   .onRequest(async ({}, res) => {
-    // The app has very few users right now (less than 20).
-    // const userSnapshot = await firestore
-    //   .collection(USERS_COLLECTION_NAME)
-    //   .limit(100)
-    //   .get();
+    // migrate users
+    // -----
+    const usersSnapshot = await firestore
+      .collection(USERS_COLLECTION_NAME)
+      .limit(100)
+      .get();
 
-    // for await (const user of userSnapshot.docs) {
-    //   await createUserStatisticsCollection(user.id);
-    //   const data = user.data()
-    //   const stats = data.stats
+    for await (const userDoc of usersSnapshot.docs) {
+      // await createUserStatisticsCollection(userDoc.id);
+      const userData = userDoc.data()
 
-    //   const statsCollection = adminApp.firestore()
-    //     .collection(USERS_COLLECTION_NAME)
-    //     .doc(user.id)
-    //     .collection(STATISTICS_COLLECTION_NAME);
+      await userDoc.ref.set({
+        created_at: userData.createdAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+        email: userData.email,
+        language: userData.lang || 'en',
+        name: userData.name,
+        name_lower_case: userData.nameLowerCase,
+        pricing: userData.pricing,
+        profile_picture: {
+          dimension: {
+            height: userData.profilePicture?.dimensions?.height ?? 0,
+            width: userData.profilePicture?.dimensions?.width ?? 0,
+          },
+          extension: userData.profilePicture?.ext ?? userData.profilePicture?.extension ?? '',
+          links: {
+            edited: userData.profilePicture.url.edited,
+            original: userData.profilePicture.url.original,
+          },
+          path: {
+            edited: userData.profilePicture?.path?.edited ?? '',
+            original: userData.profilePicture?.path?.original ?? '',
+          },
+          size: userData.profilePicture?.size ?? 0,
+          updated_at: userData.profilePicture?.updatedAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+        },
+        rights: {
+          'user:manage_licenses': userData.rights['user:managelicenses'] || false,
+          'user:manage_art_movements': userData.rights['user:manageartstyles'] || false,
+          'user:manage_sections': userData.rights['user:managesections'] || false,
+          'user:manage_users': userData.rights['user:manageusers'] || false,
+        },
+        social_links: {
+          artstation: userData.urls.artstation,
+          devianart: userData.urls.deviantart,
+          discord: userData.urls.discord,
+          dribbble: userData.urls.dribbble,
+          facebook: userData.urls.facebook,
+          instagram: userData.urls.instagram,
+          patreon: userData.urls.patreon,
+          tumblr: userData.urls.tumblr,
+          tiktok: userData.urls.tiktok,
+          tipeee: userData.urls.tipeee,
+          twitch: userData.urls.twitch,
+          twitter: userData.urls.twitter,
+          website: userData.urls.website,
+          wikipedia: userData.urls.wikipedia,
+          youtube: userData.urls.youtube,
+        },
+        updated_at: userData.updatedAt ?? adminApp.firestore.Timestamp.now(),
+        user_id: userData.uid,
+      })
 
-    //   const { books, illustrations, storage } = stats
+      // migrate user's licenses
+      const userLicensesSnapshot = await adminApp.firestore()
+        .collection(USERS_COLLECTION_NAME)
+        .doc(userDoc.id)
+        .collection(LICENSES_COLLECTION_NAME)
+        .get()
 
-    //   await statsCollection
-    //   .doc('books')
-    //   .update({
-    //     created: books.created,
-    //     deleted: books.deleted,
-    //     liked: 0,
-    //     owned: books.owned,
-    //     updatedAt: adminApp.firestore.Timestamp.now(),
-    //   })
+      for await (const licenseDoc of userLicensesSnapshot.docs) {
+        const data = licenseDoc.data()
 
-    //   await statsCollection
-    //   .doc(ILLUSTRATIONS_COLLECTION_NAME)
-    //   .update({
-    //     created: illustrations.created,
-    //     deleted: illustrations.deleted,
-    //     liked: 0,
-    //     owned: illustrations.owned,
-    //     updated: illustrations.updated,
-    //     updatedAt: adminApp.firestore.Timestamp.now(),
-    //   })
+        await adminApp.firestore()
+        .collection(USERS_COLLECTION_NAME)
+        .doc(userDoc.id)
+        .collection(USER_LICENSES_COLLECTION_NAME)
+        .add({
+          abbreviation: data.abbreviation ?? '',
+          created_at: data.createdAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+          created_by: data.createdBy?.id ?? '',
+          description: data.description ?? '',
+          id: data.id ?? '',
+          license_updated_at: data.licenseUpdatedAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+          links: {
+            image: data.urls?.image ?? '',
+            legal_code: data.urls?.legalCode ?? '',
+            terms: data.urls?.terms ?? '',
+            privacy: data.urls?.privacy ?? '',
+            wikipedia: data.urls?.wikipedia ?? '',
+            website: data.urls?.website ?? '',
+          },
+          name: data.name ?? '',
+          notice: data.notice ?? '',
+          terms: {
+            attribution: false,
+            no_additional_restriction: false,
+          },
+          type: data.type ?? "user" as EnumLicenseType.user,
+          updated_at: data.updatedAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+          updated_by: data.updatedBy?.id ??'',
+          usage: {
+            commercial: data.usage.commercial ?? false,
+            foss: data.usage.foss ?? false,
+            free: data.usage.free ?? false,
+            oss: data.usage.oss ?? false,
+            personal: data.usage.personal ?? false,
+            print: data.usage.print ?? false,
+            remix: data.usage.adapt ?? false,
+            sell: data.usage.sell ?? false,
+            share: data.usage.share ?? false,
+            share_a_like: data.usage.shareALike ?? false,
+            view: data.usage.view ?? true,
+          },
+          version: '1.0',
+        })
+      }
 
-    //   await statsCollection
-    //   .doc(STORAGES_DOCUMENT_NAME)
-    //   .update({ // all number values are in bytes
-    //     illustrations: {
-    //       total: storage.illustrations.total,
-    //       used: storage.illustrations.used,
-    //       updatedAt: adminApp.firestore.Timestamp.now(),
-    //     },
-    //     videos: {
-    //       total: 0,
-    //       used: 0,
-    //       updatedAt: adminApp.firestore.Timestamp.now(),
-    //     },
-    //   })
-    // }
+      // migrate pages
+      const pagesSnapshot = await adminApp.firestore()
+        .collection(USERS_COLLECTION_NAME)
+        .doc(userDoc.id)
+        .collection("pages")
+        .get()
 
-    // const appBookStats = await firestore
-    //   .collection('stats')
-    //   .doc('books')
-    //   .get();
+      for await (const pageDoc of pagesSnapshot.docs) {
+        const pageData = pageDoc.data();
+        const sectionsData = pageData.sections.map((sectionData: any) => {
+          return {
+            created_at: sectionData.createdAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+            data_types: sectionData.dataTypes,
+            description: sectionData.description,
+            id: sectionData.id,
+            items: sectionData.items,
+            mode: sectionData.mode,
+            modes: sectionData.modes,
+            name: sectionData.name,
+            size: sectionData.size ?? 'large',
+            sizes: sectionData.sizes,
+          }
+        })
 
-    // const appBookData = appBookStats.data();
-    // if (appBookData) {
-    //   await firestore
-    //     .collection(STATISTICS_COLLECTION_NAME)
-    //     .doc('books')
-    //     .create(appBookData)
-    // }
+        await adminApp.firestore()
+          .collection(USERS_COLLECTION_NAME)
+          .doc(userDoc.id)
+          .collection(USER_PAGES_COLLECTION_NAME)
+          .add({
+            created_at: pageData.createdAt,
+            is_active: pageData.isActive,
+            is_draft: pageData.isDraft,
+            name: pageData.name,
+            sections: sectionsData,
+            type: pageData.type,
+            updated_at: pageData.updatedAt,
+          })
+      }
 
-    // const appIllustrationStats = await firestore
-    //   .collection('stats')
-    //   .doc(ILLUSTRATIONS_COLLECTION_NAME)
-    //   .get();
+      // migrate public
+      const publicSnap = await adminApp.firestore()
+        .collection(USERS_COLLECTION_NAME)
+        .doc(userDoc.id)
+        .collection('public')
+        .doc("basic")
+        .get()
 
-    // const appIllustrationData = appIllustrationStats.data();
-    // if (appIllustrationData) {
-    //   await firestore
-    //     .collection(STATISTICS_COLLECTION_NAME)
-    //     .doc(ILLUSTRATIONS_COLLECTION_NAME)
-    //     .create(appIllustrationData)
-    // }
+      const publicDocData = publicSnap.data();
+
+      if (publicDocData) {
+        await adminApp.firestore()
+          .collection(USERS_COLLECTION_NAME)
+          .doc(userDoc.id)
+          .collection(USER_PUBLIC_FIELDS_COLLECTION_NAME)
+          .doc(BASE_DOCUMENT_NAME)
+          .create({
+            location: publicDocData.location,
+            name: publicDocData.name,
+            profile_picture: {
+              dimensions: {
+                height: publicDocData.profilePicture?.dimensions?.height ?? 0,
+                width: publicDocData.profilePicture?.dimensions?.width ?? 0,
+              },
+              extension: userData.profilePicture?.ext ?? userData.profilePicture?.extension ?? '',
+              links: {
+                edited: userData.profilePicture.url.edited,
+                original: userData.profilePicture.url.original,
+              },
+              path: {
+                edited: userData.profilePicture?.path?.edited ?? '',
+                original: userData.profilePicture?.path?.original ?? '',
+              },
+              size: userData.profilePicture?.size ?? 0,
+              updated_at: userData.profilePicture?.updatedAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+            },
+            social_links: publicDocData.urls,
+            summary: publicDocData.summary,
+          })
+      }
+
+      // migrate statistics
+      const statisticsSnap = await adminApp.firestore()
+        .collection(USERS_COLLECTION_NAME)
+        .doc(userDoc.id)
+        .collection(STATISTICS_COLLECTION_NAME)
+        .get();
+
+      for await (const statsDoc of statisticsSnap.docs) {
+        const statsDocData = statsDoc.data()
+
+        let payload: Record<string, any> = {
+          created: statsDocData.created,
+          deleted: statsDocData.deleted,
+          name: statsDoc.id,
+          owned: statsDocData.owned,
+          updated_at: statsDocData.updatedAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+          user_id: userDoc.id,
+        }
+
+        if (statsDoc.id === 'books') {
+          payload = { ... payload, ...{ liked: statsDocData.liked }}
+        }
+
+        if (statsDoc.id === 'challenges' || statsDoc.id === 'contests') {
+          payload = { ...payload, ...{ 
+            entered: statsDocData.entered,
+            participating: statsDocData.participating,
+            won: statsDocData.won,
+          }}
+        }
+
+        if (statsDoc.id === 'galleries') {
+          payload = { ...payload, ...{ 
+            entered: statsDocData.entered,
+          }}
+        }
+
+        if (statsDoc.id === 'illustrations') {
+          payload = { ... payload, ...{ 
+            liked: statsDocData.liked, 
+            updated: statsDocData.updated ?? 0, 
+          }}
+        }
+
+        if (statsDoc.id === 'notifications') {
+          payload = {
+            name: statsDoc.id,
+            total: 0,
+            unread: 0,
+            user_id: userDoc.id,
+            updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+          }
+        }
+
+        if (statsDoc.id === 'storages') {
+          payload = {
+            illustrations: {
+              total: 0,
+              updated_at: statsDocData.illustrations?.updatedAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+              used: statsDocData.illustrations.used,
+            },
+            name: statsDoc.id,
+            videos: {
+              total: 0,
+              updated_at: statsDocData.videos?.updatedAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+              used: statsDocData.videos.used,
+            },
+            user_id: userDoc.id,
+          }
+        }
+
+        await adminApp.firestore()
+        .collection(USERS_COLLECTION_NAME)
+        .doc(userDoc.id)
+        .collection(USER_STATISTICS_COLLECTION_NAME)
+        .doc(statsDoc.id)
+        .create(payload)
+      }
+    }
+
+    // migrate global licenses
+    const licensesSnapshot = await adminApp.firestore()
+        .collection(LICENSES_COLLECTION_NAME)
+        .get()
+
+    for await (const licenseDoc of licensesSnapshot.docs) {
+      const data = licenseDoc.data()
+
+      await adminApp.firestore()
+      .collection(USER_LICENSES_COLLECTION_NAME)
+      .add({
+        abbreviation: data.abbreviation,
+        created_at: data.createdAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+        created_by: data.createdBy?.id ?? '',
+        description: data.description ?? '',
+        license_updated_at: data.licenseUpdatedAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+        links: {
+          image: data.urls.image ?? '',
+          legal_code: data.urls.legalCode ?? '',
+          terms: data.urls.terms ?? '',
+          privacy: data.urls.privacy ?? '',
+          wikipedia: data.urls.wikipedia ?? '',
+          website: data.urls.website ?? '',
+        },
+        name: data.name ?? '',
+        notice: data.notice ?? '',
+        terms: {
+          attribution: false,
+          no_additional_restriction: false,
+        },
+        type: data.type ?? "staff" as EnumLicenseType.user,
+        updated_at: data.updatedAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+        updated_by: data.updatedBy?.id ?? '',
+        usage: {
+          commercial: data.usage.commercial ?? false,
+          foss: data.usage.foss ?? false,
+          free: data.usage.free ?? false,
+          oss: data.usage.oss ?? false,
+          personal: data.usage.personal ?? false,
+          print: data.usage.print ?? false,
+          remix: data.usage.adapt ?? false,
+          sell: data.usage.sell ?? false,
+          share: data.usage.share ?? false,
+          share_a_like: data.usage.shareALike ?? false,
+          view: data.usage.view ?? true,
+        },
+        version: data.version ?? '1.0',
+      })
+    }
+
+    // migrate global sections
+    const sectionsSnap = await adminApp.firestore()
+      .collection("sections")
+      .get()
+
+    for await (const sectionDoc of sectionsSnap.docs) {
+      const sectionData = sectionDoc.data()
+
+      await adminApp.firestore()
+      .collection("sections")
+      .doc(sectionDoc.id)
+      .set({
+        created_at: sectionData.createdAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+        data_types: sectionData.dataTypes,
+        description: sectionData.description,
+        items: sectionData.items,
+        mode: sectionData.mode,
+        modes: sectionData.modes,
+        name: sectionData.name,
+        size: sectionData.size ?? 'large',
+        sizes: sectionData.sizes,
+        updated_at: sectionData.updatedAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+      })
+    }
+
+    // migrate gloabl stats
+    const bookStatsSnapshot = await adminApp.firestore()
+      .collection(STATISTICS_COLLECTION_NAME)
+      .doc(BOOKS_COLLECTION_NAME)
+      .get()
+
+    const bookStatsData = bookStatsSnapshot.data()
+    if (bookStatsData) {
+      await bookStatsSnapshot.ref.set({
+        created: bookStatsData.created,
+        current: bookStatsData.total,
+        deleted: bookStatsData.deleted,
+        shared: bookStatsData.shared,
+        updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      })
+    }
+
+    const illusStatsSnapshot = await adminApp.firestore()
+      .collection(STATISTICS_COLLECTION_NAME)
+      .doc(ILLUSTRATIONS_COLLECTION_NAME)
+      .get()
+
+    const illusStatsData = illusStatsSnapshot.data()
+    if (illusStatsData) {
+      await illusStatsSnapshot.ref.set({
+        created: illusStatsData.created,
+        current: illusStatsData.total,
+        deleted: illusStatsData.deleted,
+        downloaded: illusStatsData.downloaded,
+        remixed: 0,
+        shared: illusStatsData.shared,
+        updated: illusStatsData.updated,
+        updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      })
+    }
+
+    await adminApp.firestore()
+      .collection(STATISTICS_COLLECTION_NAME)
+      .doc(LICENSES_COLLECTION_NAME)
+      .create({
+        created: 0,
+        current: 0,
+        deleted: 0,
+        updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      })
+
+    await adminApp.firestore()
+      .collection(STATISTICS_COLLECTION_NAME)
+      .doc("pages")
+      .create({
+        created: 0,
+        current: 0,
+        deleted: 0,
+        shared: 0,
+        updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      })
+      
+
+    await adminApp.firestore()
+      .collection(STATISTICS_COLLECTION_NAME)
+      .doc("sections")
+      .create({
+        created: 0,
+        current: 0,
+        deleted: 0,
+        updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      })
+
+    await adminApp.firestore()
+      .collection(STATISTICS_COLLECTION_NAME)
+      .doc(USERS_COLLECTION_NAME)
+      .create({
+        created: 0,
+        current: 0,
+        deleted: 0,
+        updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      })
+    
+    // migrate gloabl styles -> art_movements
+    const artStyleSnap = await adminApp.firestore()
+      .collection("styles")
+      .get()
+
+      for await (const artStyleDoc of artStyleSnap.docs) {
+        const data = artStyleDoc.data()
+        await adminApp.firestore()
+          .collection("art_movements")
+          .doc(artStyleDoc.id)
+          .create({
+            created_at: data.createdAt,
+            description: data.description,
+            links: data.urls,
+            name: data.name,
+            udpated_at: data.udpatedAt,
+          })
+      }
+
+    // migrate gloabl books
+    const bookSnapshot = await adminApp.firestore()
+      .collection(BOOKS_COLLECTION_NAME)
+      .get()
+
+    for await (const bookDoc of bookSnapshot.docs) {
+      const data = bookDoc.data()
+
+      await bookDoc.ref
+        .set({
+          count: data.count,
+          cover: {
+            mode: 'last_illustration_added',
+            link: data.cover?.auto?.url ?? '',
+            updated_at: data.cover?.auto?.updatedAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+          },
+          created_at: data.createdAt,
+          description: data.description,
+          illustrations: data.illustrations.map((illus: any) => {
+            return {
+              created_at: illus.createdAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+              id: illus.id,
+              scale_factor: {
+                height: 1,
+                width: 1,
+              },
+            }
+          }),
+          layout: 'grid',
+          layout_orientation: 'vertical',
+          links: {
+            share: {
+              read: '',
+              write: '',
+            }
+          },
+          name: data.name || '',
+          updated_at: data.updatedAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+          user_id: data.user.id,
+          visibility: data.visibility ?? 'public',
+        })
+
+      await bookDoc.ref.collection(BOOK_STATISTICS_COLLECTION_NAME)
+        .doc(BASE_DOCUMENT_NAME)
+        .create({
+          book_id: bookDoc.id,
+          downloads: 0,
+          likes: 0,
+          shares: 0,
+          user_id: data.user.id,
+          views: 0,
+        })
+    }
+
+    // migrate gloabl illustrations
+    const illustrationsSnap = await adminApp.firestore()
+      .collection(ILLUSTRATIONS_COLLECTION_NAME)
+      .get()
+
+    for await (const illustrationDoc of illustrationsSnap.docs) {
+      const data = illustrationDoc.data()
+
+      await illustrationDoc.ref
+        .set({
+          art_movements: data.styles ?? {},
+          created_at: data.createdAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+          description: data.description ?? '',
+          dimensions: data.dimensions,
+          extension: data.extension ?? data.ext ?? '',
+          license: {
+            id: data.license?.id ?? '',
+            type: data.license?.from ?? data.license?.type ?? '',
+          },
+          links: {
+            original: data.urls.original,
+            storage: data.urls.storage,
+            thumbnails: data.urls.thumbnails,
+          },
+          lore: data.story ?? '',
+          name: data.name,
+          size: data.size,
+          topics: data.topics ?? {},
+          updated_at: data.updatedAt ?? adminApp.firestore.FieldValue.serverTimestamp(),
+          user_id: data.user.id,
+          version: data.version ?? 1,
+          visibility: data.visibility ?? 'public',
+        })
+
+        await illustrationDoc.ref
+        .collection(ILLUSTRATION_STATISTICS_COLLECTION_NAME)
+        .doc(BASE_DOCUMENT_NAME)
+        .create({
+          downloads: 0,
+          illustration_id: illustrationDoc.id,
+          likes: 0,
+          shares: 0,
+          views: 0,
+          updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+          user_id: data.user.id,
+        })
+    }
 
     res.status(200).send('done');
   });
@@ -165,7 +649,7 @@ export const checkUsernameAvailability = functions
 
     const nameSnap = await firestore
       .collection(USERS_COLLECTION_NAME)
-      .where('nameLowerCase', '==', name.toLowerCase())
+      .where('name_lower_case', '==', name.toLowerCase())
       .limit(1)
       .get();
 
@@ -193,10 +677,9 @@ export const createAccount = functions
 
     const { username, password, email } = data;
 
-    const userRecord = await adminApp
+    const userAuthRecord = await adminApp
       .auth()
       .createUser({
-        displayName: username,
         password: password,
         email: email,
         emailVerified: false,
@@ -204,36 +687,37 @@ export const createAccount = functions
 
     await adminApp.firestore()
       .collection(USERS_COLLECTION_NAME)
-      .doc(userRecord.uid)
+      .doc(userAuthRecord.uid)
       .set({
-        createdAt: adminApp.firestore.Timestamp.now(),
+        created_at: adminApp.firestore.FieldValue.serverTimestamp(),
         email: email,
-        lang: 'en',
+        language: 'en',
         name: username,
-        nameLowerCase: username.toLowerCase(),
+        name_lower_case: username.toLowerCase(),
         pricing: 'free',
-        profilePicture: {
-          ext: '',
-          path: {
-            edited: '',
-            original: '',
+        profile_picture: {
+          dimensions: {
+            height: 0,
+            width: 0,
           },
-          size: 0,
-          updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
-          url: {
+          extension: '',
+          links: {
             edited: '',
             original: getRandomProfilePictureLink(),
+            storage: '',
           },
+          size: 0,
+          type: '',
+          updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
         },
         rights: {
-          'user:managedata': false,
-          'user:managelicenses': false,
-          'user:manageartstyles': false,
-          'user:managesections': false,
-          'user:manageusers': false,
+          'user:manage_data': false,
+          'user:manage_licenses': false,
+          'user:manage_art_movements': false,
+          'user:manage_sections': false,
+          'user:manage_users': false,
         },
-        updatedAt: adminApp.firestore.Timestamp.now(),
-        urls: {
+        social_links: {
           artstation: '',
           devianart: '',
           discord: '',
@@ -241,7 +725,6 @@ export const createAccount = functions
           facebook: '',
           instagram: '',
           patreon: '',
-          pp: '',
           tumblr: '',
           tiktok: '',
           tipeee: '',
@@ -251,14 +734,15 @@ export const createAccount = functions
           wikipedia: '',
           youtube: '',
         },
-        uid: userRecord.uid,
+        updated_at: adminApp.firestore.Timestamp.now(),
+        user_id: userAuthRecord.uid,
       });
 
-    await createUserStatisticsCollection(userRecord.uid)
+    await createUserStatisticsCollection(userAuthRecord.uid)
 
     return {
       user: {
-        id: userRecord.uid,
+        id: userAuthRecord.uid,
         email,
       },
     };
@@ -272,7 +756,7 @@ export const deleteAccount = functions
   .https
   .onCall(async (data: DeleteAccountParams, context) => {
     const userAuth = context.auth;
-    const { idToken } = data;
+    const { id_token } = data;
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -281,16 +765,15 @@ export const deleteAccount = functions
       );
     }
 
-    await checkUserIsSignedIn(context, idToken);
+    await checkUserIsSignedIn(context, id_token);
 
-    const userSnap = await firestore
+    const userSnapshot = await firestore
       .collection(USERS_COLLECTION_NAME)
       .doc(userAuth.uid)
       .get();
 
-    const userData = userSnap.data();
-
-    if (!userSnap.exists || !userData) {
+    const userData = userSnapshot.data();
+    if (!userSnapshot.exists || !userData) {
       throw new functions.https.HttpsError(
         'not-found',
         `This user document doesn't exist. It may have been deleted.`,
@@ -302,7 +785,7 @@ export const deleteAccount = functions
       .deleteUser(userAuth.uid);
 
     await firebaseTools.firestore
-      .delete(userSnap.ref.path, {
+      .delete(userSnapshot.ref.path, {
         project: process.env.GCLOUD_PROJECT,
         recursive: true,
         yes: true,
@@ -323,19 +806,19 @@ export const fetchUser = functions
   .region(cloudRegions.eu)
   .https
   .onCall(async (data, context) => {
-    const userId: string = data.userId;
+    const user_id: string = data.user_id;
 
-    if (typeof userId !== 'string') {
+    if (typeof user_id !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `'fetchUser' must be called with one (1) argument [userId]
+        `'fetchUser' must be called with one (1) argument [user_id]
         representing the user's id to fetch.`,
       );
     }
 
     const userSnap = await firestore
       .collection(USERS_COLLECTION_NAME)
-      .doc(userId)
+      .doc(user_id)
       .get();
 
     const userData = userSnap.data();
@@ -343,8 +826,7 @@ export const fetchUser = functions
     if (!userSnap.exists || !userData) {
       throw new functions.https.HttpsError(
         'not-found',
-        `The specified user does not exist. 
-        It may have been deleted.`,
+        `The specified user does not exist. It may have been deleted.`,
       );
     }
 
@@ -357,22 +839,19 @@ export const fetchUser = functions
     return formatUserData(userDataWithId);
   });
 
-const LIKE_ILLUSTRATION_TYPE = 'illustration';
-const LIKE_BOOK_TYPE = 'book';
-
 /**
  * When an user likes something (illustration, book).
  */
 export const onLike = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('users/{userId}/user_likes/{likeId}')
+  .document(LIKE_DOC_PATH)
   .onCreate(async (likeSnapshot, context) => {
     const data = likeSnapshot.data();
-    const { type, targetId } = data;
+    const { type, target_id, user_id } = data;
 
     // Check fields availability.
-    if (!data || !type || !targetId) {
+    if (!data || !type || !target_id) {
       return await likeSnapshot.ref.delete();
     }
 
@@ -380,7 +859,7 @@ export const onLike = functions
       return await likeSnapshot.ref.delete();
     }
 
-    if (targetId !== likeSnapshot.id) {
+    if (target_id !== likeSnapshot.id) {
       return await likeSnapshot.ref.delete();
     }
 
@@ -407,9 +886,21 @@ export const onLike = functions
       }
     }
 
-    const userId: string = context.params.userId;
-    await incrementUserLikeCount(userId, type);
-    await incrementDocumentLikeCount(likeSnapshot.id, type);
+    const user_id_path_param: string = context.params.user_id;
+    if (user_id !== user_id_path_param) {
+      return await likeSnapshot.ref.delete();
+    }
+
+    await incrementUserLikeCount(user_id_path_param, type)
+    await incrementDocumentLikeCount(likeSnapshot.id, type)
+
+    if (type === LIKE_BOOK_TYPE) {
+      await addUserToBookLike(likeSnapshot.id, user_id_path_param)
+    }
+
+    if (type === LIKE_ILLUSTRATION_TYPE) {
+      await addUserToIllustrationLike(likeSnapshot.id, user_id_path_param)
+    }
 
     return await likeSnapshot.ref.update({
       created_at: adminApp.firestore.FieldValue.serverTimestamp(),
@@ -422,13 +913,13 @@ export const onLike = functions
 export const onUnLike = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('users/{userId}/user_likes/{likeId}')
+  .document(LIKE_DOC_PATH)
   .onDelete(async (likeSnapshot, context) => {
     const data = likeSnapshot.data();
-    const { type, targetId } = data;
+    const { type, target_id } = data;
 
     // Check fields availability.
-    if (!data || !type || !targetId) {
+    if (!data || !type || !target_id) {
       return;
     }
 
@@ -436,7 +927,7 @@ export const onUnLike = functions
       return;
     }
 
-    if (targetId !== likeSnapshot.id) {
+    if (target_id !== likeSnapshot.id) {
       return;
     }
 
@@ -463,9 +954,19 @@ export const onUnLike = functions
       }
     }
 
-    const userId: string = context.params.userId;
-    await decrementUserLikeCount(userId, type);
+    const user_id_path_param: string = context.params.user_id
+    await decrementUserLikeCount(user_id_path_param, type)
     await decrementDocumentLikeCount(likeSnapshot.id, type)
+
+    if (type === LIKE_BOOK_TYPE) {
+      await removeUserToBookLike(likeSnapshot.id, user_id_path_param)
+    }
+
+    if (type === LIKE_ILLUSTRATION_TYPE) {
+      await removeUserToIllustrationLike(likeSnapshot.id, user_id_path_param)
+    }
+
+    return true
   })
 
 /**
@@ -474,29 +975,22 @@ export const onUnLike = functions
 export const onCreatePublicInfo = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('users/{userId}')
+  .document('users/{user_id}')
   .onCreate(async (snapshot, context) => {
     const data = snapshot.data();
-    const userId: string = context.params.userId;
-    
-    if (typeof userId !== 'string') {
-      throw new functions.https.HttpsError(
-        'unauthenticated',
-        `There was an issue with the user's id. Its value: [${userId}].`,
-      );
-    }
+    const user_id_path_param: string = context.params.user_id;
 
     return await adminApp.firestore()
       .collection(USERS_COLLECTION_NAME)
-      .doc(userId)
-      .collection('public')
-      .doc('basic')
+      .doc(user_id_path_param)
+      .collection(USER_PUBLIC_FIELDS_COLLECTION_NAME)
+      .doc(BASE_DOCUMENT_NAME)
       .create({
         location: data.location,
         name: data.name,
-        profilePicture: data.profilePicture,
+        profile_picture: data.profile_picture,
         summary: data.summary,
-        urls: data.urls,
+        social_links: data.social_links,
       });
   })
 
@@ -507,7 +1001,7 @@ export const onCreatePublicInfo = functions
 export const onUpdatePublicInfo = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('users/{userId}')
+  .document('users/{user_id}')
   .onUpdate(async (change, context) => {
     const shouldUpdate = shouldUpdatePublicInfo(change);
     if (!shouldUpdate) {
@@ -515,26 +1009,19 @@ export const onUpdatePublicInfo = functions
     }
 
     const afterData = change.after.data();
-    const userId: string = context.params.userId;
-    
-    if (typeof userId !== 'string') {
-      throw new functions.https.HttpsError(
-        'unauthenticated',
-        `There was an issue with the user's id. Its value: [${userId}].`,
-      );
-    }
+    const user_id: string = context.params.user_id;
 
     return await adminApp.firestore()
       .collection(USERS_COLLECTION_NAME)
-      .doc(userId)
-      .collection('public')
-      .doc('basic')
+      .doc(user_id)
+      .collection(USER_PUBLIC_FIELDS_COLLECTION_NAME)
+      .doc(BASE_DOCUMENT_NAME)
       .update({
         location: afterData.location,
         name: afterData.name,
-        profilePicture: afterData.profilePicture,
+        profile_picture: afterData.profile_picture,
         summary: afterData.summary,
-        urls: afterData.urls,
+        social_links: afterData.social_links,
       });
   })
 
@@ -548,7 +1035,7 @@ export const updateEmail = functions
   .https
   .onCall(async (data: UpdateEmailParams, context) => {
     const userAuth = context.auth;
-    const { idToken, newEmail } = data;
+    const { id_token, email } = data;
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -557,10 +1044,10 @@ export const updateEmail = functions
       );
     }
 
-    await checkUserIsSignedIn(context, idToken);
-    const isFormatOk = validateEmailFormat(newEmail);
+    await checkUserIsSignedIn(context, id_token);
+    const isFormatOk = validateEmailFormat(email);
 
-    if (!newEmail || !isFormatOk) {
+    if (!email || !isFormatOk) {
       throw new functions.https.HttpsError(
         'invalid-argument',
         `The function must be called with a valid [newEmail] argument. 
@@ -568,7 +1055,7 @@ export const updateEmail = functions
       );
     }
 
-    const isEmailTaken = await isUserExistsByEmail(newEmail);
+    const isEmailTaken = await isUserExistsByEmail(email);
 
     if (isEmailTaken) {
       throw new functions.https.HttpsError(
@@ -581,7 +1068,7 @@ export const updateEmail = functions
     await adminApp
       .auth()
       .updateUser(userAuth.uid, {
-        email: newEmail,
+        email: email,
         emailVerified: false,
       });
 
@@ -589,7 +1076,7 @@ export const updateEmail = functions
       .collection(USERS_COLLECTION_NAME)
       .doc(userAuth.uid)
       .update({
-        email: newEmail,
+        email: email,
       });
 
     return {
@@ -616,39 +1103,39 @@ export const updateUsername = functions
       );
     }
 
-    const { newUsername } = data;
-    const isFormatOk = validateNameFormat(newUsername);
+    const { username } = data;
+    const isFormatOk = validateNameFormat(username);
 
-    if (!newUsername || !isFormatOk) {
+    if (!username || !isFormatOk) {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called with a valid [newUsername].
-         The value you specified is not in a correct format.`,
+        `The function must be called with a valid [username]. ` +
+         `The value you specified is not in a correct format.`,
       );
     }
 
-    const isUsernameTaken = await isUserExistsByUsername(newUsername.toLowerCase());
+    const isUsernameTaken = await isUserExistsByUsername(username.toLowerCase());
 
     if (isUsernameTaken) {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The name specified is not available.
-         Please try with a new one.`,
+        `The name specified is not available. ` +
+         `Please try with a new one.`,
       );
     }
 
     await adminApp
       .auth()
       .updateUser(userAuth.uid, {
-        displayName: newUsername,
+        displayName: username,
       });
 
     await firestore
       .collection(USERS_COLLECTION_NAME)
       .doc(userAuth.uid)
       .update({
-        name: newUsername,
-        nameLowerCase: newUsername.toLowerCase(),
+        name: username,
+        name_lower_case: username.toLowerCase(),
       });
 
     return {
@@ -695,9 +1182,9 @@ export const updatePublicStrings = functions
   })
 
 /**
- * Update user's urls (mostly external social links).
+ * Update user's social links.
  */
-export const updateUrls = functions
+export const updateSocialLinks = functions
   .region(cloudRegions.eu)
   .https
   .onCall(async (data, context) => {
@@ -710,21 +1197,21 @@ export const updateUrls = functions
       );
     }
 
-    const urls = data.urls;
+    const socialLinks = data.socialLinks;
 
-    if (typeof urls !== 'object') {
+    if (typeof socialLinks !== 'object') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `You provided a wrong argument type for [urls]. ` +
-        `The function should be called with a [urls] argument wich is an object or map of urls.`,
+        `You provided a wrong argument type for [socialLinks]. ` +
+        `The function should be called with a [socialLinks] argument wich is an object or map of strings.`,
       );
     }
 
-    for (const [key, value] of Object.entries(urls)) {
+    for (const [key, value] of Object.entries(socialLinks)) {
       if (typeof key !== 'string' || typeof value !== 'string') {
         throw new functions.https.HttpsError(
           'invalid-argument',
-          `The [urls] argument is not a map of (string, string) for (key, value). ` +
+          `The [socialLinks] argument is not a map of (string, string) for (key, value). ` +
           `${key} has a type of ${typeof key}. ${value} has a type of ${typeof value}`,
         );
       }
@@ -734,7 +1221,7 @@ export const updateUrls = functions
       .collection(USERS_COLLECTION_NAME)
       .doc(userAuth.uid)
       .update({
-        urls
+        social_links: socialLinks
       });
   })
 
@@ -755,9 +1242,9 @@ function checkCreateAccountData(data: any) {
     return false;
   }
 
-  if (typeof data['username'] !== 'string' ||
-    typeof data['email'] !== 'string' ||
-    typeof data['password'] !== 'string') {
+  if (typeof data.username !== 'string' ||
+    typeof data.email !== 'string' ||
+    typeof data.password !== 'string') {
     return false;
   }
 
@@ -766,83 +1253,105 @@ function checkCreateAccountData(data: any) {
 
 /**
  * Create user's statistics sub-collection.
- * @param userUid User's id.
+ * @param user_id User's id.
  */
- async function createUserStatisticsCollection(userUid: string) {
-  const statsCollection = adminApp.firestore()
+ async function createUserStatisticsCollection(user_id: string) {
+  const userStatsCollection = adminApp.firestore()
   .collection(USERS_COLLECTION_NAME)
-  .doc(userUid)
-  .collection(STATISTICS_COLLECTION_NAME);
+  .doc(user_id)
+  .collection(USER_STATISTICS_COLLECTION_NAME);
 
-  await statsCollection
-    .doc('books')
+  await userStatsCollection
+    .doc(BOOKS_COLLECTION_NAME)
     .create({
       created: 0,
       deleted: 0,
       liked: 0,
+      name: BOOKS_COLLECTION_NAME,
       owned: 0,
+      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      user_id,
     })
 
-  await statsCollection
-    .doc('challenges')
+  await userStatsCollection
+    .doc(CHALLENGES_COLLECTION_NAME)
     .create({
       created: 0,
       deleted: 0,
       entered: 0,
+      name: CHALLENGES_COLLECTION_NAME,
       owned: 0,
       participating: 0,
+      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      user_id,
       won: 0,
     })
 
-  await statsCollection
-    .doc('contests')
+  await userStatsCollection
+    .doc(CONTESTS_COLLECTION_NAME)
     .create({
       created: 0,
       deleted: 0,
       entered: 0,
+      name: CONTESTS_COLLECTION_NAME,
       owned: 0,
       participating: 0,
+      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      user_id,
       won: 0,
     })
 
-  await statsCollection
-    .doc('galleries')
+  await userStatsCollection
+    .doc(GALLERIES_COLLECTION_NAME)
     .create({
       created: 0,
       deleted: 0,
       entered: 0,
+      name: GALLERIES_COLLECTION_NAME,
       opened: 0,
       owned: 0,
+      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      user_id,
     })
 
-  await statsCollection
+  await userStatsCollection
     .doc(ILLUSTRATIONS_COLLECTION_NAME)
     .create({
       created: 0,
       deleted: 0,
       liked: 0,
+      name: ILLUSTRATIONS_COLLECTION_NAME,
       owned: 0,
       updated: 0,
+      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      user_id,
     })
 
-  await statsCollection
-    .doc('notifications')
+  await userStatsCollection
+    .doc(NOTIFICATIONS_DOCUMENT_NAME)
     .create({
+      name: NOTIFICATIONS_DOCUMENT_NAME,
       total: 0,
       unread: 0,
+      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      user_id,
     })
 
 
-  await statsCollection
+  await userStatsCollection
   .doc(STORAGES_DOCUMENT_NAME)
   .create({ // all number values are in bytes
     illustrations: {
       total: 0,
       used: 0,
+      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
     },
+    name: STORAGES_DOCUMENT_NAME,
+    user_id,
     videos: {
       total: 0,
       used: 0,
+      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
     },
   })
 }
@@ -872,7 +1381,7 @@ async function decrementUserLikeCount(userId:string, likeType: string) {
   liked = typeof liked === 'number' ? liked - 1: 0;
   liked = Math.max(0, liked);
 
-  snapshot.ref.update({
+  return await snapshot.ref.update({
     liked,
     updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
   });
@@ -885,7 +1394,7 @@ async function decrementUserLikeCount(userId:string, likeType: string) {
  * @returns void.
  */
 async function decrementDocumentLikeCount(documentId:string, likeType: string) {
-  const collectionName: string = likeType === 'book' 
+  const collectionName = likeType === 'book' 
     ? BOOKS_COLLECTION_NAME
     : ILLUSTRATIONS_COLLECTION_NAME;
 
@@ -907,7 +1416,7 @@ async function decrementDocumentLikeCount(documentId:string, likeType: string) {
   likes = typeof likes === 'number' ? likes - 1 : 0;
   likes = Math.max(0, likes);
 
-  await snapshot.ref.update({ 
+  return await snapshot.ref.update({ 
     likes,
     updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
   });
@@ -920,24 +1429,24 @@ async function decrementDocumentLikeCount(documentId:string, likeType: string) {
  * @returns void.
  */
  async function incrementUserLikeCount(userId:string, likeType: string) {
-  const docName = likeType === 'books' 
+  const docStatsName = likeType === 'books' 
   ? BOOKS_COLLECTION_NAME
   : ILLUSTRATIONS_COLLECTION_NAME;
 
-  const snapshot = await firestore
+  const userStatsSnapshot = await firestore
     .collection(USERS_COLLECTION_NAME)
     .doc(userId)
     .collection(USER_STATISTICS_COLLECTION_NAME)
-    .doc(docName)
+    .doc(docStatsName)
     .get();
 
-  const data = snapshot.data();
-  if (!snapshot.exists || !data) { return; }
+  const userStatsData = userStatsSnapshot.data();
+  if (!userStatsSnapshot.exists || !userStatsData) { return; }
 
-  let liked: number = data.liked;
+  let liked: number = userStatsData.liked;
   liked = typeof liked === 'number' ? liked + 1: 1;
 
-  snapshot.ref.update({
+  return await userStatsSnapshot.ref.update({
     liked,
     updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
   });
@@ -950,20 +1459,19 @@ async function decrementDocumentLikeCount(documentId:string, likeType: string) {
  */
 function formatUserData(userData: any) {
   return {
-    createdAt: userData.createdAt,
-    email: userData.email,
-    id: userData.id,
+    created_at: userData.created_at,
+    // email: userData.email,
+    id: userData.user_id,
     job: userData.job ?? '',
-    lang: userData.lang ?? '',
+    language: userData.language ?? '',
     location: userData.location,
     name: userData.name,
-    pp: userData.pp,
+    profile_picture: userData.profile_picture,
     pricing: userData.pricing,
-    role: userData.role,
-    stats: userData.stats,
     summary: userData.summary,
-    updatedAt: userData.updatedAt,
-    urls: userData.urls,
+    updated_at: userData.updated_at,
+    social_links: userData.social_links,
+    user_id: userData.user_id,
   };
 }
 
@@ -991,11 +1499,11 @@ function getRandomProfilePictureLink(): string {
  * @returns void.
  */
  async function incrementDocumentLikeCount(documentId:string, likeType: string) {
-  const collectionName: string = likeType === 'book' 
+  const collectionName = likeType === 'book' 
     ? BOOKS_COLLECTION_NAME
     : ILLUSTRATIONS_COLLECTION_NAME;
 
-  const statsCollectionName: string = likeType === 'book'
+  const statsCollectionName = likeType === 'book'
     ? BOOK_STATISTICS_COLLECTION_NAME
     : ILLUSTRATION_STATISTICS_COLLECTION_NAME;
 
@@ -1007,15 +1515,53 @@ function getRandomProfilePictureLink(): string {
     .get();
 
   const data = snapshot.data();
-  if (!data) { return; }
+  if (!snapshot.exists || !data) { return; }
 
   let likes: number = data.likes;
   likes = typeof likes === 'number' ? likes + 1 : 1;
 
-  await snapshot.ref.update({ 
+  return await snapshot.ref.update({ 
     likes,
     updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
   });
+}
+
+/**
+ * Add a target user to book's [book_liked_by] collection.
+ * @param bookId Illustration's id or book's id.
+ * @param userId User's id who liked this book.
+ * @returns void.
+ */
+ async function addUserToBookLike(bookId:string, userId: string) {
+  return await firestore
+    .collection(BOOKS_COLLECTION_NAME)
+    .doc(bookId)
+    .collection(BOOK_LIKED_BY_COLLECTION_NAME)
+    .doc(userId)
+    .create({
+      book_id: bookId,
+      created_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      user_id: userId,
+    })
+}
+
+/**
+ * Add a target user to illustration's [illustration_liked_by] collection.
+ * @param illustrationId Illustration's id or book's id.
+ * @param userId User's id who liked this book.
+ * @returns void.
+ */
+ async function addUserToIllustrationLike(illustrationId:string, userId: string) {
+  return await firestore
+    .collection(ILLUSTRATIONS_COLLECTION_NAME)
+    .doc(illustrationId)
+    .collection(ILLUSTRATION_LIKED_BY_COLLECTION_NAME)
+    .doc(userId)
+    .create({
+      created_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      illustration_id: illustrationId,
+      user_id: userId,
+    })
 }
 
 async function isUserExistsByEmail(email: string) {
@@ -1048,7 +1594,7 @@ async function isUserExistsByEmail(email: string) {
 async function isUserExistsByUsername(nameLowerCase: string) {
   const nameSnapshot = await firestore
     .collection(USERS_COLLECTION_NAME)
-    .where('nameLowerCase', '==', nameLowerCase)
+    .where('name_lower_case', '==', nameLowerCase)
     .limit(1)
     .get();
 
@@ -1057,6 +1603,36 @@ async function isUserExistsByUsername(nameLowerCase: string) {
   }
 
   return true;
+}
+
+/**
+ * Remove a target user to book's [book_liked_by] collection.
+ * @param bookId Illustration's id or book's id.
+ * @param userId User's id who liked this book.
+ * @returns void.
+ */
+ async function removeUserToBookLike(bookId:string, userId: string) {
+  await firestore
+    .collection(BOOKS_COLLECTION_NAME)
+    .doc(bookId)
+    .collection(BOOK_LIKED_BY_COLLECTION_NAME)
+    .doc(userId)
+    .delete()
+}
+
+/**
+ * Remove a target user to illustration's [illustration_liked_by] collection.
+ * @param illustrationId Illustration's id or book's id.
+ * @param userId User's id who liked this book.
+ * @returns void.
+ */
+ async function removeUserToIllustrationLike(illustrationId:string, userId: string) {
+  await firestore
+    .collection(ILLUSTRATIONS_COLLECTION_NAME)
+    .doc(illustrationId)
+    .collection(ILLUSTRATION_LIKED_BY_COLLECTION_NAME)
+    .doc(userId)
+    .delete()
 }
 
 /**
@@ -1073,8 +1649,8 @@ function shouldUpdatePublicInfo(change: functions.Change<functions.firestore.Que
     return true;
   }
 
-  const beforeProfilePicture = beforeData.profilePicture;
-  const afterProfilePicture = afterData.profilePicture;
+  const beforeProfilePicture = beforeData.profile_picture;
+  const afterProfilePicture = afterData.profile_picture;
 
   for (const [key, value] of Object.entries(beforeProfilePicture)) {
     if (value !== afterProfilePicture[key]) {
@@ -1082,11 +1658,11 @@ function shouldUpdatePublicInfo(change: functions.Change<functions.firestore.Que
     }
   }
 
-  const beforeUrls = beforeData.urls;
-  const afterUrls = afterData.urls;
+  const beforeSocialLinks = beforeData.social_links;
+  const afterSocialLinks = afterData.social_links;
 
-  for (const [key, value] of Object.entries(beforeUrls)) {
-    if (value !== afterUrls[key]) {
+  for (const [key, value] of Object.entries(beforeSocialLinks)) {
+    if (value !== afterSocialLinks[key]) {
       return true;
     }
   }

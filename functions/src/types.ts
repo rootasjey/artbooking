@@ -85,7 +85,7 @@ enum EnumLicenseType {
 }
 
 interface CheckPropertiesParams {
-  illustrationId: string;
+  illustration_id: string;
 }
 
 interface CreateUserAccountParams {
@@ -96,14 +96,13 @@ interface CreateUserAccountParams {
 
 interface CreateBookParams {
   description: string;
-  illustrationIds: string[];
+  illustration_ids: string[];
   name: string;
   visibility: Visibility;
 }
 
 interface CreateIllustrationParams {
   name: string;
-  isUserAuthor: boolean;
   visibility: Visibility;
 }
 
@@ -120,28 +119,28 @@ interface DataUpdateParams {
 }
 
 interface DeleteAccountParams {
-  idToken: string;
+  id_token: string;
 }
 
 
 interface DeleteBookParams {
   /** Book's id. */
-  bookId: string;
+  book_id: string;
 }
 
 interface DeleteBooksParams {
   /** Book's id. */
-  bookIds: string[];
+  book_ids: string[];
 }
 
 interface DeleteIllustrationParams {
   /** Illustration's id. */
-  illustrationId: string;
+  illustration_id: string;
 }
 
 interface DeleteMultipleIllustrationsParams {
   /// Array of illustrations ids.
-  illustrationIds: string[];
+  illustration_ids: string[];
 }
 
 interface DeleteListParams {
@@ -157,7 +156,7 @@ interface DeleteOneLicenseParams {
   type: EnumLicenseType,
 
   /** License to delete. */
-  licenseId: string;
+  license_id: string;
 }
 
 interface GenerateImageThumbsResult {
@@ -186,12 +185,10 @@ interface License {
   abbreviation: string;
 
   /** When this entry was created in Firestore. */
-  createdAt: FirebaseFirestore.FieldValue;
+  created_at: FirebaseFirestore.FieldValue;
 
-  /** User who created this license. */
-  createdBy: {
-    id: string;
-  },
+  /** User's id who created this license. */
+  created_by: string
 
   /** Information about this license. */
   description: string;
@@ -203,7 +200,28 @@ interface License {
   id: string;
 
   /** License's term of service & privacy policy update. */
-  licenseUpdatedAt: FirebaseFirestore.FieldValue;
+  license_updated_at: FirebaseFirestore.FieldValue;
+
+  /** License's links. */
+  links: {
+    /** Logo or image link. */
+    image: string;
+
+    /** Link to the legal code related to this license. */
+    legal_code: string;
+
+    /** Terms of Use url document. */
+    terms: string;
+
+    /** Privacy policy url document. */
+    privacy: string;
+
+    /** Wikipedia link related to this license. */
+    wikipedia: string;
+
+    /** Official website of this license. */
+    website: string;
+  },
 
   /** License's name. */
   name: string;
@@ -223,22 +241,17 @@ interface License {
      * You may not apply legal terms or technological measures 
      * that legally restricts others from doing anything the license permits.
      */
-    noAdditionalRestriction: boolean;
+    no_additional_restriction: boolean;
   };
 
   /** When this entry was last updated in Firestore. */
-  updatedAt: FirebaseFirestore.FieldValue;
+  updated_at: FirebaseFirestore.FieldValue;
 
   /** User who updated this license. */
-  updatedBy: {
-    id: string;
-  },
+  updated_by: string
 
   /** Specify how the illustration can be used. */
   usage: {
-    /** Other can add, remove or modify part of this illustration freely. */
-    adapt: boolean;
-
     /** Can be used in commercial projects & products. */
     commercial: boolean;
 
@@ -257,6 +270,9 @@ interface License {
     /** Can be freely printed. */
     print: boolean;
 
+    /** Other can add, remove or modify part of this illustration freely. */
+    remix: boolean;
+
     /** Can sell outside of the official app by another individual. */
     sell: boolean;
 
@@ -267,30 +283,9 @@ interface License {
      * Require that anyone who use the work - licensees - 
      * make that new work available under the same license terms. 
     */
-    shareALike: boolean;
+    share_a_like: boolean;
     /** Can be viewed. */
     view: boolean;
-  },
-
-  /** License's urls. */
-  urls: {
-    /** Logo or image link. */
-    image: string;
-
-    /** Link to the legal code related to this license. */
-    legalCode: string;
-
-    /** Terms of Use url document. */
-    terms: string;
-
-    /** Privacy policy url document. */
-    privacy: string;
-
-    /** Wikipedia link related to this license. */
-    wikipedia: string;
-
-    /** Official website of this license. */
-    website: string;
   },
 
   /** If this license has a specific version. */
@@ -304,12 +299,12 @@ interface NotifFuncParams {
 }
 
 interface SetUserAuthorParams {
-  illustrationId: string;
+  illustration_id: string;
 }
 
 interface BookIllustration {
   /** Date when this illustration was added to this book. */
-  createdAt: FirebaseFirestore.FieldValue;
+  created_at: FirebaseFirestore.FieldValue;
 
   /** This illustration's id. */
   id: string;
@@ -319,10 +314,8 @@ interface BookIllustration {
    * when the [layout] (or [mobileLayout]) is {customGrid}, 
    * {customVerticalList} or {customHorizontalList}.
    */
-  vScaleFactor: {
+  scale_factor: {
     height: number;
-    mobileHeight: number;
-    mobileWidth: number;
     width: number;
   };
 }
@@ -337,15 +330,15 @@ interface ThumbnailUrls {
 
 interface UpdateBookIllustrationsParams {
   /** Book's id. */
-  bookId: string;
+  book_id: string;
 
   /** illustrations' ids. */
-  illustrationIds: string[];
+  illustration_ids: string[];
 }
 
 interface RenameBookPropertiesParams {
   /** This book's id. */
-  bookId: string;
+  book_id: string;
 
   /** This book's description. */
   description: string;
@@ -356,7 +349,7 @@ interface RenameBookPropertiesParams {
 
 interface UpdateBookPropertiesParams {
   /** This book's id. */
-  bookId: string;
+  book_id: string;
 
   /** This book's description. */
   description: string;
@@ -393,8 +386,8 @@ interface UpdateBookPropertiesParams {
 }
 
 interface UpdateEmailParams {
-  newEmail: string;
-  idToken: string;
+  email: string;
+  id_token: string;
 }
 interface UpdateIllusPositionParams {
   /** Illustration's position (int) before the update. */
@@ -411,11 +404,11 @@ interface UpdateIllusPositionParams {
 }
 
 interface UpdateIllusStylesParams {
-  /** Image's styles. */
-  styles: [string],
+  /** Illustration's art movements to set. */
+  art_movements: [string],
   
   /** Illustration's id. */
-  illustrationId: string;
+  illustration_id: string;
 }
 
 /**
@@ -423,7 +416,7 @@ interface UpdateIllusStylesParams {
  */
 interface UpdateIllusLicenseParams {
   /** Illustration'id to update. */
-  illustrationId: string;
+  illustration_id: string;
   /** Specifies how this illustration can be used. */
   license: {
     /**
@@ -445,31 +438,31 @@ interface UpdateIllusPresentationParams {
   description: string,
 
   /** Illustration's id. */
-  illustrationId: string;
+  illustration_id: string;
 
   /** Illustration's name. */
   name: string;
 
   /** Detailed text explaining more about this illustration. */
-  story: string;
+  lore: string;
 }
 
 interface UpdateIllusTopicsParams {
-  /** Image's topics. */
+  /** Illustration's topics. */
   topics: [string],
   
   /** Illustration's id. */
-  illustrationId: string;
+  illustration_id: string;
 }
 
 interface UpdateIllusVisibilityParams {
   /** Illustration's id. */
-  illustrationId: string;
+  illustration_id: string;
 
   /** Illustration's visibility. */
   visibility: Visibility;
 }
 
 interface UpdateUsernameParams {
-  newUsername: string;
+  username: string;
 }

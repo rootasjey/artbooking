@@ -8,56 +8,62 @@ const env = functions.config();
 const client = algolia(env.algolia.appid, env.algolia.apikey);
 const illustrationsIndex = client.initIndex('illustrations');
 const licensesIndex = client.initIndex('licenses');
-const stylesIndex = client.initIndex('styles');
+const artMovementsIndex = client.initIndex('art_movements');
 const usersIndex = client.initIndex('users');
 
+const ART_MOVEMENT_DOC_PATH = 'art_movements/{art_movement_id}'
+const ILLUSTRATION_DOC_PATH = 'illustrations/{illustration_id}'
+const LICENSE_DOC_PATH = 'licenses/{license_id}'
+const USER_DOC_PATH = 'users/{user_id}'
+
 // ----------------
-// Art styles index
+// Art art movement index
 // ----------------
+
 /**
- * Update styles index on create document.
+ * Update art movement index on create document.
  */
-export const onIndexStyle = functions
+export const onIndexArtMovement = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('styles/{styleId}')
+  .document(ART_MOVEMENT_DOC_PATH)
   .onCreate(async (snapshot) => {
     const data = snapshot.data();
     const objectID = snapshot.id;
 
-    return stylesIndex.saveObject({
+    return artMovementsIndex.saveObject({
       objectID,
       ...data,
     })
   });
 
 /**
- * Update styles index on update document.
+ * Update art movement index on update document.
  */
-  export const onReIndexStyle = functions
+  export const onReIndexArtMovement = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('styles/{styleId}')
+  .document(ART_MOVEMENT_DOC_PATH)
   .onUpdate(async (snapshot) => {
     const data = snapshot.after.data();
     const objectID = snapshot.after.id;
 
-    return stylesIndex.saveObject({
+    return artMovementsIndex.saveObject({
       objectID,
       ...data,
     })
   });
 
 /**
- * Update styles index on delete document.
+ * Update art movement index on delete document.
  */
-  export const onUnIndexStyle = functions
+  export const onUnIndexArtMovement = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('styles/{styleId}')
+  .document(ART_MOVEMENT_DOC_PATH)
   .onDelete(async (snapshot) => {
     const objectID = snapshot.id;
-    return stylesIndex.deleteObject(objectID);
+    return artMovementsIndex.deleteObject(objectID);
   });
 
 // -------------------
@@ -66,7 +72,7 @@ export const onIndexStyle = functions
 export const onIndexIllustration = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('illustrations/{illustrationId}')
+  .document(ILLUSTRATION_DOC_PATH)
   .onCreate(async (snapshot) => {
     const data = snapshot.data();
     const objectID = snapshot.id;
@@ -85,7 +91,7 @@ export const onIndexIllustration = functions
 export const onReIndexIllustration = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('illustrations/{illustrationId}')
+  .document(ILLUSTRATION_DOC_PATH)
   .onUpdate(async (snapshot) => {
     const data = snapshot.after.data();
     const objectID = snapshot.after.id;
@@ -104,7 +110,7 @@ export const onReIndexIllustration = functions
 export const onUnIndexIllustration = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('illustrations/{illustrationId}')
+  .document(ILLUSTRATION_DOC_PATH)
   .onDelete(async (snapshot) => {
     const data = snapshot.data();
     const objectID = snapshot.id;
@@ -126,7 +132,7 @@ export const onUnIndexIllustration = functions
 export const onIndexLicense = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('licenses/{licenseId}')
+  .document(LICENSE_DOC_PATH)
   .onCreate(async (snapshot) => {
     const data = snapshot.data();
     const objectID = snapshot.id;
@@ -143,7 +149,7 @@ export const onIndexLicense = functions
 export const onReIndexLicense = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('licenses/{licenseId}')
+  .document(LICENSE_DOC_PATH)
   .onUpdate(async (snapshot) => {
     const data = snapshot.after.data();
     const objectID = snapshot.after.id;
@@ -160,7 +166,7 @@ export const onReIndexLicense = functions
 export const onUnIndexLicense = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('licenses/{licenseId}')
+  .document(LICENSE_DOC_PATH)
   .onDelete(async (snapshot) => {
     const objectID = snapshot.id;
     return licensesIndex.deleteObject(objectID);
@@ -172,25 +178,25 @@ export const onUnIndexLicense = functions
 export const onIndexUser = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('users/{userId}')
+  .document(USER_DOC_PATH)
   .onCreate(async (snapshot) => {
     const data = snapshot.data();
     const objectID = snapshot.id;
 
     return usersIndex.saveObject({
       objectID,
-      lang: data.lang,
+      language: data.language,
+      links: data.links,
       name: data.name,
-      nameLowerCase: data.nameLowerCase,
+      name_lower_case: data.name_lower_case,
       pricing: data.pricing,
-      urls: data.urls,
     });
   });
 
 export const onReIndexUser = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('users/{userId}')
+  .document(USER_DOC_PATH)
   .onUpdate(async (snapshot) => {
     const beforeData = snapshot.before.data();
     const afterData = snapshot.after.data();
@@ -202,18 +208,18 @@ export const onReIndexUser = functions
 
     return usersIndex.saveObject({
       objectID,
-      lang: afterData.lang,
+      language: afterData.language,
+      links: afterData.links,
       name: afterData.name,
-      nameLowerCase: afterData.nameLowerCase,
+      name_lower_case: afterData.name_lower_case,
       pricing: afterData.pricing,
-      urls: afterData.urls,
     });
   });
 
 export const onUnIndexUser = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('users/{userId}')
+  .document(USER_DOC_PATH)
   .onDelete(async (snapshot) => {
     const objectID = snapshot.id;
     return usersIndex.deleteObject(objectID);
@@ -232,8 +238,7 @@ function indexedPropChanged(
   beforeData: FirebaseFirestore.DocumentData,
   afterData: FirebaseFirestore.DocumentData,
 ): boolean {
-
-  if (beforeData.lang !== afterData.lang) {
+  if (beforeData.language !== afterData.language) {
     return true;
   }
 
@@ -241,7 +246,7 @@ function indexedPropChanged(
     return true;
   }
 
-  if (beforeData.nameLowerCase !== afterData.nameLowerCase) {
+  if (beforeData.name_lower_case !== afterData.name_lower_case) {
     return true;
   }
 
@@ -249,11 +254,11 @@ function indexedPropChanged(
     return true;
   }
 
-  // Urls
-  const beforeUrls = beforeData.urls;
-  const afterUrls = afterData.urls;
+  // Links
+  const beforeLinks = beforeData.links;
+  const afterLinks = afterData.links;
 
-  if (!deepEqual(beforeUrls, afterUrls, { strict: true })) {
+  if (!deepEqual(beforeLinks, afterLinks, { strict: true })) {
     return true;
   }
 

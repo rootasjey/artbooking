@@ -3,7 +3,7 @@ import * as functions from 'firebase-functions';
 import * as fs from 'fs-extra';
 
 import { adminApp } from './adminApp';
-import { allowedLicenseTypes as allowedLicenseTypes, cloudRegions, LICENSES_COLLECTION_NAME, USERS_COLLECTION_NAME } from './utils';
+import { allowedLicenseTypes as allowedLicenseTypes, cloudRegions, LICENSES_COLLECTION_NAME, USERS_COLLECTION_NAME, USER_LICENSES_COLLECTION_NAME } from './utils';
 
 const firestore = adminApp.firestore();
 
@@ -61,7 +61,7 @@ export const createOne = functions
     }
 
     const formatedLicense = formatLicense(license);
-    formatedLicense.createdBy.id = userAuth.uid;
+    formatedLicense.created_by = userAuth.uid;
 
     const createdLicense = type === 'staff' 
       ? await createStaffLicense(formatedLicense)
@@ -85,7 +85,7 @@ export const deleteOne = functions
   .https
   .onCall(async (params: DeleteOneLicenseParams, context) => {
     const userAuth = context.auth;
-    const { type, licenseId } = params;
+    const { type, license_id } = params;
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -115,12 +115,12 @@ export const deleteOne = functions
     }
     
     type === 'staff'
-     ? await deleteStaffLicense(licenseId, userAuth.uid)
-     : await deleteUserLicense(licenseId, userAuth.uid);
+     ? await deleteStaffLicense(license_id, userAuth.uid)
+     : await deleteUserLicense(license_id, userAuth.uid);
 
     return {
       license: {
-        id: licenseId,
+        id: license_id,
       },
       success: true,
     };
@@ -173,8 +173,8 @@ export const updateOne = functions
     const formatedLicense = formatLicense(license);
     const licenseId = formatedLicense.id;
     
-    formatedLicense.updatedBy.id = userAuth.uid;
-    formatedLicense.updatedAt = adminApp.firestore.FieldValue.serverTimestamp()
+    formatedLicense.updated_by = userAuth.uid;
+    formatedLicense.updated_at = adminApp.firestore.FieldValue.serverTimestamp()
 
     if (!licenseId) {
       throw new functions.https.HttpsError(
@@ -223,7 +223,7 @@ async function createUserLicense(formatedLicense: License, userId: string) {
   return await firestore
     .collection(USERS_COLLECTION_NAME)
     .doc(userId)
-    .collection(LICENSES_COLLECTION_NAME)
+    .collection(USER_LICENSES_COLLECTION_NAME)
     .add(formatedLicense);
 }
 
@@ -234,13 +234,13 @@ async function createUserLicense(formatedLicense: License, userId: string) {
  * @returns Updated license.
  */
 async function updateStaffLicense(formatedLicense: License) {
-  const doc = firestore
+  const licenseSnapshot = await firestore
   .collection(LICENSES_COLLECTION_NAME)
-  .doc(formatedLicense.id);
+  .doc(formatedLicense.id)
+  .get()
 
-  const snapshot = await doc.get();
-  const data = snapshot.data();
-  if( !data) {
+  const licenseData = licenseSnapshot.data()
+  if (!licenseSnapshot.exists || !licenseData) {
     throw new functions.https.HttpsError(
       'not-found', 
       `Sorry, we didn't find the target document to update. ` +
@@ -248,8 +248,8 @@ async function updateStaffLicense(formatedLicense: License) {
     )
   }
 
-  formatedLicense.createdAt = data.createdAt;
-  return await doc.update(formatedLicense);
+  formatedLicense.updated_at = adminApp.firestore.FieldValue.serverTimestamp();
+  return await licenseSnapshot.ref.update(formatedLicense);
 }
 
 /**
@@ -259,15 +259,15 @@ async function updateStaffLicense(formatedLicense: License) {
  * @returns Updated license.
  */
 async function updateUserLicense(formatedLicense: License, userId: string) {
-  const doc = firestore
+  const licenseSnapshot = await firestore
   .collection(USERS_COLLECTION_NAME)
     .doc(userId)
-    .collection(LICENSES_COLLECTION_NAME)
+    .collection(USER_LICENSES_COLLECTION_NAME)
     .doc(formatedLicense.id)
+    .get()
 
-  const snapshot = await doc.get();
-  const data = snapshot.data();
-  if( !data) {
+  const licenseData = licenseSnapshot.data();
+  if( !licenseData) {
     throw new functions.https.HttpsError(
       'not-found', 
       `Sorry, we didn't find the target document to update. ` +
@@ -275,8 +275,8 @@ async function updateUserLicense(formatedLicense: License, userId: string) {
     )
   }
 
-  formatedLicense.createdAt = data.createdAt;
-  return await doc.update(formatedLicense);
+  formatedLicense.updated_at = adminApp.firestore.FieldValue.serverTimestamp();
+  return await licenseSnapshot.ref.update(formatedLicense);
 }
 
 /**
@@ -289,7 +289,6 @@ async function canManageLicense(userId: string) {
     .get();
 
   const userData = userSnap.data();
-
   if (!userSnap.exists || !userData) {
     throw new functions.https.HttpsError(
       'not-found',
@@ -299,12 +298,13 @@ async function canManageLicense(userId: string) {
   }
 
   const rights = userData['rights'];
-  const manageLicenseRight: boolean = rights['user:managelicense'];
+  const manageLicenseRight: boolean = rights['user:manage_licenses'];
 
   if (!manageLicenseRight) {
     throw new functions.https.HttpsError(
       'permission-denied',
-      `You don't have the permission to perform this action with the user [${userId}].`,
+      `You don't have the permission to perform this action ` +
+      `with the user [${userId}].`,
     );
   }
 }
@@ -329,12 +329,29 @@ async function deleteStaffLicense(licenseId: string, userId: string) {
  * @param userId User performing the deletion.
  */
 async function deleteUserLicense(licenseId: string, userId: string) {
-  await firestore
+  const licenseSnapshot = await firestore
     .collection(USERS_COLLECTION_NAME)
     .doc(userId)
-    .collection(LICENSES_COLLECTION_NAME)
+    .collection(USER_LICENSES_COLLECTION_NAME)
     .doc(licenseId)
-    .delete();
+    .get();
+
+  const licenseData = licenseSnapshot.data()
+  if (!licenseSnapshot.exists || !licenseData) {
+    throw new functions.https.HttpsError(
+      'not-found',
+      `This license [${licenseId}] does not exist.`,
+    )
+  }
+
+  if (licenseData.created_by !== userId) {
+    throw new functions.https.HttpsError(
+      'permission-denied',
+      `You don't have the right to delete this licenses`,
+    )
+  }
+
+  return await licenseSnapshot.ref.delete()
 }
 
 /**
@@ -345,44 +362,40 @@ async function deleteUserLicense(licenseId: string, userId: string) {
 function formatLicense(data: License): License {
   const wellFormatedLicense: License = {
     abbreviation: '',
-    createdAt: adminApp.firestore.FieldValue.serverTimestamp(),
-    createdBy: {
-      id: '',
-    },
+    created_at: adminApp.firestore.FieldValue.serverTimestamp(),
+    created_by: '',
     description: '',
-    type: "user" as EnumLicenseType.user,
     id: '',
-    licenseUpdatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
+    license_updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+    links: {
+      image: '',
+      legal_code: '',
+      terms: '',
+      privacy: '',
+      wikipedia: '',
+      website: '',
+    },
     name: '',
     notice: '',
     terms: {
       attribution: false,
-      noAdditionalRestriction: false,
+      no_additional_restriction: false,
     },
-    updatedAt: adminApp.firestore.FieldValue.serverTimestamp(),
-    updatedBy: {
-      id: '',
-    },
+    type: "user" as EnumLicenseType.user,
+    updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+    updated_by: '',
     usage: {
-      adapt: false,
       commercial: false,
       foss: false,
       free: false,
       oss: false,
       personal: false,
       print: false,
+      remix: false,
       sell: false,
       share: false,
-      shareALike: false,
+      share_a_like: false,
       view: true,
-    },
-    urls: {
-      image: '',
-      legalCode: '',
-      terms: '',
-      privacy: '',
-      wikipedia: '',
-      website: '',
     },
     version: '1.0',
   };
@@ -395,19 +408,16 @@ function formatLicense(data: License): License {
     wellFormatedLicense.abbreviation = data.abbreviation;
   }
 
-  if (data.createdAt) {
-    wellFormatedLicense.createdAt = data.createdAt;
+  if (data.created_at) {
+    wellFormatedLicense.created_at = data.created_at;
+  }
+  
+  if (typeof data.created_by === 'string') {
+    wellFormatedLicense.created_by = data.created_by;
   }
 
-  if (typeof data.createdBy !== 'object') {
-    data.createdBy = { id: '' };
-  } else if (typeof data.createdBy?.id === 'string') {
-    wellFormatedLicense.createdBy.id = data.createdBy.id;
-  }
-
-  if (typeof data.licenseUpdatedAt === 'number') {
-    wellFormatedLicense.licenseUpdatedAt = adminApp
-      .firestore.Timestamp.fromMillis(data.licenseUpdatedAt);
+  if (data.license_updated_at) {
+    wellFormatedLicense.license_updated_at = data.license_updated_at;
   }
 
   if (typeof data.description === 'string') {
@@ -435,26 +445,22 @@ function formatLicense(data: License): License {
   if (!data.terms) {
     data.terms = {
       attribution: false,
-      noAdditionalRestriction: false,
+      no_additional_restriction: false,
     };
   }
    
   if (typeof data.terms.attribution === 'boolean') {
-      wellFormatedLicense.terms.attribution = data.terms.attribution;
-    }
+    wellFormatedLicense.terms.attribution = data.terms.attribution;
+  }
 
-    if (typeof data.terms.noAdditionalRestriction === 'boolean') {
-      wellFormatedLicense.terms.noAdditionalRestriction = data.terms.noAdditionalRestriction;
-    }
+  if (typeof data.terms.no_additional_restriction === 'boolean') {
+    wellFormatedLicense.terms.no_additional_restriction = data.terms.no_additional_restriction;
+  }
 
   // USAGE
   // -----
   if (!data.usage || typeof data.usage !== 'object') {
     return wellFormatedLicense;
-  }
-
-  if (typeof data.usage.adapt === 'boolean') {
-    wellFormatedLicense.usage.adapt = data.usage.adapt;
   }
 
   if (typeof data.usage.commercial === 'boolean') {
@@ -481,6 +487,10 @@ function formatLicense(data: License): License {
     wellFormatedLicense.usage.print = data.usage.print;
   }
 
+  if (typeof data.usage.remix === 'boolean') {
+    wellFormatedLicense.usage.remix = data.usage.remix;
+  }
+
   if (typeof data.usage.sell === 'boolean') {
     wellFormatedLicense.usage.sell = data.usage.sell;
   }
@@ -489,8 +499,8 @@ function formatLicense(data: License): License {
     wellFormatedLicense.usage.share = data.usage.share;
   }
 
-  if (typeof data.usage.shareALike === 'boolean') {
-    wellFormatedLicense.usage.shareALike = data.usage.shareALike;
+  if (typeof data.usage.share_a_like === 'boolean') {
+    wellFormatedLicense.usage.share_a_like = data.usage.share_a_like;
   }
 
   if (typeof data.usage.view === 'boolean') {
@@ -499,48 +509,43 @@ function formatLicense(data: License): License {
 
   // UPDATED BY
   // ----------
-  if (typeof data.updatedBy !== 'object') {
-    data.updatedBy = { id: '' };
-  } else {
-    if (typeof data.updatedBy.id === 'string') {
-      wellFormatedLicense.updatedBy.id = data.updatedBy.id;
-    }
-  
-    if (typeof data.version === 'string') {
-      wellFormatedLicense.version = data.version;
-    }
-  }
-
-  // URLS
-  // ----
-  if (data.urls) {
-    if (typeof data.urls.wikipedia === 'string') {
-      wellFormatedLicense.urls.wikipedia = data.urls.wikipedia;
-    }
-
-    if (typeof data.urls.website === 'string') {
-      wellFormatedLicense.urls.website = data.urls.website;
-    }
-
-    if (typeof data.urls.image === 'string') {
-      wellFormatedLicense.urls.image = data.urls.image;
-    }
-
-    if (typeof data.urls.legalCode === 'string') {
-      wellFormatedLicense.urls.legalCode = data.urls.legalCode;
-    }
-
-    if (typeof data.urls.privacy === 'string') {
-      wellFormatedLicense.urls.privacy = data.urls.privacy;
-    }
-
-    if (typeof data.urls.terms === 'string') {
-      wellFormatedLicense.urls.terms = data.urls.terms;
-    }
+  if (typeof data.updated_by === 'string') {
+    wellFormatedLicense.updated_by = data.updated_by;
   }
 
   if (typeof data.version === 'string') {
     wellFormatedLicense.version = data.version;
+  }
+
+  // Links
+  // -----
+  const licenseLinks = data.links;
+  if (!licenseLinks) {
+    return wellFormatedLicense
+  }
+
+  if (typeof licenseLinks.wikipedia === 'string') {
+    wellFormatedLicense.links.wikipedia = licenseLinks.wikipedia;
+  }
+
+  if (typeof licenseLinks.website === 'string') {
+    wellFormatedLicense.links.website = licenseLinks.website;
+  }
+
+  if (typeof licenseLinks.image === 'string') {
+    wellFormatedLicense.links.image = licenseLinks.image;
+  }
+
+  if (typeof licenseLinks.legal_code === 'string') {
+    wellFormatedLicense.links.legal_code = licenseLinks.legal_code;
+  }
+
+  if (typeof licenseLinks.privacy === 'string') {
+    wellFormatedLicense.links.privacy = licenseLinks.privacy;
+  }
+
+  if (typeof licenseLinks.terms === 'string') {
+    wellFormatedLicense.links.terms = licenseLinks.terms;
   }
 
   return wellFormatedLicense;

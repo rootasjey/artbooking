@@ -5,16 +5,30 @@ const env = functions.config();
 
 export const allowedLicenseTypes = ["staff", "user"];
 
+export const ART_MOVEMENTS_COLLECTION_NAME = 'art_movements'
 export const BASE_DOCUMENT_NAME = 'base'
+export const BOOK_LIKED_BY_COLLECTION_NAME = 'book_liked_by'
+export const BOOK_STATISTICS_COLLECTION_NAME = 'book_statistics'
 export const BOOKS_COLLECTION_NAME = 'books'
+export const CHALLENGES_COLLECTION_NAME = 'challenges'
+export const CONTESTS_COLLECTION_NAME = 'contests'
+export const GALLERIES_COLLECTION_NAME = 'galleries'
+export const ILLUSTRATION_LIKED_BY_COLLECTION_NAME = 'illustration_liked_by'
+export const ILLUSTRATION_STATISTICS_COLLECTION_NAME = 'illustration_statistics'
 export const ILLUSTRATIONS_COLLECTION_NAME = 'illustrations'
 export const LICENSES_COLLECTION_NAME = 'licenses'
+export const NOTIFICATIONS_DOCUMENT_NAME = 'notifications'
 export const STATISTICS_COLLECTION_NAME = 'statistics'
-export const USER_STATISTICS_COLLECTION_NAME = 'user_statistics'
-export const ILLUSTRATION_STATISTICS_COLLECTION_NAME = 'illustration_statistics'
-export const BOOK_STATISTICS_COLLECTION_NAME = 'book_statistics'
 export const STORAGES_DOCUMENT_NAME = 'storages'
+export const USER_LICENSES_COLLECTION_NAME = 'user_licenses'
+export const USER_PAGES_COLLECTION_NAME = 'user_pages'
+export const USER_PUBLIC_FIELDS_COLLECTION_NAME = 'user_public_fields'
+export const USER_STATISTICS_COLLECTION_NAME = 'user_statistics'
 export const USERS_COLLECTION_NAME = 'users'
+
+
+export const LIKE_ILLUSTRATION_TYPE = 'illustration';
+export const LIKE_BOOK_TYPE = 'book';
 
 export const cloudRegions = {
   eu: 'europe-west3'
@@ -99,9 +113,9 @@ export function randomIntFromInterval(min: number, max: number) {
  * @param visibilityParam - Visibility value. Accepted values: acl, private, public, unlisted.
  */
 export function checkOrGetDefaultVisibility(visibilityParam: string) {
-  const defaultVisibility = 'private';
+  const defaultVisibility = 'public';
 
-  const allowedVisibility = ['acl', 'private', 'public', 'unlisted'];
+  const allowedVisibility = ['acl', 'private', 'public', 'archived', 'challenge', 'contest'];
 
   if (allowedVisibility.includes(visibilityParam)) {
     return visibilityParam;

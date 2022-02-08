@@ -1,8 +1,12 @@
 import * as functions from 'firebase-functions';
 import { adminApp } from './adminApp';
-import { cloudRegions, ILLUSTRATIONS_COLLECTION_NAME, STATISTICS_COLLECTION_NAME, STORAGES_DOCUMENT_NAME, USERS_COLLECTION_NAME } from './utils';
+import { BOOKS_COLLECTION_NAME, cloudRegions, ILLUSTRATIONS_COLLECTION_NAME, STATISTICS_COLLECTION_NAME, STORAGES_DOCUMENT_NAME, USERS_COLLECTION_NAME, USER_STATISTICS_COLLECTION_NAME } from './utils';
 
 const firestore = adminApp.firestore();
+
+const BOOK_DOC_PATH = 'books/{book_id}'
+const ILLUSTRATION_DOC_PATH = 'illustrations/{illustration_id}'
+const USER_DOC_PATH = 'users/{user_id}'
 
 // ------
 // Books
@@ -10,56 +14,58 @@ const firestore = adminApp.firestore();
 export const onCreateBook = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('books/{bookId}')
-  .onCreate(async (bookSnap) => {
-    const bookData = bookSnap.data();
+  .document(BOOK_DOC_PATH)
+  .onCreate(async (bookSnapshot) => {
+    const bookData = bookSnapshot.data();
 
-    const statsSnap = await firestore
+    // Update global books stats.
+    // -------------------------
+    const bookStatsSnapshot = await firestore
       .collection(STATISTICS_COLLECTION_NAME)
-      .doc('books')
+      .doc(BOOKS_COLLECTION_NAME)
       .get();
 
-    const statsData = statsSnap.data();
-    if (!statsSnap.exists || !statsData) {
+    const bookStatsData = bookStatsSnapshot.data();
+    if (!bookStatsSnapshot.exists || !bookStatsData) {
       return false;
     }
 
-    let total: number = statsData.total ?? 0;
-    let created: number = statsData.created ?? 0;
+    let globalBookCreated: number = bookStatsData.created ?? 0;
+    let globalBookCurrent: number = bookStatsData.current ?? 0;
 
-    total = typeof total === 'number' ? total + 1 : 1;
-    created = typeof created === 'number' ? created + 1 : 1;
+    globalBookCreated = typeof globalBookCreated === 'number' ? globalBookCreated + 1 : 1;
+    globalBookCurrent = typeof globalBookCurrent === 'number' ? globalBookCurrent + 1 : 1;
 
-    await statsSnap.ref.update({
-      total,
-      created,
-      updatedAt: adminApp.firestore.Timestamp.now(),
+    await bookStatsSnapshot.ref.update({
+      created: globalBookCreated,
+      current: globalBookCurrent,
+      updated_at: adminApp.firestore.Timestamp.now(),
     });
 
     // Update user's books stats.
     // -------------------------
-    const userStatsSnap = await firestore
+    const userBookStatsSnapshot = await firestore
       .collection(USERS_COLLECTION_NAME)
-      .doc(bookData.user.id)
-      .collection(STATISTICS_COLLECTION_NAME)
-      .doc('books')
+      .doc(bookData.user_id)
+      .collection(USER_STATISTICS_COLLECTION_NAME)
+      .doc(BOOKS_COLLECTION_NAME)
       .get();
 
-    const bookStatsData = userStatsSnap.data();
-    if (!userStatsSnap.exists || !bookStatsData) {
+    const userBookStatsData = userBookStatsSnapshot.data();
+    if (!userBookStatsSnapshot.exists || !userBookStatsData) {
       return false;
     }
 
-    let bookCreated: number = bookStatsData.created ?? 0;
-    let bookOwned: number = bookStatsData.owned ?? 0;
+    let userBookCreated: number = userBookStatsData.created ?? 0;
+    let userBookOwned: number = userBookStatsData.owned ?? 0;
 
-    bookCreated = typeof bookCreated === 'number' ? bookCreated + 1 : 1;
-    bookOwned = typeof bookOwned === 'number' ? bookOwned + 1 : 1;
+    userBookCreated = typeof userBookCreated === 'number' ? userBookCreated + 1 : 1;
+    userBookOwned = typeof userBookOwned === 'number' ? userBookOwned + 1 : 1;
 
-    await userStatsSnap.ref.update({
-      created: bookCreated,
-      owned: bookOwned,
-      updatedAt: adminApp.firestore.Timestamp.now(),
+    await userBookStatsSnapshot.ref.update({
+      created: userBookCreated,
+      owned: userBookOwned,
+      updated_at: adminApp.firestore.Timestamp.now(),
     });
     
     return true;
@@ -69,62 +75,64 @@ export const onCreateBook = functions
 export const onDeleteBook = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('books/{bookId}')
-  .onDelete(async (bookSnap) => {
-    const bookData = bookSnap.data();
+  .document(BOOK_DOC_PATH)
+  .onDelete(async (bookSnapshot) => {
+    const bookData = bookSnapshot.data();
 
-    const statsSnap = await firestore
+    // Update global books stats.
+    // -------------------------
+    const bookStatsSnapshot = await firestore
       .collection(STATISTICS_COLLECTION_NAME)
-      .doc('books')
+      .doc(BOOKS_COLLECTION_NAME)
       .get();
 
-    const statsData = statsSnap.data();
-    if (!statsSnap.exists || !statsData) {
+    const bookStatsData = bookStatsSnapshot.data();
+    if (!bookStatsSnapshot.exists || !bookStatsData) {
       return false;
     }
 
-    let total: number = statsData.total ?? 0;
-    let deleted: number = statsData.deleted ?? 0;
+    let globalBookCurrent: number = bookStatsData.current ?? 0;
+    let globalBookDeleted: number = bookStatsData.deleted ?? 0;
 
-    total = typeof total === 'number' ? total : 0;
-    deleted = typeof deleted === 'number' ? deleted : 0;
+    globalBookCurrent = typeof globalBookCurrent === 'number' ? globalBookCurrent : 0;
+    globalBookDeleted = typeof globalBookDeleted === 'number' ? globalBookDeleted : 0;
 
-    total = Math.max(0, total - 1);
-    deleted++;
+    globalBookCurrent = Math.max(0, globalBookCurrent - 1);
+    globalBookDeleted++;
 
-    await statsSnap.ref.update({
-      total, 
-      deleted,
-      updatedAt: adminApp.firestore.Timestamp.now(),
+    await bookStatsSnapshot.ref.update({
+      current: globalBookCurrent, 
+      deleted: globalBookDeleted,
+      updated_at: adminApp.firestore.Timestamp.now(),
     });
 
     // Update user's books stats.
     // -------------------------
-    const userStatsSnap = await firestore
+    const userBookStatsSnapshot = await firestore
       .collection(USERS_COLLECTION_NAME)
-      .doc(bookData.user.id)
-      .collection(STATISTICS_COLLECTION_NAME)
-      .doc('books')
+      .doc(bookData.user_id)
+      .collection(USER_STATISTICS_COLLECTION_NAME)
+      .doc(BOOKS_COLLECTION_NAME)
       .get();
 
-    const bookStatsData = userStatsSnap.data();
-    if (!userStatsSnap.exists || !bookStatsData) {
+    const userBookStatsData = userBookStatsSnapshot.data();
+    if (!userBookStatsSnapshot.exists || !userBookStatsData) {
       return false;
     }
 
-    let bookDeleted: number = bookStatsData.deleted ?? 0;
-    let bookOwned: number = bookStatsData.owned ?? 0;
+    let userBookDeleted: number = userBookStatsData.deleted ?? 0;
+    let userBookOwned: number = userBookStatsData.owned ?? 0;
 
-    bookDeleted = typeof bookDeleted === 'number' ? bookDeleted : 0;
-    bookOwned = typeof bookOwned === 'number' ? bookOwned : 0;
+    userBookDeleted = typeof userBookDeleted === 'number' ? userBookDeleted : 0;
+    userBookOwned = typeof userBookOwned === 'number' ? userBookOwned : 0;
 
-    bookOwned = Math.max(0, bookOwned - 1);
-    bookDeleted++
+    userBookOwned = Math.max(0, userBookOwned - 1);
+    userBookDeleted++
 
-    await userStatsSnap.ref.update({
-      deleted: bookDeleted,
-      owned: bookOwned,
-      updatedAt: adminApp.firestore.Timestamp.now(),
+    await userBookStatsSnapshot.ref.update({
+      deleted: userBookDeleted,
+      owned: userBookOwned,
+      updated_at: adminApp.firestore.Timestamp.now(),
     })
 
     return true;
@@ -137,56 +145,58 @@ export const onDeleteBook = functions
 export const onCreateIllustration = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('illustrations/{illustrationId}')
-  .onCreate(async (illustrationSnap) => {
-    const illustrationData = illustrationSnap.data();
+  .document(ILLUSTRATION_DOC_PATH)
+  .onCreate(async (illustrationSnapshot) => {
+    const illustrationData = illustrationSnapshot.data();
 
-    const statsSnap = await firestore
+    // Update global illustrations stats.
+    // ---------------------------------
+    const illustrationStatsSnapshot = await firestore
       .collection(STATISTICS_COLLECTION_NAME)
       .doc(ILLUSTRATIONS_COLLECTION_NAME)
       .get();
 
-    const statsData = statsSnap.data();
-    if (!statsSnap.exists || !statsData) {
+    const illustrationStatsData = illustrationStatsSnapshot.data();
+    if (!illustrationStatsSnapshot.exists || !illustrationStatsData) {
       return false;
     }
 
-    let total: number = statsData.total ?? 0;
-    let created: number = statsData.created ?? 0;
+    let globalIllustrationCreated: number = illustrationStatsData.created ?? 0;
+    let globalIllustrationCurrent: number = illustrationStatsData.current ?? 0;
 
-    total = typeof total === 'number' ? total + 1 : 1;
-    created = typeof created === 'number' ? created + 1 : 1;
+    globalIllustrationCreated = typeof globalIllustrationCreated === 'number' ? globalIllustrationCreated + 1 : 1;
+    globalIllustrationCurrent = typeof globalIllustrationCurrent === 'number' ? globalIllustrationCurrent + 1 : 1;
 
-    await statsSnap.ref.update({
-      total, 
-      created, 
-      updatedAt: adminApp.firestore.Timestamp.now(),
+    await illustrationStatsSnapshot.ref.update({
+      created: globalIllustrationCreated, 
+      current: globalIllustrationCurrent, 
+      updated_at: adminApp.firestore.Timestamp.now(),
     });
 
     // Update user's illustrations stats.
     // ---------------------------------
-    const userStatsSnap = await firestore
+    const userIllustrationStatsSnapshot = await firestore
       .collection(USERS_COLLECTION_NAME)
-      .doc(illustrationData.user.id)
-      .collection(STATISTICS_COLLECTION_NAME)
+      .doc(illustrationData.user_id)
+      .collection(USER_STATISTICS_COLLECTION_NAME)
       .doc(ILLUSTRATIONS_COLLECTION_NAME)
       .get();
 
-    const illustrationStatsData = userStatsSnap.data();
-    if (!userStatsSnap.exists || !illustrationStatsData) {
+    const userIllustrationStatsData = userIllustrationStatsSnapshot.data();
+    if (!userIllustrationStatsSnapshot.exists || !userIllustrationStatsData) {
       return false;
     }
 
-    let illustrationCreated: number = illustrationStatsData.created ?? 0;
-    let illustrationOwned: number = illustrationStatsData.owned ?? 0;
+    let userIllustrationCreated: number = userIllustrationStatsData.created ?? 0;
+    let userIllustrationOwned: number = userIllustrationStatsData.owned ?? 0;
 
-    illustrationCreated = typeof illustrationCreated === 'number' ? illustrationCreated + 1 : 1;
-    illustrationOwned = typeof illustrationOwned === 'number' ? illustrationOwned + 1 : 1;
+    userIllustrationCreated = typeof userIllustrationCreated === 'number' ? userIllustrationCreated + 1 : 1;
+    userIllustrationOwned = typeof userIllustrationOwned === 'number' ? userIllustrationOwned + 1 : 1;
 
-    await userStatsSnap.ref.update({
-      created: illustrationCreated,
-      owned: illustrationOwned,
-      updatedAt: adminApp.firestore.Timestamp.now(),
+    await userIllustrationStatsSnapshot.ref.update({
+      created: userIllustrationCreated,
+      owned: userIllustrationOwned,
+      updated_at: adminApp.firestore.Timestamp.now(),
     })
 
     return true;
@@ -196,73 +206,74 @@ export const onCreateIllustration = functions
 export const onDeleteIllustration = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('illustrations/{illustrationId}')
-  .onDelete(async (illustrationSnap) => {
-    const illustrationData = illustrationSnap.data();
+  .document(ILLUSTRATION_DOC_PATH)
+  .onDelete(async (illustrationSnapshot) => {
+    const illustrationData = illustrationSnapshot.data();
 
-    const statsSnap = await firestore
+    // Update global illustrations stats.
+    // ---------------------------------
+    const illustrationStatsSnapshot = await firestore
       .collection(STATISTICS_COLLECTION_NAME)
       .doc(ILLUSTRATIONS_COLLECTION_NAME)
       .get();
 
-    const statsData = statsSnap.data();
-    if (!statsSnap.exists || !statsData) {
+    const illustrationStatsData = illustrationStatsSnapshot.data();
+    if (!illustrationStatsSnapshot.exists || !illustrationStatsData) {
       return false;
     }
 
-    let total: number = statsData.total ?? 0;
-    let deleted: number = statsData.deleted ?? 0;
+    let globalIllustrationCurrent: number = illustrationStatsData.current ?? 0;
+    let globalIllustrationDeleted: number = illustrationStatsData.deleted ?? 0;
 
-    total = typeof total === 'number' ? total : 0;
-    deleted = typeof deleted === 'number' ? deleted : 0;
+    globalIllustrationCurrent = typeof globalIllustrationCurrent === 'number' ? globalIllustrationCurrent : 0;
+    globalIllustrationDeleted = typeof globalIllustrationDeleted === 'number' ? globalIllustrationDeleted : 0;
     
-    total = Math.max(0, statsData.total - 1);
-    deleted++;
+    globalIllustrationCurrent = Math.max(0, globalIllustrationCurrent - 1);
+    globalIllustrationDeleted++;
 
-    await statsSnap.ref.update({
-      total, 
-      deleted,
-      updatedAt: adminApp.firestore.Timestamp.now(),
+    await illustrationStatsSnapshot.ref.update({
+      current: globalIllustrationCurrent, 
+      deleted: globalIllustrationDeleted,
+      updated_at: adminApp.firestore.Timestamp.now(),
     });
 
     // Update user's illustrations stats.
     // ---------------------------------
-    const userStatsSnap = await firestore
+    const userIllustrationStatsSnapshot = await firestore
       .collection(USERS_COLLECTION_NAME)
-      .doc(illustrationData.user.id)
-      .collection(STATISTICS_COLLECTION_NAME)
+      .doc(illustrationData.user_id)
+      .collection(USER_STATISTICS_COLLECTION_NAME)
       .doc(ILLUSTRATIONS_COLLECTION_NAME)
       .get();
 
-    const illustrationStatsData = userStatsSnap.data();
-    if (!userStatsSnap.exists || !illustrationStatsData) {
+    const userIllustrationStatsData = userIllustrationStatsSnapshot.data();
+    if (!userIllustrationStatsSnapshot.exists || !userIllustrationStatsData) {
       return false;
     }
 
-    let illustrationDeleted: number = illustrationStatsData.deleted ?? 0;
-    let illustrationOwned: number = illustrationStatsData.owned ?? 0;
+    let userIllustrationDeleted: number = userIllustrationStatsData.deleted ?? 0;
+    let userIllustrationOwned: number = userIllustrationStatsData.owned ?? 0;
 
-    illustrationDeleted = typeof illustrationDeleted === 'number' ? illustrationDeleted : 0;
-    illustrationOwned = typeof illustrationOwned === 'number' ? illustrationOwned : 0;
+    userIllustrationDeleted = typeof userIllustrationDeleted === 'number' ? userIllustrationDeleted : 0;
+    userIllustrationOwned = typeof userIllustrationOwned === 'number' ? userIllustrationOwned : 0;
 
-    illustrationOwned = Math.max(0, illustrationOwned - 1);
-    illustrationDeleted++;
+    userIllustrationOwned = Math.max(0, userIllustrationOwned - 1);
+    userIllustrationDeleted++;
 
-    await userStatsSnap.ref.update({
-      deleted: illustrationDeleted,
-      owned: illustrationOwned,
-      updatedAt: adminApp.firestore.Timestamp.now(),
+    await userIllustrationStatsSnapshot.ref.update({
+      deleted: userIllustrationDeleted,
+      owned: userIllustrationOwned,
+      updated_at: adminApp.firestore.Timestamp.now(),
     })
 
-    let imageBytesToRemove = 0;
-    if (illustrationData) {
-      imageBytesToRemove = illustrationData.size ?? 0;
-    }
+    // Update user's storages stats.
+    // ---------------------------------
+    const imageBytesToRemove = illustrationData?.size ?? 0;
 
     const storageSnapshot = await firestore
       .collection(USERS_COLLECTION_NAME)
-      .doc(illustrationData.user.id)
-      .collection(STATISTICS_COLLECTION_NAME)
+      .doc(illustrationData.user_id)
+      .collection(USER_STATISTICS_COLLECTION_NAME)
       .doc(STORAGES_DOCUMENT_NAME)
       .get();
     
@@ -271,13 +282,13 @@ export const onDeleteIllustration = functions
       return
     }
 
-    let storageIllustrationsUsed: number = storageData.illustrations.used;
-    storageIllustrationsUsed -= imageBytesToRemove;
+    let userStorageIllustrationsUsed: number = storageData.illustrations.used;
+    userStorageIllustrationsUsed -= imageBytesToRemove;
     
     await storageSnapshot.ref.update({
       illustrations: {
-        used: storageIllustrationsUsed,
-        updatedAt: adminApp.firestore.Timestamp.now(),
+        used: userStorageIllustrationsUsed,
+        updated_at: adminApp.firestore.Timestamp.now(),
       },
     });
 
@@ -290,127 +301,59 @@ export const onDeleteIllustration = functions
 export const onCreateUser = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('users/{userId}')
-  .onCreate(async (userSnap) => {
-    const userData = userSnap.data();
-    const isDev: boolean = userData.developer?.isProgramActive;
-
-    const statsSnap = await firestore
+  .document(USER_DOC_PATH)
+  .onCreate(async (userSnapshot) => {
+    const userStatsSnapshot = await firestore
       .collection(STATISTICS_COLLECTION_NAME)
-      .doc('users')
+      .doc(USERS_COLLECTION_NAME)
       .get();
 
-    const statsData = statsSnap.data();
-
-    if (!statsSnap.exists || !statsData) {
+    const userStatsData = userStatsSnapshot.data();
+    if (!userStatsSnapshot.exists || !userStatsData) {
       return false;
     }
 
-    let total: number = statsData.total ?? 0;
-    let created: number = statsData.created ?? 0;
+    let globalUserCurrent: number = userStatsData.current ?? 0;
+    let globalUserCreated: number = userStatsData.created ?? 0;
 
-    total = typeof total === 'number' ? total + 1 : 1;
-    created = typeof created === 'number' ? created + 1 : 1;
+    globalUserCurrent = typeof globalUserCurrent === 'number' ? globalUserCurrent + 1 : 1;
+    globalUserCreated = typeof globalUserCreated === 'number' ? globalUserCreated + 1 : 1;
 
-    const payload: Record<string, number> = { total, created };
-
-    if (isDev) {
-      payload.dev = statsData.dev + 1;
-    }
-
-    await statsSnap.ref.update({
-      ...payload, 
-      ...{ updatedAt: adminApp.firestore.Timestamp.now() },
+    return await userStatsSnapshot.ref.update({ 
+      created: globalUserCreated, 
+      current: globalUserCurrent, 
+      updated_at: adminApp.firestore.Timestamp.now(), 
     });
-    return true;
-  });
-
-export const onUpdateUser = functions
-  .region(cloudRegions.eu)
-  .firestore
-  .document('users/{userId}')
-  .onUpdate(async (change) => {
-    const before = change.before.data();
-    const after = change.after.data();
-
-    if (!before || !after) {
-      return;
-    }
-
-    const devBefore: boolean = before.developer?.isProgramActive ?? false;
-    const devAfter: boolean = after.developer?.isProgramActive ?? false;
-
-    if (devAfter === devBefore) {
-      return;
-    }
-
-    const statsSnap = await firestore
-      .collection(STATISTICS_COLLECTION_NAME)
-      .doc('users')
-      .get();
-
-    const statsData = statsSnap.data();
-
-    if (!statsSnap.exists || !statsData) {
-      return false;
-    }
-
-    let dev: number = statsData.dev;
-
-    // New dev account.
-    if (devBefore === false && devAfter === true) {
-      dev++;
-    }
-
-    // Closed dev account
-    if (devBefore === true && devAfter === false) {
-      dev--;
-    }
-
-    await statsSnap.ref.update({
-      dev,
-    });
-
-    return true;
   });
 
 export const onDeleteUser = functions
   .region(cloudRegions.eu)
   .firestore
-  .document('users/{userId}')
-  .onDelete(async (userSnap) => {
-    const userData = userSnap.data();
-    const wasDev: boolean = userData.developer?.isProgramActive ?? false;
-
-    const statsSnap = await firestore
+  .document(USER_DOC_PATH)
+  .onDelete(async (userSnapshot) => {
+    const userStatsSnapshot = await firestore
       .collection(STATISTICS_COLLECTION_NAME)
-      .doc('users')
+      .doc(USERS_COLLECTION_NAME)
       .get();
 
-    const statsData = statsSnap.data();
-
-    if (!statsSnap.exists || !statsData) {
+    const userStatsData = userStatsSnapshot.data();
+    if (!userStatsSnapshot.exists || !userStatsData) {
       return false;
     }
 
-    let total: number = statsData.total ?? 0;
-    let deleted: number = statsData.deleted ?? 0;
+    let globalUserCurrent: number = userStatsData.current ?? 0;
+    let globalUserDeleted: number = userStatsData.deleted ?? 0;
 
-    total = typeof total === 'number' ? total : 0;
-    deleted = typeof deleted === 'number' ? deleted : 0;
+    globalUserCurrent = typeof globalUserCurrent === 'number' ? globalUserCurrent : 0;
+    globalUserDeleted = typeof globalUserDeleted === 'number' ? globalUserDeleted : 0;
 
-    total = Math.max(0, statsData.total - 1);
-    deleted++;
+    globalUserCurrent = Math.max(0, globalUserCurrent - 1);
+    globalUserDeleted++;
 
-    const payload: Record<string, number> = { total, deleted };
-
-    if (wasDev) {
-      payload.dev = Math.max(0, statsData.dev - 1);
-    }
-
-    await statsSnap.ref.update({
-      ...payload,
-      ...{ updatedAt: adminApp.firestore.Timestamp.now() }
+    await userStatsSnapshot.ref.update({ 
+      current: globalUserCurrent,
+      deleted: globalUserDeleted,
+      updated_at: adminApp.firestore.Timestamp.now(), 
     });
 
     return true;
