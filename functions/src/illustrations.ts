@@ -573,66 +573,6 @@ export const onStorageUpload = functions
   });
 
 /**
- * Set the illustration's author id same as user's id.
- */
-export const setUserAuthor = functions
-  .region(cloudRegions.eu)
-  .https
-  .onCall(async (data: SetUserAuthorParams, context) => {
-    const userAuth = context.auth;
-
-    if (!userAuth) {
-      throw new functions.https.HttpsError(
-        'unauthenticated', 
-        `The function must be called from an authenticated user.`,
-      );
-    }
-
-    const { illustration_id } = data;
-    if (!illustration_id || typeof illustration_id !== 'string') {
-      throw new functions.https.HttpsError(
-        'invalid-argument',
-        `You must provid a valid argument for [illustration_id] ` +
-         `which is illustration to update.`,
-      )
-    }
-
-    const illustrationSnap = await firestore
-      .collection(ILLUSTRATIONS_COLLECTION_NAME)
-      .doc(illustration_id)
-      .get();
-
-    const illustrationData = illustrationSnap.data();
-
-    if (!illustrationSnap.exists || !illustrationData) {
-      throw new functions.https.HttpsError(
-        'not-found', 
-        `The document doesn't exists anymore.
-         Please try again later or contact us.`,
-      );
-    }
-
-    if (illustrationData.user_id !== userAuth.uid) {
-      throw new functions.https.HttpsError(
-        'permission-denied', 
-        `You don't have the permission to update this illustration.`,
-      );
-    }
-
-    await illustrationSnap.ref.update({
-      author: {
-        id: userAuth.uid,
-      }});
-
-    return {
-      illustration: {
-        id: illustration_id,
-      },
-      success: true,
-    }
-  });
-
-/**
  * Unset illustration's license.
  */
 export const unsetLicense = functions
@@ -685,66 +625,6 @@ export const unsetLicense = functions
       },
       success: true,
     };
-  });
-
-/**
- * Unset the image's author id same as user's id.
- */
-export const unsetUserAuthor = functions
-  .region(cloudRegions.eu)
-  .https
-  .onCall(async (data: SetUserAuthorParams, context) => {
-    const userAuth = context.auth;
-
-    if (!userAuth) {
-      throw new functions.https.HttpsError(
-        'unauthenticated', 
-        `The function must be called from an authenticated user.`,
-      );
-    }
-
-    const { illustration_id } = data;
-
-    if (!illustration_id || typeof illustration_id !== 'string') {
-      throw new functions.https.HttpsError(
-        'invalid-argument',
-        `You must provid a valid argument for [illustration_id]
-         which is illustration to update.`,
-      )
-    }
-
-    const illustrationSnap = await firestore
-      .collection(ILLUSTRATIONS_COLLECTION_NAME)
-      .doc(illustration_id)
-      .get();
-
-    const illustrationData = illustrationSnap.data();
-
-    if (!illustrationSnap.exists || !illustrationData) {
-      throw new functions.https.HttpsError(
-        'not-found',
-        `The document doesn't exists anymore.
-         Please try again later or contact us.`,
-      );
-    }
-
-    if (illustrationData.user_id !== userAuth.uid) {
-      throw new functions.https.HttpsError(
-        'permission-denied',
-        `You don't have the permission to update this illustration.`,
-      );
-    }
-
-    await illustrationSnap.ref.update({
-      updated_at: adminApp.firestore.Timestamp.now(),
-    });
-
-    return {
-      illustration: {
-        id: illustration_id,
-      },
-      success: true,
-    }
   });
 
 /**

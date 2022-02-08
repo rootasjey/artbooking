@@ -800,46 +800,6 @@ export const deleteAccount = functions
   });
 
 /**
- * Return user's data.
- */
-export const fetchUser = functions
-  .region(cloudRegions.eu)
-  .https
-  .onCall(async (data, context) => {
-    const user_id: string = data.user_id;
-
-    if (typeof user_id !== 'string') {
-      throw new functions.https.HttpsError(
-        'invalid-argument',
-        `'fetchUser' must be called with one (1) argument [user_id]
-        representing the user's id to fetch.`,
-      );
-    }
-
-    const userSnap = await firestore
-      .collection(USERS_COLLECTION_NAME)
-      .doc(user_id)
-      .get();
-
-    const userData = userSnap.data();
-
-    if (!userSnap.exists || !userData) {
-      throw new functions.https.HttpsError(
-        'not-found',
-        `The specified user does not exist. It may have been deleted.`,
-      );
-    }
-
-
-    const userDataWithId = {
-      ...userData,
-      ...{ id: userSnap.id },
-    };
-
-    return formatUserData(userDataWithId);
-  });
-
-/**
  * When an user likes something (illustration, book).
  */
 export const onLike = functions
@@ -1450,29 +1410,6 @@ async function decrementDocumentLikeCount(documentId:string, likeType: string) {
     liked,
     updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
   });
-}
-
-/**
- * Take a raw Firestore data object and return formated data.
- * @param userData User's data.
- * @returns Return a formated data to consume.
- */
-function formatUserData(userData: any) {
-  return {
-    created_at: userData.created_at,
-    // email: userData.email,
-    id: userData.user_id,
-    job: userData.job ?? '',
-    language: userData.language ?? '',
-    location: userData.location,
-    name: userData.name,
-    profile_picture: userData.profile_picture,
-    pricing: userData.pricing,
-    summary: userData.summary,
-    updated_at: userData.updated_at,
-    social_links: userData.social_links,
-    user_id: userData.user_id,
-  };
 }
 
 /**
