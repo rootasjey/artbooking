@@ -1,5 +1,5 @@
 import 'package:artbooking/components/dialogs/input_dialog.dart';
-import 'package:artbooking/types/user/user_urls.dart';
+import 'package:artbooking/types/user/user_links.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
@@ -9,12 +9,12 @@ import 'package:unicons/unicons.dart';
 class SettingsPageUserLinks extends StatelessWidget {
   const SettingsPageUserLinks({
     Key? key,
-    required this.urls,
-    this.onUrlChanged,
+    required this.socialLinks,
+    this.onLinkChanged,
   }) : super(key: key);
 
-  final UserUrls urls;
-  final void Function(UserUrls)? onUrlChanged;
+  final UserSocialLinks socialLinks;
+  final void Function(UserSocialLinks)? onLinkChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -23,159 +23,198 @@ class SettingsPageUserLinks extends StatelessWidget {
       runSpacing: 12.0,
       children: [
         IconButton(
-          tooltip: UserUrls.instagramString,
+          tooltip: UserSocialLinks.instagramString,
           onPressed: () => showEditLinkDialog(
             context,
-            key: UserUrls.instagramString,
-            initialValue: urls.instagram,
+            key: UserSocialLinks.instagramString,
+            initialValue: socialLinks.instagram,
+            onValidate: (String newValue) {
+              return socialLinks.copyWith(instagram: newValue);
+            },
           ),
           icon: wrapIcon(
             Icon(UniconsLine.instagram),
-            urls.instagram,
+            socialLinks.instagram,
           ),
         ),
         IconButton(
-          tooltip: UserUrls.twitterString,
+          tooltip: UserSocialLinks.twitterString,
           onPressed: () => showEditLinkDialog(
             context,
-            key: UserUrls.twitterString,
-            initialValue: urls.twitter,
+            key: UserSocialLinks.twitterString,
+            initialValue: socialLinks.twitter,
+            onValidate: (String newValue) {
+              return socialLinks.copyWith(twitter: newValue);
+            },
           ),
           icon: wrapIcon(
             Icon(UniconsLine.twitter),
-            urls.twitter,
+            socialLinks.twitter,
           ),
         ),
         IconButton(
-          tooltip: UserUrls.websiteString,
+          tooltip: UserSocialLinks.websiteString,
           onPressed: () => showEditLinkDialog(
             context,
-            key: UserUrls.websiteString,
-            initialValue: urls.website,
+            key: UserSocialLinks.websiteString,
+            initialValue: socialLinks.website,
+            onValidate: (String newValue) {
+              return socialLinks.copyWith(website: newValue);
+            },
           ),
           icon: wrapIcon(
             Icon(UniconsLine.globe),
-            urls.website,
+            socialLinks.website,
           ),
         ),
         IconButton(
-          tooltip: UserUrls.behanceString,
+          tooltip: UserSocialLinks.behanceString,
           onPressed: () => showEditLinkDialog(
             context,
-            key: UserUrls.behanceString,
-            initialValue: urls.behance,
+            key: UserSocialLinks.behanceString,
+            initialValue: socialLinks.behance,
+            onValidate: (String newValue) {
+              return socialLinks.copyWith(behance: newValue);
+            },
           ),
           icon: wrapIcon(
             Icon(UniconsLine.behance),
-            urls.behance,
+            socialLinks.behance,
           ),
         ),
         IconButton(
-          tooltip: UserUrls.deviantartString,
+          tooltip: UserSocialLinks.deviantartString,
           onPressed: () => showEditLinkDialog(
             context,
-            key: UserUrls.deviantartString,
-            initialValue: urls.deviantart,
+            key: UserSocialLinks.deviantartString,
+            initialValue: socialLinks.deviantart,
+            onValidate: (String newValue) {
+              return socialLinks.copyWith(deviantart: newValue);
+            },
           ),
           icon: wrapIcon(
             FaIcon(FontAwesomeIcons.deviantart),
-            urls.deviantart,
+            socialLinks.deviantart,
           ),
         ),
         IconButton(
-          tooltip: UserUrls.discordString,
+          tooltip: UserSocialLinks.discordString,
           onPressed: () => showEditLinkDialog(
             context,
-            key: UserUrls.discordString,
-            initialValue: urls.discord,
+            key: UserSocialLinks.discordString,
+            initialValue: socialLinks.discord,
+            onValidate: (String newValue) {
+              return socialLinks.copyWith(discord: newValue);
+            },
           ),
           icon: wrapIcon(
             Icon(UniconsLine.discord),
-            urls.discord,
+            socialLinks.discord,
           ),
         ),
         IconButton(
-          tooltip: UserUrls.dribbbleString,
+          tooltip: UserSocialLinks.dribbbleString,
           onPressed: () => showEditLinkDialog(
             context,
-            key: UserUrls.dribbbleString,
-            initialValue: urls.dribbble,
+            key: UserSocialLinks.dribbbleString,
+            initialValue: socialLinks.dribbble,
+            onValidate: (String newValue) {
+              return socialLinks.copyWith(dribbble: newValue);
+            },
           ),
           icon: wrapIcon(
             Icon(UniconsLine.dribbble),
-            urls.dribbble,
+            socialLinks.dribbble,
           ),
         ),
         IconButton(
-          tooltip: UserUrls.facebookString,
+          tooltip: UserSocialLinks.facebookString,
           onPressed: () => showEditLinkDialog(
             context,
-            key: UserUrls.facebookString,
-            initialValue: urls.facebook,
+            key: UserSocialLinks.facebookString,
+            initialValue: socialLinks.facebook,
+            onValidate: (String newValue) {
+              return socialLinks.copyWith(facebook: newValue);
+            },
           ),
           icon: wrapIcon(
             Icon(UniconsLine.facebook),
-            urls.facebook,
+            socialLinks.facebook,
           ),
         ),
         IconButton(
-          tooltip: UserUrls.twitchString,
+          tooltip: UserSocialLinks.twitchString,
           onPressed: () => showEditLinkDialog(
             context,
-            key: UserUrls.twitchString,
-            initialValue: urls.twitch,
+            key: UserSocialLinks.twitchString,
+            initialValue: socialLinks.twitch,
+            onValidate: (String newValue) {
+              return socialLinks.copyWith(twitch: newValue);
+            },
           ),
           icon: wrapIcon(
             FaIcon(FontAwesomeIcons.twitch),
-            urls.twitch,
+            socialLinks.twitch,
           ),
         ),
         IconButton(
-          tooltip: UserUrls.patreonString,
+          tooltip: UserSocialLinks.patreonString,
           onPressed: () => showEditLinkDialog(
             context,
-            key: UserUrls.patreonString,
-            initialValue: urls.patreon,
+            key: UserSocialLinks.patreonString,
+            initialValue: socialLinks.patreon,
+            onValidate: (String newValue) {
+              return socialLinks.copyWith(patreon: newValue);
+            },
           ),
           icon: wrapIcon(
             FaIcon(FontAwesomeIcons.patreon),
-            urls.patreon,
+            socialLinks.patreon,
           ),
         ),
         IconButton(
-          tooltip: UserUrls.tiktokString,
+          tooltip: UserSocialLinks.tiktokString,
           onPressed: () => showEditLinkDialog(
             context,
-            key: UserUrls.tiktokString,
-            initialValue: urls.tiktok,
+            key: UserSocialLinks.tiktokString,
+            initialValue: socialLinks.tiktok,
+            onValidate: (String newValue) {
+              return socialLinks.copyWith(tiktok: newValue);
+            },
           ),
           icon: wrapIcon(
             FaIcon(FontAwesomeIcons.tiktok),
-            urls.tiktok,
+            socialLinks.tiktok,
           ),
         ),
         IconButton(
-          tooltip: UserUrls.tumblrString,
+          tooltip: UserSocialLinks.tumblrString,
           onPressed: () => showEditLinkDialog(
             context,
-            key: UserUrls.tumblrString,
-            initialValue: urls.tumblr,
+            key: UserSocialLinks.tumblrString,
+            initialValue: socialLinks.tumblr,
+            onValidate: (String newValue) {
+              return socialLinks.copyWith(tumblr: newValue);
+            },
           ),
           icon: wrapIcon(
             Icon(UniconsLine.tumblr),
-            urls.tumblr,
+            socialLinks.tumblr,
           ),
         ),
         IconButton(
-          tooltip: UserUrls.youtubeString,
+          tooltip: UserSocialLinks.youtubeString,
           onPressed: () => showEditLinkDialog(
             context,
-            key: UserUrls.youtubeString,
-            initialValue: urls.youtube,
+            key: UserSocialLinks.youtubeString,
+            initialValue: socialLinks.youtube,
+            onValidate: (String newValue) {
+              return socialLinks.copyWith(youtube: newValue);
+            },
           ),
           icon: wrapIcon(
             Icon(UniconsLine.youtube),
-            urls.youtube,
+            socialLinks.youtube,
           ),
         ),
       ],
@@ -193,6 +232,7 @@ class SettingsPageUserLinks extends StatelessWidget {
     BuildContext context, {
     required String key,
     required String initialValue,
+    required UserSocialLinks onValidate(String newValue),
   }) {
     final _locationController = TextEditingController();
     _locationController.text = initialValue;
@@ -213,13 +253,15 @@ class SettingsPageUserLinks extends StatelessWidget {
         titleValue: "link_update".tr().toUpperCase(),
         onCancel: Beamer.of(context).popRoute,
         onSubmitInput: (value) {
-          urls.setUrl(key, value);
-          onUrlChanged?.call(urls);
+          // links.setUrl(key, value);
+          final newUserSocialLinks = onValidate.call(value);
+          onLinkChanged?.call(newUserSocialLinks);
           Beamer.of(context).popRoute();
         },
         onSubmitted: (value) {
-          urls.setUrl(key, value);
-          onUrlChanged?.call(urls);
+          // links.setUrl(key, value);
+          final newUserSocialLinks = onValidate.call(value);
+          onLinkChanged?.call(newUserSocialLinks);
           Beamer.of(context).popRoute();
         },
       ),

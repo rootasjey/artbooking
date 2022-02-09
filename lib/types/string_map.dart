@@ -1,31 +1,25 @@
 import 'dart:convert';
 
 class StringMap {
-  final String edited;
-  final String original;
-
   const StringMap({
     this.edited = '',
     this.original = '',
+    this.storage = '',
   });
+
+  final String edited;
+  final String original;
+  final String storage;
 
   StringMap copyWith({
     String? edited,
     String? original,
+    String? storage,
   }) {
     return StringMap(
       edited: edited ?? this.edited,
       original: original ?? this.original,
-    );
-  }
-
-  StringMap merge(StringMap userPPPath) {
-    final newEdited = userPPPath.edited;
-    final newOriginal = userPPPath.original;
-
-    return StringMap(
-      edited: newEdited.isNotEmpty ? newEdited : this.edited,
-      original: newOriginal.isNotEmpty ? newOriginal : this.original,
+      storage: storage ?? this.storage,
     );
   }
 
@@ -33,6 +27,7 @@ class StringMap {
     return {
       'edited': edited,
       'original': original,
+      'storage': storage,
     };
   }
 
@@ -48,6 +43,7 @@ class StringMap {
     return StringMap(
       edited: map['edited'] ?? '',
       original: map['original'] ?? '',
+      storage: map['storage'] ?? '',
     );
   }
 
@@ -57,7 +53,8 @@ class StringMap {
       StringMap.fromMap(json.decode(source));
 
   @override
-  String toString() => 'StringMap(edited: $edited, original: $original)';
+  String toString() => 'StringMap(edited: $edited, original: $original, '
+      'storage: $storage)';
 
   @override
   bool operator ==(Object other) {
@@ -65,9 +62,10 @@ class StringMap {
 
     return other is StringMap &&
         other.edited == edited &&
+        other.storage == storage &&
         other.original == original;
   }
 
   @override
-  int get hashCode => edited.hashCode ^ original.hashCode;
+  int get hashCode => edited.hashCode ^ original.hashCode ^ storage.hashCode;
 }

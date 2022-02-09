@@ -9,6 +9,8 @@ import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:artbooking/types/enums/enum_license_type.dart';
+import 'package:artbooking/types/license/license_links.dart';
+import 'package:artbooking/types/license/license_usage.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -40,7 +42,7 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
   @override
   void initState() {
     super.initState();
-    _license.setType(widget.type);
+    _license = _license.copyWith(type: widget.type);
     tryFetchLicense();
   }
 
@@ -67,6 +69,7 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
                     onUsageValueChange: onUsageValueChanged,
                     onDescriptionChanged: onDescriptionChanged,
                     onTitleChanged: onTitleChanged,
+                    onLinkValueChange: onLinkValueChange,
                   ),
                 ],
               ),
@@ -120,7 +123,7 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
       }
 
       data['id'] = snapshot.id;
-      setState(() => _license = License.fromJSON(data));
+      setState(() => _license = License.fromMap(data));
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
@@ -147,7 +150,7 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
     try {
       final HttpsCallableResult<dynamic> response =
           await Utilities.cloud.fun("licenses-createOne").call({
-        "license": _license.toJSON(),
+        "license": _license.toMap(),
       });
 
       final data = LicenseResponse.fromJSON(response.data);
@@ -176,7 +179,7 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
     try {
       final HttpsCallableResult<dynamic> response =
           await Utilities.cloud.fun("licenses-updateOne").call({
-        "license": _license.toJSON(),
+        "license": _license.toMap(),
       });
 
       final data = LicenseResponse.fromJSON(response.data);
@@ -195,15 +198,27 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
     }
   }
 
-  void onUsageValueChanged() {
-    setState(() {});
+  void onUsageValueChanged(LicenseUsage newLicenseUsage) {
+    setState(() {
+      _license = _license.copyWith(
+        usage: newLicenseUsage,
+      );
+    });
   }
 
   void onDescriptionChanged(String newDescription) {
-    _license.description = newDescription;
+    _license = _license.copyWith(description: newDescription);
   }
 
   void onTitleChanged(String newName) {
-    _license.name = newName;
+    _license = _license.copyWith(name: newName);
+  }
+
+  void onLinkValueChange(LicenseLinks newLicenseLink) {
+    setState(() {
+      _license = _license.copyWith(
+        links: newLicenseLink,
+      );
+    });
   }
 }

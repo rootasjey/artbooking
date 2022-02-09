@@ -1,7 +1,6 @@
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/book/book_cover.dart';
 import 'package:artbooking/types/book/book_illustration.dart';
-import 'package:artbooking/types/book/book_urls.dart';
 import 'package:artbooking/types/enums/enum_book_layout.dart';
 import 'package:artbooking/types/enums/enum_book_layout_orientation.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
@@ -15,13 +14,9 @@ class Book {
     this.id = '',
     this.illustrations = const [],
     this.layout = EnumBookLayout.grid,
-    this.layoutMobile = EnumBookLayout.verticalList,
     this.layoutOrientation = EnumBookLayoutOrientation.vertical,
-    this.layoutOrientationMobile = EnumBookLayoutOrientation.vertical,
-    this.matrice = const [[]],
     this.name = '',
     this.updatedAt,
-    required this.urls,
     this.visibility = EnumContentVisibility.private,
   });
 
@@ -47,9 +42,6 @@ class Book {
   /// Defines content layout and presentation.
   EnumBookLayout layout;
 
-  /// Defines content layout and presentation for small screens.
-  EnumBookLayout layoutMobile;
-
   /// Defines layout scroll orientation.
   /// Will be used if [layout] value is {adaptativeGrid},
   /// {customGrid}, {customList}, {grid}, {smallGrid}, {largeGrid}.
@@ -58,7 +50,7 @@ class Book {
   /// For small resolutions, defines layout scroll orientation.
   /// Will be used if [layout] value is {adaptativeGrid}, {customGrid},
   /// {customList}, {grid}, {smallGrid}, {largeGrid}.
-  EnumBookLayoutOrientation layoutOrientationMobile;
+  // EnumBookLayoutOrientation layoutOrientationMobile;
 
   /// This book's name.
   String name;
@@ -71,13 +63,13 @@ class Book {
   /// When the conversion is done, [illustrations] property is cleared
   /// for space and sync purpose (free up space as doc is limited to 1MB
   /// and the cost to maintain 2 data structures updated is too high).
-  List<List<BookIllustration>> matrice;
+  // List<List<BookIllustration>> matrice;
 
   /// Last time this book was updated.
   final DateTime? updatedAt;
 
   /// Urls of assets or other content.
-  final BookUrls urls;
+  // final BookLinks links;
 
   /// Control if other people can view this book.
   final EnumContentVisibility visibility;
@@ -85,26 +77,21 @@ class Book {
   factory Book.empty() {
     return Book(
       cover: BookCover.empty(),
-      urls: BookUrls.empty(),
     );
   }
 
   factory Book.fromJSON(Map<String, dynamic> data) {
     return Book(
       count: data['count'] ?? 0,
-      cover: BookCover.fromJSON(data['cover']),
-      createdAt: Utilities.date.fromFirestore(data['createdAt']),
+      cover: BookCover.fromMap(data['cover']),
+      createdAt: Utilities.date.fromFirestore(data['created_at']),
       description: data['description'] ?? '',
       id: data['id'] ?? '',
       illustrations: parseIllustrations(data['illustrations']),
       layout: parseLayout(data['layout']),
-      layoutMobile: parseLayout(data['layoutMobile']),
-      layoutOrientation: parseOrientation(data['layoutOrientation']),
-      layoutOrientationMobile:
-          parseOrientation(data['layoutOrientationMobile']),
+      layoutOrientation: parseOrientation(data['layout_orientation']),
       name: data['name'] ?? '',
-      updatedAt: Utilities.date.fromFirestore(data['updatedAt']),
-      urls: BookUrls.fromJSON(data['urls']),
+      updatedAt: Utilities.date.fromFirestore(data['updated_at']),
       visibility: parseStringVisibility(data['visibility']),
     );
   }
@@ -128,25 +115,18 @@ class Book {
   /// auto (set to the last uploaded illustration),
   /// or default if the book is empty.
   String getCoverUrl() {
-    String url = "https://firebasestorage.googleapis.com/"
+    if (cover.link.isNotEmpty) {
+      return cover.link;
+    }
+
+    return "https://firebasestorage.googleapis.com/"
         "v0/b/artbooking-54d22.appspot.com/o/static"
         "%2Fimages%2Fbook_cover_512x683.png"
         "?alt=media&token=d77bc23b-90d7-4663-be3a-e878c6403e51";
-
-    if (cover.custom.url.isNotEmpty) {
-      url = cover.custom.url;
-    } else if (cover.auto.url.isNotEmpty) {
-      url = cover.auto.url;
-    }
-
-    return url;
   }
 
-  String layoutOrientationToString({bool isMobile = false}) {
-    final layoutOrientationValue =
-        isMobile ? layoutOrientationMobile : layoutOrientation;
-
-    switch (layoutOrientationValue) {
+  String layoutOrientationToString() {
+    switch (layoutOrientation) {
       case EnumBookLayoutOrientation.both:
         return 'both';
       case EnumBookLayoutOrientation.horizontal:
@@ -158,10 +138,8 @@ class Book {
     }
   }
 
-  String layoutToString({bool mobile = false}) {
-    final layoutValue = mobile ? layoutMobile : layout;
-
-    switch (layoutValue) {
+  String layoutToString() {
+    switch (layout) {
       case EnumBookLayout.adaptativeGrid:
         return 'adaptativeGrid';
       case EnumBookLayout.customExtendedGrid:

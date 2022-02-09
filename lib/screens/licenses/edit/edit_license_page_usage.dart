@@ -17,7 +17,7 @@ class EditLicensePageUsage extends StatelessWidget {
   }) : super(key: key);
 
   final LicenseUsage usage;
-  final Function()? onValueChange;
+  final Function(LicenseUsage)? onValueChange;
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +45,9 @@ class EditLicensePageUsage extends StatelessWidget {
             children: [
               SquareLink(
                 onTap: () {
-                  usage.adapt = !usage.adapt;
-                  onValueChange?.call();
+                  onValueChange?.call(
+                    usage.copyWith(adapt: !usage.adapt),
+                  );
                 },
                 onLongPress: () async {
                   final dialogReturnValue = await onEditUsage(
@@ -56,8 +57,9 @@ class EditLicensePageUsage extends StatelessWidget {
                   );
 
                   if (dialogReturnValue.validated) {
-                    usage.adapt = dialogReturnValue.value;
-                    onValueChange?.call();
+                    onValueChange?.call(
+                      usage.copyWith(adapt: !usage.adapt),
+                    );
                   }
                 },
                 checked: usage.adapt,
@@ -73,8 +75,9 @@ class EditLicensePageUsage extends StatelessWidget {
               ),
               SquareLink(
                 onTap: () {
-                  usage.commercial = !usage.commercial;
-                  onValueChange?.call();
+                  onValueChange?.call(
+                    usage.copyWith(commercial: !usage.commercial),
+                  );
                 },
                 onLongPress: () async {
                   final dialogReturnValue = await onEditUsage(
@@ -84,8 +87,9 @@ class EditLicensePageUsage extends StatelessWidget {
                   );
 
                   if (dialogReturnValue.validated) {
-                    usage.commercial = dialogReturnValue.value;
-                    onValueChange?.call();
+                    onValueChange?.call(
+                      usage.copyWith(commercial: !usage.commercial),
+                    );
                   }
                 },
                 checked: usage.commercial,
@@ -101,8 +105,9 @@ class EditLicensePageUsage extends StatelessWidget {
               ),
               SquareLink(
                 onTap: () {
-                  usage.free = !usage.free;
-                  onValueChange?.call();
+                  onValueChange?.call(
+                    usage.copyWith(free: !usage.free),
+                  );
                 },
                 onLongPress: () async {
                   final dialogReturnValue = await onEditUsage(
@@ -112,8 +117,9 @@ class EditLicensePageUsage extends StatelessWidget {
                   );
 
                   if (dialogReturnValue.validated) {
-                    usage.free = dialogReturnValue.value;
-                    onValueChange?.call();
+                    onValueChange?.call(
+                      usage.copyWith(free: !usage.free),
+                    );
                   }
                 },
                 checked: usage.free,
@@ -129,8 +135,9 @@ class EditLicensePageUsage extends StatelessWidget {
               ),
               SquareLink(
                 onTap: () {
-                  usage.oss = !usage.oss;
-                  onValueChange?.call();
+                  onValueChange?.call(
+                    usage.copyWith(oss: !usage.oss),
+                  );
                 },
                 onLongPress: () async {
                   final dialogReturnValue = await onEditUsage(
@@ -140,8 +147,9 @@ class EditLicensePageUsage extends StatelessWidget {
                   );
 
                   if (dialogReturnValue.validated) {
-                    usage.oss = dialogReturnValue.value;
-                    onValueChange?.call();
+                    onValueChange?.call(
+                      usage.copyWith(oss: !usage.oss),
+                    );
                   }
                 },
                 checked: usage.oss,
@@ -157,8 +165,9 @@ class EditLicensePageUsage extends StatelessWidget {
               ),
               SquareLink(
                 onTap: () {
-                  usage.personal = !usage.personal;
-                  onValueChange?.call();
+                  onValueChange?.call(
+                    usage.copyWith(personal: !usage.personal),
+                  );
                 },
                 onLongPress: () async {
                   final dialogReturnValue = await onEditUsage(
@@ -168,8 +177,9 @@ class EditLicensePageUsage extends StatelessWidget {
                   );
 
                   if (dialogReturnValue.validated) {
-                    usage.personal = dialogReturnValue.value;
-                    onValueChange?.call();
+                    onValueChange?.call(
+                      usage.copyWith(personal: !usage.personal),
+                    );
                   }
                 },
                 checked: usage.personal,
@@ -185,8 +195,9 @@ class EditLicensePageUsage extends StatelessWidget {
               ),
               SquareLink(
                 onTap: () {
-                  usage.print = !usage.print;
-                  onValueChange?.call();
+                  onValueChange?.call(
+                    usage.copyWith(print: !usage.print),
+                  );
                 },
                 onLongPress: () async {
                   final dialogReturnValue = await onEditUsage(
@@ -196,8 +207,9 @@ class EditLicensePageUsage extends StatelessWidget {
                   );
 
                   if (dialogReturnValue.validated) {
-                    usage.print = dialogReturnValue.value;
-                    onValueChange?.call();
+                    onValueChange?.call(
+                      usage.copyWith(print: !usage.print),
+                    );
                   }
                 },
                 checked: usage.print,
@@ -213,8 +225,9 @@ class EditLicensePageUsage extends StatelessWidget {
               ),
               SquareLink(
                 onTap: () {
-                  usage.sell = !usage.sell;
-                  onValueChange?.call();
+                  onValueChange?.call(
+                    usage.copyWith(sell: !usage.sell),
+                  );
                 },
                 onLongPress: () async {
                   final dialogReturnValue = await onEditUsage(
@@ -224,8 +237,9 @@ class EditLicensePageUsage extends StatelessWidget {
                   );
 
                   if (dialogReturnValue.validated) {
-                    usage.sell = dialogReturnValue.value;
-                    onValueChange?.call();
+                    onValueChange?.call(
+                      usage.copyWith(sell: !usage.sell),
+                    );
                   }
                 },
                 checked: usage.sell,
@@ -241,8 +255,9 @@ class EditLicensePageUsage extends StatelessWidget {
               ),
               SquareLink(
                 onTap: () {
-                  usage.share = !usage.share;
-                  onValueChange?.call();
+                  onValueChange?.call(
+                    usage.copyWith(share: !usage.share),
+                  );
                 },
                 onLongPress: () async {
                   final dialogReturnValue = await onEditUsage(
@@ -252,8 +267,9 @@ class EditLicensePageUsage extends StatelessWidget {
                   );
 
                   if (dialogReturnValue.validated) {
-                    usage.share = dialogReturnValue.value;
-                    onValueChange?.call();
+                    onValueChange?.call(
+                      usage.copyWith(share: !usage.share),
+                    );
                   }
                 },
                 checked: usage.share,
@@ -269,8 +285,9 @@ class EditLicensePageUsage extends StatelessWidget {
               ),
               SquareLink(
                 onTap: () {
-                  usage.view = !usage.view;
-                  onValueChange?.call();
+                  onValueChange?.call(
+                    usage.copyWith(view: !usage.view),
+                  );
                 },
                 onLongPress: () async {
                   final dialogReturnValue = await onEditUsage(
@@ -280,8 +297,9 @@ class EditLicensePageUsage extends StatelessWidget {
                   );
 
                   if (dialogReturnValue.validated) {
-                    usage.view = dialogReturnValue.value;
-                    onValueChange?.call();
+                    onValueChange?.call(
+                      usage.copyWith(view: !usage.view),
+                    );
                   }
                 },
                 checked: usage.view,

@@ -1,6 +1,6 @@
-/// External links for this art style.
-class ArtStyleUrls {
-  const ArtStyleUrls({
+/// External links for this art movement.
+class ArtMovementLinks {
+  const ArtMovementLinks({
     this.image = '',
     this.wikipedia = '',
   });
@@ -13,19 +13,19 @@ class ArtStyleUrls {
   /// You may find useful information.
   final String wikipedia;
 
-  factory ArtStyleUrls.empty() {
-    return ArtStyleUrls(
+  factory ArtMovementLinks.empty() {
+    return ArtMovementLinks(
       image: '',
       wikipedia: '',
     );
   }
 
-  factory ArtStyleUrls.fromJSON(Map<String, dynamic>? data) {
+  factory ArtMovementLinks.fromMap(Map<String, dynamic>? data) {
     if (data == null) {
-      return ArtStyleUrls.empty();
+      return ArtMovementLinks.empty();
     }
 
-    return ArtStyleUrls(
+    return ArtMovementLinks(
       image: data['image'],
       wikipedia: data['wikipedia'],
     );

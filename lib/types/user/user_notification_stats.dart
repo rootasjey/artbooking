@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-class UserNotificationsStats {
-  const UserNotificationsStats({
+class UserNotificationStats {
+  const UserNotificationStats({
     this.total = 0,
     this.unread = 0,
   });
@@ -12,11 +12,11 @@ class UserNotificationsStats {
   /// Number of unread notifications.
   final int unread;
 
-  UserNotificationsStats copyWith({
+  UserNotificationStats copyWith({
     int? total,
     int? unread,
   }) {
-    return UserNotificationsStats(
+    return UserNotificationStats(
       total: total ?? this.total,
       unread: unread ?? this.unread,
     );
@@ -29,19 +29,19 @@ class UserNotificationsStats {
     };
   }
 
-  factory UserNotificationsStats.empty() {
-    return UserNotificationsStats(
+  factory UserNotificationStats.empty() {
+    return UserNotificationStats(
       total: 0,
       unread: 0,
     );
   }
 
-  factory UserNotificationsStats.fromMap(Map<String, dynamic>? map) {
+  factory UserNotificationStats.fromMap(Map<String, dynamic>? map) {
     if (map == null) {
-      return UserNotificationsStats.empty();
+      return UserNotificationStats.empty();
     }
 
-    return UserNotificationsStats(
+    return UserNotificationStats(
       total: map['total']?.toInt() ?? 0,
       unread: map['unread']?.toInt() ?? 0,
     );
@@ -49,8 +49,8 @@ class UserNotificationsStats {
 
   String toJson() => json.encode(toMap());
 
-  factory UserNotificationsStats.fromJson(String source) =>
-      UserNotificationsStats.fromMap(json.decode(source));
+  factory UserNotificationStats.fromJson(String source) =>
+      UserNotificationStats.fromMap(json.decode(source));
 
   @override
   String toString() => 'UserNotificationsStats(total: $total, unread: $unread)';
@@ -59,7 +59,7 @@ class UserNotificationsStats {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is UserNotificationsStats &&
+    return other is UserNotificationStats &&
         other.total == total &&
         other.unread == unread;
   }

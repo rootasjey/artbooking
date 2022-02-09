@@ -4,7 +4,6 @@ import 'package:artbooking/types/cloud_functions/illustrations_response.dart';
 import 'package:artbooking/types/cloud_functions/illustration_response.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
-import 'package:artbooking/types/license/license.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class IllustrationsActions {
@@ -18,7 +17,7 @@ class IllustrationsActions {
     try {
       final response =
           await Utilities.cloud.fun('illustrations-checkProperties').call({
-        'illustrationId': illustrationId,
+        'illustration_id': illustrationId,
       });
 
       return CheckPropertiesResponse.fromJSON(response.data);
@@ -39,7 +38,7 @@ class IllustrationsActions {
       final response =
           await Utilities.cloud.fun('illustrations-createOne').call({
         'name': name,
-        'visibility': Illustration.visibilityPropToString(visibility),
+        'visibility': Illustration.convertVisibilityToString(visibility),
       });
 
       return IllustrationResponse.fromJSON(response.data);
@@ -58,7 +57,7 @@ class IllustrationsActions {
     try {
       final response =
           await Utilities.cloud.fun('illustrations-deleteOne').call({
-        'illustrationId': illustrationId,
+        'illustration_id': illustrationId,
       });
 
       return IllustrationResponse.fromJSON(response.data);
@@ -77,7 +76,7 @@ class IllustrationsActions {
     try {
       final response =
           await Utilities.cloud.fun('illustrations-deleteMany').call({
-        'illustrationIds': illustrationIds,
+        'illustration_ids': illustrationIds,
       });
 
       return IllustrationsResponse.fromJSON(response.data);
@@ -87,35 +86,6 @@ class IllustrationsActions {
     } catch (error) {
       Utilities.logger.e(error);
       return IllustrationsResponse.fromMessage(error.toString());
-    }
-  }
-
-  static Future<IllustrationResponse> updateMetadata({
-    String? name,
-    String? description,
-    String? summary,
-    required License license,
-    EnumContentVisibility visibility = EnumContentVisibility.private,
-    required Illustration illustration,
-  }) async {
-    try {
-      final response =
-          await Utilities.cloud.fun('illustrations-updateMetadata').call({
-        'illustrationId': illustration.id,
-        'name': name,
-        'description': description,
-        'summary': summary,
-        'license': license.toJSON(),
-        'visibility': Illustration.visibilityPropToString(visibility),
-      });
-
-      return IllustrationResponse.fromJSON(response.data);
-    } on FirebaseFunctionsException catch (exception) {
-      Utilities.logger.e(exception);
-      return IllustrationResponse.fromException(exception);
-    } catch (error) {
-      Utilities.logger.e(error);
-      return IllustrationResponse.fromMessage(error.toString());
     }
   }
 }

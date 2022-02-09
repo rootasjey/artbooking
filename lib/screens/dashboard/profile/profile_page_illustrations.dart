@@ -172,7 +172,7 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
         final data = document.data();
         data['id'] = document.id;
 
-        _illustrations.add(Illustration.fromJSON(data));
+        _illustrations.add(Illustration.fromMap(data));
       }
     } catch (error) {
       Utilities.logger.e(error);

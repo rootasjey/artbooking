@@ -3,20 +3,24 @@ import 'dart:convert';
 /// Define which actions are available for the target user.
 class UserRights {
   const UserRights({
-    this.isAdmin = false,
-    this.canManageLicense = false,
-    this.canManageStyles = false,
+    this.canManageArtMovements = false,
+    this.canManageData = false,
+    this.canManageLicenses = false,
+    this.canManageSections = false,
     this.canManageUsers = false,
   });
 
-  /// If true, the current user is an admin.
-  final bool isAdmin;
+  /// If true, the current user can manage app data.
+  final bool canManageData;
 
   /// True if the current user can manage (add, remove, edit) staff licenses.
-  final bool canManageLicense;
+  final bool canManageLicenses;
 
-  /// True if the current user can manage (add, remove, edit) art styles.
-  final bool canManageStyles;
+  /// True if the current user can manage (add, remove, edit) art movements.
+  final bool canManageArtMovements;
+
+  /// True if the current user can manage (add, remove, edit) sections.
+  final bool canManageSections;
 
   /// True if the current user can manage (add, remove, edit) users.
   final bool canManageUsers;
@@ -26,17 +30,18 @@ class UserRights {
     bool? canManageLicense,
   }) {
     return UserRights(
-      isAdmin: isAdmin ?? this.isAdmin,
-      canManageLicense: canManageLicense ?? this.canManageLicense,
+      canManageData: isAdmin ?? this.canManageData,
+      canManageLicenses: canManageLicense ?? this.canManageLicenses,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'user:admin': isAdmin,
-      'user:managelicense': canManageLicense,
-      'user:managestyles': canManageStyles,
-      'user:manageusers': canManageUsers,
+      'user:manage_art_movements': canManageArtMovements,
+      'user:manage_data': canManageArtMovements,
+      'user:manage_licenses': canManageLicenses,
+      'user:manage_sections': canManageUsers,
+      'user:manage_users': canManageUsers,
     };
   }
 
@@ -50,10 +55,11 @@ class UserRights {
     }
 
     return UserRights(
-      isAdmin: map['user:admin'] ?? false,
-      canManageLicense: map['user:managelicense'] ?? false,
-      canManageStyles: map['user:managestyles'] ?? false,
-      canManageUsers: map['user:manageusers'] ?? false,
+      canManageArtMovements: map['user:manage_art_movements'] ?? false,
+      canManageData: map['user:manage_data'] ?? false,
+      canManageLicenses: map['user:manage_licenses'] ?? false,
+      canManageSections: map['user:manage_sections'] ?? false,
+      canManageUsers: map['user:manage_users'] ?? false,
     );
   }
 
@@ -64,17 +70,27 @@ class UserRights {
 
   @override
   String toString() =>
-      'UserRights(isAdmin: $isAdmin, canManageLicense: $canManageLicense)';
+      'UserRights(canManageArtMovements: $canManageArtMovements, '
+      'canManageData: $canManageData, canManageLicenses: $canManageLicenses, '
+      'canManageSections: $canManageSections, canManageUsers: $canManageUsers)';
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
     return other is UserRights &&
-        other.isAdmin == isAdmin &&
-        other.canManageLicense == canManageLicense;
+        other.canManageArtMovements == canManageArtMovements &&
+        other.canManageData == canManageData &&
+        other.canManageSections == canManageSections &&
+        other.canManageSections == canManageSections &&
+        other.canManageUsers == canManageUsers;
   }
 
   @override
-  int get hashCode => isAdmin.hashCode ^ canManageLicense.hashCode;
+  int get hashCode =>
+      canManageArtMovements.hashCode ^
+      canManageData.hashCode ^
+      canManageLicenses.hashCode ^
+      canManageSections.hashCode ^
+      canManageUsers.hashCode;
 }

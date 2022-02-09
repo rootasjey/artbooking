@@ -344,7 +344,7 @@ class _SearchPageState extends State<SearchPage> {
         final data = hit.data;
         data['id'] = hit.objectID;
 
-        final post = Illustration.fromJSON(data);
+        final post = Illustration.fromMap(data);
         _illustrationsSuggestions.add(post);
       }
 

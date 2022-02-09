@@ -1,12 +1,12 @@
 import 'dart:convert';
 
-import 'package:artbooking/types/user/book_stats.dart';
-import 'package:artbooking/types/user/challenges_stats.dart';
-import 'package:artbooking/types/user/contests_stats.dart';
-import 'package:artbooking/types/user/galleries_stats.dart';
-import 'package:artbooking/types/user/illustrations_stats.dart';
-import 'package:artbooking/types/user/notifications_stats.dart';
-import 'package:artbooking/types/user/storage_stats.dart';
+import 'package:artbooking/types/user/user_book_stats.dart';
+import 'package:artbooking/types/user/user_challenges_stats.dart';
+import 'package:artbooking/types/user/user_contest_stats.dart';
+import 'package:artbooking/types/user/user_gallery_stats.dart';
+import 'package:artbooking/types/user/user_illustration_stats.dart';
+import 'package:artbooking/types/user/user_notification_stats.dart';
+import 'package:artbooking/types/user/user_storage_stats.dart';
 
 class UserStats {
   UserStats({
@@ -19,21 +19,21 @@ class UserStats {
     required this.storage,
   });
 
-  UserBooksStats books;
-  UserChallengesStats challenges;
-  UserContestsStats constests;
-  UserGalleriesStats galleries;
-  UserIllustrationsStats illustrations;
-  UserNotificationsStats notifications;
+  UserBookStats books;
+  UserChallengeStats challenges;
+  UserContestStats constests;
+  UserGalleryStats galleries;
+  UserIllustrationStats illustrations;
+  UserNotificationStats notifications;
   UserStorageStats storage;
 
   UserStats copyWith({
-    UserBooksStats? books,
-    UserChallengesStats? challenges,
-    UserContestsStats? constests,
-    UserGalleriesStats? galleries,
-    UserIllustrationsStats? illustrations,
-    UserNotificationsStats? notifications,
+    UserBookStats? books,
+    UserChallengeStats? challenges,
+    UserContestStats? constests,
+    UserGalleryStats? galleries,
+    UserIllustrationStats? illustrations,
+    UserNotificationStats? notifications,
     UserStorageStats? storage,
   }) {
     return UserStats(
@@ -49,12 +49,12 @@ class UserStats {
 
   factory UserStats.empty() {
     return UserStats(
-      books: UserBooksStats.empty(),
-      challenges: UserChallengesStats.empty(),
-      constests: UserContestsStats.empty(),
-      galleries: UserGalleriesStats.empty(),
-      illustrations: UserIllustrationsStats.empty(),
-      notifications: UserNotificationsStats.empty(),
+      books: UserBookStats.empty(),
+      challenges: UserChallengeStats.empty(),
+      constests: UserContestStats.empty(),
+      galleries: UserGalleryStats.empty(),
+      illustrations: UserIllustrationStats.empty(),
+      notifications: UserNotificationStats.empty(),
       storage: UserStorageStats.empty(),
     );
   }
@@ -77,12 +77,12 @@ class UserStats {
     }
 
     return UserStats(
-      books: UserBooksStats.fromMap(map['books']),
-      challenges: UserChallengesStats.fromMap(map['challenges']),
-      constests: UserContestsStats.fromMap(map['constests']),
-      galleries: UserGalleriesStats.fromMap(map['galleries']),
-      illustrations: UserIllustrationsStats.fromMap(map['illustrations']),
-      notifications: UserNotificationsStats.fromMap(map['notifications']),
+      books: UserBookStats.fromMap(map['books']),
+      challenges: UserChallengeStats.fromMap(map['challenges']),
+      constests: UserContestStats.fromMap(map['constests']),
+      galleries: UserGalleryStats.fromMap(map['galleries']),
+      illustrations: UserIllustrationStats.fromMap(map['illustrations']),
+      notifications: UserNotificationStats.fromMap(map['notifications']),
       storage: UserStorageStats.fromMap(map['storage']),
     );
   }
@@ -94,7 +94,10 @@ class UserStats {
 
   @override
   String toString() {
-    return 'UserStats(books: $books, challenges: $challenges, constests: $constests, galleries: $galleries, illustrations: $illustrations, notifications: $notifications, storage: $storage)';
+    return 'UserStats(books: $books, challenges: $challenges, '
+        'constests: $constests, galleries: $galleries, '
+        'illustrations: $illustrations, notifications: $notifications, '
+        'storage: $storage)';
   }
 
   @override

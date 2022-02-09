@@ -264,7 +264,7 @@ class _IllustrationCardState extends State<IllustrationCard>
   void checkProperties() async {
     final illustration = widget.illustration;
 
-    if (illustration.hasPendingCreates) {
+    if (illustration.version < 1) {
       return;
     }
 

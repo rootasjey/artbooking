@@ -8,22 +8,22 @@ class DateUtilities {
   /// Parse a date from Firestore.
   /// The raw value can be a int, Timestamp or a Map.
   /// Return a valida date and the currect date if it fails to parse ra‹ value.
-  DateTime fromFirestore(dynamic data) {
+  DateTime fromFirestore(dynamic map) {
     DateTime date = DateTime.now();
 
-    if (data == null) {
+    if (map == null) {
       return date;
     }
 
     try {
-      if (data is int) {
-        date = DateTime.fromMillisecondsSinceEpoch(data);
-      } else if (data is Timestamp) {
-        date = data.toDate();
-      } else if (data is String) {
-        date = DateTime.parse(data);
-      } else if (data != null && data['_seconds'] != null) {
-        date = DateTime.fromMillisecondsSinceEpoch(data['_seconds'] * 1000);
+      if (map is int) {
+        date = DateTime.fromMillisecondsSinceEpoch(map);
+      } else if (map is Timestamp) {
+        date = map.toDate();
+      } else if (map is String) {
+        date = DateTime.parse(map);
+      } else if (map != null && map['_seconds'] != null) {
+        date = DateTime.fromMillisecondsSinceEpoch(map['_seconds'] * 1000);
       }
     } catch (error) {
       Utilities.logger.e(error);

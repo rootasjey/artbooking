@@ -3,22 +3,22 @@ import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/components/square/square_link.dart';
 import 'package:artbooking/types/dialog_return_value.dart';
-import 'package:artbooking/types/license/license_urls.dart';
+import 'package:artbooking/types/license/license_links.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:unicons/unicons.dart';
 
-class EditLicensePageUrls extends StatelessWidget {
-  const EditLicensePageUrls({
+class EditLicensePageLinks extends StatelessWidget {
+  const EditLicensePageLinks({
     Key? key,
-    required this.urls,
+    required this.links,
     this.onValueChange,
   }) : super(key: key);
 
-  final LicenseUrls urls;
-  final Function()? onValueChange;
+  final LicenseLinks links;
+  final Function(LicenseLinks)? onValueChange;
 
   @override
   Widget build(BuildContext context) {
@@ -50,19 +50,20 @@ class EditLicensePageUrls extends StatelessWidget {
                       await onEditUrl(
                     context,
                     dialogTitle: 'website',
-                    initialValue: urls.website,
+                    initialValue: links.website,
                   );
 
                   if (dialogReturnValue.validated) {
-                    urls.website = dialogReturnValue.value;
-                    onValueChange?.call();
+                    onValueChange?.call(links.copyWith(
+                      website: dialogReturnValue.value,
+                    ));
                   }
                 },
-                checked: urls.website.isNotEmpty,
+                checked: links.website.isNotEmpty,
                 icon: Icon(
                   UniconsLine.globe,
                   size: 42.0,
-                  color: getIconColor(context, urls.website.isNotEmpty),
+                  color: getIconColor(context, links.website.isNotEmpty),
                 ),
                 text: Text(
                   "website",
@@ -78,19 +79,20 @@ class EditLicensePageUrls extends StatelessWidget {
                       await onEditUrl(
                     context,
                     dialogTitle: 'wikipedia',
-                    initialValue: urls.wikipedia,
+                    initialValue: links.wikipedia,
                   );
 
                   if (dialogReturnValue.validated) {
-                    urls.wikipedia = dialogReturnValue.value;
-                    onValueChange?.call();
+                    onValueChange?.call(
+                      links.copyWith(wikipedia: dialogReturnValue.value),
+                    );
                   }
                 },
-                checked: urls.wikipedia.isNotEmpty,
+                checked: links.wikipedia.isNotEmpty,
                 icon: Icon(
                   FontAwesomeIcons.wikipediaW,
                   size: 36.0,
-                  color: getIconColor(context, urls.wikipedia.isNotEmpty),
+                  color: getIconColor(context, links.wikipedia.isNotEmpty),
                 ),
                 text: Text(
                   "wikipedia",

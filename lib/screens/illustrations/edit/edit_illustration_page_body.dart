@@ -82,7 +82,7 @@ class EditIllustrationPageBody extends StatelessWidget {
             onUpdatePresentation: onUpdatePresentation,
           ),
           EditIllustrationPageStyles(
-            selectedStyles: illustration.styles,
+            selectedStyles: illustration.artMovements,
             showStylesPanel: showStylesPanel,
             onRemoveStyleAndUpdate: onRemoveStyleAndUpdate,
             onToggleStylesPanel: onToggleStylesPanel,

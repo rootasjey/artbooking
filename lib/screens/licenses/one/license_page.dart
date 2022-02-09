@@ -60,7 +60,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
   Widget build(BuildContext context) {
     final User user = ref.watch(AppState.userProvider);
     final bool canManageLicense =
-        user.firestoreUser?.rights.canManageLicense ?? false;
+        user.firestoreUser?.rights.canManageLicenses ?? false;
 
     return Scaffold(
       floatingActionButton: fab(canManageLicense),
@@ -125,7 +125,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
       startListeningToDocument(query);
 
       data['id'] = docSnapshot.id;
-      setState(() => _license = License.fromJSON(data));
+      setState(() => _license = License.fromMap(data));
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
@@ -244,7 +244,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
 
       setState(() {
         data['id'] = docSnapshot.id;
-        _license = License.fromJSON(data);
+        _license = License.fromMap(data);
       });
     });
   }

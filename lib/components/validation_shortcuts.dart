@@ -53,12 +53,12 @@ class ValidationShortcuts extends StatelessWidget {
         actions: {
           EnterIntent: CallbackAction<EnterIntent>(
             onInvoke: (EnterIntent enterIntent) {
-              onValidate?.call();
+              return onValidate?.call();
             },
           ),
           EscapeIntent: CallbackAction<EscapeIntent>(
             onInvoke: (EscapeIntent escapeIntent) {
-              onCancel?.call();
+              return onCancel?.call();
             },
           ),
         },

@@ -1,7 +1,7 @@
 import 'package:artbooking/screens/settings/settings_page_body_left.dart';
 import 'package:artbooking/screens/settings/settings_page_body_right.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
-import 'package:artbooking/types/user/user_urls.dart';
+import 'package:artbooking/types/user/user_links.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPageBody extends StatelessWidget {
@@ -16,7 +16,7 @@ class SettingsPageBody extends StatelessWidget {
     this.onGoToUpdateEmail,
     this.onEditLocation,
     this.onEditSummary,
-    this.onUrlChanged,
+    this.onLinkChanged,
     this.profilePictureHeroTag = '',
   }) : super(key: key);
 
@@ -30,7 +30,7 @@ class SettingsPageBody extends StatelessWidget {
   final void Function()? onGoToUpdateEmail;
   final void Function()? onEditLocation;
   final void Function()? onEditSummary;
-  final void Function(UserUrls)? onUrlChanged;
+  final void Function(UserSocialLinks)? onLinkChanged;
   final String profilePictureHeroTag;
 
   @override
@@ -49,8 +49,8 @@ class SettingsPageBody extends StatelessWidget {
               profilePictureUrl: userFirestore.getProfilePicture(),
               onEditPicture: onEditPicture,
               onUploadPicture: onUploadPicture,
-              urls: userFirestore.urls,
-              onUrlChanged: onUrlChanged,
+              socialLinks: userFirestore.socialLinks,
+              onLinkChanged: onLinkChanged,
             ),
             SettingsPageBodyRight(
               userFirestore: userFirestore,

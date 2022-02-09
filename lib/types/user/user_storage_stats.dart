@@ -3,16 +3,16 @@ import 'dart:convert';
 import 'package:artbooking/types/user/storage_stats_item.dart';
 
 class UserStorageStats {
-  UserStorageStats({
+  const UserStorageStats({
     required this.illustrations,
     required this.videos,
   });
 
   /// Number of existing illustrations this user own.
-  StorageStatsItem illustrations;
+  final StorageStatsItem illustrations;
 
   /// Total illustrations updates by providing a new version.
-  StorageStatsItem videos;
+  final StorageStatsItem videos;
 
   UserStorageStats copyWith({
     StorageStatsItem? illustrations,

@@ -97,7 +97,7 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
     bool isAdmin = false;
 
     if (userFirestore != null) {
-      isAdmin = userFirestore.rights.isAdmin;
+      isAdmin = userFirestore.rights.canManageData;
     }
 
     return SliverPadding(

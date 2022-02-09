@@ -79,10 +79,10 @@ class UserNotifier extends StateNotifier<User> {
     final UserFirestore? firestoreUser = state.firestoreUser;
     if (firestoreUser == null) return orElse;
 
-    final editedURL = firestoreUser.profilePicture.url.edited;
+    final editedURL = firestoreUser.profilePicture.links.edited;
     if (editedURL.isNotEmpty) return editedURL;
 
-    final originalURL = firestoreUser.profilePicture.url.original;
+    final originalURL = firestoreUser.profilePicture.links.original;
     if (originalURL.isNotEmpty) return originalURL;
 
     return orElse;
@@ -270,8 +270,8 @@ class UserNotifier extends StateNotifier<User> {
       final idToken = await authUser.getIdToken();
 
       final response = await Utilities.cloud.fun('users-updateEmail').call({
-        'newEmail': authUser.email,
-        'idToken': idToken,
+        'email': authUser.email,
+        'id_token': idToken,
       });
 
       await signIn(email: authUser.email);
@@ -328,7 +328,7 @@ class UserNotifier extends StateNotifier<User> {
   Future<CloudFunctionsResponse> updateUsername(String newUsername) async {
     try {
       final response = await Utilities.cloud.fun('users-updateUsername').call({
-        'newUsername': newUsername,
+        'username': newUsername,
       });
 
       return CloudFunctionsResponse.fromJSON(response.data);

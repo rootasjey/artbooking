@@ -1,4 +1,4 @@
-import 'package:artbooking/components/add_style_panel.dart';
+import 'package:artbooking/components/add_art_movement_panel.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/components/sheet_header.dart';
 import 'package:artbooking/globals/app_state.dart';
@@ -11,7 +11,7 @@ import 'package:artbooking/types/firestore/document_map.dart';
 import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/license/license.dart';
-import 'package:artbooking/types/art_style/art_style.dart';
+import 'package:artbooking/types/art_movement/art_movement.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -40,11 +40,23 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
   bool _showStylesPanel = false;
   bool _showLicensesPanel = false;
 
+  License _license = License.empty();
+  EnumContentVisibility _visibility = EnumContentVisibility.public;
+  List<String> _topics = [];
+
   final GlobalKey<ExpansionTileCardState> _presentationCardKey = GlobalKey();
 
   final _numberRegex = VerbalExpression()
     ..digit()
     ..oneOrMore();
+
+  @override
+  void initState() {
+    super.initState();
+    _license = widget.illustration.license;
+    _visibility = widget.illustration.visibility;
+    _topics = widget.illustration.topics;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,14 +118,14 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
               message: '${"illustration_updating".tr()}...',
             ),
           ),
-          stylesSidePanel(),
+          artMovementsSidePanel(),
           Positioned(
             top: 100.0,
             right: 24.0,
             child: SelectLicensePanel(
               elevation: 8.0,
               isVisible: _showLicensesPanel,
-              selectedLicense: widget.illustration.license,
+              selectedLicense: _license,
               onClose: () => setState(() => _showLicensesPanel = false),
               onToggleLicenseAndUpdate: onToggleLicenseAndUpdate,
             ),
@@ -123,13 +135,13 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
     );
   }
 
-  Widget stylesSidePanel() {
+  Widget artMovementsSidePanel() {
     return Positioned(
       top: 100.0,
       right: 24.0,
-      child: AddStylePanel(
+      child: AddArtMovementPanel(
         isVisible: _showStylesPanel,
-        selectedStyles: widget.illustration.styles,
+        selectedStyles: widget.illustration.artMovements,
         onClose: () {
           setState(() => _showStylesPanel = false);
         },
@@ -138,17 +150,17 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
     );
   }
 
-  void onAddStyleAndUpdate(String styleName) async {
+  void onAddArtMovementsAndUpdate(String styleName) async {
     setState(() {
-      widget.illustration.styles.add(styleName);
+      widget.illustration.artMovements.add(styleName);
       _isSaving = true;
     });
 
     try {
       final response =
-          await Utilities.cloud.illustrations("updateStyles").call({
-        "illustrationId": widget.illustration.id,
-        "styles": widget.illustration.styles,
+          await Utilities.cloud.illustrations("updateArtMovements").call({
+        "illustration_id": widget.illustration.id,
+        "art_movements": widget.illustration.artMovements,
       });
 
       final bool success = response.data["success"];
@@ -176,7 +188,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       Utilities.logger.e(error);
 
       setState(() {
-        widget.illustration.styles.remove(styleName);
+        widget.illustration.artMovements.remove(styleName);
       });
 
       context.showErrorBar(
@@ -200,7 +212,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
     final topicsToAdd = topicString.split(",");
     final topicsMap = Map<String, bool>();
 
-    for (String topic in widget.illustration.topics) {
+    for (String topic in _topics) {
       topicsMap[topic] = true;
     }
 
@@ -218,13 +230,14 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
 
     setState(() {
       _isSaving = true;
-      widget.illustration.topics = topicsMap.keys.toList();
+      // widget.illustration.topics = topicsMap.keys.toList();
+      _topics = topicsMap.keys.toList();
     });
 
     try {
       final response =
           await Utilities.cloud.illustrations("updateTopics").call({
-        "illustrationId": widget.illustration.id,
+        "illustration_id": widget.illustration.id,
         "topics": topicsMap.keys.toList(),
       });
 
@@ -237,7 +250,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       Utilities.logger.e(error);
 
       for (String topic in topicsToAdd) {
-        widget.illustration.topics.remove(topic);
+        _topics.remove(topic);
       }
 
       String errorMessage = error.message ??
@@ -259,7 +272,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       Utilities.logger.e(error);
 
       for (String topic in topicsToAdd) {
-        widget.illustration.topics.remove(topic);
+        _topics.remove(topic);
       }
 
       context.showErrorBar(
@@ -271,10 +284,8 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
   }
 
   DocumentMap getLicenseQuery() {
-    final License license = widget.illustration.license;
-
-    if (license.type == EnumLicenseType.staff) {
-      return FirebaseFirestore.instance.collection("licenses").doc(license.id);
+    if (_license.type == EnumLicenseType.staff) {
+      return FirebaseFirestore.instance.collection("licenses").doc(_license.id);
     }
 
     final String? uid = ref.read(AppState.userProvider).authUser?.uid;
@@ -283,13 +294,11 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
         .collection('users')
         .doc(uid)
         .collection("licenses")
-        .doc(license.id);
+        .doc(_license.id);
   }
 
   void fetchLicense() async {
-    final License license = widget.illustration.license;
-
-    if (license.id.isEmpty) {
+    if (_license.id.isEmpty) {
       return;
     }
 
@@ -300,12 +309,16 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
         return;
       }
 
-      final data = licenseSnap.data()!;
+      final data = licenseSnap.data();
+      if (data == null) {
+        return;
+      }
+
       data['id'] = licenseSnap.id;
 
       setState(() {
-        final completeLicense = License.fromJSON(data);
-        widget.illustration.license = completeLicense;
+        final completeLicense = License.fromMap(data);
+        _license = completeLicense;
       });
     } catch (error) {
       Utilities.logger.e(error);
@@ -315,14 +328,14 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
   void onRemoveStyleAndUpdate(String styleName) async {
     setState(() {
       _isSaving = true;
-      widget.illustration.styles.remove(styleName);
+      widget.illustration.artMovements.remove(styleName);
     });
 
     try {
       final response =
-          await Utilities.cloud.illustrations("updateStyles").call({
-        "illustrationId": widget.illustration.id,
-        "styles": widget.illustration.styles,
+          await Utilities.cloud.illustrations("updateArtMovements").call({
+        "illustration_id": widget.illustration.id,
+        "art_movements": widget.illustration.artMovements,
       });
 
       final bool success = response.data["success"];
@@ -341,7 +354,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       );
     } catch (error) {
       Utilities.logger.e(error);
-      widget.illustration.styles.add(styleName);
+      widget.illustration.artMovements.add(styleName);
 
       context.showErrorBar(
         content: Text("styles_update_fail".tr()),
@@ -353,15 +366,15 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
 
   void onRemoveTopicAndUpdate(String topic) async {
     setState(() {
-      widget.illustration.topics.remove(topic);
+      _topics.remove(topic);
       _isSaving = true;
     });
 
     try {
       final response =
           await Utilities.cloud.illustrations("updateTopics").call({
-        "illustrationId": widget.illustration.id,
-        "topics": widget.illustration.topics,
+        "illustration_id": widget.illustration.id,
+        "topics": _topics,
       });
 
       final bool success = response.data["success"];
@@ -371,7 +384,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       }
     } catch (error) {
       Utilities.logger.e(error);
-      widget.illustration.topics.add(topic);
+      _topics.add(topic);
 
       context.showErrorBar(
         content: Text(error.toString()),
@@ -399,12 +412,12 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
 
     final illustration = widget.illustration;
     final previousLicense = illustration.license;
-    illustration.license = license;
+    _license = license;
 
     try {
       final response =
           await Utilities.cloud.illustrations("updateLicense").call({
-        "illustrationId": illustration.id,
+        "illustration_id": illustration.id,
         "license": {
           "id": license.id,
           "type": license.typeToString(),
@@ -434,14 +447,13 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
   void onUnselectLicenseAndUpdate() async {
     setState(() => _isSaving = true);
 
-    final illustration = widget.illustration;
-    final previousLicense = illustration.license;
-    illustration.license = License.empty();
+    final License previousLicense = _license.copyWith();
+    _license = License.empty();
 
     try {
       final response =
           await Utilities.cloud.illustrations("unsetLicense").call({
-        "illustrationId": illustration.id,
+        "illustration_id": widget.illustration.id,
       });
 
       final bool success = response.data["success"];
@@ -451,8 +463,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       }
     } catch (error) {
       Utilities.logger.e(error);
-
-      illustration.license = previousLicense;
+      _license = previousLicense;
 
       context.showErrorBar(
         content: Text(error.toString()),
@@ -465,29 +476,34 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
   void onUpdatePresentation(
     String name,
     String description,
-    String story,
+    String lore,
   ) async {
-    final Illustration illustration = widget.illustration;
+    Illustration illustration = widget.illustration;
     final String prevName = illustration.name;
     final String prevDescription = illustration.description;
-    final String prevStory = illustration.story;
+    final String prevLore = illustration.lore;
 
     _presentationCardKey.currentState?.collapse();
 
     setState(() {
       _isSaving = true;
-      illustration.name = name;
-      illustration.description = description;
-      illustration.story = story;
+      illustration = illustration.copyWith(
+        name: name,
+        description: description,
+        lore: lore,
+      );
+      // illustration.name = name;
+      // illustration.description = description;
+      // illustration.lore = story;
     });
 
     try {
       final HttpsCallableResult response =
           await Utilities.cloud.illustrations("updatePresentation").call({
-        "illustrationId": widget.illustration.id,
+        "illustration_id": widget.illustration.id,
         "name": name,
         "description": description,
-        "story": story,
+        "lore": lore,
       });
 
       final bool success = response.data['success'];
@@ -505,39 +521,43 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       _presentationCardKey.currentState?.expand();
 
       setState(() {
-        illustration.name = prevName;
-        illustration.description = prevDescription;
-        illustration.story = prevStory;
+        illustration = illustration.copyWith(
+          name: prevName,
+          description: prevDescription,
+          lore: prevLore,
+        );
+        // illustration.name = prevName;
+        // illustration.description = prevDescription;
+        // illustration.lore = prevStory;
       });
     } finally {
       setState(() => _isSaving = false);
     }
   }
 
-  void onToggleStyleAndUpdate(ArtStyle style, bool selected) {
+  void onToggleStyleAndUpdate(ArtMovement style, bool selected) {
     if (selected) {
       onRemoveStyleAndUpdate(style.name);
       return;
     }
 
-    onAddStyleAndUpdate(style.name);
+    onAddArtMovementsAndUpdate(style.name);
   }
 
   void onUpdateVisibility(EnumContentVisibility visibility) async {
     final illustration = widget.illustration;
-    final EnumContentVisibility previousVisibility =
-        widget.illustration.visibility;
+    final EnumContentVisibility previousVisibility = _visibility;
 
     setState(() {
       _isSaving = true;
-      illustration.visibility = visibility;
+      _visibility = visibility;
     });
 
     try {
       final HttpsCallableResult response =
           await Utilities.cloud.illustrations("updateVisibility").call({
-        "illustrationId": illustration.id,
-        "visibility": illustration.visibilityToString(),
+        "illustration_id": illustration.id,
+        "visibility": Illustration.convertVisibilityToString(_visibility),
       });
 
       final bool success = response.data["success"];
@@ -547,14 +567,14 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       }
     } on FirebaseFunctionsException catch (error) {
       Utilities.logger.e(error);
-      illustration.visibility = previousVisibility;
+      _visibility = previousVisibility;
 
       context.showErrorBar(
         content: Text("[${error.code}] ${error.message}"),
       );
     } catch (error) {
       Utilities.logger.e(error);
-      illustration.visibility = previousVisibility;
+      _visibility = previousVisibility;
 
       context.showErrorBar(
         content: Text("illustration_visibility_update_fail".tr()),

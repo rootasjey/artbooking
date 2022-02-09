@@ -3,4 +3,5 @@ enum EnumContentVisibility {
   private,
   public,
   unlisted,
+  archived,
 }

@@ -1,9 +1,11 @@
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page_text_inputs.dart';
-import 'package:artbooking/screens/licenses/edit/edit_license_page_urls.dart';
+import 'package:artbooking/screens/licenses/edit/edit_license_page_links.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page_usage.dart';
 import 'package:artbooking/types/license/license.dart';
+import 'package:artbooking/types/license/license_links.dart';
+import 'package:artbooking/types/license/license_usage.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +20,7 @@ class EditLicensePageBody extends StatelessWidget {
     this.onValidate,
     this.onTitleChanged,
     this.onDescriptionChanged,
+    this.onLinkValueChange,
   }) : super(key: key);
 
   final bool isLoading;
@@ -26,7 +29,8 @@ class EditLicensePageBody extends StatelessWidget {
   /// True if we create a new license. It's an update therwise.
   final bool isNewLicense;
   final License license;
-  final void Function()? onUsageValueChange;
+  final void Function(LicenseUsage)? onUsageValueChange;
+  final void Function(LicenseLinks)? onLinkValueChange;
   final void Function()? onValidate;
   final void Function(String)? onTitleChanged;
   final void Function(String)? onDescriptionChanged;
@@ -60,9 +64,9 @@ class EditLicensePageBody extends StatelessWidget {
             usage: license.usage,
             onValueChange: onUsageValueChange,
           ),
-          EditLicensePageUrls(
-            urls: license.urls,
-            onValueChange: onUsageValueChange,
+          EditLicensePageLinks(
+            links: license.links,
+            onValueChange: onLinkValueChange,
           ),
           Padding(
             padding: const EdgeInsets.only(left: 16.0, top: 80.0),

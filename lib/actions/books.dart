@@ -12,8 +12,8 @@ class BooksActions {
     try {
       final response =
           await Utilities.cloud.fun('books-addIllustrations').call({
-        'bookId': bookId,
-        'illustrationIds': illustrationIds,
+        'book_id': bookId,
+        'illustration_ids': illustrationIds,
       });
 
       return IllustrationsResponse.fromJSON(response.data);
@@ -35,7 +35,7 @@ class BooksActions {
       final response = await Utilities.cloud.fun('books-createOne').call({
         'name': name,
         'description': description,
-        'illustrationIds': illustrationIds,
+        'illustration_ids': illustrationIds,
       });
 
       return BookResponse.fromJSON(response.data);
@@ -53,7 +53,7 @@ class BooksActions {
   }) async {
     try {
       final response = await Utilities.cloud.fun('books-deleteOne').call({
-        'bookId': bookId,
+        'book_id': bookId,
       });
 
       return BookResponse.fromJSON(response.data);
@@ -71,7 +71,7 @@ class BooksActions {
   }) async {
     try {
       final response = await Utilities.cloud.fun('books-deleteMany').call({
-        'bookIds': bookIds,
+        'book_ids': bookIds,
       });
 
       return BooksResponse.fromJSON(response.data);
@@ -91,8 +91,8 @@ class BooksActions {
     try {
       final response =
           await Utilities.cloud.fun('books-removeIllustrations').call({
-        'bookId': bookId,
-        'illustrationIds': illustrationIds,
+        'book_id': bookId,
+        'illustration_ids': illustrationIds,
       });
 
       return IllustrationsResponse.fromJSON(response.data);
@@ -114,7 +114,7 @@ class BooksActions {
       final response = await Utilities.cloud.fun('books-renameOne').call({
         'name': name,
         'description': description,
-        'bookId': bookId,
+        'book_id': bookId,
       });
 
       return BookResponse.fromJSON(response.data);

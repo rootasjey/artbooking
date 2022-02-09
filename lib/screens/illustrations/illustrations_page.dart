@@ -207,7 +207,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
 
     setState(() {
       data['id'] = documentChange.doc.id;
-      final illustration = Illustration.fromJSON(data);
+      final illustration = Illustration.fromMap(data);
       _illustrationsList.insert(0, illustration);
     });
   }
@@ -242,7 +242,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
         final data = document.data();
         data['id'] = document.id;
 
-        _illustrationsList.add(Illustration.fromJSON(data));
+        _illustrationsList.add(Illustration.fromMap(data));
       }
 
       setState(() {
@@ -288,7 +288,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
         final data = document.data();
         data['id'] = document.id;
 
-        _illustrationsList.add(Illustration.fromJSON(data));
+        _illustrationsList.add(Illustration.fromMap(data));
       }
 
       setState(() {
@@ -384,7 +384,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
       );
 
       data['id'] = documentChange.doc.id;
-      final updatedIllustration = Illustration.fromJSON(data);
+      final updatedIllustration = Illustration.fromMap(data);
 
       setState(() {
         _illustrationsList.removeAt(index);

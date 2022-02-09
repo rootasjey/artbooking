@@ -1,4 +1,13 @@
-class ThumbnailUrls {
+class ThumbnailLinks {
+  const ThumbnailLinks({
+    this.t1920 = '',
+    this.t2400 = '',
+    this.t1080 = '',
+    this.t720 = '',
+    this.t480 = '',
+    this.t360 = '',
+  });
+
   /// Thumbnail with a width of 1920 pixels.
   final String t1920;
 
@@ -17,25 +26,16 @@ class ThumbnailUrls {
   /// Thumbnail with a width of 360 pixels.
   final String t360;
 
-  ThumbnailUrls({
-    this.t1920 = '',
-    this.t2400 = '',
-    this.t1080 = '',
-    this.t720 = '',
-    this.t480 = '',
-    this.t360 = '',
-  });
-
-  factory ThumbnailUrls.empty() {
-    return ThumbnailUrls();
+  factory ThumbnailLinks.empty() {
+    return ThumbnailLinks();
   }
 
-  factory ThumbnailUrls.fromJSON(Map<String, dynamic>? data) {
+  factory ThumbnailLinks.fromMap(Map<String, dynamic>? data) {
     if (data == null) {
-      return ThumbnailUrls.empty();
+      return ThumbnailLinks.empty();
     }
 
-    return ThumbnailUrls(
+    return ThumbnailLinks(
       t1920: data['t1920'] ?? '',
       t2400: data['t2400'] ?? '',
       t1080: data['t1080'] ?? '',

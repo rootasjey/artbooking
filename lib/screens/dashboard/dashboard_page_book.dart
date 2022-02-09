@@ -839,8 +839,8 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
     }
 
     Utilities.cloud.fun('books-removeDeletedIllustrations').call({
-      'bookId': widget.bookId,
-      'illustrationIds': illustrationsErrors,
+      'book_id': widget.bookId,
+      'illustration_ids': illustrationsErrors,
     }).catchError((error, stack) {
       Utilities.logger.e(error);
       throw error;
@@ -1119,7 +1119,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
         final illustrationData = illustrationSnap.data()!;
         illustrationData['id'] = illustrationSnap.id;
 
-        final illustration = Illustration.fromJSON(illustrationData);
+        final illustration = Illustration.fromMap(illustrationData);
         _illustrations.putIfAbsent(
           generateKey(bookIllustration),
           () => illustration,
@@ -1169,7 +1169,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
         final illustrationData = illustrationSnap.data()!;
         illustrationData['id'] = illustrationSnap.id;
 
-        final illustration = Illustration.fromJSON(illustrationData);
+        final illustration = Illustration.fromMap(illustrationData);
         _illustrations.putIfAbsent(
           generateKey(bookIllustration),
           () => illustration,
@@ -1241,7 +1241,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
 
       illustrationData['id'] = illustrationSnap.id;
 
-      final illustration = Illustration.fromJSON(illustrationData);
+      final illustration = Illustration.fromMap(illustrationData);
 
       setState(() {
         _illustrations.putIfAbsent(
@@ -1250,7 +1250,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
         );
       });
 
-      if (illustration.hasPendingCreates) {
+      if (illustration.version < 1) {
         waitForThumbnail(illustrationKey, query);
       }
     }
@@ -1605,7 +1605,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
     );
   }
 
-  /// If the target illustration has [hasPendingCreates] set to true,
+  /// If the target illustration has [version] < 1,
   /// this method will listen to Firestore events in order to update
   /// the associated data in the map [_illustrations].
   void waitForThumbnail(String illustrationKey, DocumentMap query) {
@@ -1619,9 +1619,9 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
         }
 
         data['id'] = snapshot.id;
-        final illustration = Illustration.fromJSON(data);
+        final illustration = Illustration.fromMap(data);
 
-        if (illustration.hasPendingCreates) {
+        if (illustration.version < 1) {
           return;
         }
 

@@ -149,20 +149,6 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
 
   Widget frontCard() {
     final book = widget.book;
-    ImageProvider imageProvider;
-
-    if (book.cover.custom.url.isNotEmpty) {
-      imageProvider = NetworkImage(book.cover.custom.url);
-    } else if (book.cover.auto.url.isNotEmpty) {
-      imageProvider = NetworkImage(book.cover.auto.url);
-    } else {
-      imageProvider = NetworkImage(
-        "https://firebasestorage.googleapis.com/"
-        "v0/b/artbooking-54d22.appspot.com/o/static"
-        "%2Fimages%2Fbook_cover_512x683.png"
-        "?alt=media&token=d77bc23b-90d7-4663-be3a-e878c6403e51",
-      );
-    }
 
     return Container(
       width: 300.0,
@@ -180,7 +166,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
           ),
           clipBehavior: Clip.antiAlias,
           child: Ink.image(
-            image: imageProvider,
+            image: NetworkImage(book.getCoverUrl()),
             fit: BoxFit.cover,
             child: InkWell(
               onTap: widget.onTap,

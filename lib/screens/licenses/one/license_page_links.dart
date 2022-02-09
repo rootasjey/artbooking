@@ -1,22 +1,22 @@
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/components/square/square_link.dart';
-import 'package:artbooking/types/license/license_urls.dart';
+import 'package:artbooking/types/license/license_links.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class LicensePageUrls extends StatelessWidget {
-  const LicensePageUrls({
+class LicensePageLinks extends StatelessWidget {
+  const LicensePageLinks({
     Key? key,
-    required this.urls,
+    required this.links,
   }) : super(key: key);
 
-  final LicenseUrls urls;
+  final LicenseLinks links;
 
   @override
   Widget build(BuildContext context) {
-    if (urls.website.isEmpty && urls.wikipedia.isEmpty) {
+    if (links.website.isEmpty && links.wikipedia.isEmpty) {
       return Container();
     }
 
@@ -40,9 +40,9 @@ class LicensePageUrls extends StatelessWidget {
           spacing: 16.0,
           runSpacing: 16.0,
           children: [
-            if (urls.website.isNotEmpty)
+            if (links.website.isNotEmpty)
               SquareLink(
-                onTap: () => launch(urls.website),
+                onTap: () => launch(links.website),
                 icon: Icon(
                   UniconsLine.globe,
                   size: 42.0,
@@ -55,9 +55,9 @@ class LicensePageUrls extends StatelessWidget {
                   ),
                 ),
               ),
-            if (urls.wikipedia.isNotEmpty)
+            if (links.wikipedia.isNotEmpty)
               SquareLink(
-                onTap: () => launch(urls.wikipedia),
+                onTap: () => launch(links.wikipedia),
                 icon: Icon(
                   FontAwesomeIcons.wikipediaW,
                   size: 36.0,

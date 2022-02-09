@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Dimensions {
   const Dimensions({
     this.height = 0,
@@ -10,6 +12,16 @@ class Dimensions {
   /// Illustration's width.
   final int width;
 
+  Dimensions copyWith({
+    int? height,
+    int? width,
+  }) {
+    return Dimensions(
+      height: height ?? this.height,
+      width: width ?? this.width,
+    );
+  }
+
   factory Dimensions.empty() {
     return Dimensions(
       height: 0,
@@ -17,14 +29,14 @@ class Dimensions {
     );
   }
 
-  factory Dimensions.fromJSON(Map<String, dynamic>? data) {
-    if (data == null) {
+  factory Dimensions.fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
       return Dimensions.empty();
     }
 
     return Dimensions(
-      height: data['height'] ?? 0,
-      width: data['width'] ?? 0,
+      height: map['height']?.toInt() ?? 0,
+      width: map['width']?.toInt() ?? 0,
     );
   }
 
@@ -34,4 +46,31 @@ class Dimensions {
     final double factor = fromHeight / height;
     return (width * factor).truncateToDouble();
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'height': height,
+      'width': width,
+    };
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory Dimensions.fromJson(String source) =>
+      Dimensions.fromMap(json.decode(source));
+
+  @override
+  String toString() => 'Dimensions(height: $height, width: $width)';
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is Dimensions &&
+        other.height == height &&
+        other.width == width;
+  }
+
+  @override
+  int get hashCode => height.hashCode ^ width.hashCode;
 }

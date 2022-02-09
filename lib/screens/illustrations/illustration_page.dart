@@ -82,7 +82,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     final UserFirestore? userFirestore =
         ref.watch(AppState.userProvider).firestoreUser;
 
-    final bool isOwner = userFirestore?.id == _illustration.author.id;
+    final bool isOwner = userFirestore?.id == _illustration.userId;
 
     return HeroControllerScope(
       controller: HeroController(),
@@ -161,7 +161,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
       data['id'] = snapshot.id;
 
       setState(() {
-        _illustration = Illustration.fromJSON(data);
+        _illustration = Illustration.fromMap(data);
         _isLoading = false;
       });
     } catch (error) {
@@ -193,7 +193,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
 
         setState(() {
           data['id'] = snapshot.id;
-          _illustration = Illustration.fromJSON(data);
+          _illustration = Illustration.fromMap(data);
           _updatingImage = false;
         });
       },
@@ -227,7 +227,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
           onSave: onSaveEditedIllustration,
           dimensions: _illustration.dimensions,
           imageToEdit: ExtendedNetworkImageProvider(
-            _illustration.urls.original,
+            _illustration.links.original,
             cache: true,
             cacheRawData: true,
             cacheMaxAge: const Duration(seconds: 3),
@@ -242,7 +242,31 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     );
   }
 
-  void onLike() async {}
+  void onLike() async {
+    if (_illustration.id.isEmpty) {
+      return;
+    }
+
+    try {
+      final firestoreUser = ref.read(AppState.userProvider).firestoreUser;
+      if (firestoreUser == null) {
+        throw ErrorDescription("user_not_connected".tr());
+      }
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(firestoreUser.id)
+          .collection("likes")
+          .doc(_illustration.id)
+          .set({
+        "type": "illustration",
+        "targetId": _illustration.id,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
 
   void onSaveEditedIllustration(Uint8List? editedImageData) async {
     if (editedImageData == null) {
@@ -259,7 +283,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
         throw Exception("user_not_connected".tr());
       }
 
-      final String userId = firestoreUser.uid;
+      final String userId = firestoreUser.id;
       final String illustrationId = _illustration.id;
 
       if (userId.isEmpty) {

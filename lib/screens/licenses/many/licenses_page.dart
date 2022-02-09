@@ -82,7 +82,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   Widget build(BuildContext context) {
     final User user = ref.watch(AppState.userProvider);
     final bool canManageStaffLicense =
-        user.firestoreUser?.rights.canManageLicense ?? false;
+        user.firestoreUser?.rights.canManageLicenses ?? false;
 
     final bool canManageLicense =
         _selectedTab == EnumLicenseType.staff ? canManageStaffLicense : true;
@@ -142,7 +142,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final license = License.fromJSON(data);
+        final license = License.fromMap(data);
         _licenses.add(license);
       }
 
@@ -184,7 +184,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final license = License.fromJSON(data);
+        final license = License.fromMap(data);
         _licenses.add(license);
       }
 
@@ -236,7 +236,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final license = License.fromJSON(data);
+        final license = License.fromMap(data);
         _licenses.add(license);
       }
 
@@ -282,7 +282,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final license = License.fromJSON(data);
+        final license = License.fromMap(data);
         _licenses.add(license);
       }
 
@@ -416,7 +416,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
 
     setState(() {
       data['id'] = documentChange.doc.id;
-      final illustration = License.fromJSON(data);
+      final illustration = License.fromMap(data);
       _licenses.insert(0, illustration);
     });
   }
@@ -467,7 +467,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
       );
 
       data['id'] = documentChange.doc.id;
-      final updatedIllustration = License.fromJSON(data);
+      final updatedIllustration = License.fromMap(data);
 
       setState(() {
         _licenses.removeAt(index);

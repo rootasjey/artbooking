@@ -5,7 +5,7 @@ import 'package:artbooking/components/buttons/circle_button.dart';
 import 'package:artbooking/components/animations/fade_in_x.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/types/art_style/art_style.dart';
+import 'package:artbooking/types/art_movement/art_movement.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -15,7 +15,17 @@ import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// A side panel to add art style to an illustration.
-class AddStylePanel extends StatefulWidget {
+class AddArtMovementPanel extends StatefulWidget {
+  /// Return an panel widget showing art styles.
+  const AddArtMovementPanel({
+    Key? key,
+    this.selectedStyles,
+    this.isVisible = false,
+    this.onClose,
+    this.onToggleStyleAndUpdate,
+    this.elevation = 4.0,
+  }) : super(key: key);
+
   /// Aleady selected styles for the illustration.
   final List<String?>? selectedStyles;
 
@@ -26,26 +36,16 @@ class AddStylePanel extends StatefulWidget {
   final void Function()? onClose;
 
   /// This callback when an item is tapped.
-  final void Function(ArtStyle style, bool selected)? onToggleStyleAndUpdate;
+  final void Function(ArtMovement style, bool selected)? onToggleStyleAndUpdate;
 
   /// The panel elevation.
   final double elevation;
 
-  /// Return an panel widget showing art styles.
-  const AddStylePanel({
-    Key? key,
-    this.selectedStyles,
-    this.isVisible = false,
-    this.onClose,
-    this.onToggleStyleAndUpdate,
-    this.elevation = 4.0,
-  }) : super(key: key);
-
   @override
-  _AddStylePanelState createState() => _AddStylePanelState();
+  _AddArtMovementPanelState createState() => _AddArtMovementPanelState();
 }
 
-class _AddStylePanelState extends State<AddStylePanel> {
+class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
   /// True if there're more data to fetch.
   bool _hasNext = false;
 
@@ -59,10 +59,10 @@ class _AddStylePanelState extends State<AddStylePanel> {
   DocumentSnapshot<Object>? _lastDocumentSnapshot;
 
   /// All available art styles.
-  final List<ArtStyle> _availableStyles = [];
+  final List<ArtMovement> _availableStyles = [];
 
   /// Search results.
-  final List<ArtStyle> _suggestionsStyles = [];
+  final List<ArtMovement> _suggestionsStyles = [];
 
   /// Search controller.
   final _searchTextController = TextEditingController();
@@ -74,7 +74,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
   int _limitStyles = 10;
 
   /// Selected style for image preview.
-  ArtStyle? _selectedStylePreview;
+  ArtMovement? _selectedStylePreview;
 
   /// Delay search after typing input.
   Timer? _searchTimer;
@@ -518,7 +518,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final style = ArtStyle.fromJSON(data);
+        final style = ArtMovement.fromMap(data);
         _availableStyles.add(style);
       }
 
@@ -556,7 +556,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final style = ArtStyle.fromJSON(data);
+        final style = ArtMovement.fromMap(data);
         _availableStyles.add(style);
       }
 
@@ -603,7 +603,7 @@ class _AddStylePanelState extends State<AddStylePanel> {
           final data = hit.data;
           data['id'] = hit.objectID;
 
-          final style = ArtStyle.fromJSON(data);
+          final style = ArtMovement.fromMap(data);
           _suggestionsStyles.add(style);
         }
       });

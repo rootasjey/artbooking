@@ -1,7 +1,7 @@
 import 'package:artbooking/components/avatar/better_avatar.dart';
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/screens/settings/settings_page_user_links.dart';
-import 'package:artbooking/types/user/user_urls.dart';
+import 'package:artbooking/types/user/user_links.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -12,16 +12,16 @@ class SettingsPageBodyLeft extends StatelessWidget {
     required this.profilePictureUrl,
     this.onEditPicture,
     this.onUploadPicture,
-    required this.urls,
-    this.onUrlChanged,
+    required this.socialLinks,
+    this.onLinkChanged,
     this.profilePictureHeroTag = '',
   }) : super(key: key);
 
   final void Function()? onEditPicture;
   final void Function()? onUploadPicture;
-  final void Function(UserUrls)? onUrlChanged;
+  final void Function(UserSocialLinks)? onLinkChanged;
   final String profilePictureUrl;
-  final UserUrls urls;
+  final UserSocialLinks socialLinks;
   final String profilePictureHeroTag;
 
   @override
@@ -75,8 +75,8 @@ class SettingsPageBodyLeft extends StatelessWidget {
             ),
           ),
           SettingsPageUserLinks(
-            urls: urls,
-            onUrlChanged: onUrlChanged,
+            socialLinks: socialLinks,
+            onLinkChanged: onLinkChanged,
           ),
         ],
       ),

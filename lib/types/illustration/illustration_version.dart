@@ -1,10 +1,10 @@
-import 'package:artbooking/types/illustration/urls.dart';
+import 'package:artbooking/types/illustration/illustration_links.dart';
 
 class IllustrationVersion {
   String? id;
   String? name;
   DateTime? createdAt;
-  Urls? urls;
+  IllustrationLinks? urls;
 
   IllustrationVersion({
     this.createdAt,
@@ -13,12 +13,12 @@ class IllustrationVersion {
     this.urls,
   });
 
-  factory IllustrationVersion.fromJSON(Map<String, dynamic> data) {
+  factory IllustrationVersion.fromMap(Map<String, dynamic> data) {
     return IllustrationVersion(
       id: data['id'],
       name: data['name'],
-      createdAt: data['createdAt'],
-      urls: Urls.fromJSON(data['urls']),
+      createdAt: data['created_at'],
+      urls: IllustrationLinks.fromMap(data['links']),
     );
   }
 }

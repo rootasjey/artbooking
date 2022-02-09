@@ -1,7 +1,13 @@
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/types/book/v_scale_factor.dart';
+import 'package:artbooking/types/book/scale_factor.dart';
 
 class BookIllustration {
+  const BookIllustration({
+    required this.createdAt,
+    required this.id,
+    required this.scaleFactor,
+  });
+
   /// Illustration's id.
   final String id;
 
@@ -9,19 +15,13 @@ class BookIllustration {
   final DateTime createdAt;
 
   /// Defines this illustration's side inside this book.
-  VScaleFactor vScaleFactor;
-
-  BookIllustration({
-    required this.createdAt,
-    required this.id,
-    required this.vScaleFactor,
-  });
+  final ScaleFactor scaleFactor;
 
   factory BookIllustration.fromJSON(Map<String, dynamic> data) {
     return BookIllustration(
-      createdAt: Utilities.date.fromFirestore(data['createdAt']),
+      createdAt: Utilities.date.fromFirestore(data['created_at']),
       id: data['id'],
-      vScaleFactor: VScaleFactor.fromJSON(data['vScaleFactor']),
+      scaleFactor: ScaleFactor.fromJSON(data['scale_factor']),
     );
   }
 }

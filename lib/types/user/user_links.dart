@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-class UserUrls {
-  UserUrls({
+class UserSocialLinks {
+  UserSocialLinks({
     this.artbooking = '',
     this.artstation = '',
     this.behance = '',
@@ -25,7 +25,7 @@ class UserUrls {
     this.website = '',
     this.wikipedia = '',
     this.youtube = '',
-  }) {}
+  });
 
   /// All URLs in a map.
   Map<String, String> map = Map<String, String>();
@@ -33,29 +33,51 @@ class UserUrls {
   /// Only social URLs in a map (without [image] for example).
   Map<String, String> socialMap = Map<String, String>();
 
-  String artbooking;
-  String artstation;
-  String behance;
-  String deviantart;
-  String discord;
-  String dribbble;
-  String facebook;
-  String github;
-  String instagram;
-  String linkedin;
-  String other;
-  String patreon;
-  String profilePicture;
-  String tiktok;
-  String tipeee;
-  String tumblr;
-  String twitch;
-  String twitter;
-  String website;
-  String wikipedia;
-  String youtube;
+  final String artbooking;
+  final String artstation;
+  final String behance;
+  final String deviantart;
+  final String discord;
+  final String dribbble;
+  final String facebook;
+  final String github;
+  final String instagram;
+  final String linkedin;
+  final String other;
+  final String patreon;
+  final String profilePicture;
+  final String tiktok;
+  final String tipeee;
+  final String tumblr;
+  final String twitch;
+  final String twitter;
+  final String website;
+  final String wikipedia;
+  final String youtube;
 
-  UserUrls copyWith({
+  static const artbookingString = 'artbooking';
+  static const artstationString = 'artstation';
+  static const behanceString = 'behance';
+  static const deviantartString = 'deviantart';
+  static const discordString = 'discord';
+  static const dribbbleString = 'dribbble';
+  static const facebookString = 'facebook';
+  static const githubString = 'github';
+  static const instagramString = 'instagram';
+  static const linkedinString = 'linkedin';
+  static const otherString = 'other';
+  static const patreonString = 'patreon';
+  static const profilePictureString = 'profilePicture';
+  static const tiktokString = 'tiktok';
+  static const tipeeeString = 'tipeee';
+  static const tumblrString = 'tumblr';
+  static const twitchString = 'twitch';
+  static const twitterString = 'twitter';
+  static const websiteString = 'website';
+  static const wikipediaString = 'wikipedia';
+  static const youtubeString = 'youtube';
+
+  UserSocialLinks copyWith({
     String? artbooking,
     String? artstation,
     String? behance,
@@ -80,7 +102,7 @@ class UserUrls {
     String? wikipedia,
     String? youtube,
   }) {
-    return UserUrls(
+    return UserSocialLinks(
       artbooking: artbooking ?? this.artbooking,
       artstation: artstation ?? this.artstation,
       behance: behance ?? this.behance,
@@ -106,28 +128,6 @@ class UserUrls {
       youtube: youtube ?? this.youtube,
     );
   }
-
-  static const artbookingString = 'artbooking';
-  static const artstationString = 'artstation';
-  static const behanceString = 'behance';
-  static const deviantartString = 'deviantart';
-  static const discordString = 'discord';
-  static const dribbbleString = 'dribbble';
-  static const facebookString = 'facebook';
-  static const githubString = 'github';
-  static const instagramString = 'instagram';
-  static const linkedinString = 'linkedin';
-  static const otherString = 'other';
-  static const patreonString = 'patreon';
-  static const profilePictureString = 'profilePicture';
-  static const tiktokString = 'tiktok';
-  static const tipeeeString = 'tipeee';
-  static const tumblrString = 'tumblr';
-  static const twitchString = 'twitch';
-  static const twitterString = 'twitter';
-  static const websiteString = 'website';
-  static const wikipediaString = 'wikipedia';
-  static const youtubeString = 'youtube';
 
   Map<String, dynamic> toMap() {
     return {
@@ -155,8 +155,8 @@ class UserUrls {
     };
   }
 
-  factory UserUrls.empty() {
-    return UserUrls(
+  factory UserSocialLinks.empty() {
+    return UserSocialLinks(
       artbooking: '',
       artstation: '',
       behance: '',
@@ -183,113 +183,13 @@ class UserUrls {
     );
   }
 
-  void copyFrom(UserUrls copy) {
-    artbooking = copy.artbooking;
-    artstation = copy.artstation;
-    behance = copy.behance;
-    deviantart = copy.deviantart;
-    discord = copy.discord;
-    dribbble = copy.dribbble;
-    facebook = copy.facebook;
-    github = copy.github;
-    instagram = copy.instagram;
-    linkedin = copy.linkedin;
-    map = copy.map;
-    socialMap = copy.socialMap;
-    other = copy.other;
-    patreon = copy.patreon;
-    profilePicture = copy.profilePicture;
-    tiktok = copy.tiktok;
-    tipeee = copy.tipeee;
-    tumblr = copy.tumblr;
-    twitch = copy.twitch;
-    twitter = copy.twitter;
-    website = copy.website;
-    wikipedia = copy.wikipedia;
-    youtube = copy.youtube;
-  }
-
   Map<String, String> getAvailableLinks() {
     return Map.from(socialMap)..removeWhere((key, value) => value.isEmpty);
   }
 
-  /// Update the URL specified by [key] with the new [value].
-  /// This function will propagate update to [map] and [socialMap].
-  void setUrl(String key, String value) {
-    map[key] = value;
-    socialMap[key] = value;
-
-    switch (key) {
-      case artbookingString:
-        artbooking = value;
-        break;
-      case artstationString:
-        artstation = value;
-        break;
-      case behanceString:
-        behance = value;
-        break;
-      case deviantartString:
-        deviantart = value;
-        break;
-      case discordString:
-        discord = value;
-        break;
-      case dribbbleString:
-        dribbble = value;
-        break;
-      case facebookString:
-        facebook = value;
-        break;
-      case githubString:
-        github = value;
-        break;
-      case instagramString:
-        instagram = value;
-        break;
-      case linkedinString:
-        linkedin = value;
-        break;
-      case otherString:
-        other = value;
-        break;
-      case patreonString:
-        patreon = value;
-        break;
-      case profilePictureString:
-        profilePicture = value;
-        break;
-      case tiktokString:
-        tiktok = value;
-        break;
-      case tipeeeString:
-        tipeee = value;
-        break;
-      case tumblrString:
-        tumblr = value;
-        break;
-      case twitchString:
-        twitch = value;
-        break;
-      case twitterString:
-        twitter = value;
-        break;
-      case websiteString:
-        website = value;
-        break;
-      case wikipediaString:
-        wikipedia = value;
-        break;
-      case youtubeString:
-        youtube = value;
-        break;
-      default:
-    }
-  }
-
-  factory UserUrls.fromMap(Map<String, dynamic>? map) {
+  factory UserSocialLinks.fromMap(Map<String, dynamic>? map) {
     if (map == null) {
-      return UserUrls.empty();
+      return UserSocialLinks.empty();
     }
 
     final dataMap = Map<String, String>();
@@ -303,7 +203,7 @@ class UserUrls {
       }
     });
 
-    return UserUrls(
+    return UserSocialLinks(
       artbooking: map[artbookingString] ?? '',
       artstation: map[artstationString] ?? '',
       behance: map[behanceString] ?? '',
@@ -332,12 +232,12 @@ class UserUrls {
 
   String toJson() => json.encode(toMap());
 
-  factory UserUrls.fromJson(String source) =>
-      UserUrls.fromMap(json.decode(source));
+  factory UserSocialLinks.fromJson(String source) =>
+      UserSocialLinks.fromMap(json.decode(source));
 
   @override
   String toString() {
-    return 'UserUrls(artbooking: $artbooking, artstation: $artstation, '
+    return 'UserSocialLinks(artbooking: $artbooking, artstation: $artstation, '
         'behance: $behance, deviantart: $deviantart, discord: $discord, '
         'dribbble: $dribbble, facebook: $facebook, github: $github, '
         'instagram: $instagram, linkedin: $linkedin, other: $other, '
@@ -350,7 +250,7 @@ class UserUrls {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is UserUrls &&
+    return other is UserSocialLinks &&
         other.artbooking == artbooking &&
         other.artstation == artstation &&
         other.behance == behance &&

@@ -194,7 +194,7 @@ class _ProfilePageHeroState extends State<ProfilePageHero> {
   }
 
   Widget userLinks() {
-    final urls = _userFirestore.urls;
+    final urls = _userFirestore.socialLinks;
 
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),

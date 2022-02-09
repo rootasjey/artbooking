@@ -219,7 +219,6 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
       final HttpsCallableResult responseResult =
           await Utilities.cloud.illustrations("createOne").call({
         "name": fileName,
-        "isUserAuthor": true,
         "visibility": "public",
       });
 

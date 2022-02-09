@@ -47,7 +47,7 @@ class EditIllustrationPagePresentation extends StatelessWidget {
 
     /// Illustration's story after page loading.
     /// Used to know if they're pending changes.
-    final String _initialStory = illustration.story;
+    final String _initialStory = illustration.lore;
 
     _nameInputController.text = _initialName;
     _descriptionInputController.text = _initialDescription;

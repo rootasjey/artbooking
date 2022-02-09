@@ -1,30 +1,47 @@
-import 'package:artbooking/types/book/book_auto_cover.dart';
-import 'package:artbooking/types/book/book_custom_cover.dart';
+import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/types/enums/enum_book_cover_mode.dart';
 
 class BookCover {
-  final BookAutoCover auto;
-  final BookCustomCover custom;
-
-  BookCover({
-    required this.auto,
-    required this.custom,
+  const BookCover({
+    required this.mode,
+    required this.link,
+    required this.updatedAt,
   });
+
+  final BookCoverMode mode;
+  final String link;
+  final DateTime? updatedAt;
 
   factory BookCover.empty() {
     return BookCover(
-      auto: BookAutoCover.empty(),
-      custom: BookCustomCover.empty(),
+      mode: BookCoverMode.lastIllustrationAdded,
+      link: '',
+      updatedAt: DateTime.now(),
     );
   }
 
-  factory BookCover.fromJSON(Map<String, dynamic>? data) {
+  factory BookCover.fromMap(Map<String, dynamic>? data) {
     if (data == null) {
       return BookCover.empty();
     }
 
     return BookCover(
-      auto: BookAutoCover.fromJSON(data['auto']),
-      custom: BookCustomCover.fromJSON(data['custom']),
+      link: data['link'],
+      updatedAt: Utilities.date.fromFirestore(data['updated_at']),
+      mode: parseBookCoverMode(data['mode']),
     );
+  }
+
+  static BookCoverMode parseBookCoverMode(String rawMode) {
+    switch (rawMode) {
+      case 'last_illustration_added':
+        return BookCoverMode.lastIllustrationAdded;
+      case 'chosen_illustration':
+        return BookCoverMode.chosenIllustration;
+      case 'custom_cover':
+        return BookCoverMode.customCover;
+      default:
+        return BookCoverMode.lastIllustrationAdded;
+    }
   }
 }

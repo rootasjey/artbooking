@@ -1,20 +1,28 @@
 import 'dart:convert';
 
+import 'package:artbooking/globals/utilities.dart';
+
 class StorageStatsItem {
   StorageStatsItem({
-    required this.total,
-    required this.used,
+    this.total = 0,
+    this.used = 0,
+    required this.updatedAt,
   });
 
   final int total;
   final int used;
 
+  /// Last time this statistic was updated.
+  final DateTime updatedAt;
+
   StorageStatsItem copyWith({
     int? total,
     int? used,
+    DateTime? updatedAt,
   }) {
     return StorageStatsItem(
       total: total ?? this.total,
+      updatedAt: updatedAt ?? this.updatedAt,
       used: used ?? this.used,
     );
   }
@@ -30,6 +38,7 @@ class StorageStatsItem {
     return StorageStatsItem(
       total: 0,
       used: 0,
+      updatedAt: DateTime.now(),
     );
   }
 
@@ -40,6 +49,7 @@ class StorageStatsItem {
 
     return StorageStatsItem(
       total: map['total']?.toInt() ?? 0,
+      updatedAt: Utilities.date.fromFirestore(map['updated_at']),
       used: map['used']?.toInt() ?? 0,
     );
   }

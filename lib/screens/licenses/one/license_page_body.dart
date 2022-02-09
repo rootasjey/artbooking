@@ -2,7 +2,7 @@ import 'package:artbooking/components/buttons/text_rectangle_button.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/licenses/one/license_page_dates.dart';
-import 'package:artbooking/screens/licenses/one/license_page_urls.dart';
+import 'package:artbooking/screens/licenses/one/license_page_links.dart';
 import 'package:artbooking/screens/licenses/one/license_page_usage.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:easy_localization/src/public_ext.dart';
@@ -87,8 +87,8 @@ class LicensePageBody extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 42.0),
-            child: LicensePageUrls(
-              urls: license.urls,
+            child: LicensePageLinks(
+              links: license.links,
             ),
           ),
           if (canManageLicense)

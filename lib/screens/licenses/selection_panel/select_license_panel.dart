@@ -182,7 +182,7 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final license = License.fromJSON(data);
+        final license = License.fromMap(data);
         _staffLicenses.add(license);
       }
 
@@ -224,7 +224,7 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final license = License.fromJSON(data);
+        final license = License.fromMap(data);
         _staffLicenses.add(license);
       }
 
@@ -270,7 +270,7 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final license = License.fromJSON(data);
+        final license = License.fromMap(data);
         _userLicenses.add(license);
       }
 
@@ -318,7 +318,7 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final license = License.fromJSON(data);
+        final license = License.fromMap(data);
         _userLicenses.add(license);
       }
 
@@ -369,7 +369,7 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
           final data = hit.data;
           data['id'] = hit.objectID;
 
-          final license = License.fromJSON(data);
+          final license = License.fromMap(data);
           _searchResultLicenses.add(license);
         }
       });

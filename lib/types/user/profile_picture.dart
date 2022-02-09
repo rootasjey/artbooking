@@ -7,13 +7,13 @@ import 'package:artbooking/types/string_map.dart';
 
 class ProfilePicture {
   const ProfilePicture({
-    this.extension = '',
-    this.size = 0,
-    required this.updatedAt,
-    required this.path,
-    required this.url,
-    this.type = '',
     this.dimensions = const Dimensions(),
+    this.extension = '',
+    required this.links,
+    required this.path,
+    this.size = 0,
+    this.type = '',
+    required this.updatedAt,
   });
 
   static const List<String> _sampleAvatars = [
@@ -21,14 +21,15 @@ class ProfilePicture {
     "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Favatar_male.png?alt=media&token=326302d9-912d-4923-9bec-94c6bb9892ae",
   ];
 
+  final Dimensions dimensions;
+
   /// Picture extension.
   final String extension;
-  final int size;
-  final DateTime updatedAt;
+  final StringMap links;
   final StringMap path;
-  final StringMap url;
+  final int size;
   final String type;
-  final Dimensions dimensions;
+  final DateTime updatedAt;
 
   ProfilePicture copyWith({
     String? extension,
@@ -42,17 +43,17 @@ class ProfilePicture {
       size: size ?? this.size,
       updatedAt: updatedAt ?? this.updatedAt,
       path: path ?? this.path,
-      url: url ?? this.url,
+      links: url ?? this.links,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'extension': extension,
-      'size': size,
-      'updatedAt': updatedAt.millisecondsSinceEpoch,
+      'links': links.toMap(),
       'path': path.toMap(),
-      'url': url.toMap(),
+      'size': size,
+      'updated_at': updatedAt.millisecondsSinceEpoch,
     };
   }
 
@@ -62,7 +63,7 @@ class ProfilePicture {
       size: 0,
       updatedAt: DateTime.now(),
       path: StringMap.empty(),
-      url: StringMap(
+      links: StringMap(
         original: _sampleAvatars.elementAt(
           Random().nextInt(_sampleAvatars.length),
         ),
@@ -75,9 +76,10 @@ class ProfilePicture {
       return ProfilePicture.empty();
     }
 
-    StringMap url = StringMap.fromMap(map['url']);
-    if (url.original.isEmpty) {
-      url = StringMap(
+    StringMap links = StringMap.fromMap(map['links']);
+
+    if (links.original.isEmpty) {
+      links = StringMap(
         original: _sampleAvatars.elementAt(
           Random().nextInt(_sampleAvatars.length),
         ),
@@ -85,13 +87,13 @@ class ProfilePicture {
     }
 
     return ProfilePicture(
+      dimensions: Dimensions.fromMap(map['dimensions']),
       extension: map['extension'] ?? '',
-      size: map['size']?.toInt() ?? 0,
-      updatedAt: Utilities.date.fromFirestore(map['updatedAt']),
+      links: links,
       path: StringMap.fromMap(map['path']),
-      url: url,
+      size: map['size']?.toInt() ?? 0,
       type: map['type'] ?? '',
-      dimensions: Dimensions.fromJSON(map['dimensions']),
+      updatedAt: Utilities.date.fromFirestore(map['updated_at']),
     );
   }
 
@@ -102,8 +104,8 @@ class ProfilePicture {
 
   @override
   String toString() {
-    return 'ProfilePicture(extension: $extension, size: $size, updatedAt: $updatedAt, '
-        'path: $path, url: $url)';
+    return 'ProfilePicture(extension: $extension, size: $size, '
+        'updatedAt: $updatedAt, path: $path, url: $links)';
   }
 
   @override
@@ -112,18 +114,18 @@ class ProfilePicture {
 
     return other is ProfilePicture &&
         other.extension == extension &&
-        other.size == size &&
-        other.updatedAt == updatedAt &&
+        other.links == links &&
         other.path == path &&
-        other.url == url;
+        other.size == size &&
+        other.updatedAt == updatedAt;
   }
 
   @override
   int get hashCode {
     return extension.hashCode ^
+        links.hashCode ^
         size.hashCode ^
-        updatedAt.hashCode ^
         path.hashCode ^
-        url.hashCode;
+        updatedAt.hashCode;
   }
 }

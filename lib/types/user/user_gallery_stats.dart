@@ -1,41 +1,49 @@
 import 'dart:convert';
 
-class UserGalleriesStats {
-  UserGalleriesStats({
+import 'package:artbooking/globals/utilities.dart';
+
+class UserGalleryStats {
+  const UserGalleryStats({
     this.created = 0,
     this.deleted = 0,
     this.entered = 0,
     this.opened = 0,
     this.owned = 0,
+    required this.updatedAt,
   });
 
   /// Total virtual galleries this user has created.
-  int created;
+  final int created;
 
   /// Total virtual galleries this user has deleted.
-  int deleted;
+  final int deleted;
 
   /// Total virtual galleries this user has entered.
-  int entered;
+  final int entered;
 
   /// Total virtual galleries this user has entered.
-  int opened;
+  final int opened;
 
   /// Number of existing virtual galleries this user own.
-  int owned;
+  final int owned;
 
-  UserGalleriesStats copyWith({
+  /// Last time this statistic was updated.
+  final DateTime updatedAt;
+
+  UserGalleryStats copyWith({
     int? created,
     int? deleted,
     int? entered,
     int? opened,
     int? owned,
+    DateTime? updatedAt,
   }) {
-    return UserGalleriesStats(
+    return UserGalleryStats(
       created: created ?? this.created,
       deleted: deleted ?? this.deleted,
       entered: entered ?? this.entered,
       opened: opened ?? this.opened,
+      updatedAt: updatedAt ?? this.updatedAt,
       owned: owned ?? this.owned,
     );
   }
@@ -50,45 +58,48 @@ class UserGalleriesStats {
     };
   }
 
-  factory UserGalleriesStats.empty() {
-    return UserGalleriesStats(
+  factory UserGalleryStats.empty() {
+    return UserGalleryStats(
       created: 0,
       deleted: 0,
       entered: 0,
       opened: 0,
       owned: 0,
+      updatedAt: DateTime.now(),
     );
   }
 
-  factory UserGalleriesStats.fromMap(Map<String, dynamic>? map) {
+  factory UserGalleryStats.fromMap(Map<String, dynamic>? map) {
     if (map == null) {
-      return UserGalleriesStats.empty();
+      return UserGalleryStats.empty();
     }
 
-    return UserGalleriesStats(
+    return UserGalleryStats(
       created: map['created']?.toInt() ?? 0,
       deleted: map['deleted']?.toInt() ?? 0,
       entered: map['entered']?.toInt() ?? 0,
       opened: map['opened']?.toInt() ?? 0,
       owned: map['owned']?.toInt() ?? 0,
+      updatedAt: Utilities.date.fromFirestore(map['updated_at']),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory UserGalleriesStats.fromJson(String source) =>
-      UserGalleriesStats.fromMap(json.decode(source));
+  factory UserGalleryStats.fromJson(String source) =>
+      UserGalleryStats.fromMap(json.decode(source));
 
   @override
   String toString() {
-    return 'UserGalleriesStats(created: $created, deleted: $deleted, entered: $entered, opened: $opened, owned: $owned)';
+    return 'UserGalleriesStats(created: $created, deleted: $deleted, '
+        'entered: $entered, opened: $opened, owned: $owned)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is UserGalleriesStats &&
+    return other is UserGalleryStats &&
         other.created == created &&
         other.deleted == deleted &&
         other.entered == entered &&

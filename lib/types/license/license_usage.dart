@@ -1,6 +1,8 @@
+import 'dart:convert';
+
 /// Part of the license specifing what you can do the artwork.
 class LicenseUsage {
-  LicenseUsage({
+  const LicenseUsage({
     this.commercial = false,
     this.adapt = false,
     this.foss = false,
@@ -15,34 +17,34 @@ class LicenseUsage {
 
   /// Remix, transform, and build upon the material
   /// for any purpose, even commercially.
-  bool adapt;
+  final bool adapt;
 
   /// Can be used in commercial projects & products.
-  bool commercial;
+  final bool commercial;
 
   /// Can be used in other free and open source projects.
-  bool foss;
+  final bool foss;
 
   /// Can be used in other free softwares and projects.
-  bool free;
+  final bool free;
 
   /// Can be used in other open source projects.
-  bool oss;
+  final bool oss;
 
   /// Can be used for personal use (e.g. wallpaper).
-  bool personal;
+  final bool personal;
 
   /// Can be freely printed.
-  bool print;
+  final bool print;
 
   /// Can sell outside of the official app by another individual.
-  bool sell;
+  final bool sell;
 
   /// Copy and redistribute the material in any medium or format.
-  bool share;
+  final bool share;
 
   /// Can view this illustration.
-  bool view;
+  final bool view;
 
   factory LicenseUsage.empty() {
     return LicenseUsage(
@@ -59,7 +61,7 @@ class LicenseUsage {
     );
   }
 
-  factory LicenseUsage.fromJSON(Map<String, dynamic>? data) {
+  factory LicenseUsage.fromMap(Map<String, dynamic>? data) {
     if (data == null) {
       return LicenseUsage.empty();
     }
@@ -78,20 +80,87 @@ class LicenseUsage {
     );
   }
 
-  Map<String, bool> toJSON() {
-    final data = Map<String, bool>();
+  Map<String, dynamic> toMap() {
+    return {
+      'adapt': adapt,
+      'commercial': commercial,
+      'foss': foss,
+      'free': free,
+      'oss': oss,
+      'personal': personal,
+      'print': print,
+      'sell': sell,
+      'share': share,
+      'view': view,
+    };
+  }
 
-    data['commercial'] = commercial;
-    data['adapt'] = adapt;
-    data['foss'] = foss;
-    data['free'] = free;
-    data['oss'] = oss;
-    data['personal'] = personal;
-    data['print'] = print;
-    data['sell'] = sell;
-    data['share'] = share;
-    data['view'] = view;
+  LicenseUsage copyWith({
+    bool? adapt,
+    bool? commercial,
+    bool? foss,
+    bool? free,
+    bool? oss,
+    bool? personal,
+    bool? print,
+    bool? sell,
+    bool? share,
+    bool? view,
+  }) {
+    return LicenseUsage(
+      adapt: adapt ?? this.adapt,
+      commercial: commercial ?? this.commercial,
+      foss: foss ?? this.foss,
+      free: free ?? this.free,
+      oss: oss ?? this.oss,
+      personal: personal ?? this.personal,
+      print: print ?? this.print,
+      sell: sell ?? this.sell,
+      share: share ?? this.share,
+      view: view ?? this.view,
+    );
+  }
 
-    return data;
+  String toJson() => json.encode(toMap());
+
+  factory LicenseUsage.fromJson(String source) =>
+      LicenseUsage.fromMap(json.decode(source));
+
+  @override
+  String toString() {
+    return 'LicenseUsage(adapt: $adapt, commercial: $commercial, foss: $foss, '
+        'free: $free, oss: $oss, personal: $personal, print: $print, sell: $sell, '
+        'share: $share, view: $view)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is LicenseUsage &&
+        other.adapt == adapt &&
+        other.commercial == commercial &&
+        other.foss == foss &&
+        other.free == free &&
+        other.oss == oss &&
+        other.personal == personal &&
+        other.print == print &&
+        other.sell == sell &&
+        other.share == share &&
+        other.view == view;
+  }
+
+  @override
+  int get hashCode {
+    return adapt.hashCode ^
+        commercial.hashCode ^
+        foss.hashCode ^
+        free.hashCode ^
+        oss.hashCode ^
+        personal.hashCode ^
+        print.hashCode ^
+        sell.hashCode ^
+        share.hashCode ^
+        view.hashCode;
   }
 }

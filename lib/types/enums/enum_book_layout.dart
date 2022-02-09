@@ -7,7 +7,7 @@ enum EnumBookLayout {
   adaptativeGrid,
 
   /// Display items on a grid with a custom size for each illustrations.
-  /// They're 300x300 by default. With the [vScaleFactor] property,
+  /// They're 300x300 by default. With the [scaleFactor] property,
   /// they can be larger or smaller. The grid can both be scrolled
   /// on the horizontal and vertical axis. This grid con contain a row
   /// and a column that exceed the screen's size.
@@ -15,14 +15,14 @@ enum EnumBookLayout {
   customExtendedGrid,
 
   /// Display items on a grid with a custom size for each illustrations.
-  /// They're 300x300 by default. With the [vScaleFactor] property,
+  /// They're 300x300 by default. With the [scaleFactor] property,
   /// they can be larger or smaller.
   /// The grid can only be scrolled on the horizontal or vertical axis
   /// according to [layoutOrientation].
   customGrid,
 
   /// Display items in a list with a custom size for each illustrations.
-  /// They're 300x300 by default. With the [vScaleFactor] property,
+  /// They're 300x300 by default. With the [scaleFactor] property,
   /// they can be larger or smaller.
   customList,
 

@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/illustrations/illustration_poster_actions.dart';
@@ -186,7 +184,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
                 description: illustration.description,
               ),
               IllustrationPosterStory(
-                story: illustration.story,
+                story: illustration.lore,
               ),
             ],
           ),
@@ -206,25 +204,14 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
     );
   }
 
-  /// Fetch this illustration's author from its id.
-  void fetchAuthor() async {
-    final success = await fetchAuthorFast();
-
-    if (success) {
-      return;
-    }
-
-    fetchAuthorSlow();
-  }
-
   /// Fetch author from Firestore doc public data (fast).
-  Future<bool> fetchAuthorFast() async {
+  Future<bool> fetchAuthor() async {
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection("users")
-          .doc(widget.illustration.author.id)
-          .collection("public")
-          .doc("basic")
+          .doc(widget.illustration.userId)
+          .collection("user_public_fields")
+          .doc("base")
           .get();
 
       final Json? data = snapshot.data();
@@ -241,27 +228,6 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
     } catch (error) {
       Utilities.logger.e(error);
       return false;
-    }
-  }
-
-  /// Fetch author from Cloud Function (slower).
-  /// NOTE: Delete migration done.
-  void fetchAuthorSlow() async {
-    try {
-      final resp = await Utilities.cloud.fun('users-fetchUser').call({
-        'userId': widget.illustration.author.id,
-      });
-
-      final hashMap = LinkedHashMap.from(resp.data);
-      final data = Utilities.cloud.convertFromFun(hashMap);
-
-      if (!mounted) {
-        return;
-      }
-
-      setState(() => _user = UserFirestore.fromMap(data));
-    } catch (error) {
-      Utilities.logger.e(error);
     }
   }
 

@@ -1,47 +1,55 @@
 import 'dart:convert';
 
-class UserContestsStats {
-  UserContestsStats({
+import 'package:artbooking/globals/utilities.dart';
+
+class UserChallengeStats {
+  const UserChallengeStats({
     this.created = 0,
     this.deleted = 0,
     this.entered = 0,
     this.owned = 0,
     this.participating = 0,
     this.won = 0,
+    required this.updatedAt,
   });
 
-  /// Total contests this user has created.
-  int created;
+  /// Total challenges this user has created.
+  final int created;
 
-  /// Total contests this user has deleted.
-  int deleted;
+  /// Total challenges this user has deleted.
+  final int deleted;
 
-  /// Total contests this user has entered.
-  int entered;
+  /// Total challenges this user has entered.
+  final int entered;
 
-  /// Number of existing contests this user own.
-  int owned;
+  /// Number of existing challenges this user own.
+  final int owned;
 
-  /// Number of existing contests this user is doing.
-  int participating;
+  /// Number of existing challenges this user is doing.
+  final int participating;
 
-  /// Total contests this user has won.
-  int won;
+  /// Last time this statistic was updated.
+  final DateTime updatedAt;
 
-  UserContestsStats copyWith({
+  /// Total challenges this user has won.
+  final int won;
+
+  UserChallengeStats copyWith({
     int? created,
     int? deleted,
     int? entered,
     int? owned,
     int? participating,
+    DateTime? updatedAt,
     int? won,
   }) {
-    return UserContestsStats(
+    return UserChallengeStats(
       created: created ?? this.created,
       deleted: deleted ?? this.deleted,
       entered: entered ?? this.entered,
       owned: owned ?? this.owned,
       participating: participating ?? this.participating,
+      updatedAt: updatedAt ?? this.updatedAt,
       won: won ?? this.won,
     );
   }
@@ -57,47 +65,51 @@ class UserContestsStats {
     };
   }
 
-  factory UserContestsStats.empty() {
-    return UserContestsStats(
+  factory UserChallengeStats.empty() {
+    return UserChallengeStats(
       created: 0,
       deleted: 0,
       entered: 0,
       owned: 0,
       participating: 0,
+      updatedAt: DateTime.now(),
       won: 0,
     );
   }
 
-  factory UserContestsStats.fromMap(Map<String, dynamic>? map) {
+  factory UserChallengeStats.fromMap(Map<String, dynamic>? map) {
     if (map == null) {
-      return UserContestsStats.empty();
+      return UserChallengeStats.empty();
     }
 
-    return UserContestsStats(
+    return UserChallengeStats(
       created: map['created']?.toInt() ?? 0,
       deleted: map['deleted']?.toInt() ?? 0,
       entered: map['entered']?.toInt() ?? 0,
       owned: map['owned']?.toInt() ?? 0,
       participating: map['participating']?.toInt() ?? 0,
+      updatedAt: Utilities.date.fromFirestore(map['updated_at']),
       won: map['won']?.toInt() ?? 0,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory UserContestsStats.fromJson(String source) =>
-      UserContestsStats.fromMap(json.decode(source));
+  factory UserChallengeStats.fromJson(String source) =>
+      UserChallengeStats.fromMap(json.decode(source));
 
   @override
   String toString() {
-    return 'UserContestsStats(created: $created, deleted: $deleted, entered: $entered, owned: $owned, participating: $participating, won: $won)';
+    return 'UserChallengesStats(created: $created, deleted: $deleted, '
+        'entered: $entered, owned: $owned, participating: $participating, '
+        'won: $won)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is UserContestsStats &&
+    return other is UserChallengeStats &&
         other.created == created &&
         other.deleted == deleted &&
         other.entered == entered &&

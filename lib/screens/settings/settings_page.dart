@@ -11,7 +11,7 @@ import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/settings/settings_page_body.dart';
 import 'package:artbooking/screens/settings/settings_page_header.dart';
-import 'package:artbooking/types/user/user_urls.dart';
+import 'package:artbooking/types/user/user_links.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
@@ -76,7 +76,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   onGoToUpdatePasssword: onGoToUpdatePasssword,
                   onGoToUpdateUsername: onGoToUpdateUsername,
                   onUploadPicture: onUploadProfilePicture,
-                  onUrlChanged: onUrlChanged,
+                  onLinkChanged: onUrlChanged,
                 ),
               ],
             ),
@@ -133,7 +133,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           onSave: onSaveEditedProfilePicture,
           dimensions: firestoreUser.profilePicture.dimensions,
           imageToEdit: ExtendedNetworkImageProvider(
-            firestoreUser.profilePicture.url.original,
+            firestoreUser.profilePicture.links.original,
             cache: true,
             cacheRawData: true,
             cacheMaxAge: const Duration(seconds: 3),
@@ -162,7 +162,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
     final String extension =
         firestoreUser.profilePicture.extension.replaceFirst(".", "");
-    final String uid = firestoreUser.uid;
+    final String uid = firestoreUser.id;
 
     try {
       final String imagePath =
@@ -285,7 +285,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         customMetadata: {
           'extension': extension,
           'userId': authUser.uid,
-          'target': 'profilePicture',
+          'target': 'profile_picture',
         },
       );
 
@@ -306,14 +306,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     }
   }
 
-  void onUrlChanged(UserUrls userUrls) async {
+  void onUrlChanged(UserSocialLinks userUrls) async {
     setState(() {
       _isUpdating = true;
     });
 
     try {
-      await Utilities.cloud.fun("users-updateUrls").call({
-        "urls": userUrls.toMap(),
+      await Utilities.cloud.fun("users-updateSocialLinks").call({
+        "social_links": userUrls.toMap(),
       });
     } catch (error) {
       Utilities.logger.e(error);
