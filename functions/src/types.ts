@@ -389,19 +389,6 @@ interface UpdateEmailParams {
   email: string;
   id_token: string;
 }
-interface UpdateIllusPositionParams {
-  /** Illustration's position (int) before the update. */
-  afterPosition: number;
-  
-  /** Illustration's position (int) after the update. */
-  beforePosition: number;
-  
-  /** Book's id to update. */
-  bookId: string;
-
-  /** Illustration's id to re-order. */
-  illustrationId: string;
-}
 
 interface UpdateIllusStylesParams {
   /** Illustration's art movements to set. */
