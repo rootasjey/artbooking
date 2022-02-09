@@ -123,7 +123,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     try {
       final query = await FirebaseFirestore.instance
           .collection('licenses')
-          .orderBy('createdAt', descending: _descending)
+          .orderBy('created_at', descending: _descending)
           .limit(_limit);
 
       startListeningToCollection(query);
@@ -217,7 +217,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
           .collection('users')
           .doc(uid)
           .collection('licenses')
-          .orderBy('createdAt', descending: _descending)
+          .orderBy('created_at', descending: _descending)
           .limit(_limit);
 
       startListeningToCollection(query);

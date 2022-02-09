@@ -565,8 +565,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
       final QueryMap query = FirebaseFirestore.instance
           .collection('illustrations')
-          .where('user.id', isEqualTo: userAuth.uid)
-          .orderBy('createdAt', descending: _descending)
+          .where('user_id', isEqualTo: userAuth.uid)
+          .orderBy('created_at', descending: _descending)
           .limit(_limit);
 
       startListenningToData(query);
@@ -616,8 +616,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
       final QueryMap query = await FirebaseFirestore.instance
           .collection('illustrations')
-          .where('user.id', isEqualTo: userAuth.uid)
-          .orderBy('createdAt', descending: _descending)
+          .where('user_id', isEqualTo: userAuth.uid)
+          .orderBy('created_at', descending: _descending)
           .limit(_limit)
           .startAfterDocument(_lastFirestoreDoc!);
 

@@ -274,7 +274,8 @@ class Illustration {
 
   Map<String, dynamic> toMap() {
     return {
-      'createdAt': createdAt.millisecondsSinceEpoch,
+      'art_movements': artMovements,
+      'created_at': createdAt.millisecondsSinceEpoch,
       'description': description,
       'dimensions': dimensions.toMap(),
       'extension': extension,
@@ -283,10 +284,9 @@ class Illustration {
       'name': name,
       'lore': lore,
       'size': size,
-      'styles': artMovements,
       'topics': topics,
-      'updatedAt': updatedAt.millisecondsSinceEpoch,
-      'userId': userId,
+      'updated_at': updatedAt.millisecondsSinceEpoch,
+      'user_id': userId,
       'version': version,
       'visibility': visibilityToString(),
     };

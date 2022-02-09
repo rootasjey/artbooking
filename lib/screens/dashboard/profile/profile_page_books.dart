@@ -155,9 +155,9 @@ class _ProfilePageBooksState extends State<ProfilePageBooks> {
     try {
       final bookSnapshot = await FirebaseFirestore.instance
           .collection("books")
-          .where("user.id", isEqualTo: widget.userId)
+          .where("user_id", isEqualTo: widget.userId)
           .limit(6)
-          .orderBy("updatedAt", descending: true)
+          .orderBy("updated_at", descending: true)
           .get();
 
       if (bookSnapshot.size == 0) {

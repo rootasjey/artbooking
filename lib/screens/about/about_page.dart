@@ -329,7 +329,7 @@ class _AboutPageState extends State<AboutPage> {
             child: ListTile(
               title: Text('GitHub'),
               trailing: Icon(Icons.open_in_new),
-              onTap: () => launch(Constants.urls.appGithubUrl),
+              onTap: () => launch(Constants.links.githubLink),
             ),
           ),
         ],

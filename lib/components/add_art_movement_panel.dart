@@ -14,20 +14,20 @@ import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// A side panel to add art style to an illustration.
+/// A side panel to toggle art movement of an illustration.
 class AddArtMovementPanel extends StatefulWidget {
-  /// Return an panel widget showing art styles.
+  /// Return an panel widget showing art art movements.
   const AddArtMovementPanel({
     Key? key,
-    this.selectedStyles,
+    this.selectedArtMovements = const [],
     this.isVisible = false,
     this.onClose,
-    this.onToggleStyleAndUpdate,
+    this.onToggleArtMovementAndUpdate,
     this.elevation = 4.0,
   }) : super(key: key);
 
-  /// Aleady selected styles for the illustration.
-  final List<String?>? selectedStyles;
+  /// Aleady selected art movements for the illustration.
+  final List<String?> selectedArtMovements;
 
   /// True if the panel is visible.
   final bool isVisible;
@@ -36,7 +36,8 @@ class AddArtMovementPanel extends StatefulWidget {
   final void Function()? onClose;
 
   /// This callback when an item is tapped.
-  final void Function(ArtMovement style, bool selected)? onToggleStyleAndUpdate;
+  final void Function(ArtMovement style, bool selected)?
+      onToggleArtMovementAndUpdate;
 
   /// The panel elevation.
   final double elevation;
@@ -49,20 +50,20 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
   /// True if there're more data to fetch.
   bool _hasNext = false;
 
-  /// True if loading more style from Firestore.
+  /// True if loading more art movement from Firestore.
   bool _isLoadingMore = false;
 
-  /// True if the style's image is visible.
+  /// True if the art movement's image is visible.
   bool _isImagePreviewVisible = false;
 
   /// Last fetched document snapshot. Useful for pagination.
   DocumentSnapshot<Object>? _lastDocumentSnapshot;
 
-  /// All available art styles.
-  final List<ArtMovement> _availableStyles = [];
+  /// All available art art movements.
+  final List<ArtMovement> _availableArtMovements = [];
 
   /// Search results.
-  final List<ArtMovement> _suggestionsStyles = [];
+  final List<ArtMovement> _suggestionsList = [];
 
   /// Search controller.
   final _searchTextController = TextEditingController();
@@ -70,11 +71,10 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
   /// Maximum container's width.
   final double _containerWidth = 400.0;
 
-  /// Maximum styles to fetch in one request.
-  int _limitStyles = 10;
+  /// Maximum art movements to fetch in one request.
+  int _limit = 10;
 
-  /// Selected style for image preview.
-  ArtMovement? _selectedStylePreview;
+  /// Selected art movement for image preview.
 
   /// Delay search after typing input.
   Timer? _searchTimer;
@@ -82,10 +82,12 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
   final Color _clairPink = Constants.colors.clairPink;
   final Color _secondaryColor = Constants.colors.secondary;
 
+  var _selectedArtMovementPreview = ArtMovement.empty();
+
   @override
   initState() {
     super.initState();
-    fetchStyles();
+    fetchArtMovements();
   }
 
   @override
@@ -141,7 +143,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                 delegate: SliverChildListDelegate.fixed([
                   Column(
                     children: [
-                      stylesInput(),
+                      searchInput(),
                     ],
                   ),
                 ]),
@@ -155,12 +157,11 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
   }
 
   Widget body() {
-    if (_searchTextController.text.isNotEmpty &&
-        _suggestionsStyles.isNotEmpty) {
-      return searchResultsStylesList();
+    if (_searchTextController.text.isNotEmpty && _suggestionsList.isNotEmpty) {
+      return searchResultListView();
     }
 
-    return predefStylesList();
+    return predefinedListView();
   }
 
   Widget header() {
@@ -196,7 +197,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "styles_available".tr(),
+                            "art_movements_available".tr(),
                             style: Utilities.fonts.style(
                               fontSize: 22.0,
                               fontWeight: FontWeight.w600,
@@ -205,7 +206,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                           Opacity(
                             opacity: 0.5,
                             child: Text(
-                              "styles_subtitle".tr(),
+                              "art_movements_subtitle".tr(),
                               style: Utilities.fonts.style(
                                 height: 1.0,
                                 fontSize: 14.0,
@@ -237,7 +238,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
   Widget imagePreview() {
     Widget imageContainer;
 
-    if (_selectedStylePreview == null) {
+    if (_selectedArtMovementPreview.urls.image.isEmpty) {
       imageContainer = Container();
     } else {
       imageContainer = Material(
@@ -247,12 +248,12 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
         ),
         clipBehavior: Clip.antiAlias,
         child: Ink.image(
-          image: NetworkImage(_selectedStylePreview!.urls.image),
+          image: NetworkImage(_selectedArtMovementPreview.urls.image),
           width: 300.0,
           height: 260.0,
           fit: BoxFit.cover,
           child: InkWell(
-            onTap: () => launch(_selectedStylePreview!.urls.image),
+            onTap: () => launch(_selectedArtMovementPreview.urls.image),
           ),
         ),
       );
@@ -285,7 +286,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                     child: Opacity(
                       opacity: 0.8,
                       child: Text(
-                        _selectedStylePreview!.name.toUpperCase(),
+                        _selectedArtMovementPreview.name.toUpperCase(),
                         style: Utilities.fonts.style(
                           fontWeight: FontWeight.w600,
                         ),
@@ -301,7 +302,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
               child: Opacity(
                 opacity: 0.6,
                 child: Text(
-                  _selectedStylePreview!.description,
+                  _selectedArtMovementPreview.description,
                   style: Utilities.fonts.style(
                     fontWeight: FontWeight.w500,
                   ),
@@ -309,8 +310,9 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
               ),
             ),
             TextButton(
-              onPressed: () => launch(_selectedStylePreview!.urls.wikipedia),
-              child: Text(_selectedStylePreview!.urls.wikipedia),
+              onPressed: () =>
+                  launch(_selectedArtMovementPreview.urls.wikipedia),
+              child: Text(_selectedArtMovementPreview.urls.wikipedia),
               style: TextButton.styleFrom(
                 primary: Colors.black54,
               ),
@@ -321,20 +323,25 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
     );
   }
 
-  Widget predefStylesList() {
+  Widget predefinedListView() {
     return SliverPadding(
       padding: const EdgeInsets.all(8.0),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            final style = _availableStyles.elementAt(index);
-            final selected = widget.selectedStyles!.contains(style.name);
+            final artMovement = _availableArtMovements.elementAt(index);
+            final selected = widget.selectedArtMovements.contains(
+              artMovement.name,
+            );
 
             return ListTile(
-              onTap: () => widget.onToggleStyleAndUpdate?.call(style, selected),
+              onTap: () => widget.onToggleArtMovementAndUpdate?.call(
+                artMovement,
+                selected,
+              ),
               onLongPress: () {
                 setState(() {
-                  _selectedStylePreview = style;
+                  _selectedArtMovementPreview = artMovement;
                   _isImagePreviewVisible = true;
                 });
               },
@@ -349,7 +356,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                       ),
                     Expanded(
                       child: Text(
-                        style.name.toUpperCase(),
+                        artMovement.name.toUpperCase(),
                         style: Utilities.fonts.style(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
@@ -360,7 +367,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                 ),
               ),
               subtitle: Text(
-                style.description,
+                artMovement.description,
                 style: Utilities.fonts.style(
                   fontWeight: FontWeight.w600,
                 ),
@@ -368,23 +375,28 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
               contentPadding: const EdgeInsets.all(16.0),
             );
           },
-          childCount: _availableStyles.length,
+          childCount: _availableArtMovements.length,
         ),
       ),
     );
   }
 
-  Widget searchResultsStylesList() {
+  Widget searchResultListView() {
     return SliverPadding(
       padding: const EdgeInsets.all(8.0),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            final style = _suggestionsStyles.elementAt(index);
-            final selected = widget.selectedStyles!.contains(style.name);
+            final artMovement = _suggestionsList.elementAt(index);
+            final selected = widget.selectedArtMovements.contains(
+              artMovement.name,
+            );
 
             return ListTile(
-              onTap: () => widget.onToggleStyleAndUpdate?.call(style, selected),
+              onTap: () => widget.onToggleArtMovementAndUpdate?.call(
+                artMovement,
+                selected,
+              ),
               title: Opacity(
                 opacity: 0.8,
                 child: Row(
@@ -396,7 +408,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                       ),
                     Expanded(
                       child: Text(
-                        style.name.toUpperCase(),
+                        artMovement.name.toUpperCase(),
                         style: Utilities.fonts.style(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
@@ -407,7 +419,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                 ),
               ),
               subtitle: Text(
-                style.description,
+                artMovement.description,
                 style: Utilities.fonts.style(
                   fontWeight: FontWeight.w600,
                 ),
@@ -415,13 +427,13 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
               contentPadding: const EdgeInsets.all(16.0),
             );
           },
-          childCount: _suggestionsStyles.length,
+          childCount: _suggestionsList.length,
         ),
       ),
     );
   }
 
-  Widget stylesInput() {
+  Widget searchInput() {
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Column(
@@ -438,7 +450,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                   decoration: InputDecoration(
                     filled: true,
                     isDense: true,
-                    labelText: "style_label_text".tr(),
+                    labelText: "art_movement_label_text".tr(),
                     fillColor: _clairPink,
                     focusColor: _clairPink,
                     border: OutlineInputBorder(
@@ -453,7 +465,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
 
                     _searchTimer = Timer(
                       500.milliseconds,
-                      searchStyle,
+                      trySearch,
                     );
                   },
                   onFieldSubmitted: (value) {},
@@ -464,9 +476,9 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                 child: Opacity(
                   opacity: 0.6,
                   child: IconButton(
-                    tooltip: "styles_search".tr(),
+                    tooltip: "art_movements_search".tr(),
                     icon: Icon(UniconsLine.search),
-                    onPressed: searchStyle,
+                    onPressed: trySearch,
                   ),
                 ),
               ),
@@ -495,18 +507,17 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
     );
   }
 
-  /// 1st fetch
-  void fetchStyles() async {
-    _availableStyles.clear();
+  void fetchArtMovements() async {
+    _availableArtMovements.clear();
 
     try {
-      final stylesSnap = await FirebaseFirestore.instance
-          .collection('styles')
-          .limit(_limitStyles)
+      final snapshot = await FirebaseFirestore.instance
+          .collection('art_movements')
+          .limit(_limit)
           .orderBy('name', descending: true)
           .get();
 
-      if (stylesSnap.size == 0) {
+      if (snapshot.size == 0) {
         setState(() {
           _hasNext = false;
         });
@@ -514,36 +525,35 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
         return;
       }
 
-      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in stylesSnap.docs) {
-        final data = doc.data();
-        data['id'] = doc.id;
+      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
+        final map = doc.data();
+        map['id'] = doc.id;
 
-        final style = ArtMovement.fromMap(data);
-        _availableStyles.add(style);
+        final artMovement = ArtMovement.fromMap(map);
+        _availableArtMovements.add(artMovement);
       }
 
       setState(() {
-        _hasNext = _limitStyles == stylesSnap.size;
-        _lastDocumentSnapshot = stylesSnap.docs.last;
+        _hasNext = _limit == snapshot.size;
+        _lastDocumentSnapshot = snapshot.docs.last;
       });
     } catch (error) {
       Utilities.logger.e(error);
     }
   }
 
-  /// 2nd + more fetches
-  void fetchMoreStyles() async {
+  void fetchMoreArtMovements() async {
     _isLoadingMore = true;
 
     try {
-      final stylesSnap = await FirebaseFirestore.instance
-          .collection('styles')
-          .limit(_limitStyles)
+      final snapshot = await FirebaseFirestore.instance
+          .collection('art_movements')
+          .limit(_limit)
           .orderBy('name', descending: true)
           .startAfterDocument(_lastDocumentSnapshot!)
           .get();
 
-      if (stylesSnap.size == 0) {
+      if (snapshot.size == 0) {
         setState(() {
           _hasNext = false;
           _lastDocumentSnapshot = null;
@@ -552,44 +562,43 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
         return;
       }
 
-      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in stylesSnap.docs) {
-        final data = doc.data();
-        data['id'] = doc.id;
+      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
+        final map = doc.data();
+        map['id'] = doc.id;
 
-        final style = ArtMovement.fromMap(data);
-        _availableStyles.add(style);
+        final artMovement = ArtMovement.fromMap(map);
+        _availableArtMovements.add(artMovement);
       }
 
       setState(() {
-        _hasNext = _limitStyles == stylesSnap.size;
-        _lastDocumentSnapshot = stylesSnap.docs.last;
+        _hasNext = _limit == snapshot.size;
+        _lastDocumentSnapshot = snapshot.docs.last;
       });
     } catch (error) {
       Utilities.logger.e(error);
     }
   }
 
-  /// On scroll notification
   bool onNotification(ScrollNotification notification) {
     if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
       return false;
     }
 
     if (_hasNext && !_isLoadingMore && _lastDocumentSnapshot != null) {
-      fetchMoreStyles();
+      fetchMoreArtMovements();
     }
 
     return false;
   }
 
-  void searchStyle() async {
-    _suggestionsStyles.clear();
+  void trySearch() async {
+    _suggestionsList.clear();
 
     try {
       final AlgoliaQuery query = await SearchUtilities.algolia
-          .index("styles")
+          .index("art_movements")
           .query(_searchTextController.text)
-          .setHitsPerPage(_limitStyles)
+          .setHitsPerPage(_limit)
           .setPage(0);
 
       final AlgoliaQuerySnapshot snapshot = await query.getObjects();
@@ -603,8 +612,8 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
           final data = hit.data;
           data['id'] = hit.objectID;
 
-          final style = ArtMovement.fromMap(data);
-          _suggestionsStyles.add(style);
+          final artMovement = ArtMovement.fromMap(data);
+          _suggestionsList.add(artMovement);
         }
       });
     } catch (error) {

@@ -35,6 +35,7 @@ class SelectLicensePanelHeader extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: CircleButton(
+                      tooltip: "close".tr(),
                       icon: Icon(
                         UniconsLine.times,
                         color: Colors.black54,

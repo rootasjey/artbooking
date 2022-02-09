@@ -223,7 +223,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
       final QueryMap query = FirebaseFirestore.instance
           .collection('illustrations')
           .where('visibility', isEqualTo: 'public')
-          .orderBy('createdAt', descending: _descending)
+          .orderBy('created_at', descending: _descending)
           .limit(_limit);
 
       startListenningToData(query);
@@ -268,7 +268,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
       final QueryMap query = await FirebaseFirestore.instance
           .collection('illustrations')
           .where('visibility', isEqualTo: 'public')
-          .orderBy('createdAt', descending: _descending)
+          .orderBy('created_at', descending: _descending)
           .limit(_limit)
           .startAfterDocument(_lastFirestoreDoc!);
 

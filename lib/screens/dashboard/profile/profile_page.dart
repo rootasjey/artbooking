@@ -317,7 +317,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       final snapshot = await FirebaseFirestore.instance
           .collection("sections")
           .limit(limit)
-          .orderBy("createdAt", descending: descending)
+          .orderBy('created_at', descending: descending)
           .get();
 
       if (snapshot.size == 0) {
@@ -369,13 +369,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           .doc(userId)
           .collection("pages")
           .add({
-        "createdAt": Timestamp.now(),
-        "isActive": true,
-        "isDraft": true,
-        "name": "Sample-${DateTime.now()}",
-        "sections": sections.map((x) => x.toMap()).toList(),
-        "type": "profile",
-        "updatedAt": Timestamp.now(),
+        'created_at': Timestamp.now(),
+        'is_ctive': true,
+        'is_draft': true,
+        'name': 'Sample-${DateTime.now()}',
+        'sections': sections.map((x) => x.toMap()).toList(),
+        'type': 'profile',
+        'updated_at': Timestamp.now(),
       });
     } catch (error) {
       Utilities.logger.e(error);
@@ -409,7 +409,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       final snapshot = await FirebaseFirestore.instance
           .collection("users")
           .doc(userId)
-          .collection("pages")
+          .collection("user_pages")
           .where("type", isEqualTo: "profile")
           .limit(1)
           .get();

@@ -163,6 +163,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
       fetchChallengeStats(userId);
       fetchContestStats(userId);
       fetchIllustrationStats(userId);
+      fetchStorageStats(userId);
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
@@ -176,7 +177,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
         .collection("user_statistics")
         .doc("books");
 
-    bookQuery.snapshots().listen((snapshot) {
+    _bookSub = bookQuery.snapshots().listen((snapshot) {
       setState(() {
         _userBookStats = UserBookStats.fromMap(snapshot.data());
       });
@@ -194,7 +195,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
         .collection("user_statistics")
         .doc("challenges");
 
-    challengeQuery.snapshots().listen((snapshot) {
+    _challengeSub = challengeQuery.snapshots().listen((snapshot) {
       setState(() {
         _userChallengeStats = UserChallengeStats.fromMap(snapshot.data());
       });
@@ -212,7 +213,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
         .collection("user_statistics")
         .doc("contests");
 
-    contestQuery.snapshots().listen((snapshot) {
+    _contestSub = contestQuery.snapshots().listen((snapshot) {
       setState(() {
         _userContestStats = UserContestStats.fromMap(
           snapshot.data(),
@@ -232,7 +233,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
         .collection("user_statistics")
         .doc("illustrations");
 
-    illustrationQuery.snapshots().listen((snapshot) {
+    _illustrationSub = illustrationQuery.snapshots().listen((snapshot) {
       setState(() {
         _userIllustrationStats = UserIllustrationStats.fromMap(
           snapshot.data(),
@@ -242,6 +243,26 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
       Utilities.logger.e(error);
     }, onDone: () {
       _illustrationSub?.cancel();
+    });
+  }
+
+  void fetchStorageStats(String? userId) async {
+    final storagesQuery = FirebaseFirestore.instance
+        .collection("users")
+        .doc(userId)
+        .collection("user_statistics")
+        .doc("storages");
+
+    _storageSub = storagesQuery.snapshots().listen((snapshot) {
+      setState(() {
+        _userStorageStats = UserStorageStats.fromMap(
+          snapshot.data(),
+        );
+      });
+    }, onError: (error) {
+      Utilities.logger.e(error);
+    }, onDone: () {
+      _storageSub?.cancel();
     });
   }
 }

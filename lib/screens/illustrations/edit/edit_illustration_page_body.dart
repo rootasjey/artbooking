@@ -2,11 +2,12 @@ import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/screens/illustrations/edit/edit_illustration_page_license.dart';
 import 'package:artbooking/screens/illustrations/edit/edit_illustration_page_presentation.dart';
-import 'package:artbooking/screens/illustrations/edit/edit_illustration_page_styles.dart';
+import 'package:artbooking/screens/illustrations/edit/edit_illustration_page_art_movements.dart';
 import 'package:artbooking/screens/illustrations/edit/edit_illustration_page_topics.dart';
 import 'package:artbooking/screens/illustrations/edit/edit_illustration_page_visibility.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/license/license.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
@@ -18,10 +19,11 @@ class EditIllustrationPageBody extends StatelessWidget {
     required this.illustration,
     required this.presentationCardKey,
     required this.showLicensesPanel,
-    required this.showStylesPanel,
+    required this.showArtMovementPanel,
+    required this.license,
     this.onUpdatePresentation,
-    this.onToggleStylesPanel,
-    this.onRemoveStyleAndUpdate,
+    this.onToggleArtMovementPanel,
+    this.onRemoveArtMovementAndUpdate,
     this.onAddTopicAndUpdate,
     this.onRemoveTopicAndUpdate,
     this.onUpdateVisibility,
@@ -30,19 +32,27 @@ class EditIllustrationPageBody extends StatelessWidget {
     this.onUnselectLicenseAndUpdate,
     this.onDone,
     this.onExpandStateLicenseChanged,
+    required this.illustrationName,
+    required this.illustrationDescription,
+    required this.illustrationLore,
   }) : super(key: key);
 
   final bool isLoading;
   final bool showLicensesPanel;
-  final bool showStylesPanel;
+  final bool showArtMovementPanel;
 
   final GlobalKey<ExpansionTileCardState> presentationCardKey;
   final Illustration illustration;
+  final License license;
+
+  final String illustrationName;
+  final String illustrationDescription;
+  final String illustrationLore;
 
   final void Function(String, String, String)? onUpdatePresentation;
 
-  final void Function()? onToggleStylesPanel;
-  final void Function(String)? onRemoveStyleAndUpdate;
+  final void Function()? onToggleArtMovementPanel;
+  final void Function(String)? onRemoveArtMovementAndUpdate;
 
   final void Function(String)? onAddTopicAndUpdate;
   final void Function(String)? onRemoveTopicAndUpdate;
@@ -78,14 +88,16 @@ class EditIllustrationPageBody extends StatelessWidget {
         children: [
           EditIllustrationPagePresentation(
             cardKey: presentationCardKey,
-            illustration: illustration,
+            name: illustrationName,
+            description: illustrationDescription,
+            lore: illustrationLore,
             onUpdatePresentation: onUpdatePresentation,
           ),
-          EditIllustrationPageStyles(
-            selectedStyles: illustration.artMovements,
-            showStylesPanel: showStylesPanel,
-            onRemoveStyleAndUpdate: onRemoveStyleAndUpdate,
-            onToggleStylesPanel: onToggleStylesPanel,
+          EditIllustrationPageArtMovements(
+            selectedArtMovements: illustration.artMovements,
+            showArtMovementPanel: showArtMovementPanel,
+            onRemoveArtMovementAndUpdate: onRemoveArtMovementAndUpdate,
+            onToggleArtMovementPanel: onToggleArtMovementPanel,
           ),
           EditIllustrationPageTopics(
             topics: illustration.topics,
@@ -98,7 +110,7 @@ class EditIllustrationPageBody extends StatelessWidget {
           ),
           EditIllustrationPageLicense(
             showLicensesPanel: showLicensesPanel,
-            license: illustration.license,
+            license: license,
             onTapCurrentLicense: onTapCurrentLicense,
             onToggleLicensePanel: onToggleLicensePanel,
             onUnselectLicenseAndUpdate: onUnselectLicenseAndUpdate,

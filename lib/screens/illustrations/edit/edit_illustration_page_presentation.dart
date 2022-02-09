@@ -4,7 +4,6 @@ import 'package:artbooking/components/expansion_tile_card/expansion_tile_card_de
 import 'package:artbooking/components/expansion_tile_card/expansion_tile_card_title.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +17,9 @@ class EditIllustrationPagePresentation extends StatelessWidget {
     this.onTitleChanged,
     this.onDescriptionChanged,
     this.onStoryChanged,
-    required this.illustration,
+    required this.name,
+    required this.description,
+    required this.lore,
   }) : super(key: key);
 
   final void Function(String, String, String)? onUpdatePresentation;
@@ -27,7 +28,9 @@ class EditIllustrationPagePresentation extends StatelessWidget {
   final void Function(String)? onStoryChanged;
   final GlobalKey<ExpansionTileCardState> cardKey;
 
-  final Illustration illustration;
+  final String name;
+  final String description;
+  final String lore;
 
   @override
   Widget build(BuildContext context) {
@@ -39,15 +42,15 @@ class EditIllustrationPagePresentation extends StatelessWidget {
 
     /// Illustration's name after page loading.
     /// Used to know if they're pending changes.
-    final String _initialName = illustration.name;
+    final String _initialName = name;
 
     /// Illustration's description after page loading.
     /// Used to know if they're pending changes.
-    final String _initialDescription = illustration.description;
+    final String _initialDescription = description;
 
     /// Illustration's story after page loading.
     /// Used to know if they're pending changes.
-    final String _initialStory = illustration.lore;
+    final String _initialStory = lore;
 
     _nameInputController.text = _initialName;
     _descriptionInputController.text = _initialDescription;

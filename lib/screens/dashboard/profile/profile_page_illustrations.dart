@@ -156,9 +156,9 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
     try {
       final illustrationsSnapshot = await FirebaseFirestore.instance
           .collection("illustrations")
-          .where("user.id", isEqualTo: widget.userId)
+          .where("user_id", isEqualTo: widget.userId)
           .limit(6)
-          .orderBy("updatedAt", descending: true)
+          .orderBy("updated_at", descending: true)
           .get();
 
       if (illustrationsSnapshot.size == 0) {

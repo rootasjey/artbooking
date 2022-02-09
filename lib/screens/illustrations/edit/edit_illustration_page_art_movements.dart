@@ -6,19 +6,19 @@ import 'package:easy_localization/src/public_ext.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
 
-class EditIllustrationPageStyles extends StatelessWidget {
-  const EditIllustrationPageStyles({
+class EditIllustrationPageArtMovements extends StatelessWidget {
+  const EditIllustrationPageArtMovements({
     Key? key,
-    required this.selectedStyles,
-    required this.showStylesPanel,
-    this.onRemoveStyleAndUpdate,
-    this.onToggleStylesPanel,
+    required this.selectedArtMovements,
+    required this.showArtMovementPanel,
+    this.onRemoveArtMovementAndUpdate,
+    this.onToggleArtMovementPanel,
   }) : super(key: key);
 
-  final List<String> selectedStyles;
-  final bool showStylesPanel;
-  final void Function()? onToggleStylesPanel;
-  final void Function(String)? onRemoveStyleAndUpdate;
+  final List<String> selectedArtMovements;
+  final bool showArtMovementPanel;
+  final void Function()? onToggleArtMovementPanel;
+  final void Function(String)? onRemoveArtMovementAndUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +35,10 @@ class EditIllustrationPageStyles extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ExpansionTileCardTitle(
-              textValue: "styles".tr(),
+              textValue: "art_movements".tr(),
             ),
             ExpansionTileCardDescription(
-              textValue: "styles_description".tr(),
+              textValue: "art_movements_description".tr(),
             ),
           ],
         ),
@@ -50,11 +50,11 @@ class EditIllustrationPageStyles extends StatelessWidget {
               child: Wrap(
                   spacing: 12.0,
                   runSpacing: 12.0,
-                  children: selectedStyles.map((style) {
+                  children: selectedArtMovements.map((artMovement) {
                     return InputChip(
                       label: Opacity(
                         opacity: 0.8,
-                        child: Text(style),
+                        child: Text(artMovement),
                       ),
                       labelStyle:
                           Utilities.fonts.style(fontWeight: FontWeight.w700),
@@ -65,7 +65,7 @@ class EditIllustrationPageStyles extends StatelessWidget {
                       labelPadding:
                           const EdgeInsets.symmetric(horizontal: 12.0),
                       onDeleted: () {
-                        onRemoveStyleAndUpdate?.call(style);
+                        onRemoveArtMovementAndUpdate?.call(artMovement);
                       },
                       onSelected: (isSelected) {},
                     );
@@ -80,14 +80,11 @@ class EditIllustrationPageStyles extends StatelessWidget {
                 left: 16.0,
               ),
               child: DarkElevatedButton.large(
-                // onPressed: () {
-                //   setState(() {
-                //     _isSidePanelStylesVisible = !_isSidePanelStylesVisible;
-                //   });
-                // },
-                onPressed: onToggleStylesPanel,
+                onPressed: onToggleArtMovementPanel,
                 child: Text(
-                  showStylesPanel ? "style_hide_panel".tr() : "style_add".tr(),
+                  showArtMovementPanel
+                      ? "art_movement_hide_panel".tr()
+                      : "art_movement_add".tr(),
                 ),
               ),
             ),

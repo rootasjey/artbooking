@@ -277,8 +277,8 @@ class _ProfilePageHeroState extends State<ProfilePageHero> {
       final snapshot = await FirebaseFirestore.instance
           .collection("users")
           .doc(widget.userId)
-          .collection("public")
-          .doc("basic")
+          .collection("user_public_fields")
+          .doc("base")
           .get();
 
       final mapData = snapshot.data();

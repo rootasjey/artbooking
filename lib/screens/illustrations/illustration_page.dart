@@ -26,17 +26,13 @@ import 'package:mime_type/mime_type.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class IllustrationPage extends ConsumerStatefulWidget {
-  /// Illustration's id, used if direct navigation by url.
-  final String illustrationId;
-
-  /// True if navigating from dashboard.
-  final bool? fromDashboard;
-
   const IllustrationPage({
     Key? key,
     required this.illustrationId,
-    this.fromDashboard = false,
   }) : super(key: key);
+
+  /// Illustration's id, used if direct navigation by url.
+  final String illustrationId;
 
   @override
   _IllustrationPageState createState() => _IllustrationPageState();
@@ -191,6 +187,10 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
           return;
         }
 
+        if (!mounted) {
+          return;
+        }
+
         setState(() {
           data['id'] = snapshot.id;
           _illustration = Illustration.fromMap(data);
@@ -216,7 +216,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
       ),
     );
 
-    fetchIllustration(silent: true);
+    // fetchIllustration(silent: true);
   }
 
   void onGoToEditImagePage() {
@@ -256,11 +256,11 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
       await FirebaseFirestore.instance
           .collection("users")
           .doc(firestoreUser.id)
-          .collection("likes")
+          .collection("user_likes")
           .doc(_illustration.id)
           .set({
         "type": "illustration",
-        "targetId": _illustration.id,
+        "target_id": _illustration.id,
       });
     } catch (error) {
       Utilities.logger.e(error);

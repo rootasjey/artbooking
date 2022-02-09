@@ -241,9 +241,9 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
 
       final snapshot = await FirebaseFirestore.instance
           .collection('books')
-          .where('user.id', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+          .where('user_id', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
           .limit(limit)
-          .orderBy('updatedAt', descending: true)
+          .orderBy('updated_at', descending: true)
           .get();
 
       if (snapshot.docs.isEmpty) {
@@ -291,9 +291,9 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection('books')
-          .where('user.id', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+          .where('user_id', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
           .limit(limit)
-          .orderBy('updatedAt', descending: true)
+          .orderBy('updated_at', descending: true)
           .startAfterDocument(lastDoc)
           .get();
 

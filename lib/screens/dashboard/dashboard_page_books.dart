@@ -556,8 +556,8 @@ class _MyBooksPageState extends State<MyBooksPage> {
     try {
       final query = FirebaseFirestore.instance
           .collection('books')
-          .where('user.id', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
-          .orderBy('createdAt', descending: _descending)
+          .where('user_id', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+          .orderBy('created_at', descending: _descending)
           .limit(_limit);
 
       startListenningToData(query);
@@ -606,8 +606,8 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
       final snapshot = await FirebaseFirestore.instance
           .collection('books')
-          .where('user.id', isEqualTo: userAuth.uid)
-          .orderBy('createdAt', descending: _descending)
+          .where('user_id', isEqualTo: userAuth.uid)
+          .orderBy('created_at', descending: _descending)
           .limit(_limit)
           .startAfterDocument(_lastFirestoreDoc!)
           .get();

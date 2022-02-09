@@ -356,7 +356,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void copyLink(Illustration illustration) async {
-    final url = '${Constants.urls.baseIllustrationUrl}{illustration.id}';
+    final url = '${Constants.links.baseIllustrationLink}{illustration.id}';
 
     await Clipboard.setData(ClipboardData(text: url));
     context.showSuccessBar(content: Text("copy_link_success".tr()));
@@ -373,18 +373,18 @@ class _SearchPageState extends State<SearchPage> {
 
   void sharePostWeb(Illustration illustration) async {
     String? sharingText = illustration.name;
-    final url = '${Constants.urls.baseIllustrationUrl}${illustration.id}';
+    final url = '${Constants.links.baseIllustrationLink}${illustration.id}';
     final hashtags = '&hashtags=artbooking';
 
     await launch(
-      '${Constants.urls.baseTwitterShareUrl}$sharingText$hashtags&url=$url',
+      '${Constants.links.baseTwitterShareLink}$sharingText$hashtags&url=$url',
     );
   }
 
   void sharePostMobile(Illustration illustration) {
     final RenderBox box = context.findRenderObject() as RenderBox;
     String sharingText = illustration.name;
-    final url = '${Constants.urls.baseIllustrationUrl}${illustration.id}';
+    final url = '${Constants.links.baseIllustrationLink}${illustration.id}';
 
     sharingText += ' - URL: $url';
 

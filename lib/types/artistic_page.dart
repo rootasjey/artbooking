@@ -8,15 +8,15 @@ import 'package:artbooking/types/section.dart';
 
 /// Artistic page. Used for user's profile.
 class ArtisticPage {
-  ArtisticPage({
+  const ArtisticPage({
     required this.id,
     required this.createdAt,
-    required this.isActive,
-    required this.isDraft,
-    required this.name,
-    required this.type,
+    this.isActive = false,
+    this.isDraft = false,
+    this.name = '',
+    this.type = EnumPageType.profile,
     required this.updatedAt,
-    required this.sections,
+    this.sections = const [],
   });
 
   final String id;
@@ -53,12 +53,12 @@ class ArtisticPage {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'createdAt': createdAt.millisecondsSinceEpoch,
-      'isActive': isActive,
-      'isDraft': isDraft,
+      'created_at': createdAt.millisecondsSinceEpoch,
+      'is_active': isActive,
+      'is_draft': isDraft,
       'name': name,
       'type': convertTypeToString(),
-      'updatedAt': updatedAt.millisecondsSinceEpoch,
+      'updated_at': updatedAt.millisecondsSinceEpoch,
       'sections': sections.map((x) => x.toMap()).toList(),
     };
   }
@@ -79,14 +79,15 @@ class ArtisticPage {
   factory ArtisticPage.fromMap(Map<String, dynamic> map) {
     return ArtisticPage(
       id: map['id'] ?? '',
-      createdAt: Utilities.date.fromFirestore(map['createdAt']),
-      isActive: map['isActive'] ?? false,
-      isDraft: map['isDraft'] ?? false,
+      createdAt: Utilities.date.fromFirestore(map['created_at']),
+      isActive: map['is_active'] ?? false,
+      isDraft: map['is_draft'] ?? false,
       name: map['name'] ?? '',
       type: fromStringToType(map['type']),
-      updatedAt: Utilities.date.fromFirestore(map['updatedAt']),
-      sections:
-          List<Section>.from(map['sections']?.map((x) => Section.fromMap(x))),
+      updatedAt: Utilities.date.fromFirestore(map['updated_at']),
+      sections: List<Section>.from(
+        map['sections']?.map((x) => Section.fromMap(x)),
+      ),
     );
   }
 

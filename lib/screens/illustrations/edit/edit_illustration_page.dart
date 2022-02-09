@@ -36,8 +36,8 @@ class EditIllustrationPage extends ConsumerStatefulWidget {
 
 class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
   bool _isLoading = false;
-  bool _isSaving = false;
-  bool _showStylesPanel = false;
+  bool _saving = false;
+  bool _showArtMovementPanel = false;
   bool _showLicensesPanel = false;
 
   License _license = License.empty();
@@ -50,12 +50,25 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
     ..digit()
     ..oneOrMore();
 
+  /// Illustration's name.
+  String _illustrationName = '';
+
+  /// Illustration's descriptin..
+  String _illustrationDescription = '';
+
+  /// Illustration's lore..
+  String _illustrationLore = '';
+
   @override
   void initState() {
     super.initState();
-    _license = widget.illustration.license;
-    _visibility = widget.illustration.visibility;
-    _topics = widget.illustration.topics;
+    final illustration = widget.illustration;
+    _license = illustration.license;
+    _visibility = illustration.visibility;
+    _topics = illustration.topics;
+    _illustrationName = illustration.name;
+    _illustrationDescription = illustration.description;
+    _illustrationLore = illustration.lore;
   }
 
   @override
@@ -90,17 +103,21 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
                   ),
                   EditIllustrationPageBody(
                     isLoading: _isLoading,
+                    license: _license,
+                    illustrationName: _illustrationName,
+                    illustrationDescription: _illustrationDescription,
+                    illustrationLore: _illustrationLore,
                     illustration: widget.illustration,
                     presentationCardKey: _presentationCardKey,
                     showLicensesPanel: _showLicensesPanel,
-                    showStylesPanel: _showStylesPanel,
+                    showArtMovementPanel: _showArtMovementPanel,
                     onUpdatePresentation: onUpdatePresentation,
                     onExpandStateLicenseChanged: onExpandStateLicenseChanged,
                     onTapCurrentLicense: onTapCurrentLicense,
                     onToggleLicensePanel: onToggleLicensePanel,
                     onUnselectLicenseAndUpdate: onUnselectLicenseAndUpdate,
-                    onToggleStylesPanel: onToggleStylesPanel,
-                    onRemoveStyleAndUpdate: onRemoveStyleAndUpdate,
+                    onToggleArtMovementPanel: onToggleArtMovementPanel,
+                    onRemoveArtMovementAndUpdate: onRemoveArtMovementAndUpdate,
                     onAddTopicAndUpdate: onAddTopicAndUpdate,
                     onRemoveTopicAndUpdate: onRemoveTopicAndUpdate,
                     onUpdateVisibility: onUpdateVisibility,
@@ -114,7 +131,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
             top: 40.0,
             right: 24.0,
             child: PopupProgressIndicator(
-              show: _isSaving,
+              show: _saving,
               message: '${"illustration_updating".tr()}...',
             ),
           ),
@@ -140,20 +157,20 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       top: 100.0,
       right: 24.0,
       child: AddArtMovementPanel(
-        isVisible: _showStylesPanel,
-        selectedStyles: widget.illustration.artMovements,
+        isVisible: _showArtMovementPanel,
+        selectedArtMovements: widget.illustration.artMovements,
         onClose: () {
-          setState(() => _showStylesPanel = false);
+          setState(() => _showArtMovementPanel = false);
         },
-        onToggleStyleAndUpdate: onToggleStyleAndUpdate,
+        onToggleArtMovementAndUpdate: onToggleArtMovementAndUpdate,
       ),
     );
   }
 
-  void onAddArtMovementsAndUpdate(String styleName) async {
+  void onAddArtMovementsAndUpdate(String artMovementName) async {
     setState(() {
-      widget.illustration.artMovements.add(styleName);
-      _isSaving = true;
+      widget.illustration.artMovements.add(artMovementName);
+      _saving = true;
     });
 
     try {
@@ -166,19 +183,21 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       final bool success = response.data["success"];
 
       if (!success) {
-        throw "styles_update_fail".tr();
+        throw "art_movements_update_fail".tr();
       }
     } on FirebaseFunctionsException catch (error) {
       Utilities.logger.e(error);
-      String errorMessage = "styles_update_fail".tr();
+      String errorMessage = "art_movements_update_fail".tr();
+      final String? nativeErrorMessage = error.message;
 
-      if (error.code == "out-of-range") {
-        final matches = _numberRegex.toRegExp().allMatches(error.message!);
+      if (error.code == "out-of-range" && nativeErrorMessage != null) {
+        final matches = _numberRegex.toRegExp().allMatches(nativeErrorMessage);
 
-        final String? numberOfStyles =
-            matches.last.group(matches.last.groupCount);
+        final String numberOfArtMovements =
+            matches.last.group(matches.last.groupCount) ?? '0';
 
-        errorMessage = "styles_update_out_of_range".tr(args: [numberOfStyles!]);
+        errorMessage = "art_movements_update_out_of_range"
+            .tr(args: [numberOfArtMovements]);
       }
 
       context.showErrorBar(
@@ -188,14 +207,14 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       Utilities.logger.e(error);
 
       setState(() {
-        widget.illustration.artMovements.remove(styleName);
+        widget.illustration.artMovements.remove(artMovementName);
       });
 
       context.showErrorBar(
-        content: Text("styles_update_fail".tr()),
+        content: Text("art_movements_update_fail".tr()),
       );
     } finally {
-      setState(() => _isSaving = false);
+      setState(() => _saving = false);
     }
   }
 
@@ -229,7 +248,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
     }
 
     setState(() {
-      _isSaving = true;
+      _saving = true;
       // widget.illustration.topics = topicsMap.keys.toList();
       _topics = topicsMap.keys.toList();
     });
@@ -279,7 +298,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
         content: Text(error.toString()),
       );
     } finally {
-      setState(() => _isSaving = false);
+      setState(() => _saving = false);
     }
   }
 
@@ -291,9 +310,9 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
     final String? uid = ref.read(AppState.userProvider).authUser?.uid;
 
     return FirebaseFirestore.instance
-        .collection('users')
+        .collection("users")
         .doc(uid)
-        .collection("licenses")
+        .collection("user_licenses")
         .doc(_license.id);
   }
 
@@ -325,10 +344,18 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
     }
   }
 
-  void onRemoveStyleAndUpdate(String styleName) async {
+  void onExpandStateLicenseChanged(isExpanded) {
+    if (!isExpanded) {
+      return;
+    }
+
+    fetchLicense();
+  }
+
+  void onRemoveArtMovementAndUpdate(String artMovementName) async {
     setState(() {
-      _isSaving = true;
-      widget.illustration.artMovements.remove(styleName);
+      _saving = true;
+      widget.illustration.artMovements.remove(artMovementName);
     });
 
     try {
@@ -341,33 +368,33 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       final bool success = response.data["success"];
 
       if (!success) {
-        throw "styles_update_fail".tr();
+        throw "art_movements_update_fail".tr();
       }
     } on FirebaseFunctionsException catch (error) {
       Utilities.logger.e(error);
 
       final String message =
-          error.message ?? 'There was an issue while removing styles.';
+          error.message ?? 'There was an issue while removing art movements.';
 
       context.showErrorBar(
         content: Text(message),
       );
     } catch (error) {
       Utilities.logger.e(error);
-      widget.illustration.artMovements.add(styleName);
+      widget.illustration.artMovements.add(artMovementName);
 
       context.showErrorBar(
-        content: Text("styles_update_fail".tr()),
+        content: Text("art_movements_update_fail".tr()),
       );
     } finally {
-      setState(() => _isSaving = false);
+      setState(() => _saving = false);
     }
   }
 
   void onRemoveTopicAndUpdate(String topic) async {
     setState(() {
       _topics.remove(topic);
-      _isSaving = true;
+      _saving = true;
     });
 
     try {
@@ -390,25 +417,12 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
         content: Text(error.toString()),
       );
     } finally {
-      setState(() => _isSaving = false);
+      setState(() => _saving = false);
     }
-  }
-
-  void onToggleLicenseAndUpdate(
-    License license,
-    bool selected,
-  ) async {
-    if (selected) {
-      onUnselectLicenseAndUpdate();
-      return;
-    }
-
-    onSelectLicenseAndUpdate(license);
-    setState(() => _showLicensesPanel = false);
   }
 
   void onSelectLicenseAndUpdate(License license) async {
-    setState(() => _isSaving = true);
+    setState(() => _saving = true);
 
     final illustration = widget.illustration;
     final previousLicense = illustration.license;
@@ -440,12 +454,52 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
         content: Text(error.toString()),
       );
     } finally {
-      setState(() => _isSaving = false);
+      setState(() => _saving = false);
     }
   }
 
+  void onToggleArtMovementAndUpdate(ArtMovement artMovement, bool selected) {
+    if (selected) {
+      onRemoveArtMovementAndUpdate(artMovement.name);
+      return;
+    }
+
+    onAddArtMovementsAndUpdate(artMovement.name);
+  }
+
+  void onTapCurrentLicense() {
+    setState(() {
+      _showLicensesPanel = !_showLicensesPanel;
+    });
+  }
+
+  void onToggleArtMovementPanel() {
+    setState(() {
+      _showArtMovementPanel = !_showArtMovementPanel;
+    });
+  }
+
+  void onToggleLicenseAndUpdate(
+    License license,
+    bool selected,
+  ) async {
+    if (selected) {
+      onUnselectLicenseAndUpdate();
+      return;
+    }
+
+    onSelectLicenseAndUpdate(license);
+    setState(() => _showLicensesPanel = false);
+  }
+
+  void onToggleLicensePanel() {
+    setState(() {
+      _showLicensesPanel = !_showLicensesPanel;
+    });
+  }
+
   void onUnselectLicenseAndUpdate() async {
-    setState(() => _isSaving = true);
+    setState(() => _saving = true);
 
     final License previousLicense = _license.copyWith();
     _license = License.empty();
@@ -469,7 +523,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
         content: Text(error.toString()),
       );
     } finally {
-      setState(() => _isSaving = false);
+      setState(() => _saving = false);
     }
   }
 
@@ -486,15 +540,10 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
     _presentationCardKey.currentState?.collapse();
 
     setState(() {
-      _isSaving = true;
-      illustration = illustration.copyWith(
-        name: name,
-        description: description,
-        lore: lore,
-      );
-      // illustration.name = name;
-      // illustration.description = description;
-      // illustration.lore = story;
+      _saving = true;
+      _illustrationName = name;
+      _illustrationDescription = description;
+      _illustrationLore = lore;
     });
 
     try {
@@ -521,27 +570,13 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       _presentationCardKey.currentState?.expand();
 
       setState(() {
-        illustration = illustration.copyWith(
-          name: prevName,
-          description: prevDescription,
-          lore: prevLore,
-        );
-        // illustration.name = prevName;
-        // illustration.description = prevDescription;
-        // illustration.lore = prevStory;
+        _illustrationName = prevName;
+        _illustrationDescription = prevDescription;
+        _illustrationLore = prevLore;
       });
     } finally {
-      setState(() => _isSaving = false);
+      setState(() => _saving = false);
     }
-  }
-
-  void onToggleStyleAndUpdate(ArtMovement style, bool selected) {
-    if (selected) {
-      onRemoveStyleAndUpdate(style.name);
-      return;
-    }
-
-    onAddArtMovementsAndUpdate(style.name);
   }
 
   void onUpdateVisibility(EnumContentVisibility visibility) async {
@@ -549,7 +584,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
     final EnumContentVisibility previousVisibility = _visibility;
 
     setState(() {
-      _isSaving = true;
+      _saving = true;
       _visibility = visibility;
     });
 
@@ -580,33 +615,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
         content: Text("illustration_visibility_update_fail".tr()),
       );
     } finally {
-      setState(() => _isSaving = false);
+      setState(() => _saving = false);
     }
-  }
-
-  void onTapCurrentLicense() {
-    setState(() {
-      _showLicensesPanel = !_showLicensesPanel;
-    });
-  }
-
-  void onExpandStateLicenseChanged(isExpanded) {
-    if (!isExpanded) {
-      return;
-    }
-
-    fetchLicense();
-  }
-
-  void onToggleLicensePanel() {
-    setState(() {
-      _showLicensesPanel = !_showLicensesPanel;
-    });
-  }
-
-  void onToggleStylesPanel() {
-    setState(() {
-      _showStylesPanel = !_showStylesPanel;
-    });
   }
 }

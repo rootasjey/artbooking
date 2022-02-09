@@ -251,8 +251,8 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
       final query = await FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
-          .collection('licenses')
-          .orderBy('createdAt', descending: true)
+          .collection('user_licenses')
+          .orderBy('created_at', descending: true)
           .limit(_limit);
 
       final snapshot = await query.get();

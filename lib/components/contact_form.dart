@@ -507,13 +507,13 @@ class _ContactFormState extends State<ContactForm> {
 
     try {
       await FirebaseFirestore.instance.collection('messages').add({
-        'createdAt': Timestamp.now(),
+        'created_at': Timestamp.now(),
         'email': _email,
         'type': _subject,
         'body': _messageBody,
         'title': _messageTitle,
         'isRead': false,
-        'isAnwswered': false,
+        'is_anwswered': false,
       });
 
       setState(() {

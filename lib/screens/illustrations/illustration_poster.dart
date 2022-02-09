@@ -173,10 +173,9 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
           onLike: widget.onLike,
           onShare: widget.onShare,
         ),
-        Padding(
-          padding: const EdgeInsets.only(
-            top: 60.0,
-          ),
+        Container(
+          width: 500.0,
+          padding: const EdgeInsets.only(top: 60.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

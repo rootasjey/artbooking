@@ -106,10 +106,11 @@ class BooksActions {
   }
 
   /// Rename one book with a new name and a new description.
-  static Future<BookResponse> renameOne(
-      {required String name,
-      String description = '',
-      required String bookId}) async {
+  static Future<BookResponse> renameOne({
+    required String name,
+    String description = '',
+    required String bookId,
+  }) async {
     try {
       final response = await Utilities.cloud.fun('books-renameOne').call({
         'name': name,
