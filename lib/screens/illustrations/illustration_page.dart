@@ -42,9 +42,12 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
   /// True if data is loading.
   bool _isLoading = false;
   bool _updatingImage = false;
+  bool _liked = false;
+
   var _illustration = Illustration.empty();
 
-  DocSnapshotStreamSubscription? _subscription;
+  DocSnapshotStreamSubscription? _illustrationSubscription;
+  DocSnapshotStreamSubscription? _likeSubscription;
 
   @override
   void initState() {
@@ -61,6 +64,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
           .doc(_illustration.id);
 
       listenToIllustrationChanges(query);
+      fetchLike();
       return;
     }
 
@@ -69,7 +73,8 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
 
   @override
   void dispose() {
-    _subscription?.cancel();
+    _illustrationSubscription?.cancel();
+    _likeSubscription?.cancel();
     super.dispose();
   }
 
@@ -101,6 +106,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
                     onGoToEditImagePage: onGoToEditImagePage,
                     onLike: onLike,
                     onShare: onShare,
+                    liked: _liked,
                   ),
                 ],
               ),
@@ -141,7 +147,6 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
       listenToIllustrationChanges(query);
 
       final snapshot = await query.get();
-
       final data = snapshot.data();
 
       if (!snapshot.exists || data == null) {
@@ -160,6 +165,8 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
         _illustration = Illustration.fromMap(data);
         _isLoading = false;
       });
+
+      fetchLike();
     } catch (error) {
       Utilities.logger.e(error);
 
@@ -172,13 +179,35 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     }
   }
 
+  void fetchLike() async {
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+      _likeSubscription = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(_illustration.id)
+          .snapshots()
+          .listen((snapshot) {
+        setState(() {
+          _liked = snapshot.exists;
+        });
+      }, onDone: () {
+        _likeSubscription?.cancel();
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+    }
+  }
+
   /// Listen to Firestore document changes.
   void listenToIllustrationChanges(
       DocumentReference<Map<String, dynamic>> query) {
-    _subscription = query.snapshots().skip(1).listen(
+    _illustrationSubscription = query.snapshots().skip(1).listen(
       (snapshot) {
         if (!snapshot.exists) {
-          _subscription?.cancel();
+          _illustrationSubscription?.cancel();
           return;
         }
 
@@ -203,7 +232,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
         context.showErrorBar(content: Text(error.toString()));
       },
       onDone: () {
-        _subscription?.cancel();
+        _illustrationSubscription?.cancel();
       },
     );
   }
@@ -247,21 +276,43 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
       return;
     }
 
+    if (_liked) {
+      return tryUnLike();
+    }
+
+    return tryLike();
+  }
+
+  void tryLike() async {
     try {
-      final firestoreUser = ref.read(AppState.userProvider).firestoreUser;
-      if (firestoreUser == null) {
-        throw ErrorDescription("user_not_connected".tr());
-      }
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
 
       await FirebaseFirestore.instance
           .collection("users")
-          .doc(firestoreUser.id)
+          .doc(userId)
           .collection("user_likes")
           .doc(_illustration.id)
           .set({
         "type": "illustration",
         "target_id": _illustration.id,
+        "user_id": userId,
       });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
+  void tryUnLike() async {
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(_illustration.id)
+          .delete();
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));

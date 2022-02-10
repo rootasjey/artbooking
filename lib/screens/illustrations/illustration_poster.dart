@@ -17,6 +17,7 @@ class IllustrationPoster extends StatefulWidget {
   const IllustrationPoster({
     Key? key,
     required this.illustration,
+    this.liked = false,
     this.onTapUser,
     this.onLike,
     this.onShare,
@@ -28,6 +29,8 @@ class IllustrationPoster extends StatefulWidget {
   /// True if the image is being updated
   /// after a transformation (crop, rotate, flip).
   final bool updatingImage;
+
+  final bool liked;
 
   /// Edit metadata (title, description, license, ...).
   final Function()? onShowEditMetadataPanel;
@@ -167,11 +170,12 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
           ],
         ),
         IllustrationPosterActions(
-          updatingImage: widget.updatingImage,
+          liked: widget.liked,
           onEdit: widget.onShowEditMetadataPanel,
           onEditImage: widget.onGoToEditImagePage,
           onLike: widget.onLike,
           onShare: widget.onShare,
+          updatingImage: widget.updatingImage,
         ),
         Container(
           width: 500.0,

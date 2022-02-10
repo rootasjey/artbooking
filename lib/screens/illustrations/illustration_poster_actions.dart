@@ -5,6 +5,7 @@ import 'package:unicons/unicons.dart';
 class IllustrationPosterActions extends StatelessWidget {
   const IllustrationPosterActions({
     Key? key,
+    this.liked = false,
     this.onLike,
     this.onShare,
     this.onEdit,
@@ -12,14 +13,16 @@ class IllustrationPosterActions extends StatelessWidget {
     this.updatingImage = false,
   }) : super(key: key);
 
-  /// True if the image is being updated
-  /// after a transformation (crop, rotate, flip).
-  final bool updatingImage;
+  final bool liked;
 
   final Function()? onLike;
   final Function()? onShare;
   final Function()? onEdit;
   final Function()? onEditImage;
+
+  /// True if the image is being updated
+  /// after a transformation (crop, rotate, flip).
+  final bool updatingImage;
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +39,9 @@ class IllustrationPosterActions extends StatelessWidget {
           alignment: WrapAlignment.center,
           children: [
             IconButton(
-              tooltip: "like".tr(),
+              tooltip: liked ? "unlike".tr() : "like".tr(),
               icon: Icon(UniconsLine.heart),
+              color: liked ? Theme.of(context).secondaryHeaderColor : null,
               onPressed: onLike,
             ),
             IconButton(
