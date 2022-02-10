@@ -7,6 +7,7 @@ export const allowedLicenseTypes = ["staff", "user"];
 
 export const ART_MOVEMENTS_COLLECTION_NAME = 'art_movements'
 export const BASE_DOCUMENT_NAME = 'base'
+export const BOOK_DOC_PATH = 'books/{book_id}'
 export const BOOK_LIKED_BY_COLLECTION_NAME = 'book_liked_by'
 export const BOOK_STATISTICS_COLLECTION_NAME = 'book_statistics'
 export const BOOKS_COLLECTION_NAME = 'books'
@@ -25,7 +26,6 @@ export const USER_PAGES_COLLECTION_NAME = 'user_pages'
 export const USER_PUBLIC_FIELDS_COLLECTION_NAME = 'user_public_fields'
 export const USER_STATISTICS_COLLECTION_NAME = 'user_statistics'
 export const USERS_COLLECTION_NAME = 'users'
-
 
 export const LIKE_ILLUSTRATION_TYPE = 'illustration';
 export const LIKE_BOOK_TYPE = 'book';

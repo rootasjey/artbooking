@@ -2,6 +2,7 @@ import * as functions from 'firebase-functions';
 import { adminApp } from './adminApp';
 import { 
   BOOKS_COLLECTION_NAME, 
+  BOOK_DOC_PATH, 
   cloudRegions, 
   ILLUSTRATIONS_COLLECTION_NAME, 
   STATISTICS_COLLECTION_NAME, 
@@ -12,7 +13,6 @@ import {
 
 const firestore = adminApp.firestore();
 
-const BOOK_DOC_PATH = 'books/{book_id}'
 const ILLUSTRATION_DOC_PATH = 'illustrations/{illustration_id}'
 const USER_DOC_PATH = 'users/{user_id}'
 

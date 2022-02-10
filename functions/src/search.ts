@@ -1,11 +1,12 @@
 import * as functions from 'firebase-functions';
 import algolia from 'algoliasearch';
 import deepEqual = require('deep-equal');
-import { cloudRegions } from './utils';
+import { BOOK_DOC_PATH, cloudRegions } from './utils';
 
 const env = functions.config();
 
 const client = algolia(env.algolia.appid, env.algolia.apikey);
+const booksIndex = client.initIndex('books');
 const illustrationsIndex = client.initIndex('illustrations');
 const licensesIndex = client.initIndex('licenses');
 const artMovementsIndex = client.initIndex('art_movements');
@@ -17,7 +18,7 @@ const LICENSE_DOC_PATH = 'licenses/{license_id}'
 const USER_DOC_PATH = 'users/{user_id}'
 
 // ----------------
-// Art art movement index
+// Art movement index
 // ----------------
 
 /**
@@ -66,6 +67,74 @@ export const onIndexArtMovement = functions
     return artMovementsIndex.deleteObject(objectID);
   });
 
+
+// ----------------
+// Books index
+// ----------------
+
+/**
+ * Update art movement index on create document.
+ */
+export const onIndexBook = functions
+  .region(cloudRegions.eu)
+  .firestore
+  .document(BOOK_DOC_PATH)
+  .onCreate(async (snapshot) => {
+    const data = snapshot.data();
+    const objectID = snapshot.id;
+
+    // Do not index private book.
+    if (data.visibility !== 'public') {
+      return;
+    }
+
+    return booksIndex.saveObject({
+      objectID,
+      ...data,
+    })
+  });
+
+/**
+ * Update art movement index on update document.
+ */
+  export const onReIndexBook = functions
+  .region(cloudRegions.eu)
+  .firestore
+  .document(BOOK_DOC_PATH)
+  .onUpdate(async (snapshot) => {
+    const data = snapshot.after.data();
+    const objectID = snapshot.after.id;
+
+    // Remove book from index if not public anymore.
+    if (data.visibility !== 'public') {
+      return booksIndex.deleteObject(objectID);
+    }
+
+    return booksIndex.saveObject({
+      objectID,
+      ...data,
+    })
+  });
+
+/**
+ * Update book index on delete document.
+ */
+  export const onUnIndexBook = functions
+  .region(cloudRegions.eu)
+  .firestore
+  .document(BOOK_DOC_PATH)
+  .onDelete(async (snapshot) => {
+    const data = snapshot.data();
+    const objectID = snapshot.id;
+
+    // Do not index private book.
+    if (data.visibility !== 'public') {
+      return;
+    }
+
+    return booksIndex.deleteObject(objectID);
+  });
+
 // -------------------
 // Illustrations index
 // -------------------
@@ -77,7 +146,7 @@ export const onIndexIllustration = functions
     const data = snapshot.data();
     const objectID = snapshot.id;
 
-    // Do not index private iillustrations.
+    // Do not index private iillustration.
     if (data.visibility !== 'public') {
       return;
     }
@@ -96,7 +165,7 @@ export const onReIndexIllustration = functions
     const data = snapshot.after.data();
     const objectID = snapshot.after.id;
 
-    // Remove image from index if not public anymore.
+    // Remove illustration from index if not public anymore.
     if (data.visibility !== 'public') {
       return illustrationsIndex.deleteObject(objectID);
     }
