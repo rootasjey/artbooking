@@ -10,11 +10,11 @@ class EditIllustrationPageVisibility extends StatelessWidget {
   const EditIllustrationPageVisibility({
     Key? key,
     this.onUpdateVisibility,
-    required this.visibilityValue,
+    required this.visibility,
   }) : super(key: key);
 
   final void Function(EnumContentVisibility)? onUpdateVisibility;
-  final String visibilityValue;
+  final EnumContentVisibility visibility;
 
   @override
   Widget build(BuildContext context) {
@@ -63,8 +63,7 @@ class EditIllustrationPageVisibility extends StatelessWidget {
                     ),
                     child: Center(
                       child: Text(
-                        // "visibility_${illustration.visibilityToString()}"
-                        "visibility_${visibilityValue}".tr().toUpperCase(),
+                        "visibility_${visibility.name}".tr().toUpperCase(),
                         style: Utilities.fonts.style(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,

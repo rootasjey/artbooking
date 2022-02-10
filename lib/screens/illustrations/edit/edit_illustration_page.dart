@@ -121,6 +121,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
                     onAddTopicAndUpdate: onAddTopicAndUpdate,
                     onRemoveTopicAndUpdate: onRemoveTopicAndUpdate,
                     onUpdateVisibility: onUpdateVisibility,
+                    illustrationVisibility: _visibility,
                     onDone: Beamer.of(context).popRoute,
                   )
                 ],

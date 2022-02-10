@@ -17,10 +17,14 @@ class EditIllustrationPageBody extends StatelessWidget {
     Key? key,
     required this.isLoading,
     required this.illustration,
-    required this.presentationCardKey,
-    required this.showLicensesPanel,
-    required this.showArtMovementPanel,
+    required this.illustrationName,
+    required this.illustrationDescription,
+    required this.illustrationLore,
+    required this.illustrationVisibility,
     required this.license,
+    required this.presentationCardKey,
+    required this.showArtMovementPanel,
+    required this.showLicensesPanel,
     this.onUpdatePresentation,
     this.onToggleArtMovementPanel,
     this.onRemoveArtMovementAndUpdate,
@@ -32,9 +36,6 @@ class EditIllustrationPageBody extends StatelessWidget {
     this.onUnselectLicenseAndUpdate,
     this.onDone,
     this.onExpandStateLicenseChanged,
-    required this.illustrationName,
-    required this.illustrationDescription,
-    required this.illustrationLore,
   }) : super(key: key);
 
   final bool isLoading;
@@ -48,6 +49,7 @@ class EditIllustrationPageBody extends StatelessWidget {
   final String illustrationName;
   final String illustrationDescription;
   final String illustrationLore;
+  final EnumContentVisibility illustrationVisibility;
 
   final void Function(String, String, String)? onUpdatePresentation;
 
@@ -105,7 +107,7 @@ class EditIllustrationPageBody extends StatelessWidget {
             onRemoveTopicAndUpdate: onAddTopicAndUpdate,
           ),
           EditIllustrationPageVisibility(
-            visibilityValue: illustration.visibilityToString(),
+            visibility: illustrationVisibility,
             onUpdateVisibility: onUpdateVisibility,
           ),
           EditIllustrationPageLicense(
