@@ -104,13 +104,12 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
                   EditIllustrationPageBody(
                     isLoading: _isLoading,
                     license: _license,
+                    illustration: widget.illustration,
                     illustrationName: _illustrationName,
                     illustrationDescription: _illustrationDescription,
                     illustrationLore: _illustrationLore,
-                    illustration: widget.illustration,
-                    presentationCardKey: _presentationCardKey,
-                    showLicensesPanel: _showLicensesPanel,
-                    showArtMovementPanel: _showArtMovementPanel,
+                    illustrationTopics: _topics,
+                    illustrationVisibility: _visibility,
                     onUpdatePresentation: onUpdatePresentation,
                     onExpandStateLicenseChanged: onExpandStateLicenseChanged,
                     onTapCurrentLicense: onTapCurrentLicense,
@@ -121,8 +120,10 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
                     onAddTopicAndUpdate: onAddTopicAndUpdate,
                     onRemoveTopicAndUpdate: onRemoveTopicAndUpdate,
                     onUpdateVisibility: onUpdateVisibility,
-                    illustrationVisibility: _visibility,
                     onDone: Beamer.of(context).popRoute,
+                    presentationCardKey: _presentationCardKey,
+                    showLicensesPanel: _showLicensesPanel,
+                    showArtMovementPanel: _showArtMovementPanel,
                   )
                 ],
               ),
@@ -250,7 +251,6 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
 
     setState(() {
       _saving = true;
-      // widget.illustration.topics = topicsMap.keys.toList();
       _topics = topicsMap.keys.toList();
     });
 
@@ -258,7 +258,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       final response =
           await Utilities.cloud.illustrations("updateTopics").call({
         "illustration_id": widget.illustration.id,
-        "topics": topicsMap.keys.toList(),
+        "topics": _topics,
       });
 
       final bool success = response.data["success"];

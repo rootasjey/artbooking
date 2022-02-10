@@ -22,6 +22,7 @@ class EditIllustrationPageTopics extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _topicInputController = TextEditingController();
+    final _inputFocusNode = FocusNode();
 
     return Container(
       width: 600.0,
@@ -57,10 +58,7 @@ class EditIllustrationPageTopics extends StatelessWidget {
                   return InputChip(
                     label: Opacity(
                       opacity: 0.8,
-                      child: Text(
-                        "${topic.substring(0, 1).toUpperCase()}"
-                        "${topic.substring(1)}",
-                      ),
+                      child: Text(topic),
                     ),
                     labelStyle: Utilities.fonts.style(
                       fontWeight: FontWeight.w600,
@@ -71,7 +69,10 @@ class EditIllustrationPageTopics extends StatelessWidget {
                     onDeleted: () {
                       onRemoveTopicAndUpdate?.call(topic);
                     },
-                    onSelected: (isSelected) {},
+                    onSelected: (isSelected) {
+                      _topicInputController.text = topic;
+                      _inputFocusNode.requestFocus();
+                    },
                   );
                 }).toList(),
               ),
@@ -100,6 +101,7 @@ class EditIllustrationPageTopics extends StatelessWidget {
                       SizedBox(
                         width: 300.0,
                         child: TextFormField(
+                          focusNode: _inputFocusNode,
                           controller: _topicInputController,
                           decoration: InputDecoration(
                             labelText: "topics_label_text".tr(),

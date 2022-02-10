@@ -20,6 +20,7 @@ class EditIllustrationPageBody extends StatelessWidget {
     required this.illustrationName,
     required this.illustrationDescription,
     required this.illustrationLore,
+    required this.illustrationTopics,
     required this.illustrationVisibility,
     required this.license,
     required this.presentationCardKey,
@@ -49,6 +50,7 @@ class EditIllustrationPageBody extends StatelessWidget {
   final String illustrationName;
   final String illustrationDescription;
   final String illustrationLore;
+  final List<String> illustrationTopics;
   final EnumContentVisibility illustrationVisibility;
 
   final void Function(String, String, String)? onUpdatePresentation;
@@ -102,9 +104,9 @@ class EditIllustrationPageBody extends StatelessWidget {
             onToggleArtMovementPanel: onToggleArtMovementPanel,
           ),
           EditIllustrationPageTopics(
-            topics: illustration.topics,
+            topics: illustrationTopics,
             onAddTopicAndUpdate: onAddTopicAndUpdate,
-            onRemoveTopicAndUpdate: onAddTopicAndUpdate,
+            onRemoveTopicAndUpdate: onRemoveTopicAndUpdate,
           ),
           EditIllustrationPageVisibility(
             visibility: illustrationVisibility,
