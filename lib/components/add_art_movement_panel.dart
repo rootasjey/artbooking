@@ -36,8 +36,10 @@ class AddArtMovementPanel extends StatefulWidget {
   final void Function()? onClose;
 
   /// This callback when an item is tapped.
-  final void Function(ArtMovement style, bool selected)?
-      onToggleArtMovementAndUpdate;
+  final void Function(
+    ArtMovement style,
+    bool selected,
+  )? onToggleArtMovementAndUpdate;
 
   /// The panel elevation.
   final double elevation;
@@ -81,6 +83,8 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
 
   final Color _clairPink = Constants.colors.clairPink;
   final Color _secondaryColor = Constants.colors.secondary;
+
+  final _scrollController = ScrollController();
 
   var _selectedArtMovementPreview = ArtMovement.empty();
 
@@ -136,6 +140,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
       child: NotificationListener<ScrollNotification>(
         onNotification: onNotification,
         child: CustomScrollView(
+          controller: _scrollController,
           slivers: [
             SliverPadding(
               padding: const EdgeInsets.only(top: 0.0),
@@ -183,6 +188,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: CircleButton(
+                      tooltip: "close".tr(),
                       icon: Icon(
                         UniconsLine.times,
                         color: Colors.black54,
@@ -238,7 +244,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
   Widget imagePreview() {
     Widget imageContainer;
 
-    if (_selectedArtMovementPreview.urls.image.isEmpty) {
+    if (_selectedArtMovementPreview.links.image.isEmpty) {
       imageContainer = Container();
     } else {
       imageContainer = Material(
@@ -248,12 +254,12 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
         ),
         clipBehavior: Clip.antiAlias,
         child: Ink.image(
-          image: NetworkImage(_selectedArtMovementPreview.urls.image),
+          image: NetworkImage(_selectedArtMovementPreview.links.image),
           width: 300.0,
           height: 260.0,
           fit: BoxFit.cover,
           child: InkWell(
-            onTap: () => launch(_selectedArtMovementPreview.urls.image),
+            onTap: () => launch(_selectedArtMovementPreview.links.image),
           ),
         ),
       );
@@ -311,8 +317,8 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
             ),
             TextButton(
               onPressed: () =>
-                  launch(_selectedArtMovementPreview.urls.wikipedia),
-              child: Text(_selectedArtMovementPreview.urls.wikipedia),
+                  launch(_selectedArtMovementPreview.links.wikipedia),
+              child: Text(_selectedArtMovementPreview.links.wikipedia),
               style: TextButton.styleFrom(
                 primary: Colors.black54,
               ),
@@ -331,7 +337,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
           (context, index) {
             final artMovement = _availableArtMovements.elementAt(index);
             final selected = widget.selectedArtMovements.contains(
-              artMovement.name,
+              artMovement.id,
             );
 
             return ListTile(
@@ -389,7 +395,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
           (context, index) {
             final artMovement = _suggestionsList.elementAt(index);
             final selected = widget.selectedArtMovements.contains(
-              artMovement.name,
+              artMovement.id,
             );
 
             return ListTile(

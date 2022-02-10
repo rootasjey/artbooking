@@ -167,9 +167,9 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
     );
   }
 
-  void onAddArtMovementsAndUpdate(String artMovementName) async {
+  void onAddArtMovementsAndUpdate(String artMovementId) async {
     setState(() {
-      widget.illustration.artMovements.add(artMovementName);
+      widget.illustration.artMovements.add(artMovementId);
       _saving = true;
     });
 
@@ -207,7 +207,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       Utilities.logger.e(error);
 
       setState(() {
-        widget.illustration.artMovements.remove(artMovementName);
+        widget.illustration.artMovements.remove(artMovementId);
       });
 
       context.showErrorBar(
@@ -352,10 +352,10 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
     fetchLicense();
   }
 
-  void onRemoveArtMovementAndUpdate(String artMovementName) async {
+  void onRemoveArtMovementAndUpdate(String artMovementId) async {
     setState(() {
       _saving = true;
-      widget.illustration.artMovements.remove(artMovementName);
+      widget.illustration.artMovements.remove(artMovementId);
     });
 
     try {
@@ -381,7 +381,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       );
     } catch (error) {
       Utilities.logger.e(error);
-      widget.illustration.artMovements.add(artMovementName);
+      widget.illustration.artMovements.add(artMovementId);
 
       context.showErrorBar(
         content: Text("art_movements_update_fail".tr()),
@@ -460,11 +460,11 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
 
   void onToggleArtMovementAndUpdate(ArtMovement artMovement, bool selected) {
     if (selected) {
-      onRemoveArtMovementAndUpdate(artMovement.name);
+      onRemoveArtMovementAndUpdate(artMovement.id);
       return;
     }
 
-    onAddArtMovementsAndUpdate(artMovement.name);
+    onAddArtMovementsAndUpdate(artMovement.id);
   }
 
   void onTapCurrentLicense() {
