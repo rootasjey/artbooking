@@ -194,6 +194,9 @@ export const createOne = functions
     }
 
     checkVisibilityValue(visibility);
+
+    const user_custom_index = await getNextIllustrationIndex(userAuth.uid)
+
     const illustrationSnap = await firestore
       .collection(ILLUSTRATIONS_COLLECTION_NAME)
       .add({
@@ -239,6 +242,7 @@ export const createOne = functions
         },
         topics: {},
         updated_at: adminApp.firestore.Timestamp.now(),
+        user_custom_index,
         user_id: userAuth.uid,
         version: 0,
         visibility: visibility,
@@ -1279,6 +1283,24 @@ async function getDimensionsFromUrl(url: string): Promise<ISizeCalculationResult
       });
     });
   });
+}
+
+async function getNextIllustrationIndex(userId: string) {
+  const userIllustrationStatsSnapshot = await firestore
+    .collection(USERS_COLLECTION_NAME)
+    .doc(userId)
+    .collection(USER_STATISTICS_COLLECTION_NAME)
+    .doc(ILLUSTRATIONS_COLLECTION_NAME)
+    .get()
+
+  const userIllustrationStatsData = userIllustrationStatsSnapshot.data()
+  if (!userIllustrationStatsSnapshot.exists || !userIllustrationStatsData) {
+    return 0
+  }
+
+  let userIllustrationCreated: number = userIllustrationStatsData.created ?? 0
+  userIllustrationCreated = typeof userIllustrationCreated === 'number' ? userIllustrationCreated + 1 : 1
+  return userIllustrationCreated
 }
 
 /**

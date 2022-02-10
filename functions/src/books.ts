@@ -6,7 +6,9 @@ import {
   BOOK_STATISTICS_COLLECTION_NAME, 
   checkOrGetDefaultVisibility, 
   cloudRegions, 
-  ILLUSTRATIONS_COLLECTION_NAME
+  ILLUSTRATIONS_COLLECTION_NAME,
+  USERS_COLLECTION_NAME,
+  USER_STATISTICS_COLLECTION_NAME
 } from './utils';
 
 const firebaseTools = require('firebase-tools');
@@ -135,6 +137,7 @@ export const createOne = functions
 
     const bookIllustrations = await createBookIllustrations(illustration_ids);
     const bookThumbnailLink: string = await getBookThumbnailLink(bookIllustrations);
+    const user_custom_index = await getNextBookIndex(userAuth.uid)
 
     const addedBookDoc = await firestore
       .collection(BOOKS_COLLECTION_NAME)
@@ -152,6 +155,7 @@ export const createOne = functions
         layout_orientation: 'vertical',
         name,
         updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+        user_custom_index,
         user_id: userAuth.uid,
         visibility: checkOrGetDefaultVisibility(visibility),
       });
@@ -778,5 +782,23 @@ async function getBookThumbnailLink(
 
   const thumbnails = illustrationData.links.thumbnails;
   return thumbnails.t480 || thumbnails.t360 || thumbnails.t720;
+}
+
+async function getNextBookIndex(userId: string) {
+  const userBookStatsSnapshot = await firestore
+    .collection(USERS_COLLECTION_NAME)
+    .doc(userId)
+    .collection(USER_STATISTICS_COLLECTION_NAME)
+    .doc(BOOKS_COLLECTION_NAME)
+    .get()
+
+  const userBookStatsData = userBookStatsSnapshot.data()
+  if (!userBookStatsSnapshot.exists || !userBookStatsData) {
+    return 0
+  }
+
+  let userBookCreated: number = userBookStatsData.created ?? 0
+  userBookCreated = typeof userBookCreated === 'number' ? userBookCreated + 1 : 1
+  return userBookCreated
 }
 
