@@ -30,10 +30,11 @@ class CloudUtilities {
   HttpsCallable fun(
     String functionName, {
     HttpsCallableOptions? options,
+    String? region,
   }) {
     return FirebaseFunctions.instanceFor(
       app: Firebase.app(),
-      region: 'europe-west3',
+      region: region ?? 'europe-west1',
     ).httpsCallable(
       functionName,
       options: options,
@@ -50,7 +51,7 @@ class CloudUtilities {
   }) {
     return FirebaseFunctions.instanceFor(
       app: Firebase.app(),
-      region: 'europe-west3',
+      region: 'europe-west1',
     ).httpsCallable(
       "illustrations-$functionName",
       options: options,
