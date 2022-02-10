@@ -29,57 +29,6 @@ const firestore = adminApp.firestore();
 
 const LIKE_DOC_PATH = 'users/{user_id}/user_likes/{like_id}'
 
-/**
- * Update list.quote doc to use same id
- * Must be used after app updates (mobile & web).
- */
-export const migration = functions
-  .region(cloudRegions.eu)
-  .https
-  .onRequest(async ({}, res) => {
-    // migrate users
-    // -----
-    const usersSnapshot = await firestore
-      .collection(USERS_COLLECTION_NAME)
-      .limit(100)
-      .get();
-
-    for await (const userDocument of usersSnapshot.docs) {
-      const illustrationSnapshot = await adminApp.firestore()
-        .collection(ILLUSTRATIONS_COLLECTION_NAME)
-        .where("user_id", "==", userDocument.id)
-        .orderBy("created_at", "asc")
-        .get()
-
-      let illustrationIndex = 0
-      for await (const illustrationDocument of illustrationSnapshot.docs) {
-        await illustrationDocument.ref.update({
-          user_custom_index: illustrationIndex,
-        })
-
-        illustrationIndex++
-      }
-
-      const bookSnapshot = await adminApp.firestore()
-        .collection(BOOKS_COLLECTION_NAME)
-        .where("user_id", "==", userDocument.id)
-        .orderBy("created_at", "asc")
-        .get()
-
-      let bookIndex = 0
-
-      for await (const bookDocument of bookSnapshot.docs) {
-        await bookDocument.ref.update({
-          user_custom_index: bookIndex,
-        })
-
-        bookIndex++
-      }
-    }
-
-    res.status(200).send('done');
-  });
-
 export const checkEmailAvailability = functions
   .region(cloudRegions.eu)
   .https
