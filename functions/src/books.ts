@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 import { adminApp } from './adminApp';
 import { 
   BASE_DOCUMENT_NAME,
-  BOOKS_COLLECTION_NAME, 
+  BOOKS_COLLECTION_NAME,
   BOOK_STATISTICS_COLLECTION_NAME, 
   checkOrGetDefaultVisibility, 
   cloudRegions, 

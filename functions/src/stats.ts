@@ -1,6 +1,14 @@
 import * as functions from 'firebase-functions';
 import { adminApp } from './adminApp';
-import { BOOKS_COLLECTION_NAME, cloudRegions, ILLUSTRATIONS_COLLECTION_NAME, STATISTICS_COLLECTION_NAME, STORAGES_DOCUMENT_NAME, USERS_COLLECTION_NAME, USER_STATISTICS_COLLECTION_NAME } from './utils';
+import { 
+  BOOKS_COLLECTION_NAME, 
+  cloudRegions, 
+  ILLUSTRATIONS_COLLECTION_NAME, 
+  STATISTICS_COLLECTION_NAME, 
+  STORAGES_DOCUMENT_NAME, 
+  USERS_COLLECTION_NAME, 
+  USER_STATISTICS_COLLECTION_NAME,
+} from './utils';
 
 const firestore = adminApp.firestore();
 

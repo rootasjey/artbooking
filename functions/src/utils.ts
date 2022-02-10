@@ -31,7 +31,7 @@ export const LIKE_ILLUSTRATION_TYPE = 'illustration';
 export const LIKE_BOOK_TYPE = 'book';
 
 export const cloudRegions = {
-  eu: 'europe-west3'
+  eu: 'europe-west1'
 };
 
 export async function checkUserIsSignedIn(
