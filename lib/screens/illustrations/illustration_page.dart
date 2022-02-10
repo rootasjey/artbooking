@@ -46,7 +46,10 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
 
   var _illustration = Illustration.empty();
 
+  /// Listen to changes for this illustration.
   DocSnapshotStreamSubscription? _illustrationSubscription;
+
+  /// Listent to changes for this illustration's like status.
   DocSnapshotStreamSubscription? _likeSubscription;
 
   @override

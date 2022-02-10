@@ -72,6 +72,9 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   /// True if there's a request to fetch the next illustration's batch.
   bool _isLoadingMore = false;
 
+  /// True if the current authenticated user has liked this book.
+  bool _liked = false;
+
   /// Why a map and not just a list?
   ///
   /// -> faster access & because it's already done.
@@ -115,7 +118,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   ];
 
   /// Listens to book's updates.
-  DocSnapshotStreamSubscription? _bookStreamSubscription;
+  DocSnapshotStreamSubscription? _bookSubscription;
 
   /// Listens to illustrations' updates.
   final Map<String, DocSnapshotStreamSubscription> _illustrationSubs = {};
@@ -129,6 +132,9 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   var _newBookNameController = TextEditingController();
   var _newBookDescriptionController = TextEditingController();
 
+  /// Listent to changes for this book's like status.
+  DocSnapshotStreamSubscription? _likeSubscription;
+
   @override
   initState() {
     super.initState();
@@ -138,6 +144,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
     if (bookFromNav != null && bookFromNav.id == widget.bookId) {
       _book = bookFromNav;
       fetchIllustrationsAndListenToUpdates();
+      fetchLike();
     } else {
       fetchBookAndIllustrations();
     }
@@ -145,7 +152,8 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
 
   @override
   void dispose() {
-    _bookStreamSubscription?.cancel();
+    _bookSubscription?.cancel();
+    _likeSubscription?.cancel();
     _newBookNameController.dispose();
     _newBookDescriptionController.dispose();
     super.dispose();
@@ -741,16 +749,27 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
         ? Theme.of(context).secondaryHeaderColor
         : Theme.of(context).primaryColor;
 
-    return Opacity(
-      opacity: 0.8,
-      child: Text(
-        "illustrations_count".plural(_book.illustrations.length),
-        style: Utilities.fonts.style(
-          color: color,
-          fontSize: 16.0,
-          fontWeight: FontWeight.w600,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Opacity(
+          opacity: 0.8,
+          child: Text(
+            "illustrations_count".plural(_book.illustrations.length),
+            style: Utilities.fonts.style(
+              color: color,
+              fontSize: 16.0,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
-      ),
+        IconButton(
+          tooltip: _liked ? "unlike".tr() : "like".tr(),
+          icon: Icon(UniconsLine.heart),
+          color: _liked ? Theme.of(context).secondaryHeaderColor : null,
+          onPressed: onLike,
+        ),
+      ],
     );
   }
 
@@ -1035,6 +1054,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
 
   void fetchBookAndIllustrations() async {
     await fetchBook();
+    fetchLike();
     fetchIllustrations();
   }
 
@@ -1182,6 +1202,28 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
       Utilities.logger.e(error);
     } finally {
       setState(() => _isLoadingMore = false);
+    }
+  }
+
+  void fetchLike() async {
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+      _likeSubscription = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(_book.id)
+          .snapshots()
+          .listen((snapshot) {
+        setState(() {
+          _liked = snapshot.exists;
+        });
+      }, onDone: () {
+        _likeSubscription?.cancel();
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
     }
   }
 
@@ -1399,6 +1441,54 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
     });
   }
 
+  void onLike() async {
+    if (_book.id.isEmpty) {
+      return;
+    }
+
+    if (_liked) {
+      return tryUnLike();
+    }
+
+    return tryLike();
+  }
+
+  void tryLike() async {
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(_book.id)
+          .set({
+        "type": "book",
+        "target_id": _book.id,
+        "user_id": userId,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
+  void tryUnLike() async {
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(_book.id)
+          .delete();
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
   void onPopupMenuItemSelected(EnumIllustrationItemAction action, int index,
       Illustration illustration, String illustrationKey) {
     switch (action) {
@@ -1582,7 +1672,7 @@ class _MyBookPageState extends ConsumerState<DashboardPageBook> {
   }
 
   void startListenningToData(DocumentReference<Map<String, dynamic>> query) {
-    _bookStreamSubscription = query.snapshots().skip(1).listen(
+    _bookSubscription = query.snapshots().skip(1).listen(
       (DocumentSnapshot<Map<String, dynamic>> snapshot) {
         final bookData = snapshot.data();
         if (!snapshot.exists || bookData == null) {
