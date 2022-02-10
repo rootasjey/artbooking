@@ -5,6 +5,7 @@ import 'package:unicons/unicons.dart';
 class IllustrationPosterActions extends StatelessWidget {
   const IllustrationPosterActions({
     Key? key,
+    this.isOwner = false,
     this.liked = false,
     this.onLike,
     this.onShare,
@@ -13,6 +14,7 @@ class IllustrationPosterActions extends StatelessWidget {
     this.updatingImage = false,
   }) : super(key: key);
 
+  final bool isOwner;
   final bool liked;
 
   final Function()? onLike;
@@ -40,7 +42,7 @@ class IllustrationPosterActions extends StatelessWidget {
           children: [
             IconButton(
               tooltip: liked ? "unlike".tr() : "like".tr(),
-              icon: Icon(UniconsLine.heart),
+              icon: Icon(liked ? UniconsLine.heart : UniconsLine.heart_break),
               color: liked ? Theme.of(context).secondaryHeaderColor : null,
               onPressed: onLike,
             ),
@@ -49,19 +51,29 @@ class IllustrationPosterActions extends StatelessWidget {
               icon: Icon(UniconsLine.share),
               onPressed: onShare,
             ),
-            IconButton(
-              tooltip: "edit".tr(),
-              icon: Icon(UniconsLine.edit),
-              onPressed: onEdit,
-            ),
-            IconButton(
-              tooltip: "edit_image".tr(),
-              icon: Icon(UniconsLine.crop_alt),
-              onPressed: updatingImage ? null : onEditImage,
-            ),
+            ...getOwnerActions(),
           ],
         ),
       ),
     );
+  }
+
+  List<Widget> getOwnerActions() {
+    if (!isOwner) {
+      return [];
+    }
+
+    return [
+      IconButton(
+        tooltip: "edit".tr(),
+        icon: Icon(UniconsLine.edit),
+        onPressed: onEdit,
+      ),
+      IconButton(
+        tooltip: "edit_image".tr(),
+        icon: Icon(UniconsLine.crop_alt),
+        onPressed: updatingImage ? null : onEditImage,
+      ),
+    ];
   }
 }

@@ -17,6 +17,7 @@ class IllustrationPoster extends StatefulWidget {
   const IllustrationPoster({
     Key? key,
     required this.illustration,
+    this.isOwner = false,
     this.liked = false,
     this.onTapUser,
     this.onLike,
@@ -31,6 +32,8 @@ class IllustrationPoster extends StatefulWidget {
   final bool updatingImage;
 
   final bool liked;
+
+  final bool isOwner;
 
   /// Edit metadata (title, description, license, ...).
   final Function()? onShowEditMetadataPanel;
@@ -170,6 +173,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
           ],
         ),
         IllustrationPosterActions(
+          isOwner: widget.isOwner,
           liked: widget.liked,
           onEdit: widget.onShowEditMetadataPanel,
           onEditImage: widget.onGoToEditImagePage,

@@ -10,6 +10,7 @@ class IllustrationPageBody extends StatelessWidget {
     Key? key,
     required this.isLoading,
     required this.illustration,
+    this.isOwner = false,
     this.liked = false,
     this.onLike,
     this.onShare,
@@ -19,6 +20,7 @@ class IllustrationPageBody extends StatelessWidget {
   }) : super(key: key);
 
   final bool isLoading;
+  final bool isOwner;
   final bool liked;
   final bool updatingImage;
   final Function()? onLike;
@@ -60,6 +62,7 @@ class IllustrationPageBody extends StatelessWidget {
         delegate: SliverChildListDelegate.fixed([
           IllustrationPageHeader(),
           IllustrationPoster(
+            isOwner: isOwner,
             illustration: illustration,
             liked: liked,
             updatingImage: updatingImage,

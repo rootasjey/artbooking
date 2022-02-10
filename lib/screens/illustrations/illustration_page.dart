@@ -102,6 +102,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
                 slivers: [
                   ApplicationBar(),
                   IllustrationPageBody(
+                    isOwner: isOwner,
                     isLoading: _isLoading,
                     updatingImage: _updatingImage,
                     illustration: _illustration,
