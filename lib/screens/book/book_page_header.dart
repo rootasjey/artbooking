@@ -25,10 +25,12 @@ class BookPageHeader extends StatelessWidget {
     this.onToggleMultiSelect,
     this.onShowRenameBookDialog,
     this.onUploadToThisBook,
+    this.owner = false,
   }) : super(key: key);
 
   final Book book;
   final bool liked;
+  final bool owner;
   final bool forceMultiSelect;
 
   /// Currently selected illustrations.
@@ -178,34 +180,35 @@ class BookPageHeader extends StatelessWidget {
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.only(
-              top: 32.0,
-              left: 8.0,
+          if (owner)
+            Padding(
+              padding: const EdgeInsets.only(
+                top: 32.0,
+                left: 8.0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  BookPageActions(
+                    forceMultiSelect: forceMultiSelect,
+                    multiSelectedItems: multiSelectedItems,
+                    onConfirmDeleteBook: onConfirmDeleteBook,
+                    onToggleMultiSelect: onToggleMultiSelect,
+                    onShowRenameBookDialog: onShowRenameBookDialog,
+                    onUploadToThisBook: onUploadToThisBook,
+                    visible: multiSelectedItems.isEmpty,
+                  ),
+                  BookPageGroupActions(
+                    onClearMultiSelect: onClearMultiSelect,
+                    onConfirmDeleteManyIllustrations:
+                        onConfirmDeleteManyIllustrations,
+                    onMultiSelectAll: onMultiSelectAll,
+                    multiSelectedItems: multiSelectedItems,
+                    visible: multiSelectedItems.isNotEmpty,
+                  ),
+                ],
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                BookPageActions(
-                  forceMultiSelect: forceMultiSelect,
-                  multiSelectedItems: multiSelectedItems,
-                  onConfirmDeleteBook: onConfirmDeleteBook,
-                  onToggleMultiSelect: onToggleMultiSelect,
-                  onShowRenameBookDialog: onShowRenameBookDialog,
-                  onUploadToThisBook: onUploadToThisBook,
-                  visible: multiSelectedItems.isEmpty,
-                ),
-                BookPageGroupActions(
-                  onClearMultiSelect: onClearMultiSelect,
-                  onConfirmDeleteManyIllustrations:
-                      onConfirmDeleteManyIllustrations,
-                  onMultiSelectAll: onMultiSelectAll,
-                  multiSelectedItems: multiSelectedItems,
-                  visible: multiSelectedItems.isNotEmpty,
-                ),
-              ],
-            ),
-          ),
         ]),
       ),
     );

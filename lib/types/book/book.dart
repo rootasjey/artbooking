@@ -21,6 +21,7 @@ class Book {
     this.layoutOrientation = EnumBookLayoutOrientation.vertical,
     this.name = '',
     required this.updatedAt,
+    required this.userId,
     this.visibility = EnumContentVisibility.private,
   });
 
@@ -75,6 +76,8 @@ class Book {
   /// Urls of assets or other content.
   // final BookLinks links;
 
+  final String userId;
+
   /// Control if other people can view this book.
   final EnumContentVisibility visibility;
 
@@ -83,6 +86,7 @@ class Book {
       cover: BookCover.empty(),
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      userId: '',
     );
   }
 
@@ -99,6 +103,7 @@ class Book {
       name: data['name'] ?? '',
       updatedAt: Utilities.date.fromFirestore(data['updated_at']),
       visibility: parseStringVisibility(data['visibility']),
+      userId: data['user_id'] ?? '',
     );
   }
 
@@ -255,6 +260,7 @@ class Book {
     String? name,
     DateTime? updatedAt,
     EnumContentVisibility? visibility,
+    String? userId,
   }) {
     return Book(
       count: count ?? this.count,
@@ -267,6 +273,7 @@ class Book {
       layoutOrientation: layoutOrientation ?? this.layoutOrientation,
       name: name ?? this.name,
       updatedAt: updatedAt ?? this.updatedAt,
+      userId: userId ?? this.userId,
       visibility: visibility ?? this.visibility,
     );
   }
@@ -283,6 +290,7 @@ class Book {
       'layoutOrientation': layoutOrientationToString(),
       'name': name,
       'visibility': visibilityToString(),
+      'user_id': userId,
     };
   }
 

@@ -20,6 +20,7 @@ class BookPageBody extends StatelessWidget {
     this.onPopupMenuItemSelected,
     this.onLongPressIllustration,
     this.onTapIllustrationCard,
+    this.owner = false,
   }) : super(key: key);
 
   /// Why a map and not just a list?
@@ -31,6 +32,7 @@ class BookPageBody extends StatelessWidget {
   final MapStringIllustration illustrations;
 
   final bool loading;
+  final bool owner;
 
   /// Currently selected illustrations.
   final MapStringIllustration multiSelectedItems;
@@ -90,9 +92,9 @@ class BookPageBody extends StatelessWidget {
               selectionMode: selectionMode,
               onTap: () =>
                   onTapIllustrationCard?.call(illustrationKey, illustration),
-              onPopupMenuItemSelected: onPopupMenuItemSelected,
-              popupMenuEntries: popupMenuEntries,
-              onLongPress: onLongPressIllustration,
+              onPopupMenuItemSelected: owner ? onPopupMenuItemSelected : null,
+              popupMenuEntries: owner ? popupMenuEntries : [],
+              onLongPress: owner ? onLongPressIllustration : null,
             );
           },
           childCount: illustrations.length,
