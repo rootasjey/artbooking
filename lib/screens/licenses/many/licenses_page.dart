@@ -159,7 +159,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   }
 
   /// Fetch more staff licenses on Firestore.
-  void fetchStaffLicensesMore() async {
+  void fetchMoreStaffLicenses() async {
     setState(() => _isLoadingMore = true);
 
     try {
@@ -216,7 +216,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
       final query = await FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
-          .collection('licenses')
+          .collection('user_licenses')
           .orderBy('created_at', descending: _descending)
           .limit(_limit);
 
@@ -253,7 +253,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   }
 
   /// Fetch more user's licenses on Firestore.
-  void fetchUserLicensesMore() async {
+  void fetchMoreUserLicenses() async {
     setState(() => _isLoadingMore = true);
 
     try {
@@ -262,7 +262,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
       final snapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
-          .collection('licenses')
+          .collection('user_licenses')
           .limit(_limit)
           .orderBy('name', descending: true)
           .startAfterDocument(_lastDocumentSnapshot!)
@@ -305,7 +305,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     }
 
     if (_hasNext && !_isLoadingMore && _lastDocumentSnapshot != null) {
-      fetchStaffLicensesMore();
+      fetchMoreStaffLicenses();
     }
 
     return false;
@@ -436,7 +436,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
 
     try {
       final response = await Utilities.cloud.fun('licenses-deleteOne').call({
-        'licenseId': license.id,
+        'license_id': license.id,
         'type': license.typeToString(),
       });
 
