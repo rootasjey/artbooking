@@ -344,13 +344,6 @@ async function deleteUserLicense(licenseId: string, userId: string) {
     )
   }
 
-  if (licenseData.created_by !== userId) {
-    throw new functions.https.HttpsError(
-      'permission-denied',
-      `You don't have the right to delete this licenses`,
-    )
-  }
-
   return await licenseSnapshot.ref.delete()
 }
 
