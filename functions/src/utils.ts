@@ -34,6 +34,33 @@ export const cloudRegions = {
   eu: 'europe-west1'
 };
 
+/**
+ * Throw an exception if the visibility's value is not
+ * among allowed values.
+ */
+export function checkVisibilityValue(visibility: string) {
+  let isAllowed = false;
+
+  switch (visibility) {
+    case "acl":
+    case "private":
+    case "public":
+    case "archived":
+      isAllowed = true;
+      break;
+    default:
+      isAllowed = false;
+      break;
+  }
+
+  if (!isAllowed) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      `Invalide [visibility] value. Allowed values are: [acl], [private], [public], [archived].`,
+    );
+  }
+}
+
 export async function checkUserIsSignedIn(
   context: functions.https.CallableContext,
   idToken: string,

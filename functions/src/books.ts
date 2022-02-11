@@ -5,6 +5,7 @@ import {
   BOOKS_COLLECTION_NAME,
   BOOK_STATISTICS_COLLECTION_NAME, 
   checkOrGetDefaultVisibility, 
+  checkVisibilityValue, 
   cloudRegions, 
   ILLUSTRATIONS_COLLECTION_NAME,
   USERS_COLLECTION_NAME,
@@ -546,13 +547,13 @@ export const renameOne = functions
       name,
     } = params;
 
-    const bookSnap = await firestore
+    const bookSnapshot = await firestore
       .collection(BOOKS_COLLECTION_NAME)
       .doc(book_id)
       .get();
 
-    const bookData = bookSnap.data();
-    if (!bookSnap.exists || !bookData) {
+    const bookData = bookSnapshot.data();
+    if (!bookSnapshot.exists || !bookData) {
       throw new functions.https.HttpsError(
         'not-found',
         `The book [${book_id}] doesn't exist anymore.`,
@@ -566,7 +567,7 @@ export const renameOne = functions
       )
     }
 
-    await bookSnap.ref.update({
+    await bookSnapshot.ref.update({
       description,
       name,
       updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
@@ -661,6 +662,70 @@ export const setCover = functions
       success: true,
     };
   });
+
+export const updateVisibility = functions
+  .region(cloudRegions.eu)
+  .https
+  .onCall(async (params: any, context) => {
+    const userAuth = context.auth;
+    
+    if (!userAuth) {
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
+    }
+
+    const { book_id, visibility } = params
+
+    if (typeof book_id !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called with a valid [bookId] (string) parameter
+         which is the book to update.`,
+      );
+    }
+
+    if (typeof visibility !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `The function must be called  with a valid [visibility] ` +
+         `argument which is a string.`,
+      );
+    }
+
+    checkVisibilityValue(visibility);
+
+    const bookSnapshot = await firestore
+      .collection(BOOKS_COLLECTION_NAME)
+      .doc(book_id)
+      .get();
+
+    const bookData = bookSnapshot.data();
+    if (!bookSnapshot.exists || !bookData) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        `The book [${book_id}] doesn't exist anymore.`,
+      )
+    }
+
+    if (bookData.user_id !== userAuth.uid) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        `You don't have the permission to update this book ${bookData.user_id}.`,
+      )
+    }
+
+    await bookSnapshot.ref.update({
+      visibility,
+      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+    });
+
+    return {
+      book: { id: book_id },
+      success: true,
+    };
+  })
 
 // ----------------
 // Helper functions

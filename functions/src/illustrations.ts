@@ -12,6 +12,7 @@ import {
   allowedLicenseTypes,
   ART_MOVEMENTS_COLLECTION_NAME,
   BASE_DOCUMENT_NAME,
+  checkVisibilityValue,
   cloudRegions,
   ILLUSTRATIONS_COLLECTION_NAME,
   ILLUSTRATION_STATISTICS_COLLECTION_NAME,
@@ -194,7 +195,6 @@ export const createOne = functions
     }
 
     checkVisibilityValue(visibility);
-
     const user_custom_index = await getNextIllustrationIndex(userAuth.uid)
 
     const illustrationSnap = await firestore
@@ -1082,33 +1082,6 @@ function checkIllustrationLicenseFormat(data: any) {
     `The value provided for [type] parameter is not valid. ` +
     `Allowed values are: ${allowedLicenseTypes.join(", ")}`,
   );
-}
-
-/**
- * Throw an exception if the visibility's value is not
- * among allowed values.
- */
-function checkVisibilityValue(visibility: string) {
-  let isAllowed = false;
-
-  switch (visibility) {
-    case "acl":
-    case "private":
-    case "public":
-    case "archived":
-      isAllowed = true;
-      break;
-    default:
-      isAllowed = false;
-      break;
-  }
-
-  if (!isAllowed) {
-    throw new functions.https.HttpsError(
-      'invalid-argument',
-      `Invalide [visibility] value. Allowed values are: [acl], [private], [public], [archived].`,
-    );
-  }
 }
 
 /**
