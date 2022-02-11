@@ -13,6 +13,7 @@ import 'package:artbooking/screens/book/book_page_body.dart';
 import 'package:artbooking/screens/book/book_page_header.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/book/book_illustration.dart';
+import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -189,6 +190,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
               onShowDatesDialog: onShowDatesDialog,
               onShowRenameBookDialog: onShowRenameBookDialog,
               onUploadToThisBook: onUploadToThisBook,
+              onUpdateVisibility: onUpdateVisibility,
               owner: owner,
             ),
             BookPageBody(
@@ -1178,5 +1180,34 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     );
 
     _illustrationSubs.putIfAbsent(query.id, () => illustrationSub);
+  }
+
+  void onUpdateVisibility(EnumContentVisibility visibility) async {
+    final prevVisibility = _book.visibility;
+
+    setState(() {
+      _book = _book.copyWith(visibility: visibility);
+    });
+
+    try {
+      Utilities.logger.i("visibility.: ${visibility.toString()}");
+      final response =
+          await Utilities.cloud.fun("books-updateVisibility").call({
+        "book_id": _book.id,
+        "visibility": Book.convertVisibilityToString(visibility),
+      });
+
+      final bool success = response.data["success"];
+      if (!success) {
+        throw Error();
+      }
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+
+      setState(() {
+        _book = _book.copyWith(visibility: prevVisibility);
+      });
+    }
   }
 }

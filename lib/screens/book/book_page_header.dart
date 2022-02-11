@@ -3,6 +3,7 @@ import 'package:artbooking/screens/book/book_page_actions.dart';
 import 'package:artbooking/screens/book/book_page_group_actions.dart';
 import 'package:artbooking/screens/book/book_page.dart';
 import 'package:artbooking/types/book/book.dart';
+import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ class BookPageHeader extends StatelessWidget {
     this.onShowRenameBookDialog,
     this.onUploadToThisBook,
     this.owner = false,
+    this.onUpdateVisibility,
   }) : super(key: key);
 
   final Book book;
@@ -45,6 +47,7 @@ class BookPageHeader extends StatelessWidget {
   final void Function()? onShowDatesDialog;
   final void Function()? onShowRenameBookDialog;
   final void Function()? onUploadToThisBook;
+  final void Function(EnumContentVisibility)? onUpdateVisibility;
 
   @override
   Widget build(BuildContext context) {
@@ -197,6 +200,8 @@ class BookPageHeader extends StatelessWidget {
                     onShowRenameBookDialog: onShowRenameBookDialog,
                     onUploadToThisBook: onUploadToThisBook,
                     visible: multiSelectedItems.isEmpty,
+                    visibility: book.visibility,
+                    onUpdateVisibility: onUpdateVisibility,
                   ),
                   BookPageGroupActions(
                     onClearMultiSelect: onClearMultiSelect,
