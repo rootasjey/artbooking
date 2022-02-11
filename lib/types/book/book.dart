@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/book/book_cover.dart';
 import 'package:artbooking/types/book/book_illustration.dart';
@@ -6,17 +10,17 @@ import 'package:artbooking/types/enums/enum_book_layout_orientation.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 
 class Book {
-  Book({
+  const Book({
     this.count = 0,
     required this.cover,
-    this.createdAt,
+    required this.createdAt,
     this.description = '',
     this.id = '',
     this.illustrations = const [],
     this.layout = EnumBookLayout.grid,
     this.layoutOrientation = EnumBookLayoutOrientation.vertical,
     this.name = '',
-    this.updatedAt,
+    required this.updatedAt,
     this.visibility = EnumContentVisibility.private,
   });
 
@@ -27,25 +31,25 @@ class Book {
   final BookCover cover;
 
   /// When this book was created.
-  final DateTime? createdAt;
+  final DateTime createdAt;
 
   /// This book's description.
-  String description;
+  final String description;
 
   /// Firestore's id.
   final String id;
 
   /// Each document inside the array is a simplified illustration document.
   /// Limited to 100 → Because a document is limited to 1MB in size.
-  List<BookIllustration> illustrations;
+  final List<BookIllustration> illustrations;
 
   /// Defines content layout and presentation.
-  EnumBookLayout layout;
+  final EnumBookLayout layout;
 
   /// Defines layout scroll orientation.
   /// Will be used if [layout] value is {adaptativeGrid},
   /// {customGrid}, {customList}, {grid}, {smallGrid}, {largeGrid}.
-  EnumBookLayoutOrientation layoutOrientation;
+  final EnumBookLayoutOrientation layoutOrientation;
 
   /// For small resolutions, defines layout scroll orientation.
   /// Will be used if [layout] value is {adaptativeGrid}, {customGrid},
@@ -53,7 +57,7 @@ class Book {
   // EnumBookLayoutOrientation layoutOrientationMobile;
 
   /// This book's name.
-  String name;
+  final String name;
 
   /// Used when [layout] value is {extendedGrid}.
   /// This property is initially empty and is filled when {extendedGrid} is chosen.
@@ -66,7 +70,7 @@ class Book {
   // List<List<BookIllustration>> matrice;
 
   /// Last time this book was updated.
-  final DateTime? updatedAt;
+  final DateTime updatedAt;
 
   /// Urls of assets or other content.
   // final BookLinks links;
@@ -77,12 +81,14 @@ class Book {
   factory Book.empty() {
     return Book(
       cover: BookCover.empty(),
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
   }
 
-  factory Book.fromJSON(Map<String, dynamic> data) {
+  factory Book.fromMap(Map<String, dynamic> data) {
     return Book(
-      count: data['count'] ?? 0,
+      count: data['count']?.toInt() ?? 0,
       cover: BookCover.fromMap(data['cover']),
       createdAt: Utilities.date.fromFirestore(data['created_at']),
       description: data['description'] ?? '',
@@ -104,17 +110,17 @@ class Book {
     }
 
     for (var bookIllustrationData in data) {
-      illustrations.add(BookIllustration.fromJSON(bookIllustrationData));
+      illustrations.add(BookIllustration.fromMap(bookIllustrationData));
     }
 
     return illustrations;
   }
 
-  /// Return this book cover url.
+  /// Return this book cover link.
   /// It can either be custom (manually set),
   /// auto (set to the last uploaded illustration),
   /// or default if the book is empty.
-  String getCoverUrl() {
+  String getCoverLink() {
     if (cover.link.isNotEmpty) {
       return cover.link;
     }
@@ -235,5 +241,90 @@ class Book {
       default:
         return 'private';
     }
+  }
+
+  Book copyWith({
+    int? count,
+    BookCover? cover,
+    DateTime? createdAt,
+    String? description,
+    String? id,
+    List<BookIllustration>? illustrations,
+    EnumBookLayout? layout,
+    EnumBookLayoutOrientation? layoutOrientation,
+    String? name,
+    DateTime? updatedAt,
+    EnumContentVisibility? visibility,
+  }) {
+    return Book(
+      count: count ?? this.count,
+      cover: cover ?? this.cover,
+      createdAt: createdAt ?? this.createdAt,
+      description: description ?? this.description,
+      id: id ?? this.id,
+      illustrations: illustrations ?? this.illustrations,
+      layout: layout ?? this.layout,
+      layoutOrientation: layoutOrientation ?? this.layoutOrientation,
+      name: name ?? this.name,
+      updatedAt: updatedAt ?? this.updatedAt,
+      visibility: visibility ?? this.visibility,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'count': count,
+      'cover': cover.toMap(),
+      'createdAt': createdAt.millisecondsSinceEpoch,
+      'description': description,
+      'id': id,
+      'illustrations': illustrations.map((x) => x.toMap()).toList(),
+      'layout': layoutToString(),
+      'layoutOrientation': layoutOrientationToString(),
+      'name': name,
+      'visibility': visibilityToString(),
+    };
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory Book.fromJson(String source) => Book.fromMap(json.decode(source));
+
+  @override
+  String toString() {
+    return 'Book(count: $count, cover: $cover, createdAt: $createdAt, description: $description, id: $id, illustrations: $illustrations, layout: $layout, layoutOrientation: $layoutOrientation, name: $name, updatedAt: $updatedAt, visibility: $visibility)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is Book &&
+        other.count == count &&
+        other.cover == cover &&
+        other.createdAt == createdAt &&
+        other.description == description &&
+        other.id == id &&
+        listEquals(other.illustrations, illustrations) &&
+        other.layout == layout &&
+        other.layoutOrientation == layoutOrientation &&
+        other.name == name &&
+        other.updatedAt == updatedAt &&
+        other.visibility == visibility;
+  }
+
+  @override
+  int get hashCode {
+    return count.hashCode ^
+        cover.hashCode ^
+        createdAt.hashCode ^
+        description.hashCode ^
+        id.hashCode ^
+        illustrations.hashCode ^
+        layout.hashCode ^
+        layoutOrientation.hashCode ^
+        name.hashCode ^
+        updatedAt.hashCode ^
+        visibility.hashCode;
   }
 }

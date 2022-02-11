@@ -63,11 +63,6 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
   ScrollController _scrollController = ScrollController();
 
-  final _newBookNameController = TextEditingController();
-  final _newBookDescriptionController = TextEditingController();
-  String _newBookName = '';
-  String _newBookDescription = '';
-
   QuerySnapshotStreamSubscription? _streamSubscription;
 
   @override
@@ -78,8 +73,6 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
   @override
   void dispose() {
-    _newBookNameController.dispose();
-    _newBookDescriptionController.dispose();
     _streamSubscription?.cancel();
     _focusNode.dispose();
     super.dispose();
@@ -430,7 +423,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
     setState(() {
       data['id'] = documentChange.doc.id;
-      final book = Book.fromJSON(data);
+      final book = Book.fromMap(data);
       _books.insert(0, book);
     });
   }
@@ -497,12 +490,12 @@ class _MyBooksPageState extends State<MyBooksPage> {
     );
   }
 
-  void createBook() async {
+  void createBook(String name, String description) async {
     setState(() => _isCreating = true);
 
     final BookResponse response = await BooksActions.createOne(
-      name: _newBookName,
-      description: _newBookDescription,
+      name: name,
+      description: description,
     );
 
     setState(() => _isCreating = false);
@@ -576,7 +569,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
         final data = document.data();
         data['id'] = document.id;
 
-        _books.add(Book.fromJSON(data));
+        _books.add(Book.fromMap(data));
       }
 
       setState(() {
@@ -625,7 +618,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
         final data = document.data();
         data['id'] = document.id;
 
-        _books.add(Book.fromJSON(data));
+        _books.add(Book.fromMap(data));
       }
 
       setState(() {
@@ -673,21 +666,22 @@ class _MyBooksPageState extends State<MyBooksPage> {
   }
 
   void showBookCreationDialog() {
+    final _nameController = TextEditingController();
+    final _descriptionController = TextEditingController();
+
     showDialog(
       context: context,
       builder: (context) => InputDialog(
         titleValue: "book_create".tr().toUpperCase(),
         subtitleValue: "book_create_description".tr(),
-        nameController: _newBookNameController,
-        onNameChanged: (newValue) {
-          _newBookName = newValue;
-        },
-        onDescriptionChanged: (newValue) {
-          _newBookDescription = newValue;
-        },
+        nameController: _nameController,
+        descriptionController: _descriptionController,
         onCancel: Beamer.of(context).popRoute,
         onSubmitted: (value) {
-          createBook();
+          createBook(
+            _nameController.text,
+            _descriptionController.text,
+          );
           Beamer.of(context).popRoute();
         },
       ),
@@ -695,29 +689,27 @@ class _MyBooksPageState extends State<MyBooksPage> {
   }
 
   void showRenameBookDialog(Book book) {
-    _newBookNameController.text = book.name;
-    _newBookDescriptionController.text = book.description;
+    final _nameController = TextEditingController();
+    final _descriptionController = TextEditingController();
 
-    _newBookName = book.name;
-    _newBookDescription = book.description;
+    _nameController.text = book.name;
+    _descriptionController.text = book.description;
 
     showDialog(
       context: context,
       builder: (context) => InputDialog(
-        descriptionController: _newBookDescriptionController,
         submitButtonValue: "rename".tr(),
-        nameController: _newBookNameController,
+        nameController: _nameController,
+        descriptionController: _descriptionController,
         titleValue: "book_rename".tr().toUpperCase(),
         subtitleValue: "book_rename_description".tr(),
-        onNameChanged: (newValue) {
-          _newBookName = newValue;
-        },
-        onDescriptionChanged: (newValue) {
-          _newBookDescription = newValue;
-        },
         onCancel: Beamer.of(context).popRoute,
         onSubmitted: (value) {
-          renameBook(book);
+          renameBook(
+            book,
+            _nameController.text,
+            _descriptionController.text,
+          );
           Beamer.of(context).popRoute();
         },
       ),
@@ -725,19 +717,21 @@ class _MyBooksPageState extends State<MyBooksPage> {
   }
 
   /// Rename one book.
-  void renameBook(Book book) async {
+  void renameBook(Book book, String name, String description) async {
     try {
       final prevName = book.name;
       final prevDescription = book.description;
 
       setState(() {
-        book.name = _newBookName;
-        book.description = _newBookDescription;
+        book = book.copyWith(
+          name: name,
+          description: description,
+        );
       });
 
       final response = await BooksActions.renameOne(
-        name: _newBookName,
-        description: _newBookDescription,
+        name: name,
+        description: description,
         bookId: book.id,
       );
 
@@ -746,8 +740,10 @@ class _MyBooksPageState extends State<MyBooksPage> {
       }
 
       setState(() {
-        book.name = prevName;
-        book.description = prevDescription;
+        book = book.copyWith(
+          name: prevName,
+          description: prevDescription,
+        );
       });
 
       context.showErrorBar(
@@ -796,7 +792,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
       );
 
       data['id'] = documentChange.doc.id;
-      final updatedBook = Book.fromJSON(data);
+      final updatedBook = Book.fromMap(data);
 
       setState(() {
         _books.removeAt(index);

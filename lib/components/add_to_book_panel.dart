@@ -259,7 +259,7 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final book = Book.fromJSON(data);
+        final book = Book.fromMap(data);
         books.add(book);
       });
 
@@ -310,7 +310,7 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
         final data = doc.data();
         data['id'] = doc.id;
 
-        final book = Book.fromJSON(data);
+        final book = Book.fromMap(data);
         books.add(book);
       });
 

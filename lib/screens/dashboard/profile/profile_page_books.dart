@@ -170,7 +170,7 @@ class _ProfilePageBooksState extends State<ProfilePageBooks> {
       for (DocSnapMap document in bookSnapshot.docs) {
         final data = document.data();
         data['id'] = document.id;
-        _books.add(Book.fromJSON(data));
+        _books.add(Book.fromMap(data));
       }
     } catch (error) {
       Utilities.logger.e(error);

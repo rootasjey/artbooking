@@ -7,7 +7,7 @@ import 'package:artbooking/screens/settings/delete_account/delete_account_page.d
 import 'package:artbooking/screens/illustrations/illustration_page.dart';
 import 'package:artbooking/screens/licenses/one/license_page.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page.dart';
-import 'package:artbooking/screens/dashboard/dashboard_page_book.dart';
+import 'package:artbooking/screens/book/book_page.dart';
 import 'package:artbooking/screens/activity/activity_page.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page_books.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page_illustrations.dart';
@@ -149,7 +149,7 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
         ),
       if (state.pathPatternSegments.contains(':bookId'))
         BeamPage(
-          child: DashboardPageBook(
+          child: BookPage(
             bookId: state.pathParameters['bookId']!,
           ),
           key: ValueKey('$booksRoute/one'),

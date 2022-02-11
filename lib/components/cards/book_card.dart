@@ -166,7 +166,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
           ),
           clipBehavior: Clip.antiAlias,
           child: Ink.image(
-            image: NetworkImage(book.getCoverUrl()),
+            image: NetworkImage(book.getCoverLink()),
             fit: BoxFit.cover,
             child: InkWell(
               onTap: widget.onTap,

@@ -255,7 +255,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
               onTap: () => onTapIllustrationCard(illustration),
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               popupMenuEntries: _popupMenuEntries,
-              onLongPress: (selected) {
+              onLongPress: (key, illustration, selected) {
                 if (selected) {
                   setState(() {
                     _multiSelectedItems.remove(illustration.id);

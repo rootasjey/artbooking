@@ -41,7 +41,7 @@ class IllustrationCard extends StatefulWidget {
   final Illustration illustration;
 
   /// Trigger when the user long press this card.
-  final Function(bool)? onLongPress;
+  final Function(String, Illustration, bool)? onLongPress;
 
   /// Card's size (width = height).
   final double size;
@@ -133,9 +133,11 @@ class _IllustrationCardState extends State<IllustrationCard>
         child: InkWell(
           onTap: widget.onTap,
           onLongPress: () {
-            if (widget.onLongPress != null) {
-              widget.onLongPress!(widget.selected);
-            }
+            widget.onLongPress?.call(
+              widget.illustrationKey,
+              widget.illustration,
+              widget.selected,
+            );
           },
           onHover: (isHover) {
             if (isHover) {
