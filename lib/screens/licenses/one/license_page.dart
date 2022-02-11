@@ -105,7 +105,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
     return FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
-        .collection('licenses')
+        .collection('user_licenses')
         .doc(widget.licenseId);
   }
 
