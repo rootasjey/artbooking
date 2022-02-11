@@ -236,6 +236,10 @@ class Book {
   }
 
   String visibilityToString() {
+    return convertVisibilityToString(visibility);
+  }
+
+  static String convertVisibilityToString(EnumContentVisibility visibility) {
     switch (visibility) {
       case EnumContentVisibility.acl:
         return 'acl';
@@ -300,7 +304,10 @@ class Book {
 
   @override
   String toString() {
-    return 'Book(count: $count, cover: $cover, createdAt: $createdAt, description: $description, id: $id, illustrations: $illustrations, layout: $layout, layoutOrientation: $layoutOrientation, name: $name, updatedAt: $updatedAt, visibility: $visibility)';
+    return 'Book(count: $count, cover: $cover, createdAt: $createdAt, '
+        'description: $description, id: $id, illustrations: $illustrations, '
+        'layout: $layout, layoutOrientation: $layoutOrientation, name: $name, '
+        'updatedAt: $updatedAt, visibility: $visibility)';
   }
 
   @override

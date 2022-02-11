@@ -204,18 +204,7 @@ class Illustration {
   }
 
   String visibilityToString() {
-    switch (visibility) {
-      case EnumContentVisibility.acl:
-        return 'acl';
-      case EnumContentVisibility.archived:
-        return 'archived';
-      case EnumContentVisibility.private:
-        return 'private';
-      case EnumContentVisibility.public:
-        return 'public';
-      default:
-        return 'private';
-    }
+    return convertVisibilityToString(visibility);
   }
 
   static String convertVisibilityToString(EnumContentVisibility visibility) {
