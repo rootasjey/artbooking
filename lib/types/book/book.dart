@@ -19,6 +19,7 @@ class Book {
     this.illustrations = const [],
     this.layout = EnumBookLayout.grid,
     this.layoutOrientation = EnumBookLayoutOrientation.vertical,
+    this.liked = false,
     this.name = '',
     required this.updatedAt,
     required this.userId,
@@ -56,6 +57,11 @@ class Book {
   /// Will be used if [layout] value is {adaptativeGrid}, {customGrid},
   /// {customList}, {grid}, {smallGrid}, {largeGrid}.
   // EnumBookLayoutOrientation layoutOrientationMobile;
+
+  /// True if the current authenticated user liked this book.
+  /// This property does NOT exist as a Book's field in Firestore.
+  /// I must be fetched from Book's subcollection `book_likes`.
+  final bool liked;
 
   /// This book's name.
   final String name;
@@ -100,6 +106,7 @@ class Book {
       illustrations: parseIllustrations(data['illustrations']),
       layout: parseLayout(data['layout']),
       layoutOrientation: parseOrientation(data['layout_orientation']),
+      liked: data['liked'] ?? false,
       name: data['name'] ?? '',
       updatedAt: Utilities.date.fromFirestore(data['updated_at']),
       visibility: parseStringVisibility(data['visibility']),
@@ -261,6 +268,7 @@ class Book {
     List<BookIllustration>? illustrations,
     EnumBookLayout? layout,
     EnumBookLayoutOrientation? layoutOrientation,
+    bool? liked,
     String? name,
     DateTime? updatedAt,
     EnumContentVisibility? visibility,
@@ -275,6 +283,7 @@ class Book {
       illustrations: illustrations ?? this.illustrations,
       layout: layout ?? this.layout,
       layoutOrientation: layoutOrientation ?? this.layoutOrientation,
+      liked: liked ?? this.liked,
       name: name ?? this.name,
       updatedAt: updatedAt ?? this.updatedAt,
       userId: userId ?? this.userId,
@@ -292,6 +301,7 @@ class Book {
       'illustrations': illustrations.map((x) => x.toMap()).toList(),
       'layout': layoutToString(),
       'layoutOrientation': layoutOrientationToString(),
+      'liked': liked,
       'name': name,
       'visibility': visibilityToString(),
       'user_id': userId,
@@ -306,8 +316,8 @@ class Book {
   String toString() {
     return 'Book(count: $count, cover: $cover, createdAt: $createdAt, '
         'description: $description, id: $id, illustrations: $illustrations, '
-        'layout: $layout, layoutOrientation: $layoutOrientation, name: $name, '
-        'updatedAt: $updatedAt, visibility: $visibility)';
+        'layout: $layout, layoutOrientation: $layoutOrientation, liked: $liked, '
+        'name: $name, updatedAt: $updatedAt, visibility: $visibility)';
   }
 
   @override
@@ -323,6 +333,7 @@ class Book {
         listEquals(other.illustrations, illustrations) &&
         other.layout == layout &&
         other.layoutOrientation == layoutOrientation &&
+        other.liked == liked &&
         other.name == name &&
         other.updatedAt == updatedAt &&
         other.visibility == visibility;
@@ -338,6 +349,7 @@ class Book {
         illustrations.hashCode ^
         layout.hashCode ^
         layoutOrientation.hashCode ^
+        liked.hashCode ^
         name.hashCode ^
         updatedAt.hashCode ^
         visibility.hashCode;
