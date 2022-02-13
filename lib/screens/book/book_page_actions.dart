@@ -1,5 +1,4 @@
 import 'package:artbooking/components/buttons/square_button.dart';
-import 'package:artbooking/components/buttons/text_rectangle_button.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/book/book_page.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
@@ -60,11 +59,13 @@ class BookPageActions extends StatelessWidget {
           onTap: onShowRenameBookDialog,
           child: Icon(UniconsLine.edit_alt),
         ),
-        TextRectangleButton(
-          onPressed: onToggleMultiSelect,
-          icon: Icon(UniconsLine.layers),
-          label: Text('multi_select'.tr()),
-          primary: forceMultiSelect ? Colors.lightGreen : Colors.black38,
+        SquareButton(
+          onTap: onToggleMultiSelect,
+          child: Icon(
+            UniconsLine.layers,
+            color: forceMultiSelect ? Colors.lightGreen : null,
+          ),
+          message: "multi_select".tr(),
         ),
         PopupMenuButton(
           tooltip: "illustration_visibility_choose".tr(),
