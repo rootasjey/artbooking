@@ -6,6 +6,14 @@ enum EnumIllustrationItemAction {
   /// Delete this illustration from database.
   delete,
 
+  
+  /// Like an illustration..
+  like,
+
+
   /// Remove this illustration from a book.
   removeFromBook,
+  
+  /// Unlike an illustration..
+  unlike,
 }

@@ -1,9 +1,12 @@
 import 'package:artbooking/components/application_bar/application_bar.dart';
-import 'package:artbooking/components/cards/illustration_card.dart';
-import 'package:artbooking/components/icons/animated_app_icon.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/texts/page_title.dart';
+import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
+import 'package:artbooking/screens/illustrations/illustrations_page_body.dart';
+import 'package:artbooking/screens/illustrations/illustrations_page_fab.dart';
+import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/types/firestore/doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
@@ -12,29 +15,50 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
+import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
-class IllustrationsPage extends StatefulWidget {
+class IllustrationsPage extends ConsumerStatefulWidget {
   @override
   _IllustrationsPageState createState() => _IllustrationsPageState();
 }
 
-class _IllustrationsPageState extends State<IllustrationsPage> {
-  bool _hasNext = true;
-  bool _isFabVisible = false;
-
-  final _scrollController = ScrollController();
-
-  bool _isLoading = false;
-  bool _isLoadingMore = false;
+class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
   bool _descending = true;
+  bool _hasNext = true;
+  bool _loadingMore = false;
+  bool _loading = false;
+  bool _showFab = false;
+
+  DocumentSnapshot? _lastDocument;
 
   final int _limit = 30;
+  final List<Illustration> _illustrations = [];
+  final _scrollController = ScrollController();
 
-  final List<Illustration> _illustrationsList = [];
-  DocumentSnapshot? _lastDocument;
-  QuerySnapshotStreamSubscription? _streamSubscription;
+  QuerySnapshotStreamSubscription? _illustrationsSubscription;
+
+  /// Items when opening the popup.
+  final List<PopupMenuEntry<EnumIllustrationItemAction>> _likePopupMenuEntries =
+      [
+    PopupMenuItemIcon(
+      value: EnumIllustrationItemAction.like,
+      icon: Icon(UniconsLine.heart),
+      textLabel: "like".tr(),
+    ),
+  ];
+
+  /// Items when opening the popup.
+  final List<PopupMenuEntry<EnumIllustrationItemAction>>
+      _unlikePopupMenuEntries = [
+    PopupMenuItemIcon(
+      value: EnumIllustrationItemAction.unlike,
+      icon: Icon(UniconsLine.heart_break),
+      textLabel: "unlike".tr(),
+    ),
+  ];
 
   @override
   void initState() {
@@ -44,7 +68,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
 
   @override
   void dispose() {
-    _streamSubscription?.cancel();
+    _illustrationsSubscription?.cancel();
     _scrollController.dispose();
     super.dispose();
   }
@@ -54,7 +78,10 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
     return HeroControllerScope(
       controller: HeroController(),
       child: Scaffold(
-        floatingActionButton: fab(),
+        floatingActionButton: IllustrationsPageFab(
+          show: _showFab,
+          scrollController: _scrollController,
+        ),
         body: NotificationListener<ScrollNotification>(
           onNotification: onNotification,
           child: CustomScrollView(
@@ -72,128 +99,17 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
                   bottom: 24.0,
                 ),
               ),
-              body(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget body() {
-    if (_isLoading) {
-      return SliverList(
-        delegate: SliverChildListDelegate.fixed([
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 100.0),
-            child: AnimatedAppIcon(
-              textTitle: "illustrations_loading".tr(),
-            ),
-          ),
-        ]),
-      );
-    }
-
-    if (_illustrationsList.isEmpty) {
-      return emptyView();
-    }
-
-    return gridView();
-  }
-
-  Widget emptyView() {
-    return SliverPadding(
-      padding: const EdgeInsets.only(
-        top: 40.0,
-        left: 50.0,
-        bottom: 100.0,
-      ),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  bottom: 12.0,
-                ),
-                child: Text(
-                  "lonely_there".tr(),
-                  style: TextStyle(
-                    fontSize: 32.0,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  bottom: 16.0,
-                  // top: 24.0,
-                ),
-                child: Opacity(
-                  opacity: 0.4,
-                  child: Text(
-                    "illustrations_empty".tr(),
-                    style: TextStyle(
-                      fontSize: 16.0,
-                    ),
-                  ),
-                ),
+              IllustrationsPageBody(
+                loading: _loading,
+                illustrations: _illustrations,
+                onDoubleTap: onDoubleTapBookItem,
+                onTapIllustrationCard: onTapIllustrationCard,
+                likePopupMenuEntries: _likePopupMenuEntries,
+                unlikePopupMenuEntries: _unlikePopupMenuEntries,
+                onPopupMenuItemSelected: onPopupMenuItemSelected,
               ),
             ],
           ),
-        ]),
-      ),
-    );
-  }
-
-  Widget fab() {
-    if (!_isFabVisible) {
-      return Container();
-    }
-
-    return FloatingActionButton(
-      onPressed: () {
-        _scrollController.animateTo(
-          0.0,
-          duration: const Duration(seconds: 1),
-          curve: Curves.easeOut,
-        );
-      },
-      backgroundColor: Theme.of(context).primaryColor,
-      foregroundColor: Colors.white,
-      child: Icon(UniconsLine.arrow_up),
-    );
-  }
-
-  Widget gridView() {
-    return SliverPadding(
-      padding: const EdgeInsets.only(
-        top: 40.0,
-        left: 40.0,
-        right: 40.0,
-        bottom: 100.0,
-      ),
-      sliver: SliverGrid(
-        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 300.0,
-          mainAxisSpacing: 20.0,
-          crossAxisSpacing: 20.0,
-        ),
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final illustration = _illustrationsList.elementAt(index);
-
-            return IllustrationCard(
-              index: index,
-              heroTag: illustration.id,
-              illustration: illustration,
-              onTap: () => onTapIllustrationCard(illustration),
-              // onPopupMenuItemSelected: onPopupMenuItemSelected,
-              // popupMenuEntries: _popupMenuEntries,
-            );
-          },
-          childCount: _illustrationsList.length,
         ),
       ),
     );
@@ -211,15 +127,15 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
     setState(() {
       data['id'] = documentChange.doc.id;
       final illustration = Illustration.fromMap(data);
-      _illustrationsList.insert(0, illustration);
+      _illustrations.insert(0, illustration);
     });
   }
 
   /// Fetch illustrations data from Firestore.
   void fetchIllustrations() async {
     setState(() {
-      _isLoading = true;
-      _illustrationsList.clear();
+      _loading = true;
+      _illustrations.clear();
     });
 
     try {
@@ -234,7 +150,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
 
       if (snapshot.docs.isEmpty) {
         setState(() {
-          _isLoading = false;
+          _loading = false;
           _hasNext = false;
         });
 
@@ -244,8 +160,9 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
       for (DocSnapMap document in snapshot.docs) {
         final data = document.data();
         data['id'] = document.id;
+        data['liked'] = await fetchLike(document.id);
 
-        _illustrationsList.add(Illustration.fromMap(data));
+        _illustrations.add(Illustration.fromMap(data));
       }
 
       setState(() {
@@ -255,7 +172,28 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
-      setState(() => _isLoading = false);
+      setState(() => _loading = false);
+    }
+  }
+
+  Future<bool> fetchLike(String illustrationId) async {
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+      final snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(illustrationId)
+          .get();
+
+      if (snapshot.exists) {
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      Utilities.logger.e(error);
+      return false;
     }
   }
 
@@ -265,7 +203,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
       return;
     }
 
-    _isLoadingMore = true;
+    _loadingMore = true;
 
     try {
       final QueryMap query = await FirebaseFirestore.instance
@@ -281,7 +219,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
       if (snapshot.docs.isEmpty) {
         setState(() {
           _hasNext = false;
-          _isLoadingMore = false;
+          _loadingMore = false;
         });
 
         return;
@@ -290,31 +228,44 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
       for (DocSnapMap document in snapshot.docs) {
         final data = document.data();
         data['id'] = document.id;
+        data['liked'] = await fetchLike(document.id);
 
-        _illustrationsList.add(Illustration.fromMap(data));
+        _illustrations.add(Illustration.fromMap(data));
       }
 
       setState(() {
         _lastDocument = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
-        _isLoadingMore = false;
+        _loadingMore = false;
       });
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
-      setState(() => _isLoading = false);
+      setState(() => _loading = false);
     }
+  }
+
+  void onDoubleTapBookItem(Illustration illustration, int index) {
+    onLike(illustration, index);
+  }
+
+  void onLike(Illustration illustration, int index) {
+    if (illustration.liked) {
+      return tryUnLike(illustration, index);
+    }
+
+    return tryLike(illustration, index);
   }
 
   bool onNotification(ScrollNotification notification) {
     // FAB visibility
-    if (notification.metrics.pixels < 50 && _isFabVisible) {
+    if (notification.metrics.pixels < 50 && _showFab) {
       setState(() {
-        _isFabVisible = false;
+        _showFab = false;
       });
-    } else if (notification.metrics.pixels > 50 && !_isFabVisible) {
+    } else if (notification.metrics.pixels > 50 && !_showFab) {
       setState(() {
-        _isFabVisible = true;
+        _showFab = true;
       });
     }
 
@@ -322,11 +273,26 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
       return false;
     }
 
-    if (_hasNext && !_isLoadingMore) {
+    if (_hasNext && !_loadingMore) {
       fetchMoreIllustrations();
     }
 
     return false;
+  }
+
+  void onPopupMenuItemSelected(
+    EnumIllustrationItemAction action,
+    int index,
+    Illustration illustration,
+    String illustrationKey,
+  ) {
+    switch (action) {
+      case EnumIllustrationItemAction.like:
+      case EnumIllustrationItemAction.unlike:
+        onLike(illustration, index);
+        break;
+      default:
+    }
   }
 
   void onTapIllustrationCard(Illustration illustration) {
@@ -343,7 +309,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
   /// Delete the corresponding document from the UI.
   void removeStreamingDoc(DocumentChangeMap documentChange) {
     setState(() {
-      _illustrationsList.removeWhere(
+      _illustrations.removeWhere(
         (illustration) => illustration.id == documentChange.doc.id,
       );
     });
@@ -351,7 +317,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
 
   /// Listen to the last Firestore query of this page.
   void startListenningToData(QueryMap query) {
-    _streamSubscription = query.snapshots().skip(1).listen(
+    _illustrationsSubscription = query.snapshots().skip(1).listen(
       (snapshot) {
         for (DocumentChangeMap documentChange in snapshot.docChanges) {
           switch (documentChange.type) {
@@ -373,6 +339,71 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
     );
   }
 
+  void tryLike(Illustration illustration, int index) async {
+    setState(() {
+      _illustrations.replaceRange(
+        index,
+        index + 1,
+        [illustration.copyWith(liked: true)],
+      );
+    });
+
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(illustration.id)
+          .set({
+        "type": "illustration",
+        "target_id": illustration.id,
+        "user_id": userId,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+      setState(() {
+        _illustrations.replaceRange(
+          index,
+          index + 1,
+          [illustration.copyWith(liked: false)],
+        );
+      });
+    }
+  }
+
+  void tryUnLike(Illustration illustration, int index) async {
+    setState(() {
+      _illustrations.replaceRange(
+        index,
+        index + 1,
+        [illustration.copyWith(liked: false)],
+      );
+    });
+
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(illustration.id)
+          .delete();
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+      setState(() {
+        _illustrations.replaceRange(
+          index,
+          index + 1,
+          [illustration.copyWith(liked: true)],
+        );
+      });
+    }
+  }
+
   /// Fire when a new document has been updated in Firestore.
   /// Update the corresponding document in the UI.
   void updateStreamingDoc(DocumentChangeMap documentChange) {
@@ -382,7 +413,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
         return;
       }
 
-      final int index = _illustrationsList.indexWhere(
+      final int index = _illustrations.indexWhere(
         (illustration) => illustration.id == documentChange.doc.id,
       );
 
@@ -390,8 +421,8 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
       final updatedIllustration = Illustration.fromMap(data);
 
       setState(() {
-        _illustrationsList.removeAt(index);
-        _illustrationsList.insert(index, updatedIllustration);
+        _illustrations.removeAt(index);
+        _illustrations.insert(index, updatedIllustration);
       });
     } on Exception catch (error) {
       Utilities.logger.e(
