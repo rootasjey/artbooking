@@ -10,6 +10,7 @@ import 'package:artbooking/components/add_to_book_panel.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/book/book_page_body.dart';
+import 'package:artbooking/screens/book/book_page_fab.dart';
 import 'package:artbooking/screens/book/book_page_header.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/book/book_illustration.dart';
@@ -155,20 +156,10 @@ class _MyBookPageState extends ConsumerState<BookPage> {
         _book.userId == ref.read(AppState.userProvider).firestoreUser?.id;
 
     return Scaffold(
-      floatingActionButton: _showFab
-          ? FloatingActionButton(
-              onPressed: () {
-                _scrollController.animateTo(
-                  0.0,
-                  duration: 1.seconds,
-                  curve: Curves.easeOut,
-                );
-              },
-              backgroundColor: Theme.of(context).primaryColor,
-              foregroundColor: Colors.white,
-              child: Icon(UniconsLine.arrow_up),
-            )
-          : Container(),
+      floatingActionButton: BookPageFab(
+        show: _showFab,
+        scrollController: _scrollController,
+      ),
       body: NotificationListener<ScrollNotification>(
         onNotification: onNotification,
         child: CustomScrollView(
@@ -1190,7 +1181,6 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     });
 
     try {
-      Utilities.logger.i("visibility.: ${visibility.toString()}");
       final response =
           await Utilities.cloud.fun("books-updateVisibility").call({
         "book_id": _book.id,

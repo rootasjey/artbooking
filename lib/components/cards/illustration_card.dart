@@ -238,7 +238,7 @@ class _IllustrationCardState extends State<IllustrationCard>
           tween: Theme.of(context)
               .primaryColor
               .tweenTo(Theme.of(context).secondaryHeaderColor),
-          duration: 2.seconds,
+          duration: Duration(seconds: 2),
           curve: Curves.decelerate,
           builder: (context, child, value) {
             return Icon(

@@ -1,4 +1,6 @@
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/screens/book/book_page.dart';
+import 'package:artbooking/screens/book/books_page.dart';
 import 'package:artbooking/screens/home/home_page.dart';
 import 'package:artbooking/screens/illustrations/illustration_page.dart';
 import 'package:artbooking/screens/illustrations/illustrations_page.dart';
@@ -11,12 +13,16 @@ class HomeLocation extends BeamLocation<BeamState> {
   static const String route = '/';
   static const String illustrationsRoute = '/illustrations';
   static const String illustrationRoute = '/illustrations/:illustrationId';
+  static const String booksRoute = '/books';
+  static const String bookRoute = '/books/:bookId';
 
   @override
   List<String> get pathPatterns => [
         route,
         illustrationsRoute,
         illustrationRoute,
+        booksRoute,
+        bookRoute,
       ];
 
   @override
@@ -35,13 +41,29 @@ class HomeLocation extends BeamLocation<BeamState> {
           title: Utilities.getPageTitle("illustrations".tr()),
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathPatternSegments.contains(':illustrationId'))
+      if (state.pathPatternSegments.contains(":illustrationId"))
         BeamPage(
           child: IllustrationPage(
-            illustrationId: state.pathParameters['illustrationId']!,
+            illustrationId: state.pathParameters["illustrationId"]!,
           ),
           key: ValueKey(illustrationRoute),
           title: Utilities.getPageTitle("illustration".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
+      if (state.pathPatternSegments.contains("books"))
+        BeamPage(
+          child: BooksPage(),
+          key: ValueKey(booksRoute),
+          title: Utilities.getPageTitle("books".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
+      if (state.pathPatternSegments.contains(":bookId"))
+        BeamPage(
+          child: BookPage(
+            bookId: state.pathParameters["bookId"]!,
+          ),
+          key: ValueKey(bookRoute),
+          title: Utilities.getPageTitle("book".tr()),
           type: BeamPageType.fadeTransition,
         ),
     ];
