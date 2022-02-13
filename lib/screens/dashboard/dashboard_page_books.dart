@@ -39,7 +39,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   bool _forceMultiSelect = false;
   bool _isCreating = false;
 
-  DocumentSnapshot? _lastFirestoreDoc;
+  DocumentSnapshot? _lastDocument;
 
   final _books = <Book>[];
   final _focusNode = FocusNode();
@@ -63,7 +63,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
   ScrollController _scrollController = ScrollController();
 
-  QuerySnapshotStreamSubscription? _streamSubscription;
+  QuerySnapshotStreamSubscription? _bookSubscription;
 
   @override
   initState() {
@@ -73,7 +73,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
   @override
   void dispose() {
-    _streamSubscription?.cancel();
+    _bookSubscription?.cancel();
     _focusNode.dispose();
     super.dispose();
   }
@@ -573,7 +573,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
       }
 
       setState(() {
-        _lastFirestoreDoc = snapshot.docs.last;
+        _lastDocument = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
       });
     } catch (error) {
@@ -584,7 +584,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   }
 
   void fetchManyBooksMore() async {
-    if (!_hasNext || _lastFirestoreDoc == null) {
+    if (!_hasNext || _lastDocument == null) {
       return;
     }
 
@@ -602,7 +602,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
           .where('user_id', isEqualTo: userAuth.uid)
           .orderBy('created_at', descending: _descending)
           .limit(_limit)
-          .startAfterDocument(_lastFirestoreDoc!)
+          .startAfterDocument(_lastDocument!)
           .get();
 
       if (snapshot.docs.isEmpty) {
@@ -623,7 +623,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
       setState(() {
         _isLoadingMore = false;
-        _lastFirestoreDoc = snapshot.docs.last;
+        _lastDocument = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
       });
     } catch (error) {
@@ -756,7 +756,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
   /// Listen to the last Firestore query of this page.
   void startListenningToData(QueryMap query) {
-    _streamSubscription = query.snapshots().skip(1).listen(
+    _bookSubscription = query.snapshots().skip(1).listen(
       (snapshot) {
         for (DocumentChangeMap documentChange in snapshot.docChanges) {
           switch (documentChange.type) {

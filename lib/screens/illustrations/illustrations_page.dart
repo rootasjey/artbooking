@@ -33,7 +33,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
   final int _limit = 30;
 
   final List<Illustration> _illustrationsList = [];
-  DocumentSnapshot? _lastFirestoreDoc;
+  DocumentSnapshot? _lastDocument;
   QuerySnapshotStreamSubscription? _streamSubscription;
 
   @override
@@ -246,7 +246,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
       }
 
       setState(() {
-        _lastFirestoreDoc = snapshot.docs.last;
+        _lastDocument = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
       });
     } catch (error) {
@@ -258,7 +258,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
 
   /// Fetch more illustrations data from Firestore.
   void fetchMoreIllustrations() async {
-    if (!_hasNext || _lastFirestoreDoc == null) {
+    if (!_hasNext || _lastDocument == null) {
       return;
     }
 
@@ -270,7 +270,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
           .where('visibility', isEqualTo: 'public')
           .orderBy('created_at', descending: _descending)
           .limit(_limit)
-          .startAfterDocument(_lastFirestoreDoc!);
+          .startAfterDocument(_lastDocument!);
 
       startListenningToData(query);
       final snapshot = await query.get();
@@ -292,7 +292,7 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
       }
 
       setState(() {
-        _lastFirestoreDoc = snapshot.docs.last;
+        _lastDocument = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
         _isLoadingMore = false;
       });

@@ -735,7 +735,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     });
   }
 
-  void onLike() async {
+  void onLike() {
     if (_liked) {
       return tryUnLike();
     }
