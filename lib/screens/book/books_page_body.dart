@@ -69,6 +69,7 @@ class BooksPageBody extends StatelessWidget {
               index: index,
               onTap: () => onTap?.call(book),
               onDoubleTap: () => onDoubleTap?.call(book, index),
+              onTapLike: () => onDoubleTap?.call(book, index),
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               popupMenuEntries:
                   book.liked ? unlikePopupMenuEntries : likePopupMenuEntries,

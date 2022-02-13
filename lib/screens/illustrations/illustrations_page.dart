@@ -61,12 +61,15 @@ class _IllustrationsPageState extends State<IllustrationsPage> {
             controller: _scrollController,
             slivers: <Widget>[
               ApplicationBar(),
-              SliverPadding(
-                padding: const EdgeInsets.only(top: 70.0, bottom: 24.0),
-                sliver: PageTitle(
-                  showBackButton: true,
-                  titleValue: "illustrations".tr(),
-                  subtitleValue: "illustrations_browse".tr(),
+              PageTitle(
+                showBackButton: true,
+                titleValue: "illustrations".tr(),
+                subtitleValue: "illustrations_browse".tr(),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                padding: const EdgeInsets.only(
+                  left: 36.0,
+                  top: 40.0,
+                  bottom: 24.0,
                 ),
               ),
               body(),

@@ -93,7 +93,12 @@ class _BooksPageState extends ConsumerState<BooksPage> {
               showBackButton: true,
               titleValue: "books".tr(),
               subtitleValue: "books_browse".tr(),
-              padding: const EdgeInsets.only(top: 70.0, bottom: 24.0),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.only(
+                left: 36.0,
+                top: 40.0,
+                bottom: 24.0,
+              ),
             ),
             BooksPageBody(
               loading: _loading,
@@ -362,7 +367,6 @@ class _BooksPageState extends ConsumerState<BooksPage> {
 
     try {
       final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
-
       await FirebaseFirestore.instance
           .collection("users")
           .doc(userId)

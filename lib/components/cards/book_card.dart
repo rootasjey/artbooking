@@ -19,6 +19,7 @@ class BookCard extends StatefulWidget {
     this.index = 0,
     this.onTap,
     this.onDoubleTap,
+    this.onTapLike,
   });
 
   /// Book's data for this card.
@@ -38,6 +39,9 @@ class BookCard extends StatefulWidget {
 
   /// Trigger when the user double taps on this card.
   final Function()? onDoubleTap;
+
+  /// Trigger when heart icon tap.
+  final Function()? onTapLike;
 
   /// Popup menu item entries.
   final List<PopupMenuEntry<EnumBookItemAction>> popupMenuEntries;
@@ -62,6 +66,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   double _elevation = 4.0;
 
   bool _showLikeAnimation = false;
+  bool _keepHeartIconVisibile = false;
 
   @override
   void initState() {
@@ -105,38 +110,39 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   }
 
   Widget likeOverlay() {
-    // Is hover
-    if (_elevation == 8.0) {
-      final IconData iconData =
-          widget.book.liked ? FontAwesomeIcons.solidHeart : UniconsLine.heart;
-
-      final colorTween = widget.book.liked
-          ? Colors.red.shade200.tweenTo(Theme.of(context).secondaryHeaderColor)
-          : Colors.white.tweenTo(Colors.black26);
-
-      return Align(
-        alignment: Alignment.topRight,
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Opacity(
-            opacity: 1.0,
-            child: MirrorAnimation<Color?>(
-              tween: colorTween,
-              duration: Duration(seconds: 2),
-              builder: (context, child, value) {
-                return Icon(
-                  iconData,
-                  color: value,
-                  size: 16.0,
-                );
-              },
-            ),
-          ),
-        ),
-      );
+    if (widget.onTapLike == null) {
+      return Container();
     }
 
-    return Container();
+    if (_elevation != 8.0 && !_keepHeartIconVisibile) {
+      return Container();
+    }
+
+    final IconData iconData =
+        widget.book.liked ? FontAwesomeIcons.solidHeart : UniconsLine.heart;
+
+    final color = widget.book.liked
+        ? Theme.of(context).secondaryHeaderColor
+        : Colors.black26;
+
+    return Align(
+      alignment: Alignment.topRight,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24.0),
+        onHover: (isHover) {
+          _keepHeartIconVisibile = isHover;
+        },
+        onTap: widget.onTapLike,
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Icon(
+            iconData,
+            color: color,
+            size: 16.0,
+          ),
+        ),
+      ),
+    );
   }
 
   Widget likeAnimationOverlay() {
