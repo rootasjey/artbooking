@@ -4,6 +4,7 @@ import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
@@ -25,6 +26,8 @@ class IllustrationCard extends StatefulWidget {
     this.onPopupMenuItemSelected,
     this.onTap,
     this.popupMenuEntries = const [],
+    this.onDoubleTap,
+    this.onTapLike,
   }) : super(key: key);
 
   /// Index position in a list, if available.
@@ -46,15 +49,25 @@ class IllustrationCard extends StatefulWidget {
   /// Card's size (width = height).
   final double size;
 
+  /// Trigger when the user double taps on this card.
+  final void Function()? onDoubleTap;
+
   /// Trigger when the user taps on this card.
-  final VoidCallback? onTap;
+  final void Function()? onTap;
+
+  /// Trigger when heart icon tap.
+  final void Function()? onTapLike;
 
   /// Popup menu item entries.
   final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries;
 
   /// Callback function when popup menu item entries are tapped.
-  final void Function(EnumIllustrationItemAction, int, Illustration, String)?
-      onPopupMenuItemSelected;
+  final void Function(
+    EnumIllustrationItemAction,
+    int,
+    Illustration,
+    String,
+  )? onPopupMenuItemSelected;
 
   /// Custom app generated key to perform operations quicker.
   final String illustrationKey;
@@ -74,6 +87,9 @@ class _IllustrationCardState extends State<IllustrationCard>
   late AnimationController _scaleController;
 
   bool _showPopupMenu = false;
+
+  bool _showLikeAnimation = false;
+  bool _keepHeartIconVisibile = false;
 
   double _startElevation = 3.0;
   double _endElevation = 6.0;
@@ -132,30 +148,9 @@ class _IllustrationCardState extends State<IllustrationCard>
         fit: BoxFit.cover,
         child: InkWell(
           onTap: widget.onTap,
-          onLongPress: () {
-            widget.onLongPress?.call(
-              widget.illustrationKey,
-              widget.illustration,
-              widget.selected,
-            );
-          },
-          onHover: (isHover) {
-            if (isHover) {
-              setState(() {
-                _elevation = _endElevation;
-                _showPopupMenu = true;
-                _scaleController.forward();
-              });
-
-              return;
-            }
-
-            setState(() {
-              _elevation = _startElevation;
-              _showPopupMenu = false;
-              _scaleController.reverse();
-            });
-          },
+          onLongPress: onLongPressImage,
+          onHover: onHoverImage,
+          onDoubleTap: onDoubleTap,
           child: Stack(
             children: [
               multiSelectIndicator(),
@@ -165,7 +160,72 @@ class _IllustrationCardState extends State<IllustrationCard>
                   right: 10.0,
                   child: popupMenuButton(),
                 ),
+              likeOverlay(),
+              likeAnimationOverlay(),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget likeOverlay() {
+    if (widget.onTapLike == null) {
+      return Container();
+    }
+
+    if (_elevation != _endElevation && !_keepHeartIconVisibile) {
+      return Container();
+    }
+
+    final IconData iconData = widget.illustration.liked
+        ? FontAwesomeIcons.solidHeart
+        : UniconsLine.heart;
+
+    final color = widget.illustration.liked
+        ? Theme.of(context).secondaryHeaderColor
+        : Colors.black26;
+
+    return Align(
+      alignment: Alignment.topRight,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24.0),
+        onHover: (isHover) {
+          _keepHeartIconVisibile = isHover;
+        },
+        onTap: widget.onTapLike,
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Icon(
+            iconData,
+            color: color,
+            size: 16.0,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget likeAnimationOverlay() {
+    if (!_showLikeAnimation) {
+      return Container();
+    }
+
+    return ScaleTransition(
+      scale: _scaleAnimation,
+      child: SizedBox(
+        width: widget.size,
+        height: widget.size,
+        child: Material(
+          color: Colors.black.withOpacity(0.3),
+          child: Center(
+            child: Icon(
+              widget.illustration.liked
+                  ? UniconsLine.heart
+                  : UniconsLine.heart_break,
+              size: 42.0,
+              color: Theme.of(context).secondaryHeaderColor,
+            ),
           ),
         ),
       ),
@@ -230,6 +290,15 @@ class _IllustrationCardState extends State<IllustrationCard>
     );
   }
 
+  void onDoubleTap() {
+    widget.onDoubleTap?.call();
+    setState(() => _showLikeAnimation = true);
+
+    Future.delayed(Duration(seconds: 1), () {
+      setState(() => _showLikeAnimation = false);
+    });
+  }
+
   Widget popupMenuButton() {
     return Opacity(
       opacity: _showPopupMenu ? 1.0 : 0.0,
@@ -282,5 +351,31 @@ class _IllustrationCardState extends State<IllustrationCard>
     } catch (error) {
       Utilities.logger.e(error);
     }
+  }
+
+  void onHoverImage(isHover) {
+    if (isHover) {
+      setState(() {
+        _elevation = _endElevation;
+        _showPopupMenu = true;
+        _scaleController.forward();
+      });
+
+      return;
+    }
+
+    setState(() {
+      _elevation = _startElevation;
+      _showPopupMenu = false;
+      _scaleController.reverse();
+    });
+  }
+
+  void onLongPressImage() {
+    widget.onLongPress?.call(
+      widget.illustrationKey,
+      widget.illustration,
+      widget.selected,
+    );
   }
 }
