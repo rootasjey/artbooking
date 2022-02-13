@@ -1,5 +1,6 @@
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:unicons/unicons.dart';
 
 class IllustrationPosterActions extends StatelessWidget {
@@ -42,7 +43,10 @@ class IllustrationPosterActions extends StatelessWidget {
           children: [
             IconButton(
               tooltip: liked ? "unlike".tr() : "like".tr(),
-              icon: Icon(liked ? UniconsLine.heart : UniconsLine.heart_break),
+              icon: Icon(
+                liked ? FontAwesomeIcons.solidHeart : UniconsLine.heart,
+              ),
+              iconSize: liked ? 18.0 : 24.0,
               color: liked ? Theme.of(context).secondaryHeaderColor : null,
               onPressed: onLike,
             ),
