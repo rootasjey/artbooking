@@ -35,13 +35,13 @@ class BookCard extends StatefulWidget {
   final void Function(EnumBookItemAction, int, Book)? onPopupMenuItemSelected;
 
   /// Trigger when the user taps on this card.
-  final Function()? onTap;
+  final void Function()? onTap;
 
   /// Trigger when the user double taps on this card.
-  final Function()? onDoubleTap;
+  final void Function()? onDoubleTap;
 
   /// Trigger when heart icon tap.
-  final Function()? onTapLike;
+  final void Function()? onTapLike;
 
   /// Popup menu item entries.
   final List<PopupMenuEntry<EnumBookItemAction>> popupMenuEntries;

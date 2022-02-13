@@ -66,7 +66,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
   @override
   void initState() {
     super.initState();
-    fetchManyBooks();
+    fetchBooks();
   }
 
   @override
@@ -134,7 +134,28 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     });
   }
 
-  void fetchManyBooks() async {
+  Future<bool> fetchLike(String bookId) async {
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+      final snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(bookId)
+          .get();
+
+      if (snapshot.exists) {
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      Utilities.logger.e(error);
+      return false;
+    }
+  }
+
+  void fetchBooks() async {
     setState(() {
       _loading = true;
       _hasNext = true;
@@ -179,7 +200,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     }
   }
 
-  void fetchManyBooksMore() async {
+  void fetchMoreBooks() async {
     final lastDocument = _lastDocument;
 
     if (!_hasNext || lastDocument == null || _isLoadingMore) {
@@ -209,6 +230,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
       for (DocSnapMap document in snapshot.docs) {
         final data = document.data();
         data['id'] = document.id;
+        data['liked'] = await fetchLike(document.id);
 
         _books.add(Book.fromMap(data));
       }
@@ -233,6 +255,10 @@ class _BooksPageState extends ConsumerState<BooksPage> {
         "bookId": book.id,
       },
     );
+  }
+
+  void onDoubleTapBookItem(Book book, int index) {
+    onLike(book, index);
   }
 
   void onPressedFab() {
@@ -269,7 +295,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     }
 
     if (_hasNext && !_isLoadingMore) {
-      fetchManyBooksMore();
+      fetchMoreBooks();
     }
 
     return false;
@@ -414,30 +440,5 @@ class _BooksPageState extends ConsumerState<BooksPage> {
 
       Utilities.logger.e(error);
     }
-  }
-
-  Future<bool> fetchLike(String bookId) async {
-    try {
-      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
-      final snapshot = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(userId)
-          .collection("user_likes")
-          .doc(bookId)
-          .get();
-
-      if (snapshot.exists) {
-        return true;
-      }
-
-      return false;
-    } catch (error) {
-      Utilities.logger.e(error);
-      return false;
-    }
-  }
-
-  void onDoubleTapBookItem(Book book, int index) {
-    onLike(book, index);
   }
 }
