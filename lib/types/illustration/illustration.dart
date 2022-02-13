@@ -18,6 +18,7 @@ class Illustration {
     this.extension = '',
     this.id = '',
     required this.license,
+    this.liked = false,
     this.name = '',
     this.size = 0,
     this.lore = '',
@@ -46,6 +47,11 @@ class Illustration {
 
   /// Specifies how this illustration can be used.
   final License license;
+
+  /// True if this is book is liked by the current authenticated user.
+  /// This property does NOT exist on the Firestore document, but in
+  /// a dedicated sub-collection.
+  final bool liked;
 
   /// This illustration's name.
   final String name;
@@ -110,6 +116,7 @@ class Illustration {
       extension: data['extension'] ?? '',
       id: data['id'] ?? '',
       license: License.fromMap(data['license']),
+      liked: data['liked'] ?? false,
       links: IllustrationLinks.fromMap(data['links']),
       lore: data['lore'] ?? '',
       name: data['name'] ?? '',
@@ -229,6 +236,7 @@ class Illustration {
     String? extension,
     String? id,
     License? license,
+    bool? liked,
     String? name,
     IllustrationLinks? links,
     String? lore,
@@ -249,6 +257,7 @@ class Illustration {
       id: id ?? this.id,
       license: license ?? this.license,
       links: links ?? this.links,
+      liked: liked ?? this.liked,
       name: name ?? this.name,
       lore: lore ?? this.lore,
       size: size ?? this.size,
@@ -270,6 +279,7 @@ class Illustration {
       'extension': extension,
       'id': id,
       'license': license.toMap(),
+      'liked': liked,
       'name': name,
       'lore': lore,
       'size': size,
@@ -290,9 +300,10 @@ class Illustration {
   String toString() {
     return 'Illustration(createdAt: $createdAt, description: $description, '
         'dimensions: $dimensions, extension: $extension, id: $id, '
-        'license: $license, name: $name, lore: $lore, size: $size, '
-        'styles: $artMovements, topics: $topics, updatedAt: $updatedAt, '
-        'userId: $userId, version: $version, visibility: $visibility)';
+        'license: $license, liked: $liked, name: $name, lore: $lore, '
+        'size: $size,  styles: $artMovements, topics: $topics, '
+        'updatedAt: $updatedAt, userId: $userId, version: $version, '
+        'visibility: $visibility)';
   }
 
   @override
@@ -306,6 +317,7 @@ class Illustration {
         other.extension == extension &&
         other.id == id &&
         other.license == license &&
+        other.liked == liked &&
         other.name == name &&
         other.lore == lore &&
         other.size == size &&
@@ -325,6 +337,7 @@ class Illustration {
         extension.hashCode ^
         id.hashCode ^
         license.hashCode ^
+        liked.hashCode ^
         name.hashCode ^
         lore.hashCode ^
         size.hashCode ^
