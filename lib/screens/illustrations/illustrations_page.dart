@@ -108,8 +108,8 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
               IllustrationsPageBody(
                 loading: _loading,
                 illustrations: _illustrations,
-                onDoubleTap: onDoubleTapBookItem,
-                onTapIllustrationCard: onTapIllustrationCard,
+                onDoubleTap: onDoubleTapIllustrationItem,
+                onTapIllustrationCard: onTapIllustration,
                 likePopupMenuEntries: _likePopupMenuEntries,
                 unlikePopupMenuEntries: _unlikePopupMenuEntries,
                 onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -339,7 +339,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
     });
   }
 
-  void onDoubleTapBookItem(Illustration illustration, int index) {
+  void onDoubleTapIllustrationItem(Illustration illustration, int index) {
     onLike(illustration, index);
   }
 
@@ -421,7 +421,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
     });
   }
 
-  void onTapIllustrationCard(Illustration illustration) {
+  void onTapIllustration(Illustration illustration) {
     NavigationStateHelper.illustration = illustration;
     Beamer.of(context).beamToNamed(
       "illustrations/${illustration.id}",

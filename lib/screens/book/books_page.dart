@@ -108,7 +108,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
             BooksPageBody(
               loading: _loading,
               books: _books,
-              onTap: navigateToBook,
+              onTap: onTapBook,
               onDoubleTap: onDoubleTapBookItem,
               likePopupMenuEntries: _likePopupMenuEntries,
               unlikePopupMenuEntries: _unlikePopupMenuEntries,
@@ -297,7 +297,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     );
   }
 
-  void navigateToBook(Book book) {
+  void onTapBook(Book book) {
     NavigationStateHelper.book = book;
     Beamer.of(context).beamToNamed(
       "/books/${book.id}",
