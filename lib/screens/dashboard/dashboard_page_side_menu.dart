@@ -239,24 +239,6 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
         hoverColor: Constants.colors.books,
         routePath: DashboardLocationContent.booksRoute,
       ),
-      // SideMenuItem(
-      //   destination: MyGalleriesDeepRoute(),
-      //   iconData: UniconsLine.images,
-      //   label: 'Galleries',
-      //   hoverColor: Colors.pink.shade200,
-      // ),
-      // SideMenuItem(
-      //   destination: MyChallengesDeepRoute(),
-      //   iconData: UniconsLine.dumbbell,
-      //   label: 'Challenges',
-      //   hoverColor: Colors.green,
-      // ),
-      // SideMenuItem(
-      //   destination: MyContestsDeepRoute(),
-      //   iconData: UniconsLine.trophy,
-      //   label: 'Contests',
-      //   hoverColor: Colors.yellow.shade800,
-      // ),
       SideMenuItem(
         iconData: UniconsLine.user,
         label: "profile_my".tr(),
@@ -268,6 +250,12 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
         label: "settings".tr(),
         hoverColor: Constants.colors.settings,
         routePath: DashboardLocationContent.settingsRoute,
+      ),
+      SideMenuItem(
+        iconData: UniconsLine.heart,
+        label: "likes".tr(),
+        hoverColor: Colors.pink,
+        routePath: DashboardLocationContent.likesRoute,
       ),
       SideMenuItem(
         iconData: UniconsLine.document_info,

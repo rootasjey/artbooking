@@ -3,6 +3,7 @@ import 'package:artbooking/router/locations/signin_location.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page_welcome.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page.dart';
 import 'package:artbooking/screens/dashboard/profile/profile_page.dart';
+import 'package:artbooking/screens/likes/likes_page.dart';
 import 'package:artbooking/screens/settings/delete_account/delete_account_page.dart';
 import 'package:artbooking/screens/illustrations/illustration_page.dart';
 import 'package:artbooking/screens/licenses/one/license_page.dart';
@@ -106,6 +107,8 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
   static const String licensesRoute = '$route/licenses';
   static const String licenseRoute = '$licensesRoute/:licenseId';
 
+  static const String likesRoute = "$route/likes";
+
   @override
   List<String> get pathPatterns => [
         booksRoute,
@@ -122,6 +125,7 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
         updateUsernameRoute,
         licensesRoute,
         licenseRoute,
+        likesRoute,
       ];
 
   @override
@@ -231,6 +235,13 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
           ),
           key: ValueKey('$licenseRoute'),
           title: Utilities.getPageTitle("license".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
+      if (state.pathPatternSegments.contains('likes'))
+        BeamPage(
+          child: LikesPage(),
+          key: ValueKey("$likesRoute"),
+          title: Utilities.getPageTitle("likes".tr()),
           type: BeamPageType.fadeTransition,
         ),
     ];
