@@ -167,8 +167,12 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
   }
 
   Future<bool> fetchLike(String illustrationId) async {
+    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+    if (userId == null) {
+      return false;
+    }
+
     try {
-      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
       final snapshot = await FirebaseFirestore.instance
           .collection("users")
           .doc(userId)
