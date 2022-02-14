@@ -4,8 +4,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
-class DashboardPageBooksGroupActions extends StatelessWidget {
-  const DashboardPageBooksGroupActions({
+class MyBooksPageGroupActions extends StatelessWidget {
+  const MyBooksPageGroupActions({
     Key? key,
     required this.show,
     this.onShowDeleteManyBooks,

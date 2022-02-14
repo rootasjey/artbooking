@@ -7,9 +7,9 @@ import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
-import 'package:artbooking/screens/dashboard/books/dashboard_page_books_body.dart';
-import 'package:artbooking/screens/dashboard/books/dashboard_page_books_fab.dart';
-import 'package:artbooking/screens/dashboard/books/dashboard_page_books_header.dart';
+import 'package:artbooking/screens/dashboard/books/my_books_page_body.dart';
+import 'package:artbooking/screens/dashboard/books/my_books_page_fab.dart';
+import 'package:artbooking/screens/dashboard/books/my_books_page_header.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/firestore/doc_snap_map.dart';
@@ -81,7 +81,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: DashboardPageBooksFab(
+      floatingActionButton: MyBooksPageFab(
         scrollController: _scrollController,
         show: _isFabVisible,
         onShowCreateBookDialog: onShowCreateBookDialog,
@@ -94,7 +94,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
               controller: _scrollController,
               slivers: <Widget>[
                 ApplicationBar(),
-                DashboardPageBooksHeader(
+                MyBooksPageHeader(
                   multiSelectActive: _forceMultiSelect,
                   multiSelectedItems: _multiSelectedItems,
                   onSelectAll: onSelectAll,
@@ -102,7 +102,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
                   onTriggerMultiSelect: onTriggerMultiSelect,
                   onShowCreateBookDialog: onShowCreateBookDialog,
                 ),
-                DashboardPageBooksBody(
+                MyBooksPageBody(
                   books: _books,
                   loading: _loading,
                   onShowCreateBookDialog: onShowCreateBookDialog,

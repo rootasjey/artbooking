@@ -6,8 +6,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
-class DashboardPageBooksBody extends StatelessWidget {
-  const DashboardPageBooksBody({
+class MyBooksPageBody extends StatelessWidget {
+  const MyBooksPageBody({
     Key? key,
     required this.loading,
     required this.books,

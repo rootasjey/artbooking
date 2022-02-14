@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
-class DashboardPageBooksFab extends StatelessWidget {
-  const DashboardPageBooksFab({
+class MyBooksPageFab extends StatelessWidget {
+  const MyBooksPageFab({
     Key? key,
     required this.show,
     this.onShowCreateBookDialog,

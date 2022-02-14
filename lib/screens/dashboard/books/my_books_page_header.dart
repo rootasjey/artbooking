@@ -1,12 +1,12 @@
 import 'package:artbooking/components/texts/page_title.dart';
-import 'package:artbooking/screens/dashboard/books/dashboard_page_books_actions.dart';
-import 'package:artbooking/screens/dashboard/books/dashboard_page_books_group_actions.dart';
+import 'package:artbooking/screens/dashboard/books/my_books_page_actions.dart';
+import 'package:artbooking/screens/dashboard/books/my_books_page_group_actions.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-class DashboardPageBooksHeader extends StatelessWidget {
-  const DashboardPageBooksHeader({
+class MyBooksPageHeader extends StatelessWidget {
+  const MyBooksPageHeader({
     Key? key,
     required this.multiSelectActive,
     this.onShowCreateBookDialog,
@@ -40,13 +40,13 @@ class DashboardPageBooksHeader extends StatelessWidget {
             subtitleValue: "books_subtitle".tr(),
             padding: const EdgeInsets.only(bottom: 16.0),
           ),
-          DashboardPageBooksActions(
+          MyBooksPageActions(
             show: multiSelectedItems.isEmpty,
             multiSelectActive: multiSelectActive,
             onTriggerMultiSelect: onTriggerMultiSelect,
             onShowCreateBookDialog: onShowCreateBookDialog,
           ),
-          DashboardPageBooksGroupActions(
+          MyBooksPageGroupActions(
             show: multiSelectedItems.isNotEmpty,
             multiSelectedItems: multiSelectedItems,
             onSelectAll: onSelectAll,
