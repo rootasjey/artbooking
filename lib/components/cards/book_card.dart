@@ -20,6 +20,8 @@ class BookCard extends StatefulWidget {
     this.onTap,
     this.onDoubleTap,
     this.onTapLike,
+    this.width = 360.0,
+    this.height = 402.0,
   });
 
   /// Book's data for this card.
@@ -54,6 +56,9 @@ class BookCard extends StatefulWidget {
   /// alongside all other cards in the list/grid, if any.
   final bool selectionMode;
 
+  final double width;
+  final double height;
+
   @override
   _BookCardState createState() => _BookCardState();
 }
@@ -67,6 +72,8 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
 
   bool _showLikeAnimation = false;
   bool _keepHeartIconVisibile = false;
+
+  final double _captionHeight = 42.0;
 
   @override
   void initState() {
@@ -88,11 +95,11 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
       tag: widget.book.id,
       child: OverflowBox(
         // avoid hero animation overflow
-        minHeight: 360.0,
-        maxHeight: 402.0,
+        minHeight: widget.height - _captionHeight,
+        maxHeight: widget.height,
         child: SizedBox(
-          width: 360.0,
-          height: 440.0,
+          width: widget.width,
+          height: widget.height,
           child: Column(
             children: [
               Stack(
@@ -153,8 +160,8 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     return ScaleTransition(
       scale: _scaleAnimation,
       child: SizedBox(
-        width: 300.0,
-        height: 360.0,
+        width: widget.width - 60.0,
+        height: widget.height - _captionHeight,
         child: Material(
           color: Colors.black.withOpacity(0.3),
           child: Center(
@@ -173,10 +180,10 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     return Positioned(
       top: 0.0,
       right: 0.0,
-      width: 200.0,
+      width: widget.width - 160.0,
       child: SizedBox(
-        width: 280.0,
-        height: 360.0,
+        width: widget.width - 80.0,
+        height: widget.height - _captionHeight,
         child: Card(
           elevation: _elevation / 2.0,
           color: Colors.white70,
@@ -194,7 +201,8 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
 
     return Material(
       color: Colors.transparent,
-      child: Padding(
+      child: Container(
+        width: widget.width - 50.0,
         padding: const EdgeInsets.only(
           left: 16.0,
           right: 16.0,
@@ -226,8 +234,8 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     final book = widget.book;
 
     return Container(
-      width: 300.0,
-      height: 360.0,
+      width: widget.width - 60.0,
+      height: widget.height - _captionHeight,
       padding: const EdgeInsets.only(right: 12.0),
       child: ScaleTransition(
         scale: _scaleAnimation,
