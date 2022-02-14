@@ -74,6 +74,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   bool _keepHeartIconVisibile = false;
 
   final double _captionHeight = 42.0;
+  final double _cardRadius = 8.0;
 
   @override
   void initState() {
@@ -188,7 +189,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
           elevation: _elevation / 2.0,
           color: Colors.white70,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
+            borderRadius: BorderRadius.circular(_cardRadius),
           ),
           clipBehavior: Clip.hardEdge,
         ),
@@ -245,7 +246,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
               : Colors.transparent,
           elevation: _elevation,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
+            borderRadius: BorderRadius.circular(_cardRadius),
           ),
           clipBehavior: Clip.antiAlias,
           child: Stack(
