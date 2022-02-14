@@ -1,3 +1,4 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -16,30 +17,19 @@ class IllustrationsPageEmpty extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(
-                bottom: 12.0,
-              ),
-              child: Text(
-                "lonely_there".tr(),
-                style: TextStyle(
-                  fontSize: 32.0,
-                  color: Theme.of(context).primaryColor,
-                ),
+            Text(
+              "lonely_there".tr(),
+              style: Utilities.fonts.style(
+                fontSize: 26.0,
+                color: Theme.of(context).primaryColor,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(
-                bottom: 16.0,
-                // top: 24.0,
-              ),
-              child: Opacity(
-                opacity: 0.4,
-                child: Text(
-                  "illustrations_empty".tr(),
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
+            Opacity(
+              opacity: 0.4,
+              child: Text(
+                "illustrations_empty".tr(),
+                style: Utilities.fonts.style(
+                  fontSize: 16.0,
                 ),
               ),
             ),
