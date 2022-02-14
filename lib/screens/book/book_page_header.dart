@@ -7,6 +7,7 @@ import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:unicons/unicons.dart';
 
@@ -166,14 +167,24 @@ class BookPageHeader extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            IconButton(
-                              tooltip: liked ? "unlike".tr() : "like".tr(),
-                              icon: Icon(UniconsLine.heart),
-                              color: liked
-                                  ? Theme.of(context).secondaryHeaderColor
-                                  : null,
-                              onPressed: onLike,
-                            ),
+                            if (liked)
+                              IconButton(
+                                tooltip: "unlike".tr(),
+                                icon: Icon(
+                                  FontAwesomeIcons.solidHeart,
+                                ),
+                                iconSize: 18.0,
+                                color: Theme.of(context).secondaryHeaderColor,
+                                onPressed: onLike,
+                              )
+                            else
+                              IconButton(
+                                tooltip: "like".tr(),
+                                icon: Icon(
+                                  UniconsLine.heart,
+                                ),
+                                onPressed: onLike,
+                              ),
                           ],
                         ),
                       ],
