@@ -8,6 +8,7 @@ import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/dashboard/books/dashboard_page_books_body.dart';
+import 'package:artbooking/screens/dashboard/books/dashboard_page_books_fab.dart';
 import 'package:artbooking/screens/dashboard/books/dashboard_page_books_header.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
@@ -68,7 +69,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   @override
   initState() {
     super.initState();
-    fetchManyBooks();
+    fetchBooks();
   }
 
   @override
@@ -81,11 +82,15 @@ class _MyBooksPageState extends State<MyBooksPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: fab(),
+      floatingActionButton: DashboardPageBooksFab(
+        scrollController: _scrollController,
+        show: _isFabVisible,
+        onShowCreateBookDialog: onShowCreateBookDialog,
+      ),
       body: Stack(
         children: [
           NotificationListener<ScrollNotification>(
-            onNotification: onNotification,
+            onNotification: onScrollNotification,
             child: CustomScrollView(
               controller: _scrollController,
               slivers: <Widget>[
@@ -128,33 +133,9 @@ class _MyBooksPageState extends State<MyBooksPage> {
     );
   }
 
-  Widget fab() {
-    if (!_isFabVisible) {
-      return FloatingActionButton(
-        onPressed: onShowCreateBookDialog,
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-        child: Icon(UniconsLine.plus),
-      );
-    }
-
-    return FloatingActionButton(
-      onPressed: () {
-        _scrollController.animateTo(
-          0.0,
-          duration: 1.seconds,
-          curve: Curves.easeOut,
-        );
-      },
-      backgroundColor: Theme.of(context).primaryColor,
-      foregroundColor: Colors.white,
-      child: Icon(UniconsLine.arrow_up),
-    );
-  }
-
   /// Fire when a new document has been created in Firestore.
   /// Add the corresponding document in the UI.
-  void addStreamingDoc(DocumentChangeMap documentChange) {
+  void onAddStreamingBook(DocumentChangeMap documentChange) {
     final data = documentChange.doc.data();
 
     if (data == null) {
@@ -224,7 +205,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
         return DeleteDialog(
           titleValue: "book_delete".tr().toUpperCase(),
           descriptionValue: "book_delete_description".tr(),
-          onValidate: () => deleteBook(book, index),
+          onValidate: () => onDeleteBook(book, index),
         );
       },
     );
@@ -279,7 +260,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     }
   }
 
-  void fetchManyBooks() async {
+  void fetchBooks() async {
     setState(() {
       _loading = true;
       _hasNext = true;
@@ -293,7 +274,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
           .orderBy('created_at', descending: _descending)
           .limit(_limit);
 
-      startListenningToData(query);
+      listenBooksEvents(query);
       final snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
@@ -323,7 +304,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     }
   }
 
-  void fetchManyBooksMore() async {
+  void fetchMoreBooks() async {
     if (!_hasNext || _lastDocument == null) {
       return;
     }
@@ -388,7 +369,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   }
 
   /// On scroll notifications.
-  bool onNotification(ScrollNotification notification) {
+  bool onScrollNotification(ScrollNotification notification) {
     // FAB visibility
     if (notification.metrics.pixels < 50 && _isFabVisible) {
       setState(() {
@@ -405,7 +386,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     }
 
     if (_hasNext && !_isLoadingMore) {
-      fetchManyBooksMore();
+      fetchMoreBooks();
     }
 
     return false;
@@ -437,7 +418,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
   /// Fire when a new document has been delete from Firestore.
   /// Delete the corresponding document from the UI.
-  void removeStreamingDoc(DocumentChangeMap documentChange) {
+  void onRemoveStreamingBook(DocumentChangeMap documentChange) {
     setState(() {
       _books.removeWhere((book) => book.id == documentChange.doc.id);
     });
@@ -466,7 +447,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     );
   }
 
-  void showRenameBookDialog(Book book) {
+  void onShowRenameBookDialog(Book book) {
     final _nameController = TextEditingController();
     final _descriptionController = TextEditingController();
 
@@ -483,7 +464,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
         subtitleValue: "book_rename_description".tr(),
         onCancel: Beamer.of(context).popRoute,
         onSubmitted: (value) {
-          renameBook(
+          onRenameBook(
             book,
             _nameController.text,
             _descriptionController.text,
@@ -495,7 +476,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   }
 
   /// Rename one book.
-  void renameBook(Book book, String name, String description) async {
+  void onRenameBook(Book book, String name, String description) async {
     try {
       final prevName = book.name;
       final prevDescription = book.description;
@@ -533,19 +514,19 @@ class _MyBooksPageState extends State<MyBooksPage> {
   }
 
   /// Listen to the last Firestore query of this page.
-  void startListenningToData(QueryMap query) {
+  void listenBooksEvents(QueryMap query) {
     _bookSubscription = query.snapshots().skip(1).listen(
       (snapshot) {
         for (DocumentChangeMap documentChange in snapshot.docChanges) {
           switch (documentChange.type) {
             case DocumentChangeType.added:
-              addStreamingDoc(documentChange);
+              onAddStreamingBook(documentChange);
               break;
             case DocumentChangeType.modified:
-              updateStreamingDoc(documentChange);
+              onUpdateStreamingBook(documentChange);
               break;
             case DocumentChangeType.removed:
-              removeStreamingDoc(documentChange);
+              onRemoveStreamingBook(documentChange);
               break;
           }
         }
@@ -558,7 +539,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
   /// Fire when a new document has been updated in Firestore.
   /// Update the corresponding document in the UI.
-  void updateStreamingDoc(DocumentChangeMap documentChange) {
+  void onUpdateStreamingBook(DocumentChangeMap documentChange) {
     try {
       final data = documentChange.doc.data();
       if (data == null) {
@@ -586,7 +567,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     }
   }
 
-  void deleteBook(Book book, int index) async {
+  void onDeleteBook(Book book, int index) async {
     setState(() => _books.removeAt(index));
 
     final response = await BooksActions.deleteOne(
@@ -604,7 +585,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     );
   }
 
-  void multiSelectBook(book) {
+  void onMultiSelectBook(book) {
     final selected = _multiSelectedItems.containsKey(book.id);
 
     if (selected) {
@@ -621,7 +602,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     });
   }
 
-  void navigateToBook(Book book) {
+  void onNavigateToBook(Book book) {
     NavigationStateHelper.book = book;
     Beamer.of(context).beamToNamed(
       "dashboard/books/${book.id}",
@@ -634,11 +615,11 @@ class _MyBooksPageState extends State<MyBooksPage> {
   /// When [onTapBook] event fires on a book.
   void onTapBook(Book book) {
     if (_multiSelectedItems.isEmpty && !_forceMultiSelect) {
-      navigateToBook(book);
+      onNavigateToBook(book);
       return;
     }
 
-    multiSelectBook(book);
+    onMultiSelectBook(book);
   }
 
   void onPopupMenuItemSelected(
@@ -648,7 +629,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   ) {
     switch (action) {
       case EnumBookItemAction.rename:
-        showRenameBookDialog(book);
+        onShowRenameBookDialog(book);
         break;
       case EnumBookItemAction.delete:
         confirmDeleteOneBook(book, index);
