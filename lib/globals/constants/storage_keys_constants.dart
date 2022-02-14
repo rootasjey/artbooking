@@ -4,7 +4,10 @@ class StorageKeys {
   final String autoBrightness = 'autoBrightness';
   final String brightness = 'brightness';
   final String dashboardSideMenuExpanded = 'dashboard_side_menu_expanded';
-  final String discoverType = 'discover_type';
+  final String dashboardLicenseTab = 'dashboard_saved_license_tab';
+  final String dashboardLikeTab = 'dashboard_saved_license_tab';
+  final String dashboardIllustrationTab = 'dashboard_saved_license_tab';
+  final String dashboardBookTab = 'dashboard_saved_license_tab';
   final String drafts = 'drafts';
   final String email = 'email';
   final String firstLaunch = 'first_launch';

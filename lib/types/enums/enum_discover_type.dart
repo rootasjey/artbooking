@@ -1,4 +1,0 @@
-enum EnumDiscoverType {
-  authors,
-  references,
-}

@@ -67,7 +67,8 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   @override
   initState() {
     super.initState();
-    fetchStaffLicenses();
+    loadPreferences();
+    fetchLicense();
   }
 
   @override
@@ -120,6 +121,14 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
       child: Icon(UniconsLine.plus),
       backgroundColor: Theme.of(context).secondaryHeaderColor,
     );
+  }
+
+  void fetchLicense() {
+    if (_selectedTab == EnumLicenseType.staff) {
+      return fetchStaffLicenses();
+    }
+
+    return fetchUserLicenses();
   }
 
   /// Fetch staff license on Firestore.
@@ -310,12 +319,18 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     }
   }
 
-  void onChangedTab(EnumLicenseType newLicenseTab) {
+  void loadPreferences() {
+    _selectedTab = Utilities.storage.getLicenseTab();
+  }
+
+  void onChangedTab(EnumLicenseType licenseTab) {
+    Utilities.storage.saveLicenseTab(licenseTab);
+
     setState(() {
-      _selectedTab = newLicenseTab;
+      _selectedTab = licenseTab;
     });
 
-    switch (newLicenseTab) {
+    switch (licenseTab) {
       case EnumLicenseType.staff:
         fetchStaffLicenses();
         break;

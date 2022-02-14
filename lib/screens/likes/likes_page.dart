@@ -78,6 +78,7 @@ class _LikesPageState extends ConsumerState<LikesPage> {
   @override
   initState() {
     super.initState();
+    loadPreferences();
     fetchLikes();
   }
 
@@ -342,12 +343,17 @@ class _LikesPageState extends ConsumerState<LikesPage> {
     }
   }
 
+  void loadPreferences() {
+    _selectedTab = Utilities.storage.getLikeTab();
+  }
+
   void onChangedTab(EnumLikeType likeType) {
     setState(() {
       _selectedTab = likeType;
     });
 
     fetchLikes();
+    Utilities.storage.saveLikeTab(likeType);
   }
 
   /// On scroll notification
