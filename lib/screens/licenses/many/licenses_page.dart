@@ -56,7 +56,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   /// Maximum licenses to fetch in one request.
   int _limit = 20;
 
-  QuerySnapshotStreamSubscription? _streamSubscription;
+  QuerySnapshotStreamSubscription? _licenseSubscription;
 
   /// Delay search after typing input.
   Timer? _searchTimer;
@@ -74,7 +74,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   void dispose() {
     _searchTimer?.cancel();
     _searchTextController.dispose();
-    _streamSubscription?.cancel();
+    _licenseSubscription?.cancel();
     super.dispose();
   }
 
@@ -110,9 +110,21 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     );
   }
 
+  Widget fab(bool canManageLicense) {
+    if (!canManageLicense) {
+      return Container();
+    }
+
+    return FloatingActionButton(
+      onPressed: openNewLicenseDialog,
+      child: Icon(UniconsLine.plus),
+      backgroundColor: Theme.of(context).secondaryHeaderColor,
+    );
+  }
+
   /// Fetch staff license on Firestore.
   void fetchStaffLicenses() async {
-    _streamSubscription?.cancel();
+    _licenseSubscription?.cancel();
 
     setState(() {
       _lastDocumentSnapshot = null;
@@ -126,7 +138,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
           .orderBy('created_at', descending: _descending)
           .limit(_limit);
 
-      startListeningToCollection(query);
+      listenLicenseEvents(query);
       final snapshot = await query.get();
 
       if (snapshot.size == 0) {
@@ -202,7 +214,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
 
   /// Fetch user's license on Firestore.
   void fetchUserLicenses() async {
-    _streamSubscription?.cancel();
+    _licenseSubscription?.cancel();
 
     setState(() {
       _lastDocumentSnapshot = null;
@@ -220,7 +232,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
           .orderBy('created_at', descending: _descending)
           .limit(_limit);
 
-      startListeningToCollection(query);
+      listenLicenseEvents(query);
       final snapshot = await query.get();
 
       if (snapshot.size == 0) {
@@ -298,6 +310,22 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     }
   }
 
+  void onChangedTab(EnumLicenseType newLicenseTab) {
+    setState(() {
+      _selectedTab = newLicenseTab;
+    });
+
+    switch (newLicenseTab) {
+      case EnumLicenseType.staff:
+        fetchStaffLicenses();
+        break;
+      case EnumLicenseType.user:
+        fetchUserLicenses();
+        break;
+      default:
+    }
+  }
+
   /// On scroll notification
   bool onNotification(ScrollNotification notification) {
     if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
@@ -309,6 +337,112 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     }
 
     return false;
+  }
+
+  /// Listen to the last Firestore query of this page.
+  void listenLicenseEvents(QueryMap query) {
+    _licenseSubscription?.cancel();
+    _licenseSubscription = query.snapshots().skip(1).listen(
+      (snapshot) {
+        for (DocumentChangeMap documentChange in snapshot.docChanges) {
+          switch (documentChange.type) {
+            case DocumentChangeType.added:
+              onAddStreamingLicense(documentChange);
+              break;
+            case DocumentChangeType.modified:
+              onUpdateStreamingLicense(documentChange);
+              break;
+            case DocumentChangeType.removed:
+              onRemoveStreamingLicense(documentChange);
+              break;
+          }
+        }
+      },
+      onError: (error) {
+        Utilities.logger.e(error);
+      },
+    );
+  }
+
+  /// Fire when a new document has been created in Firestore.
+  /// Add the corresponding document in the UI.
+  void onAddStreamingLicense(DocumentChangeMap documentChange) {
+    final data = documentChange.doc.data();
+
+    if (data == null) {
+      return;
+    }
+
+    setState(() {
+      data['id'] = documentChange.doc.id;
+      final illustration = License.fromMap(data);
+      _licenses.insert(0, illustration);
+    });
+  }
+
+  void onDeleteLicense(targetLicense, targetIndex) {
+    showDeleteConfirmDialog(targetLicense, targetIndex);
+  }
+
+  void onEditLicense(License targetLicense, int targetIndex) {
+    showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => EditLicensePage(
+        licenseId: targetLicense.id,
+        type: targetLicense.type,
+      ),
+    );
+  }
+
+  /// Fire when a new document has been delete from Firestore.
+  /// Delete the corresponding document from the UI.
+  void onRemoveStreamingLicense(DocumentChangeMap documentChange) {
+    setState(() {
+      _licenses.removeWhere(
+        (license) => license.id == documentChange.doc.id,
+      );
+    });
+  }
+
+  void onTapLicense(License license) {
+    final route = DashboardLocationContent.licenseRoute
+        .replaceFirst(':licenseId', license.id);
+
+    Beamer.of(context).beamToNamed(route, data: {
+      'licenseId': license.id,
+    }, routeState: {
+      'type': license.typeToString(),
+    });
+  }
+
+  /// Fire when a new document has been updated in Firestore.
+  /// Update the corresponding document in the UI.
+  void onUpdateStreamingLicense(DocumentChangeMap documentChange) {
+    try {
+      final data = documentChange.doc.data();
+      if (data == null || !documentChange.doc.exists) {
+        return;
+      }
+
+      final int index = _licenses.indexWhere(
+        (illustration) => illustration.id == documentChange.doc.id,
+      );
+
+      data['id'] = documentChange.doc.id;
+      final updatedIllustration = License.fromMap(data);
+
+      setState(() {
+        _licenses.removeAt(index);
+        _licenses.insert(index, updatedIllustration);
+      });
+    } on Exception catch (error) {
+      Utilities.logger.e(
+        "The document with the id ${documentChange.doc.id} "
+        "doesn't exist in the illustrations list.",
+      );
+
+      Utilities.logger.e(error);
+    }
   }
 
   void openNewLicenseDialog() async {
@@ -381,56 +515,6 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     );
   }
 
-  /// Listen to the last Firestore query of this page.
-  void startListeningToCollection(QueryMap query) {
-    _streamSubscription = query.snapshots().skip(1).listen(
-      (snapshot) {
-        for (DocumentChangeMap documentChange in snapshot.docChanges) {
-          switch (documentChange.type) {
-            case DocumentChangeType.added:
-              addStreamingDoc(documentChange);
-              break;
-            case DocumentChangeType.modified:
-              updateStreamingDoc(documentChange);
-              break;
-            case DocumentChangeType.removed:
-              removeStreamingDoc(documentChange);
-              break;
-          }
-        }
-      },
-      onError: (error) {
-        Utilities.logger.e(error);
-      },
-    );
-  }
-
-  /// Fire when a new document has been created in Firestore.
-  /// Add the corresponding document in the UI.
-  void addStreamingDoc(DocumentChangeMap documentChange) {
-    final data = documentChange.doc.data();
-
-    if (data == null) {
-      return;
-    }
-
-    setState(() {
-      data['id'] = documentChange.doc.id;
-      final illustration = License.fromMap(data);
-      _licenses.insert(0, illustration);
-    });
-  }
-
-  /// Fire when a new document has been delete from Firestore.
-  /// Delete the corresponding document from the UI.
-  void removeStreamingDoc(DocumentChangeMap documentChange) {
-    setState(() {
-      _licenses.removeWhere(
-        (license) => license.id == documentChange.doc.id,
-      );
-    });
-  }
-
   void tryDeleteLicense(License license, int index) async {
     setState(() => _licenses.removeAt(index));
 
@@ -450,89 +534,6 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
       setState(() => _licenses.insert(index, license));
-    }
-  }
-
-  /// Fire when a new document has been updated in Firestore.
-  /// Update the corresponding document in the UI.
-  void updateStreamingDoc(DocumentChangeMap documentChange) {
-    try {
-      final data = documentChange.doc.data();
-      if (data == null || !documentChange.doc.exists) {
-        return;
-      }
-
-      final int index = _licenses.indexWhere(
-        (illustration) => illustration.id == documentChange.doc.id,
-      );
-
-      data['id'] = documentChange.doc.id;
-      final updatedIllustration = License.fromMap(data);
-
-      setState(() {
-        _licenses.removeAt(index);
-        _licenses.insert(index, updatedIllustration);
-      });
-    } on Exception catch (error) {
-      Utilities.logger.e(
-        "The document with the id ${documentChange.doc.id} "
-        "doesn't exist in the illustrations list.",
-      );
-
-      Utilities.logger.e(error);
-    }
-  }
-
-  void onDeleteLicense(targetLicense, targetIndex) {
-    showDeleteConfirmDialog(targetLicense, targetIndex);
-  }
-
-  void onEditLicense(License targetLicense, int targetIndex) {
-    showCupertinoModalBottomSheet(
-      context: context,
-      builder: (context) => EditLicensePage(
-        licenseId: targetLicense.id,
-        type: targetLicense.type,
-      ),
-    );
-  }
-
-  Widget? fab(bool canManageLicense) {
-    if (!canManageLicense) {
-      return null;
-    }
-
-    return FloatingActionButton(
-      onPressed: openNewLicenseDialog,
-      child: Icon(UniconsLine.plus),
-      backgroundColor: Theme.of(context).secondaryHeaderColor,
-    );
-  }
-
-  void onTapLicense(License license) {
-    final route = DashboardLocationContent.licenseRoute
-        .replaceFirst(':licenseId', license.id);
-
-    Beamer.of(context).beamToNamed(route, data: {
-      'licenseId': license.id,
-    }, routeState: {
-      'type': license.typeToString(),
-    });
-  }
-
-  void onChangedTab(EnumLicenseType newLicenseTab) {
-    setState(() {
-      _selectedTab = newLicenseTab;
-    });
-
-    switch (newLicenseTab) {
-      case EnumLicenseType.staff:
-        fetchStaffLicenses();
-        break;
-      case EnumLicenseType.user:
-        fetchUserLicenses();
-        break;
-      default:
     }
   }
 }

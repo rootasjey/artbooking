@@ -40,7 +40,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
   bool _isDeleting = false;
   bool _isLoading = false;
 
-  DocSnapshotStreamSubscription? _streamSubscription;
+  DocSnapshotStreamSubscription? _licenseSubscription;
 
   var _license = License.empty();
 
@@ -52,7 +52,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
 
   @override
   void dispose() {
-    _streamSubscription?.cancel();
+    _licenseSubscription?.cancel();
     super.dispose();
   }
 
@@ -81,9 +81,9 @@ class _LicensePageState extends ConsumerState<LicensePage> {
     );
   }
 
-  Widget? fab(bool canManageLicense) {
+  Widget fab(bool canManageLicense) {
     if (!canManageLicense) {
-      return null;
+      return Container();
     }
 
     return FloatingActionButton(
@@ -122,7 +122,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
         return;
       }
 
-      startListeningToDocument(query);
+      listenLicenseEvents(query);
 
       data['id'] = docSnapshot.id;
       setState(() => _license = License.fromMap(data));
@@ -131,6 +131,26 @@ class _LicensePageState extends ConsumerState<LicensePage> {
     } finally {
       setState(() => _isLoading = false);
     }
+  }
+
+  void listenLicenseEvents(DocumentReference<Map<String, dynamic>> query) {
+    _licenseSubscription?.cancel();
+    _licenseSubscription = query.snapshots().skip(1).listen((docSnapshot) {
+      final Json? data = docSnapshot.data();
+
+      if (!docSnapshot.exists || data == null) {
+        context.canBeamBack
+            ? Beamer.of(context).popRoute()
+            : Beamer.of(context).beamToNamed(HomeLocation.route);
+
+        return;
+      }
+
+      setState(() {
+        data['id'] = docSnapshot.id;
+        _license = License.fromMap(data);
+      });
+    });
   }
 
   void onDeleteLicense() {
@@ -228,24 +248,5 @@ class _LicensePageState extends ConsumerState<LicensePage> {
     } finally {
       setState(() => _isDeleting = false);
     }
-  }
-
-  void startListeningToDocument(DocumentReference<Map<String, dynamic>> query) {
-    _streamSubscription = query.snapshots().skip(1).listen((docSnapshot) {
-      final Json? data = docSnapshot.data();
-
-      if (!docSnapshot.exists || data == null) {
-        context.canBeamBack
-            ? Beamer.of(context).popRoute()
-            : Beamer.of(context).beamToNamed(HomeLocation.route);
-
-        return;
-      }
-
-      setState(() {
-        data['id'] = docSnapshot.id;
-        _license = License.fromMap(data);
-      });
-    });
   }
 }
