@@ -94,7 +94,7 @@ class LicensesPageBody extends StatelessWidget {
 
     return SliverPadding(
       padding: const EdgeInsets.only(
-        left: 54.0,
+        left: 34.0,
         right: 30.0,
         bottom: 300.0,
       ),

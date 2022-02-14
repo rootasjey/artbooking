@@ -6,6 +6,7 @@ import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/buttons/text_rectangle_button.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/add_to_book_panel.dart';
+import 'package:artbooking/components/texts/page_title.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/globals/app_state.dart';
@@ -288,18 +289,11 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       ),
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
-          Padding(
+          PageTitle(
+            renderSliver: false,
+            titleValue: "illustrations".tr(),
+            subtitleValue: "illustrations_subtitle".tr(),
             padding: const EdgeInsets.only(bottom: 16.0),
-            child: Opacity(
-              opacity: 0.8,
-              child: Text(
-                'illustrations'.tr().toUpperCase(),
-                style: Utilities.fonts.style(
-                  fontSize: 30.0,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
           ),
           defaultActionsToolbar(),
           multiSelectToolbar(),

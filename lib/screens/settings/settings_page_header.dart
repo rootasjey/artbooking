@@ -9,8 +9,8 @@ class SettingsPageHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverPadding(
       padding: const EdgeInsets.only(
-        left: 100.0,
-        top: 40.0,
+        left: 54.0,
+        top: 60.0,
       ),
       sliver: PageTitle(
         crossAxisAlignment: CrossAxisAlignment.start,

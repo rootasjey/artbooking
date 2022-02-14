@@ -260,9 +260,9 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
     return [
       SideMenuItem(
         iconData: UniconsLine.chart_pie,
-        label: "statistics".tr(),
+        label: "activity".tr(),
         hoverColor: Constants.colors.activity,
-        routePath: DashboardLocationContent.statisticsRoute,
+        routePath: DashboardLocationContent.activityRoute,
       ),
       SideMenuItem(
         iconData: UniconsLine.picture,

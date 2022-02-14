@@ -1,4 +1,5 @@
 import 'package:artbooking/components/application_bar/application_bar.dart';
+import 'package:artbooking/components/texts/page_title.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page_card.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
@@ -59,24 +60,12 @@ class DashboardPageWelcome extends ConsumerWidget {
       padding: const EdgeInsets.only(
         top: 60.0,
         left: 54.0,
-        bottom: 24.0,
+        bottom: 54.0,
       ),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: Opacity(
-              opacity: 0.8,
-              child: Text(
-                "dashboard".tr().toUpperCase(),
-                style: Utilities.fonts.style(
-                  fontSize: 30.0,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-          ),
-        ]),
+      sliver: PageTitle(
+        titleValue: "dashboard".tr(),
+        subtitleValue: "dashboard_greetings".tr(),
+        crossAxisAlignment: CrossAxisAlignment.start,
       ),
     );
   }
@@ -150,10 +139,10 @@ class DashboardPageWelcome extends ConsumerWidget {
           DashbordPageCard(
             hoverColor: Constants.colors.activity,
             iconData: UniconsLine.chart_pie,
-            textTitle: "statistics".tr(),
-            textSubtitle: "statistics_subtitle".tr(),
+            textTitle: "activity".tr(),
+            textSubtitle: "activity_subtitle".tr(),
             onTap: () {
-              context.beamToNamed(DashboardLocationContent.statisticsRoute);
+              context.beamToNamed(DashboardLocationContent.activityRoute);
             },
           ),
           DashbordPageCard(

@@ -6,6 +6,7 @@ import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page.dart';
+import 'package:artbooking/screens/licenses/many/licenses_page_fab.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page_header.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page_body.dart';
 import 'package:artbooking/types/cloud_functions/license_response.dart';
@@ -22,7 +23,6 @@ import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:unicons/unicons.dart';
 
 class LicensesPage extends ConsumerStatefulWidget {
   const LicensesPage({Key? key}) : super(key: key);
@@ -89,7 +89,10 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
         _selectedTab == EnumLicenseType.staff ? canManageStaffLicense : true;
 
     return Scaffold(
-      floatingActionButton: fab(canManageLicense),
+      floatingActionButton: LicensesPageFab(
+        show: canManageLicense,
+        onPressed: openNewLicenseDialog,
+      ),
       body: CustomScrollView(
         slivers: <Widget>[
           ApplicationBar(),
@@ -108,18 +111,6 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
           )
         ],
       ),
-    );
-  }
-
-  Widget fab(bool canManageLicense) {
-    if (!canManageLicense) {
-      return Container();
-    }
-
-    return FloatingActionButton(
-      onPressed: openNewLicenseDialog,
-      child: Icon(UniconsLine.plus),
-      backgroundColor: Theme.of(context).secondaryHeaderColor,
     );
   }
 

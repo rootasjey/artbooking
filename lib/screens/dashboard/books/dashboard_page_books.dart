@@ -1,14 +1,14 @@
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
-import 'package:artbooking/components/icons/animated_app_icon.dart';
-import 'package:artbooking/components/cards/book_card.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
-import 'package:artbooking/components/buttons/text_rectangle_button.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
+import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
+import 'package:artbooking/screens/dashboard/books/dashboard_page_books_body.dart';
+import 'package:artbooking/screens/dashboard/books/dashboard_page_books_header.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/firestore/doc_snap_map.dart';
@@ -31,13 +31,13 @@ class MyBooksPage extends StatefulWidget {
 }
 
 class _MyBooksPageState extends State<MyBooksPage> {
-  bool _isLoading = false;
+  bool _loading = false;
   bool _descending = true;
   bool _hasNext = true;
   bool _isFabVisible = false;
   bool _isLoadingMore = false;
   bool _forceMultiSelect = false;
-  bool _isCreating = false;
+  bool _creating = false;
 
   DocumentSnapshot? _lastDocument;
 
@@ -82,120 +82,48 @@ class _MyBooksPageState extends State<MyBooksPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: fab(),
-      body: NotificationListener<ScrollNotification>(
-        onNotification: onNotification,
-        child: CustomScrollView(
-          controller: _scrollController,
-          slivers: <Widget>[
-            ApplicationBar(),
-            header(),
-            body(),
-            SliverPadding(
-              padding: const EdgeInsets.only(bottom: 100.0),
+      body: Stack(
+        children: [
+          NotificationListener<ScrollNotification>(
+            onNotification: onNotification,
+            child: CustomScrollView(
+              controller: _scrollController,
+              slivers: <Widget>[
+                ApplicationBar(),
+                DashboardPageBooksHeader(
+                  multiSelectActive: _forceMultiSelect,
+                  multiSelectedItems: _multiSelectedItems,
+                  onSelectAll: onSelectAll,
+                  onClearSelection: onClearSelection,
+                  onTriggerMultiSelect: onTriggerMultiSelect,
+                  onShowCreateBookDialog: onShowCreateBookDialog,
+                ),
+                DashboardPageBooksBody(
+                  books: _books,
+                  loading: _loading,
+                  onShowCreateBookDialog: onShowCreateBookDialog,
+                  popupMenuEntries: _popupMenuEntries,
+                  onLongPressBook: onLongPressBook,
+                  forceMultiSelect: _forceMultiSelect,
+                  multiSelectedItems: _multiSelectedItems,
+                  onPopupMenuItemSelected: onPopupMenuItemSelected,
+                  onTapBook: onTapBook,
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.only(bottom: 100.0),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget body() {
-    if (_isLoading) {
-      return SliverList(
-        delegate: SliverChildListDelegate.fixed([
-          Padding(
-            padding: const EdgeInsets.only(top: 100.0),
-            child: AnimatedAppIcon(textTitle: "loading_books".tr()),
           ),
-        ]),
-      );
-    }
-
-    if (_books.isEmpty) {
-      return emptyView();
-    }
-
-    return gridView();
-  }
-
-  Widget createButton() {
-    return TextRectangleButton(
-      onPressed: showBookCreationDialog,
-      icon: Icon(UniconsLine.plus),
-      label: Text('create'.tr()),
-      primary: Colors.black38,
-    );
-  }
-
-  Widget defaultActionsToolbar() {
-    if (_multiSelectedItems.isNotEmpty) {
-      return Container();
-    }
-
-    return Wrap(
-      spacing: 12.0,
-      runSpacing: 12.0,
-      children: [
-        createButton(),
-        multiSelectButton(),
-        sortButton(),
-      ],
-    );
-  }
-
-  Widget emptyView() {
-    return SliverPadding(
-      padding: const EdgeInsets.only(
-        top: 40.0,
-        left: 50.0,
-      ),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  bottom: 12.0,
-                ),
-                child: Text(
-                  "lonely_there".tr(),
-                  style: TextStyle(
-                    fontSize: 32.0,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  bottom: 12.0,
-                ),
-                child: Opacity(
-                  opacity: 0.6,
-                  child: Text(
-                    "books_none_created".tr(),
-                    style: TextStyle(
-                      fontSize: 16.0,
-                    ),
-                  ),
-                ),
-              ),
-              ElevatedButton.icon(
-                onPressed: showBookCreationDialog,
-                icon: Icon(UniconsLine.book_medical),
-                label: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Text(
-                    "create".tr(),
-                    style: TextStyle(
-                      fontSize: 16.0,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+          Positioned(
+            top: 100.0,
+            right: 24.0,
+            child: PopupProgressIndicator(
+              show: _creating,
+              message: "book_creating".tr() + "...",
+            ),
           ),
-        ]),
+        ],
       ),
     );
   }
@@ -203,7 +131,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
   Widget fab() {
     if (!_isFabVisible) {
       return FloatingActionButton(
-        onPressed: showBookCreationDialog,
+        onPressed: onShowCreateBookDialog,
         backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,
         child: Icon(UniconsLine.plus),
@@ -221,194 +149,6 @@ class _MyBooksPageState extends State<MyBooksPage> {
       backgroundColor: Theme.of(context).primaryColor,
       foregroundColor: Colors.white,
       child: Icon(UniconsLine.arrow_up),
-    );
-  }
-
-  Widget header() {
-    return SliverPadding(
-      padding: const EdgeInsets.only(
-        top: 60.0,
-        left: 50.0,
-        bottom: 24.0,
-      ),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: Row(
-              children: [
-                Opacity(
-                  opacity: 0.8,
-                  child: Text(
-                    "books".tr().toUpperCase(),
-                    style: Utilities.fonts.style(
-                      fontSize: 30.0,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                if (_isCreating)
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 24.0,
-                      top: 12.0,
-                    ),
-                    child: CircularProgressIndicator(),
-                  ),
-              ],
-            ),
-          ),
-          defaultActionsToolbar(),
-          multiSelectToolbar(),
-        ]),
-      ),
-    );
-  }
-
-  Widget gridView() {
-    final selectionMode = _forceMultiSelect || _multiSelectedItems.isNotEmpty;
-
-    return SliverPadding(
-      padding: const EdgeInsets.all(40.0),
-      sliver: SliverGrid(
-        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          mainAxisExtent: 410.0,
-          maxCrossAxisExtent: 340.0,
-          mainAxisSpacing: 20.0,
-          crossAxisSpacing: 20.0,
-        ),
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final book = _books.elementAt(index);
-            final selected = _multiSelectedItems.containsKey(book.id);
-
-            return BookCard(
-              book: book,
-              selected: selected,
-              selectionMode: selectionMode,
-              onTap: () => onTap(book),
-              onPopupMenuItemSelected: onPopupMenuItemSelected,
-              popupMenuEntries: _popupMenuEntries,
-              onLongPress: (selected) {
-                if (selected) {
-                  setState(() {
-                    _multiSelectedItems.remove(book.id);
-                  });
-
-                  return;
-                }
-
-                setState(() {
-                  _multiSelectedItems.putIfAbsent(book.id, () => book);
-                });
-              },
-            );
-          },
-          childCount: _books.length,
-        ),
-      ),
-    );
-  }
-
-  Widget multiSelectAll() {
-    return TextRectangleButton(
-      icon: Icon(UniconsLine.layers),
-      label: Text("select_all".tr()),
-      primary: Colors.black38,
-      onPressed: () {
-        _books.forEach((illustration) {
-          _multiSelectedItems.putIfAbsent(
-            illustration.id,
-            () => illustration,
-          );
-        });
-
-        setState(() {});
-      },
-    );
-  }
-
-  Widget multiSelectButton() {
-    return TextRectangleButton(
-      onPressed: () {
-        setState(() {
-          _forceMultiSelect = !_forceMultiSelect;
-        });
-      },
-      icon: Icon(UniconsLine.layers),
-      label: Text('multi_select'.tr()),
-      primary: _forceMultiSelect ? Colors.lightGreen : Colors.black38,
-    );
-  }
-
-  Widget multiSelectClear() {
-    return TextRectangleButton(
-      icon: Icon(UniconsLine.ban),
-      label: Text("clear_selection".tr()),
-      primary: Colors.black38,
-      onPressed: () {
-        setState(() {
-          _multiSelectedItems.clear();
-          _forceMultiSelect = _multiSelectedItems.length > 0;
-        });
-      },
-    );
-  }
-
-  Widget multiSelectCount() {
-    return Opacity(
-      opacity: 0.6,
-      child: Text(
-        "multi_items_selected".tr(
-          args: [_multiSelectedItems.length.toString()],
-        ),
-        style: TextStyle(
-          fontSize: 30.0,
-        ),
-      ),
-    );
-  }
-
-  Widget multiSelectDelete() {
-    return TextRectangleButton(
-      icon: Icon(UniconsLine.trash),
-      label: Text("delete".tr()),
-      primary: Colors.black38,
-      onPressed: confirmDeleteManyBooks,
-    );
-  }
-
-  Widget multiSelectToolbar() {
-    if (_multiSelectedItems.isEmpty) {
-      return Container();
-    }
-
-    return Wrap(
-      spacing: 12.0,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        multiSelectCount(),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Container(
-            height: 25.0,
-            width: 2.0,
-            color: Colors.black12,
-          ),
-        ),
-        multiSelectClear(),
-        multiSelectAll(),
-        multiSelectDelete(),
-      ],
-    );
-  }
-
-  Widget sortButton() {
-    return TextRectangleButton(
-      onPressed: () {},
-      icon: Icon(UniconsLine.sort),
-      label: Text('sort'.tr()),
-      primary: Colors.black38,
     );
   }
 
@@ -491,14 +231,14 @@ class _MyBooksPageState extends State<MyBooksPage> {
   }
 
   void createBook(String name, String description) async {
-    setState(() => _isCreating = true);
+    setState(() => _creating = true);
 
     final BookResponse response = await BooksActions.createOne(
       name: name,
       description: description,
     );
 
-    setState(() => _isCreating = false);
+    setState(() => _creating = false);
 
     if (!response.success) {
       context.showErrorBar(
@@ -541,7 +281,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
   void fetchManyBooks() async {
     setState(() {
-      _isLoading = true;
+      _loading = true;
       _hasNext = true;
       _books.clear();
     });
@@ -558,7 +298,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
       if (snapshot.docs.isEmpty) {
         setState(() {
-          _isLoading = false;
+          _loading = false;
           _hasNext = false;
         });
 
@@ -579,7 +319,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
-      setState(() => _isLoading = false);
+      setState(() => _loading = false);
     }
   }
 
@@ -629,8 +369,22 @@ class _MyBooksPageState extends State<MyBooksPage> {
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
-      setState(() => _isLoading = false);
+      setState(() => _loading = false);
     }
+  }
+
+  void onLongPressBook(Book book, bool selected) {
+    if (selected) {
+      setState(() {
+        _multiSelectedItems.remove(book.id);
+      });
+
+      return;
+    }
+
+    setState(() {
+      _multiSelectedItems.putIfAbsent(book.id, () => book);
+    });
   }
 
   /// On scroll notifications.
@@ -657,6 +411,30 @@ class _MyBooksPageState extends State<MyBooksPage> {
     return false;
   }
 
+  void onSelectAll() {
+    _books.forEach((illustration) {
+      _multiSelectedItems.putIfAbsent(
+        illustration.id,
+        () => illustration,
+      );
+    });
+
+    setState(() {});
+  }
+
+  void onClearSelection() {
+    setState(() {
+      _multiSelectedItems.clear();
+      _forceMultiSelect = _multiSelectedItems.length > 0;
+    });
+  }
+
+  void onTriggerMultiSelect() {
+    setState(() {
+      _forceMultiSelect = !_forceMultiSelect;
+    });
+  }
+
   /// Fire when a new document has been delete from Firestore.
   /// Delete the corresponding document from the UI.
   void removeStreamingDoc(DocumentChangeMap documentChange) {
@@ -665,7 +443,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     });
   }
 
-  void showBookCreationDialog() {
+  void onShowCreateBookDialog() {
     final _nameController = TextEditingController();
     final _descriptionController = TextEditingController();
 
@@ -853,8 +631,8 @@ class _MyBooksPageState extends State<MyBooksPage> {
     );
   }
 
-  /// When [onTap] event fires on a book.
-  void onTap(Book book) {
+  /// When [onTapBook] event fires on a book.
+  void onTapBook(Book book) {
     if (_multiSelectedItems.isEmpty && !_forceMultiSelect) {
       navigateToBook(book);
       return;

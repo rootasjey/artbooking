@@ -38,7 +38,7 @@ class SettingsPageBody extends StatelessWidget {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: 42.0,
+          horizontal: 18.0,
           vertical: 100.0,
         ),
         child: Row(

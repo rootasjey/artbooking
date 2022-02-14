@@ -19,7 +19,7 @@ class LicensesPageHeader extends StatelessWidget {
     return SliverPadding(
       padding: const EdgeInsets.only(
         top: 60.0,
-        left: 74.0,
+        left: 54.0,
         bottom: 24.0,
       ),
       sliver: SliverList(
@@ -27,7 +27,7 @@ class LicensesPageHeader extends StatelessWidget {
           Opacity(
             opacity: 0.8,
             child: Text(
-              "licenses".tr().toUpperCase(),
+              "licenses".tr(),
               style: Utilities.fonts.style(
                 fontSize: 30.0,
                 fontWeight: FontWeight.w800,

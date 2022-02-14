@@ -105,7 +105,7 @@ class _SquareStatsState extends State<SquareStats> {
   }
 
   /// Show a "soon" label if the card
-  /// doesn't have an [onTap] function callback.
+  /// doesn't have an onTap function callback.
   Widget availableSoonLabel() {
     if (widget.onTap != null) {
       return Container();
@@ -179,7 +179,7 @@ class _SquareStatsState extends State<SquareStats> {
   }
 
   /// Return the card's border color
-  /// based on the availability of the [onTap] function.
+  /// based on the availability of the onTap function.
   Color getBorderColor() {
     if (widget.onTap == null) {
       return Colors.transparent;
@@ -189,7 +189,7 @@ class _SquareStatsState extends State<SquareStats> {
   }
 
   /// Return the card's elevation
-  /// based on the availability of the [onTap] function.
+  /// based on the availability of the onTap function.
   double getElevation() {
     if (widget.onTap == null) {
       return 0.0;

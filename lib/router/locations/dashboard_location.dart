@@ -10,7 +10,7 @@ import 'package:artbooking/screens/licenses/one/license_page.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page.dart';
 import 'package:artbooking/screens/book/book_page.dart';
 import 'package:artbooking/screens/activity/activity_page.dart';
-import 'package:artbooking/screens/dashboard/dashboard_page_books.dart';
+import 'package:artbooking/screens/dashboard/books/dashboard_page_books.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page_illustrations.dart';
 import 'package:artbooking/screens/settings/settings_page.dart';
 import 'package:artbooking/screens/settings/update_email/update_email_page.dart';
@@ -25,8 +25,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DashboardLocation extends BeamLocation<BeamState> {
   /// Main root value for this location.
-  static const String route = '/dashboard';
-  static const String routeWildCard = '/dashboard/*';
+  static const String route = "/dashboard";
+  static const String routeWildCard = "/dashboard/*";
 
   @override
   List<String> get pathPatterns => [routeWildCard];
@@ -67,45 +67,45 @@ class DashboardLocation extends BeamLocation<BeamState> {
 
 class DashboardLocationContent extends BeamLocation<BeamState> {
   /// Main root value for this location.
-  static const String route = '/dashboard';
+  static const String route = "/dashboard";
 
   /// Books route value for this location.
-  static const String booksRoute = '$route/books';
+  static const String booksRoute = "$route/books";
 
   /// Book route value for this location.
-  static const String bookRoute = '$booksRoute/:bookId';
+  static const String bookRoute = "$booksRoute/:bookId";
 
   /// Illustrations route value for this location.
-  static const String illustrationsRoute = '$route/illustrations';
+  static const String illustrationsRoute = "$route/illustrations";
 
   /// Illustration route value for this location.
-  static const String illustrationRoute = '$illustrationsRoute/:illustrationId';
+  static const String illustrationRoute = "$illustrationsRoute/:illustrationId";
 
-  static const String illustrationBookRoute = '$bookRoute/:illustrationId/';
+  static const String illustrationBookRoute = "$bookRoute/:illustrationId/";
 
   /// Profile route value for this location.
-  static const String profileRoute = '$route/profile';
+  static const String profileRoute = "$route/profile";
 
   /// Settings route value for this location.
-  static const String settingsRoute = '$route/settings';
+  static const String settingsRoute = "$route/settings";
 
   /// Delete account route value for this location.
-  static const String deleteAccountRoute = '$route/settings/delete/account';
+  static const String deleteAccountRoute = "$route/settings/delete/account";
 
-  /// Statistics route value for this location.
-  static const String statisticsRoute = '$route/statistics';
+  /// Activity route value for this location.
+  static const String activityRoute = "$route/activity";
 
   /// Update email route value for this location.
-  static const String updateEmailRoute = '$route/settings/update/email';
+  static const String updateEmailRoute = "$route/settings/update/email";
 
   /// Update password route value for this location.
-  static const String updatePasswordRoute = '$route/settings/update/password';
+  static const String updatePasswordRoute = "$route/settings/update/password";
 
   /// Update username route value for this location.
-  static const String updateUsernameRoute = '$route/settings/update/username';
+  static const String updateUsernameRoute = "$route/settings/update/username";
 
-  static const String licensesRoute = '$route/licenses';
-  static const String licenseRoute = '$licensesRoute/:licenseId';
+  static const String licensesRoute = "$route/licenses";
+  static const String licenseRoute = "$licensesRoute/:licenseId";
 
   static const String likesRoute = "$route/likes";
 
@@ -116,7 +116,7 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
         illustrationsRoute,
         illustrationRoute,
         illustrationBookRoute,
-        statisticsRoute,
+        activityRoute,
         profileRoute,
         settingsRoute,
         deleteAccountRoute,
@@ -137,107 +137,107 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
         title: Utilities.getPageTitle("dashboard".tr()),
         type: BeamPageType.fadeTransition,
       ),
-      if (state.pathPatternSegments.contains('statistics'))
+      if (state.pathPatternSegments.contains("activity"))
         BeamPage(
           child: ActivityPage(),
-          key: ValueKey(statisticsRoute),
-          title: Utilities.getPageTitle("statistics".tr()),
+          key: ValueKey(activityRoute),
+          title: Utilities.getPageTitle("activity".tr()),
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathPatternSegments.contains('books'))
+      if (state.pathPatternSegments.contains("books"))
         BeamPage(
           child: MyBooksPage(),
           key: ValueKey(booksRoute),
           title: Utilities.getPageTitle("books_my".tr()),
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathPatternSegments.contains(':bookId'))
+      if (state.pathPatternSegments.contains(":bookId"))
         BeamPage(
           child: BookPage(
-            bookId: state.pathParameters['bookId']!,
+            bookId: state.pathParameters["bookId"]!,
           ),
-          key: ValueKey('$booksRoute/one'),
+          key: ValueKey("$booksRoute/one"),
           title: Utilities.getPageTitle("book".tr()),
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathPatternSegments.contains('illustrations'))
+      if (state.pathPatternSegments.contains("illustrations"))
         BeamPage(
           child: MyIllustrationsPage(),
           key: ValueKey(illustrationsRoute),
           title: Utilities.getPageTitle("illustrations_my".tr()),
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathPatternSegments.contains(':illustrationId'))
+      if (state.pathPatternSegments.contains(":illustrationId"))
         BeamPage(
           child: IllustrationPage(
-            illustrationId: state.pathParameters['illustrationId']!,
+            illustrationId: state.pathParameters["illustrationId"]!,
           ),
-          key: ValueKey('$illustrationsRoute/one'),
+          key: ValueKey("$illustrationsRoute/one"),
           title: Utilities.getPageTitle("illustration".tr()),
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathPatternSegments.contains('settings'))
+      if (state.pathPatternSegments.contains("settings"))
         BeamPage(
           child: SettingsPage(),
-          key: ValueKey('$settingsRoute'),
+          key: ValueKey("$settingsRoute"),
           title: Utilities.getPageTitle("settings".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (isDeleteAccount(state.pathPatternSegments))
         BeamPage(
           child: SettingsPageDeleteAccount(),
-          key: ValueKey('$deleteAccountRoute'),
+          key: ValueKey("$deleteAccountRoute"),
           title: Utilities.getPageTitle("account_delete".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (isUpdateEmail(state.pathPatternSegments))
         BeamPage(
           child: UpdateEmailPage(),
-          key: ValueKey('$updateEmailRoute'),
+          key: ValueKey("$updateEmailRoute"),
           title: Utilities.getPageTitle("email_update".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (isUpdatePassword(state.pathPatternSegments))
         BeamPage(
           child: UpdatePasswordPage(),
-          key: ValueKey('$updatePasswordRoute'),
+          key: ValueKey("$updatePasswordRoute"),
           title: Utilities.getPageTitle("password_update".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (isUpdateUsername(state.pathPatternSegments))
         BeamPage(
           child: UpdateUsernamePage(),
-          key: ValueKey('$updateUsernameRoute'),
+          key: ValueKey("$updateUsernameRoute"),
           title: Utilities.getPageTitle("username_update".tr()),
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathPatternSegments.contains('profile'))
+      if (state.pathPatternSegments.contains("profile"))
         BeamPage(
           child: ProfilePage(
             userId: state.pathParameters["userId"] ?? '',
           ),
-          key: ValueKey('$profileRoute'),
+          key: ValueKey("$profileRoute"),
           title: Utilities.getPageTitle("profile_my".tr()),
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathPatternSegments.contains('licenses'))
+      if (state.pathPatternSegments.contains("licenses"))
         BeamPage(
           child: LicensesPage(),
-          key: ValueKey('$licensesRoute'),
+          key: ValueKey("$licensesRoute"),
           title: Utilities.getPageTitle("licenses".tr()),
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathPatternSegments.contains(':licenseId'))
+      if (state.pathPatternSegments.contains(":licenseId"))
         BeamPage(
           child: LicensePage(
             type: getLicenseType(state.routeState),
-            licenseId: state.pathParameters['licenseId'] ?? '',
+            licenseId: state.pathParameters["licenseId"] ?? '',
           ),
-          key: ValueKey('$licenseRoute'),
+          key: ValueKey("$licenseRoute"),
           title: Utilities.getPageTitle("license".tr()),
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathPatternSegments.contains('likes'))
+      if (state.pathPatternSegments.contains("likes"))
         BeamPage(
           child: LikesPage(),
           key: ValueKey("$likesRoute"),
@@ -250,7 +250,7 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
   EnumLicenseType getLicenseType(Object? routeState) {
     final mapState = routeState as Map<String, dynamic>;
 
-    if (mapState['type'] == 'staff') {
+    if (mapState["type"] == "staff") {
       return EnumLicenseType.staff;
     }
 
@@ -259,25 +259,25 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
 
   /// True if the path match the delete account page.
   bool isDeleteAccount(List<String> pathBlueprintSegments) {
-    return pathBlueprintSegments.contains('delete') &&
-        pathBlueprintSegments.contains('account');
+    return pathBlueprintSegments.contains("delete") &&
+        pathBlueprintSegments.contains("account");
   }
 
   /// True if the path match the delete account page.
   bool isUpdateEmail(List<String> pathBlueprintSegments) {
-    return pathBlueprintSegments.contains('update') &&
-        pathBlueprintSegments.contains('email');
+    return pathBlueprintSegments.contains("update") &&
+        pathBlueprintSegments.contains("email");
   }
 
   /// True if the path match the delete account page.
   bool isUpdatePassword(List<String> pathBlueprintSegments) {
-    return pathBlueprintSegments.contains('update') &&
-        pathBlueprintSegments.contains('password');
+    return pathBlueprintSegments.contains("update") &&
+        pathBlueprintSegments.contains("password");
   }
 
   /// True if the path match the delete account page.
   bool isUpdateUsername(List<String> pathBlueprintSegments) {
-    return pathBlueprintSegments.contains('update') &&
-        pathBlueprintSegments.contains('username');
+    return pathBlueprintSegments.contains("update") &&
+        pathBlueprintSegments.contains("username");
   }
 }
