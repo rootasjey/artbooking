@@ -23,7 +23,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
 class MyBooksPage extends StatefulWidget {

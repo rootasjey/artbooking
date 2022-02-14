@@ -44,7 +44,7 @@ class IllustrationCard extends StatefulWidget {
   final Illustration illustration;
 
   /// Trigger when the user long press this card.
-  final Function(String, Illustration, bool)? onLongPress;
+  final void Function(String, Illustration, bool)? onLongPress;
 
   /// Card's size (width = height).
   final double size;

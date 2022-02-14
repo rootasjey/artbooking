@@ -11,7 +11,7 @@ import 'package:artbooking/screens/licenses/many/licenses_page.dart';
 import 'package:artbooking/screens/book/book_page.dart';
 import 'package:artbooking/screens/activity/activity_page.dart';
 import 'package:artbooking/screens/dashboard/books/dashboard_page_books.dart';
-import 'package:artbooking/screens/dashboard/dashboard_page_illustrations.dart';
+import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page.dart';
 import 'package:artbooking/screens/settings/settings_page.dart';
 import 'package:artbooking/screens/settings/update_email/update_email_page.dart';
 import 'package:artbooking/screens/settings/update_password/update_password_page.dart';
