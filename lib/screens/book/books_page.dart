@@ -43,6 +43,9 @@ class _BooksPageState extends ConsumerState<BooksPage> {
   /// Listens to book's updates.
   QuerySnapshotStreamSubscription? _bookSubscription;
 
+  /// Listens to user like's updates.
+  QuerySnapshotStreamSubscription? _likeSubscription;
+
   /// Items when opening the popup.
   final List<PopupMenuEntry<EnumBookItemAction>> _likePopupMenuEntries = [
     PopupMenuItemIcon(
@@ -67,11 +70,13 @@ class _BooksPageState extends ConsumerState<BooksPage> {
   void initState() {
     super.initState();
     fetchBooks();
+    listenLikeEvents();
   }
 
   @override
   void dispose() {
     _bookSubscription?.cancel();
+    _likeSubscription?.cancel();
     _scrollController.dispose();
     super.dispose();
   }
@@ -118,22 +123,6 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     );
   }
 
-  /// Fire when a new document has been created in Firestore.
-  /// Add the corresponding document in the UI.
-  void addStreamingDoc(DocumentChangeMap documentChange) {
-    final data = documentChange.doc.data();
-
-    if (data == null) {
-      return;
-    }
-
-    setState(() {
-      data['id'] = documentChange.doc.id;
-      final book = Book.fromMap(data);
-      _books.insert(0, book);
-    });
-  }
-
   Future<bool> fetchLike(String bookId) async {
     try {
       final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
@@ -169,7 +158,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
           .orderBy("updated_at", descending: _descending)
           .limit(_limit);
 
-      startListenningToData(query);
+      listenBookEvents(query);
       final snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
@@ -247,6 +236,67 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     }
   }
 
+  /// Listen to Firestore book events.
+  void listenBookEvents(QueryMap query) {
+    _bookSubscription = query.snapshots().skip(1).listen(
+      (snapshot) {
+        for (DocumentChangeMap documentChange in snapshot.docChanges) {
+          switch (documentChange.type) {
+            case DocumentChangeType.added:
+              onAddStreamingBook(documentChange);
+              break;
+            case DocumentChangeType.modified:
+              onUpdateStreamingBook(documentChange);
+              break;
+            case DocumentChangeType.removed:
+              onRemoveStreamingBook(documentChange);
+              break;
+          }
+        }
+      },
+      onError: (error) {
+        Utilities.logger.e(error);
+      },
+    );
+  }
+
+  /// Listen to illustrations' likes for sync purpose.
+  void listenLikeEvents() {
+    String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+    if (userId == null) {
+      return;
+    }
+
+    _likeSubscription = FirebaseFirestore.instance
+        .collection("users")
+        .doc(userId)
+        .collection("user_likes")
+        .where("type", isEqualTo: "book")
+        .snapshots()
+        .skip(1)
+        .listen(
+      (snapshot) {
+        for (DocumentChangeMap documentChange in snapshot.docChanges) {
+          switch (documentChange.type) {
+            case DocumentChangeType.added:
+              onAddStreamingLike(documentChange);
+              break;
+            case DocumentChangeType.removed:
+              onRemoveStreamingLike(documentChange);
+              break;
+            default:
+          }
+        }
+      },
+      onError: (error) {
+        Utilities.logger.e(error);
+      },
+      onDone: () {
+        _likeSubscription?.cancel();
+      },
+    );
+  }
+
   void navigateToBook(Book book) {
     NavigationStateHelper.book = book;
     Beamer.of(context).beamToNamed(
@@ -255,6 +305,43 @@ class _BooksPageState extends ConsumerState<BooksPage> {
         "bookId": book.id,
       },
     );
+  }
+
+  /// Fire when a new document has been created in Firestore.
+  /// Add the corresponding document in the UI.
+  void onAddStreamingBook(DocumentChangeMap documentChange) {
+    final data = documentChange.doc.data();
+    if (data == null) {
+      return;
+    }
+
+    setState(() {
+      data['id'] = documentChange.doc.id;
+      final book = Book.fromMap(data);
+      _books.insert(0, book);
+    });
+  }
+
+  void onAddStreamingLike(DocumentChangeMap documentChange) {
+    final String likeId = documentChange.doc.id;
+    final int index = _books.indexWhere((x) => x.id == likeId);
+
+    if (index < 0) {
+      return;
+    }
+
+    final Book book = _books.elementAt(index);
+    if (book.liked) {
+      return;
+    }
+
+    setState(() {
+      _books.replaceRange(
+        index,
+        index + 1,
+        [book.copyWith(liked: true)],
+      );
+    });
   }
 
   void onDoubleTapBookItem(Book book, int index) {
@@ -277,9 +364,8 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     return tryLike(book, index);
   }
 
-  /// On scroll notifications.
+  /// On scroll page notifications.
   bool onNotification(ScrollNotification notification) {
-    // FAB visibility
     if (notification.metrics.pixels < 50 && _showFab) {
       setState(() {
         _showFab = false;
@@ -317,34 +403,62 @@ class _BooksPageState extends ConsumerState<BooksPage> {
 
   /// Fire when a new document has been delete from Firestore.
   /// Delete the corresponding document from the UI.
-  void removeStreamingDoc(DocumentChangeMap documentChange) {
+  void onRemoveStreamingBook(DocumentChangeMap documentChange) {
     setState(() {
       _books.removeWhere((book) => book.id == documentChange.doc.id);
     });
   }
 
-  /// Listen to the last Firestore query of this page.
-  void startListenningToData(QueryMap query) {
-    _bookSubscription = query.snapshots().skip(1).listen(
-      (snapshot) {
-        for (DocumentChangeMap documentChange in snapshot.docChanges) {
-          switch (documentChange.type) {
-            case DocumentChangeType.added:
-              addStreamingDoc(documentChange);
-              break;
-            case DocumentChangeType.modified:
-              updateStreamingDoc(documentChange);
-              break;
-            case DocumentChangeType.removed:
-              removeStreamingDoc(documentChange);
-              break;
-          }
-        }
-      },
-      onError: (error) {
-        Utilities.logger.e(error);
-      },
-    );
+  void onRemoveStreamingLike(DocumentChangeMap documentChange) {
+    final String likeId = documentChange.doc.id;
+    final int index = _books.indexWhere((x) => x.id == likeId);
+
+    if (index < 0) {
+      return;
+    }
+
+    final Book book = _books.elementAt(index);
+    if (!book.liked) {
+      return;
+    }
+
+    setState(() {
+      _books.replaceRange(
+        index,
+        index + 1,
+        [book.copyWith(liked: false)],
+      );
+    });
+  }
+
+  /// Fire when a new document has been updated in Firestore.
+  /// Update the corresponding document in the UI.
+  void onUpdateStreamingBook(DocumentChangeMap documentChange) {
+    try {
+      final data = documentChange.doc.data();
+      if (data == null) {
+        return;
+      }
+
+      final int index = _books.indexWhere(
+        (book) => book.id == documentChange.doc.id,
+      );
+
+      data['id'] = documentChange.doc.id;
+      final updatedBook = Book.fromMap(data);
+
+      setState(() {
+        _books.removeAt(index);
+        _books.insert(index, updatedBook);
+      });
+    } on Exception catch (error) {
+      Utilities.logger.e(
+        "The document with the id ${documentChange.doc.id} "
+        "doesn't exist in the books list.",
+      );
+
+      Utilities.logger.e(error);
+    }
   }
 
   void tryLike(Book book, int index) async {
@@ -409,36 +523,6 @@ class _BooksPageState extends ConsumerState<BooksPage> {
           [book.copyWith(liked: true)],
         );
       });
-    }
-  }
-
-  /// Fire when a new document has been updated in Firestore.
-  /// Update the corresponding document in the UI.
-  void updateStreamingDoc(DocumentChangeMap documentChange) {
-    try {
-      final data = documentChange.doc.data();
-      if (data == null) {
-        return;
-      }
-
-      final int index = _books.indexWhere(
-        (book) => book.id == documentChange.doc.id,
-      );
-
-      data['id'] = documentChange.doc.id;
-      final updatedBook = Book.fromMap(data);
-
-      setState(() {
-        _books.removeAt(index);
-        _books.insert(index, updatedBook);
-      });
-    } on Exception catch (error) {
-      Utilities.logger.e(
-        "The document with the id ${documentChange.doc.id} "
-        "doesn't exist in the books list.",
-      );
-
-      Utilities.logger.e(error);
     }
   }
 }

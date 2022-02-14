@@ -38,7 +38,11 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
   final List<Illustration> _illustrations = [];
   final _scrollController = ScrollController();
 
-  QuerySnapshotStreamSubscription? _illustrationsSubscription;
+  /// Listens to illustration's updates.
+  QuerySnapshotStreamSubscription? _illustrationSubscription;
+
+  /// Listens to user like's updates.
+  QuerySnapshotStreamSubscription? _likeSubscription;
 
   /// Items when opening the popup.
   final List<PopupMenuEntry<EnumIllustrationItemAction>> _likePopupMenuEntries =
@@ -64,11 +68,13 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
   void initState() {
     super.initState();
     fetchIllustrations();
+    listenLikeEvents();
   }
 
   @override
   void dispose() {
-    _illustrationsSubscription?.cancel();
+    _illustrationSubscription?.cancel();
+    _likeSubscription?.cancel();
     _scrollController.dispose();
     super.dispose();
   }
@@ -115,22 +121,6 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
     );
   }
 
-  /// Fire when a new document has been created in Firestore.
-  /// Add the corresponding document in the UI.
-  void addStreamingDoc(DocumentChangeMap documentChange) {
-    final data = documentChange.doc.data();
-
-    if (data == null) {
-      return;
-    }
-
-    setState(() {
-      data['id'] = documentChange.doc.id;
-      final illustration = Illustration.fromMap(data);
-      _illustrations.insert(0, illustration);
-    });
-  }
-
   /// Fetch illustrations data from Firestore.
   void fetchIllustrations() async {
     setState(() {
@@ -145,7 +135,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
           .orderBy('created_at', descending: _descending)
           .limit(_limit);
 
-      startListenningToData(query);
+      listenIllustrationEvents(query);
       final snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
@@ -213,7 +203,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
           .limit(_limit)
           .startAfterDocument(_lastDocument!);
 
-      startListenningToData(query);
+      listenIllustrationEvents(query);
       final snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
@@ -243,6 +233,106 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
     } finally {
       setState(() => _loading = false);
     }
+  }
+
+  /// Listen to Firestore illustration events
+  void listenIllustrationEvents(QueryMap query) {
+    _illustrationSubscription?.cancel();
+    _illustrationSubscription = query.snapshots().skip(1).listen(
+      (snapshot) {
+        for (DocumentChangeMap documentChange in snapshot.docChanges) {
+          switch (documentChange.type) {
+            case DocumentChangeType.added:
+              onAddStreamingIllustration(documentChange);
+              break;
+            case DocumentChangeType.modified:
+              onUpdateStreamingIllustration(documentChange);
+              break;
+            case DocumentChangeType.removed:
+              onRemoveStreamingIllustration(documentChange);
+              break;
+          }
+        }
+      },
+      onError: (error) {
+        Utilities.logger.e(error);
+      },
+    );
+  }
+
+  /// Listen to Firestore illustration' like events for sync purpose.
+  void listenLikeEvents() {
+    String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+    if (userId == null) {
+      return;
+    }
+
+    _likeSubscription = FirebaseFirestore.instance
+        .collection("users")
+        .doc(userId)
+        .collection("user_likes")
+        .where("type", isEqualTo: "illustration")
+        .snapshots()
+        .skip(1)
+        .listen(
+      (snapshot) {
+        for (DocumentChangeMap documentChange in snapshot.docChanges) {
+          switch (documentChange.type) {
+            case DocumentChangeType.added:
+              onAddStreamingLike(documentChange);
+              break;
+            case DocumentChangeType.removed:
+              onRemoveStreamingLike(documentChange);
+              break;
+            default:
+          }
+        }
+      },
+      onError: (error) {
+        Utilities.logger.e(error);
+      },
+      onDone: () {
+        _likeSubscription?.cancel();
+      },
+    );
+  }
+
+  /// Fire when a new document has been created in Firestore.
+  /// Add the corresponding document in the UI.
+  void onAddStreamingIllustration(DocumentChangeMap documentChange) {
+    final data = documentChange.doc.data();
+
+    if (data == null) {
+      return;
+    }
+
+    setState(() {
+      data['id'] = documentChange.doc.id;
+      final illustration = Illustration.fromMap(data);
+      _illustrations.insert(0, illustration);
+    });
+  }
+
+  void onAddStreamingLike(DocumentChangeMap documentChange) {
+    final String likeId = documentChange.doc.id;
+    final int index = _illustrations.indexWhere((x) => x.id == likeId);
+
+    if (index < 0) {
+      return;
+    }
+
+    final Illustration illustration = _illustrations.elementAt(index);
+    if (illustration.liked) {
+      return;
+    }
+
+    setState(() {
+      _illustrations.replaceRange(
+        index,
+        index + 1,
+        [illustration.copyWith(liked: true)],
+      );
+    });
   }
 
   void onDoubleTapBookItem(Illustration illustration, int index) {
@@ -295,6 +385,38 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
     }
   }
 
+  /// Fire when a new document has been delete from Firestore.
+  /// Delete the corresponding document from the UI.
+  void onRemoveStreamingIllustration(DocumentChangeMap documentChange) {
+    setState(() {
+      _illustrations.removeWhere(
+        (illustration) => illustration.id == documentChange.doc.id,
+      );
+    });
+  }
+
+  void onRemoveStreamingLike(DocumentChangeMap documentChange) {
+    final String likeId = documentChange.doc.id;
+    final int index = _illustrations.indexWhere((x) => x.id == likeId);
+
+    if (index < 0) {
+      return;
+    }
+
+    final Illustration illustration = _illustrations.elementAt(index);
+    if (!illustration.liked) {
+      return;
+    }
+
+    setState(() {
+      _illustrations.replaceRange(
+        index,
+        index + 1,
+        [illustration.copyWith(liked: false)],
+      );
+    });
+  }
+
   void onTapIllustrationCard(Illustration illustration) {
     NavigationStateHelper.illustration = illustration;
     Beamer.of(context).beamToNamed(
@@ -305,38 +427,35 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
     );
   }
 
-  /// Fire when a new document has been delete from Firestore.
-  /// Delete the corresponding document from the UI.
-  void removeStreamingDoc(DocumentChangeMap documentChange) {
-    setState(() {
-      _illustrations.removeWhere(
+  /// Fire when a new document has been updated in Firestore.
+  /// Update the corresponding document in the UI.
+  void onUpdateStreamingIllustration(DocumentChangeMap documentChange) async {
+    try {
+      final data = documentChange.doc.data();
+      if (data == null) {
+        return;
+      }
+
+      final int index = _illustrations.indexWhere(
         (illustration) => illustration.id == documentChange.doc.id,
       );
-    });
-  }
 
-  /// Listen to the last Firestore query of this page.
-  void startListenningToData(QueryMap query) {
-    _illustrationsSubscription = query.snapshots().skip(1).listen(
-      (snapshot) {
-        for (DocumentChangeMap documentChange in snapshot.docChanges) {
-          switch (documentChange.type) {
-            case DocumentChangeType.added:
-              addStreamingDoc(documentChange);
-              break;
-            case DocumentChangeType.modified:
-              updateStreamingDoc(documentChange);
-              break;
-            case DocumentChangeType.removed:
-              removeStreamingDoc(documentChange);
-              break;
-          }
-        }
-      },
-      onError: (error) {
-        Utilities.logger.e(error);
-      },
-    );
+      data['id'] = documentChange.doc.id;
+      data['liked'] = await fetchLike(documentChange.doc.id);
+      final updatedIllustration = Illustration.fromMap(data);
+
+      setState(() {
+        _illustrations.removeAt(index);
+        _illustrations.insert(index, updatedIllustration);
+      });
+    } on Exception catch (error) {
+      Utilities.logger.e(
+        "The document with the id ${documentChange.doc.id} "
+        "doesn't exist in the illustrations list.",
+      );
+
+      Utilities.logger.e(error);
+    }
   }
 
   void tryLike(Illustration illustration, int index) async {
@@ -401,36 +520,6 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
           [illustration.copyWith(liked: true)],
         );
       });
-    }
-  }
-
-  /// Fire when a new document has been updated in Firestore.
-  /// Update the corresponding document in the UI.
-  void updateStreamingDoc(DocumentChangeMap documentChange) {
-    try {
-      final data = documentChange.doc.data();
-      if (data == null) {
-        return;
-      }
-
-      final int index = _illustrations.indexWhere(
-        (illustration) => illustration.id == documentChange.doc.id,
-      );
-
-      data['id'] = documentChange.doc.id;
-      final updatedIllustration = Illustration.fromMap(data);
-
-      setState(() {
-        _illustrations.removeAt(index);
-        _illustrations.insert(index, updatedIllustration);
-      });
-    } on Exception catch (error) {
-      Utilities.logger.e(
-        "The document with the id ${documentChange.doc.id} "
-        "doesn't exist in the illustrations list.",
-      );
-
-      Utilities.logger.e(error);
     }
   }
 }
