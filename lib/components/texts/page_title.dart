@@ -10,9 +10,13 @@ class PageTitle extends StatelessWidget {
     required this.subtitleValue,
     this.showBackButton = false,
     this.title,
-    this.crossAxisAlignment = CrossAxisAlignment.center,
+    this.crossAxisAlignment = CrossAxisAlignment.start,
     this.padding = EdgeInsets.zero,
+    this.renderSliver = true,
   }) : super(key: key);
+
+  /// If true, render this Widget as a sliver box.
+  final bool renderSliver;
 
   /// If specified, [titleValue] will be ignored.
   final Widget? title;
@@ -42,58 +46,64 @@ class PageTitle extends StatelessWidget {
         child: Text(
           titleValue ?? '',
           style: Utilities.fonts.style(
-            fontSize: 24.0,
-            fontWeight: FontWeight.w700,
+            fontSize: 30.0,
+            fontWeight: FontWeight.w800,
           ),
         ),
       );
     }
 
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: padding,
-        child: Column(
-          crossAxisAlignment: crossAxisAlignment,
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (showBackButton)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 24.0),
-                    child: Opacity(
-                      opacity: 0.8,
-                      child: IconButton(
-                        onPressed: Beamer.of(context).popRoute,
-                        icon: Icon(UniconsLine.arrow_left),
-                      ),
+    final child = Padding(
+      padding: padding,
+      child: Column(
+        crossAxisAlignment: crossAxisAlignment,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (showBackButton)
+                Padding(
+                  padding: const EdgeInsets.only(right: 24.0),
+                  child: Opacity(
+                    opacity: 0.8,
+                    child: IconButton(
+                      onPressed: Beamer.of(context).popRoute,
+                      icon: Icon(UniconsLine.arrow_left),
                     ),
                   ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    titleWidget,
-                    SizedBox(
-                      width: 500.0,
-                      child: Opacity(
-                        opacity: 0.4,
-                        child: Text(
-                          subtitleValue,
-                          style: Utilities.fonts.style(
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.w700,
-                          ),
+                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  titleWidget,
+                  SizedBox(
+                    width: 500.0,
+                    child: Opacity(
+                      opacity: 0.4,
+                      child: Text(
+                        subtitleValue,
+                        style: Utilities.fonts.style(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
+
+    if (renderSliver) {
+      return SliverToBoxAdapter(
+        child: child,
+      );
+    }
+
+    return child;
   }
 }
