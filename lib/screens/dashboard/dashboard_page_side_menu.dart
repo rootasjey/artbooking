@@ -10,7 +10,6 @@ import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
 /// User's dashboard side menu.
@@ -33,6 +32,9 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
   /// If false, the side menu shows only icon.
   /// Default to true.
   bool _isExpanded = true;
+
+  final double _expandedWidth = 300.0;
+  final double _collapsedWidth = 70.0;
 
   @override
   void initState() {
@@ -67,9 +69,9 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
     return Material(
       color: Theme.of(context).backgroundColor,
       child: AnimatedContainer(
-        duration: 500.milliseconds,
+        duration: Duration(milliseconds: 500),
         curve: Curves.easeOutExpo,
-        width: _isExpanded ? 300.0 : 70.0,
+        width: _isExpanded ? _expandedWidth : _collapsedWidth,
         child: Stack(
           children: [
             OverflowBox(
@@ -104,6 +106,7 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
       padding: EdgeInsets.only(
         left: _isExpanded ? 20.0 : 16.0,
         right: 20.0,
+        bottom: 100.0,
       ),
       sliver: SliverList(
           delegate: SliverChildListDelegate.fixed(
@@ -164,17 +167,51 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
   }
 
   Widget toggleExpandButton() {
+    final double maxHeight = 76.0;
+
     return Positioned(
-      bottom: 24.0,
-      left: _isExpanded ? 32.0 : 16.0,
-      child: Opacity(
-        opacity: 0.6,
-        child: IconButton(
-          tooltip: _isExpanded ? "collapse".tr() : "expand".tr(),
-          icon: _isExpanded
-              ? Icon(UniconsLine.left_arrow_from_left)
-              : Icon(UniconsLine.arrow_from_right),
-          onPressed: _toggleSideMenu,
+      bottom: 0.0,
+      left: 0.0,
+      right: 0.0,
+      child: Material(
+        color: Theme.of(context).backgroundColor,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: _expandedWidth,
+            maxHeight: maxHeight,
+          ),
+          child: OverflowBox(
+            maxWidth: _expandedWidth,
+            maxHeight: maxHeight,
+            child: InkWell(
+              onTap: _toggleSideMenu,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: 24.0,
+                  left: _isExpanded ? 58.0 : 6.0,
+                  bottom: 24.0,
+                ),
+                child: Row(
+                  children: [
+                    if (_isExpanded)
+                      Tooltip(
+                        message: "collapse".tr(),
+                        child: Icon(
+                          UniconsLine.left_arrow_from_left,
+                        ),
+                      )
+                    else
+                      Expanded(
+                        child: Tooltip(
+                          message: "expand".tr(),
+                          child: Icon(UniconsLine.arrow_from_right),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
