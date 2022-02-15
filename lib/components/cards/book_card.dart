@@ -432,7 +432,8 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
         _indexSlideshow++;
 
         if (_indexSlideshow >= _lastIllustrations.length) {
-          _indexSlideshow = 0;
+          stopCoverSlideshow();
+          return;
         }
 
         setState(() {
