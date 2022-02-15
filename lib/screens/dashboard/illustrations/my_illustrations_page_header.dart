@@ -1,6 +1,8 @@
 import 'package:artbooking/components/texts/page_title.dart';
 import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page_actions.dart';
 import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page_group_actions.dart';
+import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page_tabs.dart';
+import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -9,20 +11,26 @@ class MyIllustrationsPageHeader extends StatelessWidget {
   const MyIllustrationsPageHeader({
     Key? key,
     required this.multiSelectActive,
+    required this.multiSelectedItems,
+    required this.selectedTab,
     this.uploadIllustration,
     this.onTriggerMultiSelect,
     this.onSelectAll,
     this.onClearSelection,
-    required this.multiSelectedItems,
     this.onConfirmDeleteGroup,
+    this.onChangedTab,
   }) : super(key: key);
 
   final bool multiSelectActive;
+
+  final EnumVisibilityTab selectedTab;
+
   final void Function()? uploadIllustration;
   final void Function()? onTriggerMultiSelect;
   final void Function()? onSelectAll;
   final void Function()? onClearSelection;
   final void Function()? onConfirmDeleteGroup;
+  final void Function(EnumVisibilityTab)? onChangedTab;
 
   final Map<String?, Illustration> multiSelectedItems;
 
@@ -40,7 +48,11 @@ class MyIllustrationsPageHeader extends StatelessWidget {
             renderSliver: false,
             titleValue: "illustrations".tr(),
             subtitleValue: "illustrations_subtitle".tr(),
-            padding: const EdgeInsets.only(bottom: 16.0),
+            padding: const EdgeInsets.only(bottom: 4.0),
+          ),
+          MyIllustrationsPageTabs(
+            selectedTab: selectedTab,
+            onChangedTab: onChangedTab,
           ),
           MyIllustrationsPageActions(
             multiSelectActive: multiSelectActive,

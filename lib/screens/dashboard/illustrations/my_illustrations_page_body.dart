@@ -13,10 +13,11 @@ class MyIllustrationsPageBody extends StatelessWidget {
     required this.illustrations,
     required this.multiSelectedItems,
     required this.forceMultiSelect,
+    required this.popupMenuEntries,
     this.onLongPressIllustration,
     this.onTapIllustration,
     this.onPopupMenuItemSelected,
-    required this.popupMenuEntries,
+    this.uploadIllustration,
   }) : super(key: key);
 
   final bool loading;
@@ -31,6 +32,8 @@ class MyIllustrationsPageBody extends StatelessWidget {
     Illustration,
     String,
   )? onPopupMenuItemSelected;
+
+  final void Function()? uploadIllustration;
 
   final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries;
 
@@ -50,7 +53,9 @@ class MyIllustrationsPageBody extends StatelessWidget {
     }
 
     if (illustrations.isEmpty) {
-      return MyIllustrationsPageEmpty();
+      return MyIllustrationsPageEmpty(
+        uploadIllustration: uploadIllustration,
+      );
     }
 
     final selectionMode = forceMultiSelect || multiSelectedItems.isNotEmpty;

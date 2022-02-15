@@ -10,6 +10,7 @@ import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:artbooking/types/firestore/doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
@@ -18,7 +19,6 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,7 +31,6 @@ class MyIllustrationsPage extends ConsumerStatefulWidget {
 }
 
 class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
-  bool _descending = true;
   bool _forceMultiSelect = false;
   bool _hasNext = true;
   bool _loading = false;
@@ -62,16 +61,22 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   ScrollController _scrollController = ScrollController();
   QuerySnapshotStreamSubscription? _illustrationSubscription;
 
+  var _selectedTab = EnumVisibilityTab.active;
+
   @override
   initState() {
     super.initState();
+    loadPreferences();
     fetchIllustrations();
   }
 
   @override
   void dispose() {
     _illustrationSubscription?.cancel();
+    _scrollController.dispose();
     _popupFocusNode.dispose();
+    _multiSelectedItems.clear();
+    _illustrations.clear();
     super.dispose();
   }
 
@@ -98,6 +103,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                 onSelectAll: onSelectAll,
                 onTriggerMultiSelect: onTriggerMultiSelect,
                 onConfirmDeleteGroup: confirmDeleteGroup,
+                selectedTab: _selectedTab,
+                onChangedTab: onChangedTab,
               ),
               MyIllustrationsPageBody(
                 forceMultiSelect: _forceMultiSelect,
@@ -108,6 +115,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                 onTapIllustration: onTapIllustration,
                 onPopupMenuItemSelected: onPopupMenuItemSelected,
                 popupMenuEntries: _popupMenuEntries,
+                uploadIllustration: uploadIllustration,
               ),
             ],
           ),
@@ -259,6 +267,53 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     }
   }
 
+  /// Return query to fetch illustrations according to the selected tab.
+  /// It's either active illustrations or archvied ones.
+  QueryMap getFetchQuery() {
+    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+    if (_selectedTab == EnumVisibilityTab.active) {
+      return FirebaseFirestore.instance
+          .collection("illustrations")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", isNotEqualTo: "archived")
+          .limit(_limit);
+    }
+
+    return FirebaseFirestore.instance
+        .collection("illustrations")
+        .where("user_id", isEqualTo: userId)
+        .where("visibility", isEqualTo: "archived")
+        .limit(_limit);
+  }
+
+  /// Return query to fetch more illustrations according to the selected tab.
+  /// It's either active illustrations or archvied ones.
+  QueryMap? getFetchMoreQuery() {
+    final lastDocument = _lastFirestoreDoc;
+    if (lastDocument == null) {
+      return null;
+    }
+
+    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+    if (_selectedTab == EnumVisibilityTab.active) {
+      return FirebaseFirestore.instance
+          .collection("illustrations")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", isNotEqualTo: "archived")
+          .limit(_limit)
+          .startAfterDocument(lastDocument);
+    }
+
+    return FirebaseFirestore.instance
+        .collection("illustrations")
+        .where("user_id", isEqualTo: userId)
+        .where("visibility", isEqualTo: "archived")
+        .limit(_limit)
+        .startAfterDocument(lastDocument);
+  }
+
   /// Fetch illustrations data from Firestore.
   void fetchIllustrations() async {
     setState(() {
@@ -267,17 +322,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     });
 
     try {
-      final User? userAuth = FirebaseAuth.instance.currentUser;
-
-      if (userAuth == null) {
-        throw Exception("User is not authenticated.");
-      }
-
-      final QueryMap query = FirebaseFirestore.instance
-          .collection('illustrations')
-          .where('user_id', isEqualTo: userAuth.uid)
-          .orderBy('created_at', descending: _descending)
-          .limit(_limit);
+      final QueryMap query = getFetchQuery();
 
       listenIllustrationsEvents(query);
       final snapshot = await query.get();
@@ -293,8 +338,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
       for (DocSnapMap document in snapshot.docs) {
         final data = document.data();
-        data['id'] = document.id;
-
+        data["id"] = document.id;
         _illustrations.add(Illustration.fromMap(data));
       }
 
@@ -318,18 +362,10 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     _loadingMore = true;
 
     try {
-      final User? userAuth = FirebaseAuth.instance.currentUser;
-
-      if (userAuth == null) {
-        throw Exception("User is not authenticated.");
+      final QueryMap? query = getFetchMoreQuery();
+      if (query == null) {
+        return;
       }
-
-      final QueryMap query = await FirebaseFirestore.instance
-          .collection('illustrations')
-          .where('user_id', isEqualTo: userAuth.uid)
-          .orderBy('created_at', descending: _descending)
-          .limit(_limit)
-          .startAfterDocument(_lastFirestoreDoc!);
 
       listenIllustrationsEvents(query);
       final snapshot = await query.get();
@@ -360,6 +396,10 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     } finally {
       setState(() => _loading = false);
     }
+  }
+
+  void loadPreferences() {
+    _selectedTab = Utilities.storage.getIllustrationsTab();
   }
 
   /// Listen to tillustrations'events.
@@ -427,6 +467,15 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       final illustration = Illustration.fromMap(data);
       _illustrations.insert(0, illustration);
     });
+  }
+
+  void onChangedTab(EnumVisibilityTab selectedTab) {
+    setState(() {
+      _selectedTab = selectedTab;
+    });
+
+    fetchIllustrations();
+    Utilities.storage.saveIllustrationsTab(selectedTab);
   }
 
   void onClearSelection() {
