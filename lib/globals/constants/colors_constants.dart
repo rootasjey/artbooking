@@ -25,9 +25,13 @@ class ColorsConstants {
   /// Color for galleries.
   final Color galleries = Colors.green;
 
+  final Color home = Colors.blue.shade300;
+
   /// Color for illustrations.
   final Color illustrations = Color(0xFF796AD2);
   final Color lightBackground = Color(0xFfe3e6ec);
+  final Color likes = Colors.pink;
+  final Color licenses = Colors.amber.shade800;
   final Color location = Colors.green.shade300;
 
   final Color password = Colors.orange.shade300;
