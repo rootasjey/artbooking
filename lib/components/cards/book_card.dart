@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
+import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:simple_animations/simple_animations.dart';
@@ -76,18 +80,28 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   final double _captionHeight = 42.0;
   final double _cardRadius = 8.0;
 
+  int _indexSlideshow = 0;
+  List<Illustration> _lastIllustrations = [];
+  String _coverLink = "";
+  Timer? _timerSlideshow;
+
   @override
   void initState() {
     super.initState();
 
+    _coverLink = widget.book.getCoverLink();
     _scaleController = createController()..duration = 250.milliseconds;
-
     _scaleAnimation =
         0.6.tweenTo(1.0).animatedBy(_scaleController).curve(Curves.elasticOut);
 
-    setState(() {
-      _elevation = _initElevation;
-    });
+    setState(() => _elevation = _initElevation);
+  }
+
+  @override
+  void dispose() {
+    _timerSlideshow?.cancel();
+    _lastIllustrations.clear();
+    super.dispose();
   }
 
   @override
@@ -232,8 +246,6 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   }
 
   Widget frontCard() {
-    final book = widget.book;
-
     return Container(
       width: widget.width - 60.0,
       height: widget.height - _captionHeight,
@@ -252,7 +264,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
           child: Stack(
             children: [
               Ink.image(
-                image: NetworkImage(book.getCoverLink()),
+                image: NetworkImage(_coverLink),
                 fit: BoxFit.cover,
                 child: InkWell(
                   onTap: widget.onTap,
@@ -336,6 +348,39 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     );
   }
 
+  /// Fetch last illustrations of this book.
+  Future fetchLastIllustrations() async {
+    final Book book = widget.book;
+    if (book.illustrations.isEmpty) {
+      return;
+    }
+
+    _lastIllustrations.clear();
+
+    final int arrayLength = book.illustrations.length;
+    final int end = arrayLength > 4 ? 5 : arrayLength;
+    final illustrations = book.illustrations.sublist(0, end);
+
+    try {
+      for (var illustrationBook in illustrations) {
+        final snapshot = await FirebaseFirestore.instance
+            .collection("illustrations")
+            .doc(illustrationBook.id)
+            .get();
+
+        final data = snapshot.data();
+        if (!snapshot.exists || data == null) {
+          continue;
+        }
+
+        final illustration = Illustration.fromMap(data);
+        _lastIllustrations.add(illustration);
+      }
+    } catch (error) {
+      Utilities.logger.e(error);
+    }
+  }
+
   void onDoubleTap() {
     widget.onDoubleTap?.call();
     setState(() => _showLikeAnimation = true);
@@ -349,9 +394,11 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     if (isHover) {
       _elevation = 8.0;
       _scaleController.forward();
+      startCoverSlideshow();
     } else {
       _elevation = _initElevation;
       _scaleController.reverse();
+      stopCoverSlideshow();
     }
 
     setState(() {});
@@ -361,5 +408,43 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     if (widget.onLongPress != null) {
       widget.onLongPress?.call(widget.selected);
     }
+  }
+
+  void startCoverSlideshow() async {
+    if (_lastIllustrations.isEmpty) {
+      await fetchLastIllustrations();
+    }
+
+    if (_lastIllustrations.isEmpty) {
+      return;
+    }
+
+    _indexSlideshow = 0;
+
+    setState(() {
+      _coverLink = _lastIllustrations.first.getThumbnail();
+    });
+
+    _timerSlideshow?.cancel();
+    _timerSlideshow = Timer.periodic(
+      Duration(seconds: 2),
+      (time) {
+        _indexSlideshow++;
+
+        if (_indexSlideshow >= _lastIllustrations.length) {
+          _indexSlideshow = 0;
+        }
+
+        setState(() {
+          _coverLink =
+              _lastIllustrations.elementAt(_indexSlideshow).getThumbnail();
+        });
+      },
+    );
+  }
+
+  void stopCoverSlideshow() {
+    _timerSlideshow?.cancel();
+    _coverLink = widget.book.getCoverLink();
   }
 }
