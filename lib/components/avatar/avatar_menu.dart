@@ -1,6 +1,7 @@
 import 'package:artbooking/components/avatar/adaptive_user_avatar.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/locations/search_location.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -41,13 +42,13 @@ class AvatarMenu extends StatelessWidget {
             initials: avatarInitials,
           ),
         ),
-        onSelected: (uri) async {
-          if (uri == 'signout') {
+        onSelected: (String path) async {
+          if (path == 'signout') {
             onSignOut();
             return;
           }
 
-          Beamer.of(context).beamToNamed(uri);
+          Beamer.of(context, root: true).beamToNamed(path);
         },
         itemBuilder: itemBuilder,
       ),
@@ -59,48 +60,40 @@ class AvatarMenu extends StatelessWidget {
   ) {
     final Color iconColor = Colors.black87;
 
+    final lastHistory = Beamer.of(context).beamingHistory.last;
+    final currentPathLocation = lastHistory.state.routeInformation.location;
+    final bool pathIsDashboard = currentPathLocation == DashboardLocation.route;
+    final bool pathIsHome = currentPathLocation == HomeLocation.route;
+
     return [
       if (compact) ...[
-        PopupMenuItemIcon(
-          icon: Icon(UniconsLine.plus, color: iconColor),
-          textLabel: "upload".tr(),
-          value: '/dashboard',
-        ),
         PopupMenuItemIcon(
           icon: Icon(UniconsLine.search, color: iconColor),
           textLabel: "search".tr(),
           value: SearchLocation.route,
         ),
       ],
+      if (!pathIsHome)
+        PopupMenuItemIcon(
+          icon: Icon(UniconsLine.home, color: iconColor),
+          textLabel: "home".tr(),
+          value: HomeLocation.route,
+        ),
+      if (!pathIsDashboard)
+        PopupMenuItemIcon(
+          icon: Icon(UniconsLine.window_section, color: iconColor),
+          textLabel: "dashboard".tr(),
+          value: DashboardLocationContent.route,
+        ),
       PopupMenuItemIcon(
-        icon: Icon(UniconsLine.window_section, color: iconColor),
-        textLabel: "dashboard".tr(),
-        value: DashboardLocationContent.route,
-      ),
-      PopupMenuItemIcon(
-        icon: Icon(UniconsLine.chart_pie, color: iconColor),
-        textLabel: "statistics_my".tr(),
-        value: DashboardLocationContent.activityRoute,
-      ),
-      PopupMenuItemIcon(
-        icon: Icon(UniconsLine.picture, color: iconColor),
-        textLabel: "illustrations_my".tr(),
-        value: DashboardLocationContent.illustrationsRoute,
-      ),
-      PopupMenuItemIcon(
-        icon: Icon(UniconsLine.book_alt, color: iconColor),
-        textLabel: "books_my".tr(),
-        value: DashboardLocationContent.booksRoute,
-      ),
-      PopupMenuItemIcon(
-        icon: Icon(UniconsLine.user, color: iconColor),
-        textLabel: "profile_my".tr(),
-        value: '/dashboard/profile',
+        icon: Icon(UniconsLine.setting, color: iconColor),
+        textLabel: "settings".tr(),
+        value: DashboardLocationContent.settingsRoute,
       ),
       PopupMenuItemIcon(
         icon: Icon(UniconsLine.sign_left, color: iconColor),
         textLabel: "signout".tr(),
-        value: 'signout',
+        value: "signout",
       ),
     ];
   }
