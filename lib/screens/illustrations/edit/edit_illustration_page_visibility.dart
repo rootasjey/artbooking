@@ -73,19 +73,25 @@ class EditIllustrationPageVisibility extends StatelessWidget {
                   ),
                 ),
                 onSelected: onUpdateVisibility,
-                itemBuilder: (context) =>
-                    <PopupMenuEntry<EnumContentVisibility>>[
-                  visibiltyPopupItem(
-                    value: EnumContentVisibility.private,
-                    titleValue: "visibility_private".tr(),
-                    subtitleValue: "visibility_private_description".tr(),
-                  ),
-                  visibiltyPopupItem(
-                    value: EnumContentVisibility.public,
-                    titleValue: "visibility_public".tr(),
-                    subtitleValue: "visibility_public_description".tr(),
-                  ),
-                ],
+                itemBuilder: (context) {
+                  return [
+                    visibiltyPopupItem(
+                      value: EnumContentVisibility.private,
+                      titleValue: "visibility_private".tr(),
+                      subtitleValue: "visibility_private_description".tr(),
+                    ),
+                    visibiltyPopupItem(
+                      value: EnumContentVisibility.public,
+                      titleValue: "visibility_public".tr(),
+                      subtitleValue: "visibility_public_description".tr(),
+                    ),
+                    visibiltyPopupItem(
+                      value: EnumContentVisibility.archived,
+                      titleValue: "visibility_archived".tr(),
+                      subtitleValue: "visibility_archived_description".tr(),
+                    ),
+                  ];
+                },
               ),
             ),
           ),

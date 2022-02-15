@@ -596,7 +596,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       final HttpsCallableResult response =
           await Utilities.cloud.illustrations("updateVisibility").call({
         "illustration_id": illustration.id,
-        "visibility": Illustration.convertVisibilityToString(_visibility),
+        "visibility": _visibility.name,
       });
 
       final bool success = response.data["success"];
