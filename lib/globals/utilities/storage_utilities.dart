@@ -3,6 +3,7 @@ import 'package:artbooking/types/enums/enum_items_layout.dart';
 import 'package:artbooking/globals/constants/storage_keys_constants.dart';
 import 'package:artbooking/types/enums/enum_license_type.dart';
 import 'package:artbooking/types/enums/enum_like_type.dart';
+import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 
 class StorageUtilities {
@@ -92,15 +93,23 @@ class StorageUtilities {
   // /      Layout     /
   // / ----------------/
   EnumLicenseType getLicenseTab() {
-    final String key = Constants.storageKeys.dashboardLicenseTab;
+    final String key = Constants.storageKeys.dashboardLicensesTab;
     final String? value = _localStorage.getString(key);
     return value == EnumLicenseType.staff.name
         ? EnumLicenseType.staff
         : EnumLicenseType.user;
   }
 
+  EnumVisibilityTab getIllustrationsTab() {
+    final String key = Constants.storageKeys.dashboardIllustrationsTab;
+    final String? value = _localStorage.getString(key);
+    return value == EnumVisibilityTab.active.name
+        ? EnumVisibilityTab.active
+        : EnumVisibilityTab.archived;
+  }
+
   EnumLikeType getLikeTab() {
-    final String key = Constants.storageKeys.dashboardLicenseTab;
+    final String key = Constants.storageKeys.dashboardLicensesTab;
     final String? value = _localStorage.getString(key);
     return value == EnumLikeType.book.name
         ? EnumLikeType.book
@@ -145,13 +154,18 @@ class StorageUtilities {
     return _localStorage.getBool(key) ?? true;
   }
 
+  void saveIllustrationsTab(EnumVisibilityTab visibilityTab) {
+    final String key = Constants.storageKeys.dashboardIllustrationsTab;
+    _localStorage.setString(key, visibilityTab.name);
+  }
+
   void saveLicenseTab(EnumLicenseType licenseTab) {
-    final String key = Constants.storageKeys.dashboardLicenseTab;
+    final String key = Constants.storageKeys.dashboardLicensesTab;
     _localStorage.setString(key, licenseTab.name);
   }
 
   void saveLikeTab(EnumLikeType likeTab) {
-    final String key = Constants.storageKeys.dashboardLicenseTab;
+    final String key = Constants.storageKeys.dashboardLicensesTab;
     _localStorage.setString(key, likeTab.name);
   }
 
