@@ -81,7 +81,7 @@ class AvatarMenu extends StatelessWidget {
         ),
       if (!pathIsDashboard)
         PopupMenuItemIcon(
-          icon: Icon(UniconsLine.window_section, color: iconColor),
+          icon: Icon(UniconsLine.window_maximize, color: iconColor),
           textLabel: "dashboard".tr(),
           value: DashboardLocationContent.route,
         ),

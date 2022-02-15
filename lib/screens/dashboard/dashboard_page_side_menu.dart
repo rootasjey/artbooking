@@ -237,7 +237,7 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
                 },
                 icon: Opacity(
                   opacity: 0.8,
-                  child: Icon(UniconsLine.window_section),
+                  child: Icon(UniconsLine.window_maximize),
                 ),
               ),
             ],
