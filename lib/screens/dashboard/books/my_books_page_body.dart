@@ -1,10 +1,10 @@
 import 'package:artbooking/components/cards/book_card.dart';
 import 'package:artbooking/components/icons/animated_app_icon.dart';
+import 'package:artbooking/screens/dashboard/books/my_books_page_empty.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:unicons/unicons.dart';
 
 class MyBooksPageBody extends StatelessWidget {
   const MyBooksPageBody({
@@ -45,59 +45,8 @@ class MyBooksPageBody extends StatelessWidget {
     }
 
     if (books.isEmpty) {
-      return SliverPadding(
-        padding: const EdgeInsets.only(
-          top: 40.0,
-          left: 50.0,
-        ),
-        sliver: SliverList(
-          delegate: SliverChildListDelegate.fixed([
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 12.0,
-                  ),
-                  child: Text(
-                    "lonely_there".tr(),
-                    style: TextStyle(
-                      fontSize: 32.0,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 12.0,
-                  ),
-                  child: Opacity(
-                    opacity: 0.6,
-                    child: Text(
-                      "books_none_created".tr(),
-                      style: TextStyle(
-                        fontSize: 16.0,
-                      ),
-                    ),
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: onShowCreateBookDialog,
-                  icon: Icon(UniconsLine.book_medical),
-                  label: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Text(
-                      "create".tr(),
-                      style: TextStyle(
-                        fontSize: 16.0,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ]),
-        ),
+      return MyBooksPageEmpty(
+        createBook: onShowCreateBookDialog,
       );
     }
 
