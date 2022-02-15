@@ -12,9 +12,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ApplicationBar extends ConsumerWidget {
-  ApplicationBar({this.padding = const EdgeInsets.only(top: 30.0)});
+  ApplicationBar({
+    this.padding = const EdgeInsets.only(top: 30.0),
+    this.minimal = false,
+  });
 
   final EdgeInsets padding;
+
+  /// If true, will only display right section with search, language, & avatar.
+  final bool minimal;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -43,11 +49,12 @@ class ApplicationBar extends ConsumerWidget {
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               AppIcon(size: 32.0),
-              mainSection(compact),
+              if (!minimal) mainSection(compact),
               userSection(
                 context,
                 ref: ref,
                 compact: compact,
+                minimal: minimal,
                 isAuthenticated: userNotifier.isAuthenticated,
                 initials: initials,
                 avatarUrl: avatarUrl ?? '',
@@ -70,6 +77,7 @@ class ApplicationBar extends ConsumerWidget {
   Widget userSection(
     BuildContext context, {
     bool compact = false,
+    bool minimal = false,
     bool isAuthenticated = false,
     required WidgetRef ref,
     String initials = '',
@@ -80,6 +88,7 @@ class ApplicationBar extends ConsumerWidget {
         compact: compact,
         avatarInitials: initials,
         avatarURL: avatarUrl,
+        showSearch: minimal,
         onSignOut: () => onSignOut(context, ref),
       );
     }
@@ -90,6 +99,6 @@ class ApplicationBar extends ConsumerWidget {
   void onSignOut(BuildContext context, WidgetRef ref) async {
     final user = ref.read(AppState.userProvider.notifier);
     await user.signOut();
-    Beamer.of(context).beamToNamed(HomeLocation.route);
+    Beamer.of(context, root: true).beamToNamed(HomeLocation.route);
   }
 }

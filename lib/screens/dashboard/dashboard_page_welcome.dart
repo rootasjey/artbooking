@@ -31,7 +31,7 @@ class DashboardPageWelcome extends ConsumerWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
-          ApplicationBar(),
+          ApplicationBar(minimal: true),
           header(),
           SliverList(
             delegate: SliverChildListDelegate.fixed([
