@@ -245,11 +245,8 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     await showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => EditIllustrationPage(
-        illustration: _illustration,
-      ),
+          illustration: _illustration, goToEditImagePage: goToEditImagePage),
     );
-
-    // fetchIllustration(silent: true);
   }
 
   void onGoToEditImagePage() {
@@ -265,6 +262,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
             cacheRawData: true,
             cacheMaxAge: const Duration(seconds: 3),
           ),
+          goToEditIllustrationMetada: goToEditIllustrationMetada,
         );
       }, transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeScaleTransition(
@@ -372,4 +370,14 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
   }
 
   void onShare() async {}
+
+  void goToEditIllustrationMetada() async {
+    await Beamer.of(context).popRoute();
+    onShowEditMetadataPanel();
+  }
+
+  void goToEditImagePage() async {
+    await Beamer.of(context).popRoute();
+    onGoToEditImagePage();
+  }
 }

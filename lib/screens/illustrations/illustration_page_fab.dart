@@ -25,7 +25,7 @@ class IllustrationPageFab extends StatelessWidget {
       foregroundColor: Colors.white,
       icon: Padding(
         padding: const EdgeInsets.only(left: 8.0),
-        child: Icon(UniconsLine.edit),
+        child: Icon(UniconsLine.edit_alt),
       ),
       label: Padding(
         padding: const EdgeInsets.all(8.0),

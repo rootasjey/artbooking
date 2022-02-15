@@ -26,9 +26,11 @@ class EditIllustrationPage extends ConsumerStatefulWidget {
   const EditIllustrationPage({
     Key? key,
     required this.illustration,
+    this.goToEditImagePage,
   }) : super(key: key);
 
   final Illustration illustration;
+  final void Function()? goToEditImagePage;
 
   @override
   _EditIllustrationPageState createState() => _EditIllustrationPageState();
@@ -124,6 +126,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
                     presentationCardKey: _presentationCardKey,
                     showLicensesPanel: _showLicensesPanel,
                     showArtMovementPanel: _showArtMovementPanel,
+                    goToEditImagePage: widget.goToEditImagePage,
                   )
                 ],
               ),

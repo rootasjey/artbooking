@@ -21,6 +21,7 @@ class EditImagePage extends ConsumerStatefulWidget {
     this.useNativeLib = false,
     required this.dimensions,
     this.heroTag = '',
+    this.goToEditIllustrationMetada,
   }) : super(key: key);
 
   /// Image object. Should be defined is navigating from another page.
@@ -30,6 +31,7 @@ class EditImagePage extends ConsumerStatefulWidget {
   final bool useNativeLib;
   final Dimensions dimensions;
   final Object heroTag;
+  final void Function()? goToEditIllustrationMetada;
 
   @override
   _EditImagePageState createState() => _EditImagePageState();
@@ -95,6 +97,9 @@ class _EditImagePageState extends ConsumerState<EditImagePage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isProcessing ? null : validateEdit,
         label: Text("save".tr()),
+        extendedTextStyle: Utilities.fonts.style(
+          fontWeight: FontWeight.w700,
+        ),
         icon: Icon(UniconsLine.save),
         backgroundColor:
             _isProcessing ? Colors.grey : Theme.of(context).primaryColor,
@@ -111,6 +116,8 @@ class _EditImagePageState extends ConsumerState<EditImagePage> {
                     children: [
                       EditImagePageHeader(
                         isProcessing: _isProcessing,
+                        goToEditIllustrationMetada:
+                            widget.goToEditIllustrationMetada,
                       ),
                       Hero(
                         tag: widget.heroTag,

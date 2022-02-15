@@ -8,9 +8,11 @@ class EditImagePageHeader extends StatelessWidget {
   const EditImagePageHeader({
     Key? key,
     required this.isProcessing,
+    this.goToEditIllustrationMetada,
   }) : super(key: key);
 
   final bool isProcessing;
+  final void Function()? goToEditIllustrationMetada;
 
   @override
   Widget build(BuildContext context) {
@@ -41,29 +43,51 @@ class EditImagePageHeader extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Opacity(
-                      opacity: 0.8,
-                      child: Text(
-                        isProcessing
-                            ? "${'changes_applying'.tr()}..."
-                            : "edit_image".tr(),
-                        style: Utilities.fonts.style(
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.w700,
-                          color: isProcessing
-                              ? Theme.of(context).secondaryHeaderColor
-                              : null,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Opacity(
+                        opacity: 0.8,
+                        child: Text(
+                          isProcessing
+                              ? "${'changes_applying'.tr()}..."
+                              : "edit_image".tr(),
+                          style: Utilities.fonts.style(
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.w700,
+                            color: isProcessing
+                                ? Theme.of(context).secondaryHeaderColor
+                                : null,
+                          ),
                         ),
                       ),
                     ),
-                    Opacity(
-                      opacity: 0.4,
-                      child: Text(
-                        "edit_image_description".tr(),
-                        style: Utilities.fonts.style(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.w700,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
+                      child: Opacity(
+                        opacity: 0.4,
+                        child: Text(
+                          "edit_image_description".tr(),
+                          style: Utilities.fonts.style(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: goToEditIllustrationMetada,
+                      child: Text(
+                        "edit_image_suggestion".tr(),
+                        style: Utilities.fonts.style(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      style: TextButton.styleFrom(
+                        primary: Theme.of(context)
+                            .textTheme
+                            .bodyText2
+                            ?.color
+                            ?.withOpacity(0.6),
                       ),
                     ),
                   ],

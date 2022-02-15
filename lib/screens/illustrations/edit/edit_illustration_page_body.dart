@@ -1,4 +1,5 @@
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
+import 'package:artbooking/components/buttons/text_rectangle_button.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/screens/illustrations/edit/edit_illustration_page_license.dart';
 import 'package:artbooking/screens/illustrations/edit/edit_illustration_page_presentation.dart';
@@ -11,6 +12,7 @@ import 'package:artbooking/types/license/license.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
+import 'package:unicons/unicons.dart';
 
 class EditIllustrationPageBody extends StatelessWidget {
   const EditIllustrationPageBody({
@@ -37,6 +39,7 @@ class EditIllustrationPageBody extends StatelessWidget {
     this.onUnselectLicenseAndUpdate,
     this.onDone,
     this.onExpandStateLicenseChanged,
+    this.goToEditImagePage,
   }) : super(key: key);
 
   final bool isLoading;
@@ -52,6 +55,8 @@ class EditIllustrationPageBody extends StatelessWidget {
   final String illustrationLore;
   final List<String> illustrationTopics;
   final EnumContentVisibility illustrationVisibility;
+
+  final void Function()? goToEditImagePage;
 
   final void Function(String, String, String)? onUpdatePresentation;
 
@@ -86,10 +91,23 @@ class EditIllustrationPageBody extends StatelessWidget {
     }
 
     return Padding(
-      padding: EdgeInsets.only(top: 90.0),
+      padding: EdgeInsets.only(top: 70.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 20.0, bottom: 32.0),
+            child: TextRectangleButton(
+              onPressed: goToEditImagePage,
+              primary: Theme.of(context)
+                  .textTheme
+                  .bodyText2
+                  ?.color
+                  ?.withOpacity(0.6),
+              icon: Icon(UniconsLine.image_edit),
+              label: Text("edit_image".tr()),
+            ),
+          ),
           EditIllustrationPagePresentation(
             cardKey: presentationCardKey,
             name: illustrationName,
