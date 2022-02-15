@@ -2,7 +2,6 @@ import 'package:artbooking/components/buttons/text_icon_button.dart';
 import 'package:artbooking/types/side_menu_item.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
-import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
@@ -232,14 +231,13 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
                 : CrossAxisAlignment.start,
             children: [
               IconButton(
-                tooltip: "home".tr(),
+                tooltip: "hub_subtitle".tr(),
                 onPressed: () {
-                  Beamer.of(context, root: true)
-                      .beamToNamed(HomeLocation.route);
+                  Beamer.of(context).beamToNamed(DashboardLocation.route);
                 },
                 icon: Opacity(
-                  opacity: 0.6,
-                  child: Icon(UniconsLine.home),
+                  opacity: 0.8,
+                  child: Icon(UniconsLine.window_section),
                 ),
               ),
             ],
