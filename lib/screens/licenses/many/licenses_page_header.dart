@@ -57,8 +57,7 @@ class LicensesPageHeader extends StatelessWidget {
                 ),
                 DarkOutlinedButton(
                   selected: EnumLicenseType.user == selectedTab,
-                  onPressed:
-                      onChangedTab != null ? onPressedUser : onPressedUser,
+                  onPressed: onChangedTab != null ? onPressedUser : null,
                   child: Text("user".tr().toUpperCase()),
                 ),
               ],
