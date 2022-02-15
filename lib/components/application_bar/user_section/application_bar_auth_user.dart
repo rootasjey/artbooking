@@ -1,3 +1,4 @@
+import 'package:artbooking/components/application_bar/application_bar_search_button.dart';
 import 'package:artbooking/components/avatar/avatar_menu.dart';
 import 'package:artbooking/components/application_bar/application_bar_upload_button.dart';
 import 'package:artbooking/components/application_bar/application_bar_lang_button.dart';
@@ -6,13 +7,15 @@ import 'package:flutter/material.dart';
 class ApplicationBarAuthUser extends StatelessWidget {
   const ApplicationBarAuthUser({
     Key? key,
+    required this.onSignOut,
     this.compact = false,
     this.trailing = const [],
     this.avatarInitials = '',
     this.avatarURL = '',
-    required this.onSignOut,
+    this.showSearch = false,
   }) : super(key: key);
 
+  final bool showSearch;
   final bool compact;
   final List<Widget> trailing;
 
@@ -34,6 +37,7 @@ class ApplicationBarAuthUser extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          if (showSearch) ApplicationBarSearchButton(),
           ApplicationBarUploadButton(),
           if (!compact) ApplicationBarLangButton(),
           ...trailing,
