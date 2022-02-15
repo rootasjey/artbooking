@@ -1,5 +1,6 @@
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/texts/page_title.dart';
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page_card.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
@@ -170,6 +171,42 @@ class DashboardPageWelcome extends ConsumerWidget {
             textSubtitle: "settings_subtitle".tr(),
             onTap: () {
               context.beamToNamed(DashboardLocationContent.settingsRoute);
+            },
+          ),
+          DashbordPageCard(
+            hoverColor: Constants.colors.profile,
+            iconData: UniconsLine.user,
+            textTitle: "profile".tr(),
+            textSubtitle: "profile_subtitle".tr(),
+            onTap: () {
+              context.beamToNamed(DashboardLocationContent.profileRoute);
+            },
+          ),
+          DashbordPageCard(
+            hoverColor: Constants.colors.likes,
+            iconData: UniconsLine.heart,
+            textTitle: "likes".tr(),
+            textSubtitle: "likes_subtitle".tr(),
+            onTap: () {
+              context.beamToNamed(DashboardLocationContent.likesRoute);
+            },
+          ),
+          DashbordPageCard(
+            hoverColor: Constants.colors.licenses,
+            iconData: UniconsLine.document_info,
+            textTitle: "licenses".tr(),
+            textSubtitle: "licenses_subtitle".tr(),
+            onTap: () {
+              context.beamToNamed(DashboardLocationContent.licensesRoute);
+            },
+          ),
+          DashbordPageCard(
+            hoverColor: Constants.colors.home,
+            iconData: UniconsLine.home,
+            textTitle: "home".tr(),
+            textSubtitle: "home_subtitle".tr(),
+            onTap: () {
+              Beamer.of(context, root: true).beamToNamed(HomeLocation.route);
             },
           ),
         ],
