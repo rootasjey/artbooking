@@ -213,6 +213,7 @@
   "dont_own_account": "Je n'ai pas de compte",
   "ecommerce": "E-Commerce",
   "edit": "Editer",
+  "edit_illustration_texts": "Modifier le nom, la description, le lore...",
   "edit_image": "Modifier l'image",
   "edit_image_description": "Utilisez les bouttons de rognage, pivot ou de symétrie pour éditer cette image. Le bouton de réinitialisation annule tous les changements. N'oubliez pas de sauvegarder vos modifications avec le bouton de sauvegarde en bas à droite.",
   "edit_location": "Edit location",

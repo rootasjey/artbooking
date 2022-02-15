@@ -69,13 +69,13 @@ class IllustrationPosterActions extends StatelessWidget {
 
     return [
       IconButton(
-        tooltip: "edit".tr(),
-        icon: Icon(UniconsLine.edit),
+        tooltip: "edit_illustration_texts".tr(),
+        icon: Icon(UniconsLine.edit_alt),
         onPressed: onEdit,
       ),
       IconButton(
         tooltip: "edit_image".tr(),
-        icon: Icon(UniconsLine.crop_alt),
+        icon: Icon(UniconsLine.image_edit),
         onPressed: updatingImage ? null : onEditImage,
       ),
     ];
