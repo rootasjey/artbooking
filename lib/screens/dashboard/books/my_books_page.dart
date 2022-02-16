@@ -702,6 +702,11 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     showDialog(
       context: context,
       builder: (context) => ThemedDialog(
+        showDivider: true,
+        titleValue: "book_visibility_change".tr(),
+        textButtonValidation: "close".tr(),
+        onValidate: Beamer.of(context).popRoute,
+        onCancel: Beamer.of(context).popRoute,
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.only(left: 8.0),
@@ -734,16 +739,10 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                     bottom: 32.0,
                   ),
                 ),
-                Divider(),
               ],
             ),
           ),
         ),
-        titleValue: "book_visibility_change".tr(),
-        subtitleValue: "",
-        textButtonValidation: "close".tr(),
-        onValidate: Beamer.of(context).popRoute,
-        onCancel: Beamer.of(context).popRoute,
       ),
     );
   }
