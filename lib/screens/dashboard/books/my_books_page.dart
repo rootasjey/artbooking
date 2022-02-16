@@ -1,4 +1,5 @@
 import 'package:artbooking/actions/books.dart';
+import 'package:artbooking/components/buttons/visibility_button.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
@@ -13,6 +14,7 @@ import 'package:artbooking/screens/dashboard/books/my_books_page_fab.dart';
 import 'package:artbooking/screens/dashboard/books/my_books_page_header.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
+import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:artbooking/types/firestore/doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
@@ -56,6 +58,11 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       icon: Icon(UniconsLine.trash),
       textLabel: "delete".tr(),
       value: EnumBookItemAction.delete,
+    ),
+    PopupMenuItemIcon(
+      icon: Icon(UniconsLine.eye),
+      textLabel: "visibility_change".tr(),
+      value: EnumBookItemAction.updateVisibility,
     ),
   ];
 
@@ -481,6 +488,14 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     });
   }
 
+  /// When a book has been delete from Firestore.
+  /// Delete the corresponding document from the UI.
+  void onRemoveStreamingBook(DocumentChangeMap documentChange) {
+    setState(() {
+      _books.removeWhere((book) => book.id == documentChange.doc.id);
+    });
+  }
+
   /// On scroll notifications.
   bool onScrollNotification(ScrollNotification notification) {
     // FAB visibility
@@ -516,14 +531,6 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     setState(() {});
   }
 
-  /// Fire when a new document has been delete from Firestore.
-  /// Delete the corresponding document from the UI.
-  void onRemoveStreamingBook(DocumentChangeMap documentChange) {
-    setState(() {
-      _books.removeWhere((book) => book.id == documentChange.doc.id);
-    });
-  }
-
   void onNavigateToBook(Book book) {
     NavigationStateHelper.book = book;
     Beamer.of(context).beamToNamed(
@@ -545,6 +552,9 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         break;
       case EnumBookItemAction.delete:
         confirmDeleteOneBook(book, index);
+        break;
+      case EnumBookItemAction.updateVisibility:
+        showVisibilityBookDialog(book);
         break;
       default:
     }
@@ -679,9 +689,73 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     );
   }
 
+  void showVisibilityBookDialog(Book book) {
+    final width = 310.0;
+
+    showDialog(
+      context: context,
+      builder: (context) => ThemedDialog(
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(left: 16.0),
+                  width: width,
+                  child: Opacity(
+                    opacity: 0.6,
+                    child: Text(
+                      "book_visibility_choose".tr(),
+                      style: Utilities.fonts.style(
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ),
+                ),
+                VisibilityButton(
+                  maxWidth: width,
+                  visibility: book.visibility,
+                  onChangedVisibility: (visibility) {
+                    updateVisibility(book, visibility);
+                    Beamer.of(context).popRoute();
+                  },
+                  padding: const EdgeInsets.only(
+                    left: 16.0,
+                    top: 12.0,
+                    bottom: 32.0,
+                  ),
+                ),
+                Divider(),
+              ],
+            ),
+          ),
+        ),
+        titleValue: "book_visibility_change".tr(),
+        subtitleValue: "",
+        textButtonValidation: "close".tr(),
+        onValidate: Beamer.of(context).popRoute,
+        onCancel: Beamer.of(context).popRoute,
+      ),
+    );
+  }
+
   void triggerMultiSelect() {
     setState(() {
       _forceMultiSelect = !_forceMultiSelect;
     });
+  }
+
+  void updateVisibility(Book book, EnumContentVisibility visibility) async {
+    try {
+      await Utilities.cloud.fun("books-updateVisibility").call({
+        "book_id": book.id,
+        "visibility": visibility.name,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
   }
 }
