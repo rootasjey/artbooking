@@ -1,5 +1,6 @@
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/buttons/dot_close_button.dart';
+import 'package:artbooking/components/texts/title_dialog.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/components/validation_shortcuts.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -9,20 +10,22 @@ import 'package:flutter/material.dart';
 class ThemedDialog extends StatelessWidget {
   const ThemedDialog({
     Key? key,
-    this.onCancel,
-    required this.title,
+    required this.onCancel,
     required this.body,
     required this.textButtonValidation,
     this.onValidate,
+    this.title,
     this.focusNode,
     this.centerTitle = true,
     this.spaceActive = true,
     this.autofocus = true,
+    this.titleValue = "",
+    this.subtitleValue = "",
   }) : super(key: key);
 
   /// Trigger when the user tap on close button
   /// or fires keyboard shortcuts for closing the dialog.
-  final Function()? onCancel;
+  final Function() onCancel;
 
   /// Trigger when the user tap on validation button
   /// or fires keyboard shortcuts for validating the dialog.
@@ -36,7 +39,7 @@ class ThemedDialog extends StatelessWidget {
   final String textButtonValidation;
 
   /// Dialog's title.
-  final Widget title;
+  final Widget? title;
 
   /// Dialog body. Can be a [SingleChildScrollView] for example.
   final Widget body;
@@ -50,8 +53,25 @@ class ThemedDialog extends StatelessWidget {
   /// If true, this dialog will try to request focus on load.
   final bool autofocus;
 
+  final String titleValue;
+
+  final String subtitleValue;
+
   @override
   Widget build(BuildContext context) {
+    Widget _title = Container();
+    if (title != null) {
+      _title = titleContainer(
+        color: Theme.of(context).secondaryHeaderColor,
+      );
+    } else {
+      _title = TitleDialog(
+        titleValue: titleValue,
+        subtitleValue: subtitleValue,
+        onCancel: onCancel,
+      );
+    }
+
     return ValidationShortcuts(
       autofocus: autofocus,
       focusNode: focusNode,
@@ -60,9 +80,7 @@ class ThemedDialog extends StatelessWidget {
       spaceActive: spaceActive,
       child: SimpleDialog(
         backgroundColor: Constants.colors.clairPink,
-        title: titleContainer(
-          color: Theme.of(context).secondaryHeaderColor,
-        ),
+        title: _title,
         titlePadding: EdgeInsets.zero,
         contentPadding: const EdgeInsets.all(16.0),
         children: [
