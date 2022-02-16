@@ -1184,7 +1184,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
       final response =
           await Utilities.cloud.fun("books-updateVisibility").call({
         "book_id": _book.id,
-        "visibility": Book.convertVisibilityToString(visibility),
+        "visibility": visibility.name,
       });
 
       final bool success = response.data["success"];

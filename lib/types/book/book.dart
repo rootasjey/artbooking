@@ -218,11 +218,11 @@ class Book {
 
   static EnumBookLayoutOrientation parseOrientation(String? stringOrientation) {
     switch (stringOrientation) {
-      case 'both':
+      case "both":
         return EnumBookLayoutOrientation.both;
-      case 'horizontal':
+      case "horizontal":
         return EnumBookLayoutOrientation.horizontal;
-      case 'vertical':
+      case "vertical":
         return EnumBookLayoutOrientation.vertical;
       default:
         return EnumBookLayoutOrientation.vertical;
@@ -231,31 +231,16 @@ class Book {
 
   static EnumContentVisibility parseStringVisibility(String? stringVisibility) {
     switch (stringVisibility) {
-      case 'acl':
+      case "acl":
         return EnumContentVisibility.acl;
-      case 'private':
+      case "archived":
+        return EnumContentVisibility.archived;
+      case "private":
         return EnumContentVisibility.private;
-      case 'public':
+      case "public":
         return EnumContentVisibility.public;
       default:
         return EnumContentVisibility.private;
-    }
-  }
-
-  String visibilityToString() {
-    return convertVisibilityToString(visibility);
-  }
-
-  static String convertVisibilityToString(EnumContentVisibility visibility) {
-    switch (visibility) {
-      case EnumContentVisibility.acl:
-        return 'acl';
-      case EnumContentVisibility.private:
-        return 'private';
-      case EnumContentVisibility.public:
-        return 'public';
-      default:
-        return 'private';
     }
   }
 
@@ -303,7 +288,7 @@ class Book {
       'layoutOrientation': layoutOrientationToString(),
       'liked': liked,
       'name': name,
-      'visibility': visibilityToString(),
+      'visibility': visibility.name,
       'user_id': userId,
     };
   }

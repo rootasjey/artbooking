@@ -210,25 +210,6 @@ class Illustration {
     }
   }
 
-  String visibilityToString() {
-    return convertVisibilityToString(visibility);
-  }
-
-  static String convertVisibilityToString(EnumContentVisibility visibility) {
-    switch (visibility) {
-      case EnumContentVisibility.acl:
-        return 'acl';
-      case EnumContentVisibility.archived:
-        return 'archived';
-      case EnumContentVisibility.private:
-        return 'private';
-      case EnumContentVisibility.public:
-        return 'public';
-      default:
-        return 'private';
-    }
-  }
-
   Illustration copyWith({
     DateTime? createdAt,
     String? description,
@@ -287,7 +268,7 @@ class Illustration {
       'updated_at': updatedAt.millisecondsSinceEpoch,
       'user_id': userId,
       'version': version,
-      'visibility': visibilityToString(),
+      'visibility': visibility.name,
     };
   }
 

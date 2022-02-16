@@ -3,7 +3,6 @@ import 'package:artbooking/types/cloud_functions/check_urls_response.dart';
 import 'package:artbooking/types/cloud_functions/illustrations_response.dart';
 import 'package:artbooking/types/cloud_functions/illustration_response.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
-import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class IllustrationsActions {
@@ -37,8 +36,8 @@ class IllustrationsActions {
     try {
       final response =
           await Utilities.cloud.fun('illustrations-createOne').call({
-        'name': name,
-        'visibility': Illustration.convertVisibilityToString(visibility),
+        "name": name,
+        "visibility": visibility.name,
       });
 
       return IllustrationResponse.fromJSON(response.data);
