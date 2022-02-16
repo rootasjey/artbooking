@@ -103,6 +103,11 @@ class BookPageActions extends StatelessWidget {
               titleValue: "visibility_public".tr(),
               subtitleValue: "visibility_public_description".tr(),
             ),
+            visibiltyPopupItem(
+              value: EnumContentVisibility.archived,
+              titleValue: "visibility_archived".tr(),
+              subtitleValue: "visibility_archived_description".tr(),
+            ),
           ],
         ),
       ],
@@ -116,19 +121,28 @@ class BookPageActions extends StatelessWidget {
   }) {
     return PopupMenuItem(
       value: value,
-      child: ListTile(
-        title: Text(
-          titleValue,
-          style: Utilities.fonts.style(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        subtitle: Text(
-          subtitleValue,
-          style: Utilities.fonts.style(
-            fontSize: 14.0,
-            fontWeight: FontWeight.w500,
-          ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              titleValue,
+              style: Utilities.fonts.style(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            Opacity(
+              opacity: 0.6,
+              child: Text(
+                subtitleValue,
+                style: Utilities.fonts.style(
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
