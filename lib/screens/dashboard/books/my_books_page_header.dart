@@ -1,7 +1,9 @@
 import 'package:artbooking/components/texts/page_title.dart';
 import 'package:artbooking/screens/dashboard/books/my_books_page_actions.dart';
 import 'package:artbooking/screens/dashboard/books/my_books_page_group_actions.dart';
+import 'package:artbooking/screens/dashboard/books/my_books_page_title.dart';
 import 'package:artbooking/types/book/book.dart';
+import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -9,18 +11,22 @@ class MyBooksPageHeader extends StatelessWidget {
   const MyBooksPageHeader({
     Key? key,
     required this.multiSelectActive,
+    required this.multiSelectedItems,
+    required this.selectedTab,
     this.onShowCreateBookDialog,
     this.onTriggerMultiSelect,
     this.onSelectAll,
-    required this.multiSelectedItems,
     this.onClearSelection,
+    this.onChangedTab,
   }) : super(key: key);
 
   final bool multiSelectActive;
+  final EnumVisibilityTab selectedTab;
   final void Function()? onShowCreateBookDialog;
   final void Function()? onTriggerMultiSelect;
   final void Function()? onSelectAll;
   final void Function()? onClearSelection;
+  final void Function(EnumVisibilityTab)? onChangedTab;
 
   final Map<String?, Book> multiSelectedItems;
 
@@ -36,8 +42,11 @@ class MyBooksPageHeader extends StatelessWidget {
         delegate: SliverChildListDelegate.fixed([
           PageTitle(
             renderSliver: false,
-            titleValue: "books".tr(),
-            subtitleValue: "books_subtitle".tr(),
+            title: MyBooksPageTitle(
+              selectedTab: selectedTab,
+              onChangedTab: onChangedTab,
+            ),
+            subtitleValue: "books_my_subtitle_extended".tr(),
             padding: const EdgeInsets.only(bottom: 16.0),
           ),
           MyBooksPageActions(

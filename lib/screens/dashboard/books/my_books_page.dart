@@ -5,6 +5,7 @@ import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
+import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/dashboard/books/my_books_page_body.dart';
@@ -12,6 +13,7 @@ import 'package:artbooking/screens/dashboard/books/my_books_page_fab.dart';
 import 'package:artbooking/screens/dashboard/books/my_books_page_header.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
+import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:artbooking/types/firestore/doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
@@ -20,19 +22,18 @@ import 'package:artbooking/types/cloud_functions/book_response.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
-class MyBooksPage extends StatefulWidget {
+class MyBooksPage extends ConsumerStatefulWidget {
   @override
   _MyBooksPageState createState() => _MyBooksPageState();
 }
 
-class _MyBooksPageState extends State<MyBooksPage> {
+class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   bool _loading = false;
-  bool _descending = true;
   bool _hasNext = true;
   bool _isFabVisible = false;
   bool _isLoadingMore = false;
@@ -65,9 +66,12 @@ class _MyBooksPageState extends State<MyBooksPage> {
 
   QuerySnapshotStreamSubscription? _bookSubscription;
 
+  EnumVisibilityTab _selectedTab = EnumVisibilityTab.active;
+
   @override
   initState() {
     super.initState();
+    loadPreferences();
     fetchBooks();
   }
 
@@ -95,6 +99,8 @@ class _MyBooksPageState extends State<MyBooksPage> {
               slivers: <Widget>[
                 ApplicationBar(),
                 MyBooksPageHeader(
+                  selectedTab: _selectedTab,
+                  onChangedTab: onChangedTab,
                   multiSelectActive: _forceMultiSelect,
                   multiSelectedItems: _multiSelectedItems,
                   onSelectAll: onSelectAll,
@@ -259,6 +265,47 @@ class _MyBooksPageState extends State<MyBooksPage> {
     }
   }
 
+  QueryMap getFetchQuery() {
+    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+    if (_selectedTab == EnumVisibilityTab.active) {
+      return FirebaseFirestore.instance
+          .collection("books")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", isNotEqualTo: "archived")
+          .limit(_limit);
+    }
+    return FirebaseFirestore.instance
+        .collection("books")
+        .where("user_id", isEqualTo: userId)
+        .where("visibility", isEqualTo: "archived")
+        .limit(_limit);
+  }
+
+  QueryMap? getFetchMoreQuery() {
+    final lastDocument = _lastDocument;
+    if (lastDocument == null) {
+      return null;
+    }
+
+    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+    if (_selectedTab == EnumVisibilityTab.active) {
+      return FirebaseFirestore.instance
+          .collection("books")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", isNotEqualTo: "archived")
+          .limit(_limit)
+          .startAfterDocument(lastDocument);
+    }
+    return FirebaseFirestore.instance
+        .collection("books")
+        .where("user_id", isEqualTo: userId)
+        .where("visibility", isNotEqualTo: "archived")
+        .limit(_limit)
+        .startAfterDocument(lastDocument);
+  }
+
   void fetchBooks() async {
     setState(() {
       _loading = true;
@@ -267,11 +314,7 @@ class _MyBooksPageState extends State<MyBooksPage> {
     });
 
     try {
-      final query = FirebaseFirestore.instance
-          .collection('books')
-          .where('user_id', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
-          .orderBy('created_at', descending: _descending)
-          .limit(_limit);
+      final query = getFetchQuery();
 
       listenBooksEvents(query);
       final snapshot = await query.get();
@@ -288,7 +331,6 @@ class _MyBooksPageState extends State<MyBooksPage> {
       for (DocSnapMap document in snapshot.docs) {
         final data = document.data();
         data['id'] = document.id;
-
         _books.add(Book.fromMap(data));
       }
 
@@ -311,20 +353,12 @@ class _MyBooksPageState extends State<MyBooksPage> {
     _isLoadingMore = true;
 
     try {
-      final userAuth = FirebaseAuth.instance.currentUser;
-
-      if (userAuth == null) {
-        throw Exception("User is not authenticated.");
+      final QueryMap? query = getFetchMoreQuery();
+      if (query == null) {
+        return;
       }
 
-      final snapshot = await FirebaseFirestore.instance
-          .collection('books')
-          .where('user_id', isEqualTo: userAuth.uid)
-          .orderBy('created_at', descending: _descending)
-          .limit(_limit)
-          .startAfterDocument(_lastDocument!)
-          .get();
-
+      final snapshot = await query.get();
       if (snapshot.docs.isEmpty) {
         setState(() {
           _hasNext = false;
@@ -351,6 +385,10 @@ class _MyBooksPageState extends State<MyBooksPage> {
     } finally {
       setState(() => _loading = false);
     }
+  }
+
+  void loadPreferences() {
+    _selectedTab = Utilities.storage.getBooksTab();
   }
 
   void onLongPressBook(Book book, bool selected) {
@@ -400,6 +438,15 @@ class _MyBooksPageState extends State<MyBooksPage> {
     });
 
     setState(() {});
+  }
+
+  void onChangedTab(EnumVisibilityTab selectedTab) {
+    setState(() {
+      _selectedTab = selectedTab;
+    });
+
+    fetchBooks();
+    Utilities.storage.saveBooksTab(selectedTab);
   }
 
   void onClearSelection() {
