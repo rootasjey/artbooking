@@ -17,4 +17,7 @@ enum EnumBookItemAction {
 
   /// Update this book's description.
   updateDescription,
+
+  /// Update this book's visibility.
+  updateVisibility,
 }
