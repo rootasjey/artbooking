@@ -40,6 +40,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   bool _forceMultiSelect = false;
   bool _creating = false;
 
+  /// Last fetched book document.
   DocumentSnapshot? _lastDocument;
 
   final _books = <Book>[];
@@ -88,7 +89,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       floatingActionButton: MyBooksPageFab(
         scrollController: _scrollController,
         show: _isFabVisible,
-        onShowCreateBookDialog: onShowCreateBookDialog,
+        onShowCreateBookDialog: showCreateBookDialog,
       ),
       body: Stack(
         children: [
@@ -104,14 +105,14 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                   multiSelectActive: _forceMultiSelect,
                   multiSelectedItems: _multiSelectedItems,
                   onSelectAll: onSelectAll,
-                  onClearSelection: onClearSelection,
-                  onTriggerMultiSelect: onTriggerMultiSelect,
-                  onShowCreateBookDialog: onShowCreateBookDialog,
+                  onClearSelection: clearSelection,
+                  onTriggerMultiSelect: triggerMultiSelect,
+                  onShowCreateBookDialog: showCreateBookDialog,
                 ),
                 MyBooksPageBody(
                   books: _books,
                   loading: _loading,
-                  onShowCreateBookDialog: onShowCreateBookDialog,
+                  onShowCreateBookDialog: showCreateBookDialog,
                   popupMenuEntries: _popupMenuEntries,
                   onLongPressBook: onLongPressBook,
                   forceMultiSelect: _forceMultiSelect,
@@ -138,19 +139,10 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     );
   }
 
-  /// Fire when a new document has been created in Firestore.
-  /// Add the corresponding document in the UI.
-  void onAddStreamingBook(DocumentChangeMap documentChange) {
-    final data = documentChange.doc.data();
-
-    if (data == null) {
-      return;
-    }
-
+  void clearSelection() {
     setState(() {
-      data['id'] = documentChange.doc.id;
-      final book = Book.fromMap(data);
-      _books.insert(0, book);
+      _multiSelectedItems.clear();
+      _forceMultiSelect = _multiSelectedItems.length > 0;
     });
   }
 
@@ -194,7 +186,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
           textButtonValidation: "delete".tr(),
           onCancel: Beamer.of(context).popRoute,
           onValidate: () {
-            deleteSelection();
+            deleteGroup();
             Beamer.of(context).popRoute();
           },
         );
@@ -210,7 +202,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         return DeleteDialog(
           titleValue: "book_delete".tr().toUpperCase(),
           descriptionValue: "book_delete_description".tr(),
-          onValidate: () => onDeleteBook(book, index),
+          onValidate: () => deleteBook(book, index),
         );
       },
     );
@@ -239,7 +231,25 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     );
   }
 
-  void deleteSelection() async {
+  void deleteBook(Book book, int index) async {
+    setState(() => _books.removeAt(index));
+
+    final response = await BooksActions.deleteOne(
+      bookId: book.id,
+    );
+
+    if (response.success) {
+      return;
+    }
+
+    setState(() => _books.insert(index, book));
+
+    context.showErrorBar(
+      content: Text(response.error.details),
+    );
+  }
+
+  void deleteGroup() async {
     _multiSelectedItems.entries.forEach((multiSelectItem) {
       _books.removeWhere((item) => item.id == multiSelectItem.key);
     });
@@ -387,8 +397,74 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     }
   }
 
+  /// Listen to the last Firestore query of this page.
+  void listenBooksEvents(QueryMap query) {
+    _bookSubscription = query.snapshots().skip(1).listen(
+      (snapshot) {
+        for (DocumentChangeMap documentChange in snapshot.docChanges) {
+          switch (documentChange.type) {
+            case DocumentChangeType.added:
+              onAddStreamingBook(documentChange);
+              break;
+            case DocumentChangeType.modified:
+              onUpdateStreamingBook(documentChange);
+              break;
+            case DocumentChangeType.removed:
+              onRemoveStreamingBook(documentChange);
+              break;
+          }
+        }
+      },
+      onError: (error) {
+        Utilities.logger.e(error);
+      },
+    );
+  }
+
   void loadPreferences() {
     _selectedTab = Utilities.storage.getBooksTab();
+  }
+
+  void multiSelectBook(book) {
+    final selected = _multiSelectedItems.containsKey(book.id);
+
+    if (selected) {
+      setState(() {
+        _multiSelectedItems.remove(book.id);
+        _forceMultiSelect = _multiSelectedItems.length > 0;
+      });
+
+      return;
+    }
+
+    setState(() {
+      _multiSelectedItems.putIfAbsent(book.id, () => book);
+    });
+  }
+
+  /// Fire when a new book is created in collection.
+  /// Add the corresponding document in the UI.
+  void onAddStreamingBook(DocumentChangeMap documentChange) {
+    final data = documentChange.doc.data();
+
+    if (data == null) {
+      return;
+    }
+
+    setState(() {
+      data['id'] = documentChange.doc.id;
+      final book = Book.fromMap(data);
+      _books.insert(0, book);
+    });
+  }
+
+  void onChangedTab(EnumVisibilityTab selectedTab) {
+    setState(() {
+      _selectedTab = selectedTab;
+    });
+
+    fetchBooks();
+    Utilities.storage.saveBooksTab(selectedTab);
   }
 
   void onLongPressBook(Book book, bool selected) {
@@ -440,28 +516,6 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     setState(() {});
   }
 
-  void onChangedTab(EnumVisibilityTab selectedTab) {
-    setState(() {
-      _selectedTab = selectedTab;
-    });
-
-    fetchBooks();
-    Utilities.storage.saveBooksTab(selectedTab);
-  }
-
-  void onClearSelection() {
-    setState(() {
-      _multiSelectedItems.clear();
-      _forceMultiSelect = _multiSelectedItems.length > 0;
-    });
-  }
-
-  void onTriggerMultiSelect() {
-    setState(() {
-      _forceMultiSelect = !_forceMultiSelect;
-    });
-  }
-
   /// Fire when a new document has been delete from Firestore.
   /// Delete the corresponding document from the UI.
   void onRemoveStreamingBook(DocumentChangeMap documentChange) {
@@ -470,59 +524,74 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     });
   }
 
-  void onShowCreateBookDialog() {
-    final _nameController = TextEditingController();
-    final _descriptionController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) => InputDialog(
-        titleValue: "book_create".tr().toUpperCase(),
-        subtitleValue: "book_create_description".tr(),
-        nameController: _nameController,
-        descriptionController: _descriptionController,
-        onCancel: Beamer.of(context).popRoute,
-        onSubmitted: (value) {
-          createBook(
-            _nameController.text,
-            _descriptionController.text,
-          );
-          Beamer.of(context).popRoute();
-        },
-      ),
+  void onNavigateToBook(Book book) {
+    NavigationStateHelper.book = book;
+    Beamer.of(context).beamToNamed(
+      "dashboard/books/${book.id}",
+      data: {
+        "bookId": book.id,
+      },
     );
   }
 
-  void onShowRenameBookDialog(Book book) {
-    final _nameController = TextEditingController();
-    final _descriptionController = TextEditingController();
+  void onPopupMenuItemSelected(
+    EnumBookItemAction action,
+    int index,
+    Book book,
+  ) {
+    switch (action) {
+      case EnumBookItemAction.rename:
+        showRenameBookDialog(book);
+        break;
+      case EnumBookItemAction.delete:
+        confirmDeleteOneBook(book, index);
+        break;
+      default:
+    }
+  }
 
-    _nameController.text = book.name;
-    _descriptionController.text = book.description;
+  /// When a book card receives onTap event.
+  void onTapBook(Book book) {
+    if (_multiSelectedItems.isEmpty && !_forceMultiSelect) {
+      onNavigateToBook(book);
+      return;
+    }
 
-    showDialog(
-      context: context,
-      builder: (context) => InputDialog(
-        submitButtonValue: "rename".tr(),
-        nameController: _nameController,
-        descriptionController: _descriptionController,
-        titleValue: "book_rename".tr().toUpperCase(),
-        subtitleValue: "book_rename_description".tr(),
-        onCancel: Beamer.of(context).popRoute,
-        onSubmitted: (value) {
-          onRenameBook(
-            book,
-            _nameController.text,
-            _descriptionController.text,
-          );
-          Beamer.of(context).popRoute();
-        },
-      ),
-    );
+    multiSelectBook(book);
+  }
+
+  /// Fire when a new document has been updated in Firestore.
+  /// Update the corresponding document in the UI.
+  void onUpdateStreamingBook(DocumentChangeMap documentChange) {
+    try {
+      final data = documentChange.doc.data();
+      if (data == null) {
+        return;
+      }
+
+      final int index = _books.indexWhere(
+        (book) => book.id == documentChange.doc.id,
+      );
+
+      data['id'] = documentChange.doc.id;
+      final updatedBook = Book.fromMap(data);
+
+      setState(() {
+        _books.removeAt(index);
+        _books.insert(index, updatedBook);
+      });
+    } on Exception catch (error) {
+      Utilities.logger.e(
+        "The document with the id ${documentChange.doc.id} "
+        "doesn't exist in the books list.",
+      );
+
+      Utilities.logger.e(error);
+    }
   }
 
   /// Rename one book.
-  void onRenameBook(Book book, String name, String description) async {
+  void renameBook(Book book, String name, String description) async {
     try {
       final prevName = book.name;
       final prevDescription = book.description;
@@ -559,128 +628,60 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     }
   }
 
-  /// Listen to the last Firestore query of this page.
-  void listenBooksEvents(QueryMap query) {
-    _bookSubscription = query.snapshots().skip(1).listen(
-      (snapshot) {
-        for (DocumentChangeMap documentChange in snapshot.docChanges) {
-          switch (documentChange.type) {
-            case DocumentChangeType.added:
-              onAddStreamingBook(documentChange);
-              break;
-            case DocumentChangeType.modified:
-              onUpdateStreamingBook(documentChange);
-              break;
-            case DocumentChangeType.removed:
-              onRemoveStreamingBook(documentChange);
-              break;
-          }
-        }
-      },
-      onError: (error) {
-        Utilities.logger.e(error);
-      },
+  void showCreateBookDialog() {
+    final _nameController = TextEditingController();
+    final _descriptionController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => InputDialog(
+        titleValue: "book_create".tr().toUpperCase(),
+        subtitleValue: "book_create_description".tr(),
+        nameController: _nameController,
+        descriptionController: _descriptionController,
+        onCancel: Beamer.of(context).popRoute,
+        onSubmitted: (value) {
+          createBook(
+            _nameController.text,
+            _descriptionController.text,
+          );
+          Beamer.of(context).popRoute();
+        },
+      ),
     );
   }
 
-  /// Fire when a new document has been updated in Firestore.
-  /// Update the corresponding document in the UI.
-  void onUpdateStreamingBook(DocumentChangeMap documentChange) {
-    try {
-      final data = documentChange.doc.data();
-      if (data == null) {
-        return;
-      }
+  void showRenameBookDialog(Book book) {
+    final _nameController = TextEditingController();
+    final _descriptionController = TextEditingController();
 
-      final int index = _books.indexWhere(
-        (book) => book.id == documentChange.doc.id,
-      );
+    _nameController.text = book.name;
+    _descriptionController.text = book.description;
 
-      data['id'] = documentChange.doc.id;
-      final updatedBook = Book.fromMap(data);
-
-      setState(() {
-        _books.removeAt(index);
-        _books.insert(index, updatedBook);
-      });
-    } on Exception catch (error) {
-      Utilities.logger.e(
-        "The document with the id ${documentChange.doc.id} "
-        "doesn't exist in the books list.",
-      );
-
-      Utilities.logger.e(error);
-    }
-  }
-
-  void onDeleteBook(Book book, int index) async {
-    setState(() => _books.removeAt(index));
-
-    final response = await BooksActions.deleteOne(
-      bookId: book.id,
-    );
-
-    if (response.success) {
-      return;
-    }
-
-    setState(() => _books.insert(index, book));
-
-    context.showErrorBar(
-      content: Text(response.error.details),
+    showDialog(
+      context: context,
+      builder: (context) => InputDialog(
+        submitButtonValue: "rename".tr(),
+        nameController: _nameController,
+        descriptionController: _descriptionController,
+        titleValue: "book_rename".tr().toUpperCase(),
+        subtitleValue: "book_rename_description".tr(),
+        onCancel: Beamer.of(context).popRoute,
+        onSubmitted: (value) {
+          renameBook(
+            book,
+            _nameController.text,
+            _descriptionController.text,
+          );
+          Beamer.of(context).popRoute();
+        },
+      ),
     );
   }
 
-  void onMultiSelectBook(book) {
-    final selected = _multiSelectedItems.containsKey(book.id);
-
-    if (selected) {
-      setState(() {
-        _multiSelectedItems.remove(book.id);
-        _forceMultiSelect = _multiSelectedItems.length > 0;
-      });
-
-      return;
-    }
-
+  void triggerMultiSelect() {
     setState(() {
-      _multiSelectedItems.putIfAbsent(book.id, () => book);
+      _forceMultiSelect = !_forceMultiSelect;
     });
-  }
-
-  void onNavigateToBook(Book book) {
-    NavigationStateHelper.book = book;
-    Beamer.of(context).beamToNamed(
-      "dashboard/books/${book.id}",
-      data: {
-        "bookId": book.id,
-      },
-    );
-  }
-
-  /// When [onTapBook] event fires on a book.
-  void onTapBook(Book book) {
-    if (_multiSelectedItems.isEmpty && !_forceMultiSelect) {
-      onNavigateToBook(book);
-      return;
-    }
-
-    onMultiSelectBook(book);
-  }
-
-  void onPopupMenuItemSelected(
-    EnumBookItemAction action,
-    int index,
-    Book book,
-  ) {
-    switch (action) {
-      case EnumBookItemAction.rename:
-        onShowRenameBookDialog(book);
-        break;
-      case EnumBookItemAction.delete:
-        confirmDeleteOneBook(book, index);
-        break;
-      default:
-    }
   }
 }

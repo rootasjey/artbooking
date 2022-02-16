@@ -37,7 +37,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   bool _loadingMore = false;
   bool _showFab = false;
 
-  DocumentSnapshot? _lastFirestoreDoc;
+  /// Last fetched illustration document.
+  DocumentSnapshot? _lastDocument;
 
   final int _limit = 20;
 
@@ -290,7 +291,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   /// Return query to fetch more illustrations according to the selected tab.
   /// It's either active illustrations or archvied ones.
   QueryMap? getFetchMoreQuery() {
-    final lastDocument = _lastFirestoreDoc;
+    final lastDocument = _lastDocument;
     if (lastDocument == null) {
       return null;
     }
@@ -343,7 +344,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       }
 
       setState(() {
-        _lastFirestoreDoc = snapshot.docs.last;
+        _lastDocument = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
       });
     } catch (error) {
@@ -355,7 +356,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   /// Fetch more illustrations data from Firestore.
   void fetchMoreIllustrations() async {
-    if (!_hasNext || _lastFirestoreDoc == null) {
+    if (!_hasNext || _lastDocument == null) {
       return;
     }
 
@@ -387,7 +388,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       }
 
       setState(() {
-        _lastFirestoreDoc = snapshot.docs.last;
+        _lastDocument = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
         _loadingMore = false;
       });
@@ -453,7 +454,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     );
   }
 
-  /// Fire when a new document has been created in Firestore.
+  /// Fire when a new illustration is created in the collection.
   /// Add the corresponding document in the UI.
   void onAddStreamingIllustration(DocumentChangeMap documentChange) {
     final data = documentChange.doc.data();
