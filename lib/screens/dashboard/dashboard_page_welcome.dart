@@ -150,7 +150,7 @@ class DashboardPageWelcome extends ConsumerWidget {
             hoverColor: Constants.colors.illustrations,
             iconData: UniconsLine.picture,
             textTitle: "illustrations".tr(),
-            textSubtitle: "illustrations_subtitle".tr(),
+            textSubtitle: "illustrations_my_subtitle".tr(),
             onTap: () {
               context.beamToNamed(DashboardLocationContent.illustrationsRoute);
             },

@@ -1,7 +1,7 @@
 import 'package:artbooking/components/texts/page_title.dart';
 import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page_actions.dart';
 import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page_group_actions.dart';
-import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page_tabs.dart';
+import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page_title.dart';
 import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -46,13 +46,12 @@ class MyIllustrationsPageHeader extends StatelessWidget {
         delegate: SliverChildListDelegate.fixed([
           PageTitle(
             renderSliver: false,
-            titleValue: "illustrations".tr(),
-            subtitleValue: "illustrations_subtitle".tr(),
+            title: MyIllustrationsPageTitle(
+              selectedTab: selectedTab,
+              onChangedTab: onChangedTab,
+            ),
+            subtitleValue: "illustrations_my_subtitle_extended".tr(),
             padding: const EdgeInsets.only(bottom: 4.0),
-          ),
-          MyIllustrationsPageTabs(
-            selectedTab: selectedTab,
-            onChangedTab: onChangedTab,
           ),
           MyIllustrationsPageActions(
             multiSelectActive: multiSelectActive,
