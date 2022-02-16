@@ -8,12 +8,14 @@ import 'package:unicons/unicons.dart';
 class MyBooksPageEmpty extends StatelessWidget {
   const MyBooksPageEmpty({
     Key? key,
-    this.createBook,
     required this.selectedTab,
+    this.createBook,
+    this.onGoToActiveBooks,
   }) : super(key: key);
 
-  final void Function()? createBook;
   final EnumVisibilityTab selectedTab;
+  final void Function()? createBook;
+  final void Function()? onGoToActiveBooks;
 
   @override
   Widget build(BuildContext context) {
@@ -73,10 +75,16 @@ class MyBooksPageEmpty extends StatelessWidget {
                 ),
               ),
             ),
-            DarkElevatedButton.large(
-              onPressed: createBook,
-              child: Text("create".tr()),
-            ),
+            if (selectedTab == EnumVisibilityTab.active)
+              DarkElevatedButton.large(
+                onPressed: createBook,
+                child: Text("create".tr()),
+              )
+            else
+              DarkElevatedButton.large(
+                onPressed: onGoToActiveBooks,
+                child: Text("books_go_to_active".tr()),
+              ),
           ],
         ),
       ),

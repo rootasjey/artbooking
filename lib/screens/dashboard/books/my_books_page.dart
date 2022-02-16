@@ -126,6 +126,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                   multiSelectedItems: _multiSelectedItems,
                   onPopupMenuItemSelected: onPopupMenuItemSelected,
                   onTapBook: onTapBook,
+                  onGoToActiveBooks: onGoToActiveBooks,
                   selectedTab: _selectedTab,
                 ),
                 SliverPadding(
@@ -407,6 +408,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
   /// Listen to the last Firestore query of this page.
   void listenBooksEvents(QueryMap query) {
+    _bookSubscription?.cancel();
     _bookSubscription = query.snapshots().skip(1).listen(
       (snapshot) {
         for (DocumentChangeMap documentChange in snapshot.docChanges) {
@@ -473,6 +475,10 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
     fetchBooks();
     Utilities.storage.saveBooksTab(selectedTab);
+  }
+
+  void onGoToActiveBooks() {
+    onChangedTab(EnumVisibilityTab.active);
   }
 
   void onLongPressBook(Book book, bool selected) {
@@ -555,7 +561,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         confirmDeleteOneBook(book, index);
         break;
       case EnumBookItemAction.updateVisibility:
-        showVisibilityBookDialog(book);
+        showVisibilityBookDialog(book, index);
         break;
       default:
     }
@@ -690,7 +696,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     );
   }
 
-  void showVisibilityBookDialog(Book book) {
+  void showVisibilityBookDialog(Book book, int index) {
     final width = 310.0;
 
     showDialog(
@@ -719,7 +725,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                   maxWidth: width,
                   visibility: book.visibility,
                   onChangedVisibility: (visibility) {
-                    updateVisibility(book, visibility);
+                    updateVisibility(book, visibility, index);
                     Beamer.of(context).popRoute();
                   },
                   padding: const EdgeInsets.only(
@@ -748,15 +754,48 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     });
   }
 
-  void updateVisibility(Book book, EnumContentVisibility visibility) async {
+  void updateVisibility(
+    Book book,
+    EnumContentVisibility visibility,
+    int index,
+  ) async {
+    bool removedBook = false;
+
+    if (_selectedTab == EnumVisibilityTab.active &&
+        visibility == EnumContentVisibility.archived) {
+      _books.removeAt(index);
+      removedBook = true;
+    }
+
+    if (_selectedTab == EnumVisibilityTab.archived &&
+        visibility != EnumContentVisibility.archived) {
+      _books.removeAt(index);
+      removedBook = true;
+    }
+
+    setState(() {});
+
     try {
-      await Utilities.cloud.fun("books-updateVisibility").call({
+      final response =
+          await Utilities.cloud.fun("books-updateVisibility").call({
         "book_id": book.id,
         "visibility": visibility.name,
       });
+
+      if (response.data['success'] as bool) {
+        return;
+      }
+
+      throw Error();
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
+
+      if (removedBook) {
+        setState(() {
+          _books.insert(index, book);
+        });
+      }
     }
   }
 }

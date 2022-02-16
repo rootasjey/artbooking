@@ -129,6 +129,7 @@
   "books_delete": "Supprimer ces books",
   "books_delete_description": "La suppression de ces books n'entraînera PAS la suppression des illustrations contenues à l'intérieur de ceux-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible.",
   "books_description": "Les moments de lecture sont reposants, calme et souvent frétillants. Une petite liste de books que j'ai adorés:",
+  "books_go_to_active": "Allez aux books actifs",
   "books_loading": "Chargement des books",
   "books_my": "Mes books",
   "books_my_subtitle": "Parcourez vos books créés.",

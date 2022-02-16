@@ -129,6 +129,7 @@
   "books_delete": "Delete these book",
   "books_delete_description": "Deleting these books won't delete illustrations inside it. Illustrations live on their own. This action is irrevsible.",
   "books_description": "Reading moments are peaceful, calm and often thrilling. A short list of my most liked books of all times:",
+  "books_go_to_active": "Go to active books",
   "books_loading": "Loading books",
   "books_my": "My books",
   "books_my_empty": "You have no book",
