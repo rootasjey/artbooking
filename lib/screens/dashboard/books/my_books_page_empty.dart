@@ -1,5 +1,6 @@
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -8,9 +9,11 @@ class MyBooksPageEmpty extends StatelessWidget {
   const MyBooksPageEmpty({
     Key? key,
     this.createBook,
+    required this.selectedTab,
   }) : super(key: key);
 
   final void Function()? createBook;
+  final EnumVisibilityTab selectedTab;
 
   @override
   Widget build(BuildContext context) {
@@ -45,11 +48,12 @@ class MyBooksPageEmpty extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "books_my_empty".tr(),
+                  selectedTab == EnumVisibilityTab.active
+                      ? "books_my_empty".tr()
+                      : "books_my_empty_archived".tr(),
                   style: Utilities.fonts.style(
                     fontSize: 26.0,
                     fontWeight: FontWeight.w600,
-                    // color: Theme.of(context).primaryColor,
                   ),
                 ),
               ],
@@ -60,7 +64,9 @@ class MyBooksPageEmpty extends StatelessWidget {
               child: Opacity(
                 opacity: 0.4,
                 child: Text(
-                  "books_my_empty_subtitle".tr(),
+                  selectedTab == EnumVisibilityTab.active
+                      ? "books_my_empty_subtitle".tr()
+                      : "books_my_empty_archived_subtitle".tr(),
                   style: Utilities.fonts.style(
                     fontSize: 16.0,
                   ),

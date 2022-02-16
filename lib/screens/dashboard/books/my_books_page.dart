@@ -126,6 +126,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                   multiSelectedItems: _multiSelectedItems,
                   onPopupMenuItemSelected: onPopupMenuItemSelected,
                   onTapBook: onTapBook,
+                  selectedTab: _selectedTab,
                 ),
                 SliverPadding(
                   padding: const EdgeInsets.only(bottom: 100.0),

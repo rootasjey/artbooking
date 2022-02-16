@@ -3,6 +3,7 @@ import 'package:artbooking/components/icons/animated_app_icon.dart';
 import 'package:artbooking/screens/dashboard/books/my_books_page_empty.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
+import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +15,7 @@ class MyBooksPageBody extends StatelessWidget {
     required this.forceMultiSelect,
     required this.multiSelectedItems,
     required this.popupMenuEntries,
+    required this.selectedTab,
     this.onShowCreateBookDialog,
     this.onTapBook,
     this.onPopupMenuItemSelected,
@@ -22,13 +24,16 @@ class MyBooksPageBody extends StatelessWidget {
 
   final bool forceMultiSelect;
   final bool loading;
-  final List<Book> books;
+
+  final EnumVisibilityTab selectedTab;
+
   final void Function()? onShowCreateBookDialog;
   final void Function(Book)? onTapBook;
   final void Function(EnumBookItemAction, int, Book)? onPopupMenuItemSelected;
-  final List<PopupMenuEntry<EnumBookItemAction>> popupMenuEntries;
   final void Function(Book, bool)? onLongPressBook;
 
+  final List<Book> books;
+  final List<PopupMenuEntry<EnumBookItemAction>> popupMenuEntries;
   final Map<String?, Book> multiSelectedItems;
 
   @override
@@ -47,6 +52,7 @@ class MyBooksPageBody extends StatelessWidget {
     if (books.isEmpty) {
       return MyBooksPageEmpty(
         createBook: onShowCreateBookDialog,
+        selectedTab: selectedTab,
       );
     }
 

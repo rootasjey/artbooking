@@ -134,6 +134,8 @@
   "books_my_subtitle": "Parcourez vos books créés.",
   "books_my_subtitle_extended": "Parcourez vos books créés. Appuyez sur 'actifs' ou 'archivés' pour changer de vue.",
   "books_my_empty": "Vous n'avez aucun book",
+  "books_my_empty_archived": "Vous n'avez aucun book archivé",
+  "books_my_empty_archived_subtitle": "Vos books archivés apparaîtront ici. Mais pour l'instant il y en a aucun.",
   "books_my_empty_subtitle": "Commencez par créer un nouveau book et ajouter-y des illustrations. Vous pourrez ensuite le consulter sur cette même page.",
   "books_none_created": "Vous avez créé aucun book pour le moment.",
   "books_public_empty": "Il n'y a pas de books publiques actuellement. Veuillez revenir plus tard.",

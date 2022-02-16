@@ -132,6 +132,8 @@
   "books_loading": "Loading books",
   "books_my": "My books",
   "books_my_empty": "You have no book",
+  "books_my_empty_archived": "You have no archived book",
+  "books_my_empty_archived_subtitle": "Created books with 'archived' visibility will appear here. But there's none right now.",
   "books_my_empty_subtitle": "Start by creating a new book and add some of your illustrations to it. It will appear here.",
   "books_my_subtitle": "Browse your created art books.",
   "books_my_subtitle_extended": "Browse your created art books. Tap 'active' or 'archived' to change view.",
