@@ -21,7 +21,10 @@ class ThemedDialog extends StatelessWidget {
     this.autofocus = true,
     this.titleValue = "",
     this.subtitleValue = "",
+    this.showDivider = false,
   }) : super(key: key);
+
+  final bool showDivider;
 
   /// Trigger when the user tap on close button
   /// or fires keyboard shortcuts for closing the dialog.
@@ -82,10 +85,21 @@ class ThemedDialog extends StatelessWidget {
         backgroundColor: Constants.colors.clairPink,
         title: _title,
         titlePadding: EdgeInsets.zero,
-        contentPadding: const EdgeInsets.all(16.0),
+        contentPadding: EdgeInsets.zero,
         children: [
-          body,
-          footerButtons(),
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 16.0,
+              top: 16.0,
+              right: 16.0,
+            ),
+            child: body,
+          ),
+          if (showDivider) Divider(),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: footerButtons(),
+          ),
         ],
       ),
     );
@@ -103,12 +117,16 @@ class ThemedDialog extends StatelessWidget {
   }
 
   Widget footerButtons() {
-    return Padding(
-      padding: EdgeInsets.all(24.0),
-      child: DarkElevatedButton.large(
-        onPressed: onValidate,
-        child: Text(textButtonValidation),
-      ),
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.all(24.0),
+          child: DarkElevatedButton.large(
+            onPressed: onValidate,
+            child: Text(textButtonValidation),
+          ),
+        ),
+      ],
     );
   }
 
