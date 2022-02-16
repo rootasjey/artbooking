@@ -13,20 +13,21 @@ import 'package:unicons/unicons.dart';
 
 /// A card representing a book;
 class BookCard extends StatefulWidget {
-  BookCard({
+  const BookCard({
+    Key? key,
     required this.book,
-    this.selected = false,
-    this.selectionMode = false,
+    required this.index,
     this.onLongPress,
-    this.popupMenuEntries = const [],
     this.onPopupMenuItemSelected,
-    this.index = 0,
     this.onTap,
     this.onDoubleTap,
     this.onTapLike,
+    this.popupMenuEntries = const [],
+    this.selected = false,
+    this.selectionMode = false,
     this.width = 360.0,
     this.height = 402.0,
-  });
+  }) : super(key: key);
 
   /// Book's data for this card.
   final Book book;
