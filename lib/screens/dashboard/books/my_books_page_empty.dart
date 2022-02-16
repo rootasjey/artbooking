@@ -35,9 +35,10 @@ class MyBooksPageEmpty extends StatelessWidget {
               children: [
                 Positioned(
                   bottom: 6.0,
+                  left: 0.0,
+                  right: 0.0,
                   child: SizedBox(
                     height: 8.0,
-                    width: 280.0,
                     child: Container(
                       color: Colors.pink.withOpacity(0.4),
                     ),
