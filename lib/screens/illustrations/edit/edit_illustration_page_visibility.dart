@@ -1,6 +1,6 @@
+import 'package:artbooking/components/buttons/visibility_button.dart';
 import 'package:artbooking/components/expansion_tile_card/expansion_tile_card_description.dart';
 import 'package:artbooking/components/expansion_tile_card/expansion_tile_card_title.dart';
-import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
@@ -46,81 +46,13 @@ class EditIllustrationPageVisibility extends StatelessWidget {
         children: [
           Align(
             alignment: Alignment.topLeft,
-            child: Padding(
+            child: VisibilityButton(
+              visibility: visibility,
+              onChangedVisibility: onUpdateVisibility,
               padding: const EdgeInsets.only(top: 12.0, left: 16.0),
-              child: PopupMenuButton(
-                tooltip: "illustration_visibility_choose".tr(),
-                child: Material(
-                  color: Colors.black87,
-                  elevation: 4.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6.0),
-                  ),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: 200.0,
-                      minHeight: 48.0,
-                    ),
-                    child: Center(
-                      child: Text(
-                        "visibility_${visibility.name}".tr().toUpperCase(),
-                        style: Utilities.fonts.style(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                onSelected: onUpdateVisibility,
-                itemBuilder: (context) {
-                  return [
-                    visibiltyPopupItem(
-                      value: EnumContentVisibility.private,
-                      titleValue: "visibility_private".tr(),
-                      subtitleValue: "visibility_private_description".tr(),
-                    ),
-                    visibiltyPopupItem(
-                      value: EnumContentVisibility.public,
-                      titleValue: "visibility_public".tr(),
-                      subtitleValue: "visibility_public_description".tr(),
-                    ),
-                    visibiltyPopupItem(
-                      value: EnumContentVisibility.archived,
-                      titleValue: "visibility_archived".tr(),
-                      subtitleValue: "visibility_archived_description".tr(),
-                    ),
-                  ];
-                },
-              ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  PopupMenuItem<EnumContentVisibility> visibiltyPopupItem({
-    required EnumContentVisibility value,
-    required String titleValue,
-    required String subtitleValue,
-  }) {
-    return PopupMenuItem(
-      value: value,
-      child: ListTile(
-        title: Text(
-          titleValue,
-          style: Utilities.fonts.style(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        subtitle: Text(
-          subtitleValue,
-          style: Utilities.fonts.style(
-            fontSize: 14.0,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
       ),
     );
   }
