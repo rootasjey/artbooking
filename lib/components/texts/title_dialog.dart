@@ -37,26 +37,28 @@ class TitleDialog extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Opacity(
-                    opacity: 0.8,
-                    child: Text(
-                      titleValue,
-                      style: Utilities.fonts.style(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w700,
+                  if (titleValue.isNotEmpty)
+                    Opacity(
+                      opacity: 0.8,
+                      child: Text(
+                        titleValue,
+                        style: Utilities.fonts.style(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
-                  ),
-                  Opacity(
-                    opacity: 0.4,
-                    child: Text(
-                      subtitleValue,
-                      style: Utilities.fonts.style(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w700,
+                  if (subtitleValue.isNotEmpty)
+                    Opacity(
+                      opacity: 0.4,
+                      child: Text(
+                        subtitleValue,
+                        style: Utilities.fonts.style(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
