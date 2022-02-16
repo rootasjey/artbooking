@@ -100,12 +100,20 @@ class StorageUtilities {
         : EnumLicenseType.user;
   }
 
+  EnumVisibilityTab getBooksTab() {
+    final String key = Constants.storageKeys.dashboardBooksTab;
+    final String? value = _localStorage.getString(key);
+    return value == EnumVisibilityTab.archived.name
+        ? EnumVisibilityTab.archived
+        : EnumVisibilityTab.active;
+  }
+
   EnumVisibilityTab getIllustrationsTab() {
     final String key = Constants.storageKeys.dashboardIllustrationsTab;
     final String? value = _localStorage.getString(key);
-    return value == EnumVisibilityTab.active.name
-        ? EnumVisibilityTab.active
-        : EnumVisibilityTab.archived;
+    return value == EnumVisibilityTab.archived.name
+        ? EnumVisibilityTab.archived
+        : EnumVisibilityTab.active;
   }
 
   EnumLikeType getLikeTab() {
@@ -156,6 +164,11 @@ class StorageUtilities {
 
   void saveIllustrationsTab(EnumVisibilityTab visibilityTab) {
     final String key = Constants.storageKeys.dashboardIllustrationsTab;
+    _localStorage.setString(key, visibilityTab.name);
+  }
+
+  void saveBooksTab(EnumVisibilityTab visibilityTab) {
+    final String key = Constants.storageKeys.dashboardBooksTab;
     _localStorage.setString(key, visibilityTab.name);
   }
 
