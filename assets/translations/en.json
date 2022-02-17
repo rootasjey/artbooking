@@ -112,8 +112,20 @@
   "book_creating": "Creating book",
   "book_creation_error": "Sorry, there was an error while creating your book. Please try again later.",
   "book_creation_success": "Your book has been successfully created!",
-  "book_delete": "Delete this book",
-  "book_delete_description": "Deleting this book won't delete illustrations inside it. Illustrations live on their own. This action is irrevsible.",
+  "book_delete": {
+    "zero": "Delete this book",
+    "one": "Delete this book",
+    "two": "Delete these books",
+    "many": "Delete these books",
+    "other": "Delete these books"
+  },
+  "book_delete_description": {
+    "zero": "Deleting this book won't delete illustrations inside it. Illustrations live on their own. This action is irrevsible.",
+    "one": "Deleting this book won't delete illustrations inside it. Illustrations live on their own. This action is irrevsible.",
+    "two": "Deleting these books won't delete illustrations inside it. Illustrations live on their own. This action is irrevsible.",
+    "many": "Deleting these books won't delete illustrations inside it. Illustrations live on their own. This action is irrevsible.",
+    "other": "Deleting these books won't delete illustrations inside it. Illustrations live on their own. This action is irrevsible."
+  },
   "book_loading": "Loading book",
   "book_no_illustrations": "You haven't added any illustration to this book yet. You can add one from your illustrations page.",
   "book_rename": "Rename book",

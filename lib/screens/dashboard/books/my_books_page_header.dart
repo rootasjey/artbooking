@@ -18,10 +18,16 @@ class MyBooksPageHeader extends StatelessWidget {
     this.onSelectAll,
     this.onClearSelection,
     this.onChangedTab,
+    this.onAddToBook,
+    this.onChangeGroupVisibility,
+    this.onConfirmDeleteGroup,
   }) : super(key: key);
 
   final bool multiSelectActive;
   final EnumVisibilityTab selectedTab;
+  final void Function()? onAddToBook;
+  final void Function()? onChangeGroupVisibility;
+  final void Function()? onConfirmDeleteGroup;
   final void Function()? onShowCreateBookDialog;
   final void Function()? onTriggerMultiSelect;
   final void Function()? onSelectAll;
@@ -60,6 +66,9 @@ class MyBooksPageHeader extends StatelessWidget {
             multiSelectedItems: multiSelectedItems,
             onSelectAll: onSelectAll,
             onClearSelection: onClearSelection,
+            onAddToBook: onAddToBook,
+            onChangeGroupVisibility: onChangeGroupVisibility,
+            onConfirmDeleteGroup: onConfirmDeleteGroup,
           ),
         ]),
       ),

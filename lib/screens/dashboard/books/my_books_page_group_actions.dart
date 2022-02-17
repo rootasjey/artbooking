@@ -1,4 +1,4 @@
-import 'package:artbooking/components/buttons/text_rectangle_button.dart';
+import 'package:artbooking/components/buttons/square_button.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -7,18 +7,22 @@ import 'package:unicons/unicons.dart';
 class MyBooksPageGroupActions extends StatelessWidget {
   const MyBooksPageGroupActions({
     Key? key,
-    required this.show,
-    this.onShowDeleteManyBooks,
-    this.onSelectAll,
     required this.multiSelectedItems,
+    required this.show,
+    this.onConfirmDeleteGroup,
+    this.onSelectAll,
     this.onClearSelection,
+    this.onAddToBook,
+    this.onChangeGroupVisibility,
   }) : super(key: key);
 
   final bool show;
   final Map<String?, Book> multiSelectedItems;
-  final void Function()? onShowDeleteManyBooks;
+  final void Function()? onConfirmDeleteGroup;
   final void Function()? onSelectAll;
   final void Function()? onClearSelection;
+  final void Function()? onAddToBook;
+  final void Function()? onChangeGroupVisibility;
 
   @override
   Widget build(BuildContext context) {
@@ -49,23 +53,30 @@ class MyBooksPageGroupActions extends StatelessWidget {
             color: Colors.black12,
           ),
         ),
-        TextRectangleButton(
-          icon: Icon(UniconsLine.ban),
-          label: Text("clear_selection".tr()),
-          primary: Colors.black38,
-          onPressed: onClearSelection,
+        SquareButton(
+          message: "clear_selection".tr(),
+          child: Icon(UniconsLine.ban),
+          onTap: onClearSelection,
         ),
-        TextRectangleButton(
-          icon: Icon(UniconsLine.layers),
-          label: Text("select_all".tr()),
-          primary: Colors.black38,
-          onPressed: onSelectAll,
+        SquareButton(
+          message: "delete".tr(),
+          child: Icon(UniconsLine.trash),
+          onTap: onConfirmDeleteGroup,
         ),
-        TextRectangleButton(
-          icon: Icon(UniconsLine.trash),
-          label: Text("delete".tr()),
-          primary: Colors.black38,
-          onPressed: onShowDeleteManyBooks,
+        SquareButton(
+          message: "select_all".tr(),
+          child: Icon(UniconsLine.object_group),
+          onTap: onSelectAll,
+        ),
+        SquareButton(
+          message: "visibility_change".tr(),
+          child: Icon(UniconsLine.eye),
+          onTap: onChangeGroupVisibility,
+        ),
+        SquareButton(
+          message: "add_to_book".tr(),
+          child: Icon(UniconsLine.book_medical),
+          onTap: onAddToBook,
         ),
       ],
     );

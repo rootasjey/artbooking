@@ -50,7 +50,7 @@ class BookPageActions extends StatelessWidget {
           child: Icon(UniconsLine.upload),
         ),
         SquareButton(
-          message: "book_delete".tr(),
+          message: "book_delete".plural(1),
           onTap: onUploadToThisBook,
           child: Icon(UniconsLine.trash),
         ),

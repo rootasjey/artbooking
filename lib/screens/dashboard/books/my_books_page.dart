@@ -1,4 +1,5 @@
 import 'package:artbooking/actions/books.dart';
+import 'package:artbooking/components/add_to_book_panel.dart';
 import 'package:artbooking/components/buttons/visibility_button.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
@@ -27,6 +28,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:unicons/unicons.dart';
 
 class MyBooksPage extends ConsumerStatefulWidget {
@@ -115,6 +117,9 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                   onClearSelection: clearSelection,
                   onTriggerMultiSelect: triggerMultiSelect,
                   onShowCreateBookDialog: showCreateBookDialog,
+                  onAddToBook: showAddGroupToBookDialog,
+                  onChangeGroupVisibility: showGroupVisibilityDialog,
+                  onConfirmDeleteGroup: onConfirmDeleteGroup,
                 ),
                 MyBooksPageBody(
                   books: _books,
@@ -156,62 +161,36 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   }
 
   /// Show a dialog to confirm multiple books deletion.
-  void confirmDeleteManyBooks() async {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return ThemedDialog(
-          focusNode: _focusNode,
-          title: Column(
-            children: [
-              Opacity(
-                opacity: 0.8,
-                child: Text(
-                  "books_delete".tr().toUpperCase(),
-                  style: Utilities.fonts.style(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Container(
-                width: 300.0,
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Opacity(
-                  opacity: 0.4,
-                  child: Text(
-                    "books_delete_description".tr(),
-                    textAlign: TextAlign.center,
-                    style: Utilities.fonts.style(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          body: SingleChildScrollView(),
-          textButtonValidation: "delete".tr(),
-          onCancel: Beamer.of(context).popRoute,
-          onValidate: () {
-            deleteGroup();
-            Beamer.of(context).popRoute();
-          },
-        );
-      },
-    );
+  void onConfirmDeleteGroup() async {
+    if (_multiSelectedItems.isEmpty) {
+      context.showErrorBar(content: Text("multi_select_no_item".tr()));
+      return;
+    }
+
+    final Book book = _multiSelectedItems.values.first;
+    final int index = _books.indexWhere((x) => x.id == book.id);
+    confirmDeleteBook(book, index);
   }
 
   /// Show a dialog to confirm a single book deletion.
-  void confirmDeleteOneBook(Book book, int index) async {
+  void confirmDeleteBook(Book book, int index) async {
     showDialog(
       context: context,
       builder: (context) {
+        final int count = _multiSelectedItems.length;
         return DeleteDialog(
-          titleValue: "book_delete".tr().toUpperCase(),
-          descriptionValue: "book_delete_description".tr(),
-          onValidate: () => deleteBook(book, index),
+          titleValue: "book_delete".plural(count).toUpperCase(),
+          descriptionValue: "book_delete_description".plural(count),
+          onValidate: () {
+            if (_multiSelectedItems.isEmpty) {
+              deleteBook(book, index);
+            } else {
+              _multiSelectedItems.putIfAbsent(book.id, () => book);
+              deleteGroup();
+            }
+          },
+          showCounter: _multiSelectedItems.isNotEmpty,
+          count: count,
         );
       },
     );
@@ -558,7 +537,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         showRenameBookDialog(book);
         break;
       case EnumBookItemAction.delete:
-        confirmDeleteOneBook(book, index);
+        confirmDeleteBook(book, index);
         break;
       case EnumBookItemAction.updateVisibility:
         showVisibilityDialog(book, index);
@@ -645,6 +624,60 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     }
   }
 
+  void showAddGroupToBookDialog() {
+    if (_multiSelectedItems.isEmpty) {
+      context.showErrorBar(content: Text("multi_select_no_item".tr()));
+      return;
+    }
+
+    showAddToBookDialog(_multiSelectedItems.values.first);
+  }
+
+  void showAddToBookDialog(Book book) {
+    int flex = Utilities.size.isMobileSize(context) ? 5 : 3;
+
+    showCustomModalBottomSheet(
+      context: context,
+      builder: (context) => AddToBookPanel(
+        scrollController: ModalScrollController.of(context),
+        illustrations: [],
+        books: [book] + _multiSelectedItems.values.toList(),
+      ),
+      containerWidget: (context, animation, child) {
+        return SafeArea(
+          child: Row(
+            children: [
+              Spacer(),
+              Expanded(
+                flex: flex,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Material(
+                    clipBehavior: Clip.antiAlias,
+                    borderRadius: BorderRadius.circular(12.0),
+                    child: child,
+                  ),
+                ),
+              ),
+              Spacer(),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void showGroupVisibilityDialog() {
+    if (_multiSelectedItems.isEmpty) {
+      context.showErrorBar(content: Text("multi_select_no_item".tr()));
+      return;
+    }
+
+    final Book book = _multiSelectedItems.values.first;
+    final int index = _books.indexWhere((x) => x.id == book.id);
+    showVisibilityDialog(book, index);
+  }
+
   void showCreateBookDialog() {
     final _nameController = TextEditingController();
     final _descriptionController = TextEditingController();
@@ -703,7 +736,9 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       context: context,
       builder: (context) => ThemedDialog(
         showDivider: true,
-        titleValue: "book_visibility_change".tr(),
+        titleValue: "book_visibility_change".plural(
+          _multiSelectedItems.length,
+        ),
         textButtonValidation: "close".tr(),
         onValidate: Beamer.of(context).popRoute,
         onCancel: Beamer.of(context).popRoute,
@@ -713,13 +748,32 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (_multiSelectedItems.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.only(left: 18.0),
+                    width: 300.0,
+                    child: Opacity(
+                      opacity: 0.6,
+                      child: Text(
+                        "multi_items_selected".plural(
+                          _multiSelectedItems.length,
+                        ),
+                        style: Utilities.fonts.style(
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
                 Container(
                   padding: const EdgeInsets.only(left: 16.0),
                   width: width,
                   child: Opacity(
                     opacity: 0.6,
                     child: Text(
-                      "book_visibility_choose".tr(),
+                      "book_visibility_choose".plural(
+                        _multiSelectedItems.length,
+                      ),
                       style: Utilities.fonts.style(
                         fontSize: 16.0,
                       ),
@@ -730,8 +784,15 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                   maxWidth: width,
                   visibility: book.visibility,
                   onChangedVisibility: (visibility) {
-                    updateVisibility(book, visibility, index);
+                    if (_multiSelectedItems.isEmpty) {
+                      updateVisibility(book, visibility, index);
+                    } else {
+                      _multiSelectedItems.putIfAbsent(book.id, () => book);
+                      updateGroupVisibility(visibility);
+                    }
+
                     Beamer.of(context).popRoute();
+                    clearSelection();
                   },
                   padding: const EdgeInsets.only(
                     left: 16.0,
@@ -751,6 +812,16 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     setState(() {
       _forceMultiSelect = !_forceMultiSelect;
     });
+  }
+
+  void updateGroupVisibility(EnumContentVisibility visibility) {
+    for (Book book in _multiSelectedItems.values) {
+      final int index = _books.indexWhere(
+        (x) => x.id == book.id,
+      );
+
+      updateVisibility(book, visibility, index);
+    }
   }
 
   void updateVisibility(

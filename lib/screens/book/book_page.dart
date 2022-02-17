@@ -233,7 +233,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
               Opacity(
                 opacity: 0.8,
                 child: Text(
-                  "book_delete".tr().toUpperCase(),
+                  "book_delete".plural(1).toUpperCase(),
                   style: Utilities.fonts.style(
                     color: Colors.black,
                     fontWeight: FontWeight.w700,
@@ -246,7 +246,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
                 child: Opacity(
                   opacity: 0.4,
                   child: Text(
-                    "book_delete_description".tr(),
+                    "book_delete_description".plural(1),
                     textAlign: TextAlign.center,
                     style: Utilities.fonts.style(
                       color: Colors.black,
