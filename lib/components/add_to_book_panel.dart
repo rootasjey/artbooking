@@ -15,10 +15,12 @@ class AddToBookPanel extends StatefulWidget {
   AddToBookPanel({
     this.scrollController,
     required this.illustrations,
+    this.books = const [],
   });
 
   final ScrollController? scrollController;
   final List<Illustration> illustrations;
+  final List<Book> books;
 
   @override
   _AddToBookPanelState createState() => _AddToBookPanelState();
@@ -178,13 +180,27 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
   void addIllustrationToBook({required String bookId}) async {
     context.showSuccessBar(
       icon: Icon(UniconsLine.plus),
-      content:
-          Text("The illustration has been successfully added to your book."),
+      content: Text(
+        "The illustration has been successfully added to your book.",
+      ),
+    );
+
+    final List<Illustration> illustrations = widget.illustrations;
+    final List<String> illustrationIds =
+        illustrations.map((x) => x.id).toList();
+
+    final List<Book> books = widget.books;
+
+    illustrationIds.addAll(
+      books.fold(
+        [],
+        (p, b) => p.toList() + ((b.illustrations.map((i) => i.id)).toList()),
+      ),
     );
 
     final response = await BooksActions.addIllustrations(
       bookId: bookId,
-      illustrationIds: widget.illustrations.map((x) => x.id).toList(),
+      illustrationIds: illustrationIds,
     );
 
     if (response.hasErrors) {
@@ -209,10 +225,23 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
       duration: 60.seconds,
     );
 
+    final List<Illustration> illustrations = widget.illustrations;
+    final List<String> illustrationIds =
+        illustrations.map((x) => x.id).toList();
+
+    final List<Book> books = widget.books;
+
+    illustrationIds.addAll(
+      books.fold(
+        [],
+        (p, b) => p.toList() + ((b.illustrations.map((i) => i.id)).toList()),
+      ),
+    );
+
     final createdList = await BooksActions.createOne(
       name: _newBookName,
       description: _newBookDescription,
-      illustrationIds: widget.illustrations.map((x) => x.id).toList(),
+      illustrationIds: illustrationIds,
     );
 
     Utilities.flash.dismissProgress(id: 'create_book');
