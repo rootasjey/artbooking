@@ -148,51 +148,15 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   }
 
   /// Show a dialog to confirm multiple illustrations deletion.
-  void confirmDeleteGroup() async {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return ThemedDialog(
-          focusNode: _popupFocusNode,
-          title: Column(
-            children: [
-              Opacity(
-                opacity: 0.8,
-                child: Text(
-                  "illustrations_delete".tr().toUpperCase(),
-                  style: Utilities.fonts.style(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Container(
-                width: 300.0,
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Opacity(
-                  opacity: 0.4,
-                  child: Text(
-                    "illustrations_delete_description".tr(),
-                    textAlign: TextAlign.center,
-                    style: Utilities.fonts.style(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          body: SingleChildScrollView(),
-          textButtonValidation: "delete".tr(),
-          onCancel: Beamer.of(context).popRoute,
-          onValidate: () {
-            deleteSelection();
-            Beamer.of(context).popRoute();
-          },
-        );
-      },
-    );
+  void confirmDeleteGroup() {
+    if (_multiSelectedItems.isEmpty) {
+      context.showErrorBar(content: Text("multi_select_no_item".tr()));
+      return;
+    }
+
+    final Illustration illustration = _multiSelectedItems.values.first;
+    final int index = _illustrations.indexWhere((x) => x.id == illustration.id);
+    confirmDeleteIllustration(illustration, index);
   }
 
   /// Show a dialog to confirm single illustration deletion.
@@ -210,7 +174,11 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
               Opacity(
                 opacity: 0.8,
                 child: Text(
-                  "illustration_delete".tr().toUpperCase(),
+                  "illustration_delete_plural"
+                      .plural(
+                        _multiSelectedItems.length,
+                      )
+                      .toUpperCase(),
                   style: Utilities.fonts.style(
                     color: Colors.black,
                     fontWeight: FontWeight.w700,
@@ -223,7 +191,9 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                 child: Opacity(
                   opacity: 0.4,
                   child: Text(
-                    "illustration_delete_description".tr(),
+                    "illustration_delete_description_plural".plural(
+                      _multiSelectedItems.length,
+                    ),
                     textAlign: TextAlign.center,
                     style: Utilities.fonts.style(
                       color: Colors.black,
@@ -234,11 +204,44 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
               ),
             ],
           ),
-          body: SingleChildScrollView(),
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (_multiSelectedItems.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.only(left: 24.0),
+                    width: 300.0,
+                    child: Opacity(
+                      opacity: 0.6,
+                      child: Text(
+                        "multi_items_selected".plural(
+                          _multiSelectedItems.length,
+                        ),
+                        style: Utilities.fonts.style(
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
           textButtonValidation: "delete".tr(),
           onCancel: Beamer.of(context).popRoute,
           onValidate: () {
-            deleteIllustration(illustration, index);
+            if (_multiSelectedItems.isEmpty) {
+              deleteIllustration(illustration, index);
+            } else {
+              _multiSelectedItems.putIfAbsent(
+                illustration.id,
+                () => illustration,
+              );
+
+              deleteGroup();
+            }
+
             Beamer.of(context).popRoute();
           },
         );
@@ -264,7 +267,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     });
   }
 
-  void deleteSelection() async {
+  void deleteGroup() async {
     _multiSelectedItems.entries.forEach((multiSelectItem) {
       _illustrations.removeWhere((item) => item.id == multiSelectItem.key);
     });
@@ -696,36 +699,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       return;
     }
 
-    int flex = Utilities.size.isMobileSize(context) ? 5 : 3;
-
-    showCustomModalBottomSheet(
-      context: context,
-      builder: (context) => AddToBookPanel(
-        scrollController: ModalScrollController.of(context),
-        illustrations: _multiSelectedItems.values.toList(),
-      ),
-      containerWidget: (context, animation, child) {
-        return SafeArea(
-          child: Row(
-            children: [
-              Spacer(),
-              Expanded(
-                flex: flex,
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Material(
-                    clipBehavior: Clip.antiAlias,
-                    borderRadius: BorderRadius.circular(12.0),
-                    child: child,
-                  ),
-                ),
-              ),
-              Spacer(),
-            ],
-          ),
-        );
-      },
-    );
+    final Illustration illustration = _multiSelectedItems.values.first;
+    showAddToBook(illustration);
   }
 
   void showAddToBook(Illustration illustration) {
@@ -735,7 +710,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       context: context,
       builder: (context) => AddToBookPanel(
         scrollController: ModalScrollController.of(context),
-        illustrations: [illustration],
+        illustrations: [illustration] + _multiSelectedItems.values.toList(),
       ),
       containerWidget: (context, animation, child) {
         return SafeArea(
@@ -767,78 +742,9 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       return;
     }
 
-    final width = 310.0;
-    final firstVisibility = _multiSelectedItems.values.first.visibility;
-
-    showDialog(
-      context: context,
-      builder: (context) => ThemedDialog(
-        showDivider: true,
-        titleValue: "illustration_visibility_change".plural(
-          _multiSelectedItems.length,
-        ),
-        textButtonValidation: "close".tr(),
-        onValidate: Beamer.of(context).popRoute,
-        onCancel: Beamer.of(context).popRoute,
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (_multiSelectedItems.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.only(left: 16.0),
-                    width: width,
-                    child: Opacity(
-                      opacity: 0.6,
-                      child: Text(
-                        "multi_items_selected".plural(
-                          _multiSelectedItems.length,
-                        ),
-                        style: Utilities.fonts.style(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-                Container(
-                  padding: const EdgeInsets.only(left: 16.0),
-                  width: width,
-                  child: Opacity(
-                    opacity: 0.6,
-                    child: Text(
-                      "illustration_visibility_choose".plural(
-                        _multiSelectedItems.length,
-                      ),
-                      style: Utilities.fonts.style(
-                        fontSize: 16.0,
-                      ),
-                    ),
-                  ),
-                ),
-                VisibilityButton(
-                  maxWidth: width,
-                  group: _multiSelectedItems.isNotEmpty,
-                  visibility: firstVisibility,
-                  onChangedVisibility: (visibility) {
-                    updateGroupVisibility(visibility);
-                    Beamer.of(context).popRoute();
-                    onClearSelection();
-                  },
-                  padding: const EdgeInsets.only(
-                    left: 16.0,
-                    top: 12.0,
-                    bottom: 32.0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+    final Illustration illustration = _multiSelectedItems.values.first;
+    final int index = _illustrations.indexWhere((x) => x.id == illustration.id);
+    showVisibilityDialog(illustration, index);
   }
 
   void showVisibilityDialog(Illustration illustration, int index) {
@@ -897,7 +803,17 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                   group: _multiSelectedItems.isNotEmpty,
                   visibility: illustration.visibility,
                   onChangedVisibility: (visibility) {
-                    updateVisibility(illustration, visibility, index);
+                    if (_multiSelectedItems.isEmpty) {
+                      updateVisibility(illustration, visibility, index);
+                    } else {
+                      _multiSelectedItems.putIfAbsent(
+                        illustration.id,
+                        () => illustration,
+                      );
+
+                      updateGroupVisibility(visibility);
+                    }
+
                     Beamer.of(context).popRoute();
                     onClearSelection();
                   },
