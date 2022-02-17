@@ -87,6 +87,7 @@ export const addIllustrations = functions
       count: newBookIllustrations.length,
       cover: { 
         link: bookThumbnailLink, 
+        mode: bookData.cover?.mode ?? "last_illustration_added",
         updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
       },
       illustrations: newBookIllustrations,
