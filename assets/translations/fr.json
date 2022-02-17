@@ -432,6 +432,7 @@
   "illustrations_subtitle": "Parcourez les illustrations.",
   "illustrations_yours_browse": "Parcourir vos illustrations",
   "image_cropping": "Rognage de votre image...",
+  "image_load_failed_reload": "Une erreur est survenue lors du chargement de cette image. Appuyez pour recharger.",
   "image_size_exceeded": "La taille de l'image ne doit être inférieure 5MB",
   "image_update_cloud": "Transfert de votre image dans le cloud...",
   "image_updating": "Mise à jour de l'image",

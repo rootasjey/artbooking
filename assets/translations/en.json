@@ -433,6 +433,7 @@
   "illustrations_yours_browse": "Browse your illustrations",
   "image_size_exceeded": "Image's size cannot be greater than 5MB",
   "image_update_cloud": "Updating your image to the cloud...",
+  "image_load_failed_reload": "There was an arror loading this image. Tap to reload.",
   "image_updating": "Updating image",
   "image_cropping": "Cropping your image...",
   "input_empty_invalid": "Input's value cannot be empty. Please specify a non-empty value.",
