@@ -13,7 +13,7 @@ class MyIllustrationsPageGroupActions extends StatelessWidget {
     required this.multiSelectedItems,
     this.onClearSelection,
     this.onAddToBook,
-    this.onChangeVisibility,
+    this.onChangeGroupVisibility,
   }) : super(key: key);
 
   final bool show;
@@ -22,7 +22,7 @@ class MyIllustrationsPageGroupActions extends StatelessWidget {
   final void Function()? onSelectAll;
   final void Function()? onClearSelection;
   final void Function()? onAddToBook;
-  final void Function()? onChangeVisibility;
+  final void Function()? onChangeGroupVisibility;
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +71,7 @@ class MyIllustrationsPageGroupActions extends StatelessWidget {
         SquareButton(
           message: "visibility_change".tr(),
           child: Icon(UniconsLine.eye),
-          onTap: onChangeVisibility,
+          onTap: onChangeGroupVisibility,
         ),
         SquareButton(
           message: "add_to_book".tr(),

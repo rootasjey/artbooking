@@ -12,30 +12,33 @@ import 'package:supercharged/supercharged.dart';
 
 /// List of an user's books.
 class AddToBookPanel extends StatefulWidget {
-  final ScrollController? scrollController;
-  final Illustration illustration;
+  AddToBookPanel({
+    this.scrollController,
+    required this.illustrations,
+  });
 
-  AddToBookPanel({this.scrollController, required this.illustration});
+  final ScrollController? scrollController;
+  final List<Illustration> illustrations;
 
   @override
   _AddToBookPanelState createState() => _AddToBookPanelState();
 }
 
 class _AddToBookPanelState extends State<AddToBookPanel> {
-  bool hasErrors = false;
-  bool isLoading = false;
-  bool isLoaded = false;
-  bool hasNext = false;
-  bool isLoadingMore = false;
+  bool _hasErrors = false;
+  bool _loading = false;
+  bool _loaded = false;
+  bool _hasNext = false;
+  bool _loadingMore = false;
 
-  late DocumentSnapshot lastDoc;
+  late DocumentSnapshot _lastDocument;
 
-  final limit = 10;
+  final _limit = 10;
 
-  List<Book> books = [];
+  List<Book> _books = [];
 
-  String newBookName = '';
-  String newBookDescription = '';
+  String _newBookName = '';
+  String _newBookDescription = '';
 
   @override
   Widget build(BuildContext context) {
@@ -47,27 +50,27 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
   Widget body() {
     List<Widget> tiles = [];
 
-    if (hasErrors) {
+    if (_hasErrors) {
       tiles.add(errorTileList(onPressed: () async {
         await fetchBooks();
         setState(() {
-          isLoaded = true;
+          _loaded = true;
         });
       }));
     }
 
-    if (books.length == 0 && !isLoading && !isLoaded) {
+    if (_books.length == 0 && !_loading && !_loaded) {
       tiles.add(LinearProgressIndicator());
 
       fetchBooks().then((_) {
         setState(() {
-          isLoaded = true;
+          _loaded = true;
         });
       });
     }
 
-    if (books.length > 0) {
-      for (var list in books) {
+    if (_books.length > 0) {
+      for (var list in _books) {
         tiles.add(tileList(list));
       }
     }
@@ -78,10 +81,10 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
           return false;
         }
 
-        if (hasNext && !isLoadingMore) {
+        if (_hasNext && !_loadingMore) {
           fetchMoreBooks().then((_) {
             setState(() {
-              isLoadingMore = false;
+              _loadingMore = false;
             });
           });
         }
@@ -181,7 +184,7 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
 
     final response = await BooksActions.addIllustrations(
       bookId: bookId,
-      illustrationIds: [widget.illustration.id],
+      illustrationIds: widget.illustrations.map((x) => x.id).toList(),
     );
 
     if (response.hasErrors) {
@@ -201,15 +204,15 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
       context,
       title: "Create",
       progressId: 'create_book',
-      message: "Creating book $newBookName...",
+      message: "Creating book $_newBookName...",
       icon: Icon(UniconsLine.plus),
       duration: 60.seconds,
     );
 
     final createdList = await BooksActions.createOne(
-      name: newBookName,
-      description: newBookDescription,
-      illustrationIds: [widget.illustration.id],
+      name: _newBookName,
+      description: _newBookDescription,
+      illustrationIds: widget.illustrations.map((x) => x.id).toList(),
     );
 
     Utilities.flash.dismissProgress(id: 'create_book');
@@ -227,29 +230,29 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
 
     context.showSuccessBar(
       icon: Icon(UniconsLine.check),
-      content: Text("Your list $newBookName has been successfully created."),
+      content: Text("Your list $_newBookName has been successfully created."),
     );
   }
 
   Future fetchBooks() async {
     setState(() {
-      isLoading = true;
+      _loading = true;
     });
 
     try {
-      books.clear();
+      _books.clear();
 
       final snapshot = await FirebaseFirestore.instance
           .collection('books')
           .where('user_id', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
-          .limit(limit)
+          .limit(_limit)
           .orderBy('updated_at', descending: true)
           .get();
 
       if (snapshot.docs.isEmpty) {
         setState(() {
-          hasNext = false;
-          isLoading = false;
+          _hasNext = false;
+          _loading = false;
         });
 
         return;
@@ -260,21 +263,21 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
         data['id'] = doc.id;
 
         final book = Book.fromMap(data);
-        books.add(book);
+        _books.add(book);
       });
 
-      lastDoc = snapshot.docs.last;
+      _lastDocument = snapshot.docs.last;
 
       setState(() {
-        hasNext = snapshot.docs.length == limit;
-        isLoading = false;
+        _hasNext = snapshot.docs.length == _limit;
+        _loading = false;
       });
     } catch (error) {
       Utilities.logger.e(error);
 
       setState(() {
-        isLoading = false;
-        hasErrors = false;
+        _loading = false;
+        _hasErrors = false;
       });
 
       context.showErrorBar(
@@ -285,22 +288,22 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
 
   Future fetchMoreBooks() async {
     setState(() {
-      isLoadingMore = true;
+      _loadingMore = true;
     });
 
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection('books')
           .where('user_id', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
-          .limit(limit)
+          .limit(_limit)
           .orderBy('updated_at', descending: true)
-          .startAfterDocument(lastDoc)
+          .startAfterDocument(_lastDocument)
           .get();
 
       if (snapshot.docs.isEmpty) {
         setState(() {
-          hasNext = false;
-          isLoadingMore = false;
+          _hasNext = false;
+          _loadingMore = false;
         });
 
         return;
@@ -311,21 +314,21 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
         data['id'] = doc.id;
 
         final book = Book.fromMap(data);
-        books.add(book);
+        _books.add(book);
       });
 
-      lastDoc = snapshot.docs.last;
+      _lastDocument = snapshot.docs.last;
 
       setState(() {
-        hasNext = snapshot.docs.length == limit;
-        isLoadingMore = false;
+        _hasNext = snapshot.docs.length == _limit;
+        _loadingMore = false;
       });
     } catch (error) {
       Utilities.logger.e(error);
 
       setState(() {
-        isLoadingMore = false;
-        hasErrors = false;
+        _loadingMore = false;
+        _hasErrors = false;
       });
 
       context.showErrorBar(
@@ -356,7 +359,7 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
               ),
               textInputAction: TextInputAction.next,
               onChanged: (newValue) {
-                newBookName = newValue;
+                _newBookName = newValue;
               },
             ),
             Padding(
@@ -370,7 +373,7 @@ class _AddToBookPanelState extends State<AddToBookPanel> {
                 ),
               ),
               onChanged: (newValue) {
-                newBookDescription = newValue;
+                _newBookDescription = newValue;
               },
               onSubmitted: (_) {
                 createBookAndAddIllustration(context);

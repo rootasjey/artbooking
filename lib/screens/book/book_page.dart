@@ -909,7 +909,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
       context: context,
       builder: (context) => AddToBookPanel(
         scrollController: ModalScrollController.of(context),
-        illustration: illustration,
+        illustrations: [illustration],
       ),
       containerWidget: (context, animation, child) {
         return SafeArea(

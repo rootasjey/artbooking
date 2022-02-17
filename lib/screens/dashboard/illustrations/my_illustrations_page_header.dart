@@ -21,8 +21,8 @@ class MyIllustrationsPageHeader extends StatelessWidget {
     this.onConfirmDeleteGroup,
     this.onChangedTab,
     this.onUpdateLayout,
-    this.onAddToBook,
-    this.onChangeVisibility,
+    this.onAddGroupToBook,
+    this.onChangeGroupVisibility,
   }) : super(key: key);
 
   final bool multiSelectActive;
@@ -30,16 +30,34 @@ class MyIllustrationsPageHeader extends StatelessWidget {
 
   final EnumVisibilityTab selectedTab;
 
-  final void Function()? onAddToBook;
+  /// Add a group of illustrations to a book.
+  final void Function()? onAddGroupToBook;
+
+  /// Trigger on tab change.
   final void Function(EnumVisibilityTab)? onChangedTab;
-  final void Function()? onChangeVisibility;
+
+  /// Update visibility of a group of illustrations.
+  final void Function()? onChangeGroupVisibility;
+
+  /// Cancel multiple section.
   final void Function()? onClearSelection;
+
+  /// Show a popup to confirm illustrations group deletion.
   final void Function()? onConfirmDeleteGroup;
+
+  /// Select all displayed illustrations.
   final void Function()? onSelectAll;
+
+  /// Toggle multi-select
   final void Function()? onTriggerMultiSelect;
+
+  /// Limit illustrations to 3-in-a-row.
   final void Function()? onUpdateLayout;
+
+  /// Create a new illustration.
   final void Function()? onUploadIllustration;
 
+  /// Selected items.
   final Map<String?, Illustration> multiSelectedItems;
 
   @override
@@ -85,8 +103,8 @@ class MyIllustrationsPageHeader extends StatelessWidget {
             onSelectAll: onSelectAll,
             onClearSelection: onClearSelection,
             onConfirmDeleteGroup: onConfirmDeleteGroup,
-            onAddToBook: onAddToBook,
-            onChangeVisibility: onChangeVisibility,
+            onAddToBook: onAddGroupToBook,
+            onChangeGroupVisibility: onChangeGroupVisibility,
           ),
         ]),
       ),

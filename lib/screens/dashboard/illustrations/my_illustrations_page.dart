@@ -122,7 +122,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                 onChangedTab: onChangedTab,
                 limitThreeInRow: _layoutThreeInRow,
                 onUpdateLayout: onUpdateLayout,
-                onChangeVisibility: showGroupVisibilityDialog,
+                onChangeGroupVisibility: showGroupVisibilityDialog,
+                onAddGroupToBook: showAddGroupToBook,
               ),
               MyIllustrationsPageBody(
                 forceMultiSelect: _forceMultiSelect,
@@ -689,6 +690,44 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     }
   }
 
+  void showAddGroupToBook() {
+    if (_multiSelectedItems.isEmpty) {
+      context.showErrorBar(content: Text("multi_select_no_item".tr()));
+      return;
+    }
+
+    int flex = Utilities.size.isMobileSize(context) ? 5 : 3;
+
+    showCustomModalBottomSheet(
+      context: context,
+      builder: (context) => AddToBookPanel(
+        scrollController: ModalScrollController.of(context),
+        illustrations: _multiSelectedItems.values.toList(),
+      ),
+      containerWidget: (context, animation, child) {
+        return SafeArea(
+          child: Row(
+            children: [
+              Spacer(),
+              Expanded(
+                flex: flex,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Material(
+                    clipBehavior: Clip.antiAlias,
+                    borderRadius: BorderRadius.circular(12.0),
+                    child: child,
+                  ),
+                ),
+              ),
+              Spacer(),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void showAddToBook(Illustration illustration) {
     int flex = Utilities.size.isMobileSize(context) ? 5 : 3;
 
@@ -696,7 +735,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       context: context,
       builder: (context) => AddToBookPanel(
         scrollController: ModalScrollController.of(context),
-        illustration: illustration,
+        illustrations: [illustration],
       ),
       containerWidget: (context, animation, child) {
         return SafeArea(
