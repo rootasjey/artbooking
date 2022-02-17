@@ -655,7 +655,8 @@ async function createUserSettingsCollection(user_id: string) {
   .collection(USER_SETTINGS_COLLECTION_NAME)
   .doc(LAYOUT_DOC_NAME)
   .create({
-    illustrations_three_in_a_row: false,
+    illustrations_three_in_a_row: true,
+    book_default_layout: "grid",
   });
 }
 /**
