@@ -14,6 +14,7 @@ import {
   ILLUSTRATIONS_COLLECTION_NAME, 
   ILLUSTRATION_LIKED_BY_COLLECTION_NAME, 
   ILLUSTRATION_STATISTICS_COLLECTION_NAME, 
+  LAYOUT_DOC_NAME, 
   LIKE_BOOK_TYPE, 
   LIKE_ILLUSTRATION_TYPE, 
   NOTIFICATIONS_DOCUMENT_NAME, 
@@ -21,6 +22,7 @@ import {
   STORAGES_DOCUMENT_NAME, 
   USERS_COLLECTION_NAME, 
   USER_PUBLIC_FIELDS_COLLECTION_NAME, 
+  USER_SETTINGS_COLLECTION_NAME, 
   USER_STATISTICS_COLLECTION_NAME 
 } from './utils';
 
@@ -173,6 +175,7 @@ export const createAccount = functions
       });
 
     await createUserStatisticsCollection(userAuthRecord.uid)
+    await createUserSettingsCollection(userAuthRecord.uid)
 
     return {
       user: {
@@ -645,6 +648,16 @@ function checkCreateAccountData(data: any) {
   return true;
 }
 
+async function createUserSettingsCollection(user_id: string) {
+  return await adminApp.firestore()
+  .collection(USERS_COLLECTION_NAME)
+  .doc(user_id)
+  .collection(USER_SETTINGS_COLLECTION_NAME)
+  .doc(LAYOUT_DOC_NAME)
+  .create({
+    illustrations_three_in_a_row: false,
+  });
+}
 /**
  * Create user's statistics sub-collection.
  * @param user_id User's id.
