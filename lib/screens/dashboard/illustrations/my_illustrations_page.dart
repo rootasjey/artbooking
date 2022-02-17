@@ -137,6 +137,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                 limitThreeInRow: _layoutThreeInRow,
                 uploadIllustration: uploadIllustration,
               ),
+              SliverPadding(padding: const EdgeInsets.only(bottom: 300.0)),
             ],
           ),
         ),
@@ -296,7 +297,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       return FirebaseFirestore.instance
           .collection("illustrations")
           .where("user_id", isEqualTo: userId)
-          .where("visibility", isNotEqualTo: "archived")
+          .where("visibility", whereIn: ["public", "private"])
+          .orderBy("user_custom_index", descending: true)
           .limit(_limit);
     }
 
@@ -304,6 +306,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         .collection("illustrations")
         .where("user_id", isEqualTo: userId)
         .where("visibility", isEqualTo: "archived")
+        .orderBy("user_custom_index", descending: true)
         .limit(_limit);
   }
 
@@ -321,7 +324,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       return FirebaseFirestore.instance
           .collection("illustrations")
           .where("user_id", isEqualTo: userId)
-          .where("visibility", isNotEqualTo: "archived")
+          .where("visibility", whereIn: ["public", "private"])
+          .orderBy("user_custom_index", descending: true)
           .limit(_limit)
           .startAfterDocument(lastDocument);
     }
@@ -330,6 +334,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         .collection("illustrations")
         .where("user_id", isEqualTo: userId)
         .where("visibility", isEqualTo: "archived")
+        .orderBy("user_custom_index", descending: true)
         .limit(_limit)
         .startAfterDocument(lastDocument);
   }
@@ -463,7 +468,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
-      setState(() => _loading = false);
+      _loadingMore = false;
     }
   }
 
@@ -473,6 +478,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   /// Listen to tillustrations'events.
   void listenIllustrationsEvents(QueryMap query) {
+    _illustrationSubscription?.cancel();
     _illustrationSubscription = query.snapshots().skip(1).listen(
       (snapshot) {
         for (DocumentChangeMap documentChange in snapshot.docChanges) {

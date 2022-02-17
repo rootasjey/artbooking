@@ -65,6 +65,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
         uploadIllustration: uploadIllustration,
         selectedTab: selectedTab,
         onGoToActiveTab: onGoToActiveTab,
+        limitThreeInRow: limitThreeInRow,
       );
     }
 

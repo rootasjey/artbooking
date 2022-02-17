@@ -12,21 +12,32 @@ class MyIllustrationsPageEmpty extends ConsumerWidget {
     required this.selectedTab,
     this.uploadIllustration,
     this.onGoToActiveTab,
+    this.limitThreeInRow = false,
   }) : super(key: key);
 
+  final bool limitThreeInRow;
   final EnumVisibilityTab selectedTab;
   final void Function()? uploadIllustration;
   final void Function()? onGoToActiveTab;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    EdgeInsets padding = const EdgeInsets.only(
+      top: 40.0,
+      left: 54.0,
+      bottom: 100.0,
+    );
+
+    if (limitThreeInRow) {
+      padding = const EdgeInsets.only(
+        top: 40.0,
+        left: 120.0,
+        bottom: 100.0,
+      );
+    }
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.only(
-          top: 40.0,
-          left: 54.0,
-          bottom: 100.0,
-        ),
+        padding: padding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
