@@ -68,7 +68,7 @@ class BookPageActions extends StatelessWidget {
           message: "multi_select".tr(),
         ),
         PopupMenuButton(
-          tooltip: "illustration_visibility_choose".tr(),
+          tooltip: "illustration_visibility_choose".plural(1),
           child: Material(
             color: Colors.black87,
             elevation: 4.0,
