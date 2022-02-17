@@ -1,5 +1,6 @@
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
+import 'package:artbooking/components/buttons/visibility_button.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/add_to_book_panel.dart';
@@ -7,6 +8,7 @@ import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page_body.dart';
 import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page_fab.dart';
 import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page_header.dart';
+import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -43,16 +45,22 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   final int _limit = 20;
 
   final _illustrations = <Illustration>[];
-  final List<PopupMenuEntry<EnumIllustrationItemAction>> _popupMenuEntries = [
+
+  final _popupMenuEntries = <PopupMenuEntry<EnumIllustrationItemAction>>[
     PopupMenuItemIcon(
-      value: EnumIllustrationItemAction.addToBook,
       icon: Icon(UniconsLine.book_medical),
       textLabel: "add_to_book".tr(),
+      value: EnumIllustrationItemAction.addToBook,
     ),
     PopupMenuItemIcon(
-      value: EnumIllustrationItemAction.delete,
       icon: Icon(UniconsLine.trash),
       textLabel: "delete".tr(),
+      value: EnumIllustrationItemAction.delete,
+    ),
+    PopupMenuItemIcon(
+      icon: Icon(UniconsLine.eye),
+      textLabel: "visibility_change".tr(),
+      value: EnumIllustrationItemAction.updateVisibility,
     ),
   ];
 
@@ -112,10 +120,12 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                 illustrations: _illustrations,
                 loading: _loading,
                 multiSelectedItems: _multiSelectedItems,
+                onGoToActiveTab: onGoToActiveTab,
                 onLongPressIllustration: onLongPressIllustration,
-                onTapIllustration: onTapIllustration,
                 onPopupMenuItemSelected: onPopupMenuItemSelected,
+                onTapIllustration: onTapIllustration,
                 popupMenuEntries: _popupMenuEntries,
+                selectedTab: _selectedTab,
                 uploadIllustration: uploadIllustration,
               ),
             ],
@@ -487,6 +497,10 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     });
   }
 
+  void onGoToActiveIllustrations() {
+    onChangedTab(EnumVisibilityTab.active);
+  }
+
   void onLongPressIllustration(key, illustration, selected) {
     if (selected) {
       setState(() {
@@ -548,6 +562,9 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         break;
       case EnumIllustrationItemAction.addToBook:
         showAddToBook(illustration);
+        break;
+      case EnumIllustrationItemAction.updateVisibility:
+        showVisibilityDialog(illustration, index);
         break;
       default:
         break;
@@ -641,7 +658,107 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     );
   }
 
+  void showVisibilityDialog(Illustration illustration, int index) {
+    final width = 310.0;
+
+    showDialog(
+      context: context,
+      builder: (context) => ThemedDialog(
+        showDivider: true,
+        titleValue: "illustration_visibility_change".tr(),
+        textButtonValidation: "close".tr(),
+        onValidate: Beamer.of(context).popRoute,
+        onCancel: Beamer.of(context).popRoute,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(left: 16.0),
+                  width: width,
+                  child: Opacity(
+                    opacity: 0.6,
+                    child: Text(
+                      "illustration_visibility_choose".tr(),
+                      style: Utilities.fonts.style(
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ),
+                ),
+                VisibilityButton(
+                  maxWidth: width,
+                  visibility: illustration.visibility,
+                  onChangedVisibility: (visibility) {
+                    updateVisibility(illustration, visibility, index);
+                    Beamer.of(context).popRoute();
+                  },
+                  padding: const EdgeInsets.only(
+                    left: 16.0,
+                    top: 12.0,
+                    bottom: 32.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void uploadIllustration() {
     ref.read(AppState.uploadTaskListProvider.notifier).pickImage();
+  }
+
+  void updateVisibility(
+    Illustration illustration,
+    EnumContentVisibility visibility,
+    int index,
+  ) async {
+    bool removedIllustration = false;
+
+    if (_selectedTab == EnumVisibilityTab.active &&
+        visibility == EnumContentVisibility.archived) {
+      _illustrations.removeAt(index);
+      removedIllustration = true;
+    }
+
+    if (_selectedTab == EnumVisibilityTab.archived &&
+        visibility != EnumContentVisibility.archived) {
+      _illustrations.removeAt(index);
+      removedIllustration = true;
+    }
+
+    setState(() {});
+
+    try {
+      final response =
+          await Utilities.cloud.fun("illustrations-updateVisibility").call({
+        "illustration_id": illustration.id,
+        "visibility": visibility.name,
+      });
+
+      if (response.data['success'] as bool) {
+        return;
+      }
+
+      throw Error();
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+
+      if (removedIllustration) {
+        setState(() {
+          _illustrations.insert(index, illustration);
+        });
+      }
+    }
+  }
+
+  void onGoToActiveTab() {
+    onChangedTab(EnumVisibilityTab.active);
   }
 }

@@ -2,6 +2,7 @@ import 'package:artbooking/components/cards/illustration_card.dart';
 import 'package:artbooking/components/icons/animated_app_icon.dart';
 import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page_empty.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
+import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -14,17 +15,20 @@ class MyIllustrationsPageBody extends StatelessWidget {
     required this.multiSelectedItems,
     required this.forceMultiSelect,
     required this.popupMenuEntries,
+    required this.selectedTab,
+    this.onGoToActiveTab,
     this.onLongPressIllustration,
-    this.onTapIllustration,
     this.onPopupMenuItemSelected,
+    this.onTapIllustration,
     this.uploadIllustration,
   }) : super(key: key);
 
   final bool loading;
-  final List<Illustration> illustrations;
-  final Map<String?, Illustration> multiSelectedItems;
-  final void Function(String, Illustration, bool)? onLongPressIllustration;
   final bool forceMultiSelect;
+
+  final EnumVisibilityTab selectedTab;
+
+  final void Function(String, Illustration, bool)? onLongPressIllustration;
   final void Function(Illustration)? onTapIllustration;
   final void Function(
     EnumIllustrationItemAction,
@@ -33,9 +37,13 @@ class MyIllustrationsPageBody extends StatelessWidget {
     String,
   )? onPopupMenuItemSelected;
 
+  final void Function()? onGoToActiveTab;
   final void Function()? uploadIllustration;
 
+  final List<Illustration> illustrations;
   final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries;
+
+  final Map<String?, Illustration> multiSelectedItems;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +63,8 @@ class MyIllustrationsPageBody extends StatelessWidget {
     if (illustrations.isEmpty) {
       return MyIllustrationsPageEmpty(
         uploadIllustration: uploadIllustration,
+        selectedTab: selectedTab,
+        onGoToActiveTab: onGoToActiveTab,
       );
     }
 

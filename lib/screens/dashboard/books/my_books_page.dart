@@ -561,7 +561,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         confirmDeleteOneBook(book, index);
         break;
       case EnumBookItemAction.updateVisibility:
-        showVisibilityBookDialog(book, index);
+        showVisibilityDialog(book, index);
         break;
       default:
     }
@@ -696,7 +696,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     );
   }
 
-  void showVisibilityBookDialog(Book book, int index) {
+  void showVisibilityDialog(Book book, int index) {
     final width = 310.0;
 
     showDialog(
