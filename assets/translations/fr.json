@@ -119,8 +119,20 @@
   "book_rename": "Renommer ce book",
   "book_rename_description": "Donnez un nouveau titre ou une nouvelle description à ce book.",
   "book_upload_illustration": "Envoyer une nouvelle illustration et ajouter cette dernière à ce book.",
-  "book_visibility_change": "Changer la visibilité du book",
-  "book_visibility_choose": "Appuyez sur le bouton ci-dessous pour choisir qui peut voir votre book.",
+  "book_visibility_change": {
+    "zero": "Changer la visibilité du book",
+    "one": "Changer la visibilité du book",
+    "two": "Changer la visibilité des books",
+    "many": "Changer la visibilité des books",
+    "other": "Changer la visibilité des books"
+  },
+  "book_visibility_choose": {
+    "zero": "Appuyez sur le bouton ci-dessous pour choisir qui peut voir votre book.",
+    "one": "Appuyez sur le bouton ci-dessous pour choisir qui peut voir votre book.",
+    "two": "Appuyez sur le bouton ci-dessous pour choisir qui peut voir vos books.",
+    "many": "Appuyez sur le bouton ci-dessous pour choisir qui peut voir vos books.",
+    "other": "Appuyez sur le bouton ci-dessous pour choisir qui peut voir vos books."
+  },
   "books": "Books",
   "books_active_word": "Actifs",
   "books_active_or_archived": "Voir vos books actifs ou archivés.",
@@ -361,6 +373,20 @@
   "illustration_create_error": "Désolés, nous avons rencontré une erreur durant la création de votre illustration. Veuillez réessayer plus tard.",
   "illustration_delete": "Supprimer cette illustration",
   "illustration_delete_description": "Si cette illustration est référencée à l'intérieur de books, concours, challenges, galleries, cette suppression entraînera la formation de liens morts. Cette action est irrevsible.",
+  "illustration_delete_description_plural": {
+    "zero": "La suppression de ce book n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de celui-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible.",
+    "one": "La suppression de ce book n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de celui-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible.",
+    "two": "La suppression de ces books n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de ceux-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible.",
+    "many": "La suppression de ces books n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de ceux-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible.",
+    "other": "La suppression de ces books n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de ceux-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible."
+  },
+  "illustration_delete_plural": {
+    "zero": "Supprimer ce book",
+    "one": "Supprimer ce book",
+    "two": "Supprimer ces books",
+    "many": "Supprimer ces books",
+    "other": "Supprimer ces books"
+  },
   "illustration_description_dot": "Description de l'illustration...",
   "illustration_description_sample": "C'est une fleur sur un balcon...",
   "illustration_license_description": "Définissez comment les règles d'utilisation de votre travail.",

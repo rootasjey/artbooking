@@ -119,8 +119,20 @@
   "book_rename": "Rename book",
   "book_rename_description": "Give a new name or description to this book.",
   "book_upload_illustration": "Upload a new illustration and add it to this book.",
-  "book_visibility_change": "Change book visibility",
-  "book_visibility_choose": "Tap on the following button to choose who can see your book.",
+  "book_visibility_change": {
+    "zero": "Change book visibility",
+    "one": "Change book visibility",
+    "two": "Change books visibility",
+    "many": "Change books visibility",
+    "other": "Change books visibility"
+  },
+  "book_visibility_choose": {
+    "zero": "Tap on the following button to choose who can see your book.",
+    "one": "Tap on the following button to choose who can see your book.",
+    "two": "Tap on the following button to choose who can see your books.",
+    "many": "Tap on the following button to choose who can see your books.",
+    "other": "Tap on the following button to choose who can see your books."
+  },
   "books": "Books",
   "books_active_word": "Active",
   "books_active_or_archived": "View your active or archived books.",
@@ -361,6 +373,20 @@
   "illustration_create_error": "Sorry, there was an issue while creating your illustration. Please try again later.",
   "illustration_delete": "Delete this illustration",
   "illustration_delete_description": "If this illustration is referenced inside books, contests, challenges, galleries, it will leave a dead link. This action is irrevsible.",
+  "illustration_delete_description_plural": {
+    "zero": "If this illustration is referenced inside books, contests, challenges, galleries, it will leave a dead link. This action is irrevsible.",
+    "one": "If this illustration is referenced inside books, contests, challenges, galleries, it will leave a dead link. This action is irrevsible.",
+    "two": "If these illustrations are referenced inside books, contests, challenges, galleries, it will leave dead links. This action is irrevsible.",
+    "many": "If these illustrations are referenced inside books, contests, challenges, galleries, it will leave dead links. This action is irrevsible.",
+    "other": "If these illustrations are referenced inside books, contests, challenges, galleries, it will leave dead links. This action is irrevsible."
+  },
+  "illustration_delete_plural": {
+    "zero": "Delete this illustration",
+    "one": "Delete this illustration",
+    "two": "Delete these illustrations",
+    "many": "Delete these illustrations",
+    "other": "Delete these illustrations"
+  },
   "illustration_description_dot": "Illustration's description...",
   "illustration_description_sample": "It's a flower on a balcony...",
   "illustrations_layout_three_in_a_row": "Limit number of cards to 3 in a row",
