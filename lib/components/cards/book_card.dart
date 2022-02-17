@@ -1,12 +1,16 @@
 import 'dart:async';
 
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
@@ -264,26 +268,75 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
           clipBehavior: Clip.antiAlias,
           child: Stack(
             children: [
-              Ink.image(
-                image: NetworkImage(_coverLink),
+              ExtendedImage.network(
+                _coverLink,
                 fit: BoxFit.cover,
-                child: InkWell(
-                  onTap: widget.onTap,
-                  onDoubleTap: onDoubleTap,
-                  onLongPress: onLongPress,
-                  onHover: onHover,
-                  child: Stack(
-                    children: [
-                      multiSelectIndicator(),
-                    ],
-                  ),
-                ),
+                width: widget.width - 60.0,
+                height: widget.height - _captionHeight,
+                clearMemoryCacheWhenDispose: true,
+                loadStateChanged: (state) {
+                  switch (state.extendedImageLoadState) {
+                    case LoadState.completed:
+                      return Ink.image(
+                        image: state.imageProvider,
+                        fit: BoxFit.cover,
+                        child: InkWell(
+                          onTap: widget.onTap,
+                          onDoubleTap: onDoubleTap,
+                          onLongPress: onLongPress,
+                          onHover: onHover,
+                          child: Stack(
+                            children: [
+                              multiSelectIndicator(),
+                            ],
+                          ),
+                        ),
+                      );
+                    case LoadState.loading:
+                      return loadingCard();
+                    case LoadState.failed:
+                      return InkWell(
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(
+                              "image_load_failed".tr(),
+                              style: Utilities.fonts.style(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                        onTap: () {
+                          state.reLoadImage();
+                        },
+                      );
+                    default:
+                      return state.completedWidget;
+                  }
+                },
               ),
               likeOverlay(),
               likeAnimationOverlay(),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget loadingCard() {
+    return Card(
+      color: Constants.colors.clairPink,
+      elevation: _elevation,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(_cardRadius),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Shimmer(
+        colorOpacity: 0.2,
+        color: Theme.of(context).primaryColor,
+        child: Container(),
       ),
     );
   }
