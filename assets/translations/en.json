@@ -363,6 +363,7 @@
   "illustration_delete_description": "If this illustration is referenced inside books, contests, challenges, galleries, it will leave a dead link. This action is irrevsible.",
   "illustration_description_dot": "Illustration's description...",
   "illustration_description_sample": "It's a flower on a balcony...",
+  "illustrations_layout_three_in_a_row": "Limit number of cards to 3 in a row",
   "illustration_license_description": "Define how other can and cannot use your work.",
   "illustration_metadata": "Illustration's metadata",
   "illustration_name_metadata": "{}'s metadata",

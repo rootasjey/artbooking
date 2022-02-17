@@ -13,35 +13,49 @@ class MyIllustrationsPageHeader extends StatelessWidget {
     required this.multiSelectActive,
     required this.multiSelectedItems,
     required this.selectedTab,
-    this.uploadIllustration,
+    required this.limitThreeInRow,
+    this.onUploadIllustration,
     this.onTriggerMultiSelect,
     this.onSelectAll,
     this.onClearSelection,
     this.onConfirmDeleteGroup,
     this.onChangedTab,
+    this.onUpdateLayout,
   }) : super(key: key);
 
   final bool multiSelectActive;
+  final bool limitThreeInRow;
 
   final EnumVisibilityTab selectedTab;
 
-  final void Function()? uploadIllustration;
-  final void Function()? onTriggerMultiSelect;
-  final void Function()? onSelectAll;
+  final void Function(EnumVisibilityTab)? onChangedTab;
   final void Function()? onClearSelection;
   final void Function()? onConfirmDeleteGroup;
-  final void Function(EnumVisibilityTab)? onChangedTab;
+  final void Function()? onSelectAll;
+  final void Function()? onTriggerMultiSelect;
+  final void Function()? onUpdateLayout;
+  final void Function()? onUploadIllustration;
 
   final Map<String?, Illustration> multiSelectedItems;
 
   @override
   Widget build(BuildContext context) {
-    return SliverPadding(
-      padding: const EdgeInsets.only(
+    EdgeInsets padding = const EdgeInsets.only(
+      top: 60.0,
+      left: 50.0,
+      bottom: 24.0,
+    );
+
+    if (limitThreeInRow) {
+      padding = const EdgeInsets.only(
         top: 60.0,
-        left: 50.0,
+        left: 120.0,
         bottom: 24.0,
-      ),
+      );
+    }
+
+    return SliverPadding(
+      padding: padding,
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
           PageTitle(
@@ -57,7 +71,9 @@ class MyIllustrationsPageHeader extends StatelessWidget {
             multiSelectActive: multiSelectActive,
             show: multiSelectedItems.isEmpty,
             onTriggerMultiSelect: onTriggerMultiSelect,
-            uploadIllustration: uploadIllustration,
+            onUploadIllustration: onUploadIllustration,
+            limitThreeInRow: limitThreeInRow,
+            onUpdateLayout: onUpdateLayout,
           ),
           MyIllustrationsPageGroupActions(
             show: multiSelectedItems.isNotEmpty,

@@ -9,14 +9,20 @@ class MyIllustrationsPageActions extends StatelessWidget {
     Key? key,
     required this.multiSelectActive,
     required this.show,
-    this.uploadIllustration,
+    this.onUploadIllustration,
     this.onTriggerMultiSelect,
+    required this.limitThreeInRow,
+    this.onUpdateLayout,
   }) : super(key: key);
 
   final bool multiSelectActive;
   final bool show;
-  final void Function()? uploadIllustration;
+  final bool limitThreeInRow;
   final void Function()? onTriggerMultiSelect;
+
+  /// Limit number of illustrations to 3 in a row.
+  final void Function()? onUpdateLayout;
+  final void Function()? onUploadIllustration;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +35,7 @@ class MyIllustrationsPageActions extends StatelessWidget {
       runSpacing: 12.0,
       children: [
         TextRectangleButton(
-          onPressed: uploadIllustration,
+          onPressed: onUploadIllustration,
           icon: Icon(UniconsLine.upload),
           label: Text("upload".tr()),
           primary: Colors.black38,
@@ -42,6 +48,16 @@ class MyIllustrationsPageActions extends StatelessWidget {
           child: Icon(
             UniconsLine.layers,
             color: multiSelectActive ? Colors.white : null,
+          ),
+        ),
+        SquareButton(
+          active: limitThreeInRow,
+          message: "illustrations_layout_three_in_a_row".tr(),
+          onTap: onUpdateLayout,
+          opacity: limitThreeInRow ? 1.0 : 0.4,
+          child: Icon(
+            UniconsLine.table,
+            color: limitThreeInRow ? Colors.white : null,
           ),
         ),
       ],

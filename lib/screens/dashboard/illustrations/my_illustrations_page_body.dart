@@ -16,6 +16,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
     required this.forceMultiSelect,
     required this.popupMenuEntries,
     required this.selectedTab,
+    this.limitThreeInRow = false,
     this.onGoToActiveTab,
     this.onLongPressIllustration,
     this.onPopupMenuItemSelected,
@@ -25,6 +26,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
 
   final bool loading;
   final bool forceMultiSelect;
+  final bool limitThreeInRow;
 
   final EnumVisibilityTab selectedTab;
 
@@ -48,15 +50,13 @@ class MyIllustrationsPageBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return SliverList(
-        delegate: SliverChildListDelegate.fixed([
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 100.0),
-            child: AnimatedAppIcon(
-              textTitle: "illustrations_loading".tr(),
-            ),
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 100.0),
+          child: AnimatedAppIcon(
+            textTitle: "illustrations_loading".tr(),
           ),
-        ]),
+        ),
       );
     }
 
@@ -71,18 +71,9 @@ class MyIllustrationsPageBody extends StatelessWidget {
     final selectionMode = forceMultiSelect || multiSelectedItems.isNotEmpty;
 
     return SliverPadding(
-      padding: const EdgeInsets.only(
-        top: 40.0,
-        left: 40.0,
-        right: 40.0,
-        bottom: 100.0,
-      ),
+      padding: getGridPadding(),
       sliver: SliverGrid(
-        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 300.0,
-          mainAxisSpacing: 20.0,
-          crossAxisSpacing: 20.0,
-        ),
+        gridDelegate: getGridDelegate(),
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             final illustration = illustrations.elementAt(index);
@@ -103,6 +94,38 @@ class MyIllustrationsPageBody extends StatelessWidget {
           childCount: illustrations.length,
         ),
       ),
+    );
+  }
+
+  EdgeInsets getGridPadding() {
+    if (limitThreeInRow) {
+      return const EdgeInsets.symmetric(
+        horizontal: 120.0,
+        vertical: 40.0,
+      );
+    }
+
+    return const EdgeInsets.only(
+      top: 40.0,
+      left: 40.0,
+      right: 40.0,
+      bottom: 100.0,
+    );
+  }
+
+  SliverGridDelegate getGridDelegate() {
+    if (limitThreeInRow) {
+      return SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        mainAxisSpacing: 40.0,
+        crossAxisSpacing: 40.0,
+      );
+    }
+
+    return SliverGridDelegateWithMaxCrossAxisExtent(
+      maxCrossAxisExtent: 300.0,
+      mainAxisSpacing: 20.0,
+      crossAxisSpacing: 20.0,
     );
   }
 }

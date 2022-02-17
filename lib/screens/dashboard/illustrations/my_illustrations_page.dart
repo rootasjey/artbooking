@@ -18,6 +18,7 @@ import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -38,6 +39,9 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   bool _loading = false;
   bool _loadingMore = false;
   bool _showFab = false;
+
+  /// If true, illustration cards will be limited to 3 in a single row.
+  bool _layoutThreeInRow = false;
 
   /// Last fetched illustration document.
   DocumentSnapshot? _lastDocument;
@@ -66,6 +70,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   final _popupFocusNode = FocusNode();
 
+  final String _layoutKey = "illustrations_three_in_a_row";
+
   Map<String, Illustration> _multiSelectedItems = Map();
   ScrollController _scrollController = ScrollController();
   QuerySnapshotStreamSubscription? _illustrationSubscription;
@@ -76,7 +82,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   initState() {
     super.initState();
     loadPreferences();
-    fetchIllustrations();
+    fetchData();
   }
 
   @override
@@ -107,13 +113,15 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
               MyIllustrationsPageHeader(
                 multiSelectedItems: _multiSelectedItems,
                 multiSelectActive: _forceMultiSelect,
-                uploadIllustration: uploadIllustration,
+                onUploadIllustration: uploadIllustration,
                 onClearSelection: onClearSelection,
                 onSelectAll: onSelectAll,
                 onTriggerMultiSelect: onTriggerMultiSelect,
                 onConfirmDeleteGroup: confirmDeleteGroup,
                 selectedTab: _selectedTab,
                 onChangedTab: onChangedTab,
+                limitThreeInRow: _layoutThreeInRow,
+                onUpdateLayout: onUpdateLayout,
               ),
               MyIllustrationsPageBody(
                 forceMultiSelect: _forceMultiSelect,
@@ -126,6 +134,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                 onTapIllustration: onTapIllustration,
                 popupMenuEntries: _popupMenuEntries,
                 selectedTab: _selectedTab,
+                limitThreeInRow: _layoutThreeInRow,
                 uploadIllustration: uploadIllustration,
               ),
             ],
@@ -325,8 +334,16 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         .startAfterDocument(lastDocument);
   }
 
+  /// Fetch illustrations and layout (limit 3 cards in a row?).
+  void fetchData() {
+    Future.wait([
+      fetchLayout(),
+      fetchIllustrations(),
+    ]);
+  }
+
   /// Fetch illustrations data from Firestore.
-  void fetchIllustrations() async {
+  Future<void> fetchIllustrations() async {
     setState(() {
       _loading = true;
       _illustrations.clear();
@@ -361,6 +378,47 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       Utilities.logger.e(error);
     } finally {
       setState(() => _loading = false);
+    }
+  }
+
+  Future<void> fetchLayout() async {
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+      final snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_settings")
+          .doc("layout")
+          .get();
+
+      final Json? data = snapshot.data();
+      if (!snapshot.exists || data == null) {
+        return;
+      }
+
+      _layoutThreeInRow = data[_layoutKey] ?? false;
+    } catch (error) {
+      Utilities.logger.e(error);
+    }
+  }
+
+  void onUpdateLayout() async {
+    try {
+      setState(() {
+        _layoutThreeInRow = !_layoutThreeInRow;
+      });
+
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_settings")
+          .doc("layout")
+          .update({
+        _layoutKey: _layoutThreeInRow,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
     }
   }
 
@@ -485,7 +543,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       _selectedTab = selectedTab;
     });
 
-    fetchIllustrations();
+    fetchData();
     Utilities.storage.saveIllustrationsTab(selectedTab);
   }
 
