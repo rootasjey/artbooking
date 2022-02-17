@@ -11,8 +11,12 @@ class DeleteDialog extends StatelessWidget {
     required this.titleValue,
     required this.descriptionValue,
     this.onValidate,
+    this.showCounter = false,
+    this.count = 1,
   }) : super(key: key);
 
+  final bool showCounter;
+  final int count;
   final FocusNode? focusNode;
   final String titleValue;
   final String descriptionValue;
@@ -51,7 +55,31 @@ class DeleteDialog extends StatelessWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            if (showCounter)
+              Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 24.0),
+                  child: Opacity(
+                    opacity: 0.6,
+                    child: Text(
+                      "multi_items_selected".plural(
+                        count,
+                      ),
+                      style: Utilities.fonts.style(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
       textButtonValidation: "delete".tr(),
       onCancel: Beamer.of(context).popRoute,
       onValidate: () {
