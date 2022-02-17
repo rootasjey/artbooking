@@ -393,8 +393,20 @@
     "many": "Transfert de {} fichiers...",
     "other": "Transfert de {} fichiers..."
   },
-  "illustration_visibility_change": "Changer la visibilité de l'illustration",
-  "illustration_visibility_choose": "Appuyez sur le bouton ci-dessous pour choisir qui peut voir votre illustration.",
+  "illustration_visibility_change": {
+    "zero": "Changer la visibilité de l'illustration",
+    "one": "Changer la visibilité de l'illustration",
+    "two": "Changer la visibilité des illustrations",
+    "many": "Changer la visibilité des illustrations",
+    "other": "Changer la visibilité des illustrations"
+  },
+  "illustration_visibility_choose": {
+    "zero": "Appuyez sur le bouton ci-dessous pour choisir qui peut voir votre illustration.",
+    "one": "Appuyez sur le bouton ci-dessous pour choisir qui peut voir votre illustration.",
+    "two": "Appuyez sur le bouton ci-dessous pour choisir qui peut voir vos illustrations.",
+    "many": "Appuyez sur le bouton ci-dessous pour choisir qui peut voir vos illustrations.",
+    "other": "Appuyez sur le bouton ci-dessous pour choisir qui peut voir vos illustrations."
+  },
   "illustration_visibility_description": "Définissez qui peut voir, modifier ou partager votre illustration.",
   "illustration_visibility_update_fail": "Nous n'avons pas pu mettre à jour la visibilité de votre illustration.",
   "illustration_by_from": "Illustration par {} de {}",
@@ -554,6 +566,7 @@
   "move_down": "Descendre",
   "multi_items_selected": "{} selectionné(e)s",
   "multi_select": "Sélection multiple",
+  "multi_select_no_item": "Aucun élément n'a été sélectionné",
   "music": "Musique",
   "music_artists_love": "Des artists que j'aime:",
   "music_description": "La musique me tient compagnie lors de mes sessions de code, de dessin, de lecture ou de conduite.",

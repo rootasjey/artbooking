@@ -122,6 +122,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                 onChangedTab: onChangedTab,
                 limitThreeInRow: _layoutThreeInRow,
                 onUpdateLayout: onUpdateLayout,
+                onChangeVisibility: showGroupVisibilityDialog,
               ),
               MyIllustrationsPageBody(
                 forceMultiSelect: _forceMultiSelect,
@@ -556,7 +557,6 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   void onClearSelection() {
     setState(() {
       _multiSelectedItems.clear();
-
       _forceMultiSelect = _multiSelectedItems.length > 0;
     });
   }
@@ -722,14 +722,22 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     );
   }
 
-  void showVisibilityDialog(Illustration illustration, int index) {
+  void showGroupVisibilityDialog() {
+    if (_multiSelectedItems.isEmpty) {
+      context.showErrorBar(content: Text("multi_select_no_item".tr()));
+      return;
+    }
+
     final width = 310.0;
+    final firstVisibility = _multiSelectedItems.values.first.visibility;
 
     showDialog(
       context: context,
       builder: (context) => ThemedDialog(
         showDivider: true,
-        titleValue: "illustration_visibility_change".tr(),
+        titleValue: "illustration_visibility_change".plural(
+          _multiSelectedItems.length,
+        ),
         textButtonValidation: "close".tr(),
         onValidate: Beamer.of(context).popRoute,
         onCancel: Beamer.of(context).popRoute,
@@ -739,13 +747,32 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (_multiSelectedItems.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    width: width,
+                    child: Opacity(
+                      opacity: 0.6,
+                      child: Text(
+                        "multi_items_selected".plural(
+                          _multiSelectedItems.length,
+                        ),
+                        style: Utilities.fonts.style(
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
                 Container(
                   padding: const EdgeInsets.only(left: 16.0),
                   width: width,
                   child: Opacity(
                     opacity: 0.6,
                     child: Text(
-                      "illustration_visibility_choose".tr(),
+                      "illustration_visibility_choose".plural(
+                        _multiSelectedItems.length,
+                      ),
                       style: Utilities.fonts.style(
                         fontSize: 16.0,
                       ),
@@ -754,10 +781,86 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                 ),
                 VisibilityButton(
                   maxWidth: width,
+                  group: _multiSelectedItems.isNotEmpty,
+                  visibility: firstVisibility,
+                  onChangedVisibility: (visibility) {
+                    updateGroupVisibility(visibility);
+                    Beamer.of(context).popRoute();
+                    onClearSelection();
+                  },
+                  padding: const EdgeInsets.only(
+                    left: 16.0,
+                    top: 12.0,
+                    bottom: 32.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void showVisibilityDialog(Illustration illustration, int index) {
+    final width = 310.0;
+
+    showDialog(
+      context: context,
+      builder: (context) => ThemedDialog(
+        showDivider: true,
+        titleValue: "illustration_visibility_change".plural(
+          _multiSelectedItems.length,
+        ),
+        textButtonValidation: "close".tr(),
+        onValidate: Beamer.of(context).popRoute,
+        onCancel: Beamer.of(context).popRoute,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (_multiSelectedItems.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    width: width,
+                    child: Opacity(
+                      opacity: 0.6,
+                      child: Text(
+                        "multi_items_selected".plural(
+                          _multiSelectedItems.length,
+                        ),
+                        style: Utilities.fonts.style(
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                Container(
+                  padding: const EdgeInsets.only(left: 16.0),
+                  width: width,
+                  child: Opacity(
+                    opacity: 0.6,
+                    child: Text(
+                      "illustration_visibility_choose".plural(
+                        _multiSelectedItems.length,
+                      ),
+                      style: Utilities.fonts.style(
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ),
+                ),
+                VisibilityButton(
+                  maxWidth: width,
+                  group: _multiSelectedItems.isNotEmpty,
                   visibility: illustration.visibility,
                   onChangedVisibility: (visibility) {
                     updateVisibility(illustration, visibility, index);
                     Beamer.of(context).popRoute();
+                    onClearSelection();
                   },
                   padding: const EdgeInsets.only(
                     left: 16.0,
@@ -775,6 +878,16 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   void uploadIllustration() {
     ref.read(AppState.uploadTaskListProvider.notifier).pickImage();
+  }
+
+  void updateGroupVisibility(EnumContentVisibility visibility) {
+    for (var illustration in _multiSelectedItems.values) {
+      final int index = _illustrations.indexWhere(
+        (x) => x.id == illustration.id,
+      );
+
+      updateVisibility(illustration, visibility, index);
+    }
   }
 
   void updateVisibility(

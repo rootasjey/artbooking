@@ -394,8 +394,20 @@
     "many": "Uploading {} files...",
     "other": "Uploading {} files..."
   },
-  "illustration_visibility_change": "Change illustration visibility",
-  "illustration_visibility_choose": "Tap on the following button to choose who can see your illustration.",
+  "illustration_visibility_change": {
+    "zero": "Change illustration visibility",
+    "one": "Change illustration visibility",
+    "two": "Change illustrations visibility",
+    "many": "Change illustrations visibility",
+    "other": "Change illustrations visibility"
+  },
+  "illustration_visibility_choose": {
+    "zero": "Tap on the following button to choose who can see your illustration.",
+    "one": "Tap on the following button to choose who can see your illustration.",
+    "two": "Tap on the following button to choose who can see these illustrations.",
+    "many": "Tap on the following button to choose who can see these illustrations.",
+    "other": "Tap on the following button to choose who can see these illustrations."
+  },
   "illustration_visibility_description": "Define who can view, edit or share your illustration.",
   "illustration_visibility_update_fail": "Sorry, we couldn't update your illustration visibility",
   "illustration_by_from": "Illustration by {} from {}",
@@ -554,6 +566,7 @@
   "move_down": "Move down",
   "multi_items_selected": "{} selected",
   "multi_select": "Multi-select",
+  "multi_select_no_item": "No item has been selected",
   "music": "Music",
   "music_artists_love": "Artists I love:",
   "music_description": "Music keeps me company while coding, drawing, reading and driving.",

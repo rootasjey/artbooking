@@ -21,6 +21,8 @@ class MyIllustrationsPageHeader extends StatelessWidget {
     this.onConfirmDeleteGroup,
     this.onChangedTab,
     this.onUpdateLayout,
+    this.onAddToBook,
+    this.onChangeVisibility,
   }) : super(key: key);
 
   final bool multiSelectActive;
@@ -28,7 +30,9 @@ class MyIllustrationsPageHeader extends StatelessWidget {
 
   final EnumVisibilityTab selectedTab;
 
+  final void Function()? onAddToBook;
   final void Function(EnumVisibilityTab)? onChangedTab;
+  final void Function()? onChangeVisibility;
   final void Function()? onClearSelection;
   final void Function()? onConfirmDeleteGroup;
   final void Function()? onSelectAll;
@@ -81,6 +85,8 @@ class MyIllustrationsPageHeader extends StatelessWidget {
             onSelectAll: onSelectAll,
             onClearSelection: onClearSelection,
             onConfirmDeleteGroup: onConfirmDeleteGroup,
+            onAddToBook: onAddToBook,
+            onChangeVisibility: onChangeVisibility,
           ),
         ]),
       ),

@@ -4,14 +4,17 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class VisibilityButton extends StatelessWidget {
-  const VisibilityButton({
-    Key? key,
-    required this.visibility,
-    this.onChangedVisibility,
-    this.padding = EdgeInsets.zero,
-    this.maxWidth = 200.0,
-  }) : super(key: key);
+  const VisibilityButton(
+      {Key? key,
+      required this.visibility,
+      this.onChangedVisibility,
+      this.padding = EdgeInsets.zero,
+      this.maxWidth = 200.0,
+      this.group = false})
+      : super(key: key);
 
+  /// True if there are multiple items selected.
+  final bool group;
   final double maxWidth;
   final EdgeInsets padding;
   final EnumContentVisibility visibility;
@@ -22,7 +25,7 @@ class VisibilityButton extends StatelessWidget {
     return Padding(
       padding: padding,
       child: PopupMenuButton(
-        tooltip: "illustration_visibility_choose".tr(),
+        tooltip: "illustration_visibility_choose".plural(group ? 2 : 1),
         child: Material(
           color: Colors.black87,
           elevation: 4.0,
