@@ -110,6 +110,7 @@
     "11": "Our hearts are free, so tell me what's wrong with the feeling?"
   },
   "book_creating": "Creating book",
+  "book_creating_name": "Creating book {}",
   "book_creation_error": "Sorry, there was an error while creating your book. Please try again later.",
   "book_creation_success": "Your book has been successfully created!",
   "book_delete": {
@@ -148,11 +149,49 @@
   "books": "Books",
   "books_active_word": "Active",
   "books_active_or_archived": "View your active or archived books.",
+  "book_adding_illustrations": {
+    "zero": "Adding illustration to book",
+    "one": "Adding illustration to book",
+    "two": "Adding illustrations to book",
+    "many": "Adding illustrations to book",
+    "other": "Adding illustrations to book"
+  },
+  "books_adding_illustrations": {
+    "zero": "Adding illustration to books",
+    "one": "Adding illustration to books",
+    "two": "Adding illustrations to books",
+    "many": "Adding illustrations to books",
+    "other": "Adding illustrations to books"
+  },
+  "book_add_illustrations_error": {
+    "zero": "There was an error while adding illustration to book.",
+    "one": "There was an error while adding illustration to book.",
+    "two": "There was an error while adding illustrations to book.",
+    "many": "There was an error while adding illustrations to book.",
+    "other": "There was an error while adding illustrations to book."
+  },
+  "books_add_illustrations_error": {
+    "zero": "There was an error while adding illustration to books.",
+    "one": "There was an error while adding illustration to books.",
+    "two": "There was an error while adding illustrations to books.",
+    "many": "There was an error while adding illustrations to books.",
+    "other": "There was an error while adding illustrations to books."
+  },
+  "books_add_to": {
+    "zero": "Add to this book",
+    "one": "Add to this book",
+    "two": "Add to these books",
+    "many": "Add to these books",
+    "other": "Add to these books"
+  },
   "books_archived_word": "Archived",
   "books_browse": "You can browse all public books on this page.",
+  "books_choose_add_illustrations_in": "Choose the books to add the illustrations in.",
   "books_delete": "Delete these book",
   "books_delete_description": "Deleting these books won't delete illustrations inside it. Illustrations live on their own. This action is irrevsible.",
   "books_description": "Reading moments are peaceful, calm and often thrilling. A short list of my most liked books of all times:",
+  "books_fetch_error": "An error occurred while fetching books.",
+  "books_fetch_more_error": "There was an error while fetching more books.",
   "books_go_to_active": "Go to active books",
   "books_loading": "Loading books",
   "books_my": "My books",
@@ -165,6 +204,7 @@
   "books_none_created": "No books created for now.",
   "books_public_empty": "There is no public books at this moment. Please come back later.",
   "books_subtitle": "Browse created art books.",
+  "books_task": "Books task",
   "brightness": "Brightness",
   "brightness_auto": "Auto",
   "cancel": "Cancel",
@@ -480,6 +520,7 @@
   "illustrations_remove_error": "Sorry, there was an error while removing the illustration. Please try again.",
   "illustrations_remove_success": "The illustrations has been successfully removed.",
   "illustrations_subtitle": "Parcourez les illustrations.",
+  "illustrations_task": "Illustrations task",
   "illustrations_yours_browse": "Browse your illustrations",
   "image_size_exceeded": "Image's size cannot be greater than 5MB",
   "image_update_cloud": "Updating your image to the cloud...",

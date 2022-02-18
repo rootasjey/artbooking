@@ -79,6 +79,20 @@
   "body_empty_forbidden_restrictions": "Le contenu du message ne peut pas être vide. @:body_restrictions",
   "body_restrictions": "Veuillez saisir un message comportant plus de 3 caractères.",
   "book": "Book",
+  "book_add_illustrations_error": {
+    "zero": "Il y a eu une erreur durant l'ajout de l'illustration au book.",
+    "one": "Il y a eu une erreur durant l'ajout de l'illustration au book.",
+    "two": "Il y a eu une erreur durant l'ajout des illustrations au book.",
+    "many": "Il y a eu une erreur durant l'ajout des illustrations au book.",
+    "other": "Il y a eu une erreur durant l'ajout des illustrations au book."
+  },
+  "book_adding_illustrations": {
+    "zero": "Ajout de l'illustration au book",
+    "one": "Ajout de l'illustration au book",
+    "two": "Ajout des illustrations au book",
+    "many": "Ajout des illustrations au book",
+    "other": "Ajout des illustrations au book"
+  },
   "book_create": "Créer un book",
   "book_create_description": "Un book continant vos illustrations.",
   "book_create_hint_text": "Epilogues for the End of the Sky",
@@ -109,6 +123,7 @@
     "11": "Je veux partir avec toi."
   },
   "book_creating": "Création du book",
+  "book_creating_name": "Création du book {}",
   "book_creation_error": "Désolés, il y a eu une erreur durant la création de votre book. Veuillez réessayer ultérieurement.",
   "book_creation_success": "Votre book a été créé avec succès.",
   "book_delete": {
@@ -148,11 +163,35 @@
   "books": "Books",
   "books_active_word": "Actifs",
   "books_active_or_archived": "Voir vos books actifs ou archivés.",
+  "books_add_illustrations_error": {
+    "zero": "Il y a eu une erreur durant l'ajout de l'illustration aux books.",
+    "one": "Il y a eu une erreur durant l'ajout de l'illustration aux books.",
+    "two": "Il y a eu une erreur durant l'ajout des illustrations aux books.",
+    "many": "Il y a eu une erreur durant l'ajout des illustrations aux books.",
+    "other": "Il y a eu une erreur durant l'ajout des illustrations aux books."
+  },
+  "books_adding_illustrations": {
+    "zero": "Ajout de l'illustration aux books",
+    "one": "Ajout de l'illustration aux books",
+    "two": "Ajout des illustrations aux books",
+    "many": "Ajout des illustrations aux books",
+    "other": "Ajout des illustrations aux books"
+  },
+  "books_add_to": {
+    "zero": "Ajouter à ce book",
+    "one": "Ajouter à ce book",
+    "two": "Ajouter à ces books",
+    "many": "Ajouter à ces books",
+    "other": "Ajouter à ces books"
+  },
   "books_archived_word": "Archivés",
   "books_browse": "vous pouvez parcourir tous les books publiques sur cette page.",
+  "books_choose_add_illustrations_in": "Choisissez les books où ajouter les illustrations.",
   "books_delete": "Supprimer ces books",
   "books_delete_description": "La suppression de ces books n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de ceux-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible.",
   "books_description": "Les moments de lecture sont reposants, calme et souvent frétillants. Une petite liste de books que j'ai adorés:",
+  "books_fetch_error": "Une erreur est survenue durant la récupération de books.",
+  "books_fetch_more_error": "Une erreur est survenue durant la récupération de books supplémentaires.",
   "books_go_to_active": "Naviguer vers books actifs",
   "books_loading": "Chargement des books",
   "books_my": "Mes books",
@@ -165,6 +204,7 @@
   "books_none_created": "Vous avez créé aucun book pour le moment.",
   "books_public_empty": "Il n'y a pas de books publiques actuellement. Veuillez revenir plus tard.",
   "books_subtitle": "Parcourez les books créés.",
+  "books_task": "Tâche de books",
   "brightness": "Luminosité",
   "brightness_auto": "Automatique",
   "cancel": "Annuler",
@@ -480,6 +520,7 @@
   "illustrations_remove_error": "Désolé, il y a eu une erreur durant le retrait des illustrations de votre book. Veuillez réessayer ultérieurement.",
   "illustrations_remove_success": "Les illustrations ont été retirées avec succès.",
   "illustrations_subtitle": "Parcourez les illustrations.",
+  "illustrations_task": "Tâche d'illustrations",
   "illustrations_yours_browse": "Parcourir vos illustrations",
   "image_cropping": "Rognage de votre image...",
   "image_load_failed_reload": "Une erreur est survenue lors du chargement de cette image. Appuyez pour recharger.",
