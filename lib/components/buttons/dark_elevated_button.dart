@@ -88,4 +88,30 @@ class DarkElevatedButton extends StatelessWidget {
       ),
     );
   }
+
+  static Widget iconOnly({
+    void Function()? onPressed,
+    required Widget child,
+    Color color = Colors.black,
+  }) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 2.0,
+          vertical: 10.0,
+        ),
+        child: child,
+      ),
+      style: ElevatedButton.styleFrom(
+        primary: color,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4.0),
+        ),
+        textStyle: Utilities.fonts.style(
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
 }
