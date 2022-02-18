@@ -22,9 +22,24 @@ class ThemedDialog extends StatelessWidget {
     this.titleValue = "",
     this.subtitleValue = "",
     this.showDivider = false,
+    this.useRawDialog = false,
+    this.height = 600.0,
+    this.width = 500.0,
+    this.footer,
   }) : super(key: key);
 
   final bool showDivider;
+
+  /// If true, this widget will use [Dialog] as a basis
+  /// instead of [SimpleDialog]. It's necessary if you implement
+  /// your own scrolling mecanism.
+  final bool useRawDialog;
+
+  /// Dialog's width. Used only when [useRawDialog] is true.
+  final double width;
+
+  /// Dialog's height. Used only when [useRawDialog] is true.
+  final double height;
 
   /// Trigger when the user tap on close button
   /// or fires keyboard shortcuts for closing the dialog.
@@ -47,6 +62,9 @@ class ThemedDialog extends StatelessWidget {
   /// Dialog body. Can be a [SingleChildScrollView] for example.
   final Widget body;
 
+  /// If set, this widget will replace the default footer.
+  final Widget? footer;
+
   /// If true, center dialog's title.
   final bool centerTitle;
 
@@ -62,16 +80,60 @@ class ThemedDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget _title = Container();
+    Widget _titleWidget = Container();
     if (title != null) {
-      _title = titleContainer(
+      _titleWidget = titleContainer(
         color: Theme.of(context).secondaryHeaderColor,
       );
     } else {
-      _title = TitleDialog(
+      _titleWidget = TitleDialog(
         titleValue: titleValue,
         subtitleValue: subtitleValue,
         onCancel: onCancel,
+      );
+    }
+
+    Widget _footerWidget = Container();
+    if (footer != null) {
+      _footerWidget = footer as Widget;
+    } else {
+      _footerWidget = Padding(
+        padding: const EdgeInsets.only(bottom: 8.0),
+        child: footerButtons(),
+      );
+    }
+
+    if (useRawDialog) {
+      return ValidationShortcuts(
+        autofocus: autofocus,
+        focusNode: focusNode,
+        onCancel: onCancel,
+        onValidate: onValidate,
+        spaceActive: spaceActive,
+        child: Dialog(
+          insetPadding: const EdgeInsets.all(60.0),
+          alignment: Alignment.center,
+          backgroundColor: Constants.colors.clairPink,
+          child: SizedBox(
+            width: width,
+            height: height,
+            child: Column(
+              children: [
+                _titleWidget,
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 16.0,
+                    top: 16.0,
+                    right: 16.0,
+                  ),
+                  child: body,
+                ),
+                if (showDivider) Divider(),
+                _footerWidget,
+              ],
+            ),
+          ),
+        ),
       );
     }
 
@@ -83,7 +145,7 @@ class ThemedDialog extends StatelessWidget {
       spaceActive: spaceActive,
       child: SimpleDialog(
         backgroundColor: Constants.colors.clairPink,
-        title: _title,
+        title: _titleWidget,
         titlePadding: EdgeInsets.zero,
         contentPadding: EdgeInsets.zero,
         children: [
