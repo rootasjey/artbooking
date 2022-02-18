@@ -1,5 +1,5 @@
 import 'package:artbooking/actions/books.dart';
-import 'package:artbooking/components/add_to_book_panel.dart';
+import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
 import 'package:artbooking/components/buttons/visibility_button.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
@@ -28,7 +28,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:unicons/unicons.dart';
 
 class MyBooksPage extends ConsumerStatefulWidget {
@@ -634,34 +633,13 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   }
 
   void showAddToBookDialog(Book book) {
-    int flex = Utilities.size.isMobileSize(context) ? 5 : 3;
-
-    showCustomModalBottomSheet(
+    showDialog(
       context: context,
-      builder: (context) => AddToBookPanel(
-        scrollController: ModalScrollController.of(context),
-        illustrations: [],
-        books: [book] + _multiSelectedItems.values.toList(),
-      ),
-      containerWidget: (context, animation, child) {
-        return SafeArea(
-          child: Row(
-            children: [
-              Spacer(),
-              Expanded(
-                flex: flex,
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Material(
-                    clipBehavior: Clip.antiAlias,
-                    borderRadius: BorderRadius.circular(12.0),
-                    child: child,
-                  ),
-                ),
-              ),
-              Spacer(),
-            ],
-          ),
+      builder: (context) {
+        return AddToBooksDialog(
+          illustrations: [],
+          books: [book] + _multiSelectedItems.values.toList(),
+          onComplete: clearSelection,
         );
       },
     );

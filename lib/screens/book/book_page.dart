@@ -6,7 +6,7 @@ import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
-import 'package:artbooking/components/add_to_book_panel.dart';
+import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/book/book_page_body.dart';
@@ -297,7 +297,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
                   },
                 ),
                 ListTile(
-                  title: Text('Cancel'.tr()),
+                  title: Text('cancel'.tr()),
                   trailing: Icon(Icons.close),
                   onTap: () => Navigator.of(context).pop(),
                 ),
@@ -903,33 +903,11 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   }
 
   void showAddToBook(Illustration illustration) {
-    int flex = Utilities.size.isMobileSize(context) ? 5 : 3;
-
-    showCustomModalBottomSheet(
+    showDialog(
       context: context,
-      builder: (context) => AddToBookPanel(
-        scrollController: ModalScrollController.of(context),
-        illustrations: [illustration],
-      ),
-      containerWidget: (context, animation, child) {
-        return SafeArea(
-          child: Row(
-            children: [
-              Spacer(),
-              Expanded(
-                flex: flex,
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Material(
-                    clipBehavior: Clip.antiAlias,
-                    borderRadius: BorderRadius.circular(12.0),
-                    child: child,
-                  ),
-                ),
-              ),
-              Spacer(),
-            ],
-          ),
+      builder: (context) {
+        return AddToBooksDialog(
+          illustrations: [illustration] + _multiSelectedItems.values.toList(),
         );
       },
     );

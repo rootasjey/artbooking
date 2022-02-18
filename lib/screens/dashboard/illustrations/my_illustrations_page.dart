@@ -3,7 +3,7 @@ import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/buttons/visibility_button.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
-import 'package:artbooking/components/add_to_book_panel.dart';
+import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page_body.dart';
 import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page_fab.dart';
@@ -25,7 +25,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:unicons/unicons.dart';
 
 class MyIllustrationsPage extends ConsumerStatefulWidget {
@@ -704,33 +703,14 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   }
 
   void showAddToBook(Illustration illustration) {
-    int flex = Utilities.size.isMobileSize(context) ? 5 : 3;
-
-    showCustomModalBottomSheet(
+    showDialog(
       context: context,
-      builder: (context) => AddToBookPanel(
-        scrollController: ModalScrollController.of(context),
-        illustrations: [illustration] + _multiSelectedItems.values.toList(),
-      ),
-      containerWidget: (context, animation, child) {
-        return SafeArea(
-          child: Row(
-            children: [
-              Spacer(),
-              Expanded(
-                flex: flex,
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Material(
-                    clipBehavior: Clip.antiAlias,
-                    borderRadius: BorderRadius.circular(12.0),
-                    child: child,
-                  ),
-                ),
-              ),
-              Spacer(),
-            ],
-          ),
+      builder: (context) {
+        return AddToBooksDialog(
+          illustrations: [illustration] + _multiSelectedItems.values.toList(),
+          onComplete: () {
+            onClearSelection();
+          },
         );
       },
     );
