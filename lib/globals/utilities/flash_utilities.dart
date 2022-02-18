@@ -49,7 +49,7 @@ class FlashUtilities {
   Future<T?> showProgress<T>(
     BuildContext context, {
     String? title,
-    String progressId = '',
+    String progressId = "",
     required String message,
     Widget icon = const Icon(UniconsLine.chat_info),
     Duration duration = const Duration(seconds: 10),
@@ -69,10 +69,11 @@ class FlashUtilities {
           controller: controller,
           backgroundColor: Theme.of(context).backgroundColor,
           boxShadows: [BoxShadow(blurRadius: 4)],
-          barrierBlur: 3.0,
+          barrierBlur: 1.0,
           barrierColor: Colors.black38,
           barrierDismissible: true,
-          position: FlashPosition.top,
+          behavior: FlashBehavior.fixed,
+          position: FlashPosition.bottom,
           child: FlashBar(
             icon: icon,
             title: title != null && title.length > 0
