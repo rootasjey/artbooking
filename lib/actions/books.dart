@@ -11,9 +11,9 @@ class BooksActions {
   }) async {
     try {
       final response =
-          await Utilities.cloud.fun('books-addIllustrations').call({
-        'book_id': bookId,
-        'illustration_ids': illustrationIds,
+          await Utilities.cloud.fun("books-addIllustrations").call({
+        "book_id": bookId,
+        "illustration_ids": illustrationIds,
       });
 
       return IllustrationsResponse.fromJSON(response.data);
@@ -28,14 +28,14 @@ class BooksActions {
 
   static Future<BookResponse> createOne({
     required String name,
-    String description = '',
+    String description = "",
     List<String?> illustrationIds = const [],
   }) async {
     try {
-      final response = await Utilities.cloud.fun('books-createOne').call({
-        'name': name,
-        'description': description,
-        'illustration_ids': illustrationIds,
+      final response = await Utilities.cloud.fun("books-createOne").call({
+        "name": name,
+        "description": description,
+        "illustration_ids": illustrationIds,
       });
 
       return BookResponse.fromJSON(response.data);
@@ -52,8 +52,8 @@ class BooksActions {
     required String? bookId,
   }) async {
     try {
-      final response = await Utilities.cloud.fun('books-deleteOne').call({
-        'book_id': bookId,
+      final response = await Utilities.cloud.fun("books-deleteOne").call({
+        "book_id": bookId,
       });
 
       return BookResponse.fromJSON(response.data);
@@ -70,8 +70,8 @@ class BooksActions {
     required List<String?> bookIds,
   }) async {
     try {
-      final response = await Utilities.cloud.fun('books-deleteMany').call({
-        'book_ids': bookIds,
+      final response = await Utilities.cloud.fun("books-deleteMany").call({
+        "book_ids": bookIds,
       });
 
       return BooksResponse.fromJSON(response.data);
@@ -90,9 +90,9 @@ class BooksActions {
   }) async {
     try {
       final response =
-          await Utilities.cloud.fun('books-removeIllustrations').call({
-        'book_id': bookId,
-        'illustration_ids': illustrationIds,
+          await Utilities.cloud.fun("books-removeIllustrations").call({
+        "book_id": bookId,
+        "illustration_ids": illustrationIds,
       });
 
       return IllustrationsResponse.fromJSON(response.data);
@@ -108,14 +108,14 @@ class BooksActions {
   /// Rename one book with a new name and a new description.
   static Future<BookResponse> renameOne({
     required String name,
-    String description = '',
+    String description = "",
     required String bookId,
   }) async {
     try {
-      final response = await Utilities.cloud.fun('books-renameOne').call({
-        'name': name,
-        'description': description,
-        'book_id': bookId,
+      final response = await Utilities.cloud.fun("books-renameOne").call({
+        "name": name,
+        "description": description,
+        "book_id": bookId,
       });
 
       return BookResponse.fromJSON(response.data);

@@ -7,7 +7,7 @@ class IllustrationsResponse {
   IllustrationsResponse({
     this.illustrations = const [],
     this.hasErrors = false,
-    this.message = '',
+    this.message = "",
     this.error,
     this.successCount = 0,
     this.user,
@@ -45,7 +45,7 @@ class IllustrationsResponse {
   factory IllustrationsResponse.empty() {
     return IllustrationsResponse(
       error: CloudFunctionsError.empty(),
-      hasErrors: true,
+      hasErrors: false,
       illustrations: [],
       user: PartialUser.empty(),
     );
@@ -57,11 +57,11 @@ class IllustrationsResponse {
     }
 
     return IllustrationsResponse(
-      illustrations: parseIllustrations(data['items']),
-      successCount: data['successCount'] ?? 0,
-      hasErrors: data['hasErrors'] ?? true,
-      user: PartialUser.fromJSON(data['user']),
-      error: CloudFunctionsError.fromJSON(data['error']),
+      illustrations: parseIllustrations(data["items"]),
+      successCount: data["successCount"] ?? 0,
+      hasErrors: data["hasErrors"] ?? true,
+      user: PartialUser.fromJSON(data["user"]),
+      error: CloudFunctionsError.fromJSON(data["error"]),
     );
   }
 
