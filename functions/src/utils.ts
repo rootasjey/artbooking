@@ -36,6 +36,12 @@ export const cloudRegions = {
   eu: 'europe-west1'
 };
 
+export enum BookCoverMode {
+  lastIllustrationAdded = "last_illustration_added",
+  chosenIllustration = "chosen_illustration",
+  uploadedCover = "uploaded_cover",
+}
+
 /**
  * Throw an exception if the visibility's value is not
  * among allowed values.

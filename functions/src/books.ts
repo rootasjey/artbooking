@@ -2,6 +2,7 @@ import * as functions from 'firebase-functions';
 import { adminApp } from './adminApp';
 import { 
   BASE_DOCUMENT_NAME,
+  BookCoverMode,
   BOOKS_COLLECTION_NAME,
   BOOK_STATISTICS_COLLECTION_NAME, 
   checkOrGetDefaultVisibility, 
@@ -16,7 +17,7 @@ const firebaseTools = require('firebase-tools');
 const firestore = adminApp.firestore();
 
 /**
- * Add illustrations to an existing book.
+ * Add illustrations to a list of existing books.
  */
 export const addIllustrations = functions
   .region(cloudRegions.eu)
@@ -44,8 +45,8 @@ export const addIllustrations = functions
     if (!Array.isArray(illustration_ids) || illustration_ids.length === 0) {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called with a valid [illustrationIds] parameter
-         which is an array of illustrations' ids to add. And not be empty.`,
+        `The function must be called with a valid [illustration_ids] parameter ` +
+         `which is an array of illustrations' ids to add. It must not be empty.`,
       );
     }
 
@@ -76,7 +77,11 @@ export const addIllustrations = functions
 
     const bookIllustrations: BookIllustration[] = bookData.illustrations;
     let newBookIllustrations = bookIllustrations.concat(newIllustrations);
-    const bookThumbnailLink = await getBookThumbnailLink(newBookIllustrations);
+    
+    let bookCoverLink = bookData.cover?.link
+    if (bookData.cover?.mode === BookCoverMode.lastIllustrationAdded) {
+      bookCoverLink = await getBookThumbnailLink(newBookIllustrations);
+    }
     
     if (newBookIllustrations.length > 100) {
       newBookIllustrations = newBookIllustrations.slice(0, 100);
@@ -86,8 +91,8 @@ export const addIllustrations = functions
     await bookSnapshot.ref.update({
       count: newBookIllustrations.length,
       cover: { 
-        link: bookThumbnailLink, 
-        mode: bookData.cover?.mode ?? "last_illustration_added",
+        link: bookCoverLink, 
+        mode: bookData.cover?.mode ?? BookCoverMode.lastIllustrationAdded,
         updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
       },
       illustrations: newBookIllustrations,
@@ -144,9 +149,9 @@ export const createOne = functions
     const addedBookDoc = await firestore
       .collection(BOOKS_COLLECTION_NAME)
       .add({
-        count: 0,
+        count: bookIllustrations.length,
         cover: {
-          mode: 'last_illustration_added',
+          mode: BookCoverMode.lastIllustrationAdded,
           link: bookThumbnailLink,
           updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
         },
@@ -409,7 +414,11 @@ export const removeDeletedIllustrations = functions
       (bookIllustration) => !deletedIllustrations.includes(bookIllustration.id),
     );
 
-    const bookThumbnailLink = await getBookThumbnailLink(newBookIllustrations);
+    
+    let bookCoverLink = bookData.cover?.link
+    if (bookData.cover?.mode === BookCoverMode.lastIllustrationAdded) {
+      bookCoverLink = await getBookThumbnailLink(newBookIllustrations);
+    }
 
     if (newBookIllustrations.length > 100) {
       newBookIllustrations = newBookIllustrations.slice(0, 100);
@@ -419,7 +428,8 @@ export const removeDeletedIllustrations = functions
     await bookSnapshot.ref.update({
       count: newBookIllustrations.length,
       cover: { 
-        link: bookThumbnailLink, 
+        link: bookCoverLink, 
+        mode: bookData.cover?.mode ?? BookCoverMode.lastIllustrationAdded,
         updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
       },
       illustrations: newBookIllustrations,
@@ -498,12 +508,16 @@ export const removeIllustrations = functions
     const newBookIllustrations = bookIllustrations
       .filter(illustration => !illustration_ids.includes(illustration.id));
 
-    const bookThumbnailLink = await getBookThumbnailLink(newBookIllustrations);
+    let bookCoverLink = bookData.cover?.link
+    if (bookData.cover?.mode === BookCoverMode.lastIllustrationAdded) {
+      bookCoverLink = await getBookThumbnailLink(newBookIllustrations);
+    }
 
     await bookSnapshot.ref.update({
       count: newBookIllustrations.length,
-      cover: { 
-        link: bookThumbnailLink, 
+      cover: {
+        link: bookCoverLink,
+        mode: bookData.cover?.mode ?? BookCoverMode.lastIllustrationAdded,
         updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
       },
       illustrations: newBookIllustrations,
@@ -601,16 +615,16 @@ export const setCover = functions
     if (typeof book_id !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called with a valid [bookId] (string) parameter
-         which is the book to update.`,
+        `The function must be called with a valid [bookId] (string) parameter ` +
+         `which is the book to update.`,
       );
     }
 
     if (typeof illustration_id !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called with a valid [illustrationId] (string) parameter
-         which is the book to update.`,
+        `The function must be called with a valid [illustrationId] (string) parameter `+
+         `which is the book to update.`,
       );
     }
 
@@ -652,6 +666,7 @@ export const setCover = functions
     await bookSnapshot.ref.update({
       cover: {
         id: illustrationSnapshot.id,
+        mode: BookCoverMode.chosenIllustration,
         url: thumbnails.t720 || thumbnails.t480 || thumbnails.t360,
         updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
       },
