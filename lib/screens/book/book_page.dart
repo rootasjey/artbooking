@@ -190,9 +190,11 @@ class _MyBookPageState extends ConsumerState<BookPage> {
               illustrations: _illustrations,
               multiSelectedItems: _multiSelectedItems,
               popupMenuEntries: _popupMenuEntries,
+              onBrowseIllustrations: onBrowseIllustrations,
               onLongPressIllustration: onLongPressIllustration,
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               onTapIllustrationCard: onTapIllustrationCard,
+              onUploadToThisBook: onUploadToThisBook,
               owner: owner,
             ),
             SliverPadding(
@@ -679,6 +681,10 @@ class _MyBookPageState extends ConsumerState<BookPage> {
         "illustrationId": illustration.id,
       },
     );
+  }
+
+  void onBrowseIllustrations() {
+    context.beamToNamed(DashboardLocationContent.illustrationsRoute);
   }
 
   void onClearMultiSelect() {

@@ -21,6 +21,8 @@ class BookPageBody extends StatelessWidget {
     this.onLongPressIllustration,
     this.onTapIllustrationCard,
     this.owner = false,
+    this.onUploadToThisBook,
+    this.onBrowseIllustrations,
   }) : super(key: key);
 
   /// Why a map and not just a list?
@@ -41,9 +43,19 @@ class BookPageBody extends StatelessWidget {
   final bool hasError;
 
   final void Function(String, Illustration, bool)? onLongPressIllustration;
-  final void Function(EnumIllustrationItemAction, int, Illustration, String)?
-      onPopupMenuItemSelected;
+  final void Function(
+    EnumIllustrationItemAction,
+    int,
+    Illustration,
+    String,
+  )? onPopupMenuItemSelected;
   final void Function(String, Illustration)? onTapIllustrationCard;
+
+  /// Upload a new illustration and add it to this book.
+  final void Function()? onUploadToThisBook;
+
+  /// Navigate to user's illustrations.
+  final void Function()? onBrowseIllustrations;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +75,10 @@ class BookPageBody extends StatelessWidget {
     }
 
     if (illustrations.isEmpty) {
-      return BookPageBodyEmpty();
+      return BookPageBodyEmpty(
+        onBrowseIllustrations: onBrowseIllustrations,
+        onUploadToThisBook: onUploadToThisBook,
+      );
     }
 
     final selectionMode = forceMultiSelect || multiSelectedItems.isNotEmpty;
