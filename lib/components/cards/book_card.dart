@@ -448,11 +448,11 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     if (isHover) {
       _elevation = 8.0;
       _scaleController.forward();
-      startCoverSlideshow();
+      // startCoverSlideshow();
     } else {
       _elevation = _initElevation;
       _scaleController.reverse();
-      stopCoverSlideshow();
+      // stopCoverSlideshow();
     }
 
     setState(() {});
