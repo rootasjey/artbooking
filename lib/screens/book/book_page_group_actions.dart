@@ -1,4 +1,4 @@
-import 'package:artbooking/components/buttons/text_rectangle_button.dart';
+import 'package:artbooking/components/buttons/square_button.dart';
 import 'package:artbooking/screens/book/book_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +8,7 @@ class BookPageGroupActions extends StatelessWidget {
   const BookPageGroupActions({
     Key? key,
     required this.multiSelectedItems,
+    this.onAddToBook,
     this.onMultiSelectAll,
     this.onClearMultiSelect,
     this.onConfirmRemoveGroup,
@@ -19,6 +20,7 @@ class BookPageGroupActions extends StatelessWidget {
   /// Currently selected illustrations.
   final MapStringIllustration multiSelectedItems;
 
+  final void Function()? onAddToBook;
   final void Function()? onMultiSelectAll;
   final void Function()? onClearMultiSelect;
   final void Function()? onConfirmRemoveGroup;
@@ -52,23 +54,25 @@ class BookPageGroupActions extends StatelessWidget {
             color: Colors.black12,
           ),
         ),
-        TextRectangleButton(
-          icon: Icon(UniconsLine.ban),
-          label: Text("clear_selection".tr()),
-          primary: Colors.black38,
-          onPressed: onClearMultiSelect,
+        SquareButton(
+          child: Icon(UniconsLine.ban),
+          message: "clear_selection".tr(),
+          onTap: onClearMultiSelect,
         ),
-        TextRectangleButton(
-          icon: Icon(UniconsLine.layers),
-          label: Text("select_all".tr()),
-          primary: Colors.black38,
-          onPressed: onMultiSelectAll,
+        SquareButton(
+          child: Icon(UniconsLine.layers),
+          message: "select_all".tr(),
+          onTap: onMultiSelectAll,
         ),
-        TextRectangleButton(
-          icon: Icon(UniconsLine.trash),
-          label: Text("delete".tr()),
-          primary: Colors.black38,
-          onPressed: onConfirmRemoveGroup,
+        SquareButton(
+          child: Icon(UniconsLine.minus_circle),
+          message: "remove".tr(),
+          onTap: onConfirmRemoveGroup,
+        ),
+        SquareButton(
+          child: Icon(UniconsLine.book_medical),
+          message: "add_to_book".tr(),
+          onTap: onAddToBook,
         ),
       ],
     );

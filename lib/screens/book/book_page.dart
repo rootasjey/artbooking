@@ -171,6 +171,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
               liked: _liked,
               multiSelectedItems: _multiSelectedItems,
               onLike: onLike,
+              onAddToBook: showAddGroupToBook,
               onClearMultiSelect: onClearMultiSelect,
               onConfirmDeleteBook: onConfirmDeleteBook,
               onConfirmRemoveGroup: onConfirmRemoveGroup,
@@ -758,7 +759,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   ) {
     switch (action) {
       case EnumIllustrationItemAction.addToBook:
-        showAddToBook(illustration);
+        showAddToBook(illustrationKey, illustration);
         break;
       case EnumIllustrationItemAction.removeFromBook:
         if (_multiSelectedItems.isEmpty) {
@@ -872,15 +873,27 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     }
   }
 
-  void showAddToBook(Illustration illustration) {
+  void showAddToBook(String illustrationKey, Illustration illustration) {
+    _multiSelectedItems.putIfAbsent(illustrationKey, () => illustration);
+
     showDialog(
       context: context,
       builder: (context) {
         return AddToBooksDialog(
-          illustrations: [illustration] + _multiSelectedItems.values.toList(),
+          illustrations: _multiSelectedItems.values.toList(),
         );
       },
     );
+  }
+
+  void showAddGroupToBook() {
+    if (_multiSelectedItems.isEmpty) {
+      context.showErrorBar(content: Text("multi_select_no_item".tr()));
+      return;
+    }
+
+    final mapEntry = _multiSelectedItems.entries.first;
+    showAddToBook(mapEntry.key, mapEntry.value);
   }
 
   void onShowDatesDialog() {
