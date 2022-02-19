@@ -140,6 +140,27 @@
     "many": "La suppression de ces books n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de ceux-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible.",
     "other": "La suppression de ces books n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de ceux-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible."
   },
+  "book_illustrations_remove": {
+    "zero": "Rien retirer",
+    "one": "Retirer 1 illustration",
+    "two": "Retirer {} illustrations",
+    "many": "Retirer {} illustrations",
+    "other": "Retirer {} illustrations"
+  },
+  "book_illustrations_remove_title": {
+    "zero": "Retirer aucune illustration du book",
+    "one": "Retirer cette illustration du book",
+    "two": "Retirer ces illustrations du book",
+    "many": "Retirer ces illustrations du book",
+    "other": "Retirer ces illustrations du book"
+  },
+  "book_illustrations_remove_description": {
+    "zero": "Cette action n'aura aucun effet.",
+    "one": "L'illustration en elle-même continuera d'exister en dehors de ce book.",
+    "two": "Lss illustrations en elles-même continueront d'exister en dehors de ce book.",
+    "many": "Lss illustrations en elles-même continueront d'exister en dehors de ce book.",
+    "other": "Lss illustrations en elles-même continueront d'exister en dehors de ce book."
+  },
   "book_loading": "Chargement du book",
   "book_no_illustrations": "Vous avez ajouté aucune illustrations à ce book pour le moment. Vous pouvez en ajouter depuis votre page d'illustrations.",
   "book_quebert": "La Vérité sur l'Affaire Harry Quebert",

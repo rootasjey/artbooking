@@ -79,6 +79,20 @@
   "body_empty_forbidden_restrictions": "Body cannot be empty. @:body_restrictions",
   "body_restrictions": "Please enter a body with more than 3 characters.",
   "book": "Book",
+  "book_adding_illustrations": {
+    "zero": "Adding illustration to book",
+    "one": "Adding illustration to book",
+    "two": "Adding illustrations to book",
+    "many": "Adding illustrations to book",
+    "other": "Adding illustrations to book"
+  },
+  "book_add_illustrations_error": {
+    "zero": "There was an error while adding illustration to book.",
+    "one": "There was an error while adding illustration to book.",
+    "two": "There was an error while adding illustrations to book.",
+    "many": "There was an error while adding illustrations to book.",
+    "other": "There was an error while adding illustrations to book."
+  },
   "book_quebert": "The Truth About the Harry Quebert Affair",
   "book_create": "Create book",
   "book_create_description": "A book containing your illustrations.",
@@ -127,6 +141,27 @@
     "many": "Deleting these books won't delete illustrations inside it. Illustrations live on their own. This action is irrevsible.",
     "other": "Deleting these books won't delete illustrations inside it. Illustrations live on their own. This action is irrevsible."
   },
+  "book_illustrations_remove": {
+    "zero": "Don't remove",
+    "one": "Remove 1 illustration",
+    "two": "Remove {} illustrations",
+    "many": "Remove {} illustrations",
+    "other": "Remove {} illustrations"
+  },
+  "book_illustrations_remove_title": {
+    "zero": "Don't remove any illustration from book",
+    "one": "Remove this illustration from book",
+    "two": "Remove these illustrations from book",
+    "many": "Remove these illustrations from book",
+    "other": "Remove these illustrations from book"
+  },
+  "book_illustrations_remove_description": {
+    "zero": "This action will have no effect.",
+    "one": "Illustration will still exist outside of this book.",
+    "two": "Illustrations will still exist outside of this book.",
+    "many": "Illustrations will still exist outside of this book.",
+    "other": "Illustrations will still exist outside of this book."
+  },
   "book_loading": "Loading book",
   "book_no_illustrations": "You haven't added any illustration to this book yet. You can add one from your illustrations page.",
   "book_rename": "Rename book",
@@ -149,26 +184,13 @@
   "books": "Books",
   "books_active_word": "Active",
   "books_active_or_archived": "View your active or archived books.",
-  "book_adding_illustrations": {
-    "zero": "Adding illustration to book",
-    "one": "Adding illustration to book",
-    "two": "Adding illustrations to book",
-    "many": "Adding illustrations to book",
-    "other": "Adding illustrations to book"
-  },
+  
   "books_adding_illustrations": {
     "zero": "Adding illustration to books",
     "one": "Adding illustration to books",
     "two": "Adding illustrations to books",
     "many": "Adding illustrations to books",
     "other": "Adding illustrations to books"
-  },
-  "book_add_illustrations_error": {
-    "zero": "There was an error while adding illustration to book.",
-    "one": "There was an error while adding illustration to book.",
-    "two": "There was an error while adding illustrations to book.",
-    "many": "There was an error while adding illustrations to book.",
-    "other": "There was an error while adding illustrations to book."
   },
   "books_add_illustrations_error": {
     "zero": "There was an error while adding illustration to books.",
@@ -517,8 +539,8 @@
   "illustrations_my_subtitle": "Browse your uploaded illustrations.",
   "illustrations_my_subtitle_extended": "Browse your uploaded illustrations. Tap 'active' or 'archived' to change view.",
   "illustrations_no_upload": "You haven't upload any illustration yet.",
-  "illustrations_remove_error": "Sorry, there was an error while removing the illustration. Please try again.",
-  "illustrations_remove_success": "The illustrations has been successfully removed.",
+  "illustrations_remove_error": "Sorry, there was an error while removing illustrations. Please try again.",
+  "illustrations_remove_success": "Illustrations has been successfully removed.",
   "illustrations_subtitle": "Parcourez les illustrations.",
   "illustrations_task": "Illustrations task",
   "illustrations_yours_browse": "Browse your illustrations",
