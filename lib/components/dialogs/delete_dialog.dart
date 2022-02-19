@@ -13,6 +13,7 @@ class DeleteDialog extends StatelessWidget {
     this.onValidate,
     this.showCounter = false,
     this.count = 1,
+    this.textButtonValidation,
   }) : super(key: key);
 
   final bool showCounter;
@@ -21,6 +22,7 @@ class DeleteDialog extends StatelessWidget {
   final String titleValue;
   final String descriptionValue;
   final void Function()? onValidate;
+  final String? textButtonValidation;
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +82,7 @@ class DeleteDialog extends StatelessWidget {
           ],
         ),
       ),
-      textButtonValidation: "delete".tr(),
+      textButtonValidation: textButtonValidation ?? "delete".tr(),
       onCancel: Beamer.of(context).popRoute,
       onValidate: () {
         onValidate?.call();
