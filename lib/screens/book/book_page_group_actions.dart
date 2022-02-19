@@ -10,7 +10,7 @@ class BookPageGroupActions extends StatelessWidget {
     required this.multiSelectedItems,
     this.onMultiSelectAll,
     this.onClearMultiSelect,
-    this.onConfirmDeleteManyIllustrations,
+    this.onConfirmRemoveGroup,
     this.visible = false,
   }) : super(key: key);
 
@@ -21,7 +21,7 @@ class BookPageGroupActions extends StatelessWidget {
 
   final void Function()? onMultiSelectAll;
   final void Function()? onClearMultiSelect;
-  final void Function()? onConfirmDeleteManyIllustrations;
+  final void Function()? onConfirmRemoveGroup;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +68,7 @@ class BookPageGroupActions extends StatelessWidget {
           icon: Icon(UniconsLine.trash),
           label: Text("delete".tr()),
           primary: Colors.black38,
-          onPressed: onConfirmDeleteManyIllustrations,
+          onPressed: onConfirmRemoveGroup,
         ),
       ],
     );

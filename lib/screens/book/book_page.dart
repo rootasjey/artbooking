@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:artbooking/actions/books.dart';
+import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
@@ -26,10 +27,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jiffy/jiffy.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
@@ -161,7 +160,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
         scrollController: _scrollController,
       ),
       body: NotificationListener<ScrollNotification>(
-        onNotification: onNotification,
+        onNotification: onScrollNotification,
         child: CustomScrollView(
           controller: _scrollController,
           slivers: <Widget>[
@@ -174,8 +173,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
               onLike: onLike,
               onClearMultiSelect: onClearMultiSelect,
               onConfirmDeleteBook: onConfirmDeleteBook,
-              onConfirmDeleteManyIllustrations:
-                  onConfirmDeleteManyIllustrations,
+              onConfirmRemoveGroup: onConfirmRemoveGroup,
               onMultiSelectAll: onMultiSelectAll,
               onToggleMultiSelect: onToggleMultiSelect,
               onShowDatesDialog: onShowDatesDialog,
@@ -269,74 +267,37 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     );
   }
 
-  void onConfirmDeleteManyIllustrations() async {
-    showCustomModalBottomSheet(
+  /// Show a dialog to confirm a single book deletion.
+  void confirmRemoveIllustrationGroup(
+    Illustration illustration,
+    String illustrationKey,
+  ) async {
+    showDialog(
       context: context,
       builder: (context) {
-        return Material(
-          child: SafeArea(
-            top: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text(
-                    'confirm'.tr(),
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                  trailing: Icon(
-                    Icons.check,
-                    color: Colors.white,
-                  ),
-                  tileColor: Color(0xfff55c5c),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    deleteManyIllustrations();
-                  },
-                ),
-                ListTile(
-                  title: Text('cancel'.tr()),
-                  trailing: Icon(Icons.close),
-                  onTap: () => Navigator.of(context).pop(),
-                ),
-              ],
-            ),
-          ),
+        final int count = _multiSelectedItems.length;
+        final String titleValue =
+            "book_illustrations_remove_title".plural(count).toUpperCase();
+        final String descriptionValue =
+            "book_illustrations_remove_description".plural(count);
+
+        final String textButtonValidation = "book_illustrations_remove".plural(
+          count,
+          args: [count.toString()],
         );
-      },
-      containerWidget: (context, animation, child) {
-        return RawKeyboardListener(
-          autofocus: true,
-          focusNode: _keyboardFocusNode,
-          onKey: (keyEvent) {
-            if (keyEvent.isKeyPressed(LogicalKeyboardKey.enter)) {
-              Navigator.of(context).pop();
-              deleteManyIllustrations();
-            }
+
+        return DeleteDialog(
+          count: count,
+          titleValue: titleValue,
+          descriptionValue: descriptionValue,
+          textButtonValidation: textButtonValidation,
+          onValidate: () {
+            _multiSelectedItems.putIfAbsent(
+              illustrationKey,
+              () => illustration,
+            );
+            removeIllustrationGroup();
           },
-          child: SafeArea(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: 500.0,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 40.0,
-                  ),
-                  child: Material(
-                    clipBehavior: Clip.antiAlias,
-                    borderRadius: BorderRadius.circular(12.0),
-                    child: child,
-                  ),
-                ),
-              ),
-            ),
-          ),
         );
       },
     );
@@ -359,7 +320,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     );
   }
 
-  void deleteManyIllustrations() async {
+  void removeIllustrationGroup() async {
     if (_book.id.isEmpty) {
       return;
     }
@@ -766,7 +727,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   }
 
   /// On scroll notifications.
-  bool onNotification(ScrollNotification notification) {
+  bool onScrollNotification(ScrollNotification notification) {
     // FAB visibility
     if (notification.metrics.pixels < 50 && _showFab) {
       setState(() {
@@ -789,24 +750,33 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     return false;
   }
 
-  void onPopupMenuItemSelected(EnumIllustrationItemAction action, int index,
-      Illustration illustration, String illustrationKey) {
+  void onPopupMenuItemSelected(
+    EnumIllustrationItemAction action,
+    int index,
+    Illustration illustration,
+    String illustrationKey,
+  ) {
     switch (action) {
       case EnumIllustrationItemAction.addToBook:
         showAddToBook(illustration);
         break;
       case EnumIllustrationItemAction.removeFromBook:
-        onRemoveIllustrationFromBook(
-          index: index,
-          illustration: illustration,
-          illustrationKey: illustrationKey,
-        );
+        if (_multiSelectedItems.isEmpty) {
+          removeIllustrationFromBook(
+            index: index,
+            illustration: illustration,
+            illustrationKey: illustrationKey,
+          );
+          return;
+        }
+
+        confirmRemoveIllustrationGroup(illustration, illustrationKey);
         break;
       default:
     }
   }
 
-  void onRemoveIllustrationFromBook({
+  void removeIllustrationFromBook({
     required int index,
     required Illustration illustration,
     required String illustrationKey,
@@ -1177,5 +1147,16 @@ class _MyBookPageState extends ConsumerState<BookPage> {
         _book = _book.copyWith(visibility: prevVisibility);
       });
     }
+  }
+
+  void onConfirmRemoveGroup() {
+    if (_multiSelectedItems.isEmpty) {
+      context.showErrorBar(content: Text("multi_select_no_item".tr()));
+      return;
+    }
+
+    final Illustration illustration = _multiSelectedItems.values.first;
+    final String key = _multiSelectedItems.keys.first;
+    confirmRemoveIllustrationGroup(illustration, key);
   }
 }

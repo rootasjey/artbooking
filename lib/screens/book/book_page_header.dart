@@ -21,7 +21,7 @@ class BookPageHeader extends StatelessWidget {
     this.onLike,
     this.forceMultiSelect = false,
     this.onClearMultiSelect,
-    this.onConfirmDeleteManyIllustrations,
+    this.onConfirmRemoveGroup,
     this.onConfirmDeleteBook,
     this.onMultiSelectAll,
     this.onToggleMultiSelect,
@@ -40,7 +40,7 @@ class BookPageHeader extends StatelessWidget {
   final MapStringIllustration multiSelectedItems;
 
   final void Function()? onClearMultiSelect;
-  final void Function()? onConfirmDeleteManyIllustrations;
+  final void Function()? onConfirmRemoveGroup;
   final void Function()? onConfirmDeleteBook;
   final void Function()? onLike;
   final void Function()? onMultiSelectAll;
@@ -216,8 +216,7 @@ class BookPageHeader extends StatelessWidget {
                   ),
                   BookPageGroupActions(
                     onClearMultiSelect: onClearMultiSelect,
-                    onConfirmDeleteManyIllustrations:
-                        onConfirmDeleteManyIllustrations,
+                    onConfirmRemoveGroup: onConfirmRemoveGroup,
                     onMultiSelectAll: onMultiSelectAll,
                     multiSelectedItems: multiSelectedItems,
                     visible: multiSelectedItems.isNotEmpty,
