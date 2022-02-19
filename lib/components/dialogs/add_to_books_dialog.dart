@@ -85,10 +85,6 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
         descriptionController: _descriptionController,
         onCancel: Beamer.of(context).popRoute,
         onSubmitted: (value) {
-          // createBook(
-          //   _nameController.text,
-          //   _descriptionController.text,
-          // );
           createBookAndAddIllustrations();
           Beamer.of(context).popRoute();
         },
@@ -195,7 +191,7 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
 
     return ConstrainedBox(
       constraints: BoxConstraints(
-        maxHeight: 414.0,
+        maxHeight: 430.0,
         maxWidth: 400.0,
       ),
       child: NotificationListener<ScrollNotification>(

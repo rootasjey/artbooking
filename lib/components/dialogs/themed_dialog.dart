@@ -121,11 +121,7 @@ class ThemedDialog extends StatelessWidget {
               children: [
                 _titleWidget,
                 Padding(
-                  padding: const EdgeInsets.only(
-                    left: 16.0,
-                    top: 16.0,
-                    right: 16.0,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: body,
                 ),
                 if (showDivider) Divider(),
@@ -193,32 +189,35 @@ class ThemedDialog extends StatelessWidget {
   }
 
   Widget titleContainer({required Color color}) {
-    return Stack(
-      children: [
-        closeButton(),
-        Column(
-          crossAxisAlignment: centerTitle
-              ? CrossAxisAlignment.center
-              : CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 24.0,
-                left: 32.0,
-                right: 24.0,
+    return Material(
+      color: Constants.colors.clairPink,
+      child: Stack(
+        children: [
+          closeButton(),
+          Column(
+            crossAxisAlignment: centerTitle
+                ? CrossAxisAlignment.center
+                : CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(
+                  top: 24.0,
+                  left: 32.0,
+                  right: 24.0,
+                ),
+                child: title,
               ),
-              child: title,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: Divider(
-                thickness: 1.5,
-                color: color,
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: Divider(
+                  thickness: 1.5,
+                  color: color,
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
