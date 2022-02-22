@@ -14,6 +14,8 @@ class Book {
     this.count = 0,
     required this.cover,
     required this.createdAt,
+    required this.updatedAt,
+    required this.userId,
     this.description = '',
     this.id = '',
     this.illustrations = const [],
@@ -21,8 +23,7 @@ class Book {
     this.layoutOrientation = EnumBookLayoutOrientation.vertical,
     this.liked = false,
     this.name = '',
-    required this.updatedAt,
-    required this.userId,
+    this.userCustomIndex = 0,
     this.visibility = EnumContentVisibility.private,
   });
 
@@ -84,6 +85,11 @@ class Book {
 
   final String userId;
 
+  /// User defined index to reorder books in user's space.
+  /// This property can be set by the user. By default,
+  /// a new created book will take the next available index  (0, 1,...).
+  final int userCustomIndex;
+
   /// Control if other people can view this book.
   final EnumContentVisibility visibility;
 
@@ -109,8 +115,9 @@ class Book {
       liked: data['liked'] ?? false,
       name: data['name'] ?? '',
       updatedAt: Utilities.date.fromFirestore(data['updated_at']),
-      visibility: parseStringVisibility(data['visibility']),
       userId: data['user_id'] ?? '',
+      userCustomIndex: data["user_custom_index"] ?? 0,
+      visibility: parseStringVisibility(data['visibility']),
     );
   }
 
@@ -256,8 +263,9 @@ class Book {
     bool? liked,
     String? name,
     DateTime? updatedAt,
-    EnumContentVisibility? visibility,
     String? userId,
+    int? userCustomIndex,
+    EnumContentVisibility? visibility,
   }) {
     return Book(
       count: count ?? this.count,
@@ -272,6 +280,7 @@ class Book {
       name: name ?? this.name,
       updatedAt: updatedAt ?? this.updatedAt,
       userId: userId ?? this.userId,
+      userCustomIndex: userCustomIndex ?? this.userCustomIndex,
       visibility: visibility ?? this.visibility,
     );
   }
@@ -288,8 +297,9 @@ class Book {
       'layoutOrientation': layoutOrientationToString(),
       'liked': liked,
       'name': name,
-      'visibility': visibility.name,
       'user_id': userId,
+      'userCustomIndex': userCustomIndex,
+      'visibility': visibility.name,
     };
   }
 
@@ -302,7 +312,8 @@ class Book {
     return 'Book(count: $count, cover: $cover, createdAt: $createdAt, '
         'description: $description, id: $id, illustrations: $illustrations, '
         'layout: $layout, layoutOrientation: $layoutOrientation, liked: $liked, '
-        'name: $name, updatedAt: $updatedAt, visibility: $visibility)';
+        'name: $name, updatedAt: $updatedAt, userId: $userId, '
+        'userCustomIndex: $userCustomIndex visibility: $visibility)';
   }
 
   @override
@@ -321,6 +332,8 @@ class Book {
         other.liked == liked &&
         other.name == name &&
         other.updatedAt == updatedAt &&
+        other.userId == userId &&
+        other.userCustomIndex == userCustomIndex &&
         other.visibility == visibility;
   }
 
@@ -337,6 +350,8 @@ class Book {
         liked.hashCode ^
         name.hashCode ^
         updatedAt.hashCode ^
+        userId.hashCode ^
+        userCustomIndex.hashCode ^
         visibility.hashCode;
   }
 }
