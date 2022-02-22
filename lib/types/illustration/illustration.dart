@@ -11,23 +11,24 @@ import 'package:artbooking/types/license/license.dart';
 
 class Illustration {
   const Illustration({
-    this.artMovements = const [],
     required this.createdAt,
-    this.description = '',
     required this.dimensions,
+    required this.license,
+    required this.links,
+    required this.updatedAt,
+    this.artMovements = const [],
+    this.description = '',
     this.extension = '',
     this.id = '',
-    required this.license,
     this.liked = false,
     this.name = '',
     this.size = 0,
     this.lore = '',
     this.topics = const [],
-    required this.updatedAt,
-    required this.links,
     this.userId = '',
     this.version = 0,
     this.visibility = EnumContentVisibility.private,
+    this.userCustomIndex = 0,
   });
 
   /// The time this illustration has been created.
@@ -76,6 +77,11 @@ class Illustration {
 
   final String userId;
 
+  /// User defined index to reorder illustrations in user's space.
+  /// This property can be set by the user. By default,
+  /// a new created illustration will take the next available index  (0, 1,...).
+  final int userCustomIndex;
+
   /// Number of times the image has been updated & overwritten.
   /// When this value is 0, it means that the image is being upload
   /// and not available yet. The value is updated to 1 when image upload, and
@@ -102,6 +108,7 @@ class Illustration {
       updatedAt: DateTime.now(),
       links: IllustrationLinks.empty(),
       userId: '',
+      userCustomIndex: 0,
       version: 0,
       visibility: EnumContentVisibility.private,
     );
@@ -124,6 +131,7 @@ class Illustration {
       topics: parseTopics(data['topics']),
       updatedAt: Utilities.date.fromFirestore(data['updated_at']),
       userId: data['user_id'] ?? '',
+      userCustomIndex: data["user_custom_index"] ?? 0,
       version: data['version'] ?? 0,
       visibility: parseVisibility(data['visibility']),
     );
@@ -227,6 +235,7 @@ class Illustration {
     DateTime? updatedAt,
     String? userId,
     int? version,
+    int? userCustomIndex,
     List<IllustrationVersion>? versions,
     EnumContentVisibility? visibility,
   }) {
@@ -246,6 +255,7 @@ class Illustration {
       topics: topics ?? this.topics,
       updatedAt: updatedAt ?? this.updatedAt,
       userId: userId ?? this.userId,
+      userCustomIndex: userCustomIndex ?? this.userCustomIndex,
       version: version ?? this.version,
       visibility: visibility ?? this.visibility,
     );
@@ -267,6 +277,7 @@ class Illustration {
       'topics': topics,
       'updated_at': updatedAt.millisecondsSinceEpoch,
       'user_id': userId,
+      'user_custom_index': userCustomIndex,
       'version': version,
       'visibility': visibility.name,
     };
@@ -283,7 +294,8 @@ class Illustration {
         'dimensions: $dimensions, extension: $extension, id: $id, '
         'license: $license, liked: $liked, name: $name, lore: $lore, '
         'size: $size,  styles: $artMovements, topics: $topics, '
-        'updatedAt: $updatedAt, userId: $userId, version: $version, '
+        'updatedAt: $updatedAt, userId: $userId, '
+        'userCustomIndex: $userCustomIndex, version: $version, '
         'visibility: $visibility)';
   }
 
@@ -306,6 +318,7 @@ class Illustration {
         listEquals(other.topics, topics) &&
         other.updatedAt == updatedAt &&
         other.userId == userId &&
+        other.userCustomIndex == userCustomIndex &&
         other.version == version &&
         other.visibility == visibility;
   }
@@ -326,6 +339,7 @@ class Illustration {
         topics.hashCode ^
         updatedAt.hashCode ^
         userId.hashCode ^
+        userCustomIndex.hashCode ^
         version.hashCode ^
         visibility.hashCode;
   }
