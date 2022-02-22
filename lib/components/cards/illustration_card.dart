@@ -30,6 +30,7 @@ class IllustrationCard extends StatefulWidget {
     this.popupMenuEntries = const [],
     this.onDoubleTap,
     this.onTapLike,
+    this.onDrop,
   }) : super(key: key);
 
   /// Index position in a list, if available.
@@ -79,6 +80,9 @@ class IllustrationCard extends StatefulWidget {
   /// If you're not sure what to put, just use the illustration's id.
   final String heroTag;
 
+  /// Callback when drag and dropping item on this illustration card.
+  final void Function(List<int>)? onDrop;
+
   @override
   _IllustrationCardState createState() => _IllustrationCardState();
 }
@@ -105,17 +109,14 @@ class _IllustrationCardState extends State<IllustrationCard>
     _scaleAnimation =
         0.6.tweenTo(1.0).animatedBy(_scaleController).curve(Curves.elasticOut);
 
-    setState(() {
-      _elevation = _startElevation;
-    });
-
+    setState(() => _elevation = _startElevation);
     checkProperties();
   }
 
   @override
   Widget build(BuildContext context) {
     final illustration = widget.illustration;
-    Widget child = imageCard();
+    Widget child = dropTarget();
 
     if (illustration.getThumbnail().isEmpty) {
       child = loadingCard();
@@ -134,72 +135,135 @@ class _IllustrationCardState extends State<IllustrationCard>
     );
   }
 
-  Widget imageCard() {
+  Widget dropTarget() {
+    return DragTarget<int>(
+      builder: (BuildContext context, candidateItems, rejectedItems) {
+        return imageCard(
+          usingAsDropTarget: candidateItems.isNotEmpty,
+        );
+      },
+      onAccept: (int dropIndex) {
+        widget.onDrop?.call([dropIndex]);
+      },
+    );
+  }
+
+  Widget imageCard({bool usingAsDropTarget = false}) {
     String imageUrl = widget.illustration.getThumbnail();
     Color defaultColor = Colors.transparent;
+    final Color primaryColor = Theme.of(context).primaryColor;
+    final Color baseColor =
+        Theme.of(context).textTheme.bodyText2?.color ?? Colors.black;
+
+    return LongPressDraggable<int>(
+      data: widget.index,
+      feedback: draggingCard(),
+      childWhenDragging: Card(
+        elevation: 2.0,
+        color: Constants.colors.clairPink,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0),
+          side: BorderSide(color: baseColor, width: 2.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Opacity(
+            opacity: 0.6,
+            child: Center(
+              child: Text(
+                "illustration_permutation_description".tr(),
+                textAlign: TextAlign.center,
+                style: Utilities.fonts.style(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+      child: Card(
+        color: widget.selected ? primaryColor : defaultColor,
+        elevation: _elevation,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0),
+          side: usingAsDropTarget
+              ? BorderSide(color: primaryColor, width: 4.0)
+              : BorderSide.none,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: ExtendedImage.network(
+          imageUrl,
+          fit: BoxFit.cover,
+          width: widget.size,
+          height: widget.size,
+          clearMemoryCacheWhenDispose: true,
+          loadStateChanged: (state) {
+            switch (state.extendedImageLoadState) {
+              case LoadState.loading:
+                return loadingCard();
+              case LoadState.completed:
+                return Ink.image(
+                  image: state.imageProvider,
+                  fit: BoxFit.cover,
+                  child: InkWell(
+                    onTap: widget.onTap,
+                    // onLongPress: onLongPressImage,
+                    onHover: onHoverImage,
+                    onDoubleTap: onDoubleTap,
+                    child: Stack(
+                      children: [
+                        multiSelectIndicator(),
+                        if (widget.popupMenuEntries.isNotEmpty)
+                          Positioned(
+                            bottom: 10.0,
+                            right: 10.0,
+                            child: popupMenuButton(),
+                          ),
+                        likeOverlay(),
+                        likeAnimationOverlay(),
+                      ],
+                    ),
+                  ),
+                );
+              case LoadState.failed:
+                return InkWell(
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        "image_load_failed".tr(),
+                        style: Utilities.fonts.style(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                  onTap: () {
+                    state.reLoadImage();
+                  },
+                );
+              default:
+                return state.completedWidget;
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget draggingCard() {
+    String imageUrl = widget.illustration.getThumbnail();
 
     return Card(
-      color: widget.selected ? Theme.of(context).primaryColor : defaultColor,
-      elevation: _elevation,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
-      ),
+      elevation: 8.0,
       clipBehavior: Clip.antiAlias,
       child: ExtendedImage.network(
         imageUrl,
         fit: BoxFit.cover,
-        width: widget.size,
-        height: widget.size,
+        width: widget.size / 1.3,
+        height: widget.size / 1.3,
         clearMemoryCacheWhenDispose: true,
-        loadStateChanged: (state) {
-          switch (state.extendedImageLoadState) {
-            case LoadState.loading:
-              return loadingCard();
-            case LoadState.completed:
-              return Ink.image(
-                image: state.imageProvider,
-                fit: BoxFit.cover,
-                child: InkWell(
-                  onTap: widget.onTap,
-                  onLongPress: onLongPressImage,
-                  onHover: onHoverImage,
-                  onDoubleTap: onDoubleTap,
-                  child: Stack(
-                    children: [
-                      multiSelectIndicator(),
-                      if (widget.popupMenuEntries.isNotEmpty)
-                        Positioned(
-                          bottom: 10.0,
-                          right: 10.0,
-                          child: popupMenuButton(),
-                        ),
-                      likeOverlay(),
-                      likeAnimationOverlay(),
-                    ],
-                  ),
-                ),
-              );
-            case LoadState.failed:
-              return InkWell(
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      "image_load_failed".tr(),
-                      style: Utilities.fonts.style(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
-                onTap: () {
-                  state.reLoadImage();
-                },
-              );
-            default:
-              return state.completedWidget;
-          }
-        },
       ),
     );
   }

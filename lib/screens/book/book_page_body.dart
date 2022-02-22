@@ -1,17 +1,19 @@
 import 'package:artbooking/components/cards/illustration_card.dart';
 import 'package:artbooking/components/icons/animated_app_icon.dart';
-import 'package:artbooking/screens/book/book_page.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/book/book_page_body_empty.dart';
 import 'package:artbooking/screens/book/book_page_body_error.dart';
+import 'package:artbooking/types/book/book_illustration.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/illustration_map.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class BookPageBody extends StatelessWidget {
   const BookPageBody({
     Key? key,
-    required this.illustrations,
+    required this.illustrationMap,
     required this.loading,
     required this.multiSelectedItems,
     required this.popupMenuEntries,
@@ -23,6 +25,8 @@ class BookPageBody extends StatelessWidget {
     this.owner = false,
     this.onUploadToThisBook,
     this.onBrowseIllustrations,
+    this.onDrop,
+    required this.bookIllustrations,
   }) : super(key: key);
 
   /// Why a map and not just a list?
@@ -31,13 +35,15 @@ class BookPageBody extends StatelessWidget {
   ///
   /// -> for [multiSelectedItems] allow instant access to know
   /// if an illustration is currently in multi-select.
-  final MapStringIllustration illustrations;
+  final IllustrationMap illustrationMap;
+
+  final List<BookIllustration> bookIllustrations;
 
   final bool loading;
   final bool owner;
 
   /// Currently selected illustrations.
-  final MapStringIllustration multiSelectedItems;
+  final IllustrationMap multiSelectedItems;
   final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries;
   final bool forceMultiSelect;
   final bool hasError;
@@ -57,6 +63,9 @@ class BookPageBody extends StatelessWidget {
   /// Navigate to user's illustrations.
   final void Function()? onBrowseIllustrations;
 
+  /// Callback when drag and dropping item on this illustration card.
+  final void Function(int, List<int>)? onDrop;
+
   @override
   Widget build(BuildContext context) {
     if (loading) {
@@ -74,7 +83,7 @@ class BookPageBody extends StatelessWidget {
       return BookPageBodyError();
     }
 
-    if (illustrations.isEmpty) {
+    if (bookIllustrations.isEmpty) {
       return BookPageBodyEmpty(
         onBrowseIllustrations: onBrowseIllustrations,
         onUploadToThisBook: onUploadToThisBook,
@@ -93,26 +102,34 @@ class BookPageBody extends StatelessWidget {
         ),
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            final illustration = illustrations.values.elementAt(index);
-            final illustrationKey = illustrations.keys.elementAt(index);
-            final selected = multiSelectedItems.containsKey(illustrationKey);
+            final bookIllustration = bookIllustrations.elementAt(index);
+            final key = Utilities.generateIllustrationKey(bookIllustration);
+            final illustration = illustrationMap[key];
+            final bool selected = multiSelectedItems.containsKey(key);
+
+            if (illustration == null) {
+              return Container();
+            }
 
             return IllustrationCard(
               index: index,
-              heroTag: illustrationKey,
+              heroTag: key,
               illustration: illustration,
-              key: ValueKey(illustrationKey),
-              illustrationKey: illustrationKey,
+              key: ValueKey(key),
+              illustrationKey: key,
               selected: selected,
               selectionMode: selectionMode,
-              onTap: () =>
-                  onTapIllustrationCard?.call(illustrationKey, illustration),
+              onDrop: (dropIndexes) => onDrop?.call(index, dropIndexes),
+              onTap: () => onTapIllustrationCard?.call(
+                key,
+                illustration,
+              ),
               onPopupMenuItemSelected: owner ? onPopupMenuItemSelected : null,
               popupMenuEntries: owner ? popupMenuEntries : [],
-              onLongPress: owner ? onLongPressIllustration : null,
+              // onLongPress: owner ? onLongPressIllustration : null,
             );
           },
-          childCount: illustrations.length,
+          childCount: bookIllustrations.length,
         ),
       ),
     );

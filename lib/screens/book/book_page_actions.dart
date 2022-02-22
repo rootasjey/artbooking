@@ -1,7 +1,7 @@
 import 'package:artbooking/components/buttons/square_button.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/screens/book/book_page.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
+import 'package:artbooking/types/illustration_map.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -32,7 +32,7 @@ class BookPageActions extends StatelessWidget {
   final void Function(EnumContentVisibility)? onUpdateVisibility;
 
   /// Currently selected illustrations.
-  final MapStringIllustration multiSelectedItems;
+  final IllustrationMap multiSelectedItems;
 
   @override
   Widget build(BuildContext context) {

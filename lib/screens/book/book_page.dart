@@ -22,6 +22,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/firestore/document_map.dart';
 import 'package:artbooking/types/firestore/doc_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/illustration_map.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -31,9 +32,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
-
-/// A Map with [String] as key and [Illustration] as value.
-typedef MapStringIllustration = Map<String, Illustration>;
 
 class BookPage extends ConsumerStatefulWidget {
   const BookPage({
@@ -68,7 +66,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   bool _forceMultiSelect = false;
 
   /// True if there's a request to fetch the next illustration's batch.
-  bool _isLoadingMore = false;
+  bool _loadingMore = false;
 
   /// True if the current authenticated user has liked this book.
   bool _liked = false;
@@ -79,10 +77,11 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   ///
   /// -> for [_multiSelectedItems] allow instant access to know
   /// if an illustration is currently in multi-select.
-  final _illustrations = MapStringIllustration();
+  final _illustrationMap = IllustrationMap();
+  // final _illustrationList = <Illustration>[];
   final _keyboardFocusNode = FocusNode();
 
-  /// Illustrations' ids matching [book.illustrations].
+  /// Illustrations' ids matching [book.illustrationMap].
   /// Generated keys instead of simple ids due to possible duplicates.
   List<String> _currentIllustrationKeys = [];
 
@@ -96,7 +95,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   int _endIndex = 0;
 
   /// Currently selected illustrations.
-  MapStringIllustration _multiSelectedItems = Map();
+  IllustrationMap _multiSelectedItems = Map();
 
   /// Handles page's scroll.
   ScrollController _scrollController = ScrollController();
@@ -187,7 +186,8 @@ class _MyBookPageState extends ConsumerState<BookPage> {
               loading: _loading,
               hasError: _hasError,
               forceMultiSelect: _forceMultiSelect,
-              illustrations: _illustrations,
+              illustrationMap: _illustrationMap,
+              bookIllustrations: _book.illustrations,
               multiSelectedItems: _multiSelectedItems,
               popupMenuEntries: _popupMenuEntries,
               onBrowseIllustrations: onBrowseIllustrations,
@@ -195,6 +195,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               onTapIllustrationCard: onTapIllustrationCard,
               onUploadToThisBook: onUploadToThisBook,
+              onDrop: onDrop,
               owner: owner,
             ),
             SliverPadding(
@@ -330,13 +331,13 @@ class _MyBookPageState extends ConsumerState<BookPage> {
 
     _multiSelectedItems.entries.forEach(
       (MapEntry<String, Illustration> multiSelectItem) {
-        _illustrations.removeWhere(
+        _illustrationMap.removeWhere(
           (String key, Illustration value) => key == multiSelectItem.key,
         );
       },
     );
 
-    final MapStringIllustration duplicatedItems = Map.from(_multiSelectedItems);
+    final IllustrationMap duplicatedItems = Map.from(_multiSelectedItems);
     final List<String> illustrationIds = _multiSelectedItems.values
         .map((illustration) => illustration.id)
         .toList();
@@ -356,7 +357,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
         content: Text("illustrations_delete_error".tr()),
       );
 
-      _illustrations.addAll(duplicatedItems);
+      _illustrationMap.addAll(duplicatedItems);
     }
   }
 
@@ -399,12 +400,13 @@ class _MyBookPageState extends ConsumerState<BookPage> {
       }
 
       bookData['id'] = bookSnap.id;
-      startListenningToData(query);
+      listenBook(query);
 
       setState(() {
         _book = Book.fromMap(bookData);
         _currentIllustrationKeys = _book.illustrations
-            .map((bookIllustration) => generateKey(bookIllustration))
+            .map((bookIllustration) =>
+                Utilities.generateIllustrationKey(bookIllustration))
             .toList();
       });
     } catch (error) {
@@ -445,21 +447,21 @@ class _MyBookPageState extends ConsumerState<BookPage> {
 
     for (BookIllustration bookIllustration in range) {
       try {
-        final illustrationSnap = await FirebaseFirestore.instance
-            .collection('illustrations')
+        final illustrationSnapshot = await FirebaseFirestore.instance
+            .collection("illustrations")
             .doc(bookIllustration.id)
             .get();
 
-        if (!illustrationSnap.exists) {
+        final illustrationData = illustrationSnapshot.data();
+        if (!illustrationSnapshot.exists || illustrationData == null) {
           continue;
         }
 
-        final illustrationData = illustrationSnap.data()!;
-        illustrationData['id'] = illustrationSnap.id;
-
+        illustrationData['id'] = illustrationSnapshot.id;
         final illustration = Illustration.fromMap(illustrationData);
-        _illustrations.putIfAbsent(
-          generateKey(bookIllustration),
+
+        _illustrationMap.putIfAbsent(
+          Utilities.generateIllustrationKey(bookIllustration),
           () => illustration,
         );
 
@@ -477,26 +479,26 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     fetchIllustrations();
 
     final query =
-        FirebaseFirestore.instance.collection('books').doc(widget.bookId);
+        FirebaseFirestore.instance.collection("books").doc(widget.bookId);
 
-    startListenningToData(query);
+    listenBook(query);
   }
 
   void fetchIllustrationsMore() async {
-    if (!_hasNext || _book.id.isEmpty || _isLoadingMore) {
+    if (!_hasNext || _book.id.isEmpty || _loadingMore) {
       return;
     }
 
     _startIndex = _endIndex;
     _endIndex = _endIndex + _limit;
-    _isLoadingMore = true;
+    _loadingMore = true;
 
     final range = _book.illustrations.getRange(_startIndex, _endIndex);
 
     try {
       for (var bookIllustration in range) {
         final illustrationSnap = await FirebaseFirestore.instance
-            .collection('illustrations')
+            .collection("illustrations")
             .doc(bookIllustration.id)
             .get();
 
@@ -508,8 +510,8 @@ class _MyBookPageState extends ConsumerState<BookPage> {
         illustrationData['id'] = illustrationSnap.id;
 
         final illustration = Illustration.fromMap(illustrationData);
-        _illustrations.putIfAbsent(
-          generateKey(bookIllustration),
+        _illustrationMap.putIfAbsent(
+          Utilities.generateIllustrationKey(bookIllustration),
           () => illustration,
         );
       }
@@ -519,7 +521,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
-      setState(() => _isLoadingMore = false);
+      setState(() => _loadingMore = false);
     }
   }
 
@@ -545,22 +547,14 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     }
   }
 
-  /// Generate an unique key for illustrations in book (frontend).
-  String generateKey(BookIllustration bookIllustration) {
-    final String id = bookIllustration.id;
-    DateTime createdAt = bookIllustration.createdAt;
-
-    return "$id$_keySeparator${createdAt.millisecondsSinceEpoch}";
-  }
-
-  /// Find new values in [book.illustrations]
+  /// Find new values in [book.illustrationMap]
   /// that weren't there before the update.
   /// -------------------------------------------
   /// For each id in the new data:
   ///
-  /// • if the value exists in [_illustrations] → nothing changed
+  /// • if the value exists in [_illustrationMap] → nothing changed
   ///
-  /// • if the value doesn't exist in [_illustrations] → new value.
+  /// • if the value doesn't exist in [_illustrationMap] → new value.
   void handleAddedIllustrations() async {
     final List<String> added = _currentIllustrationKeys.filter(
       (String illustrationKey) {
@@ -576,7 +570,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
         // if (_illustrations.containsKey(key)) {
         //   return false;
         // }
-        if (_illustrations.containsKey(illustrationKey)) {
+        if (_illustrationMap.containsKey(illustrationKey)) {
           return false;
         }
 
@@ -589,7 +583,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
       final illustrationId = idAndCreatedAt.elementAt(0);
 
       final DocumentMap query = FirebaseFirestore.instance
-          .collection('illustrations')
+          .collection("illustrations")
           .doc(illustrationId);
 
       final illustrationSnap = await query.get();
@@ -599,12 +593,11 @@ class _MyBookPageState extends ConsumerState<BookPage> {
         continue;
       }
 
-      illustrationData['id'] = illustrationSnap.id;
-
+      illustrationData["id"] = illustrationSnap.id;
       final illustration = Illustration.fromMap(illustrationData);
 
       setState(() {
-        _illustrations.putIfAbsent(
+        _illustrationMap.putIfAbsent(
           illustrationKey,
           () => illustration,
         );
@@ -625,7 +618,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   ///
   /// • if the value doesn't exist in [_currentIllustrationKeys] → removed value.
   void handleRemovedIllustrations() {
-    final Iterable<String> customRemovedIds = _illustrations.filter(
+    final Iterable<String> customRemovedIds = _illustrationMap.filter(
       (MapEntry<String, Illustration> mapEntry) {
         // final Illustration illustration = mapEntry.value;
 
@@ -642,7 +635,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
 
     setState(() {
       for (String customId in customRemovedIds) {
-        _illustrations.remove(customId);
+        _illustrationMap.remove(customId);
       }
     });
   }
@@ -723,7 +716,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   }
 
   void onMultiSelectAll() {
-    _illustrations.forEach((String key, Illustration illustration) {
+    _illustrationMap.forEach((String key, Illustration illustration) {
       _multiSelectedItems.putIfAbsent(
         key,
         () => illustration,
@@ -750,7 +743,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
       return false;
     }
 
-    if (_hasNext && !_isLoadingMore) {
+    if (_hasNext && !_loadingMore) {
       fetchIllustrationsMore();
     }
 
@@ -791,7 +784,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     Illustration? removedIllustration;
 
     setState(() {
-      removedIllustration = _illustrations.remove(illustrationKey);
+      removedIllustration = _illustrationMap.remove(illustrationKey);
     });
 
     if (removedIllustration == null) {
@@ -809,7 +802,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
       );
 
       setState(() {
-        _illustrations.putIfAbsent(
+        _illustrationMap.putIfAbsent(
           illustrationKey,
           () => illustration,
         );
@@ -1033,7 +1026,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     );
   }
 
-  void startListenningToData(DocumentReference<Map<String, dynamic>> query) {
+  void listenBook(DocumentReference<Map<String, dynamic>> query) {
     _bookSubscription = query.snapshots().skip(1).listen(
       (DocumentSnapshot<Map<String, dynamic>> snapshot) {
         final bookData = snapshot.data();
@@ -1045,7 +1038,8 @@ class _MyBookPageState extends ConsumerState<BookPage> {
           bookData['id'] = snapshot.id;
           _book = Book.fromMap(bookData);
           _currentIllustrationKeys = _book.illustrations
-              .map((bookIllustration) => generateKey(bookIllustration))
+              .map((bookIllustration) =>
+                  Utilities.generateIllustrationKey(bookIllustration))
               .toList();
         });
 
@@ -1101,7 +1095,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
 
   /// If the target illustration has [version] < 1,
   /// this method will listen to Firestore events in order to update
-  /// the associated data in the map [_illustrations].
+  /// the associated data in the map [_illustrationMap].
   void waitForThumbnail(String illustrationKey, DocumentMap query) {
     final DocSnapshotStreamSubscription illustrationSub =
         query.snapshots().listen(
@@ -1120,7 +1114,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
         }
 
         setState(() {
-          _illustrations.update(
+          _illustrationMap.update(
             illustrationKey,
             (value) => illustration,
             ifAbsent: () => illustration,
@@ -1177,5 +1171,40 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     final Illustration illustration = _multiSelectedItems.values.first;
     final String key = _multiSelectedItems.keys.first;
     confirmRemoveIllustrationGroup(illustration, key);
+  }
+
+  void onDrop(int dropIndex, List<int> dragIndexes) async {
+    final illustrationList = _book.illustrations;
+    final firstDragIndex = dragIndexes.first;
+
+    if (dropIndex == firstDragIndex) {
+      return;
+    }
+
+    final dropIllustration = illustrationList.elementAt(dropIndex);
+    final dragIllustration = illustrationList.elementAt(firstDragIndex);
+
+    illustrationList[dropIndex] = dragIllustration;
+    illustrationList[firstDragIndex] = dropIllustration;
+
+    setState(() {
+      _book = _book.copyWith(
+        illustrations: illustrationList,
+      );
+    });
+
+    try {
+      final response = await BooksActions.reorderIllustrations(
+        bookId: _book.id,
+        dropIndex: dropIndex,
+        dragIndexes: dragIndexes,
+      );
+
+      if (response.hasErrors) {
+        throw ErrorDescription(response.error?.details ?? "");
+      }
+    } catch (error) {
+      Utilities.logger.e(error);
+    }
   }
 }

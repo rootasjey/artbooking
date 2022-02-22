@@ -7,6 +7,7 @@ import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:artbooking/globals/utilities/storage_utilities.dart';
 import 'package:artbooking/globals/utilities/language_utilities.dart';
 import 'package:artbooking/globals/utilities/size_utilities.dart';
+import 'package:artbooking/types/book/book_illustration.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -25,6 +26,14 @@ class Utilities {
   static const search = const SearchUtilities();
   static const size = const SizeUtils();
   static const storage = const StorageUtilities();
+
+  /// Generate an unique key for illustrations in book (frontend).
+  static String generateIllustrationKey(BookIllustration bookIllustration) {
+    final String id = bookIllustration.id;
+    DateTime createdAt = bookIllustration.createdAt;
+
+    return "$id--${createdAt.millisecondsSinceEpoch}";
+  }
 
   static String getStringWithUnit(int usedBytes) {
     if (usedBytes < 1000) {

@@ -1,5 +1,5 @@
 import 'package:artbooking/components/buttons/square_button.dart';
-import 'package:artbooking/screens/book/book_page.dart';
+import 'package:artbooking/types/illustration_map.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -18,7 +18,7 @@ class BookPageGroupActions extends StatelessWidget {
   final bool visible;
 
   /// Currently selected illustrations.
-  final MapStringIllustration multiSelectedItems;
+  final IllustrationMap multiSelectedItems;
 
   final void Function()? onAddToBook;
   final void Function()? onMultiSelectAll;

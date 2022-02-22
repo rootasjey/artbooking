@@ -1,9 +1,9 @@
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/book/book_page_actions.dart';
 import 'package:artbooking/screens/book/book_page_group_actions.dart';
-import 'package:artbooking/screens/book/book_page.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
+import 'package:artbooking/types/illustration_map.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +38,7 @@ class BookPageHeader extends StatelessWidget {
   final bool forceMultiSelect;
 
   /// Currently selected illustrations.
-  final MapStringIllustration multiSelectedItems;
+  final IllustrationMap multiSelectedItems;
 
   final void Function()? onAddToBook;
   final void Function()? onClearMultiSelect;
