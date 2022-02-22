@@ -22,6 +22,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
     this.onPopupMenuItemSelected,
     this.onTapIllustration,
     this.uploadIllustration,
+    this.onDragUpdateIllustration,
   }) : super(key: key);
 
   final bool loading;
@@ -40,6 +41,9 @@ class MyIllustrationsPageBody extends StatelessWidget {
 
   final void Function()? onGoToActiveTab;
   final void Function()? uploadIllustration;
+
+  /// Callback when dragging an illustration around.
+  final void Function(DragUpdateDetails details)? onDragUpdateIllustration;
 
   final List<Illustration> illustrations;
   final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries;
@@ -88,6 +92,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
               illustration: illustration,
               selected: selected,
               selectionMode: selectionMode,
+              onDragUpdate: onDragUpdateIllustration,
               onTap: () => onTapIllustration?.call(illustration),
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               popupMenuEntries: popupMenuEntries,

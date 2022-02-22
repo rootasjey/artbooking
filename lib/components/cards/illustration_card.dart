@@ -32,6 +32,7 @@ class IllustrationCard extends StatefulWidget {
     this.onDoubleTap,
     this.onTapLike,
     this.onDrop,
+    this.onDragUpdate,
   }) : super(key: key);
 
   /// Index position in a list, if available.
@@ -83,6 +84,9 @@ class IllustrationCard extends StatefulWidget {
 
   /// Callback when drag and dropping item on this illustration card.
   final void Function(List<int>)? onDrop;
+
+  /// Callback when illustration is being dragged.
+  final void Function(DragUpdateDetails details)? onDragUpdate;
 
   @override
   _IllustrationCardState createState() => _IllustrationCardState();
@@ -158,6 +162,7 @@ class _IllustrationCardState extends State<IllustrationCard>
       data: widget.index,
       feedback: draggingCard(),
       childWhenDragging: childWhenDragging(),
+      onDragUpdate: widget.onDragUpdate,
       child: Card(
         color: widget.selected ? primaryColor : defaultColor,
         elevation: _elevation,

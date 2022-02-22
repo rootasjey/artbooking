@@ -71,6 +71,12 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   /// True if the current authenticated user has liked this book.
   bool _liked = false;
 
+  /// /// Amount of offset to jump when dragging an element to the edge.
+  final double _jumpOffset = 200.0;
+
+  /// Distance to the edge where the scroll viewer starts to jump.
+  final double _edgeDistance = 200.0;
+
   /// Why a map and not just a list?
   ///
   /// -> faster access & because it's already done.
@@ -191,6 +197,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
               multiSelectedItems: _multiSelectedItems,
               popupMenuEntries: _popupMenuEntries,
               onBrowseIllustrations: onBrowseIllustrations,
+              onDragUpdateBook: onDragUpdateBook,
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               onTapIllustrationCard: onTapIllustrationCard,
               onUploadToThisBook: onUploadToThisBook,
@@ -683,6 +690,37 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     final Illustration illustration = _multiSelectedItems.values.first;
     final String key = _multiSelectedItems.keys.first;
     confirmRemoveIllustrationGroup(illustration, key);
+  }
+
+  void onDragUpdateBook(DragUpdateDetails details) async {
+    final position = details.globalPosition;
+
+    if (position.dy < _edgeDistance) {
+      if (_scrollController.offset <= 0) {
+        return;
+      }
+
+      await _scrollController.animateTo(
+        _scrollController.offset - _jumpOffset,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+      );
+
+      return;
+    }
+
+    final windowHeight = MediaQuery.of(context).size.height;
+    if (windowHeight - _edgeDistance < position.dy) {
+      if (_scrollController.position.atEdge && _scrollController.offset != 0) {
+        return;
+      }
+
+      await _scrollController.animateTo(
+        _scrollController.offset + _jumpOffset,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+      );
+    }
   }
 
   /// When an illustration card is droped somewhere.

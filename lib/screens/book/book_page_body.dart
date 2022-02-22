@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 class BookPageBody extends StatelessWidget {
   const BookPageBody({
     Key? key,
+    required this.bookIllustrations,
     required this.illustrationMap,
     required this.loading,
     required this.multiSelectedItems,
@@ -25,7 +26,7 @@ class BookPageBody extends StatelessWidget {
     this.onUploadToThisBook,
     this.onBrowseIllustrations,
     this.onDropIllustration,
-    required this.bookIllustrations,
+    this.onDragUpdateBook,
   }) : super(key: key);
 
   /// Why a map and not just a list?
@@ -63,6 +64,9 @@ class BookPageBody extends StatelessWidget {
 
   /// Callback when drag and dropping item on this illustration card.
   final void Function(int, List<int>)? onDropIllustration;
+
+  /// Callback when dragging a book around.
+  final void Function(DragUpdateDetails details)? onDragUpdateBook;
 
   @override
   Widget build(BuildContext context) {
@@ -117,6 +121,7 @@ class BookPageBody extends StatelessWidget {
               illustrationKey: key,
               selected: selected,
               selectionMode: selectionMode,
+              onDragUpdate: onDragUpdateBook,
               onDrop: (dropIndexes) => onDropIllustration?.call(
                 index,
                 dropIndexes,

@@ -22,6 +22,7 @@ class MyBooksPageBody extends StatelessWidget {
     this.onLongPressBook,
     this.onGoToActiveBooks,
     this.onDropBook,
+    this.onDragUpdateBook,
   }) : super(key: key);
 
   final bool forceMultiSelect;
@@ -36,6 +37,7 @@ class MyBooksPageBody extends StatelessWidget {
   final void Function(EnumBookItemAction, int, Book)? onPopupMenuItemSelected;
   final void Function(Book, bool)? onLongPressBook;
   final void Function()? onGoToActiveBooks;
+  final void Function(DragUpdateDetails details)? onDragUpdateBook;
 
   final List<Book> books;
   final List<PopupMenuEntry<EnumBookItemAction>> popupMenuEntries;
@@ -84,6 +86,7 @@ class MyBooksPageBody extends StatelessWidget {
               book: book,
               selected: selected,
               selectionMode: selectionMode,
+              onDragUpdate: onDragUpdateBook,
               onDrop: (List<int> dragIndexes) => onDropBook?.call(
                 index,
                 dragIndexes,

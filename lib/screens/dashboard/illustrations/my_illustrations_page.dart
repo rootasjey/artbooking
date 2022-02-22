@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/buttons/visibility_button.dart';
@@ -44,6 +46,12 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   /// Last fetched illustration document.
   DocumentSnapshot? _lastDocument;
+
+  /// /// Amount of offset to jump when dragging an element to the edge.
+  final double _jumpOffset = 200.0;
+
+  /// Distance to the edge where the scroll viewer starts to jump.
+  final double _edgeDistance = 200.0;
 
   final int _limit = 20;
 
@@ -129,6 +137,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                 illustrations: _illustrations,
                 loading: _loading,
                 multiSelectedItems: _multiSelectedItems,
+                onDragUpdateIllustration: onDragUpdateIllustration,
                 onDropIllustration: onDropIllustration,
                 onGoToActiveTab: onGoToActiveTab,
                 onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -564,8 +573,39 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     });
   }
 
+  void onDragUpdateIllustration(DragUpdateDetails details) async {
+    final position = details.globalPosition;
+
+    if (position.dy < _edgeDistance) {
+      if (_scrollController.offset <= 0) {
+        return;
+      }
+
+      await _scrollController.animateTo(
+        _scrollController.offset - _jumpOffset,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+      );
+
+      return;
+    }
+
+    final windowHeight = MediaQuery.of(context).size.height;
+    if (windowHeight - _edgeDistance < position.dy) {
+      if (_scrollController.position.atEdge && _scrollController.offset != 0) {
+        return;
+      }
+
+      await _scrollController.animateTo(
+        _scrollController.offset + _jumpOffset,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+      );
+    }
+  }
+
   void onDropIllustration(int dropIndex, List<int> dragIndexes) async {
-    final firstDragIndex = dragIndexes.first;
+    final int firstDragIndex = dragIndexes.first;
     if (dropIndex == firstDragIndex) {
       return;
     }
@@ -577,17 +617,17 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       return;
     }
 
-    final dropIllustration = _illustrations.elementAt(dropIndex);
+    final Illustration dropIllustration = _illustrations.elementAt(dropIndex);
     final dragIllustration = _illustrations.elementAt(firstDragIndex);
 
     final int dropUserCustomIndex = dropIllustration.userCustomIndex;
     final int dragUserCustomIndex = dragIllustration.userCustomIndex;
 
-    final newDropIllustration = dropIllustration.copyWith(
+    final Illustration newDropIllustration = dropIllustration.copyWith(
       userCustomIndex: dragUserCustomIndex,
     );
 
-    final newDragIllustration = dragIllustration.copyWith(
+    final Illustration newDragIllustration = dragIllustration.copyWith(
       userCustomIndex: dropUserCustomIndex,
     );
 

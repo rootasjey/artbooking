@@ -33,6 +33,7 @@ class BookCard extends StatefulWidget {
     this.width = 360.0,
     this.height = 402.0,
     this.onDrop,
+    this.onDragUpdate,
   }) : super(key: key);
 
   /// Book's data for this card.
@@ -55,6 +56,9 @@ class BookCard extends StatefulWidget {
 
   /// Trigger when heart icon tap.
   final void Function()? onTapLike;
+
+  /// Callback when book is being dragged.
+  final void Function(DragUpdateDetails details)? onDragUpdate;
 
   /// Popup menu item entries.
   final List<PopupMenuEntry<EnumBookItemAction>> popupMenuEntries;
@@ -149,6 +153,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
       data: widget.index,
       feedback: draggingCard(),
       childWhenDragging: childWhenDragging(),
+      onDragUpdate: widget.onDragUpdate,
       child: Column(
         children: [
           Stack(

@@ -46,6 +46,12 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   /// Last fetched book document.
   DocumentSnapshot? _lastDocument;
 
+  /// /// Amount of offset to jump when dragging an element to the edge.
+  final double _jumpOffset = 200.0;
+
+  /// Distance to the edge where the scroll viewer starts to jump.
+  final double _edgeDistance = 200.0;
+
   final _books = <Book>[];
   final _focusNode = FocusNode();
 
@@ -126,6 +132,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                   onDropBook: onDropBook,
                   onShowCreateBookDialog: showCreateBookDialog,
                   popupMenuEntries: _popupMenuEntries,
+                  onDragUpdateBook: onDragUpdateBook,
                   onLongPressBook: onLongPressBook,
                   forceMultiSelect: _forceMultiSelect,
                   multiSelectedItems: _multiSelectedItems,
@@ -458,6 +465,36 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
     fetchBooks();
     Utilities.storage.saveBooksTab(selectedTab);
+  }
+
+  void onDragUpdateBook(DragUpdateDetails details) {
+    final position = details.globalPosition;
+
+    if (position.dy < _edgeDistance) {
+      if (_scrollController.offset <= 0) {
+        return;
+      }
+
+      _scrollController.animateTo(
+        _scrollController.offset - _jumpOffset,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+      );
+      return;
+    }
+
+    final windowHeight = MediaQuery.of(context).size.height;
+    if (windowHeight - _edgeDistance < position.dy) {
+      if (_scrollController.position.atEdge && _scrollController.offset != 0) {
+        return;
+      }
+
+      _scrollController.animateTo(
+        _scrollController.offset + _jumpOffset,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+      );
+    }
   }
 
   void onDropBook(int dropIndex, List<int> dragIndexes) async {
