@@ -25,7 +25,7 @@ class BookPageBody extends StatelessWidget {
     this.owner = false,
     this.onUploadToThisBook,
     this.onBrowseIllustrations,
-    this.onDrop,
+    this.onDropIllustration,
     required this.bookIllustrations,
   }) : super(key: key);
 
@@ -64,7 +64,7 @@ class BookPageBody extends StatelessWidget {
   final void Function()? onBrowseIllustrations;
 
   /// Callback when drag and dropping item on this illustration card.
-  final void Function(int, List<int>)? onDrop;
+  final void Function(int, List<int>)? onDropIllustration;
 
   @override
   Widget build(BuildContext context) {
@@ -119,14 +119,16 @@ class BookPageBody extends StatelessWidget {
               illustrationKey: key,
               selected: selected,
               selectionMode: selectionMode,
-              onDrop: (dropIndexes) => onDrop?.call(index, dropIndexes),
+              onDrop: (dropIndexes) => onDropIllustration?.call(
+                index,
+                dropIndexes,
+              ),
               onTap: () => onTapIllustrationCard?.call(
                 key,
                 illustration,
               ),
               onPopupMenuItemSelected: owner ? onPopupMenuItemSelected : null,
               popupMenuEntries: owner ? popupMenuEntries : [],
-              // onLongPress: owner ? onLongPressIllustration : null,
             );
           },
           childCount: bookIllustrations.length,

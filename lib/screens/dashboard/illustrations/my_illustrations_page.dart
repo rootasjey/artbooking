@@ -565,7 +565,63 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     });
   }
 
+  void onDropIllustration(int dropIndex, List<int> dragIndexes) async {
+    final firstDragIndex = dragIndexes.first;
+    if (dropIndex == firstDragIndex) {
+      return;
+    }
+
+    if (dropIndex < 0 ||
+        firstDragIndex < 0 ||
+        dropIndex >= _illustrations.length ||
+        firstDragIndex > _illustrations.length) {
+      return;
+    }
+
+    final dropIllustration = _illustrations.elementAt(dropIndex);
+    final dragIllustration = _illustrations.elementAt(firstDragIndex);
+
+    final int dropUserCustomIndex = dropIllustration.userCustomIndex;
+    final int dragUserCustomIndex = dragIllustration.userCustomIndex;
+
+    final newDropIllustration = dropIllustration.copyWith(
+      userCustomIndex: dragUserCustomIndex,
+    );
+
+    final newDragIllustration = dragIllustration.copyWith(
+      userCustomIndex: dropUserCustomIndex,
+    );
+
+    setState(() {
+      _illustrations[firstDragIndex] = newDropIllustration;
+      _illustrations[dropIndex] = newDragIllustration;
+    });
+
+    try {
+      await FirebaseFirestore.instance
+          .collection("illustrations")
+          .doc(newDragIllustration.id)
+          .update({
+        "user_custom_index": newDragIllustration.userCustomIndex,
+      });
+
+      await FirebaseFirestore.instance
+          .collection("illustrations")
+          .doc(newDropIllustration.id)
+          .update({
+        "user_custom_index": newDropIllustration.userCustomIndex,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
   void onGoToActiveIllustrations() {
+    onChangedTab(EnumVisibilityTab.active);
+  }
+
+  void onGoToActiveTab() {
     onChangedTab(EnumVisibilityTab.active);
   }
 
@@ -863,62 +919,6 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
           _illustrations.insert(index, illustration);
         });
       }
-    }
-  }
-
-  void onGoToActiveTab() {
-    onChangedTab(EnumVisibilityTab.active);
-  }
-
-  void onDropIllustration(int dropIndex, List<int> dragIndexes) async {
-    final firstDragIndex = dragIndexes.first;
-    if (dropIndex == firstDragIndex) {
-      return;
-    }
-
-    if (dropIndex < 0 ||
-        firstDragIndex < 0 ||
-        dropIndex >= _illustrations.length ||
-        firstDragIndex > _illustrations.length) {
-      return;
-    }
-
-    final dropIllustration = _illustrations.elementAt(dropIndex);
-    final dragIllustration = _illustrations.elementAt(firstDragIndex);
-
-    final int dropUserCustomIndex = dropIllustration.userCustomIndex;
-    final int dragUserCustomIndex = dragIllustration.userCustomIndex;
-
-    final newDropIllustration = dropIllustration.copyWith(
-      userCustomIndex: dragUserCustomIndex,
-    );
-
-    final newDragIllustration = dragIllustration.copyWith(
-      userCustomIndex: dropUserCustomIndex,
-    );
-
-    setState(() {
-      _illustrations[firstDragIndex] = newDropIllustration;
-      _illustrations[dropIndex] = newDragIllustration;
-    });
-
-    try {
-      await FirebaseFirestore.instance
-          .collection("illustrations")
-          .doc(newDragIllustration.id)
-          .update({
-        "user_custom_index": newDragIllustration.userCustomIndex,
-      });
-
-      await FirebaseFirestore.instance
-          .collection("illustrations")
-          .doc(newDropIllustration.id)
-          .update({
-        "user_custom_index": newDropIllustration.userCustomIndex,
-      });
-    } catch (error) {
-      Utilities.logger.e(error);
-      context.showErrorBar(content: Text(error.toString()));
     }
   }
 }

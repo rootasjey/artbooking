@@ -195,7 +195,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               onTapIllustrationCard: onTapIllustrationCard,
               onUploadToThisBook: onUploadToThisBook,
-              onDrop: onDrop,
+              onDropIllustration: onDropIllustration,
               owner: owner,
             ),
             SliverPadding(
@@ -221,54 +221,6 @@ class _MyBookPageState extends ConsumerState<BookPage> {
       Utilities.logger.e(error);
       throw error;
     });
-  }
-
-  /// Show a dialog to confirm a single book deletion.
-  void onConfirmDeleteBook() async {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return ThemedDialog(
-          focusNode: _keyboardFocusNode,
-          title: Column(
-            children: [
-              Opacity(
-                opacity: 0.8,
-                child: Text(
-                  "book_delete".plural(1).toUpperCase(),
-                  style: Utilities.fonts.style(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Container(
-                width: 300.0,
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Opacity(
-                  opacity: 0.4,
-                  child: Text(
-                    "book_delete_description".plural(1),
-                    textAlign: TextAlign.center,
-                    style: Utilities.fonts.style(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          body: SingleChildScrollView(),
-          textButtonValidation: "delete".tr(),
-          onCancel: Beamer.of(context).popRoute,
-          onValidate: () {
-            deleteBook();
-            Beamer.of(context).popRoute();
-          },
-        );
-      },
-    );
   }
 
   /// Show a dialog to confirm a single book deletion.
@@ -322,43 +274,6 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     Beamer.of(context).beamToNamed(
       DashboardLocationContent.booksRoute,
     );
-  }
-
-  void removeIllustrationGroup() async {
-    if (_book.id.isEmpty) {
-      return;
-    }
-
-    _multiSelectedItems.entries.forEach(
-      (MapEntry<String, Illustration> multiSelectItem) {
-        _illustrationMap.removeWhere(
-          (String key, Illustration value) => key == multiSelectItem.key,
-        );
-      },
-    );
-
-    final IllustrationMap duplicatedItems = Map.from(_multiSelectedItems);
-    final List<String> illustrationIds = _multiSelectedItems.values
-        .map((illustration) => illustration.id)
-        .toList();
-
-    setState(() {
-      _multiSelectedItems.clear();
-      _forceMultiSelect = false;
-    });
-
-    final response = await BooksActions.removeIllustrations(
-      bookId: _book.id,
-      illustrationIds: illustrationIds,
-    );
-
-    if (response.hasErrors) {
-      context.showErrorBar(
-        content: Text("illustrations_delete_error".tr()),
-      );
-
-      _illustrationMap.addAll(duplicatedItems);
-    }
   }
 
   /// Get a differenciation of illustrations in this book
@@ -640,6 +555,31 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     });
   }
 
+  void listenBook(DocumentReference<Map<String, dynamic>> query) {
+    _bookSubscription = query.snapshots().skip(1).listen(
+      (DocumentSnapshot<Map<String, dynamic>> snapshot) {
+        final bookData = snapshot.data();
+        if (!snapshot.exists || bookData == null) {
+          return;
+        }
+
+        setState(() {
+          bookData['id'] = snapshot.id;
+          _book = Book.fromMap(bookData);
+          _currentIllustrationKeys = _book.illustrations
+              .map((bookIllustration) =>
+                  Utilities.generateIllustrationKey(bookIllustration))
+              .toList();
+        });
+
+        diffIllustrations();
+      },
+      onError: (error) {
+        Utilities.logger.e(error);
+      },
+    );
+  }
+
   void multiSelectIllustration(
       String illustrationKey, Illustration illustration) {
     final selected = _multiSelectedItems.containsKey(illustrationKey);
@@ -687,6 +627,101 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     });
   }
 
+  /// Show a dialog to confirm a single book deletion.
+  void onConfirmDeleteBook() async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return ThemedDialog(
+          focusNode: _keyboardFocusNode,
+          title: Column(
+            children: [
+              Opacity(
+                opacity: 0.8,
+                child: Text(
+                  "book_delete".plural(1).toUpperCase(),
+                  style: Utilities.fonts.style(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Container(
+                width: 300.0,
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Opacity(
+                  opacity: 0.4,
+                  child: Text(
+                    "book_delete_description".plural(1),
+                    textAlign: TextAlign.center,
+                    style: Utilities.fonts.style(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          body: SingleChildScrollView(),
+          textButtonValidation: "delete".tr(),
+          onCancel: Beamer.of(context).popRoute,
+          onValidate: () {
+            deleteBook();
+            Beamer.of(context).popRoute();
+          },
+        );
+      },
+    );
+  }
+
+  void onConfirmRemoveGroup() {
+    if (_multiSelectedItems.isEmpty) {
+      context.showErrorBar(content: Text("multi_select_no_item".tr()));
+      return;
+    }
+
+    final Illustration illustration = _multiSelectedItems.values.first;
+    final String key = _multiSelectedItems.keys.first;
+    confirmRemoveIllustrationGroup(illustration, key);
+  }
+
+  /// When an illustration card is droped somewhere.
+  void onDropIllustration(int dropIndex, List<int> dragIndexes) async {
+    final illustrationList = _book.illustrations;
+    final firstDragIndex = dragIndexes.first;
+
+    if (dropIndex == firstDragIndex) {
+      return;
+    }
+
+    final dropIllustration = illustrationList.elementAt(dropIndex);
+    final dragIllustration = illustrationList.elementAt(firstDragIndex);
+
+    illustrationList[dropIndex] = dragIllustration;
+    illustrationList[firstDragIndex] = dropIllustration;
+
+    setState(() {
+      _book = _book.copyWith(
+        illustrations: illustrationList,
+      );
+    });
+
+    try {
+      final response = await BooksActions.reorderIllustrations(
+        bookId: _book.id,
+        dropIndex: dropIndex,
+        dragIndexes: dragIndexes,
+      );
+
+      if (response.hasErrors) {
+        throw ErrorDescription(response.error?.details ?? "");
+      }
+    } catch (error) {
+      Utilities.logger.e(error);
+    }
+  }
+
   void onLike() {
     if (_liked) {
       return tryUnLike();
@@ -726,6 +761,32 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     setState(() {});
   }
 
+  void onPopupMenuItemSelected(
+    EnumIllustrationItemAction action,
+    int index,
+    Illustration illustration,
+    String illustrationKey,
+  ) {
+    switch (action) {
+      case EnumIllustrationItemAction.addToBook:
+        showAddToBook(illustrationKey, illustration);
+        break;
+      case EnumIllustrationItemAction.removeFromBook:
+        if (_multiSelectedItems.isEmpty) {
+          removeIllustration(
+            index: index,
+            illustration: illustration,
+            illustrationKey: illustrationKey,
+          );
+          return;
+        }
+
+        confirmRemoveIllustrationGroup(illustration, illustrationKey);
+        break;
+      default:
+    }
+  }
+
   /// On scroll notifications.
   bool onScrollNotification(ScrollNotification notification) {
     // FAB visibility
@@ -748,151 +809,6 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     }
 
     return false;
-  }
-
-  void onPopupMenuItemSelected(
-    EnumIllustrationItemAction action,
-    int index,
-    Illustration illustration,
-    String illustrationKey,
-  ) {
-    switch (action) {
-      case EnumIllustrationItemAction.addToBook:
-        showAddToBook(illustrationKey, illustration);
-        break;
-      case EnumIllustrationItemAction.removeFromBook:
-        if (_multiSelectedItems.isEmpty) {
-          removeIllustrationFromBook(
-            index: index,
-            illustration: illustration,
-            illustrationKey: illustrationKey,
-          );
-          return;
-        }
-
-        confirmRemoveIllustrationGroup(illustration, illustrationKey);
-        break;
-      default:
-    }
-  }
-
-  void removeIllustrationFromBook({
-    required int index,
-    required Illustration illustration,
-    required String illustrationKey,
-  }) async {
-    Illustration? removedIllustration;
-
-    setState(() {
-      removedIllustration = _illustrationMap.remove(illustrationKey);
-    });
-
-    if (removedIllustration == null) {
-      return;
-    }
-
-    final response = await BooksActions.removeIllustrations(
-      bookId: _book.id,
-      illustrationIds: [illustration.id],
-    );
-
-    if (response.hasErrors) {
-      context.showErrorBar(
-        content: Text("illustrations_remove_error".tr()),
-      );
-
-      setState(() {
-        _illustrationMap.putIfAbsent(
-          illustrationKey,
-          () => illustration,
-        );
-      });
-
-      context.showErrorBar(
-        content: Text("illustrations_remove_error".tr()),
-      );
-
-      return;
-    }
-  }
-
-  void onTapIllustrationCard(
-    String illustrationKey,
-    Illustration illustration,
-  ) {
-    if (_multiSelectedItems.isEmpty && !_forceMultiSelect) {
-      navigateToIllustrationPage(illustration);
-      return;
-    }
-
-    multiSelectIllustration(illustrationKey, illustration);
-  }
-
-  void onToggleMultiSelect() {
-    setState(() {
-      _forceMultiSelect = !_forceMultiSelect;
-    });
-  }
-
-  /// Rename one book.
-  void renameBook(String name, String description) async {
-    final prevName = _book.name;
-    final prevDescription = _book.description;
-
-    setState(() {
-      _book = _book.copyWith(
-        name: name,
-        description: description,
-      );
-    });
-
-    try {
-      final response = await BooksActions.renameOne(
-        name: name,
-        description: description,
-        bookId: _book.id,
-      );
-
-      if (response.success) {
-        return;
-      }
-
-      setState(() {
-        _book = _book.copyWith(
-          name: prevName,
-          description: prevDescription,
-        );
-      });
-
-      context.showErrorBar(
-        content: Text(response.error.details),
-      );
-    } catch (error) {
-      Utilities.logger.e(error);
-    }
-  }
-
-  void showAddToBook(String illustrationKey, Illustration illustration) {
-    _multiSelectedItems.putIfAbsent(illustrationKey, () => illustration);
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AddToBooksDialog(
-          illustrations: _multiSelectedItems.values.toList(),
-        );
-      },
-    );
-  }
-
-  void showAddGroupToBook() {
-    if (_multiSelectedItems.isEmpty) {
-      context.showErrorBar(content: Text("multi_select_no_item".tr()));
-      return;
-    }
-
-    final mapEntry = _multiSelectedItems.entries.first;
-    showAddToBook(mapEntry.key, mapEntry.value);
   }
 
   void onShowDatesDialog() {
@@ -1026,29 +942,194 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     );
   }
 
-  void listenBook(DocumentReference<Map<String, dynamic>> query) {
-    _bookSubscription = query.snapshots().skip(1).listen(
-      (DocumentSnapshot<Map<String, dynamic>> snapshot) {
-        final bookData = snapshot.data();
-        if (!snapshot.exists || bookData == null) {
-          return;
-        }
+  void onTapIllustrationCard(
+    String illustrationKey,
+    Illustration illustration,
+  ) {
+    if (_multiSelectedItems.isEmpty && !_forceMultiSelect) {
+      navigateToIllustrationPage(illustration);
+      return;
+    }
 
-        setState(() {
-          bookData['id'] = snapshot.id;
-          _book = Book.fromMap(bookData);
-          _currentIllustrationKeys = _book.illustrations
-              .map((bookIllustration) =>
-                  Utilities.generateIllustrationKey(bookIllustration))
-              .toList();
-        });
+    multiSelectIllustration(illustrationKey, illustration);
+  }
 
-        diffIllustrations();
-      },
-      onError: (error) {
-        Utilities.logger.e(error);
+  void onToggleMultiSelect() {
+    setState(() {
+      _forceMultiSelect = !_forceMultiSelect;
+    });
+  }
+
+  void onUpdateVisibility(EnumContentVisibility visibility) async {
+    final prevVisibility = _book.visibility;
+
+    setState(() {
+      _book = _book.copyWith(visibility: visibility);
+    });
+
+    try {
+      final response =
+          await Utilities.cloud.fun("books-updateVisibility").call({
+        "book_id": _book.id,
+        "visibility": visibility.name,
+      });
+
+      final bool success = response.data["success"];
+      if (!success) {
+        throw Error();
+      }
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+
+      setState(() {
+        _book = _book.copyWith(visibility: prevVisibility);
+      });
+    }
+  }
+
+  void onUploadToThisBook() async {
+    await ref
+        .read(AppState.uploadTaskListProvider.notifier)
+        .pickImageAndAddToBook(bookId: widget.bookId);
+  }
+
+  void removeIllustrationGroup() async {
+    if (_book.id.isEmpty) {
+      return;
+    }
+
+    _multiSelectedItems.entries.forEach(
+      (MapEntry<String, Illustration> multiSelectItem) {
+        _illustrationMap.removeWhere(
+          (String key, Illustration value) => key == multiSelectItem.key,
+        );
       },
     );
+
+    final IllustrationMap duplicatedItems = Map.from(_multiSelectedItems);
+    final List<String> illustrationIds = _multiSelectedItems.values
+        .map((illustration) => illustration.id)
+        .toList();
+
+    setState(() {
+      _multiSelectedItems.clear();
+      _forceMultiSelect = false;
+    });
+
+    final response = await BooksActions.removeIllustrations(
+      bookId: _book.id,
+      illustrationIds: illustrationIds,
+    );
+
+    if (response.hasErrors) {
+      context.showErrorBar(
+        content: Text("illustrations_delete_error".tr()),
+      );
+
+      _illustrationMap.addAll(duplicatedItems);
+    }
+  }
+
+  void removeIllustration({
+    required int index,
+    required Illustration illustration,
+    required String illustrationKey,
+  }) async {
+    Illustration? removedIllustration;
+
+    setState(() {
+      removedIllustration = _illustrationMap.remove(illustrationKey);
+    });
+
+    if (removedIllustration == null) {
+      return;
+    }
+
+    final response = await BooksActions.removeIllustrations(
+      bookId: _book.id,
+      illustrationIds: [illustration.id],
+    );
+
+    if (response.hasErrors) {
+      context.showErrorBar(
+        content: Text("illustrations_remove_error".tr()),
+      );
+
+      setState(() {
+        _illustrationMap.putIfAbsent(
+          illustrationKey,
+          () => illustration,
+        );
+      });
+
+      context.showErrorBar(
+        content: Text("illustrations_remove_error".tr()),
+      );
+
+      return;
+    }
+  }
+
+  /// Rename one book.
+  void renameBook(String name, String description) async {
+    final prevName = _book.name;
+    final prevDescription = _book.description;
+
+    setState(() {
+      _book = _book.copyWith(
+        name: name,
+        description: description,
+      );
+    });
+
+    try {
+      final response = await BooksActions.renameOne(
+        name: name,
+        description: description,
+        bookId: _book.id,
+      );
+
+      if (response.success) {
+        return;
+      }
+
+      setState(() {
+        _book = _book.copyWith(
+          name: prevName,
+          description: prevDescription,
+        );
+      });
+
+      context.showErrorBar(
+        content: Text(response.error.details),
+      );
+    } catch (error) {
+      Utilities.logger.e(error);
+    }
+  }
+
+  void showAddToBook(String illustrationKey, Illustration illustration) {
+    _multiSelectedItems.putIfAbsent(illustrationKey, () => illustration);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AddToBooksDialog(
+          illustrations: _multiSelectedItems.values.toList(),
+        );
+      },
+    );
+  }
+
+  void showAddGroupToBook() {
+    if (_multiSelectedItems.isEmpty) {
+      context.showErrorBar(content: Text("multi_select_no_item".tr()));
+      return;
+    }
+
+    final mapEntry = _multiSelectedItems.entries.first;
+    showAddToBook(mapEntry.key, mapEntry.value);
   }
 
   void tryLike() async {
@@ -1085,12 +1166,6 @@ class _MyBookPageState extends ConsumerState<BookPage> {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     }
-  }
-
-  void onUploadToThisBook() async {
-    await ref
-        .read(AppState.uploadTaskListProvider.notifier)
-        .pickImageAndAddToBook(bookId: widget.bookId);
   }
 
   /// If the target illustration has [version] < 1,
@@ -1132,79 +1207,5 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     );
 
     _illustrationSubs.putIfAbsent(query.id, () => illustrationSub);
-  }
-
-  void onUpdateVisibility(EnumContentVisibility visibility) async {
-    final prevVisibility = _book.visibility;
-
-    setState(() {
-      _book = _book.copyWith(visibility: visibility);
-    });
-
-    try {
-      final response =
-          await Utilities.cloud.fun("books-updateVisibility").call({
-        "book_id": _book.id,
-        "visibility": visibility.name,
-      });
-
-      final bool success = response.data["success"];
-      if (!success) {
-        throw Error();
-      }
-    } catch (error) {
-      Utilities.logger.e(error);
-      context.showErrorBar(content: Text(error.toString()));
-
-      setState(() {
-        _book = _book.copyWith(visibility: prevVisibility);
-      });
-    }
-  }
-
-  void onConfirmRemoveGroup() {
-    if (_multiSelectedItems.isEmpty) {
-      context.showErrorBar(content: Text("multi_select_no_item".tr()));
-      return;
-    }
-
-    final Illustration illustration = _multiSelectedItems.values.first;
-    final String key = _multiSelectedItems.keys.first;
-    confirmRemoveIllustrationGroup(illustration, key);
-  }
-
-  void onDrop(int dropIndex, List<int> dragIndexes) async {
-    final illustrationList = _book.illustrations;
-    final firstDragIndex = dragIndexes.first;
-
-    if (dropIndex == firstDragIndex) {
-      return;
-    }
-
-    final dropIllustration = illustrationList.elementAt(dropIndex);
-    final dragIllustration = illustrationList.elementAt(firstDragIndex);
-
-    illustrationList[dropIndex] = dragIllustration;
-    illustrationList[firstDragIndex] = dropIllustration;
-
-    setState(() {
-      _book = _book.copyWith(
-        illustrations: illustrationList,
-      );
-    });
-
-    try {
-      final response = await BooksActions.reorderIllustrations(
-        bookId: _book.id,
-        dropIndex: dropIndex,
-        dragIndexes: dragIndexes,
-      );
-
-      if (response.hasErrors) {
-        throw ErrorDescription(response.error?.details ?? "");
-      }
-    } catch (error) {
-      Utilities.logger.e(error);
-    }
   }
 }
