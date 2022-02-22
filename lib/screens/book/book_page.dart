@@ -191,7 +191,6 @@ class _MyBookPageState extends ConsumerState<BookPage> {
               multiSelectedItems: _multiSelectedItems,
               popupMenuEntries: _popupMenuEntries,
               onBrowseIllustrations: onBrowseIllustrations,
-              onLongPressIllustration: onLongPressIllustration,
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               onTapIllustrationCard: onTapIllustrationCard,
               onUploadToThisBook: onUploadToThisBook,

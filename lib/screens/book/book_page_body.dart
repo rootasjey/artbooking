@@ -20,7 +20,6 @@ class BookPageBody extends StatelessWidget {
     this.forceMultiSelect = false,
     this.hasError = false,
     this.onPopupMenuItemSelected,
-    this.onLongPressIllustration,
     this.onTapIllustrationCard,
     this.owner = false,
     this.onUploadToThisBook,
@@ -48,7 +47,6 @@ class BookPageBody extends StatelessWidget {
   final bool forceMultiSelect;
   final bool hasError;
 
-  final void Function(String, Illustration, bool)? onLongPressIllustration;
   final void Function(
     EnumIllustrationItemAction,
     int,

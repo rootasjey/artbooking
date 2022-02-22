@@ -19,7 +19,6 @@ class MyIllustrationsPageBody extends StatelessWidget {
     this.limitThreeInRow = false,
     this.onDropIllustration,
     this.onGoToActiveTab,
-    this.onLongPressIllustration,
     this.onPopupMenuItemSelected,
     this.onTapIllustration,
     this.uploadIllustration,
@@ -31,7 +30,6 @@ class MyIllustrationsPageBody extends StatelessWidget {
 
   final EnumVisibilityTab selectedTab;
 
-  final void Function(String, Illustration, bool)? onLongPressIllustration;
   final void Function(Illustration)? onTapIllustration;
   final void Function(
     EnumIllustrationItemAction,
@@ -93,7 +91,6 @@ class MyIllustrationsPageBody extends StatelessWidget {
               onTap: () => onTapIllustration?.call(illustration),
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               popupMenuEntries: popupMenuEntries,
-              // onLongPress: onLongPressIllustration,
               onDrop: (dropIndexes) => onDropIllustration?.call(
                 index,
                 dropIndexes,

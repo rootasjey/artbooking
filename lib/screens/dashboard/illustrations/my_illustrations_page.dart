@@ -131,7 +131,6 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                 multiSelectedItems: _multiSelectedItems,
                 onDropIllustration: onDropIllustration,
                 onGoToActiveTab: onGoToActiveTab,
-                onLongPressIllustration: onLongPressIllustration,
                 onPopupMenuItemSelected: onPopupMenuItemSelected,
                 onTapIllustration: onTapIllustration,
                 popupMenuEntries: _popupMenuEntries,
