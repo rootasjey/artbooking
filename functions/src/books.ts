@@ -679,6 +679,113 @@ export const setCover = functions
     };
   });
 
+/**
+ * Update illustrations order inside a book.
+ */
+ export const reorderIllustrations = functions
+ .region(cloudRegions.eu)
+ .https
+ .onCall(async (params: ReorderBookIllustrationsParams, context) => {
+   const userAuth = context.auth;
+
+   if (!userAuth) {
+     throw new functions.https.HttpsError(
+       'unauthenticated', 
+       `The function must be called from an authenticated user.`,
+     );
+   }
+
+   const { book_id, drop_index, drag_indexes } = params;
+
+   if (typeof book_id !== 'string') {
+     throw new functions.https.HttpsError(
+       'invalid-argument',
+       `The function must be called with a valid [bookId] parameter ` +
+        `which is the book's id to update.`,
+     );
+   }
+
+   if (typeof drop_index !== "number") {
+     throw new functions.https.HttpsError(
+       'invalid-argument',
+       `The function must be called with a valid [drop_index] parameter ` +
+        `which is the taregt illustration index where to drop illustrations to reorder.`,
+     );
+   }
+
+   if (!Array.isArray(drag_indexes) || drag_indexes.length === 0) {
+     throw new functions.https.HttpsError(
+       'invalid-argument',
+       `The function must be called with a valid [drag_indexes] parameter ` +
+        `which is an array of indexes. It must not be empty.`,
+     );
+   }
+
+   // Indexes type check
+   for (const index of drag_indexes) {
+     if (typeof index !== "number") {
+       throw new functions.https.HttpsError(
+         "invalid-argument",
+         `The function must be called with a valid [drag_indexes] parameter ` +
+         `which is an array of [number].`,
+       )
+     }
+   }
+
+   const bookSnapshot = await firestore
+     .collection(BOOKS_COLLECTION_NAME)
+     .doc(book_id)
+     .get();
+
+   const bookData = bookSnapshot.data();
+   if (!bookSnapshot.exists || !bookData) {
+     throw new functions.https.HttpsError(
+       'not-found', 
+       `The book ${book_id} to update doesn't exist anymore.`,
+     );
+   }
+
+   if (bookData.user_id !== userAuth.uid) {
+     throw new functions.https.HttpsError(
+       'permission-denied',
+       `You don't have the permission to update this book ${book_id}.`,
+     )
+   }
+
+   const dragIndex = drag_indexes[0]
+   let illustrations: BookIllustration[] = bookData.illustrations
+   const dropIllustration = illustrations[drop_index]
+   const dragIllustration = illustrations[dragIndex]
+
+   illustrations[drop_index] = dragIllustration
+   illustrations[dragIndex] = dropIllustration
+   
+   if (illustrations.length > 100) {
+     illustrations = illustrations.slice(0, 100)
+   }
+
+   await bookSnapshot.ref.update({
+     illustrations,
+     updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+   });
+
+   const items = illustrations.map((bookIllustration: BookIllustration) => { 
+     return { 
+       illustration: { 
+         id: bookIllustration.id,
+      }, 
+       success: true, 
+     };
+   });
+
+   return {
+     items,
+     successCount: illustrations.length,
+     hasErrors: false,
+     warning: "",
+   };
+ });
+
 export const updateVisibility = functions
   .region(cloudRegions.eu)
   .https

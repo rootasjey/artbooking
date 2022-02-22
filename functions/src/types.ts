@@ -328,6 +328,17 @@ interface ThumbnailUrls {
   t1080: String;
 }
 
+interface ReorderBookIllustrationsParams {
+  /** Book's id. */
+  book_id: string;
+
+  /** Drop illustration index.. */
+  drop_index: number;
+
+  /** Indexes of illustrations being dragged.  */
+  drag_indexes: number[];
+}
+
 interface UpdateBookIllustrationsParams {
   /** Book's id. */
   book_id: string;
