@@ -414,7 +414,9 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         return;
       }
 
-      _layoutThreeInRow = data[_layoutKey] ?? false;
+      setState(() {
+        _layoutThreeInRow = data[_layoutKey] ?? false;
+      });
     } catch (error) {
       Utilities.logger.e(error);
     }
