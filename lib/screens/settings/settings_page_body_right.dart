@@ -1,3 +1,4 @@
+import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/screens/dashboard/dashboard_page_card.dart';
@@ -33,60 +34,72 @@ class SettingsPageBodyRight extends ConsumerWidget {
     final bool expanded = ref.watch(AppState.dashboardSideMenuOpenProvider);
     final bool compact = width < 1400.0 && expanded;
 
+    int index = 0;
+
+    final List<Widget> children = [
+      DashbordPageCard(
+        compact: compact,
+        hoverColor: Constants.colors.activity,
+        iconData: UniconsLine.space_key,
+        textTitle: "username".tr(),
+        textSubtitle: userFirestore.name,
+        onTap: onGoToUpdateUsername,
+      ),
+      DashbordPageCard(
+        compact: compact,
+        hoverColor: Constants.colors.email,
+        iconData: UniconsLine.envelope,
+        textTitle: "email".tr(),
+        textSubtitle: userFirestore.email,
+        onTap: onGoToUpdateEmail,
+      ),
+      DashbordPageCard(
+        compact: compact,
+        hoverColor: Constants.colors.location,
+        iconData: UniconsLine.location_point,
+        textTitle: "location".tr(),
+        textSubtitle: userFirestore.location,
+        onTap: onEditLocation,
+      ),
+      DashbordPageCard(
+        compact: compact,
+        hoverColor: Constants.colors.summary,
+        iconData: UniconsLine.subject,
+        textTitle: "summary".tr(),
+        textSubtitle: userFirestore.summary,
+        onTap: onEditSummary,
+      ),
+      DashbordPageCard(
+        compact: compact,
+        hoverColor: Constants.colors.password,
+        iconData: UniconsLine.lock,
+        textTitle: "security".tr(),
+        textSubtitle: "password_update".tr(),
+        onTap: onGoToUpdatePasssword,
+      ),
+      DashbordPageCard(
+        compact: compact,
+        hoverColor: Constants.colors.delete,
+        iconData: UniconsLine.trash,
+        textTitle: "security".tr(),
+        textSubtitle: "account_delete".tr(),
+        onTap: onGoToDeleteAccount,
+      ),
+    ].map((child) {
+      index++;
+
+      return FadeInY(
+        delay: Duration(milliseconds: index * 50),
+        beginY: 32.0,
+        child: child,
+      );
+    }).toList();
+
     return Expanded(
       child: Wrap(
         spacing: 12.0,
         runSpacing: 12.0,
-        children: [
-          DashbordPageCard(
-            compact: compact,
-            hoverColor: Constants.colors.activity,
-            iconData: UniconsLine.space_key,
-            textTitle: "username".tr(),
-            textSubtitle: userFirestore.name,
-            onTap: onGoToUpdateUsername,
-          ),
-          DashbordPageCard(
-            compact: compact,
-            hoverColor: Constants.colors.email,
-            iconData: UniconsLine.envelope,
-            textTitle: "email".tr(),
-            textSubtitle: userFirestore.email,
-            onTap: onGoToUpdateEmail,
-          ),
-          DashbordPageCard(
-            compact: compact,
-            hoverColor: Constants.colors.location,
-            iconData: UniconsLine.location_point,
-            textTitle: "location".tr(),
-            textSubtitle: userFirestore.location,
-            onTap: onEditLocation,
-          ),
-          DashbordPageCard(
-            compact: compact,
-            hoverColor: Constants.colors.summary,
-            iconData: UniconsLine.subject,
-            textTitle: "summary".tr(),
-            textSubtitle: userFirestore.summary,
-            onTap: onEditSummary,
-          ),
-          DashbordPageCard(
-            compact: compact,
-            hoverColor: Constants.colors.password,
-            iconData: UniconsLine.lock,
-            textTitle: "security".tr(),
-            textSubtitle: "password_update".tr(),
-            onTap: onGoToUpdatePasssword,
-          ),
-          DashbordPageCard(
-            compact: compact,
-            hoverColor: Constants.colors.delete,
-            iconData: UniconsLine.trash,
-            textTitle: "security".tr(),
-            textSubtitle: "account_delete".tr(),
-            onTap: onGoToDeleteAccount,
-          ),
-        ],
+        children: children,
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/texts/page_title.dart';
 import 'package:artbooking/router/locations/home_location.dart';
@@ -128,6 +129,91 @@ class DashboardPageWelcome extends ConsumerWidget {
   }
 
   Widget sectionsList(BuildContext context) {
+    int index = 0;
+
+    final List<Widget> children = [
+      DashbordPageCard(
+        hoverColor: Constants.colors.activity,
+        iconData: UniconsLine.chart_pie,
+        textTitle: "activity".tr(),
+        textSubtitle: "activity_subtitle".tr(),
+        onTap: () {
+          context.beamToNamed(DashboardLocationContent.activityRoute);
+        },
+      ),
+      DashbordPageCard(
+        hoverColor: Constants.colors.illustrations,
+        iconData: UniconsLine.picture,
+        textTitle: "illustrations".tr(),
+        textSubtitle: "illustrations_my_subtitle".tr(),
+        onTap: () {
+          context.beamToNamed(DashboardLocationContent.illustrationsRoute);
+        },
+      ),
+      DashbordPageCard(
+        hoverColor: Constants.colors.books,
+        iconData: UniconsLine.book_alt,
+        textTitle: "books".tr(),
+        textSubtitle: "books_subtitle".tr(),
+        onTap: () {
+          context.beamToNamed(DashboardLocationContent.booksRoute);
+        },
+      ),
+      DashbordPageCard(
+        hoverColor: Constants.colors.settings,
+        iconData: UniconsLine.setting,
+        textTitle: "settings".tr(),
+        textSubtitle: "settings_subtitle".tr(),
+        onTap: () {
+          context.beamToNamed(DashboardLocationContent.settingsRoute);
+        },
+      ),
+      DashbordPageCard(
+        hoverColor: Constants.colors.profile,
+        iconData: UniconsLine.user,
+        textTitle: "profile".tr(),
+        textSubtitle: "profile_subtitle".tr(),
+        onTap: () {
+          context.beamToNamed(DashboardLocationContent.profileRoute);
+        },
+      ),
+      DashbordPageCard(
+        hoverColor: Constants.colors.likes,
+        iconData: UniconsLine.heart,
+        textTitle: "likes".tr(),
+        textSubtitle: "likes_subtitle".tr(),
+        onTap: () {
+          context.beamToNamed(DashboardLocationContent.likesRoute);
+        },
+      ),
+      DashbordPageCard(
+        hoverColor: Constants.colors.licenses,
+        iconData: UniconsLine.document_info,
+        textTitle: "licenses".tr(),
+        textSubtitle: "licenses_subtitle".tr(),
+        onTap: () {
+          context.beamToNamed(DashboardLocationContent.licensesRoute);
+        },
+      ),
+      DashbordPageCard(
+        hoverColor: Constants.colors.home,
+        iconData: UniconsLine.home,
+        textTitle: "home".tr(),
+        textSubtitle: "home_subtitle".tr(),
+        onTap: () {
+          Beamer.of(context, root: true).beamToNamed(HomeLocation.route);
+        },
+      ),
+    ].map((child) {
+      index++;
+
+      return FadeInY(
+        delay: Duration(milliseconds: index * 50),
+        beginY: 32.0,
+        child: child,
+      );
+    }).toList();
+
     return Padding(
       padding: const EdgeInsets.only(
         top: 32.0,
@@ -136,80 +222,7 @@ class DashboardPageWelcome extends ConsumerWidget {
       child: Wrap(
         spacing: 24.0,
         runSpacing: 24.0,
-        children: [
-          DashbordPageCard(
-            hoverColor: Constants.colors.activity,
-            iconData: UniconsLine.chart_pie,
-            textTitle: "activity".tr(),
-            textSubtitle: "activity_subtitle".tr(),
-            onTap: () {
-              context.beamToNamed(DashboardLocationContent.activityRoute);
-            },
-          ),
-          DashbordPageCard(
-            hoverColor: Constants.colors.illustrations,
-            iconData: UniconsLine.picture,
-            textTitle: "illustrations".tr(),
-            textSubtitle: "illustrations_my_subtitle".tr(),
-            onTap: () {
-              context.beamToNamed(DashboardLocationContent.illustrationsRoute);
-            },
-          ),
-          DashbordPageCard(
-            hoverColor: Constants.colors.books,
-            iconData: UniconsLine.book_alt,
-            textTitle: "books".tr(),
-            textSubtitle: "books_subtitle".tr(),
-            onTap: () {
-              context.beamToNamed(DashboardLocationContent.booksRoute);
-            },
-          ),
-          DashbordPageCard(
-            hoverColor: Constants.colors.settings,
-            iconData: UniconsLine.setting,
-            textTitle: "settings".tr(),
-            textSubtitle: "settings_subtitle".tr(),
-            onTap: () {
-              context.beamToNamed(DashboardLocationContent.settingsRoute);
-            },
-          ),
-          DashbordPageCard(
-            hoverColor: Constants.colors.profile,
-            iconData: UniconsLine.user,
-            textTitle: "profile".tr(),
-            textSubtitle: "profile_subtitle".tr(),
-            onTap: () {
-              context.beamToNamed(DashboardLocationContent.profileRoute);
-            },
-          ),
-          DashbordPageCard(
-            hoverColor: Constants.colors.likes,
-            iconData: UniconsLine.heart,
-            textTitle: "likes".tr(),
-            textSubtitle: "likes_subtitle".tr(),
-            onTap: () {
-              context.beamToNamed(DashboardLocationContent.likesRoute);
-            },
-          ),
-          DashbordPageCard(
-            hoverColor: Constants.colors.licenses,
-            iconData: UniconsLine.document_info,
-            textTitle: "licenses".tr(),
-            textSubtitle: "licenses_subtitle".tr(),
-            onTap: () {
-              context.beamToNamed(DashboardLocationContent.licensesRoute);
-            },
-          ),
-          DashbordPageCard(
-            hoverColor: Constants.colors.home,
-            iconData: UniconsLine.home,
-            textTitle: "home".tr(),
-            textSubtitle: "home_subtitle".tr(),
-            onTap: () {
-              Beamer.of(context, root: true).beamToNamed(HomeLocation.route);
-            },
-          ),
-        ],
+        children: children,
       ),
     );
   }
