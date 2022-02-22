@@ -74,6 +74,6 @@ class ApplicationBarMiddleDesktop extends ConsumerWidget {
       return;
     }
 
-    Beamer.of(context).beamToNamed(routePath);
+    Beamer.of(context, root: true).beamToNamed(routePath);
   }
 }
