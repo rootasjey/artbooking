@@ -3,6 +3,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
@@ -152,36 +153,11 @@ class _IllustrationCardState extends State<IllustrationCard>
     String imageUrl = widget.illustration.getThumbnail();
     Color defaultColor = Colors.transparent;
     final Color primaryColor = Theme.of(context).primaryColor;
-    final Color baseColor =
-        Theme.of(context).textTheme.bodyText2?.color ?? Colors.black;
 
     return LongPressDraggable<int>(
       data: widget.index,
       feedback: draggingCard(),
-      childWhenDragging: Card(
-        elevation: 2.0,
-        color: Constants.colors.clairPink,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-          side: BorderSide(color: baseColor, width: 2.0),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Opacity(
-            opacity: 0.6,
-            child: Center(
-              child: Text(
-                "illustration_permutation_description".tr(),
-                textAlign: TextAlign.center,
-                style: Utilities.fonts.style(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
+      childWhenDragging: childWhenDragging(),
       child: Card(
         color: widget.selected ? primaryColor : defaultColor,
         elevation: _elevation,
@@ -252,12 +228,51 @@ class _IllustrationCardState extends State<IllustrationCard>
     );
   }
 
+  Widget childWhenDragging() {
+    return DottedBorder(
+      strokeWidth: 3.0,
+      borderType: BorderType.RRect,
+      radius: Radius.circular(16),
+      color: Theme.of(context).primaryColor.withOpacity(0.6),
+      dashPattern: [8, 4],
+      child: ClipRRect(
+        borderRadius: BorderRadius.all(Radius.circular(16)),
+        child: Card(
+          elevation: 0.0,
+          color: Constants.colors.clairPink.withOpacity(0.6),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Opacity(
+              opacity: 0.6,
+              child: Center(
+                child: Text(
+                  "illustration_permutation_description".tr(),
+                  textAlign: TextAlign.center,
+                  style: Utilities.fonts.style(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget draggingCard() {
     String imageUrl = widget.illustration.getThumbnail();
 
     return Card(
       elevation: 8.0,
       clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+      ),
       child: ExtendedImage.network(
         imageUrl,
         fit: BoxFit.cover,
