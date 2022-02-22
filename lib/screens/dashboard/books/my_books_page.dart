@@ -123,6 +123,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                 MyBooksPageBody(
                   books: _books,
                   loading: _loading,
+                  onDropBook: onDropBook,
                   onShowCreateBookDialog: showCreateBookDialog,
                   popupMenuEntries: _popupMenuEntries,
                   onLongPressBook: onLongPressBook,
@@ -269,13 +270,15 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       return FirebaseFirestore.instance
           .collection("books")
           .where("user_id", isEqualTo: userId)
-          .where("visibility", isNotEqualTo: "archived")
+          .where("visibility", whereIn: ["public", "private"])
+          .orderBy("user_custom_index", descending: true)
           .limit(_limit);
     }
     return FirebaseFirestore.instance
         .collection("books")
         .where("user_id", isEqualTo: userId)
         .where("visibility", isEqualTo: "archived")
+        .orderBy("user_custom_index", descending: true)
         .limit(_limit);
   }
 
@@ -291,14 +294,16 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       return FirebaseFirestore.instance
           .collection("books")
           .where("user_id", isEqualTo: userId)
-          .where("visibility", isNotEqualTo: "archived")
+          .where("visibility", whereIn: ["public", "private"])
+          .orderBy("user_custom_index", descending: true)
           .limit(_limit)
           .startAfterDocument(lastDocument);
     }
     return FirebaseFirestore.instance
         .collection("books")
         .where("user_id", isEqualTo: userId)
-        .where("visibility", isNotEqualTo: "archived")
+        .where("visibility", isEqualTo: "archived")
+        .orderBy("user_custom_index", descending: true)
         .limit(_limit)
         .startAfterDocument(lastDocument);
   }
@@ -453,6 +458,58 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
     fetchBooks();
     Utilities.storage.saveBooksTab(selectedTab);
+  }
+
+  void onDropBook(int dropIndex, List<int> dragIndexes) async {
+    final firstDragIndex = dragIndexes.first;
+    if (dropIndex == firstDragIndex) {
+      return;
+    }
+
+    if (dropIndex < 0 ||
+        firstDragIndex < 0 ||
+        dropIndex >= _books.length ||
+        firstDragIndex > _books.length) {
+      return;
+    }
+
+    final Book dropBook = _books.elementAt(dropIndex);
+    final Book dragBook = _books.elementAt(firstDragIndex);
+
+    final int dropUserCustomIndex = dropBook.userCustomIndex;
+    final int dragUserCustomIndex = dragBook.userCustomIndex;
+
+    final Book newDropBook = dropBook.copyWith(
+      userCustomIndex: dragUserCustomIndex,
+    );
+
+    final Book newDragBook = dragBook.copyWith(
+      userCustomIndex: dropUserCustomIndex,
+    );
+
+    setState(() {
+      _books[firstDragIndex] = newDropBook;
+      _books[dropIndex] = newDragBook;
+    });
+
+    try {
+      await FirebaseFirestore.instance
+          .collection("books")
+          .doc(newDragBook.id)
+          .update({
+        "user_custom_index": newDragBook.userCustomIndex,
+      });
+
+      await FirebaseFirestore.instance
+          .collection("books")
+          .doc(newDropBook.id)
+          .update({
+        "user_custom_index": newDropBook.userCustomIndex,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
   }
 
   void onGoToActiveBooks() {

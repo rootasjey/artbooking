@@ -6,6 +6,7 @@ import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,7 @@ class BookCard extends StatefulWidget {
     this.selectionMode = false,
     this.width = 360.0,
     this.height = 402.0,
+    this.onDrop,
   }) : super(key: key);
 
   /// Book's data for this card.
@@ -67,6 +69,9 @@ class BookCard extends StatefulWidget {
 
   final double width;
   final double height;
+
+  /// Callback when drag and dropping item on this book card.
+  final void Function(List<int>)? onDrop;
 
   @override
   _BookCardState createState() => _BookCardState();
@@ -120,19 +125,88 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
         child: SizedBox(
           width: widget.width,
           height: widget.height,
-          child: Column(
+          child: dropTarget(),
+        ),
+      ),
+    );
+  }
+
+  Widget dropTarget() {
+    return DragTarget<int>(
+      builder: (BuildContext context, candidateItems, rejectedItems) {
+        return draggableCard(
+          usingAsDropTarget: candidateItems.isNotEmpty,
+        );
+      },
+      onAccept: (int dragIndex) {
+        widget.onDrop?.call([dragIndex]);
+      },
+    );
+  }
+
+  Widget draggableCard({bool usingAsDropTarget = false}) {
+    return LongPressDraggable<int>(
+      data: widget.index,
+      feedback: draggingCard(),
+      childWhenDragging: childWhenDragging(),
+      child: Column(
+        children: [
+          Stack(
             children: [
-              Stack(
-                children: [
-                  backCard(),
-                  frontCard(),
-                ],
+              backCard(),
+              frontCard(
+                usingAsDropTarget: usingAsDropTarget,
               ),
-              caption(),
             ],
+          ),
+          caption(),
+        ],
+      ),
+    );
+  }
+
+  Widget childWhenDragging() {
+    return DottedBorder(
+      strokeWidth: 3.0,
+      borderType: BorderType.RRect,
+      radius: Radius.circular(16),
+      color: Theme.of(context).primaryColor.withOpacity(0.6),
+      dashPattern: [8, 4],
+      child: ClipRRect(
+        borderRadius: BorderRadius.all(Radius.circular(16)),
+        child: Card(
+          elevation: 0.0,
+          color: Constants.colors.clairPink.withOpacity(0.6),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Opacity(
+              opacity: 0.6,
+              child: Center(
+                child: Text(
+                  "book_permutation_description".tr(),
+                  textAlign: TextAlign.center,
+                  style: Utilities.fonts.style(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget draggingCard() {
+    return Stack(
+      children: [
+        backCard(),
+        frontCard(),
+      ],
     );
   }
 
@@ -250,7 +324,9 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     );
   }
 
-  Widget frontCard() {
+  Widget frontCard({bool usingAsDropTarget = false}) {
+    final Color primaryColor = Theme.of(context).primaryColor;
+
     return Container(
       width: widget.width - 60.0,
       height: widget.height - _captionHeight,
@@ -258,12 +334,13 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
       child: ScaleTransition(
         scale: _scaleAnimation,
         child: Card(
-          color: widget.selected
-              ? Theme.of(context).primaryColor
-              : Colors.transparent,
+          color: widget.selected ? primaryColor : Colors.transparent,
           elevation: _elevation,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(_cardRadius),
+            side: usingAsDropTarget
+                ? BorderSide(color: primaryColor, width: 4.0)
+                : BorderSide.none,
           ),
           clipBehavior: Clip.antiAlias,
           child: Stack(
@@ -283,7 +360,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
                         child: InkWell(
                           onTap: widget.onTap,
                           onDoubleTap: onDoubleTap,
-                          onLongPress: onLongPress,
+                          // onLongPress: onLongPress,
                           onHover: onHover,
                           child: Stack(
                             children: [

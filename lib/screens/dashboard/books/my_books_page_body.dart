@@ -21,6 +21,7 @@ class MyBooksPageBody extends StatelessWidget {
     this.onPopupMenuItemSelected,
     this.onLongPressBook,
     this.onGoToActiveBooks,
+    this.onDropBook,
   }) : super(key: key);
 
   final bool forceMultiSelect;
@@ -28,6 +29,8 @@ class MyBooksPageBody extends StatelessWidget {
 
   final EnumVisibilityTab selectedTab;
 
+  /// Callback when drag and dropping item on this book card.
+  final void Function(int, List<int>)? onDropBook;
   final void Function()? onShowCreateBookDialog;
   final void Function(Book)? onTapBook;
   final void Function(EnumBookItemAction, int, Book)? onPopupMenuItemSelected;
@@ -81,10 +84,13 @@ class MyBooksPageBody extends StatelessWidget {
               book: book,
               selected: selected,
               selectionMode: selectionMode,
+              onDrop: (List<int> dragIndexes) => onDropBook?.call(
+                index,
+                dragIndexes,
+              ),
               onTap: () => onTapBook?.call(book),
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               popupMenuEntries: popupMenuEntries,
-              onLongPress: (selected) => onLongPressBook?.call(book, selected),
             );
           },
           childCount: books.length,
