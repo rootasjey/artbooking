@@ -17,6 +17,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
     required this.popupMenuEntries,
     required this.selectedTab,
     this.limitThreeInRow = false,
+    this.onDropIllustration,
     this.onGoToActiveTab,
     this.onLongPressIllustration,
     this.onPopupMenuItemSelected,
@@ -46,6 +47,9 @@ class MyIllustrationsPageBody extends StatelessWidget {
   final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries;
 
   final Map<String?, Illustration> multiSelectedItems;
+
+  /// Callback when drag and dropping item on this illustration card.
+  final void Function(int, List<int>)? onDropIllustration;
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +93,11 @@ class MyIllustrationsPageBody extends StatelessWidget {
               onTap: () => onTapIllustration?.call(illustration),
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               popupMenuEntries: popupMenuEntries,
-              onLongPress: onLongPressIllustration,
+              // onLongPress: onLongPressIllustration,
+              onDrop: (dropIndexes) => onDropIllustration?.call(
+                index,
+                dropIndexes,
+              ),
             );
           },
           childCount: illustrations.length,

@@ -129,6 +129,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                 illustrations: _illustrations,
                 loading: _loading,
                 multiSelectedItems: _multiSelectedItems,
+                onDropIllustration: onDropIllustration,
                 onGoToActiveTab: onGoToActiveTab,
                 onLongPressIllustration: onLongPressIllustration,
                 onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -665,31 +666,26 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   /// Fire when a new document has been updated in Firestore.
   /// Update the corresponding document in the UI.
   void onUpdateStreamingIllustration(DocumentChangeMap documentChange) {
-    try {
-      final data = documentChange.doc.data();
-      if (data == null) {
-        return;
-      }
-
-      final int index = _illustrations.indexWhere(
-        (illustration) => illustration.id == documentChange.doc.id,
-      );
-
-      data['id'] = documentChange.doc.id;
-      final updatedIllustration = Illustration.fromMap(data);
-
-      setState(() {
-        _illustrations.removeAt(index);
-        _illustrations.insert(index, updatedIllustration);
-      });
-    } on Exception catch (error) {
-      Utilities.logger.e(
-        "The document with the id ${documentChange.doc.id} "
-        "doesn't exist in the illustrations list.",
-      );
-
-      Utilities.logger.e(error);
+    final data = documentChange.doc.data();
+    if (!documentChange.doc.exists || data == null) {
+      return;
     }
+
+    final int index = _illustrations.indexWhere(
+      (illustration) => illustration.id == documentChange.doc.id,
+    );
+
+    if (index < 0) {
+      return;
+    }
+
+    data["id"] = documentChange.doc.id;
+    final updatedIllustration = Illustration.fromMap(data);
+
+    setState(() {
+      _illustrations.removeAt(index);
+      _illustrations.insert(index, updatedIllustration);
+    });
   }
 
   void showAddGroupToBook() {
@@ -872,5 +868,57 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   void onGoToActiveTab() {
     onChangedTab(EnumVisibilityTab.active);
+  }
+
+  void onDropIllustration(int dropIndex, List<int> dragIndexes) async {
+    final firstDragIndex = dragIndexes.first;
+    if (dropIndex == firstDragIndex) {
+      return;
+    }
+
+    if (dropIndex < 0 ||
+        firstDragIndex < 0 ||
+        dropIndex >= _illustrations.length ||
+        firstDragIndex > _illustrations.length) {
+      return;
+    }
+
+    final dropIllustration = _illustrations.elementAt(dropIndex);
+    final dragIllustration = _illustrations.elementAt(firstDragIndex);
+
+    final int dropUserCustomIndex = dropIllustration.userCustomIndex;
+    final int dragUserCustomIndex = dragIllustration.userCustomIndex;
+
+    final newDropIllustration = dropIllustration.copyWith(
+      userCustomIndex: dragUserCustomIndex,
+    );
+
+    final newDragIllustration = dragIllustration.copyWith(
+      userCustomIndex: dropUserCustomIndex,
+    );
+
+    setState(() {
+      _illustrations[firstDragIndex] = newDropIllustration;
+      _illustrations[dropIndex] = newDragIllustration;
+    });
+
+    try {
+      await FirebaseFirestore.instance
+          .collection("illustrations")
+          .doc(newDragIllustration.id)
+          .update({
+        "user_custom_index": newDragIllustration.userCustomIndex,
+      });
+
+      await FirebaseFirestore.instance
+          .collection("illustrations")
+          .doc(newDropIllustration.id)
+          .update({
+        "user_custom_index": newDropIllustration.userCustomIndex,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
   }
 }
