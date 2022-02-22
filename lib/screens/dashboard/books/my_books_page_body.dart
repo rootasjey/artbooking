@@ -86,6 +86,7 @@ class MyBooksPageBody extends StatelessWidget {
               book: book,
               selected: selected,
               selectionMode: selectionMode,
+              canDrag: true,
               onDragUpdate: onDragUpdateBook,
               onDrop: (List<int> dragIndexes) => onDropBook?.call(
                 index,

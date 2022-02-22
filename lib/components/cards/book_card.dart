@@ -34,6 +34,7 @@ class BookCard extends StatefulWidget {
     this.height = 402.0,
     this.onDrop,
     this.onDragUpdate,
+    this.canDrag = false,
   }) : super(key: key);
 
   /// Book's data for this card.
@@ -70,6 +71,10 @@ class BookCard extends StatefulWidget {
   /// If true, this card is in selection mode
   /// alongside all other cards in the list/grid, if any.
   final bool selectionMode;
+
+  /// If true, the card can be dragged.
+  /// Usually used to re-order items.
+  final bool canDrag;
 
   final double width;
   final double height;
@@ -129,12 +134,13 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
         child: SizedBox(
           width: widget.width,
           height: widget.height,
-          child: dropTarget(),
+          child: widget.canDrag ? dropTarget() : fullstackCard(),
         ),
       ),
     );
   }
 
+  /// Card wrapper to enable using book card as drop target.
   Widget dropTarget() {
     return DragTarget<int>(
       builder: (BuildContext context, candidateItems, rejectedItems) {
@@ -148,25 +154,33 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     );
   }
 
+  /// Card wrapper to enable dragging.
   Widget draggableCard({bool usingAsDropTarget = false}) {
     return LongPressDraggable<int>(
       data: widget.index,
       feedback: draggingCard(),
       childWhenDragging: childWhenDragging(),
       onDragUpdate: widget.onDragUpdate,
-      child: Column(
-        children: [
-          Stack(
-            children: [
-              backCard(),
-              frontCard(
-                usingAsDropTarget: usingAsDropTarget,
-              ),
-            ],
-          ),
-          caption(),
-        ],
+      child: fullstackCard(
+        usingAsDropTarget: usingAsDropTarget,
       ),
+    );
+  }
+
+  /// Actual card with back, front & caption.
+  Widget fullstackCard({bool usingAsDropTarget = false}) {
+    return Column(
+      children: [
+        Stack(
+          children: [
+            backCard(),
+            frontCard(
+              usingAsDropTarget: usingAsDropTarget,
+            ),
+          ],
+        ),
+        caption(),
+      ],
     );
   }
 

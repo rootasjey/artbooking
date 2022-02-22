@@ -91,6 +91,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
               heroTag: illustration.id,
               illustration: illustration,
               selected: selected,
+              canDrag: true,
               selectionMode: selectionMode,
               onDragUpdate: onDragUpdateIllustration,
               onTap: () => onTapIllustration?.call(illustration),

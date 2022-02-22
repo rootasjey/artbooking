@@ -33,6 +33,7 @@ class IllustrationCard extends StatefulWidget {
     this.onTapLike,
     this.onDrop,
     this.onDragUpdate,
+    this.canDrag = false,
   }) : super(key: key);
 
   /// Index position in a list, if available.
@@ -44,6 +45,10 @@ class IllustrationCard extends StatefulWidget {
   /// If true, this card is in selection mode
   /// alongside all other cards in the list/grid, if any.
   final bool selectionMode;
+
+  /// If true, the card can be dragged.
+  /// Usually used to re-order items.
+  final bool canDrag;
 
   /// Illustration's data for this card.
   final Illustration illustration;
@@ -121,7 +126,15 @@ class _IllustrationCardState extends State<IllustrationCard>
   @override
   Widget build(BuildContext context) {
     final illustration = widget.illustration;
-    Widget child = dropTarget();
+    Widget child = Container();
+
+    if (widget.canDrag) {
+      child = dropTarget();
+    } else {
+      child = imageCard(
+        usingAsDropTarget: false,
+      );
+    }
 
     if (illustration.getThumbnail().isEmpty) {
       child = loadingCard();
@@ -158,79 +171,85 @@ class _IllustrationCardState extends State<IllustrationCard>
     Color defaultColor = Colors.transparent;
     final Color primaryColor = Theme.of(context).primaryColor;
 
-    return LongPressDraggable<int>(
-      data: widget.index,
-      feedback: draggingCard(),
-      childWhenDragging: childWhenDragging(),
-      onDragUpdate: widget.onDragUpdate,
-      child: Card(
-        color: widget.selected ? primaryColor : defaultColor,
-        elevation: _elevation,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-          side: usingAsDropTarget
-              ? BorderSide(color: primaryColor, width: 4.0)
-              : BorderSide.none,
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: ExtendedImage.network(
-          imageUrl,
-          fit: BoxFit.cover,
-          width: widget.size,
-          height: widget.size,
-          clearMemoryCacheWhenDispose: true,
-          loadStateChanged: (state) {
-            switch (state.extendedImageLoadState) {
-              case LoadState.loading:
-                return loadingCard();
-              case LoadState.completed:
-                return Ink.image(
-                  image: state.imageProvider,
-                  fit: BoxFit.cover,
-                  child: InkWell(
-                    onTap: widget.onTap,
-                    // onLongPress: onLongPressImage,
-                    onHover: onHoverImage,
-                    onDoubleTap: onDoubleTap,
-                    child: Stack(
-                      children: [
-                        multiSelectIndicator(),
-                        if (widget.popupMenuEntries.isNotEmpty)
-                          Positioned(
-                            bottom: 10.0,
-                            right: 10.0,
-                            child: popupMenuButton(),
-                          ),
-                        likeOverlay(),
-                        likeAnimationOverlay(),
-                      ],
-                    ),
-                  ),
-                );
-              case LoadState.failed:
-                return InkWell(
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        "image_load_failed".tr(),
-                        style: Utilities.fonts.style(
-                          fontWeight: FontWeight.w700,
+    final Widget cardChild = Card(
+      color: widget.selected ? primaryColor : defaultColor,
+      elevation: _elevation,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+        side: usingAsDropTarget
+            ? BorderSide(color: primaryColor, width: 4.0)
+            : BorderSide.none,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: ExtendedImage.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        width: widget.size,
+        height: widget.size,
+        clearMemoryCacheWhenDispose: true,
+        loadStateChanged: (state) {
+          switch (state.extendedImageLoadState) {
+            case LoadState.loading:
+              return loadingCard();
+            case LoadState.completed:
+              return Ink.image(
+                image: state.imageProvider,
+                fit: BoxFit.cover,
+                child: InkWell(
+                  onTap: widget.onTap,
+                  // onLongPress: onLongPressImage,
+                  onHover: onHoverImage,
+                  onDoubleTap: onDoubleTap,
+                  child: Stack(
+                    children: [
+                      multiSelectIndicator(),
+                      if (widget.popupMenuEntries.isNotEmpty)
+                        Positioned(
+                          bottom: 10.0,
+                          right: 10.0,
+                          child: popupMenuButton(),
                         ),
+                      likeOverlay(),
+                      likeAnimationOverlay(),
+                    ],
+                  ),
+                ),
+              );
+            case LoadState.failed:
+              return InkWell(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      "image_load_failed".tr(),
+                      style: Utilities.fonts.style(
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
-                  onTap: () {
-                    state.reLoadImage();
-                  },
-                );
-              default:
-                return state.completedWidget;
-            }
-          },
-        ),
+                ),
+                onTap: () {
+                  state.reLoadImage();
+                },
+              );
+            default:
+              return state.completedWidget;
+          }
+        },
       ),
     );
+
+    if (widget.canDrag) {
+      return LongPressDraggable<int>(
+        data: widget.index,
+        feedback: draggingCard(),
+        childWhenDragging: childWhenDragging(),
+        onDragUpdate: widget.onDragUpdate,
+        child: cardChild,
+      );
+    }
+
+    return cardChild;
   }
 
   Widget childWhenDragging() {
