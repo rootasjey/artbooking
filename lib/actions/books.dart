@@ -127,4 +127,27 @@ class BooksActions {
       return BookResponse.fromMessage(error.toString());
     }
   }
+
+  static Future<IllustrationsResponse> reorderIllustrations({
+    required String bookId,
+    required int dropIndex,
+    required List<int> dragIndexes,
+  }) async {
+    try {
+      final response =
+          await Utilities.cloud.fun("books-reorderIllustrations").call({
+        "book_id": bookId,
+        "drop_index": dropIndex,
+        "drag_indexes": dragIndexes,
+      });
+
+      return IllustrationsResponse.fromJSON(response.data);
+    } on FirebaseFunctionsException catch (exception) {
+      Utilities.logger.e(exception);
+      return IllustrationsResponse.fromException(exception);
+    } catch (error) {
+      Utilities.logger.e(error);
+      return IllustrationsResponse.fromMessage(error.toString());
+    }
+  }
 }
