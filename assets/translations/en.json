@@ -164,6 +164,7 @@
   },
   "book_loading": "Loading book",
   "book_no_illustrations": "You haven't added any illustration to this book yet. You can add one from your illustrations page.",
+  "book_permutation_description": "Drop this book on another one to permute them.",
   "book_rename": "Rename book",
   "book_rename_description": "Give a new name or description to this book.",
   "book_upload_illustration": "Upload a new illustration and add it to this book.",
@@ -184,7 +185,6 @@
   "books": "Books",
   "books_active_word": "Active",
   "books_active_or_archived": "View your active or archived books.",
-  
   "books_adding_illustrations": {
     "zero": "Adding illustration to books",
     "one": "Adding illustration to books",
