@@ -1,14 +1,15 @@
 import 'dart:async';
 
 import 'package:artbooking/actions/books.dart';
+import 'package:artbooking/components/application_bar/user_section/application_bar_auth_user.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
-import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
 import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/book/book_page_body.dart';
 import 'package:artbooking/screens/book/book_page_fab.dart';
@@ -156,59 +157,71 @@ class _MyBookPageState extends ConsumerState<BookPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool owner =
-        _book.userId == ref.read(AppState.userProvider).firestoreUser?.id;
+    final firestoreUser = ref.read(AppState.userProvider).firestoreUser;
+    final bool owner = _book.userId == firestoreUser?.id;
+    final String avatarUrl = firestoreUser?.getProfilePicture() ?? "";
 
     return Scaffold(
       floatingActionButton: BookPageFab(
         show: _showFab,
         scrollController: _scrollController,
       ),
-      body: NotificationListener<ScrollNotification>(
-        onNotification: onScrollNotification,
-        child: CustomScrollView(
-          controller: _scrollController,
-          slivers: <Widget>[
-            ApplicationBar(),
-            BookPageHeader(
-              book: _book,
-              forceMultiSelect: _forceMultiSelect,
-              liked: _liked,
-              multiSelectedItems: _multiSelectedItems,
-              onLike: onLike,
-              onAddToBook: showAddGroupToBook,
-              onClearMultiSelect: onClearMultiSelect,
-              onConfirmDeleteBook: onConfirmDeleteBook,
-              onConfirmRemoveGroup: onConfirmRemoveGroup,
-              onMultiSelectAll: onMultiSelectAll,
-              onToggleMultiSelect: onToggleMultiSelect,
-              onShowDatesDialog: onShowDatesDialog,
-              onShowRenameBookDialog: onShowRenameBookDialog,
-              onUploadToThisBook: onUploadToThisBook,
-              onUpdateVisibility: onUpdateVisibility,
-              owner: owner,
+      body: Stack(
+        children: [
+          NotificationListener<ScrollNotification>(
+            onNotification: onScrollNotification,
+            child: CustomScrollView(
+              controller: _scrollController,
+              slivers: <Widget>[
+                BookPageHeader(
+                  book: _book,
+                  forceMultiSelect: _forceMultiSelect,
+                  liked: _liked,
+                  multiSelectedItems: _multiSelectedItems,
+                  onLike: onLike,
+                  onAddToBook: showAddGroupToBook,
+                  onClearMultiSelect: onClearMultiSelect,
+                  onConfirmDeleteBook: onConfirmDeleteBook,
+                  onConfirmRemoveGroup: onConfirmRemoveGroup,
+                  onMultiSelectAll: onMultiSelectAll,
+                  onToggleMultiSelect: onToggleMultiSelect,
+                  onShowDatesDialog: onShowDatesDialog,
+                  onShowRenameBookDialog: onShowRenameBookDialog,
+                  onUploadToThisBook: onUploadToThisBook,
+                  onUpdateVisibility: onUpdateVisibility,
+                  owner: owner,
+                ),
+                BookPageBody(
+                  loading: _loading,
+                  hasError: _hasError,
+                  forceMultiSelect: _forceMultiSelect,
+                  illustrationMap: _illustrationMap,
+                  bookIllustrations: _book.illustrations,
+                  multiSelectedItems: _multiSelectedItems,
+                  popupMenuEntries: _popupMenuEntries,
+                  onBrowseIllustrations: onBrowseIllustrations,
+                  onDragUpdateBook: onDragUpdateBook,
+                  onPopupMenuItemSelected: onPopupMenuItemSelected,
+                  onTapIllustrationCard: onTapIllustrationCard,
+                  onUploadToThisBook: onUploadToThisBook,
+                  onDropIllustration: onDropIllustration,
+                  owner: owner,
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.only(bottom: 100.0),
+                ),
+              ],
             ),
-            BookPageBody(
-              loading: _loading,
-              hasError: _hasError,
-              forceMultiSelect: _forceMultiSelect,
-              illustrationMap: _illustrationMap,
-              bookIllustrations: _book.illustrations,
-              multiSelectedItems: _multiSelectedItems,
-              popupMenuEntries: _popupMenuEntries,
-              onBrowseIllustrations: onBrowseIllustrations,
-              onDragUpdateBook: onDragUpdateBook,
-              onPopupMenuItemSelected: onPopupMenuItemSelected,
-              onTapIllustrationCard: onTapIllustrationCard,
-              onUploadToThisBook: onUploadToThisBook,
-              onDropIllustration: onDropIllustration,
-              owner: owner,
+          ),
+          Positioned(
+            top: 8.0,
+            right: 0.0,
+            child: ApplicationBarAuthUser(
+              onSignOut: onSignOut,
+              avatarURL: avatarUrl,
             ),
-            SliverPadding(
-              padding: const EdgeInsets.only(bottom: 100.0),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -1244,5 +1257,11 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     );
 
     _illustrationSubs.putIfAbsent(query.id, () => illustrationSub);
+  }
+
+  void onSignOut() async {
+    final user = ref.read(AppState.userProvider.notifier);
+    await user.signOut();
+    Beamer.of(context, root: true).beamToNamed(HomeLocation.route);
   }
 }
