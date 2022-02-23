@@ -328,7 +328,7 @@ class _SearchPageState extends State<SearchPage> {
 
     try {
       final query = SearchUtilities.algolia
-          .index('posts')
+          .index("illustrations")
           .query(_searchInputValue)
           .setHitsPerPage(_limit)
           .setPage(0);

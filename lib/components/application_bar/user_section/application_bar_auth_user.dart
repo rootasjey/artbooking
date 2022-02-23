@@ -29,11 +29,8 @@ class ApplicationBarAuthUser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(
-        top: 5.0,
-        right: 10.0,
-      ),
+    return Padding(
+      padding: const EdgeInsets.only(top: 5.0, right: 10.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
