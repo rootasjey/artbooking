@@ -47,6 +47,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_riverpod: 1.0.3
+  flutter_improved_scrolling: 0.0.3
   font_awesome_flutter: 9.2.0
   global_configuration: 2.0.0-nullsafety.0
   google_fonts: 2.3.1
