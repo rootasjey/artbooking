@@ -1,3 +1,4 @@
+import 'package:artbooking/components/custom_scroll_behavior.dart';
 import 'package:artbooking/components/footer/footer.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/screens/home/home_page_contact.dart';
@@ -7,6 +8,7 @@ import 'package:artbooking/screens/home/home_page_quote.dart';
 import 'package:artbooking/screens/home/home_page_roadmap.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:supercharged/supercharged.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,12 +18,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _scrollController = ScrollController();
-  bool _isFabVisible = false;
-
-  @override
-  initState() {
-    super.initState();
-  }
+  bool _showFab = false;
 
   @override
   void dispose() {
@@ -36,23 +33,28 @@ class _HomePageState extends State<HomePage> {
       body: Overlay(
         initialEntries: [
           OverlayEntry(builder: (context) {
-            return NotificationListener<ScrollNotification>(
-              onNotification: onNotification,
-              child: CustomScrollView(
-                controller: _scrollController,
-                slivers: [
-                  ApplicationBar(),
-                  SliverList(
-                    delegate: SliverChildListDelegate.fixed([
-                      HomePageHero(),
-                      HomePageCurated(),
-                      HomePageQuote(),
-                      HomePageRoadmap(),
-                      HomePageContact(),
-                      Footer(pageScrollController: _scrollController),
-                    ]),
-                  ),
-                ],
+            return ImprovedScrolling(
+              scrollController: _scrollController,
+              enableKeyboardScrolling: true,
+              onScroll: onScroll,
+              child: ScrollConfiguration(
+                behavior: CustomScrollBehavior(),
+                child: CustomScrollView(
+                  controller: _scrollController,
+                  slivers: [
+                    ApplicationBar(),
+                    SliverList(
+                      delegate: SliverChildListDelegate.fixed([
+                        HomePageHero(),
+                        HomePageCurated(),
+                        HomePageQuote(),
+                        HomePageRoadmap(),
+                        HomePageContact(),
+                        Footer(pageScrollController: _scrollController),
+                      ]),
+                    ),
+                  ],
+                ),
               ),
             );
           }),
@@ -62,7 +64,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget floattingActionButton() {
-    if (!_isFabVisible) {
+    if (!_showFab) {
       return Container();
     }
 
@@ -79,14 +81,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  bool onNotification(ScrollNotification notification) {
-    // FAB visibility
-    if (notification.metrics.pixels < 50 && _isFabVisible) {
-      setState(() => _isFabVisible = false);
-    } else if (notification.metrics.pixels > 50 && !_isFabVisible) {
-      setState(() => _isFabVisible = true);
+  void onScroll(double scrollOffset) {
+    if (scrollOffset < 50 && _showFab) {
+      setState(() => _showFab = false);
+      return;
     }
 
-    return false;
+    if (scrollOffset > 50 && !_showFab) {
+      setState(() => _showFab = true);
+    }
   }
 }

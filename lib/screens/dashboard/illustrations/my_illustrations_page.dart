@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/buttons/visibility_button.dart';
+import 'package:artbooking/components/custom_scroll_behavior.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
@@ -26,6 +27,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
@@ -111,44 +113,49 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
           show: _showFab,
           scrollController: _scrollController,
         ),
-        body: NotificationListener<ScrollNotification>(
-          onNotification: onScrollNotification,
-          child: CustomScrollView(
-            controller: _scrollController,
-            slivers: <Widget>[
-              ApplicationBar(),
-              MyIllustrationsPageHeader(
-                multiSelectedItems: _multiSelectedItems,
-                multiSelectActive: _forceMultiSelect,
-                onUploadIllustration: uploadIllustration,
-                onClearSelection: onClearSelection,
-                onSelectAll: onSelectAll,
-                onTriggerMultiSelect: onTriggerMultiSelect,
-                onConfirmDeleteGroup: confirmDeleteGroup,
-                selectedTab: _selectedTab,
-                onChangedTab: onChangedTab,
-                limitThreeInRow: _layoutThreeInRow,
-                onUpdateLayout: onUpdateLayout,
-                onChangeGroupVisibility: showGroupVisibilityDialog,
-                onAddGroupToBook: showAddGroupToBook,
-              ),
-              MyIllustrationsPageBody(
-                forceMultiSelect: _forceMultiSelect,
-                illustrations: _illustrations,
-                loading: _loading,
-                multiSelectedItems: _multiSelectedItems,
-                onDragUpdateIllustration: onDragUpdateIllustration,
-                onDropIllustration: onDropIllustration,
-                onGoToActiveTab: onGoToActiveTab,
-                onPopupMenuItemSelected: onPopupMenuItemSelected,
-                onTapIllustration: onTapIllustration,
-                popupMenuEntries: _popupMenuEntries,
-                selectedTab: _selectedTab,
-                limitThreeInRow: _layoutThreeInRow,
-                uploadIllustration: uploadIllustration,
-              ),
-              SliverPadding(padding: const EdgeInsets.only(bottom: 300.0)),
-            ],
+        body: ImprovedScrolling(
+          scrollController: _scrollController,
+          enableKeyboardScrolling: true,
+          onScroll: onScroll,
+          child: ScrollConfiguration(
+            behavior: CustomScrollBehavior(),
+            child: CustomScrollView(
+              controller: _scrollController,
+              slivers: <Widget>[
+                ApplicationBar(),
+                MyIllustrationsPageHeader(
+                  multiSelectedItems: _multiSelectedItems,
+                  multiSelectActive: _forceMultiSelect,
+                  onUploadIllustration: uploadIllustration,
+                  onClearSelection: onClearSelection,
+                  onSelectAll: onSelectAll,
+                  onTriggerMultiSelect: onTriggerMultiSelect,
+                  onConfirmDeleteGroup: confirmDeleteGroup,
+                  selectedTab: _selectedTab,
+                  onChangedTab: onChangedTab,
+                  limitThreeInRow: _layoutThreeInRow,
+                  onUpdateLayout: onUpdateLayout,
+                  onChangeGroupVisibility: showGroupVisibilityDialog,
+                  onAddGroupToBook: showAddGroupToBook,
+                ),
+                MyIllustrationsPageBody(
+                  forceMultiSelect: _forceMultiSelect,
+                  illustrations: _illustrations,
+                  loading: _loading,
+                  multiSelectedItems: _multiSelectedItems,
+                  onDragUpdateIllustration: onDragUpdateIllustration,
+                  onDropIllustration: onDropIllustration,
+                  onGoToActiveTab: onGoToActiveTab,
+                  onPopupMenuItemSelected: onPopupMenuItemSelected,
+                  onTapIllustration: onTapIllustration,
+                  popupMenuEntries: _popupMenuEntries,
+                  selectedTab: _selectedTab,
+                  limitThreeInRow: _layoutThreeInRow,
+                  uploadIllustration: uploadIllustration,
+                ),
+                SliverPadding(padding: const EdgeInsets.only(bottom: 300.0)),
+              ],
+            ),
           ),
         ),
       ),
@@ -744,6 +751,25 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         (illustration) => illustration.id == documentChange.doc.id,
       );
     });
+  }
+
+  /// Callback when the page scrolls up and down.
+  void onScroll(double scrollOffset) {
+    if (scrollOffset < 50 && _showFab) {
+      setState(() => _showFab = false);
+      return;
+    }
+
+    if (scrollOffset > 50 && !_showFab) {
+      setState(() => _showFab = true);
+    }
+
+    if (_scrollController.position.atEdge &&
+        scrollOffset > 50 &&
+        _hasNext &&
+        !_loadingMore) {
+      fetchMoreIllustrations();
+    }
   }
 
   void onSelectAll() {

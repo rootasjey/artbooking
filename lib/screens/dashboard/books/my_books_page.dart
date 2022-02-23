@@ -1,4 +1,5 @@
 import 'package:artbooking/actions/books.dart';
+import 'package:artbooking/components/custom_scroll_behavior.dart';
 import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
 import 'package:artbooking/components/buttons/visibility_button.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
@@ -27,6 +28,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
@@ -38,8 +40,8 @@ class MyBooksPage extends ConsumerStatefulWidget {
 class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   bool _loading = false;
   bool _hasNext = true;
-  bool _isFabVisible = false;
-  bool _isLoadingMore = false;
+  bool _showFab = false;
+  bool _loadingMore = false;
   bool _forceMultiSelect = false;
   bool _creating = false;
 
@@ -102,49 +104,54 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     return Scaffold(
       floatingActionButton: MyBooksPageFab(
         scrollController: _scrollController,
-        show: _isFabVisible,
+        show: _showFab,
         onShowCreateBookDialog: showCreateBookDialog,
       ),
       body: Stack(
         children: [
-          NotificationListener<ScrollNotification>(
-            onNotification: onScrollNotification,
-            child: CustomScrollView(
-              controller: _scrollController,
-              slivers: <Widget>[
-                ApplicationBar(),
-                MyBooksPageHeader(
-                  selectedTab: _selectedTab,
-                  onChangedTab: onChangedTab,
-                  multiSelectActive: _forceMultiSelect,
-                  multiSelectedItems: _multiSelectedItems,
-                  onSelectAll: onSelectAll,
-                  onClearSelection: clearSelection,
-                  onTriggerMultiSelect: triggerMultiSelect,
-                  onShowCreateBookDialog: showCreateBookDialog,
-                  onAddToBook: showAddGroupToBookDialog,
-                  onChangeGroupVisibility: showGroupVisibilityDialog,
-                  onConfirmDeleteGroup: onConfirmDeleteGroup,
-                ),
-                MyBooksPageBody(
-                  books: _books,
-                  loading: _loading,
-                  onDropBook: onDropBook,
-                  onShowCreateBookDialog: showCreateBookDialog,
-                  popupMenuEntries: _popupMenuEntries,
-                  onDragUpdateBook: onDragUpdateBook,
-                  onLongPressBook: onLongPressBook,
-                  forceMultiSelect: _forceMultiSelect,
-                  multiSelectedItems: _multiSelectedItems,
-                  onPopupMenuItemSelected: onPopupMenuItemSelected,
-                  onTapBook: onTapBook,
-                  onGoToActiveBooks: onGoToActiveBooks,
-                  selectedTab: _selectedTab,
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.only(bottom: 100.0),
-                ),
-              ],
+          ImprovedScrolling(
+            scrollController: _scrollController,
+            enableKeyboardScrolling: true,
+            onScroll: onScroll,
+            child: ScrollConfiguration(
+              behavior: CustomScrollBehavior(),
+              child: CustomScrollView(
+                controller: _scrollController,
+                slivers: <Widget>[
+                  ApplicationBar(),
+                  MyBooksPageHeader(
+                    selectedTab: _selectedTab,
+                    onChangedTab: onChangedTab,
+                    multiSelectActive: _forceMultiSelect,
+                    multiSelectedItems: _multiSelectedItems,
+                    onSelectAll: onSelectAll,
+                    onClearSelection: clearSelection,
+                    onTriggerMultiSelect: triggerMultiSelect,
+                    onShowCreateBookDialog: showCreateBookDialog,
+                    onAddToBook: showAddGroupToBookDialog,
+                    onChangeGroupVisibility: showGroupVisibilityDialog,
+                    onConfirmDeleteGroup: onConfirmDeleteGroup,
+                  ),
+                  MyBooksPageBody(
+                    books: _books,
+                    loading: _loading,
+                    onDropBook: onDropBook,
+                    onShowCreateBookDialog: showCreateBookDialog,
+                    popupMenuEntries: _popupMenuEntries,
+                    onDragUpdateBook: onDragUpdateBook,
+                    onLongPressBook: onLongPressBook,
+                    forceMultiSelect: _forceMultiSelect,
+                    multiSelectedItems: _multiSelectedItems,
+                    onPopupMenuItemSelected: onPopupMenuItemSelected,
+                    onTapBook: onTapBook,
+                    onGoToActiveBooks: onGoToActiveBooks,
+                    selectedTab: _selectedTab,
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.only(bottom: 100.0),
+                  ),
+                ],
+              ),
             ),
           ),
           Positioned(
@@ -359,7 +366,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       return;
     }
 
-    _isLoadingMore = true;
+    _loadingMore = true;
 
     try {
       final QueryMap? query = getFetchMoreQuery();
@@ -371,7 +378,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       if (snapshot.docs.isEmpty) {
         setState(() {
           _hasNext = false;
-          _isLoadingMore = false;
+          _loadingMore = false;
         });
 
         return;
@@ -385,7 +392,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       }
 
       setState(() {
-        _isLoadingMore = false;
+        _loadingMore = false;
         _lastDocument = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
       });
@@ -575,28 +582,23 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     });
   }
 
-  /// On scroll notifications.
-  bool onScrollNotification(ScrollNotification notification) {
-    // FAB visibility
-    if (notification.metrics.pixels < 50 && _isFabVisible) {
-      setState(() {
-        _isFabVisible = false;
-      });
-    } else if (notification.metrics.pixels > 50 && !_isFabVisible) {
-      setState(() {
-        _isFabVisible = true;
-      });
+  /// Callback when the page scrolls up and down.
+  void onScroll(double scrollOffset) {
+    if (scrollOffset < 50 && _showFab) {
+      setState(() => _showFab = false);
+      return;
     }
 
-    if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
-      return false;
+    if (scrollOffset > 50 && !_showFab) {
+      setState(() => _showFab = true);
     }
 
-    if (_hasNext && !_isLoadingMore) {
+    if (_scrollController.position.atEdge &&
+        scrollOffset > 50 &&
+        _hasNext &&
+        !_loadingMore) {
       fetchMoreBooks();
     }
-
-    return false;
   }
 
   void onSelectAll() {
