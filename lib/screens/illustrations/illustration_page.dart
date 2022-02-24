@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:animations/animations.dart';
+import 'package:artbooking/components/custom_scroll_behavior.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/screens/edit_image/edit_image_page.dart';
@@ -21,6 +22,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -52,6 +54,8 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
   /// Listent to changes for this illustration's like status.
   DocSnapshotStreamSubscription? _likeSubscription;
 
+  final _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -78,6 +82,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
   void dispose() {
     _illustrationSubscription?.cancel();
     _likeSubscription?.cancel();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -97,22 +102,27 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
         ),
         body: Stack(
           children: [
-            NotificationListener(
-              child: CustomScrollView(
-                slivers: [
-                  ApplicationBar(),
-                  IllustrationPageBody(
-                    isOwner: isOwner,
-                    isLoading: _isLoading,
-                    updatingImage: _updatingImage,
-                    illustration: _illustration,
-                    onShowEditMetadataPanel: onShowEditMetadataPanel,
-                    onGoToEditImagePage: onGoToEditImagePage,
-                    onLike: onLike,
-                    onShare: onShare,
-                    liked: _liked,
-                  ),
-                ],
+            ImprovedScrolling(
+              scrollController: _scrollController,
+              child: ScrollConfiguration(
+                behavior: CustomScrollBehavior(),
+                child: CustomScrollView(
+                  controller: _scrollController,
+                  slivers: [
+                    ApplicationBar(),
+                    IllustrationPageBody(
+                      isOwner: isOwner,
+                      isLoading: _isLoading,
+                      updatingImage: _updatingImage,
+                      illustration: _illustration,
+                      onShowEditMetadataPanel: onShowEditMetadataPanel,
+                      onGoToEditImagePage: onGoToEditImagePage,
+                      onLike: onLike,
+                      onShare: onShare,
+                      liked: _liked,
+                    ),
+                  ],
+                ),
               ),
             ),
             Positioned(
