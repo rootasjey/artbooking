@@ -115,7 +115,7 @@ class BookPageBody extends StatelessWidget {
 
             return IllustrationCard(
               index: index,
-              heroTag: key,
+              heroTag: illustration.id,
               illustration: illustration,
               key: ValueKey(key),
               illustrationKey: key,
