@@ -59,7 +59,7 @@ class SelectLicensePanelHeader extends StatelessWidget {
                           Opacity(
                             opacity: 0.5,
                             child: Text(
-                              "licenses_subtitle".tr(),
+                              "licenses_panel_subtitle".tr(),
                               style: Utilities.fonts.style(
                                 height: 1.0,
                                 fontSize: 14.0,

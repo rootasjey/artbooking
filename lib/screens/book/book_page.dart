@@ -8,7 +8,7 @@ import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
-import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/book/book_page_body.dart';
@@ -291,7 +291,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     );
 
     Beamer.of(context).beamToNamed(
-      DashboardLocationContent.booksRoute,
+      AtelierLocationContent.booksRoute,
     );
   }
 
@@ -622,7 +622,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
 
   void navigateToIllustrationPage(Illustration illustration) {
     NavigationStateHelper.illustration = illustration;
-    final String route = DashboardLocationContent.illustrationBookRoute
+    final String route = AtelierLocationContent.illustrationBookRoute
         .replaceFirst(":bookId", _book.id)
         .replaceFirst(":illustrationId", illustration.id);
 
@@ -636,7 +636,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   }
 
   void onBrowseIllustrations() {
-    context.beamToNamed(DashboardLocationContent.illustrationsRoute);
+    context.beamToNamed(AtelierLocationContent.illustrationsRoute);
   }
 
   void onClearMultiSelect() {

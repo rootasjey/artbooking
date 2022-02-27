@@ -2,9 +2,9 @@ import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/texts/page_title.dart';
 import 'package:artbooking/router/locations/home_location.dart';
-import 'package:artbooking/screens/dashboard/dashboard_page_card.dart';
+import 'package:artbooking/screens/atelier/atelier_page_card.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:beamer/beamer.dart';
@@ -13,8 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
-class DashboardPageWelcome extends ConsumerWidget {
-  const DashboardPageWelcome({Key? key}) : super(key: key);
+class AtelierPageWelcome extends ConsumerWidget {
+  const AtelierPageWelcome({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -45,7 +45,7 @@ class DashboardPageWelcome extends ConsumerWidget {
                       color: Theme.of(context).primaryColor,
                       name: name,
                     ),
-                    placeDescription(),
+                    navigationDescription(),
                     sectionsList(context),
                   ],
                 ),
@@ -65,8 +65,8 @@ class DashboardPageWelcome extends ConsumerWidget {
         bottom: 54.0,
       ),
       sliver: PageTitle(
-        titleValue: "dashboard".tr(),
-        subtitleValue: "dashboard_greetings".tr(),
+        titleValue: "atelier".tr(),
+        subtitleValue: "atelier_greetings".tr(),
         crossAxisAlignment: CrossAxisAlignment.start,
       ),
     );
@@ -115,7 +115,7 @@ class DashboardPageWelcome extends ConsumerWidget {
     );
   }
 
-  Widget placeDescription() {
+  Widget navigationDescription() {
     return Opacity(
       opacity: 0.4,
       child: Text(
@@ -132,70 +132,70 @@ class DashboardPageWelcome extends ConsumerWidget {
     int index = 0;
 
     final List<Widget> children = [
-      DashbordPageCard(
+      AtelierPageCard(
         hoverColor: Constants.colors.activity,
         iconData: UniconsLine.chart_pie,
         textTitle: "activity".tr(),
         textSubtitle: "activity_subtitle".tr(),
         onTap: () {
-          context.beamToNamed(DashboardLocationContent.activityRoute);
+          context.beamToNamed(AtelierLocationContent.activityRoute);
         },
       ),
-      DashbordPageCard(
+      AtelierPageCard(
         hoverColor: Constants.colors.illustrations,
         iconData: UniconsLine.picture,
         textTitle: "illustrations".tr(),
         textSubtitle: "illustrations_my_subtitle".tr(),
         onTap: () {
-          context.beamToNamed(DashboardLocationContent.illustrationsRoute);
+          context.beamToNamed(AtelierLocationContent.illustrationsRoute);
         },
       ),
-      DashbordPageCard(
+      AtelierPageCard(
         hoverColor: Constants.colors.books,
         iconData: UniconsLine.book_alt,
         textTitle: "books".tr(),
         textSubtitle: "books_subtitle".tr(),
         onTap: () {
-          context.beamToNamed(DashboardLocationContent.booksRoute);
+          context.beamToNamed(AtelierLocationContent.booksRoute);
         },
       ),
-      DashbordPageCard(
+      AtelierPageCard(
         hoverColor: Constants.colors.settings,
         iconData: UniconsLine.setting,
         textTitle: "settings".tr(),
         textSubtitle: "settings_subtitle".tr(),
         onTap: () {
-          context.beamToNamed(DashboardLocationContent.settingsRoute);
+          context.beamToNamed(AtelierLocationContent.settingsRoute);
         },
       ),
-      DashbordPageCard(
+      AtelierPageCard(
         hoverColor: Constants.colors.profile,
         iconData: UniconsLine.user,
         textTitle: "profile".tr(),
         textSubtitle: "profile_subtitle".tr(),
         onTap: () {
-          context.beamToNamed(DashboardLocationContent.profileRoute);
+          context.beamToNamed(AtelierLocationContent.profileRoute);
         },
       ),
-      DashbordPageCard(
+      AtelierPageCard(
         hoverColor: Constants.colors.likes,
         iconData: UniconsLine.heart,
         textTitle: "likes".tr(),
         textSubtitle: "likes_subtitle".tr(),
         onTap: () {
-          context.beamToNamed(DashboardLocationContent.likesRoute);
+          context.beamToNamed(AtelierLocationContent.likesRoute);
         },
       ),
-      DashbordPageCard(
+      AtelierPageCard(
         hoverColor: Constants.colors.licenses,
         iconData: UniconsLine.document_info,
         textTitle: "licenses".tr(),
         textSubtitle: "licenses_subtitle".tr(),
         onTap: () {
-          context.beamToNamed(DashboardLocationContent.licensesRoute);
+          context.beamToNamed(AtelierLocationContent.licensesRoute);
         },
       ),
-      DashbordPageCard(
+      AtelierPageCard(
         hoverColor: Constants.colors.home,
         iconData: UniconsLine.home,
         textTitle: "home".tr(),

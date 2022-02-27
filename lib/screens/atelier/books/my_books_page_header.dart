@@ -1,7 +1,7 @@
 import 'package:artbooking/components/texts/page_title.dart';
-import 'package:artbooking/screens/dashboard/books/my_books_page_actions.dart';
-import 'package:artbooking/screens/dashboard/books/my_books_page_group_actions.dart';
-import 'package:artbooking/screens/dashboard/books/my_books_page_title.dart';
+import 'package:artbooking/screens/atelier/books/my_books_page_actions.dart';
+import 'package:artbooking/screens/atelier/books/my_books_page_group_actions.dart';
+import 'package:artbooking/screens/atelier/books/my_books_page_title.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:easy_localization/easy_localization.dart';

@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:animations/animations.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
-import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/screens/edit_image/edit_image_page.dart';
 import 'package:artbooking/screens/settings/settings_page_empty.dart';
@@ -222,25 +222,25 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   void onGoToDeleteAccount() {
     Beamer.of(context).beamToNamed(
-      DashboardLocationContent.deleteAccountRoute,
+      AtelierLocationContent.deleteAccountRoute,
     );
   }
 
   void onGoToUpdatePasssword() {
     Beamer.of(context).beamToNamed(
-      DashboardLocationContent.updatePasswordRoute,
+      AtelierLocationContent.updatePasswordRoute,
     );
   }
 
   void onGoToUpdateUsername() {
     Beamer.of(context).beamToNamed(
-      DashboardLocationContent.updateUsernameRoute,
+      AtelierLocationContent.updateUsernameRoute,
     );
   }
 
   void onGoToUpdateEmail() async {
     Beamer.of(context).beamToNamed(
-      DashboardLocationContent.updateEmailRoute,
+      AtelierLocationContent.updateEmailRoute,
     );
   }
 

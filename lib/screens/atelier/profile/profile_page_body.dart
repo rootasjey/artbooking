@@ -1,9 +1,9 @@
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants/section_ids.dart';
-import 'package:artbooking/screens/dashboard/profile/profile_page_add_section.dart';
-import 'package:artbooking/screens/dashboard/profile/profile_page_books.dart';
-import 'package:artbooking/screens/dashboard/profile/profile_page_hero.dart';
-import 'package:artbooking/screens/dashboard/profile/profile_page_illustrations.dart';
+import 'package:artbooking/screens/atelier/profile/profile_page_add_section.dart';
+import 'package:artbooking/screens/atelier/profile/profile_page_books.dart';
+import 'package:artbooking/screens/atelier/profile/profile_page_hero.dart';
+import 'package:artbooking/screens/atelier/profile/profile_page_illustrations.dart';
 import 'package:artbooking/types/artistic_page.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/section.dart';

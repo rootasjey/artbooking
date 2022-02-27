@@ -1,7 +1,7 @@
 import 'package:artbooking/components/buttons/text_icon_button.dart';
 import 'package:artbooking/types/side_menu_item.dart';
 import 'package:artbooking/globals/app_state.dart';
-import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
@@ -11,9 +11,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
-/// User's dashboard side menu.
-class DashboardPageSideMenu extends ConsumerStatefulWidget {
-  const DashboardPageSideMenu({
+/// User's atelier side menu.
+class AtelierPageSideMenu extends ConsumerStatefulWidget {
+  const AtelierPageSideMenu({
     Key? key,
     required this.beamerKey,
   }) : super(key: key);
@@ -24,7 +24,7 @@ class DashboardPageSideMenu extends ConsumerStatefulWidget {
   _DashboardSideMenuState createState() => _DashboardSideMenuState();
 }
 
-class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
+class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
   late BeamerDelegate _beamerDelegate;
 
   /// True if the side menu is expanded showing icons and labels.
@@ -233,11 +233,11 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
               IconButton(
                 tooltip: "hub_subtitle".tr(),
                 onPressed: () {
-                  Beamer.of(context).beamToNamed(DashboardLocation.route);
+                  Beamer.of(context).beamToNamed(AtelierLocation.route);
                 },
                 icon: Opacity(
                   opacity: 0.8,
-                  child: Icon(UniconsLine.window_maximize),
+                  child: Icon(UniconsLine.ruler_combined),
                 ),
               ),
             ],
@@ -260,43 +260,43 @@ class _DashboardSideMenuState extends ConsumerState<DashboardPageSideMenu> {
         iconData: UniconsLine.chart_pie,
         label: "activity".tr(),
         hoverColor: Constants.colors.activity,
-        routePath: DashboardLocationContent.activityRoute,
+        routePath: AtelierLocationContent.activityRoute,
       ),
       SideMenuItem(
         iconData: UniconsLine.picture,
         label: "illustrations".tr(),
         hoverColor: Constants.colors.illustrations,
-        routePath: DashboardLocationContent.illustrationsRoute,
+        routePath: AtelierLocationContent.illustrationsRoute,
       ),
       SideMenuItem(
         iconData: UniconsLine.book_alt,
         label: "books".tr(),
         hoverColor: Constants.colors.books,
-        routePath: DashboardLocationContent.booksRoute,
+        routePath: AtelierLocationContent.booksRoute,
       ),
       SideMenuItem(
         iconData: UniconsLine.user,
         label: "profile_my".tr(),
         hoverColor: Constants.colors.galleries,
-        routePath: DashboardLocationContent.profileRoute,
+        routePath: AtelierLocationContent.profileRoute,
       ),
       SideMenuItem(
         iconData: UniconsLine.setting,
         label: "settings".tr(),
         hoverColor: Constants.colors.settings,
-        routePath: DashboardLocationContent.settingsRoute,
+        routePath: AtelierLocationContent.settingsRoute,
       ),
       SideMenuItem(
         iconData: UniconsLine.heart,
         label: "likes".tr(),
         hoverColor: Colors.pink,
-        routePath: DashboardLocationContent.likesRoute,
+        routePath: AtelierLocationContent.likesRoute,
       ),
       SideMenuItem(
         iconData: UniconsLine.document_info,
         label: "licenses".tr(),
         hoverColor: Colors.amber.shade800,
-        routePath: DashboardLocationContent.licensesRoute,
+        routePath: AtelierLocationContent.licensesRoute,
       ),
     ];
   }

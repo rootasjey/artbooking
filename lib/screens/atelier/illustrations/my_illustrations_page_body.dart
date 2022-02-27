@@ -1,6 +1,6 @@
 import 'package:artbooking/components/cards/illustration_card.dart';
 import 'package:artbooking/components/icons/animated_app_icon.dart';
-import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page_empty.dart';
+import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_empty.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:artbooking/types/illustration/illustration.dart';

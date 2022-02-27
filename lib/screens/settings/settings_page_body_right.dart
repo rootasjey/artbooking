@@ -1,7 +1,7 @@
 import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/constants.dart';
-import 'package:artbooking/screens/dashboard/dashboard_page_card.dart';
+import 'package:artbooking/screens/atelier/atelier_page_card.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +37,7 @@ class SettingsPageBodyRight extends ConsumerWidget {
     int index = 0;
 
     final List<Widget> children = [
-      DashbordPageCard(
+      AtelierPageCard(
         compact: compact,
         hoverColor: Constants.colors.activity,
         iconData: UniconsLine.space_key,
@@ -45,7 +45,7 @@ class SettingsPageBodyRight extends ConsumerWidget {
         textSubtitle: userFirestore.name,
         onTap: onGoToUpdateUsername,
       ),
-      DashbordPageCard(
+      AtelierPageCard(
         compact: compact,
         hoverColor: Constants.colors.email,
         iconData: UniconsLine.envelope,
@@ -53,7 +53,7 @@ class SettingsPageBodyRight extends ConsumerWidget {
         textSubtitle: userFirestore.email,
         onTap: onGoToUpdateEmail,
       ),
-      DashbordPageCard(
+      AtelierPageCard(
         compact: compact,
         hoverColor: Constants.colors.location,
         iconData: UniconsLine.location_point,
@@ -61,7 +61,7 @@ class SettingsPageBodyRight extends ConsumerWidget {
         textSubtitle: userFirestore.location,
         onTap: onEditLocation,
       ),
-      DashbordPageCard(
+      AtelierPageCard(
         compact: compact,
         hoverColor: Constants.colors.summary,
         iconData: UniconsLine.subject,
@@ -69,7 +69,7 @@ class SettingsPageBodyRight extends ConsumerWidget {
         textSubtitle: userFirestore.summary,
         onTap: onEditSummary,
       ),
-      DashbordPageCard(
+      AtelierPageCard(
         compact: compact,
         hoverColor: Constants.colors.password,
         iconData: UniconsLine.lock,
@@ -77,7 +77,7 @@ class SettingsPageBodyRight extends ConsumerWidget {
         textSubtitle: "password_update".tr(),
         onTap: onGoToUpdatePasssword,
       ),
-      DashbordPageCard(
+      AtelierPageCard(
         compact: compact,
         hoverColor: Constants.colors.delete,
         iconData: UniconsLine.trash,

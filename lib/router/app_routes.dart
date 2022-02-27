@@ -1,7 +1,7 @@
 import 'package:artbooking/router/locations/about_location.dart';
 import 'package:artbooking/router/locations/changelog_location.dart';
 import 'package:artbooking/router/locations/contact_location.dart';
-import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/forgot_password_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/locations/search_location.dart';
@@ -18,7 +18,7 @@ final appLocationsBuilder = BeamerDelegate(
       AboutLocation(),
       ChangelogLocation(),
       ContactLocation(),
-      DashboardLocation(),
+      AtelierLocation(),
       ForgotPasswordLocation(),
       SigninLocation(),
       SignupLocation(),

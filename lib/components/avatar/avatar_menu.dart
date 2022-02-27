@@ -1,6 +1,6 @@
 import 'package:artbooking/components/avatar/adaptive_user_avatar.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
-import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/locations/search_location.dart';
 import 'package:beamer/beamer.dart';
@@ -62,7 +62,7 @@ class AvatarMenu extends StatelessWidget {
 
     final lastHistory = Beamer.of(context).beamingHistory.last;
     final currentPathLocation = lastHistory.state.routeInformation.location;
-    final bool pathIsDashboard = currentPathLocation == DashboardLocation.route;
+    final bool pathIsDashboard = currentPathLocation == AtelierLocation.route;
     final bool pathIsHome = currentPathLocation == HomeLocation.route;
 
     return [
@@ -81,14 +81,14 @@ class AvatarMenu extends StatelessWidget {
         ),
       if (!pathIsDashboard)
         PopupMenuItemIcon(
-          icon: Icon(UniconsLine.window_maximize, color: iconColor),
-          textLabel: "dashboard".tr(),
-          value: DashboardLocationContent.route,
+          icon: Icon(UniconsLine.ruler_combined, color: iconColor),
+          textLabel: "atelier".tr(),
+          value: AtelierLocationContent.route,
         ),
       PopupMenuItemIcon(
         icon: Icon(UniconsLine.setting, color: iconColor),
         textLabel: "settings".tr(),
-        value: DashboardLocationContent.settingsRoute,
+        value: AtelierLocationContent.settingsRoute,
       ),
       PopupMenuItemIcon(
         icon: Icon(UniconsLine.sign_left, color: iconColor),

@@ -1,6 +1,6 @@
 import 'package:artbooking/components/application_bar/application_bar_search_button.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/settings_location.dart';
 import 'package:artbooking/types/app_bar_button_data.dart';
 import 'package:artbooking/globals/app_state.dart';
@@ -61,7 +61,7 @@ class ApplicationBarMiddleDesktop extends ConsumerWidget {
 
   void navigateToSettings(BuildContext context, WidgetRef ref) {
     if (ref.read(AppState.userProvider.notifier).isAuthenticated) {
-      Beamer.of(context).beamToNamed(DashboardLocationContent.settingsRoute);
+      Beamer.of(context).beamToNamed(AtelierLocationContent.settingsRoute);
       return;
     }
 

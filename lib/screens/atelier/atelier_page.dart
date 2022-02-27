@@ -1,16 +1,16 @@
-import 'package:artbooking/screens/dashboard/dashboard_page_side_menu.dart';
+import 'package:artbooking/screens/atelier/atelier_page_side_menu.dart';
 import 'package:artbooking/components/upload_panel/upload_panel.dart';
-import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 
 /// Widget showing user's dashboard.
-class DashboardPage extends StatefulWidget {
+class AtelierPage extends StatefulWidget {
   @override
-  _DashboardPageState createState() => _DashboardPageState();
+  _AtelierPageState createState() => _AtelierPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
+class _AtelierPageState extends State<AtelierPage> {
   final _beamerKey = GlobalKey<BeamerState>();
 
   @override
@@ -22,7 +22,7 @@ class _DashboardPageState extends State<DashboardPage> {
           children: [
             Row(
               children: [
-                DashboardPageSideMenu(
+                AtelierPageSideMenu(
                   beamerKey: _beamerKey,
                 ),
                 Expanded(
@@ -32,7 +32,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       key: _beamerKey,
                       routerDelegate: BeamerDelegate(
                         locationBuilder: BeamerLocationBuilder(beamLocations: [
-                          DashboardLocationContent(),
+                          AtelierLocationContent(),
                         ]),
                       ),
                     ),

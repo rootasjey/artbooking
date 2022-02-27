@@ -1,8 +1,8 @@
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/signin_location.dart';
-import 'package:artbooking/screens/dashboard/dashboard_page_welcome.dart';
-import 'package:artbooking/screens/dashboard/dashboard_page.dart';
-import 'package:artbooking/screens/dashboard/profile/profile_page.dart';
+import 'package:artbooking/screens/atelier/atelier_page_welcome.dart';
+import 'package:artbooking/screens/atelier/atelier_page.dart';
+import 'package:artbooking/screens/atelier/profile/profile_page.dart';
 import 'package:artbooking/screens/likes/likes_page.dart';
 import 'package:artbooking/screens/settings/delete_account/delete_account_page.dart';
 import 'package:artbooking/screens/illustrations/illustration_page.dart';
@@ -10,8 +10,8 @@ import 'package:artbooking/screens/licenses/one/license_page.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page.dart';
 import 'package:artbooking/screens/book/book_page.dart';
 import 'package:artbooking/screens/activity/activity_page.dart';
-import 'package:artbooking/screens/dashboard/books/my_books_page.dart';
-import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page.dart';
+import 'package:artbooking/screens/atelier/books/my_books_page.dart';
+import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page.dart';
 import 'package:artbooking/screens/settings/settings_page.dart';
 import 'package:artbooking/screens/settings/update_email/update_email_page.dart';
 import 'package:artbooking/screens/settings/update_password/update_password_page.dart';
@@ -23,10 +23,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DashboardLocation extends BeamLocation<BeamState> {
+class AtelierLocation extends BeamLocation<BeamState> {
   /// Main root value for this location.
-  static const String route = "/dashboard";
-  static const String routeWildCard = "/dashboard/*";
+  static const String route = "/atelier";
+  static const String routeWildCard = "/atelier/*";
 
   @override
   List<String> get pathPatterns => [routeWildCard];
@@ -56,18 +56,18 @@ class DashboardLocation extends BeamLocation<BeamState> {
   List<BeamPage> buildPages(BuildContext context, BeamState state) {
     return [
       BeamPage(
-        child: DashboardPage(),
+        child: AtelierPage(),
         key: ValueKey(route),
-        title: Utilities.getPageTitle("dashboard".tr()),
+        title: Utilities.getPageTitle("atelier".tr()),
         type: BeamPageType.fadeTransition,
       ),
     ];
   }
 }
 
-class DashboardLocationContent extends BeamLocation<BeamState> {
+class AtelierLocationContent extends BeamLocation<BeamState> {
   /// Main root value for this location.
-  static const String route = "/dashboard";
+  static const String route = "/atelier";
 
   /// Books route value for this location.
   static const String booksRoute = "$route/books";
@@ -90,19 +90,19 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
   static const String settingsRoute = "$route/settings";
 
   /// Delete account route value for this location.
-  static const String deleteAccountRoute = "$route/settings/delete/account";
+  static const String deleteAccountRoute = "$settingsRoute/delete/account";
 
   /// Activity route value for this location.
   static const String activityRoute = "$route/activity";
 
   /// Update email route value for this location.
-  static const String updateEmailRoute = "$route/settings/update/email";
+  static const String updateEmailRoute = "$settingsRoute/update/email";
 
   /// Update password route value for this location.
-  static const String updatePasswordRoute = "$route/settings/update/password";
+  static const String updatePasswordRoute = "$settingsRoute/update/password";
 
   /// Update username route value for this location.
-  static const String updateUsernameRoute = "$route/settings/update/username";
+  static const String updateUsernameRoute = "$settingsRoute/update/username";
 
   static const String licensesRoute = "$route/licenses";
   static const String licenseRoute = "$licensesRoute/:licenseId";
@@ -132,9 +132,9 @@ class DashboardLocationContent extends BeamLocation<BeamState> {
   List<BeamPage> buildPages(BuildContext context, BeamState state) {
     return [
       BeamPage(
-        child: DashboardPageWelcome(),
+        child: AtelierPageWelcome(),
         key: ValueKey(route),
-        title: Utilities.getPageTitle("dashboard".tr()),
+        title: Utilities.getPageTitle("atelier".tr()),
         type: BeamPageType.fadeTransition,
       ),
       if (state.pathPatternSegments.contains("activity"))

@@ -1,7 +1,7 @@
 import 'package:artbooking/components/texts/page_title.dart';
-import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page_actions.dart';
-import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page_group_actions.dart';
-import 'package:artbooking/screens/dashboard/illustrations/my_illustrations_page_title.dart';
+import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_actions.dart';
+import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_group_actions.dart';
+import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_title.dart';
 import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:easy_localization/easy_localization.dart';

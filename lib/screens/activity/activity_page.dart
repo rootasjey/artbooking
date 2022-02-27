@@ -1,5 +1,5 @@
 import 'package:artbooking/components/application_bar/application_bar.dart';
-import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/screens/activity/activity_page_member_since.dart';
 import 'package:artbooking/screens/activity/activity_page_header.dart';
 import 'package:artbooking/screens/activity/activity_page_categories.dart';
@@ -118,7 +118,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
           UniconsLine.picture,
           size: 48.0,
         ),
-        routePath: DashboardLocationContent.illustrationsRoute,
+        routePath: AtelierLocationContent.illustrationsRoute,
         titleValue: "illustrations".tr(),
       ),
       SquareStatsData(
@@ -128,7 +128,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
           UniconsLine.book_alt,
           size: 48.0,
         ),
-        routePath: DashboardLocationContent.booksRoute,
+        routePath: AtelierLocationContent.booksRoute,
         titleValue: "books".tr(),
       ),
       // SquareStatsData(

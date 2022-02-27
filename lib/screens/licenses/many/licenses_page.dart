@@ -4,7 +4,7 @@ import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page_fab.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page_header.dart';
@@ -411,7 +411,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   }
 
   void onTapLicense(License license) {
-    final route = DashboardLocationContent.licenseRoute
+    final route = AtelierLocationContent.licenseRoute
         .replaceFirst(':licenseId', license.id);
 
     Beamer.of(context).beamToNamed(route, data: {

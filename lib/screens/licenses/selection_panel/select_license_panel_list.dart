@@ -1,6 +1,6 @@
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/router/locations/dashboard_location.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';
@@ -65,7 +65,7 @@ class SelectLicensePanelList extends StatelessWidget {
                 child: Center(
                   child: DarkElevatedButton(
                     onPressed: () => Beamer.of(context).beamToNamed(
-                      DashboardLocationContent.licensesRoute,
+                      AtelierLocationContent.licensesRoute,
                     ),
                     child: Text("license_personal_create".tr()),
                   ),

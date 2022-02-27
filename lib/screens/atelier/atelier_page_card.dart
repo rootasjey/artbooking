@@ -2,8 +2,8 @@ import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 
-class DashbordPageCard extends StatefulWidget {
-  const DashbordPageCard({
+class AtelierPageCard extends StatefulWidget {
+  const AtelierPageCard({
     Key? key,
     this.hoverColor = Colors.pink,
     required IconData this.iconData,
@@ -21,10 +21,10 @@ class DashbordPageCard extends StatefulWidget {
   final Function()? onTap;
 
   @override
-  _DashbordPageCardState createState() => _DashbordPageCardState();
+  _AtelierPageCardState createState() => _AtelierPageCardState();
 }
 
-class _DashbordPageCardState extends State<DashbordPageCard> {
+class _AtelierPageCardState extends State<AtelierPageCard> {
   double _elevation = 2.0;
   Color? _iconColor;
 
