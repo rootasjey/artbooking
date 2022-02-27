@@ -10,6 +10,7 @@ import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/atelier/books/my_books_page_body.dart';
 import 'package:artbooking/screens/atelier/books/my_books_page_fab.dart';
@@ -615,7 +616,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   void onNavigateToBook(Book book) {
     NavigationStateHelper.book = book;
     Beamer.of(context).beamToNamed(
-      "dashboard/books/${book.id}",
+      AtelierLocationContent.bookRoute.replaceFirst(":bookId", book.id),
       data: {
         "bookId": book.id,
       },

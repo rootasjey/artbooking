@@ -7,6 +7,7 @@ import 'package:artbooking/components/custom_scroll_behavior.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_body.dart';
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_fab.dart';
@@ -543,7 +544,10 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   void navigateToIllustrationPage(Illustration illustration) {
     NavigationStateHelper.illustration = illustration;
     Beamer.of(context).beamToNamed(
-      "dashboard/illustrations/${illustration.id}",
+      AtelierLocationContent.illustrationRoute.replaceFirst(
+        ":illustrationId",
+        illustration.id,
+      ),
       data: {
         "illustrationId": illustration.id,
       },
