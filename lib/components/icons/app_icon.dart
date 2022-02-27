@@ -1,17 +1,18 @@
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class AppIcon extends StatefulWidget {
-  final Function? onTap;
-  final EdgeInsetsGeometry padding;
-  final double size;
-
   AppIcon({
     this.onTap,
     this.padding = EdgeInsets.zero,
     this.size = 40.0,
   });
+
+  final Function? onTap;
+  final EdgeInsetsGeometry padding;
+  final double size;
 
   @override
   _AppIconState createState() => _AppIconState();
@@ -22,13 +23,10 @@ class _AppIconState extends State<AppIcon> {
   Widget build(BuildContext context) {
     return Padding(
       child: InkWell(
-        highlightColor: Colors.transparent,
-        focusColor: Colors.transparent,
-        hoverColor: Colors.transparent,
-        onTap: widget.onTap as void Function()? ?? defaultOnTap,
-        child: Image.asset(
-          'assets/images/app_icon/64.png',
-          fit: BoxFit.cover,
+        borderRadius: BorderRadius.circular(12.0),
+        onTap: onTap,
+        child: Lottie.asset(
+          "assets/images/app_icon/icon_animation.json",
           width: widget.size,
           height: widget.size,
         ),
@@ -37,7 +35,11 @@ class _AppIconState extends State<AppIcon> {
     );
   }
 
-  void defaultOnTap() {
+  void onTap() {
+    if (widget.onTap != null) {
+      return widget.onTap?.call();
+    }
+
     Beamer.of(context, root: true).beamToNamed(HomeLocation.route);
   }
 }

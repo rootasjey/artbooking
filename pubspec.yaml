@@ -1,5 +1,5 @@
 name: artbooking
-description: Your inspirational space.
+description: The farthest reaches of unreal.
 licence: MPL-2.0
 
 # The following line prevents the package from being accidentally published to
@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.45.0+2
+version: 0.46.0+2
 
 environment:
   sdk: '>=2.13.0 <3.0.0'
@@ -53,8 +53,9 @@ dependencies:
   google_fonts: 2.3.1
   image: 3.1.1
   image_editor: 1.0.2
-  logger: 1.1.0
   introduction_screen: 2.1.0
+  logger: 1.1.0
+  lottie: 1.2.2
   jiffy: 5.0.0
   mime_type: 1.0.0
   modal_bottom_sheet: 2.0.0
@@ -96,17 +97,8 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
-    - assets/images/app_icon/32.png
-    - assets/images/app_icon/64.png
-    - assets/images/app_icon/96.png
-    - assets/images/app_icon/128.png
     - assets/images/app_icon/512.png
-    - assets/images/app_icon/1080.png
-    - assets/images/app_icon/animation.gif
-    - assets/images/woman_writing_colorful.png
-    - assets/images/gummy-canvas.png
-    - assets/images/avatar_female.png
-    - assets/images/avatar_male.png
+    - assets/images/app_icon/icon_animation.json
     - assets/translations/
     - assets/cfg/
 

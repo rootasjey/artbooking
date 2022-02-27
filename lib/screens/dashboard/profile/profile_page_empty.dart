@@ -33,8 +33,8 @@ class ProfilePageEmpty extends StatelessWidget {
                           child: CircleAvatar(
                             backgroundColor: Constants.colors.clairPink,
                             radius: 80.0,
-                            foregroundImage:
-                                AssetImage("assets/images/avatar_male.png"),
+                            foregroundImage: NetworkImage(
+                                "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Favatars%2Favatar_man_0.png?alt=media&token=2c8edef3-5e6f-4b84-a52b-2c9034951e20"),
                           ),
                         ),
                         Opacity(

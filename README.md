@@ -1,10 +1,10 @@
 
 <p align="middle">
-  <img src="./web/icons/192.png" width="100" />
+  <img src="./web/icons/512.png" width="300" />
 </p>
 
 <p align="middle">
-Your inspirational space.
+The farthest reaches of unreal
 </p>
 
 <p aling="middle">

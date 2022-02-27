@@ -286,6 +286,13 @@ class _AboutPageState extends State<AboutPage> {
             hoverColor: Theme.of(context).secondaryHeaderColor,
             baseColor: baseColor,
           ),
+          AboutPageCreditItem(
+            textValue: "Lottie animations from DIEGO VILLALPANDO CRUZ",
+            onTap: () => launch("https://lottiefiles.com/xu85gcdnbv"),
+            iconData: UniconsLine.star,
+            hoverColor: Theme.of(context).secondaryHeaderColor,
+            baseColor: baseColor,
+          ),
         ],
       ),
     );

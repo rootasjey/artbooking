@@ -64,6 +64,9 @@
   "art_movements_update_fail": "Désolés, nous n'avons pas pu mettre à jour vos mouvements artistiques. Veuillez réessayer plus tard.",
   "art_movements_update_out_of_range": "Veuillez utiliser au maximum 5 mouvements artistiques. Vous avez essayé d'en mettre {}.",
   "artworks": "Œures d'art",
+  "atelier": "Atelier",
+  "atelier_greetings": "On voulait juste vous dire bonjour 👋",
+  "atelier_sections_navigation": "Vous pouvez naviguer vers les autres sections à partir d'ici.",
   "audience": {
     "small": "Moins de 10 000 visiteurs par mois",
     "medium": "Entre 10  000 et 100 000 visiteurs par mois",

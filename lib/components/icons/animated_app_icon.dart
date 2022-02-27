@@ -1,39 +1,34 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
-class AnimatedAppIcon extends StatefulWidget {
-  final double size;
-  final String? textTitle;
-
+class AnimatedAppIcon extends StatelessWidget {
   AnimatedAppIcon({
     this.size = 100.0,
-    this.textTitle,
+    this.textTitle = "",
   });
 
-  @override
-  _AnimatedAppIconState createState() => _AnimatedAppIconState();
-}
+  final double size;
+  final String textTitle;
 
-class _AnimatedAppIconState extends State<AnimatedAppIcon> {
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Image.asset(
-          'assets/images/app_icon/animation.gif',
-          height: widget.size,
-          width: widget.size,
+        Lottie.asset(
+          "assets/images/app_icon/icon_animation.json",
+          width: size,
+          height: size,
         ),
-        if (widget.textTitle != null)
+        if (textTitle.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.only(
-              top: 8.0,
-            ),
+            padding: const EdgeInsets.only(top: 8.0),
             child: Opacity(
               opacity: 0.6,
               child: Text(
-                widget.textTitle!,
-                style: TextStyle(
-                  fontSize: 18.0,
+                textTitle,
+                style: Utilities.fonts.style(
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
