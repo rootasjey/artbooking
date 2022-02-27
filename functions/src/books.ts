@@ -161,6 +161,11 @@ export const createOne = functions
         layout: 'grid',
         layout_orientation: 'vertical',
         name,
+        staff_review: {
+          approved: false,
+          updated_at: adminApp.firestore.Timestamp.now(),
+          user_id: '',
+        },
         updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
         user_custom_index,
         user_id: userAuth.uid,

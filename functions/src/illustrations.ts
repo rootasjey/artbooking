@@ -12,6 +12,7 @@ import {
   allowedLicenseTypes,
   ART_MOVEMENTS_COLLECTION_NAME,
   BASE_DOCUMENT_NAME,
+  BOOKS_COLLECTION_NAME,
   checkVisibilityValue,
   cloudRegions,
   ILLUSTRATIONS_COLLECTION_NAME,
@@ -34,6 +35,54 @@ interface GenerateImageThumbsParams {
   objectMeta: functions.storage.ObjectMetadata;
   visibility: string;
 }
+
+export const updateFirestoreProperties = functions
+  .region(cloudRegions.eu)
+  .https
+  .onRequest(async (req, res) => {
+    const illustrationSnapshot = await firestore
+      .collection(ILLUSTRATIONS_COLLECTION_NAME)
+      .get()
+
+    for await (const illustrationDoc of illustrationSnapshot.docs) {
+      await illustrationDoc.ref.update({
+        pegi: {
+          content_descriptors: {
+            bad_language: false,
+            discrimination: false,
+            drugs: false,
+            fear: false,
+            sex: false,
+            violence: false,
+          },
+          rating: -1,
+          updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+          user_id: '',
+        },
+        staff_review: {
+          approved: false,
+          updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+          user_id: '',
+        },
+      })
+    }
+
+    const bookSnapshot = await firestore
+      .collection(BOOKS_COLLECTION_NAME)
+      .get()
+
+    for await (const bookDoc of bookSnapshot.docs) {
+      await bookDoc.ref.update({
+        staff_review: {
+          approved: false,
+          updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+          user_id: '',
+        },
+      })
+    }
+
+    res.json({success: true})
+  })
 
 /**
  * Check an illustration document in Firestore from its id [illustrationId].
@@ -230,7 +279,25 @@ export const createOne = functions
         },
         lore: '',
         name: name,
+        pegi: {
+          content_descriptors: {
+            bad_language: false,
+            discrimination: false,
+            drug: false,
+            fear: false,
+            sex: false,
+            violence: false,
+          },
+          rating: -1,
+          updated_at: adminApp.firestore.Timestamp.now(),
+          user_id: '',
+        },
         size: 0, // File's ize in bytes
+        staff_review: {
+          approved: false,
+          updated_at: adminApp.firestore.Timestamp.now(),
+          user_id: '',
+        },
         timelapse: {
           created_at: null,
           description: '',
