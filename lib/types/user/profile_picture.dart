@@ -17,8 +17,8 @@ class ProfilePicture {
   });
 
   static const List<String> _sampleAvatars = [
-    "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Favatar_female.png?alt=media&token=24de34ec-71a6-44d0-8324-50c77e848dee",
-    "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Favatar_male.png?alt=media&token=326302d9-912d-4923-9bec-94c6bb9892ae",
+    "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Favatars%2Favatar_woman_1.png?alt=media&token=2ef023f4-53c8-466b-93e4-70f58e6067bb",
+    "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Favatars%2Favatar_man_0.png?alt=media&token=2c8edef3-5e6f-4b84-a52b-2c9034951e20",
   ];
 
   final Dimensions dimensions;
