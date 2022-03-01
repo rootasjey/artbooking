@@ -125,6 +125,7 @@ export const createAccount = functions
       .collection(USERS_COLLECTION_NAME)
       .doc(userAuthRecord.uid)
       .set({
+        bio: '',
         created_at: adminApp.firestore.FieldValue.serverTimestamp(),
         email: email,
         language: 'en',
@@ -154,6 +155,7 @@ export const createAccount = functions
           'user:manage_users': false,
         },
         social_links: {
+          artbooking: '',
           artstation: '',
           devianart: '',
           discord: '',
@@ -414,10 +416,10 @@ export const onUpdatePublicInfo = functions
       .collection(USER_PUBLIC_FIELDS_COLLECTION_NAME)
       .doc(BASE_DOCUMENT_NAME)
       .update({
+        bio: afterData.bio ?? '',
         location: afterData.location,
         name: afterData.name,
         profile_picture: afterData.profile_picture,
-        lore: afterData.lore,
         social_links: afterData.social_links,
       });
   })
@@ -557,15 +559,15 @@ export const updatePublicStrings = functions
       );
     }
 
-    const lore: string = data.lore;
-    const location: string = data.location;
+    const bio: string = data.bio ?? '';
+    const location: string = data.location ?? '';
 
-    if (typeof lore !== 'string' || typeof location !== 'string') {
+    if (typeof bio !== 'string' || typeof location !== 'string') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `You provided a wrong argument type for [lore] or [location]. ` +
+        `You provided a wrong argument type for [bio] or [location]. ` +
         `Both arguments should be string, but their value are: ` +
-        `lore (${typeof lore}): ${lore}, location (${typeof location}): ${location}.`,
+        `bio (${typeof bio}): ${bio}, location (${typeof location}): ${location}.`,
       );
     }
 
@@ -573,8 +575,8 @@ export const updatePublicStrings = functions
       .collection(USERS_COLLECTION_NAME)
       .doc(userAuth.uid)
       .update({
+        bio,
         location,
-        lore,
       });
   })
 
@@ -594,21 +596,21 @@ export const updateSocialLinks = functions
       );
     }
 
-    const socialLinks = data.socialLinks;
+    const {social_links} = data;
 
-    if (typeof socialLinks !== 'object') {
+    if (typeof social_links !== 'object') {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `You provided a wrong argument type for [socialLinks]. ` +
-        `The function should be called with a [socialLinks] argument wich is an object or map of strings.`,
+        `You provided a wrong argument type for [social_links]. ` +
+        `The function should be called with a [social_links] argument wich is an object or map of strings.`,
       );
     }
 
-    for (const [key, value] of Object.entries(socialLinks)) {
+    for (const [key, value] of Object.entries(social_links)) {
       if (typeof key !== 'string' || typeof value !== 'string') {
         throw new functions.https.HttpsError(
           'invalid-argument',
-          `The [socialLinks] argument is not a map of (string, string) for (key, value). ` +
+          `The [social_links] argument is not a map of (string, string) for (key, value). ` +
           `${key} has a type of ${typeof key}. ${value} has a type of ${typeof value}`,
         );
       }
@@ -618,7 +620,7 @@ export const updateSocialLinks = functions
       .collection(USERS_COLLECTION_NAME)
       .doc(userAuth.uid)
       .update({
-        social_links: socialLinks
+        social_links: social_links
       });
   })
 
