@@ -22,7 +22,6 @@ import 'package:supercharged/supercharged.dart';
 /// Add a group of illustrations to one or more books..
 class AddToBooksDialog extends StatefulWidget {
   AddToBooksDialog({
-    this.scrollController,
     required this.illustrations,
     this.books = const [],
     this.autoFocus = false,
@@ -30,7 +29,6 @@ class AddToBooksDialog extends StatefulWidget {
   });
 
   final bool autoFocus;
-  final ScrollController? scrollController;
   final List<Illustration> illustrations;
   final List<Book> books;
 
