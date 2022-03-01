@@ -69,6 +69,9 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
   /// Main root value for this location.
   static const String route = "/atelier";
 
+  /// Activity route value for this location.
+  static const String activityRoute = "$route/activity";
+
   /// Books route value for this location.
   static const String booksRoute = "$route/books";
 
@@ -83,6 +86,11 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
 
   static const String illustrationBookRoute = "$bookRoute/:illustrationId/";
 
+  static const String licensesRoute = "$route/licenses";
+  static const String licenseRoute = "$licensesRoute/:licenseId";
+
+  static const String likesRoute = "$route/likes";
+
   /// Profile route value for this location.
   static const String profileRoute = "$route/profile";
 
@@ -92,9 +100,6 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
   /// Delete account route value for this location.
   static const String deleteAccountRoute = "$settingsRoute/delete/account";
 
-  /// Activity route value for this location.
-  static const String activityRoute = "$route/activity";
-
   /// Update email route value for this location.
   static const String updateEmailRoute = "$settingsRoute/update/email";
 
@@ -103,11 +108,6 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
 
   /// Update username route value for this location.
   static const String updateUsernameRoute = "$settingsRoute/update/username";
-
-  static const String licensesRoute = "$route/licenses";
-  static const String licenseRoute = "$licensesRoute/:licenseId";
-
-  static const String likesRoute = "$route/likes";
 
   @override
   List<String> get pathPatterns => [
