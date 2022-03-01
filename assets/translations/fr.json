@@ -850,8 +850,20 @@
   "search_hint_text": "Rechercher un article ou un projet...",
   "scroll_to_top": "Retour en haut",
   "section": "Section",
+  "section_add_new": "Ajouter une nouvelle section",
+  "section_add_new_description": "La nouvelle section que vous aurez choisie sera ajoutée à votre page de profile.",
   "section_delete": "Supprimer la section",
   "section_delete_description": "Êtes-vous sûr•e de vouloir supprimer cette section ?",
+  "section_description": {
+    "C9Z51SG4JeJ5VFUHOagF": "Une grille de books composée de 2 lignes de 3 colonnes.",
+    "ZRsIF2kdKc9xUo0cxfRI": "Une grille d'illustrations composée de 2 lignes de 3 colonnes.",
+    "zYjoMKHm0eoWGBLyzULU": "Un carrousel d'illustrations sur la gauche, et votre présentation de profile sur la droite."
+  },
+  "section_names": {
+    "C9Z51SG4JeJ5VFUHOagF": "Grille 3x2 de books",
+    "ZRsIF2kdKc9xUo0cxfRI": "Grille 3x2 d'illustrations",
+    "zYjoMKHm0eoWGBLyzULU": "Présentation avec tableaux"
+  },
   "section_rename": "Renommer cette section",
   "section_rename_description": "Éditer la description.",
   "security": "Sécurité",
