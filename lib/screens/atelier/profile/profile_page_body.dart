@@ -1,13 +1,16 @@
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants/section_ids.dart';
-import 'package:artbooking/screens/atelier/profile/profile_page_add_section.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_books.dart';
-import 'package:artbooking/screens/atelier/profile/profile_page_hero.dart';
+import 'package:artbooking/screens/atelier/profile/sections/user_section.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_illustrations.dart';
 import 'package:artbooking/types/artistic_page.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/section.dart';
+import 'package:dotted_border/dotted_border.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:unicons/unicons.dart';
 
 class ProfilePageBody extends StatelessWidget {
   const ProfilePageBody({
@@ -17,13 +20,18 @@ class ProfilePageBody extends StatelessWidget {
     this.onPopupMenuItemSelected,
     this.popupMenuEntries = const [],
     this.onAddSection,
+    this.isOwner = false,
+    this.onShowAddSection,
   }) : super(key: key);
 
+  final bool isOwner;
   final String userId;
   final ArtisticPage artisticPage;
   final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
   final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
+
   final void Function(Section)? onAddSection;
+  final void Function()? onShowAddSection;
 
   @override
   Widget build(BuildContext context) {
@@ -39,11 +47,15 @@ class ProfilePageBody extends StatelessWidget {
       slivers.add(getSectionWidget(section, index));
     }
 
-    slivers.add(ProfilePageAddSection(
-      onAddSection: onAddSection,
-    ));
+    // slivers.add(ProfilePageAddSection(
+    //   onAddSection: onAddSection,
+    // ));
+    if (isOwner) {
+      slivers.add(newSectionButton(context));
+    }
 
     return Scaffold(
+      floatingActionButton: fab(context),
       body: Stack(
         children: [
           CustomScrollView(
@@ -54,9 +66,60 @@ class ProfilePageBody extends StatelessWidget {
     );
   }
 
+  Widget newSectionButton(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+            vertical: 32.0,
+          ),
+          child: DottedBorder(
+            strokeWidth: 3.0,
+            borderType: BorderType.RRect,
+            radius: Radius.circular(8),
+            color: Theme.of(context).primaryColor.withOpacity(0.6),
+            dashPattern: [8, 4],
+            child: InkWell(
+              onTap: onShowAddSection,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24.0,
+                  vertical: 16.0,
+                ),
+                child: Opacity(
+                  opacity: 0.6,
+                  child: Text(
+                    "section_add_new".tr(),
+                    style: Utilities.fonts.style(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget fab(BuildContext context) {
+    if (!isOwner) {
+      return Container();
+    }
+
+    return FloatingActionButton(
+      onPressed: onShowAddSection,
+      backgroundColor: Theme.of(context).primaryColor,
+      child: Icon(UniconsLine.plus),
+    );
+  }
+
   Widget getSectionWidget(Section section, int index) {
     if (section.id == SectionIds.userWithArtworks) {
-      return ProfilePageHero(
+      return UserSection(
         index: index,
         section: section,
         userId: userId,

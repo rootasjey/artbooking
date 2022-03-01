@@ -1,3 +1,4 @@
+import 'package:artbooking/components/dialogs/add_section_dialog.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
@@ -104,8 +105,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       );
     }
 
+    final String? userId = ref.watch(AppState.userProvider).firestoreUser?.id;
+    final bool isOwner = userId == getUserId();
+
     return ProfilePageBody(
       userId: getUserId(),
+      isOwner: isOwner,
+      onShowAddSection: onShowAddSection,
       artisticPage: _artisticPage,
       onAddSection: tryAddSection,
       popupMenuEntries: _popupMenuEntries,
@@ -156,6 +162,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     }
   }
 
+  void onShowAddSection() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AddSectionDialog();
+      },
+    );
+  }
+
   /// Show a dialog to confirm a single section deletion.
   void confirmDeleteSection(Section section, int index) async {
     showDialog(
@@ -202,7 +217,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   void tryAddSection(Section section) async {
     try {
       final Section editedSection = section.copyWith(
-        mode: EnumSectionDataMode.lastUpdated,
+        mode: EnumSectionDataMode.chosen,
         size: EnumSectionSize.large,
       );
 

@@ -48,7 +48,7 @@ class ColorsConstants {
   /// Color for settings.
   final Color settings = Colors.teal;
 
-  final Color summary = Colors.deepPurple.shade300;
+  final Color bio = Colors.deepPurple.shade300;
 
   /// Secondary application's color.
   Color secondary = Colors.pink;

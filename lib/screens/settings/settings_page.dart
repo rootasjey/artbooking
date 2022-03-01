@@ -11,7 +11,7 @@ import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/settings/settings_page_body.dart';
 import 'package:artbooking/screens/settings/settings_page_header.dart';
-import 'package:artbooking/types/user/user_links.dart';
+import 'package:artbooking/types/user/user_social_links.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
@@ -70,7 +70,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   userFirestore: userFirestore,
                   onEditLocation: onEditLocation,
                   onEditPicture: onGoToEditProfilePicture,
-                  onEditSummary: onEditSummary,
+                  onEditBio: onEditBio,
                   onGoToDeleteAccount: onGoToDeleteAccount,
                   onGoToUpdateEmail: onGoToUpdateEmail,
                   onGoToUpdatePasssword: onGoToUpdatePasssword,
@@ -192,28 +192,28 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     }
   }
 
-  void onEditSummary() {
-    final _summaryController = TextEditingController();
+  void onEditBio() {
+    final _bioController = TextEditingController();
 
     final userFirestore = ref.read(AppState.userProvider).firestoreUser;
 
     if (userFirestore != null) {
-      _summaryController.text = userFirestore.summary;
+      _bioController.text = userFirestore.bio;
     }
 
     showDialog(
       context: context,
       builder: (context) => InputDialog.singleInput(
-        nameController: _summaryController,
+        nameController: _bioController,
         maxLines: null,
-        label: "summary".tr(),
+        label: "bio".tr(),
         sizeContaints: const Size.fromHeight(140.0),
-        submitButtonValue: "summary_update".tr(),
-        subtitleValue: "summary_update_description".tr(),
-        titleValue: "summary_use_new".tr().toUpperCase(),
+        submitButtonValue: "bio_update".tr(),
+        subtitleValue: "bio_update_description".tr(),
+        titleValue: "bio_use_new".tr().toUpperCase(),
         onCancel: Beamer.of(context).popRoute,
         onSubmitted: (value) {
-          tryUpdateSummary(_summaryController.text);
+          tryUpdateBio(_bioController.text);
           Beamer.of(context).popRoute();
         },
       ),
@@ -332,11 +332,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
     try {
       final userFirestore = ref.read(AppState.userProvider).firestoreUser;
-      final String summary = userFirestore?.summary ?? '';
+      final String bio = userFirestore?.bio ?? '';
 
       await Utilities.cloud.fun("users-updatePublicStrings").call({
         "location": location,
-        "summary": summary,
+        "bio": bio,
       });
     } catch (error) {
       Utilities.logger.e(error);
@@ -348,7 +348,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     }
   }
 
-  void tryUpdateSummary(String summary) async {
+  void tryUpdateBio(String bio) async {
     setState(() {
       _isUpdating = true;
     });
@@ -359,7 +359,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
       await Utilities.cloud.fun("users-updatePublicStrings").call({
         "location": location,
-        "summary": summary,
+        "bio": bio,
       });
     } catch (error) {
       Utilities.logger.e(error);

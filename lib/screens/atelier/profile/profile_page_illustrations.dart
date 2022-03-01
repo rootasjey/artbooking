@@ -2,11 +2,14 @@ import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/cards/illustration_card.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
+import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/firestore/doc_snap_map.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/section.dart';
+import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
@@ -79,7 +82,10 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
       child: FadeInY(
         beginY: 24.0,
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 90.9,
+            vertical: 24.0,
+          ),
           child: Stack(
             children: [
               Center(
@@ -104,9 +110,11 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 34.0),
-                      child: Wrap(
-                        spacing: 24.0,
-                        runSpacing: 24.0,
+                      child: GridView.count(
+                        crossAxisCount: 3,
+                        shrinkWrap: true,
+                        mainAxisSpacing: 24.0,
+                        crossAxisSpacing: 24.0,
                         children: _illustrations.map((illustration) {
                           index++;
 
@@ -114,6 +122,8 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
                             heroTag: illustration.id,
                             illustration: illustration,
                             index: index,
+                            onTap: () =>
+                                navigateToIllustrationPage(illustration),
                           );
                         }).toList(),
                       ),
@@ -157,8 +167,9 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
       final illustrationsSnapshot = await FirebaseFirestore.instance
           .collection("illustrations")
           .where("user_id", isEqualTo: widget.userId)
+          .orderBy("user_custom_index", descending: true)
+          .where("visibility", isEqualTo: "public")
           .limit(6)
-          .orderBy("updated_at", descending: true)
           .get();
 
       if (illustrationsSnapshot.size == 0) {
@@ -182,5 +193,18 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
         _isLoading = false;
       });
     }
+  }
+
+  void navigateToIllustrationPage(Illustration illustration) {
+    NavigationStateHelper.illustration = illustration;
+    Beamer.of(context).beamToNamed(
+      AtelierLocationContent.illustrationRoute.replaceFirst(
+        ":illustrationId",
+        illustration.id,
+      ),
+      data: {
+        "illustrationId": illustration.id,
+      },
+    );
   }
 }

@@ -17,7 +17,7 @@ class SettingsPageBodyRight extends ConsumerWidget {
     this.onGoToUpdateUsername,
     this.onGoToUpdateEmail,
     this.onEditLocation,
-    this.onEditSummary,
+    this.onEditBio,
   }) : super(key: key);
 
   final UserFirestore userFirestore;
@@ -26,7 +26,7 @@ class SettingsPageBodyRight extends ConsumerWidget {
   final void Function()? onGoToUpdateUsername;
   final void Function()? onGoToUpdateEmail;
   final void Function()? onEditLocation;
-  final void Function()? onEditSummary;
+  final void Function()? onEditBio;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -63,11 +63,11 @@ class SettingsPageBodyRight extends ConsumerWidget {
       ),
       AtelierPageCard(
         compact: compact,
-        hoverColor: Constants.colors.summary,
+        hoverColor: Constants.colors.bio,
         iconData: UniconsLine.subject,
-        textTitle: "summary".tr(),
-        textSubtitle: userFirestore.summary,
-        onTap: onEditSummary,
+        textTitle: "bio".tr(),
+        textSubtitle: userFirestore.bio,
+        onTap: onEditBio,
       ),
       AtelierPageCard(
         compact: compact,

@@ -2,11 +2,14 @@ import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/cards/book_card.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
+import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/firestore/doc_snap_map.dart';
 import 'package:artbooking/types/section.dart';
+import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +20,7 @@ class ProfilePageBooks extends StatefulWidget {
     Key? key,
     required this.title,
     required this.userId,
-    this.mode = EnumSectionDataMode.lastUpdated,
+    this.mode = EnumSectionDataMode.sync,
     this.onPopupMenuItemSelected,
     this.popupMenuEntries = const [],
     required this.index,
@@ -71,13 +74,16 @@ class _ProfilePageBooksState extends State<ProfilePageBooks> {
           .removeWhere((x) => x.value == EnumSectionAction.moveDown);
     }
 
-    int bookIndex = -1;
+    int index = -1;
 
     return SliverToBoxAdapter(
       child: FadeInY(
         beginY: 24.0,
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 70.0,
+            vertical: 24.0,
+          ),
           child: Stack(
             children: [
               Column(
@@ -101,19 +107,20 @@ class _ProfilePageBooksState extends State<ProfilePageBooks> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 34.0),
-                    child: Wrap(
-                      spacing: 24.0,
-                      runSpacing: 24.0,
-                      children: _books.map((book) {
-                        bookIndex++;
+                    child: GridView.count(
+                      crossAxisCount: 3,
+                      shrinkWrap: true,
+                      mainAxisSpacing: 24.0,
+                      crossAxisSpacing: 24.0,
+                      children: _books.map((Book book) {
+                        index++;
 
-                        return SizedBox(
-                          width: 260.0,
-                          height: 400.0,
-                          child: BookCard(
-                            index: bookIndex,
-                            book: book,
-                          ),
+                        return BookCard(
+                          index: index,
+                          book: book,
+                          width: 300.0,
+                          height: 342.0,
+                          onTap: () => navigateToBookPage(book),
                         );
                       }).toList(),
                     ),
@@ -180,5 +187,18 @@ class _ProfilePageBooksState extends State<ProfilePageBooks> {
         _isLoading = false;
       });
     }
+  }
+
+  void navigateToBookPage(Book book) {
+    NavigationStateHelper.book = book;
+    Beamer.of(context).beamToNamed(
+      AtelierLocationContent.bookRoute.replaceFirst(
+        ":bookId",
+        book.id,
+      ),
+      data: {
+        "bookId": book.id,
+      },
+    );
   }
 }

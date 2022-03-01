@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/user/profile_picture.dart';
 import 'package:artbooking/types/user/user_rights.dart';
-import 'package:artbooking/types/user/user_links.dart';
+import 'package:artbooking/types/user/user_social_links.dart';
 
 class UserFirestore {
   const UserFirestore({
@@ -19,7 +19,7 @@ class UserFirestore {
     this.pricing = 'free',
     required this.rights,
     required this.socialLinks,
-    this.summary = '',
+    this.bio = '',
     this.updatedAt,
   });
 
@@ -34,7 +34,7 @@ class UserFirestore {
   final ProfilePicture profilePicture;
   final String pricing;
   final UserSocialLinks socialLinks;
-  final String summary;
+  final String bio;
   final DateTime? updatedAt;
   final UserRights rights;
 
@@ -49,7 +49,7 @@ class UserFirestore {
     String? nameLowerCase,
     ProfilePicture? profilePicture,
     String? pricing,
-    String? summary,
+    String? bio,
     DateTime? updatedAt,
     UserSocialLinks? socialLinks,
     UserRights? rights,
@@ -67,7 +67,7 @@ class UserFirestore {
       profilePicture: profilePicture ?? this.profilePicture,
       pricing: pricing ?? this.pricing,
       rights: rights ?? this.rights,
-      summary: summary ?? this.summary,
+      bio: bio ?? this.bio,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
@@ -84,7 +84,7 @@ class UserFirestore {
       nameLowerCase: 'anonymous',
       profilePicture: ProfilePicture.empty(),
       pricing: 'free',
-      summary: 'An anonymous user ghosting decent people.',
+      bio: 'An anonymous user ghosting decent people.',
       updatedAt: DateTime.now(),
       socialLinks: UserSocialLinks.empty(),
       rights: UserRights(),
@@ -97,6 +97,7 @@ class UserFirestore {
     }
 
     return UserFirestore(
+      bio: map['bio'] ?? '',
       createdAt: Utilities.date.fromFirestore(map['created_at']),
       email: map['email'] ?? '',
       id: map['id'] ?? '',
@@ -108,7 +109,6 @@ class UserFirestore {
       nameLowerCase: map['name_lower_case'] ?? '',
       profilePicture: ProfilePicture.fromMap(map['profile_picture']),
       pricing: map['pricing'] ?? 'free',
-      summary: map['summary'] ?? '',
       updatedAt: Utilities.date.fromFirestore(map['updated_at']),
       rights: UserRights.fromMap(map['rights']),
     );
@@ -125,13 +125,13 @@ class UserFirestore {
       map['name_lower_case'] = nameLowerCase;
     }
 
+    map['bio'] = bio;
     map['job'] = job;
     map['language'] = language;
     map['location'] = location;
     map['social_links'] = socialLinks.toMap();
     map['profile_picture'] = profilePicture.toMap();
     map['pricing'] = pricing;
-    map['summary'] = summary;
     map['updated_at'] = DateTime.now().millisecondsSinceEpoch;
     map['rights'] = rights.toMap();
 
@@ -147,7 +147,7 @@ class UserFirestore {
         ' id: $id, job: $job, language: $language, location: $location, '
         'name: $name, nameLowerCase: $nameLowerCase, '
         'profilePicture: $profilePicture, pricing: $pricing, '
-        'summary: $summary, '
+        'bio: $bio, '
         'updatedAt: $updatedAt, socialLinks: $socialLinks, rights: $rights)';
   }
 
@@ -166,7 +166,7 @@ class UserFirestore {
         other.nameLowerCase == nameLowerCase &&
         other.profilePicture == profilePicture &&
         other.pricing == pricing &&
-        other.summary == summary &&
+        other.bio == bio &&
         other.updatedAt == updatedAt &&
         other.socialLinks == socialLinks &&
         other.rights == rights;
@@ -184,7 +184,7 @@ class UserFirestore {
         nameLowerCase.hashCode ^
         profilePicture.hashCode ^
         pricing.hashCode ^
-        summary.hashCode ^
+        bio.hashCode ^
         updatedAt.hashCode ^
         socialLinks.hashCode ^
         rights.hashCode;

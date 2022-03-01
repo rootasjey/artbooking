@@ -75,11 +75,11 @@ class Section {
     return {
       'id': id,
       'description': description,
-      'mode': sectionModeToString(),
+      'mode': sectionModeToString(mode),
       'modes': sectionModesToStrings(),
       'name': name,
       'items': items,
-      'size': sectionSizeToString(),
+      'size': sectionSizeToString(size),
       'sizes': sectionSizesToStrings(),
       'dataTypes': sectionDataTypesToListString(),
     };
@@ -95,37 +95,33 @@ class Section {
       items: map['items'] != null ? List<String>.from(map['items']) : [],
       size: sectionSizeFromString(map['size']),
       sizes: sectionSizesFromStrings(map['sizes']),
-      dataTypes: sectionTypesFromString(map['dataTypes']),
+      dataTypes: sectionTypesFromString(map['data_types']),
     );
   }
 
-  String sectionModeToString() {
-    switch (this.mode) {
-      case EnumSectionDataMode.lastCreated:
-        return "lastCreated";
-      case EnumSectionDataMode.lastUpdated:
-        return "lastUpdated";
-      case EnumSectionDataMode.manual:
-        return "manual";
+  static String sectionModeToString(EnumSectionDataMode mode) {
+    switch (mode) {
+      case EnumSectionDataMode.chosen:
+        return "chosen";
+      case EnumSectionDataMode.sync:
+        return "sync";
       default:
-        return "lastUpdated";
+        return "sync";
     }
   }
 
   static EnumSectionDataMode sectionModeFromString(String? modeString) {
     if (modeString == null) {
-      return EnumSectionDataMode.lastUpdated;
+      return EnumSectionDataMode.sync;
     }
 
     switch (modeString) {
-      case 'lastCreated':
-        return EnumSectionDataMode.lastCreated;
-      case 'lastUpdated':
-        return EnumSectionDataMode.lastUpdated;
-      case 'manual':
-        return EnumSectionDataMode.manual;
+      case "chosen":
+        return EnumSectionDataMode.chosen;
+      case "sync":
+        return EnumSectionDataMode.sync;
       default:
-        return EnumSectionDataMode.lastUpdated;
+        return EnumSectionDataMode.sync;
     }
   }
 
@@ -137,18 +133,7 @@ class Section {
     final List<String> modeList = [];
 
     for (var mode in this.modes) {
-      switch (mode) {
-        case EnumSectionDataMode.lastCreated:
-          modeList.add("lastCreated");
-          break;
-        case EnumSectionDataMode.lastUpdated:
-          modeList.add("lastUpdated");
-          break;
-        case EnumSectionDataMode.manual:
-          modeList.add("manual");
-          break;
-        default:
-      }
+      modeList.add(sectionModeToString(mode));
     }
 
     return modeList;
@@ -164,18 +149,7 @@ class Section {
     final List<EnumSectionDataMode> modeList = [];
 
     for (var modeStr in rawModeList) {
-      switch (modeStr) {
-        case "lastCreated":
-          modeList.add(EnumSectionDataMode.lastCreated);
-          break;
-        case "lastUpdated":
-          modeList.add(EnumSectionDataMode.lastUpdated);
-          break;
-        case "manual":
-          modeList.add(EnumSectionDataMode.manual);
-          break;
-        default:
-      }
+      modeList.add(sectionModeFromString(modeStr));
     }
 
     return modeList;
@@ -187,9 +161,9 @@ class Section {
     }
 
     switch (sizeString) {
-      case 'large':
+      case "large":
         return EnumSectionSize.large;
-      case 'medium':
+      case "medium":
         return EnumSectionSize.medium;
       default:
         return EnumSectionSize.large;
@@ -204,22 +178,14 @@ class Section {
     final List<EnumSectionSize> sectionSizes = [];
 
     for (var size in rawSectionSizes) {
-      switch (size) {
-        case 'large':
-          sectionSizes.add(EnumSectionSize.large);
-          break;
-        case 'medium':
-          sectionSizes.add(EnumSectionSize.medium);
-          break;
-        default:
-      }
+      sectionSizes.add(sectionSizeFromString(size));
     }
 
     return sectionSizes;
   }
 
-  String sectionSizeToString() {
-    switch (this.size) {
+  static String sectionSizeToString(EnumSectionSize size) {
+    switch (size) {
       case EnumSectionSize.large:
         return "large";
       case EnumSectionSize.medium:
@@ -233,16 +199,7 @@ class Section {
     final List<String> sectionSizes = [];
 
     for (var size in sizes) {
-      switch (size) {
-        case EnumSectionSize.large:
-          sectionSizes.add("large");
-          break;
-        case EnumSectionSize.medium:
-          sectionSizes.add("medium");
-          break;
-        default:
-          break;
-      }
+      sectionSizes.add(sectionSizeToString(size));
     }
 
     return sectionSizes;
@@ -258,13 +215,13 @@ class Section {
 
     for (String dataType in rawSectionTypes) {
       switch (dataType) {
-        case 'books':
+        case "books":
           dataTypes.add(EnumSectionDataType.books);
           break;
-        case 'illustrations':
+        case "illustrations":
           dataTypes.add(EnumSectionDataType.illustrations);
           break;
-        case 'user':
+        case "user":
           dataTypes.add(EnumSectionDataType.user);
           break;
         default:

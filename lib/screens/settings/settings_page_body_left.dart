@@ -1,7 +1,7 @@
 import 'package:artbooking/components/avatar/better_avatar.dart';
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
-import 'package:artbooking/screens/settings/settings_page_user_links.dart';
-import 'package:artbooking/types/user/user_links.dart';
+import 'package:artbooking/components/user_social_links_component.dart';
+import 'package:artbooking/types/user/user_social_links.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -74,7 +74,8 @@ class SettingsPageBodyLeft extends StatelessWidget {
               ],
             ),
           ),
-          SettingsPageUserLinks(
+          UserSocialLinksComponent(
+            editMode: true,
             socialLinks: socialLinks,
             onLinkChanged: onLinkChanged,
           ),
