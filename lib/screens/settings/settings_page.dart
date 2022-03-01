@@ -207,7 +207,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         nameController: _bioController,
         maxLines: null,
         label: "bio".tr(),
-        sizeContaints: const Size.fromHeight(140.0),
         submitButtonValue: "bio_update".tr(),
         subtitleValue: "bio_update_description".tr(),
         titleValue: "bio_use_new".tr().toUpperCase(),

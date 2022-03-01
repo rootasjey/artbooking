@@ -10,13 +10,15 @@ class OutlinedTextField extends StatelessWidget {
     this.hintText = '',
     this.onChanged,
     this.onSubmitted,
-    this.sizeContaints = const Size(300.0, 45.0),
+    this.constraints = const BoxConstraints(maxHeight: 140.0),
     this.autofocus = true,
     this.maxLines = 1,
     this.textInputAction,
   }) : super(key: key);
 
   final bool autofocus;
+
+  final BoxConstraints constraints;
 
   final int? maxLines;
 
@@ -34,9 +36,6 @@ class OutlinedTextField extends StatelessWidget {
 
   /// Fires when the user send/validate the input's value.
   final Function(String)? onSubmitted;
-
-  /// Maximum size for the input.
-  final Size sizeContaints;
 
   final TextInputAction? textInputAction;
 
@@ -64,7 +63,7 @@ class OutlinedTextField extends StatelessWidget {
             ),
           ),
         ConstrainedBox(
-          constraints: BoxConstraints.tight(sizeContaints),
+          constraints: constraints,
           child: TextField(
             autofocus: autofocus,
             controller: controller,
