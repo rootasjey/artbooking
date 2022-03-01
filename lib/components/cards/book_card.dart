@@ -480,6 +480,10 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   }
 
   Widget popupMenuButton() {
+    if (widget.popupMenuEntries.isEmpty) {
+      return Container();
+    }
+
     return PopupMenuButton(
       icon: Opacity(
         opacity: 0.8,
