@@ -11,7 +11,7 @@ class IllustrationPageHeader extends StatelessWidget {
       children: [
         IconButton(
           color: Theme.of(context).primaryColor,
-          onPressed: Beamer.of(context).popRoute,
+          onPressed: Beamer.of(context).beamBack,
           icon: Icon(UniconsLine.arrow_left),
         ),
       ],

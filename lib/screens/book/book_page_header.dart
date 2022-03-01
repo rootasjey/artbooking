@@ -112,7 +112,7 @@ class BookPageHeader extends StatelessWidget {
                     opacity: 0.6,
                     child: IconButton(
                       tooltip: "back".tr(),
-                      onPressed: Beamer.of(context).popRoute,
+                      onPressed: Beamer.of(context).beamBack,
                       icon: Icon(UniconsLine.arrow_left),
                     ),
                   ),
