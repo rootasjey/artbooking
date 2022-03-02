@@ -1,5 +1,6 @@
 import 'package:artbooking/components/avatar/better_avatar.dart';
 import 'package:artbooking/components/cards/illustration_card.dart';
+import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/components/user_social_links_component.dart';
@@ -8,6 +9,7 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -40,8 +42,10 @@ class UserSection extends StatefulWidget {
 }
 
 class _UserSectionState extends State<UserSection> {
-  var _userFirestore = UserFirestore.empty();
+  bool _loading = false;
   final List<Illustration> _illustrations = [];
+
+  var _userFirestore = UserFirestore.empty();
   var _illustrationBackground = Illustration.empty();
 
   @override
@@ -52,6 +56,12 @@ class _UserSectionState extends State<UserSection> {
 
   @override
   Widget build(BuildContext context) {
+    if (_loading) {
+      return LoadingView(
+        title: Text("loading".tr()),
+      );
+    }
+
     final double height = MediaQuery.of(context).size.height - 200.0;
 
     var popupMenuEntries = widget.popupMenuEntries;
@@ -69,7 +79,8 @@ class _UserSectionState extends State<UserSection> {
     }
 
     return SliverToBoxAdapter(
-      child: Padding(
+      child: Container(
+        color: Color(widget.section.backgroundColor),
         padding: const EdgeInsets.only(left: 24.0, top: 60.0, right: 24.0),
         child: Stack(
           children: [
@@ -256,8 +267,10 @@ class _UserSectionState extends State<UserSection> {
   }
 
   void fetchData() async {
+    setState(() => _loading = true);
     await fetchUser();
-    fetchBackground();
+    // fetchBackground();
+    setState(() => _loading = false);
   }
 
   /// Fetch user's public illustrations.

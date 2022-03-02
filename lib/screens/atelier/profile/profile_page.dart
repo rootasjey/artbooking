@@ -1,5 +1,6 @@
 import 'package:artbooking/components/dialogs/add_section_dialog.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
+import 'package:artbooking/components/dialogs/section_settings_dialog.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/app_state.dart';
@@ -12,6 +13,7 @@ import 'package:artbooking/types/artistic_page.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_section_size.dart';
+import 'package:artbooking/types/named_color.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -67,6 +69,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       textLabel: "delete".tr(),
       value: EnumSectionAction.delete,
     ),
+    PopupMenuItemIcon(
+      icon: Icon(UniconsLine.setting),
+      textLabel: "settings".tr(),
+      value: EnumSectionAction.settings,
+    ),
   ];
 
   @override
@@ -111,11 +118,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     return ProfilePageBody(
       userId: getUserId(),
       isOwner: isOwner,
-      onShowAddSection: onShowAddSection,
       artisticPage: _artisticPage,
       onAddSection: tryAddSection,
       popupMenuEntries: _popupMenuEntries,
       onPopupMenuItemSelected: onPopupMenuItemSelected,
+      onShowAddSection: onShowAddSection,
+      // onShowEditBackgroundColor: onShowEditBackgroundColor,
     );
   }
 
@@ -158,6 +166,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       case EnumSectionAction.delete:
         confirmDeleteSection(section, index);
         break;
+      case EnumSectionAction.settings:
+        onShowEditBackgroundColor(section, index);
+        break;
       default:
     }
   }
@@ -167,6 +178,19 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       context: context,
       builder: (context) {
         return AddSectionDialog();
+      },
+    );
+  }
+
+  void onShowEditBackgroundColor(Section section, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SectionSettingsDialog(
+          section: section,
+          onValidate: tryUpdateBackgroundColor,
+          index: index,
+        );
       },
     );
   }
@@ -226,7 +250,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       await FirebaseFirestore.instance
           .collection("users")
           .doc(getUserId())
-          .collection("pages")
+          .collection("user_pages")
           .doc(_artisticPage.id)
           .update({
         "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
@@ -246,7 +270,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       await FirebaseFirestore.instance
           .collection("users")
           .doc(getUserId())
-          .collection("pages")
+          .collection("user_pages")
           .doc(_artisticPage.id)
           .update({
         "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
@@ -275,7 +299,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       await FirebaseFirestore.instance
           .collection("users")
           .doc(getUserId())
-          .collection("pages")
+          .collection("user_pages")
           .doc(_artisticPage.id)
           .update({
         "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
@@ -309,7 +333,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       await FirebaseFirestore.instance
           .collection("users")
           .doc(getUserId())
-          .collection("pages")
+          .collection("user_pages")
           .doc(_artisticPage.id)
           .update({
         "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
@@ -382,7 +406,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       await FirebaseFirestore.instance
           .collection("users")
           .doc(userId)
-          .collection("pages")
+          .collection("user_pages")
           .add({
         'created_at': Timestamp.now(),
         'is_ctive': true,
@@ -447,6 +471,40 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  void tryUpdateBackgroundColor(
+    NamedColor selectedNamedColor,
+    Section section,
+    int index,
+  ) async {
+    try {
+      final editedSection = section.copyWith(
+        backgroundColor: selectedNamedColor.color.value,
+      );
+
+      _artisticPage.sections.replaceRange(
+        index,
+        index + 1,
+        [editedSection],
+      );
+
+      final String userId = getUserId();
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_pages")
+          .doc(_artisticPage.id)
+          .update({
+        "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
+      });
+
+      setState(() {});
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
     }
   }
 }

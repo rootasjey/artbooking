@@ -22,6 +22,7 @@ class ProfilePageBody extends StatelessWidget {
     this.onAddSection,
     this.isOwner = false,
     this.onShowAddSection,
+    this.onShowEditBackgroundColor,
   }) : super(key: key);
 
   final bool isOwner;
@@ -32,6 +33,7 @@ class ProfilePageBody extends StatelessWidget {
 
   final void Function(Section)? onAddSection;
   final void Function()? onShowAddSection;
+  final void Function()? onShowEditBackgroundColor;
 
   @override
   Widget build(BuildContext context) {
