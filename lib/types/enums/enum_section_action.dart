@@ -6,4 +6,5 @@ enum EnumSectionAction {
   changeDataMode,
   expand,
   shrink,
+  settings,
 }
