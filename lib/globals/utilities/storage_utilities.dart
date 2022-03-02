@@ -116,8 +116,8 @@ class StorageUtilities {
         : EnumVisibilityTab.active;
   }
 
-  EnumLikeType getLikeTab() {
-    final String key = Constants.storageKeys.dashboardLicensesTab;
+  EnumLikeType getLikesTab() {
+    final String key = Constants.storageKeys.dashboardLikesTab;
     final String? value = _localStorage.getString(key);
     return value == EnumLikeType.book.name
         ? EnumLikeType.book
@@ -177,8 +177,8 @@ class StorageUtilities {
     _localStorage.setString(key, licenseTab.name);
   }
 
-  void saveLikeTab(EnumLikeType likeTab) {
-    final String key = Constants.storageKeys.dashboardLicensesTab;
+  void saveLikesTab(EnumLikeType likeTab) {
+    final String key = Constants.storageKeys.dashboardLikesTab;
     _localStorage.setString(key, likeTab.name);
   }
 

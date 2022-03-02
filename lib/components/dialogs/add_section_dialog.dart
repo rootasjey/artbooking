@@ -49,7 +49,6 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
   @override
   Widget build(BuildContext context) {
     return ThemedDialog(
-      // autofocus: widget.autoFocus,
       useRawDialog: true,
       title: Opacity(
         opacity: 0.8,
