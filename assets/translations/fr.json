@@ -860,6 +860,8 @@
   "section": "Section",
   "section_add_new": "Ajouter une nouvelle section",
   "section_add_new_description": "La nouvelle section que vous aurez choisie sera ajoutée à votre page de profile.",
+  "section_configure": "Configurer cette section",
+  "section_configure_subtitle": "Vous pouvez sélectionner une nouvelle couleur de fond, ou la méthode de récupération de données.",
   "section_delete": "Supprimer la section",
   "section_delete_description": "Êtes-vous sûr•e de vouloir supprimer cette section ?",
   "section_description": {

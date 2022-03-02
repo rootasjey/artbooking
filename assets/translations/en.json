@@ -861,6 +861,8 @@
   "section": "Section",
   "section_add_new": "Add a new section",
   "section_add_new_description": "Your chosen section will be added to your profile page.",
+  "section_configure": "Configure this section",
+  "section_configure_subtitle": "You can select a background color, or data fetch mode.",
   "section_delete": "Delete section",
   "section_delete_description": "Are you sure you want to delete this section?",
   "section_description": {
