@@ -10,6 +10,7 @@ import 'package:artbooking/screens/atelier/profile/profile_page_body.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_empty.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_error.dart';
 import 'package:artbooking/types/artistic_page.dart';
+import 'package:artbooking/types/data_fetch_mode_tile_data.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_section_size.dart';
@@ -123,7 +124,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       popupMenuEntries: _popupMenuEntries,
       onPopupMenuItemSelected: onPopupMenuItemSelected,
       onShowAddSection: onShowAddSection,
-      // onShowEditBackgroundColor: onShowEditBackgroundColor,
     );
   }
 
@@ -167,7 +167,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         confirmDeleteSection(section, index);
         break;
       case EnumSectionAction.settings:
-        onShowEditBackgroundColor(section, index);
+        onShowEditSectionSettings(section, index);
         break;
       default:
     }
@@ -182,7 +182,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
-  void onShowEditBackgroundColor(Section section, int index) {
+  /// Show a popup to edit section settings (background color, fetch mode).
+  void onShowEditSectionSettings(Section section, int index) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -190,6 +191,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           section: section,
           onValidate: tryUpdateBackgroundColor,
           index: index,
+          onDataFetchModeChanged: tryUpdateDataFetchMode,
         );
       },
     );
@@ -474,10 +476,44 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     }
   }
 
-  void tryUpdateBackgroundColor(
-    NamedColor selectedNamedColor,
+  void tryUpdateDataFetchMode(
     Section section,
     int index,
+    DataFetchModeTileData dataFetchModeData,
+  ) async {
+    try {
+      final editedSection = section.copyWith(
+        mode: dataFetchModeData.mode,
+      );
+
+      _artisticPage.sections.replaceRange(
+        index,
+        index + 1,
+        [editedSection],
+      );
+
+      final String userId = getUserId();
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_pages")
+          .doc(_artisticPage.id)
+          .update({
+        "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
+      });
+
+      setState(() {});
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
+  void tryUpdateBackgroundColor(
+    NamedColor selectedNamedColor,
+    int index,
+    Section section,
   ) async {
     try {
       final editedSection = section.copyWith(

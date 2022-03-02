@@ -21,6 +21,7 @@ class StorageKeys {
   final String notificationsActivated = "notifications_activated";
   final String quoteIdNotification = "quote_id_notification";
   final String sendPushOnNewNotification = "send_push_on_new_notification";
+  final String sectionConfigTab = "section_config_tab";
   final String password = "password";
   final String username = "username";
   final String userUid = "user_uid";

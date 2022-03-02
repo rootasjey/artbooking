@@ -3,6 +3,7 @@ import 'package:artbooking/types/enums/enum_items_layout.dart';
 import 'package:artbooking/globals/constants/storage_keys_constants.dart';
 import 'package:artbooking/types/enums/enum_license_type.dart';
 import 'package:artbooking/types/enums/enum_like_type.dart';
+import 'package:artbooking/types/enums/enum_section_config_tab.dart';
 import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 
@@ -124,6 +125,14 @@ class StorageUtilities {
         : EnumLikeType.illustration;
   }
 
+  EnumSectionConfigTab getSectionConfigTab() {
+    final String key = Constants.storageKeys.sectionConfigTab;
+    final String? value = _localStorage.getString(key);
+    return value == EnumSectionConfigTab.dataFetchMode.name
+        ? EnumSectionConfigTab.dataFetchMode
+        : EnumSectionConfigTab.backgroundColor;
+  }
+
   List<String> getDrafts() {
     List<String> drafts =
         _localStorage.getStringList(Constants.storageKeys.drafts) ?? [];
@@ -184,6 +193,11 @@ class StorageUtilities {
 
   void saveItemsStyle({String? pageRoute, EnumItemsLayout? style}) {
     _localStorage.setString('items_style_$pageRoute', style.toString());
+  }
+
+  void saveSectionConfigTab(EnumSectionConfigTab sectionConfigTab) {
+    final String key = Constants.storageKeys.sectionConfigTab;
+    _localStorage.setString(key, sectionConfigTab.name);
   }
 
   /// Set the expanded state of dashboard side menu.
