@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:artbooking/globals/constants.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
@@ -9,6 +10,7 @@ import 'package:artbooking/types/enums/enum_section_size.dart';
 /// Building block for Pages.
 class Section {
   Section({
+    required this.backgroundColor,
     required this.id,
     required this.description,
     required this.mode,
@@ -22,6 +24,9 @@ class Section {
 
   /// Id of this section. It matches a specific design.
   final String id;
+
+  /// Section's background color;
+  final int backgroundColor;
 
   /// Best usage of this section.
   final String description;
@@ -48,6 +53,7 @@ class Section {
   final List<EnumSectionDataType> dataTypes;
 
   Section copyWith({
+    int? backgroundColor,
     String? id,
     String? description,
     EnumSectionDataMode? mode,
@@ -59,6 +65,7 @@ class Section {
     List<EnumSectionDataType>? types,
   }) {
     return Section(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
       id: id ?? this.id,
       description: description ?? this.description,
       mode: mode ?? this.mode,
@@ -73,20 +80,23 @@ class Section {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
+      "background_color": backgroundColor,
       'description': description,
-      'mode': sectionModeToString(mode),
-      'modes': sectionModesToStrings(),
-      'name': name,
-      'items': items,
-      'size': sectionSizeToString(size),
-      'sizes': sectionSizesToStrings(),
-      'dataTypes': sectionDataTypesToListString(),
+      "id": id,
+      "mode": sectionModeToString(mode),
+      "modes": sectionModesToStrings(),
+      "name": name,
+      "items": items,
+      "size": sectionSizeToString(size),
+      "sizes": sectionSizesToStrings(),
+      "dataTypes": sectionDataTypesToListString(),
     };
   }
 
   factory Section.fromMap(Map<String, dynamic> map) {
     return Section(
+      backgroundColor:
+          map["background_color"] ?? Constants.colors.lightBackground.value,
       id: map['id'] ?? '',
       description: map['description'] ?? '',
       mode: sectionModeFromString(map['mode']),
@@ -265,8 +275,9 @@ class Section {
 
   @override
   String toString() {
-    return "Section(id: $id, description: $description, "
-        "mode: $mode, name: $name, items: $items, size: $size, types: $dataTypes)";
+    return "Section(id: $id,  backgroundColor: $backgroundColor, "
+        "description: $description, mode: $mode, name: $name, "
+        "items: $items, size: $size, types: $dataTypes)";
   }
 
   @override
@@ -275,6 +286,7 @@ class Section {
 
     return other is Section &&
         other.id == id &&
+        other.backgroundColor == backgroundColor &&
         other.description == description &&
         other.mode == mode &&
         listEquals(other.modes, modes) &&
@@ -288,6 +300,7 @@ class Section {
   @override
   int get hashCode {
     return id.hashCode ^
+        backgroundColor.hashCode ^
         description.hashCode ^
         mode.hashCode ^
         modes.hashCode ^
