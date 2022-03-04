@@ -27,7 +27,16 @@ class ThumbnailLinks {
   final String t360;
 
   factory ThumbnailLinks.empty() {
-    return ThumbnailLinks();
+    return ThumbnailLinks(
+      t360:
+          "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Fillustrations%2Fmissing_illustration_360.png?alt=media&token=44664f38-eeb7-4392-8a43-74c05dcb56f4",
+      t480:
+          "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Fillustrations%2Fmissing_illustration_480.png?alt=media&token=5471f355-4e25-4783-a5dc-544adc62d34b",
+      t720:
+          "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Fillustrations%2Fmissing_illustration_720.png?alt=media&token=295c6b98-ede7-41f9-819d-87b7a59766ea",
+      t1080:
+          "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Fillustrations%2Fmissing_illustration_1024.png?alt=media&token=61775649-95cf-4b68-895f-77476a743d83",
+    );
   }
 
   factory ThumbnailLinks.fromMap(Map<String, dynamic>? data) {

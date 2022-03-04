@@ -16,7 +16,8 @@ class IllustrationLinks {
 
   factory IllustrationLinks.empty() {
     return IllustrationLinks(
-      original: '',
+      original:
+          "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Fillustrations%2Fmissing_illustration_2048.png?alt=media&token=558532de-9cea-4968-8578-d35b81192c84",
       share: ShareLinks.empty(),
       storage: '',
       thumbnails: ThumbnailLinks.empty(),
