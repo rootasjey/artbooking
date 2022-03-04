@@ -232,7 +232,7 @@ class _SectionSettingsDialogState extends State<SectionSettingsDialog> {
     final double cardWidth = 100.0;
     final double cardHeight = 100.0;
 
-    final bool selected = widget.section.mode == data.mode;
+    final bool selected = widget.section.dataMode == data.mode;
     final Color primaryColor = Theme.of(context).primaryColor;
     final BorderSide borderSide = selected
         ? BorderSide(color: primaryColor, width: 2.0)

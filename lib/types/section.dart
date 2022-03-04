@@ -13,8 +13,8 @@ class Section {
     required this.backgroundColor,
     required this.id,
     required this.description,
-    required this.mode,
-    required this.modes,
+    required this.dataMode,
+    required this.dataModes,
     required this.name,
     required this.items,
     required this.size,
@@ -32,10 +32,10 @@ class Section {
   final String description;
 
   /// How this section's data is populated.
-  final EnumSectionDataMode mode;
+  final EnumSectionDataMode dataMode;
 
-  /// Available mode to populate this section's data.
-  final List<EnumSectionDataMode> modes;
+  /// Available modes to populate this section's data.
+  final List<EnumSectionDataMode> dataModes;
 
   /// Human readable name.
   final String name;
@@ -56,8 +56,8 @@ class Section {
     int? backgroundColor,
     String? id,
     String? description,
-    EnumSectionDataMode? mode,
-    List<EnumSectionDataMode>? modes,
+    EnumSectionDataMode? dataMode,
+    List<EnumSectionDataMode>? dataModes,
     String? name,
     List<String>? items,
     EnumSectionSize? size,
@@ -68,8 +68,8 @@ class Section {
       backgroundColor: backgroundColor ?? this.backgroundColor,
       id: id ?? this.id,
       description: description ?? this.description,
-      mode: mode ?? this.mode,
-      modes: modes ?? this.modes,
+      dataMode: dataMode ?? this.dataMode,
+      dataModes: dataModes ?? this.dataModes,
       name: name ?? this.name,
       items: items ?? this.items,
       size: size ?? this.size,
@@ -83,8 +83,8 @@ class Section {
       "background_color": backgroundColor,
       'description': description,
       "id": id,
-      "mode": sectionModeToString(mode),
-      "modes": sectionModesToStrings(),
+      "data_mode": sectionModeToString(dataMode),
+      "data_modes": sectionModesToStrings(),
       "name": name,
       "items": items,
       "size": sectionSizeToString(size),
@@ -94,13 +94,15 @@ class Section {
   }
 
   factory Section.fromMap(Map<String, dynamic> map) {
+    final int backgroundColor =
+        map["background_color"] ?? Constants.colors.lightBackground.value;
+
     return Section(
-      backgroundColor:
-          map["background_color"] ?? Constants.colors.lightBackground.value,
+      backgroundColor: backgroundColor,
       id: map['id'] ?? '',
       description: map['description'] ?? '',
-      mode: sectionModeFromString(map['mode']),
-      modes: sectionModesFromStrings(map['modes']),
+      dataMode: sectionModeFromString(map['data_mode']),
+      dataModes: sectionModesFromStrings(map['data_modes']),
       name: map['name'] ?? '',
       items: map['items'] != null ? List<String>.from(map['items']) : [],
       size: sectionSizeFromString(map['size']),
@@ -136,13 +138,13 @@ class Section {
   }
 
   List<String> sectionModesToStrings() {
-    if (this.modes.isEmpty) {
+    if (this.dataModes.isEmpty) {
       return [];
     }
 
     final List<String> modeList = [];
 
-    for (var mode in this.modes) {
+    for (var mode in this.dataModes) {
       modeList.add(sectionModeToString(mode));
     }
 
@@ -276,8 +278,9 @@ class Section {
   @override
   String toString() {
     return "Section(id: $id,  backgroundColor: $backgroundColor, "
-        "description: $description, mode: $mode, name: $name, "
-        "items: $items, size: $size, types: $dataTypes)";
+        "description: $description, dataMode: $dataMode, "
+        "dataModes: $dataModes, name: $name, items: $items, size: $size, "
+        "types: $dataTypes)";
   }
 
   @override
@@ -288,8 +291,8 @@ class Section {
         other.id == id &&
         other.backgroundColor == backgroundColor &&
         other.description == description &&
-        other.mode == mode &&
-        listEquals(other.modes, modes) &&
+        other.dataMode == dataMode &&
+        listEquals(other.dataModes, dataModes) &&
         other.name == name &&
         listEquals(other.items, items) &&
         other.size == size &&
@@ -302,8 +305,8 @@ class Section {
     return id.hashCode ^
         backgroundColor.hashCode ^
         description.hashCode ^
-        mode.hashCode ^
-        modes.hashCode ^
+        dataMode.hashCode ^
+        dataModes.hashCode ^
         name.hashCode ^
         items.hashCode ^
         size.hashCode ^

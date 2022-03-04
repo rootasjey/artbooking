@@ -69,7 +69,7 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
   @override
   initState() {
     super.initState();
-    _currentMode = widget.section.mode;
+    _currentMode = widget.section.dataMode;
   }
 
   @override
@@ -204,7 +204,7 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
   }
 
   Widget maybeHelperText() {
-    if (widget.section.mode != EnumSectionDataMode.chosen ||
+    if (widget.section.dataMode != EnumSectionDataMode.chosen ||
         _illustrations.isNotEmpty) {
       return Container();
     }
@@ -341,7 +341,7 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
   }
 
   void fetchIllustrations() {
-    if (widget.section.mode == EnumSectionDataMode.sync) {
+    if (widget.section.dataMode == EnumSectionDataMode.sync) {
       fetchSyncIllustrations();
       return;
     }
@@ -356,8 +356,8 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
       return;
     }
 
-    if (_currentMode != widget.section.mode) {
-      _currentMode = widget.section.mode;
+    if (_currentMode != widget.section.dataMode) {
+      _currentMode = widget.section.dataMode;
       _currentMode == EnumSectionDataMode.sync ? fetchIllustrations() : null;
     }
 

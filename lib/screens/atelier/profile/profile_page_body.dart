@@ -155,7 +155,7 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         title: section.name,
-        mode: section.mode,
+        mode: section.dataMode,
         userId: userId,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
         popupMenuEntries: popupMenuEntries,
