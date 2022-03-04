@@ -19,16 +19,14 @@ class LoadingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (sliver) {
-      return SliverList(
-        delegate: SliverChildListDelegate.fixed([
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AnimatedAppIcon(),
-              title,
-            ],
-          ),
-        ]),
+      return SliverToBoxAdapter(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedAppIcon(),
+            title,
+          ],
+        ),
       );
     }
 
