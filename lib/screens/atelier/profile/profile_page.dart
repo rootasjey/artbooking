@@ -639,7 +639,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
       });
 
-      // setState(() {});
+      setState(() {});
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));

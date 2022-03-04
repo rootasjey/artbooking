@@ -61,6 +61,7 @@ class ProfilePageIllustrations extends StatefulWidget {
 
 class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
   bool _loading = false;
+  bool _firstExecution = true;
 
   List<Illustration> _illustrations = [];
   var _currentMode = EnumSectionDataMode.sync;
@@ -79,12 +80,7 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
 
   @override
   Widget build(BuildContext context) {
-    if (_currentMode != widget.section.mode) {
-      _currentMode = widget.section.mode;
-      fetchIllustrations();
-    }
-
-    diffIllustration();
+    handleFetch();
 
     if (_loading) {
       return LoadingView(title: Text("loading".tr()));
@@ -161,24 +157,30 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
 
   List<Widget> getChildren() {
     int index = -1;
+    final bool canDrag = _currentMode == EnumSectionDataMode.chosen;
+    final onDrop = canDrag ? onDropIllustration : null;
+    final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries =
+        canDrag
+            ? [
+                PopupMenuItemIcon(
+                  icon: Icon(UniconsLine.minus),
+                  textLabel: "remove".tr(),
+                  value: EnumIllustrationItemAction.remove,
+                ),
+              ]
+            : [];
 
     final children = _illustrations.map((illustration) {
       index++;
 
       return IllustrationCard(
-        canDrag: true,
-        onDrop: onDropIllustration,
+        canDrag: canDrag,
+        onDrop: onDrop,
         heroTag: "${widget.section.id}-${index}-${illustration.id}",
         illustration: illustration,
         index: index,
         onTap: () => navigateToIllustrationPage(illustration),
-        popupMenuEntries: [
-          PopupMenuItemIcon(
-            icon: Icon(UniconsLine.minus),
-            textLabel: "remove".tr(),
-            value: EnumIllustrationItemAction.remove,
-          ),
-        ],
+        popupMenuEntries: popupMenuEntries,
         onPopupMenuItemSelected: onIllustrationItemSelected,
       );
     }).toList();
@@ -245,6 +247,10 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
 
     // Remove illustrations which are not in the list anymore.
     _illustrations.removeWhere((x) => !initialIllustrations.contains(x.id));
+
+    if (illustrationsToFetch.isEmpty) {
+      return;
+    }
 
     // Fetch new illustrations.
     final List<Future<Illustration>> futures = [];
@@ -343,6 +349,23 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
     fetchChosenIllustration();
   }
 
+  void handleFetch() {
+    if (_firstExecution) {
+      _firstExecution = false;
+      fetchIllustrations();
+      return;
+    }
+
+    if (_currentMode != widget.section.mode) {
+      _currentMode = widget.section.mode;
+      _currentMode == EnumSectionDataMode.sync ? fetchIllustrations() : null;
+    }
+
+    if (_currentMode == EnumSectionDataMode.chosen) {
+      diffIllustration();
+    }
+  }
+
   void navigateToIllustrationPage(Illustration illustration) {
     NavigationStateHelper.illustration = illustration;
     Beamer.of(context).beamToNamed(
@@ -424,13 +447,15 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
           .removeWhere((x) => x.value == EnumSectionAction.moveDown);
     }
 
-    popupMenuEntries.add(
-      PopupMenuItemIcon(
-        icon: Icon(UniconsLine.plus),
-        textLabel: "illustrations_select".tr(),
-        value: EnumSectionAction.selectIllustrations,
-      ),
-    );
+    if (_currentMode == EnumSectionDataMode.chosen) {
+      popupMenuEntries.add(
+        PopupMenuItemIcon(
+          icon: Icon(UniconsLine.plus),
+          textLabel: "illustrations_select".tr(),
+          value: EnumSectionAction.selectIllustrations,
+        ),
+      );
+    }
 
     return popupMenuEntries;
   }
