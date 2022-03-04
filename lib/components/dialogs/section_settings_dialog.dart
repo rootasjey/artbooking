@@ -28,7 +28,7 @@ class SectionSettingsDialog extends StatefulWidget {
   final void Function(
     Section,
     int,
-    DataFetchModeTileData,
+    EnumSectionDataMode,
   )? onDataFetchModeChanged;
 
   @override
@@ -431,7 +431,11 @@ class _SectionSettingsDialogState extends State<SectionSettingsDialog> {
 
   void onTapFetchMode(DataFetchModeTileData data) {
     Beamer.of(context).popRoute();
-    widget.onDataFetchModeChanged?.call(widget.section, widget.index, data);
+    widget.onDataFetchModeChanged?.call(
+      widget.section,
+      widget.index,
+      data.mode,
+    );
   }
 
   void onTapNamedColor(NamedColor namedColor) {

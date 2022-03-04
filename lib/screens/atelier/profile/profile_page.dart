@@ -1,6 +1,7 @@
 import 'package:artbooking/components/dialogs/add_section_dialog.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/section_settings_dialog.dart';
+import 'package:artbooking/components/dialogs/select_illustrations_dialog.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/app_state.dart';
@@ -10,7 +11,6 @@ import 'package:artbooking/screens/atelier/profile/profile_page_body.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_empty.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_error.dart';
 import 'package:artbooking/types/artistic_page.dart';
-import 'package:artbooking/types/data_fetch_mode_tile_data.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_section_size.dart';
@@ -124,6 +124,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       popupMenuEntries: _popupMenuEntries,
       onPopupMenuItemSelected: onPopupMenuItemSelected,
       onShowAddSection: onShowAddSection,
+      onShowIllustrationDialog: onShowIllustrationDialog,
+      onUpdateSectionItems: tryUpdateSectionItems,
     );
   }
 
@@ -169,6 +171,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       case EnumSectionAction.settings:
         onShowEditSectionSettings(section, index);
         break;
+      case EnumSectionAction.setSyncDataMode:
+        tryUpdateDataFetchMode(
+          section,
+          index,
+          EnumSectionDataMode.sync,
+        );
+        break;
+      case EnumSectionAction.selectIllustrations:
+        onShowIllustrationDialog(section, index);
+        break;
       default:
     }
   }
@@ -177,7 +189,22 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     showDialog(
       context: context,
       builder: (context) {
-        return AddSectionDialog();
+        return AddSectionDialog(
+          onAddSection: tryAddSection,
+        );
+      },
+    );
+  }
+
+  void onShowIllustrationDialog(Section section, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SelectIllustrationsDialog(
+          autoFocus: true,
+          userId: getUserId(),
+          onValidate: (items) => tryAddSectionItems(section, index, items),
+        );
       },
     );
   }
@@ -479,11 +506,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   void tryUpdateDataFetchMode(
     Section section,
     int index,
-    DataFetchModeTileData dataFetchModeData,
+    EnumSectionDataMode mode,
   ) async {
     try {
       final editedSection = section.copyWith(
-        mode: dataFetchModeData.mode,
+        mode: mode,
       );
 
       _artisticPage.sections.replaceRange(
@@ -538,6 +565,81 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       });
 
       setState(() {});
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
+  void tryAddSectionItems(
+    Section section,
+    int index,
+    List<String> newItems,
+  ) async {
+    try {
+      List<String> combinedItems = section.items;
+      combinedItems.addAll(newItems);
+
+      if (combinedItems.length > 6) {
+        combinedItems = combinedItems.sublist(0, 6);
+      }
+
+      final editedSection = section.copyWith(
+        items: combinedItems,
+      );
+
+      _artisticPage.sections.replaceRange(
+        index,
+        index + 1,
+        [editedSection],
+      );
+
+      final String userId = getUserId();
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_pages")
+          .doc(_artisticPage.id)
+          .update({
+        "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
+      });
+
+      setState(() {});
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
+  void tryUpdateSectionItems(
+    Section section,
+    int index,
+    List<String> items,
+  ) async {
+    try {
+      final editedSection = section.copyWith(
+        items: items,
+      );
+
+      _artisticPage.sections.replaceRange(
+        index,
+        index + 1,
+        [editedSection],
+      );
+
+      final String userId = getUserId();
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_pages")
+          .doc(_artisticPage.id)
+          .update({
+        "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
+      });
+
+      // setState(() {});
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));

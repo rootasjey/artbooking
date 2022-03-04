@@ -23,6 +23,8 @@ class ProfilePageBody extends StatelessWidget {
     this.isOwner = false,
     this.onShowAddSection,
     this.onShowEditBackgroundColor,
+    this.onShowIllustrationDialog,
+    this.onUpdateSectionItems,
   }) : super(key: key);
 
   final bool isOwner;
@@ -34,6 +36,13 @@ class ProfilePageBody extends StatelessWidget {
   final void Function(Section)? onAddSection;
   final void Function()? onShowAddSection;
   final void Function()? onShowEditBackgroundColor;
+  final void Function(Section, int)? onShowIllustrationDialog;
+
+  final void Function(
+    Section section,
+    int index,
+    List<String> items,
+  )? onUpdateSectionItems;
 
   @override
   Widget build(BuildContext context) {
@@ -49,9 +58,6 @@ class ProfilePageBody extends StatelessWidget {
       slivers.add(getSectionWidget(section, index));
     }
 
-    // slivers.add(ProfilePageAddSection(
-    //   onAddSection: onAddSection,
-    // ));
     if (isOwner) {
       slivers.add(newSectionButton(context));
     }
@@ -135,12 +141,12 @@ class ProfilePageBody extends StatelessWidget {
       return ProfilePageIllustrations(
         index: index,
         section: section,
-        title: section.name,
-        mode: section.mode,
         userId: userId,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
         popupMenuEntries: popupMenuEntries,
         isLast: index == artisticPage.sections.length - 1,
+        onShowIllustrationDialog: onShowIllustrationDialog,
+        onUpdateSectionItems: onUpdateSectionItems,
       );
     }
 

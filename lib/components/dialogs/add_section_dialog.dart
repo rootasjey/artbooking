@@ -161,7 +161,7 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
                         size: 32.0,
                       ),
                     ),
-                    onTap: () => widget.onAddSection?.call(section),
+                    onTap: () => _onAddSection(section),
                   ),
                 ),
               ),
@@ -170,7 +170,7 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
                   padding: const EdgeInsets.only(top: 4.0, right: 12.0),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(8.0),
-                    onTap: () => widget.onAddSection?.call(section),
+                    onTap: () => _onAddSection(section),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8.0),
                       child: Container(
@@ -306,5 +306,10 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
     }
 
     return false;
+  }
+
+  _onAddSection(Section section) {
+    Beamer.of(context).popRoute();
+    widget.onAddSection?.call(section);
   }
 }
