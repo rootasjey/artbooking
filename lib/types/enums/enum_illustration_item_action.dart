@@ -9,6 +9,9 @@ enum EnumIllustrationItemAction {
   /// Like an illustration..
   like,
 
+  /// Remove this illustration from somewhere (i.e. profile section).
+  remove,
+
   /// Remove this illustration from a book.
   removeFromBook,
 
