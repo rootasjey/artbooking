@@ -123,10 +123,7 @@ class BookPageBody extends StatelessWidget {
               selectionMode: selectionMode,
               canDrag: owner,
               onDragUpdate: onDragUpdateBook,
-              onDrop: (dropIndexes) => onDropIllustration?.call(
-                index,
-                dropIndexes,
-              ),
+              onDrop: onDropIllustration,
               onTap: () => onTapIllustrationCard?.call(
                 key,
                 illustration,

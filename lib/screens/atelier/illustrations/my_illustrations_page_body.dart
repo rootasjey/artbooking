@@ -97,10 +97,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
               onTap: () => onTapIllustration?.call(illustration),
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               popupMenuEntries: popupMenuEntries,
-              onDrop: (dropIndexes) => onDropIllustration?.call(
-                index,
-                dropIndexes,
-              ),
+              onDrop: onDropIllustration,
             );
           },
           childCount: illustrations.length,

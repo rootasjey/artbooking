@@ -1,4 +1,5 @@
 import 'package:artbooking/components/cards/illustration_card.dart';
+import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
@@ -86,48 +87,10 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
     diffIllustration();
 
     if (_loading) {
-      return SliverList(
-        delegate: SliverChildListDelegate.fixed([]),
-      );
+      return LoadingView(title: Text("loading".tr()));
     }
 
     final popupMenuEntries = filterPopupMenuEntries();
-
-    int index = -1;
-
-    final children = _illustrations.map((illustration) {
-      index++;
-
-      return IllustrationCard(
-        heroTag: "${widget.section.id}-${index}-${illustration.id}",
-        illustration: illustration,
-        index: index,
-        onTap: () => navigateToIllustrationPage(illustration),
-        popupMenuEntries: [
-          PopupMenuItemIcon(
-            icon: Icon(UniconsLine.minus),
-            textLabel: "remove".tr(),
-            value: EnumIllustrationItemAction.remove,
-          ),
-        ],
-        onPopupMenuItemSelected: onIllustrationItemSelected,
-      );
-    }).toList();
-
-    if (children.length % 3 != 0 && children.length < 6) {
-      children.add(
-        IllustrationCard(
-          asPlaceHolder: true,
-          heroTag: "empty_${DateTime.now()}",
-          illustration: Illustration.empty(),
-          index: index,
-          onTap: () => widget.onShowIllustrationDialog?.call(
-            widget.section,
-            widget.index,
-          ),
-        ),
-      );
-    }
 
     return SliverToBoxAdapter(
       child: Padding(
@@ -165,7 +128,7 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
                       shrinkWrap: true,
                       mainAxisSpacing: 24.0,
                       crossAxisSpacing: 24.0,
-                      children: children,
+                      children: getChildren(),
                     ),
                   ),
                 ],
@@ -194,6 +157,48 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
         ),
       ),
     );
+  }
+
+  List<Widget> getChildren() {
+    int index = -1;
+
+    final children = _illustrations.map((illustration) {
+      index++;
+
+      return IllustrationCard(
+        canDrag: true,
+        onDrop: onDropIllustration,
+        heroTag: "${widget.section.id}-${index}-${illustration.id}",
+        illustration: illustration,
+        index: index,
+        onTap: () => navigateToIllustrationPage(illustration),
+        popupMenuEntries: [
+          PopupMenuItemIcon(
+            icon: Icon(UniconsLine.minus),
+            textLabel: "remove".tr(),
+            value: EnumIllustrationItemAction.remove,
+          ),
+        ],
+        onPopupMenuItemSelected: onIllustrationItemSelected,
+      );
+    }).toList();
+
+    if (children.length % 3 != 0 && children.length < 6) {
+      children.add(
+        IllustrationCard(
+          asPlaceHolder: true,
+          heroTag: "empty_${DateTime.now()}",
+          illustration: Illustration.empty(),
+          index: index,
+          onTap: () => widget.onShowIllustrationDialog?.call(
+            widget.section,
+            widget.index,
+          ),
+        ),
+      );
+    }
+
+    return children;
   }
 
   Widget maybeHelperText() {
@@ -349,6 +354,31 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
         "illustrationId": illustration.id,
       },
     );
+  }
+
+  void onDropIllustration(int dropTargetIndex, List<int> dragIndexes) {
+    final int firstDragIndex = dragIndexes.first;
+    if (dropTargetIndex == firstDragIndex) {
+      return;
+    }
+
+    if (dropTargetIndex < 0 ||
+        firstDragIndex < 0 ||
+        dropTargetIndex >= _illustrations.length ||
+        firstDragIndex > _illustrations.length) {
+      return;
+    }
+
+    final dropTargetIllustration = _illustrations.elementAt(dropTargetIndex);
+    final dragIllustration = _illustrations.elementAt(firstDragIndex);
+
+    setState(() {
+      _illustrations[firstDragIndex] = dropTargetIllustration;
+      _illustrations[dropTargetIndex] = dragIllustration;
+    });
+
+    final List<String> items = _illustrations.map((x) => x.id).toList();
+    widget.onUpdateSectionItems?.call(widget.section, widget.index, items);
   }
 
   void onIllustrationItemSelected(

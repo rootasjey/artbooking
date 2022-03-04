@@ -92,7 +92,7 @@ class IllustrationCard extends StatefulWidget {
   final String heroTag;
 
   /// Callback when drag and dropping item on this illustration card.
-  final void Function(List<int>)? onDrop;
+  final void Function(int dropTargetIndex, List<int> dragIndexes)? onDrop;
 
   /// Callback when illustration is being dragged.
   final void Function(DragUpdateDetails details)? onDragUpdate;
@@ -175,7 +175,7 @@ class _IllustrationCardState extends State<IllustrationCard>
         );
       },
       onAccept: (int dropIndex) {
-        widget.onDrop?.call([dropIndex]);
+        widget.onDrop?.call(widget.index, [dropIndex]);
       },
     );
   }
