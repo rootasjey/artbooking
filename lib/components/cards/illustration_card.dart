@@ -34,10 +34,14 @@ class IllustrationCard extends StatefulWidget {
     this.onDrop,
     this.onDragUpdate,
     this.canDrag = false,
+    this.asPlaceHolder = false,
   }) : super(key: key);
 
   /// Index position in a list, if available.
   final int index;
+
+  /// If true, this card will be used as a place holder.
+  final bool asPlaceHolder;
 
   /// If true, the card will be marked with a check circle.
   final bool selected;
@@ -125,6 +129,16 @@ class _IllustrationCardState extends State<IllustrationCard>
 
   @override
   Widget build(BuildContext context) {
+    if (widget.asPlaceHolder) {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: childWhenDragging(
+          textValue: "illustration_add_new".tr(),
+          onTapPlaceholder: widget.onTap,
+        ),
+      );
+    }
+
     final illustration = widget.illustration;
     Widget child = Container();
 
@@ -171,14 +185,18 @@ class _IllustrationCardState extends State<IllustrationCard>
     Color defaultColor = Colors.transparent;
     final Color primaryColor = Theme.of(context).primaryColor;
 
+    BorderSide borderSide = BorderSide.none;
+
+    if (usingAsDropTarget || widget.selected) {
+      borderSide = BorderSide(color: primaryColor, width: 4.0);
+    }
+
     final Widget cardChild = Card(
       color: widget.selected ? primaryColor : defaultColor,
       elevation: _elevation,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
-        side: usingAsDropTarget
-            ? BorderSide(color: primaryColor, width: 4.0)
-            : BorderSide.none,
+        side: borderSide,
       ),
       clipBehavior: Clip.antiAlias,
       child: ExtendedImage.network(
@@ -252,7 +270,10 @@ class _IllustrationCardState extends State<IllustrationCard>
     return cardChild;
   }
 
-  Widget childWhenDragging() {
+  Widget childWhenDragging({
+    String textValue = "",
+    Function()? onTapPlaceholder,
+  }) {
     return DottedBorder(
       strokeWidth: 3.0,
       borderType: BorderType.RRect,
@@ -267,17 +288,23 @@ class _IllustrationCardState extends State<IllustrationCard>
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Opacity(
-              opacity: 0.6,
-              child: Center(
-                child: Text(
-                  "illustration_permutation_description".tr(),
-                  textAlign: TextAlign.center,
-                  style: Utilities.fonts.style(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.w600,
+          clipBehavior: Clip.hardEdge,
+          child: InkWell(
+            onTap: onTapPlaceholder,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Opacity(
+                opacity: 0.6,
+                child: Center(
+                  child: Text(
+                    textValue.isNotEmpty
+                        ? textValue
+                        : "illustration_permutation_description".tr(),
+                    textAlign: TextAlign.center,
+                    style: Utilities.fonts.style(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
