@@ -7,6 +7,7 @@ import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
+import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/firestore/doc_snap_map.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/section.dart';
@@ -42,7 +43,11 @@ class ProfilePageIllustrations extends StatefulWidget {
     Section section,
   )? onPopupMenuItemSelected;
 
-  final void Function(Section section, int index)? onShowIllustrationDialog;
+  final void Function({
+    required Section section,
+    required int index,
+    required EnumSelectType selectType,
+  })? onShowIllustrationDialog;
 
   final void Function(
     Section section,
@@ -193,8 +198,9 @@ class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
           illustration: Illustration.empty(),
           index: index,
           onTap: () => widget.onShowIllustrationDialog?.call(
-            widget.section,
-            widget.index,
+            section: widget.section,
+            index: widget.index,
+            selectType: EnumSelectType.add,
           ),
         ),
       );

@@ -1,11 +1,9 @@
 import 'package:artbooking/components/avatar/better_avatar.dart';
-import 'package:artbooking/components/cards/illustration_card.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/components/user_social_links_component.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
-import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -43,10 +41,7 @@ class UserSection extends StatefulWidget {
 
 class _UserSectionState extends State<UserSection> {
   bool _loading = false;
-  final List<Illustration> _illustrations = [];
-
   var _userFirestore = UserFirestore.empty();
-  var _illustrationBackground = Illustration.empty();
 
   @override
   void initState() {
@@ -63,20 +58,7 @@ class _UserSectionState extends State<UserSection> {
     }
 
     final double height = MediaQuery.of(context).size.height - 200.0;
-
-    var popupMenuEntries = widget.popupMenuEntries;
-
-    if (widget.index == 0) {
-      popupMenuEntries = popupMenuEntries.toList();
-      popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);
-    }
-
-    if (widget.isLast) {
-      popupMenuEntries = popupMenuEntries.toList();
-      popupMenuEntries.removeWhere((x) {
-        return x.value == EnumSectionAction.moveDown;
-      });
-    }
+    final popupMenuEntries = getPopupMenuEntries();
 
     return SliverToBoxAdapter(
       child: Container(
@@ -89,7 +71,6 @@ class _UserSectionState extends State<UserSection> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  imageBackground(),
                   userWidget(),
                 ],
               ),
@@ -115,28 +96,6 @@ class _UserSectionState extends State<UserSection> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget imageBackground() {
-    if (_illustrationBackground.id.isEmpty) {
-      return Container();
-    }
-
-    final first = _illustrations.first;
-
-    return Flexible(
-      fit: FlexFit.tight,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          IllustrationCard(
-            heroTag: first.id,
-            illustration: first,
-            index: 0,
-          ),
-        ],
       ),
     );
   }
@@ -266,46 +225,27 @@ class _UserSectionState extends State<UserSection> {
     }
   }
 
+  List<PopupMenuItemIcon<EnumSectionAction>> getPopupMenuEntries() {
+    var popupMenuEntries = widget.popupMenuEntries.sublist(0);
+
+    if (widget.index == 0) {
+      popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);
+    }
+
+    if (widget.isLast) {
+      popupMenuEntries.removeWhere(
+        (x) => x.value == EnumSectionAction.moveDown,
+      );
+    }
+
+    popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.rename);
+    return popupMenuEntries;
+  }
+
   void fetchData() async {
     setState(() => _loading = true);
     await fetchUser();
-    // fetchBackground();
     setState(() => _loading = false);
-  }
-
-  /// Fetch user's public illustrations.
-  Future<void> fetchBackground() async {
-    if (_userFirestore.id.isEmpty) {
-      return;
-    }
-
-    setState(() {
-      _illustrations.clear();
-    });
-
-    try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection("illustrations")
-          .where("user_id", isEqualTo: _userFirestore.id)
-          .where("visibility", isEqualTo: "public")
-          .limit(3)
-          .get();
-
-      if (snapshot.docs.isEmpty) {
-        return;
-      }
-
-      for (var doc in snapshot.docs) {
-        final data = doc.data();
-        data["id"] = doc.id;
-        _illustrations.add(Illustration.fromMap(data));
-      }
-
-      setState(() {});
-    } catch (error) {
-      Utilities.logger.e(error);
-      context.showErrorBar(content: Text(error.toString()));
-    }
   }
 
   Future<void> fetchUser() async {

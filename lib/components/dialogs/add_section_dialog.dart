@@ -290,7 +290,9 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
       case "ZRsIF2kdKc9xUo0cxfRI":
         return UniconsLine.picture;
       case "zYjoMKHm0eoWGBLyzULU":
-        return UniconsLine.chat_bubble_user;
+        return UniconsLine.user_circle;
+      case "EhS7TTP5ayQ9QzEkZgAf":
+        return UniconsLine.user_square;
       default:
         return UniconsLine.books;
     }

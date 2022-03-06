@@ -2,10 +2,12 @@ import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants/section_ids.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_books.dart';
+import 'package:artbooking/screens/atelier/profile/sections/user_illustration_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/user_section.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_illustrations.dart';
 import 'package:artbooking/types/artistic_page.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
+import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -36,7 +38,12 @@ class ProfilePageBody extends StatelessWidget {
   final void Function(Section)? onAddSection;
   final void Function()? onShowAddSection;
   final void Function()? onShowEditBackgroundColor;
-  final void Function(Section, int)? onShowIllustrationDialog;
+  final void Function({
+    required Section section,
+    required int index,
+    required EnumSelectType selectType,
+    int maxPick,
+  })? onShowIllustrationDialog;
 
   final void Function(
     Section section,
@@ -126,7 +133,7 @@ class ProfilePageBody extends StatelessWidget {
   }
 
   Widget getSectionWidget(Section section, int index) {
-    if (section.id == SectionIds.userWithArtworks) {
+    if (section.id == SectionIds.user) {
       return UserSection(
         index: index,
         section: section,
@@ -157,8 +164,22 @@ class ProfilePageBody extends StatelessWidget {
         title: section.name,
         mode: section.dataMode,
         userId: userId,
+        isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
         popupMenuEntries: popupMenuEntries,
+      );
+    }
+
+    if (section.id == SectionIds.userWithIllustration) {
+      return UserIllustrationSection(
+        index: index,
+        section: section,
+        userId: userId,
+        isLast: index == artisticPage.sections.length - 1,
+        onPopupMenuItemSelected: onPopupMenuItemSelected,
+        onShowIllustrationDialog: onShowIllustrationDialog,
+        popupMenuEntries: popupMenuEntries,
+        onUpdateSectionItems: onUpdateSectionItems,
       );
     }
 

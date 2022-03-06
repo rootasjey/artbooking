@@ -4,5 +4,6 @@ class SectionIds {
 
   static const String bookGrid = "C9Z51SG4JeJ5VFUHOagF";
   static const String illustrationGrid = "ZRsIF2kdKc9xUo0cxfRI";
-  static const String userWithArtworks = "zYjoMKHm0eoWGBLyzULU";
+  static const String user = "zYjoMKHm0eoWGBLyzULU";
+  static const String userWithIllustration = "EhS7TTP5ayQ9QzEkZgAf";
 }

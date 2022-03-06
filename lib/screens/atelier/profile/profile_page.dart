@@ -14,6 +14,7 @@ import 'package:artbooking/types/artistic_page.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_section_size.dart';
+import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/named_color.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:beamer/beamer.dart';
@@ -179,7 +180,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         );
         break;
       case EnumSectionAction.selectIllustrations:
-        onShowIllustrationDialog(section, index);
+        onShowIllustrationDialog(
+          section: section,
+          index: index,
+          selectType: EnumSelectType.add,
+        );
         break;
       default:
     }
@@ -196,14 +201,22 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
-  void onShowIllustrationDialog(Section section, int index) {
+  void onShowIllustrationDialog({
+    required Section section,
+    required int index,
+    required EnumSelectType selectType,
+    int maxPick = 6,
+  }) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return SelectIllustrationsDialog(
           autoFocus: true,
+          maxPick: maxPick,
           userId: getUserId(),
-          onValidate: (items) => tryAddSectionItems(section, index, items),
+          onValidate: selectType == EnumSelectType.add
+              ? (items) => tryAddSectionItems(section, index, items)
+              : (items) => tryUpdateSectionItems(section, index, items),
         );
       },
     );
