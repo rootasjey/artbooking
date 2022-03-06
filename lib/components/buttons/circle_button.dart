@@ -9,6 +9,7 @@ class CircleButton extends StatelessWidget {
     this.elevation = 0.0,
     this.backgroundColor = Colors.black12,
     this.tooltip,
+    this.showBorder = false,
   });
 
   /// Tap callback.
@@ -27,10 +28,17 @@ class CircleButton extends StatelessWidget {
 
   final double elevation;
 
+  // final BorderSide borderSide;
+  final bool showBorder;
+
   @override
   Widget build(BuildContext context) {
     return Material(
-      shape: CircleBorder(),
+      shape: CircleBorder(
+        side: showBorder
+            ? BorderSide(color: Colors.white38, width: 2.0)
+            : BorderSide.none,
+      ),
       clipBehavior: Clip.antiAlias,
       color: Colors.transparent,
       elevation: elevation,
