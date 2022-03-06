@@ -19,8 +19,10 @@ class SelectIllustrationsDialog extends StatefulWidget {
     this.autoFocus = false,
     required this.userId,
     this.onValidate,
+    this.maxPick = 6,
   }) : super(key: key);
 
+  final int maxPick;
   final bool autoFocus;
   final String userId;
   final void Function(List<String>)? onValidate;
@@ -39,7 +41,6 @@ class _SelectIllustrationsDialogState extends State<SelectIllustrationsDialog> {
   final Map<String, bool> _selectedIllustrationIds = Map();
 
   final int _limit = 20;
-  final int _maxPick = 6;
   DocumentSnapshot? _lastDocument;
 
   var _scrollController = ScrollController();
@@ -84,8 +85,10 @@ class _SelectIllustrationsDialogState extends State<SelectIllustrationsDialog> {
             child: Opacity(
               opacity: 0.4,
               child: Text(
-                "illustrations_choose_count"
-                    .plural(_maxPick, args: ["$_maxPick"]),
+                "illustrations_choose_count".plural(
+                  widget.maxPick,
+                  args: ["${widget.maxPick}"],
+                ),
                 textAlign: TextAlign.center,
                 style: Utilities.fonts.style(
                   color: Colors.black,
@@ -268,6 +271,10 @@ class _SelectIllustrationsDialogState extends State<SelectIllustrationsDialog> {
   }
 
   void onTapIllustrationCard(Illustration illustration) {
+    if (_selectedIllustrationIds.length >= widget.maxPick) {
+      _selectedIllustrationIds.remove(_selectedIllustrationIds.keys.last);
+    }
+
     if (_selectedIllustrationIds.containsKey(illustration.id)) {
       setState(() {
         _selectedIllustrationIds.remove(illustration.id);
@@ -281,7 +288,13 @@ class _SelectIllustrationsDialogState extends State<SelectIllustrationsDialog> {
   }
 
   void onValidate() {
-    widget.onValidate?.call(_selectedIllustrationIds.keys.toList());
+    List<String> illustrationIds = _selectedIllustrationIds.keys.toList();
+
+    if (illustrationIds.length > widget.maxPick) {
+      illustrationIds = illustrationIds.sublist(0, widget.maxPick);
+    }
+
+    widget.onValidate?.call(illustrationIds);
     Beamer.of(context).popRoute();
   }
 
