@@ -462,6 +462,7 @@
   "icons_by": "Icons by",
   "illustration": "Illustration",
   "illustration_add_new": "Add a new illustration",
+  "illustration_change": "Change illustration",
   "illustration_create_error": "Sorry, there was an issue while creating your illustration. Please try again later.",
   "illustration_delete": "Delete this illustration",
   "illustration_delete_description": "If this illustration is referenced inside books, contests, challenges, galleries, it will leave a dead link. This action is irrevsible.",
@@ -486,6 +487,7 @@
   "illustration_metadata_description": "Set Illustration title, summary, description, topics & more",
   "illustration_name_metadata": "{}'s metadata",
   "illustration_permutation_description": "Drop this illustration on another one to permute them.",
+  "illustration_remove": "Remove this illustration",
   "illustration_story_dot": "Illustration'story...",
   "illustration_story_sample": "This illustration in one shot between 2PM - 4PM...",
   "illustration_title_dot": "Illustration's title...",
@@ -572,7 +574,7 @@
   "illustrations_select": "Select illustrations",
   "illustrations_select_count": {
     "zero": "Select {} illustration",
-    "one": "Select {} illustrations",
+    "one": "Select {} illustration",
     "two": "Select {} illustrations",
     "few": "Select {} illustrations",
     "many": "Select {} illustrations",
@@ -896,12 +898,14 @@
   "section_description": {
     "C9Z51SG4JeJ5VFUHOagF": "A grid of books composed of 2 rows of 3 columns.",
     "ZRsIF2kdKc9xUo0cxfRI": "A grid of illustrations composed of 2 rows of 3 columns.",
-    "zYjoMKHm0eoWGBLyzULU": "A carrousel of illustrations on the left, and your profile presentation on the right."
+    "zYjoMKHm0eoWGBLyzULU": "Your profile presentation centered.",
+    "EhS7TTP5ayQ9QzEkZgAf": "A section with an illustration on on side, and your profile presentation on the other side."
   },
   "section_name": {
     "C9Z51SG4JeJ5VFUHOagF": "3x2 Book Grid",
     "ZRsIF2kdKc9xUo0cxfRI": "3x2 Illustration Grid",
-    "zYjoMKHm0eoWGBLyzULU": "User with Illustration Window"
+    "zYjoMKHm0eoWGBLyzULU": "User",
+    "EhS7TTP5ayQ9QzEkZgAf": "Illustration / User"
   },
   "section_rename": "Rename section",
   "section_rename_description": "Give a new description to this section.",

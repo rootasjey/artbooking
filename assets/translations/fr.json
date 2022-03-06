@@ -461,6 +461,7 @@
   "icons_by": "Icons par",
   "illustration": "Illustration",
   "illustration_add_new": "Ajouter une nouvelle illustration",
+  "illustration_change": "Changer d'illustration",
   "illustration_create_error": "Désolés, nous avons rencontré une erreur durant la création de votre illustration. Veuillez réessayer plus tard.",
   "illustration_delete": "Supprimer cette illustration",
   "illustration_delete_description": "Si cette illustration est référencée à l'intérieur de books, concours, challenges, galleries, cette suppression entraînera la formation de liens morts. Cette action est irrevsible.",
@@ -485,6 +486,7 @@
   "illustration_metadata_description": "Modifiez le titre de l'ilustration, son résumé, sa description, ses topics & plus",
   "illustration_name_metadata": "Méta-données de {}",
   "illustration_permutation_description": "Déposez cette illustration sur une autre pour les permutter.",
+  "illustration_remove": "Retirer cette illustration",
   "illustration_story_dot": "Histoire derrière cette illustration...",
   "illustration_story_sample": "Cette illustration a été faite entre 14h et 15h...",
   "illustration_title_dot": "Titre de l'illustration...",
@@ -571,7 +573,7 @@
   "illustrations_select": "Sélectionner des illustrations",
   "illustrations_select_count": {
     "zero": "Sélectionner {} illustration",
-    "one": "Sélectionner {} illustrations",
+    "one": "Sélectionner {} illustration",
     "two": "Sélectionner {} illustrations",
     "few": "Sélectionner {} illustrations",
     "many": "Sélectionner {} illustrations",
@@ -894,12 +896,14 @@
   "section_description": {
     "C9Z51SG4JeJ5VFUHOagF": "Une grille de books composée de 2 lignes de 3 colonnes.",
     "ZRsIF2kdKc9xUo0cxfRI": "Une grille d'illustrations composée de 2 lignes de 3 colonnes.",
-    "zYjoMKHm0eoWGBLyzULU": "Un carrousel d'illustrations sur la gauche, et votre présentation de profile sur la droite."
+    "zYjoMKHm0eoWGBLyzULU": "Votre présentation de profile centrée.",
+    "EhS7TTP5ayQ9QzEkZgAf": "Un caroussel d'illustrations sur la gauche, et votre présentation de profile sur la droite."
   },
   "section_names": {
     "C9Z51SG4JeJ5VFUHOagF": "Grille 3x2 de books",
     "ZRsIF2kdKc9xUo0cxfRI": "Grille 3x2 d'illustrations",
-    "zYjoMKHm0eoWGBLyzULU": "Présentation avec tableaux"
+    "zYjoMKHm0eoWGBLyzULU": "Présentation Utilisateur",
+    "EhS7TTP5ayQ9QzEkZgAf": "Illustration / Utilisateur"
   },
   "section_rename": "Renommer cette section",
   "section_rename_description": "Éditer la description.",
