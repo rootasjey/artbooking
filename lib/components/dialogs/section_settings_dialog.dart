@@ -20,8 +20,10 @@ class SectionSettingsDialog extends StatefulWidget {
     required this.section,
     required this.index,
     this.onDataFetchModeChanged,
+    this.showDataMode = true,
   }) : super(key: key);
 
+  final bool showDataMode;
   final Section section;
   final int index;
   final void Function(NamedColor, int, Section)? onValidate;
@@ -353,22 +355,24 @@ class _SectionSettingsDialogState extends State<SectionSettingsDialog> {
                     ],
                   ),
                 ),
-                DarkOutlinedButton(
-                  selected: _selectedTab == EnumSectionConfigTab.dataFetchMode,
-                  onPressed: () => onPressedTabButton(
-                    EnumSectionConfigTab.dataFetchMode,
+                if (widget.showDataMode)
+                  DarkOutlinedButton(
+                    selected:
+                        _selectedTab == EnumSectionConfigTab.dataFetchMode,
+                    onPressed: () => onPressedTabButton(
+                      EnumSectionConfigTab.dataFetchMode,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: Icon(UniconsLine.cloud_data_connection),
+                        ),
+                        Text("data_mode".tr()),
+                      ],
+                    ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: Icon(UniconsLine.cloud_data_connection),
-                      ),
-                      Text("data_mode".tr()),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),
@@ -419,6 +423,10 @@ class _SectionSettingsDialogState extends State<SectionSettingsDialog> {
   /// Load this specific component saved data (e.g. last selected tab).
   void loadSavedData() {
     _selectedTab = Utilities.storage.getSectionConfigTab();
+
+    if (!widget.showDataMode) {
+      _selectedTab = EnumSectionConfigTab.backgroundColor;
+    }
   }
 
   void onPressedTabButton(EnumSectionConfigTab selectedTab) {

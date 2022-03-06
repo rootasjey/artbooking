@@ -3,6 +3,7 @@ enum EnumSectionAction {
   moveUp,
   rename,
   delete,
+  editBackgroundColor,
   changeDataMode,
   selectIllustrations,
   setSyncDataMode,

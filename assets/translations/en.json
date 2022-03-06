@@ -330,6 +330,7 @@
   "dont_own_account": "I don't have an account",
   "ecommerce": "E-Commerce",
   "edit": "Edit",
+  "edit_background_color": "Edit background color",
   "edit_illustration_texts": "Edit name, description, lore...",
   "edit_image": "Edit image",
   "edit_image_description": "Use the crop, rotate or flip buttons on the right to edit this image. The reset button revert back all changes. Don't forget to save your modifications with the save button in the bottom right corner.",

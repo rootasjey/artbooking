@@ -172,6 +172,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       case EnumSectionAction.settings:
         onShowEditSectionSettings(section, index);
         break;
+      case EnumSectionAction.editBackgroundColor:
+        onShowEditSectionSettings(section, index, showDataMode: false);
+        break;
       case EnumSectionAction.setSyncDataMode:
         tryUpdateDataFetchMode(
           section,
@@ -223,7 +226,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   /// Show a popup to edit section settings (background color, fetch mode).
-  void onShowEditSectionSettings(Section section, int index) {
+  void onShowEditSectionSettings(
+    Section section,
+    int index, {
+    bool showDataMode = true,
+  }) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -231,6 +238,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           section: section,
           onValidate: tryUpdateBackgroundColor,
           index: index,
+          showDataMode: showDataMode,
           onDataFetchModeChanged: tryUpdateDataFetchMode,
         );
       },

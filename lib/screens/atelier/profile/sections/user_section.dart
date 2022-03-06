@@ -239,6 +239,16 @@ class _UserSectionState extends State<UserSection> {
     }
 
     popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.rename);
+    popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.settings);
+
+    popupMenuEntries.add(
+      PopupMenuItemIcon(
+        icon: Icon(UniconsLine.paint_tool),
+        textLabel: "edit_background_color".tr(),
+        value: EnumSectionAction.editBackgroundColor,
+      ),
+    );
+
     return popupMenuEntries;
   }
 
