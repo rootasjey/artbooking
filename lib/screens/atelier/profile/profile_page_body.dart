@@ -1,10 +1,10 @@
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants/section_ids.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/screens/atelier/profile/profile_page_books.dart';
+import 'package:artbooking/screens/atelier/profile/sections/book_grid_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/user_illustration_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/user_section.dart';
-import 'package:artbooking/screens/atelier/profile/profile_page_illustrations.dart';
+import 'package:artbooking/screens/atelier/profile/sections/illustration_grid_section.dart';
 import 'package:artbooking/types/artistic_page.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
@@ -145,7 +145,7 @@ class ProfilePageBody extends StatelessWidget {
     }
 
     if (section.id == SectionIds.illustrationGrid) {
-      return ProfilePageIllustrations(
+      return IllustrationGridSection(
         index: index,
         section: section,
         userId: userId,
@@ -158,7 +158,7 @@ class ProfilePageBody extends StatelessWidget {
     }
 
     if (section.id == SectionIds.bookGrid) {
-      return ProfilePageBooks(
+      return BookGridSection(
         index: index,
         section: section,
         title: section.name,

@@ -15,8 +15,9 @@ import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
-class ProfilePageBooks extends StatefulWidget {
-  const ProfilePageBooks({
+/// A 3x2 book grid.
+class BookGridSection extends StatefulWidget {
+  const BookGridSection({
     Key? key,
     required this.title,
     required this.userId,
@@ -40,10 +41,10 @@ class ProfilePageBooks extends StatefulWidget {
   final Section section;
 
   @override
-  State<ProfilePageBooks> createState() => _ProfilePageBooksState();
+  State<BookGridSection> createState() => _BookGridSectionState();
 }
 
-class _ProfilePageBooksState extends State<ProfilePageBooks> {
+class _BookGridSectionState extends State<BookGridSection> {
   bool _isLoading = false;
   List<Book> _books = [];
 

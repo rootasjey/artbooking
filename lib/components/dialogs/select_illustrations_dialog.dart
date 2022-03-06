@@ -16,15 +16,22 @@ import 'package:unicons/unicons.dart';
 class SelectIllustrationsDialog extends StatefulWidget {
   const SelectIllustrationsDialog({
     Key? key,
-    this.autoFocus = false,
     required this.userId,
+    this.autoFocus = false,
     this.onValidate,
     this.maxPick = 6,
   }) : super(key: key);
 
+  /// Maximum number of illustrations someone can choose.
   final int maxPick;
+
+  /// If true, this widget will request focus on load.
   final bool autoFocus;
+
+  /// User's id illustrations.
   final String userId;
+
+  /// Callback containing selected illustration ids.
   final void Function(List<String>)? onValidate;
 
   @override

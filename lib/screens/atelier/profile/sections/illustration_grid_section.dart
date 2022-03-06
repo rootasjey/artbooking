@@ -20,8 +20,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
-class ProfilePageIllustrations extends StatefulWidget {
-  const ProfilePageIllustrations({
+/// A 3x2 illustration grid.
+class IllustrationGridSection extends StatefulWidget {
+  const IllustrationGridSection({
     Key? key,
     required this.userId,
     this.onPopupMenuItemSelected,
@@ -60,11 +61,11 @@ class ProfilePageIllustrations extends StatefulWidget {
   final String userId;
 
   @override
-  State<ProfilePageIllustrations> createState() =>
-      _ProfilePageIllustrationsState();
+  State<IllustrationGridSection> createState() =>
+      _IllustrationGridSectionState();
 }
 
-class _ProfilePageIllustrationsState extends State<ProfilePageIllustrations> {
+class _IllustrationGridSectionState extends State<IllustrationGridSection> {
   bool _loading = false;
   bool _firstExecution = true;
 
