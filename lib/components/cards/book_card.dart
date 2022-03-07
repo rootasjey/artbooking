@@ -4,8 +4,6 @@ import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
-import 'package:artbooking/types/illustration/illustration.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
@@ -21,6 +19,7 @@ class BookCard extends StatefulWidget {
   const BookCard({
     Key? key,
     required this.book,
+    required this.heroTag,
     required this.index,
     this.onLongPress,
     this.onPopupMenuItemSelected,
@@ -35,7 +34,11 @@ class BookCard extends StatefulWidget {
     this.onDrop,
     this.onDragUpdate,
     this.canDrag = false,
+    this.asPlaceHolder = false,
   }) : super(key: key);
+
+  /// If true, this card will be used as a place holder.
+  final bool asPlaceHolder;
 
   /// Book's data for this card.
   final Book book;
@@ -79,8 +82,13 @@ class BookCard extends StatefulWidget {
   final double width;
   final double height;
 
-  /// Callback when drag and dropping item on this book card.
-  final void Function(List<int>)? onDrop;
+  /// Callback when drag and dropping items on this book card.
+  final void Function(int dropTargetIndex, List<int> dragIndexes)? onDrop;
+
+  /// An unique tag to identify a single component for animation.
+  /// This tag must be unique on the page and among a list.
+  /// If you're not sure what to put, just use the illustration's id.
+  final String heroTag;
 
   @override
   _BookCardState createState() => _BookCardState();
@@ -99,16 +107,16 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   final double _captionHeight = 42.0;
   final double _cardRadius = 8.0;
 
-  int _indexSlideshow = 0;
-  List<Illustration> _lastIllustrations = [];
-  String _coverLink = "";
-  Timer? _timerSlideshow;
+  // int _indexSlideshow = 0;
+  // List<Illustration> _lastIllustrations = [];
+  // String _coverLink = "";
+  // Timer? _timerSlideshow;
 
   @override
   void initState() {
     super.initState();
 
-    _coverLink = widget.book.getCoverLink();
+    // _coverLink = widget.book.getCoverLink();
     _scaleController = createController()..duration = 250.milliseconds;
     _scaleAnimation =
         0.6.tweenTo(1.0).animatedBy(_scaleController).curve(Curves.elasticOut);
@@ -118,15 +126,22 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
 
   @override
   void dispose() {
-    _timerSlideshow?.cancel();
-    _lastIllustrations.clear();
+    // _timerSlideshow?.cancel();
+    // _lastIllustrations.clear();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.asPlaceHolder) {
+      return childWhenDragging(
+        textValue: "book_add_new".tr(),
+        onTapPlaceholder: widget.onTap,
+      );
+    }
+
     return Hero(
-      tag: widget.book.id,
+      tag: widget.heroTag,
       child: OverflowBox(
         // avoid hero animation overflow
         minHeight: widget.height - _captionHeight,
@@ -149,7 +164,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
         );
       },
       onAccept: (int dragIndex) {
-        widget.onDrop?.call([dragIndex]);
+        widget.onDrop?.call(widget.index, [dragIndex]);
       },
     );
   }
@@ -184,39 +199,57 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     );
   }
 
-  Widget childWhenDragging() {
-    return DottedBorder(
-      strokeWidth: 3.0,
-      borderType: BorderType.RRect,
-      radius: Radius.circular(16),
-      color: Theme.of(context).primaryColor.withOpacity(0.6),
-      dashPattern: [8, 4],
-      child: ClipRRect(
-        borderRadius: BorderRadius.all(Radius.circular(16)),
-        child: Card(
-          elevation: 0.0,
-          color: Constants.colors.clairPink.withOpacity(0.6),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Opacity(
-              opacity: 0.6,
-              child: Center(
-                child: Text(
-                  "book_permutation_description".tr(),
-                  textAlign: TextAlign.center,
-                  style: Utilities.fonts.style(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.w600,
+  Widget childWhenDragging({
+    String textValue = "",
+    Function()? onTapPlaceholder,
+  }) {
+    return Column(
+      children: [
+        Container(
+          width: widget.width - 40.0,
+          height: widget.height - 30.0,
+          padding: const EdgeInsets.all(8.0),
+          child: DottedBorder(
+            strokeWidth: 3.0,
+            borderType: BorderType.RRect,
+            radius: Radius.circular(16),
+            color: Theme.of(context).primaryColor.withOpacity(0.6),
+            dashPattern: [8, 4],
+            child: ClipRRect(
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+              child: Card(
+                elevation: 0.0,
+                color: Constants.colors.clairPink.withOpacity(0.6),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                clipBehavior: Clip.hardEdge,
+                child: InkWell(
+                  onTap: onTapPlaceholder,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Opacity(
+                      opacity: 0.6,
+                      child: Center(
+                        child: Text(
+                          textValue.isNotEmpty
+                              ? textValue
+                              : "book_permutation_description".tr(),
+                          textAlign: TextAlign.center,
+                          style: Utilities.fonts.style(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -365,7 +398,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
           child: Stack(
             children: [
               ExtendedImage.network(
-                _coverLink,
+                widget.book.getCoverLink(),
                 fit: BoxFit.cover,
                 width: widget.width - 60.0,
                 height: widget.height - _captionHeight,
@@ -503,37 +536,37 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   }
 
   /// Fetch last illustrations of this book.
-  Future fetchLastIllustrations() async {
-    final Book book = widget.book;
-    if (book.illustrations.isEmpty) {
-      return;
-    }
+  // Future fetchLastIllustrations() async {
+  //   final Book book = widget.book;
+  //   if (book.illustrations.isEmpty) {
+  //     return;
+  //   }
 
-    _lastIllustrations.clear();
+  //   // _lastIllustrations.clear();
 
-    final int arrayLength = book.illustrations.length;
-    final int end = arrayLength > 4 ? 5 : arrayLength;
-    final illustrations = book.illustrations.sublist(0, end);
+  //   final int arrayLength = book.illustrations.length;
+  //   final int end = arrayLength > 4 ? 5 : arrayLength;
+  //   final illustrations = book.illustrations.sublist(0, end);
 
-    try {
-      for (var illustrationBook in illustrations) {
-        final snapshot = await FirebaseFirestore.instance
-            .collection("illustrations")
-            .doc(illustrationBook.id)
-            .get();
+  //   try {
+  //     for (var illustrationBook in illustrations) {
+  //       final snapshot = await FirebaseFirestore.instance
+  //           .collection("illustrations")
+  //           .doc(illustrationBook.id)
+  //           .get();
 
-        final data = snapshot.data();
-        if (!snapshot.exists || data == null) {
-          continue;
-        }
+  //       final data = snapshot.data();
+  //       if (!snapshot.exists || data == null) {
+  //         continue;
+  //       }
 
-        final illustration = Illustration.fromMap(data);
-        _lastIllustrations.add(illustration);
-      }
-    } catch (error) {
-      Utilities.logger.e(error);
-    }
-  }
+  //       final illustration = Illustration.fromMap(data);
+  //       // _lastIllustrations.add(illustration);
+  //     }
+  //   } catch (error) {
+  //     Utilities.logger.e(error);
+  //   }
+  // }
 
   void onDoubleTap() {
     widget.onDoubleTap?.call();
@@ -564,42 +597,42 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     }
   }
 
-  void startCoverSlideshow() async {
-    if (_lastIllustrations.isEmpty) {
-      await fetchLastIllustrations();
-    }
+  // void startCoverSlideshow() async {
+  //   if (_lastIllustrations.isEmpty) {
+  //     await fetchLastIllustrations();
+  //   }
 
-    if (_lastIllustrations.isEmpty) {
-      return;
-    }
+  //   if (_lastIllustrations.isEmpty) {
+  //     return;
+  //   }
 
-    _indexSlideshow = 0;
+  //   _indexSlideshow = 0;
 
-    setState(() {
-      _coverLink = _lastIllustrations.first.getThumbnail();
-    });
+  //   // setState(() {
+  //   //   _coverLink = _lastIllustrations.first.getThumbnail();
+  //   // });
 
-    _timerSlideshow?.cancel();
-    _timerSlideshow = Timer.periodic(
-      Duration(seconds: 2),
-      (time) {
-        _indexSlideshow++;
+  //   _timerSlideshow?.cancel();
+  //   _timerSlideshow = Timer.periodic(
+  //     Duration(seconds: 2),
+  //     (time) {
+  //       _indexSlideshow++;
 
-        if (_indexSlideshow >= _lastIllustrations.length) {
-          stopCoverSlideshow();
-          return;
-        }
+  //       if (_indexSlideshow >= _lastIllustrations.length) {
+  //         stopCoverSlideshow();
+  //         return;
+  //       }
 
-        setState(() {
-          _coverLink =
-              _lastIllustrations.elementAt(_indexSlideshow).getThumbnail();
-        });
-      },
-    );
-  }
+  //       // setState(() {
+  //       //   _coverLink =
+  //       //       _lastIllustrations.elementAt(_indexSlideshow).getThumbnail();
+  //       // });
+  //     },
+  //   );
+  // }
 
-  void stopCoverSlideshow() {
-    _timerSlideshow?.cancel();
-    _coverLink = widget.book.getCoverLink();
-  }
+  // void stopCoverSlideshow() {
+  //   _timerSlideshow?.cancel();
+  //   // _coverLink = widget.book.getCoverLink();
+  // }
 }

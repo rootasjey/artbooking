@@ -67,6 +67,7 @@ class BooksPageBody extends StatelessWidget {
             return BookCard(
               book: book,
               index: index,
+              heroTag: book.id,
               onTap: () => onTap?.call(book),
               onDoubleTap: () => onDoubleTap?.call(book, index),
               onTapLike: () => onDoubleTap?.call(book, index),

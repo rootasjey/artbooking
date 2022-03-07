@@ -82,16 +82,14 @@ class MyBooksPageBody extends StatelessWidget {
 
             return BookCard(
               key: ValueKey(book.id),
+              heroTag: book.id,
               index: index,
               book: book,
               selected: selected,
               selectionMode: selectionMode,
               canDrag: true,
               onDragUpdate: onDragUpdateBook,
-              onDrop: (List<int> dragIndexes) => onDropBook?.call(
-                index,
-                dragIndexes,
-              ),
+              onDrop: onDropBook,
               onTap: () => onTapBook?.call(book),
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               popupMenuEntries: popupMenuEntries,

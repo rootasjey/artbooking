@@ -101,6 +101,7 @@ class LikesPageBody extends StatelessWidget {
               return BookCard(
                 book: book,
                 index: index,
+                heroTag: book.id,
                 width: 280.0,
                 height: 332.0,
                 onTap: () => onTapBook?.call(book),
