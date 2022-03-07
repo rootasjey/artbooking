@@ -24,9 +24,9 @@ class ProfilePageBody extends StatelessWidget {
     this.onAddSection,
     this.isOwner = false,
     this.onShowAddSection,
-    this.onShowEditBackgroundColor,
     this.onShowIllustrationDialog,
     this.onUpdateSectionItems,
+    this.onShowBookDialog,
   }) : super(key: key);
 
   final bool isOwner;
@@ -37,13 +37,19 @@ class ProfilePageBody extends StatelessWidget {
 
   final void Function(Section)? onAddSection;
   final void Function()? onShowAddSection;
-  final void Function()? onShowEditBackgroundColor;
   final void Function({
     required Section section,
     required int index,
     required EnumSelectType selectType,
     int maxPick,
   })? onShowIllustrationDialog;
+
+  final void Function({
+    required Section section,
+    required int index,
+    required EnumSelectType selectType,
+    int maxPick,
+  })? onShowBookDialog;
 
   final void Function(
     Section section,
@@ -161,12 +167,12 @@ class ProfilePageBody extends StatelessWidget {
       return BookGridSection(
         index: index,
         section: section,
-        title: section.name,
-        mode: section.dataMode,
         userId: userId,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
         popupMenuEntries: popupMenuEntries,
+        onUpdateSectionItems: onUpdateSectionItems,
+        onShowBookDialog: onShowBookDialog,
       );
     }
 

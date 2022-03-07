@@ -1,6 +1,7 @@
 import 'package:artbooking/components/dialogs/add_section_dialog.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/section_settings_dialog.dart';
+import 'package:artbooking/components/dialogs/select_books_dialog.dart';
 import 'package:artbooking/components/dialogs/select_illustrations_dialog.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
@@ -127,6 +128,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       onShowAddSection: onShowAddSection,
       onShowIllustrationDialog: onShowIllustrationDialog,
       onUpdateSectionItems: tryUpdateSectionItems,
+      onShowBookDialog: onShowBookDialog,
     );
   }
 
@@ -189,6 +191,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           selectType: EnumSelectType.add,
         );
         break;
+      case EnumSectionAction.selectBooks:
+        onShowBookDialog(
+          section: section,
+          index: index,
+          selectType: EnumSelectType.add,
+        );
+        break;
       default:
     }
   }
@@ -199,6 +208,27 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       builder: (context) {
         return AddSectionDialog(
           onAddSection: tryAddSection,
+        );
+      },
+    );
+  }
+
+  void onShowBookDialog({
+    required Section section,
+    required int index,
+    required EnumSelectType selectType,
+    int maxPick = 6,
+  }) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SelectBooksDialog(
+          autoFocus: true,
+          maxPick: maxPick,
+          userId: getUserId(),
+          onValidate: selectType == EnumSelectType.add
+              ? (items) => tryAddSectionItems(section, index, items)
+              : (items) => tryUpdateSectionItems(section, index, items),
         );
       },
     );

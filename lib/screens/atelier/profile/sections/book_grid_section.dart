@@ -1,17 +1,23 @@
 import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/cards/book_card.dart';
+import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/book/book.dart';
+import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
+import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/firestore/doc_snap_map.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flash/src/flash_helper.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
@@ -19,21 +25,32 @@ import 'package:unicons/unicons.dart';
 class BookGridSection extends StatefulWidget {
   const BookGridSection({
     Key? key,
-    required this.title,
     required this.userId,
-    this.mode = EnumSectionDataMode.sync,
     this.onPopupMenuItemSelected,
     this.popupMenuEntries = const [],
     required this.index,
     required this.section,
     this.isLast = false,
+    this.onUpdateSectionItems,
+    this.onShowBookDialog,
   }) : super(key: key);
 
   final bool isLast;
-  final String title;
-  final EnumSectionDataMode mode;
   final String userId;
   final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
+
+  final void Function({
+    required Section section,
+    required int index,
+    required EnumSelectType selectType,
+  })? onShowBookDialog;
+
+  final void Function(
+    Section section,
+    int index,
+    List<String> items,
+  )? onUpdateSectionItems;
+
   final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
 
   /// Section's position in the layout (e.g. 0 is the first).
@@ -45,37 +62,40 @@ class BookGridSection extends StatefulWidget {
 }
 
 class _BookGridSectionState extends State<BookGridSection> {
-  bool _isLoading = false;
+  bool _loading = false;
+
+  /// Used to know to flush current data and refetch.
+  /// If not, simply do a data diff. and update only some UI parts.
+  var _currentMode = EnumSectionDataMode.sync;
+
+  /// Courcircuit initState.
+  /// If first execution, do a whole data fetch.
+  /// Otherwise, try a data diff. and udpdate only some UI parts.
+  bool _firstExecution = true;
+
   List<Book> _books = [];
 
   @override
   void initState() {
     super.initState();
-    fetchBooks();
+    _currentMode = widget.section.dataMode;
+  }
+
+  @override
+  void dispose() {
+    _books.clear();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return SliverList(
-        delegate: SliverChildListDelegate.fixed([]),
-      );
+    checkData();
+
+    if (_loading) {
+      return LoadingView(title: Text("loading".tr()));
     }
 
-    var popupMenuEntries = widget.popupMenuEntries;
-
-    if (widget.index == 0) {
-      popupMenuEntries = popupMenuEntries.toList();
-      popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);
-    }
-
-    if (widget.isLast) {
-      popupMenuEntries = popupMenuEntries.toList();
-      popupMenuEntries
-          .removeWhere((x) => x.value == EnumSectionAction.moveDown);
-    }
-
-    int index = -1;
+    final popupMenuEntries = getPopupMenuEntries();
 
     return SliverToBoxAdapter(
       child: FadeInY(
@@ -89,23 +109,8 @@ class _BookGridSectionState extends State<BookGridSection> {
             children: [
               Column(
                 children: [
-                  Opacity(
-                    opacity: 0.6,
-                    child: Text(
-                      widget.title.toUpperCase(),
-                      style: Utilities.fonts.style(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 200.0,
-                    child: Divider(
-                      color: Theme.of(context).secondaryHeaderColor,
-                      thickness: 4.0,
-                    ),
-                  ),
+                  titleSectionWidget(),
+                  maybeHelperText(),
                   Padding(
                     padding: const EdgeInsets.only(top: 34.0),
                     child: GridView.count(
@@ -113,17 +118,7 @@ class _BookGridSectionState extends State<BookGridSection> {
                       shrinkWrap: true,
                       mainAxisSpacing: 24.0,
                       crossAxisSpacing: 24.0,
-                      children: _books.map((Book book) {
-                        index++;
-
-                        return BookCard(
-                          index: index,
-                          book: book,
-                          width: 300.0,
-                          height: 342.0,
-                          onTap: () => navigateToBookPage(book),
-                        );
-                      }).toList(),
+                      children: getChildren(),
                     ),
                   ),
                 ],
@@ -154,9 +149,253 @@ class _BookGridSectionState extends State<BookGridSection> {
     );
   }
 
-  void fetchBooks() async {
+  List<Widget> getChildren() {
+    int index = -1;
+    final bool canDrag = _currentMode == EnumSectionDataMode.chosen;
+    final onDrop = canDrag ? onDropBook : null;
+    final List<PopupMenuEntry<EnumBookItemAction>> popupMenuEntries = canDrag
+        ? [
+            PopupMenuItemIcon(
+              icon: Icon(UniconsLine.minus),
+              textLabel: "remove".tr(),
+              value: EnumBookItemAction.remove,
+            ),
+          ]
+        : [];
+
+    final double width = 300.0;
+    final double height = 342.0;
+
+    final children = _books.map((Book book) {
+      index++;
+
+      return BookCard(
+        index: index,
+        heroTag: "${widget.section.id}_${index}_${book.id}",
+        canDrag: canDrag,
+        onDrop: onDrop,
+        book: book,
+        width: width,
+        height: height,
+        onTap: () => navigateToBookPage(book),
+        popupMenuEntries: popupMenuEntries,
+        onPopupMenuItemSelected: onBookItemSelected,
+      );
+    }).toList();
+
+    if ((children.length % 3 != 0 && children.length < 6) || children.isEmpty) {
+      children.add(
+        BookCard(
+          asPlaceHolder: true,
+          heroTag: "empty_${DateTime.now()}",
+          width: width,
+          height: height,
+          book: Book.empty(),
+          index: index,
+          onTap: () => widget.onShowBookDialog?.call(
+            section: widget.section,
+            index: widget.index,
+            selectType: EnumSelectType.add,
+          ),
+        ),
+      );
+    }
+
+    return children;
+  }
+
+  List<PopupMenuItemIcon<EnumSectionAction>> getPopupMenuEntries() {
+    final popupMenuEntries = widget.popupMenuEntries.sublist(0);
+
+    if (widget.index == 0) {
+      popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);
+    }
+
+    if (widget.isLast) {
+      popupMenuEntries.removeWhere(
+        (x) => x.value == EnumSectionAction.moveDown,
+      );
+    }
+
+    if (_currentMode == EnumSectionDataMode.chosen) {
+      popupMenuEntries.add(
+        PopupMenuItemIcon(
+          icon: Icon(UniconsLine.plus),
+          textLabel: "books_select".tr(),
+          value: EnumSectionAction.selectBooks,
+        ),
+      );
+    }
+
+    return popupMenuEntries;
+  }
+
+  Widget maybeHelperText() {
+    if (widget.section.dataMode != EnumSectionDataMode.chosen ||
+        _books.isNotEmpty) {
+      return Container();
+    }
+
+    return Container(
+      width: 500.0,
+      padding: const EdgeInsets.all(24.0),
+      child: Text.rich(
+        TextSpan(
+          text: "books_pick_description".tr(),
+          children: [
+            TextSpan(
+              text: ' ${"books_sync_description".tr()} ',
+              recognizer: TapGestureRecognizer()..onTap = setSyncDataMode,
+              style: TextStyle(
+                backgroundColor: Colors.amber.shade100,
+              ),
+            ),
+          ],
+        ),
+        style: Utilities.fonts.style(
+          fontSize: 16.0,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget titleSectionWidget() {
+    final title = widget.section.name;
+    final description = widget.section.description;
+
+    if (title.isEmpty) {
+      return Container();
+    }
+
+    return Column(
+      children: [
+        InkWell(
+          onTap: onTapTitleDescription,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                if (title.isNotEmpty)
+                  Opacity(
+                    opacity: 0.6,
+                    child: Text(
+                      title,
+                      style: Utilities.fonts.style(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                if (description.isNotEmpty)
+                  Opacity(
+                    opacity: 0.4,
+                    child: Text(
+                      description,
+                      style: Utilities.fonts.style(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 200.0,
+          child: Divider(
+            color: Theme.of(context).secondaryHeaderColor,
+            thickness: 4.0,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Update UI without re-loading the whole component.
+  void diffBook() async {
+    final illustrationIds = _books.map((x) => x.id).toList();
+    var initialIllustrations = widget.section.items;
+    if (listEquals(illustrationIds, initialIllustrations)) {
+      return;
+    }
+
+    // Ignore illustrations which are still in the list.
+    final illustrationsToFetch = initialIllustrations.sublist(0)
+      ..removeWhere((x) => illustrationIds.contains(x));
+
+    // Remove illustrations which are not in the list anymore.
+    _books.removeWhere((x) => !initialIllustrations.contains(x.id));
+
+    if (illustrationsToFetch.isEmpty) {
+      return;
+    }
+
+    // Fetch new illustrations.
+    final List<Future<Book>> futures = [];
+    for (final id in illustrationsToFetch) {
+      futures.add(fetchBook(id));
+    }
+
+    final futuresResult = await Future.wait(futures);
     setState(() {
-      _isLoading = true;
+      _books.addAll(futuresResult);
+    });
+  }
+
+  Future<Book> fetchBook(String id) async {
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection("books").doc(id).get();
+
+      final data = snapshot.data();
+      if (!snapshot.exists || data == null) {
+        return Book.empty();
+      }
+
+      data["id"] = snapshot.id;
+      return Book.fromMap(data);
+    } catch (error) {
+      Utilities.logger.e(error);
+      return Book.empty();
+    }
+  }
+
+  void fetchBooks() {
+    if (widget.section.dataMode == EnumSectionDataMode.sync) {
+      fetchSyncBooks();
+      return;
+    }
+
+    fetchChosenBooks();
+  }
+
+  /// Fetch only chosen illustrations.
+  /// When this section's data fetch mode is equals to 'chosen'.
+  void fetchChosenBooks() async {
+    setState(() {
+      _loading = true;
+      _books.clear();
+    });
+
+    final List<Future<Book>> futures = [];
+    for (final id in widget.section.items) {
+      futures.add(fetchBook(id));
+    }
+
+    final futuresResult = await Future.wait(futures);
+    setState(() {
+      _books.addAll(futuresResult);
+      _loading = false;
+    });
+  }
+
+  /// Fetch last user's public books
+  /// when this section's data fetch mode is equals to 'sync'.
+  void fetchSyncBooks() async {
+    setState(() {
+      _loading = true;
       _books.clear();
     });
 
@@ -170,7 +409,7 @@ class _BookGridSectionState extends State<BookGridSection> {
 
       if (bookSnapshot.size == 0) {
         setState(() {
-          _isLoading = false;
+          _loading = false;
         });
         return;
       }
@@ -185,8 +424,27 @@ class _BookGridSectionState extends State<BookGridSection> {
       context.showErrorBar(content: Text(error.toString()));
     } finally {
       setState(() {
-        _isLoading = false;
+        _loading = false;
       });
+    }
+  }
+
+  /// (BAD) Check for changes and fetch new data a change is detected.
+  /// WARNING: This is anti-pattern to `setState()` inside of a `build()` method.
+  void checkData() {
+    if (_firstExecution) {
+      _firstExecution = false;
+      fetchBooks();
+      return;
+    }
+
+    if (_currentMode != widget.section.dataMode) {
+      _currentMode = widget.section.dataMode;
+      _currentMode == EnumSectionDataMode.sync ? fetchBooks() : null;
+    }
+
+    if (_currentMode == EnumSectionDataMode.chosen) {
+      diffBook();
     }
   }
 
@@ -200,6 +458,67 @@ class _BookGridSectionState extends State<BookGridSection> {
       data: {
         "bookId": book.id,
       },
+    );
+  }
+
+  void onBookItemSelected(
+    EnumBookItemAction action,
+    int index,
+    Book book,
+  ) {
+    switch (action) {
+      case EnumBookItemAction.remove:
+        setState(() {
+          _books.removeWhere((x) => x.id == book.id);
+        });
+
+        List<String> items = widget.section.items;
+        items.removeWhere((x) => x == book.id);
+        widget.onUpdateSectionItems?.call(widget.section, widget.index, items);
+
+        break;
+      default:
+    }
+  }
+
+  void onDropBook(int dropTargetIndex, List<int> dragIndexes) {
+    final int firstDragIndex = dragIndexes.first;
+    if (dropTargetIndex == firstDragIndex) {
+      return;
+    }
+
+    if (dropTargetIndex < 0 ||
+        firstDragIndex < 0 ||
+        dropTargetIndex >= _books.length ||
+        firstDragIndex > _books.length) {
+      return;
+    }
+
+    final dropTargetBook = _books.elementAt(dropTargetIndex);
+    final dragBook = _books.elementAt(firstDragIndex);
+
+    setState(() {
+      _books[firstDragIndex] = dropTargetBook;
+      _books[dropTargetIndex] = dragBook;
+    });
+
+    final List<String> items = _books.map((x) => x.id).toList();
+    widget.onUpdateSectionItems?.call(widget.section, widget.index, items);
+  }
+
+  void onTapTitleDescription() {
+    widget.onPopupMenuItemSelected?.call(
+      EnumSectionAction.rename,
+      widget.index,
+      widget.section,
+    );
+  }
+
+  void setSyncDataMode() {
+    widget.onPopupMenuItemSelected?.call(
+      EnumSectionAction.setSyncDataMode,
+      widget.index,
+      widget.section,
     );
   }
 }
