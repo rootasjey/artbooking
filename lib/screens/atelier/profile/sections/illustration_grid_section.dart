@@ -66,10 +66,18 @@ class IllustrationGridSection extends StatefulWidget {
 }
 
 class _IllustrationGridSectionState extends State<IllustrationGridSection> {
+  /// True if fetching data.
   bool _loading = false;
+
+  /// Courcircuit initState.
+  /// If first execution, do a whole data fetch.
+  /// Otherwise, try a data diff. and udpdate only some UI parts.
   bool _firstExecution = true;
 
   List<Illustration> _illustrations = [];
+
+  /// Used to know to flush current data and refetch.
+  /// Otherwise, simply do a data diff. and update only some UI parts.
   var _currentMode = EnumSectionDataMode.sync;
 
   @override
@@ -86,13 +94,13 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
 
   @override
   Widget build(BuildContext context) {
-    handleFetch();
+    checkData();
 
     if (_loading) {
       return LoadingView(title: Text("loading".tr()));
     }
 
-    final popupMenuEntries = filterPopupMenuEntries();
+    final popupMenuEntries = getPopupMenuEntries();
 
     return SliverToBoxAdapter(
       child: Padding(
@@ -105,23 +113,7 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
             Center(
               child: Column(
                 children: [
-                  Opacity(
-                    opacity: 0.6,
-                    child: Text(
-                      widget.section.name,
-                      style: Utilities.fonts.style(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 200.0,
-                    child: Divider(
-                      color: Theme.of(context).secondaryHeaderColor,
-                      thickness: 4.0,
-                    ),
-                  ),
+                  titleSectionWidget(),
                   maybeHelperText(),
                   Padding(
                     padding: const EdgeInsets.only(top: 34.0),
@@ -176,13 +168,13 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
               ]
             : [];
 
-    final children = _illustrations.map((illustration) {
+    final children = _illustrations.map((Illustration illustration) {
       index++;
 
       return IllustrationCard(
         canDrag: canDrag,
         onDrop: onDrop,
-        heroTag: "${widget.section.id}-${index}-${illustration.id}",
+        heroTag: "${widget.section.id}_${index}_${illustration.id}",
         illustration: illustration,
         index: index,
         onTap: () => navigateToIllustrationPage(illustration),
@@ -191,7 +183,7 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
       );
     }).toList();
 
-    if (children.length % 3 != 0 && children.length < 6) {
+    if ((children.length % 3 != 0 && children.length < 6) || children.isEmpty) {
       children.add(
         IllustrationCard(
           asPlaceHolder: true,
@@ -208,6 +200,32 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
     }
 
     return children;
+  }
+
+  List<PopupMenuItemIcon<EnumSectionAction>> getPopupMenuEntries() {
+    final popupMenuEntries = widget.popupMenuEntries.sublist(0);
+
+    if (widget.index == 0) {
+      popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);
+    }
+
+    if (widget.isLast) {
+      popupMenuEntries.removeWhere(
+        (x) => x.value == EnumSectionAction.moveDown,
+      );
+    }
+
+    if (_currentMode == EnumSectionDataMode.chosen) {
+      popupMenuEntries.add(
+        PopupMenuItemIcon(
+          icon: Icon(UniconsLine.plus),
+          textLabel: "illustrations_select".tr(),
+          value: EnumSectionAction.selectIllustrations,
+        ),
+      );
+    }
+
+    return popupMenuEntries;
   }
 
   Widget maybeHelperText() {
@@ -240,7 +258,57 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
     );
   }
 
-  /// Update UI without reloading the whole component.
+  Widget titleSectionWidget() {
+    final title = widget.section.name;
+    final description = widget.section.description;
+
+    if (title.isEmpty) {
+      return Container();
+    }
+
+    return Column(
+      children: [
+        InkWell(
+          onTap: onTapTitleDescription,
+          child: Column(
+            children: [
+              if (title.isNotEmpty)
+                Opacity(
+                  opacity: 0.6,
+                  child: Text(
+                    title,
+                    style: Utilities.fonts.style(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              if (description.isNotEmpty)
+                Opacity(
+                  opacity: 0.4,
+                  child: Text(
+                    description,
+                    style: Utilities.fonts.style(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        SizedBox(
+          width: 200.0,
+          child: Divider(
+            color: Theme.of(context).secondaryHeaderColor,
+            thickness: 4.0,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Update UI without re-loading the whole component.
   void diffIllustration() async {
     final illustrationIds = _illustrations.map((x) => x.id).toList();
     var initialIllustrations = widget.section.items;
@@ -273,7 +341,7 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
 
   /// Fetch only chosen illustrations.
   /// When this section's data fetch mode is equals to 'chosen'.
-  void fetchChosenIllustration() async {
+  void fetchChosenIllustrations() async {
     setState(() {
       _loading = true;
       _illustrations.clear();
@@ -311,8 +379,8 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
     }
   }
 
-  /// Fetch user's public last illustrations.
-  /// When this section's data fetch mode is equals to 'sync'.
+  /// Fetch last user's public illustrations
+  /// when this section's data fetch mode is equals to 'sync'.
   void fetchSyncIllustrations() async {
     setState(() {
       _loading = true;
@@ -353,10 +421,12 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
       return;
     }
 
-    fetchChosenIllustration();
+    fetchChosenIllustrations();
   }
 
-  void handleFetch() {
+  /// (BAD) Check for changes and fetch new data a change is detected.
+  /// /// WARNING: This is anti-pattern to `setState()` inside of a `build()` method.
+  void checkData() {
     if (_firstExecution) {
       _firstExecution = false;
       fetchIllustrations();
@@ -432,38 +502,19 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
     }
   }
 
+  void onTapTitleDescription() {
+    widget.onPopupMenuItemSelected?.call(
+      EnumSectionAction.rename,
+      widget.index,
+      widget.section,
+    );
+  }
+
   void setSyncDataMode() {
     widget.onPopupMenuItemSelected?.call(
       EnumSectionAction.setSyncDataMode,
       widget.index,
       widget.section,
     );
-  }
-
-  List<PopupMenuItemIcon<EnumSectionAction>> filterPopupMenuEntries() {
-    var popupMenuEntries = widget.popupMenuEntries.sublist(0);
-
-    if (widget.index == 0) {
-      popupMenuEntries = popupMenuEntries.toList();
-      popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);
-    }
-
-    if (widget.isLast) {
-      popupMenuEntries = popupMenuEntries.toList();
-      popupMenuEntries
-          .removeWhere((x) => x.value == EnumSectionAction.moveDown);
-    }
-
-    if (_currentMode == EnumSectionDataMode.chosen) {
-      popupMenuEntries.add(
-        PopupMenuItemIcon(
-          icon: Icon(UniconsLine.plus),
-          textLabel: "illustrations_select".tr(),
-          value: EnumSectionAction.selectIllustrations,
-        ),
-      );
-    }
-
-    return popupMenuEntries;
   }
 }
