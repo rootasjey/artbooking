@@ -5,6 +5,7 @@ enum EnumSectionAction {
   delete,
   editBackgroundColor,
   changeDataMode,
+  selectBooks,
   selectIllustrations,
   setSyncDataMode,
   setChosenDataMode,
