@@ -19,7 +19,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:unicons/unicons.dart';
 import 'package:supercharged/supercharged.dart';
 
-/// Add a group of illustrations to one or more books..
+/// Add a group of illustrations to one or more books.
 class AddToBooksDialog extends StatefulWidget {
   AddToBooksDialog({
     required this.illustrations,

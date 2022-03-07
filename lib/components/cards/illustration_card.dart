@@ -91,7 +91,7 @@ class IllustrationCard extends StatefulWidget {
   /// If you're not sure what to put, just use the illustration's id.
   final String heroTag;
 
-  /// Callback when drag and dropping item on this illustration card.
+  /// Callback when drag and dropping items on this illustration card.
   final void Function(int dropTargetIndex, List<int> dragIndexes)? onDrop;
 
   /// Callback when illustration is being dragged.

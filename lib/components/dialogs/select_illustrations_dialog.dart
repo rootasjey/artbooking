@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:unicons/unicons.dart';
 
+/// A dialog presenting an user's public illustrations.
 class SelectIllustrationsDialog extends StatefulWidget {
   const SelectIllustrationsDialog({
     Key? key,
@@ -22,13 +23,13 @@ class SelectIllustrationsDialog extends StatefulWidget {
     this.maxPick = 6,
   }) : super(key: key);
 
-  /// Maximum number of illustrations someone can choose.
+  /// Maximum number of illustrations that can be choosen.
   final int maxPick;
 
   /// If true, this widget will request focus on load.
   final bool autoFocus;
 
-  /// User's id illustrations.
+  /// User's id public illustrations.
   final String userId;
 
   /// Callback containing selected illustration ids.
