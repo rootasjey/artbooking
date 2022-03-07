@@ -107,28 +107,15 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   final double _captionHeight = 42.0;
   final double _cardRadius = 8.0;
 
-  // int _indexSlideshow = 0;
-  // List<Illustration> _lastIllustrations = [];
-  // String _coverLink = "";
-  // Timer? _timerSlideshow;
-
   @override
   void initState() {
     super.initState();
 
-    // _coverLink = widget.book.getCoverLink();
     _scaleController = createController()..duration = 250.milliseconds;
     _scaleAnimation =
         0.6.tweenTo(1.0).animatedBy(_scaleController).curve(Curves.elasticOut);
 
     setState(() => _elevation = _initElevation);
-  }
-
-  @override
-  void dispose() {
-    // _timerSlideshow?.cancel();
-    // _lastIllustrations.clear();
-    super.dispose();
   }
 
   @override
@@ -535,39 +522,6 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     );
   }
 
-  /// Fetch last illustrations of this book.
-  // Future fetchLastIllustrations() async {
-  //   final Book book = widget.book;
-  //   if (book.illustrations.isEmpty) {
-  //     return;
-  //   }
-
-  //   // _lastIllustrations.clear();
-
-  //   final int arrayLength = book.illustrations.length;
-  //   final int end = arrayLength > 4 ? 5 : arrayLength;
-  //   final illustrations = book.illustrations.sublist(0, end);
-
-  //   try {
-  //     for (var illustrationBook in illustrations) {
-  //       final snapshot = await FirebaseFirestore.instance
-  //           .collection("illustrations")
-  //           .doc(illustrationBook.id)
-  //           .get();
-
-  //       final data = snapshot.data();
-  //       if (!snapshot.exists || data == null) {
-  //         continue;
-  //       }
-
-  //       final illustration = Illustration.fromMap(data);
-  //       // _lastIllustrations.add(illustration);
-  //     }
-  //   } catch (error) {
-  //     Utilities.logger.e(error);
-  //   }
-  // }
-
   void onDoubleTap() {
     widget.onDoubleTap?.call();
     setState(() => _showLikeAnimation = true);
@@ -581,11 +535,9 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     if (isHover) {
       _elevation = 8.0;
       _scaleController.forward();
-      // startCoverSlideshow();
     } else {
       _elevation = _initElevation;
       _scaleController.reverse();
-      // stopCoverSlideshow();
     }
 
     setState(() {});
@@ -596,43 +548,4 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
       widget.onLongPress?.call(widget.selected);
     }
   }
-
-  // void startCoverSlideshow() async {
-  //   if (_lastIllustrations.isEmpty) {
-  //     await fetchLastIllustrations();
-  //   }
-
-  //   if (_lastIllustrations.isEmpty) {
-  //     return;
-  //   }
-
-  //   _indexSlideshow = 0;
-
-  //   // setState(() {
-  //   //   _coverLink = _lastIllustrations.first.getThumbnail();
-  //   // });
-
-  //   _timerSlideshow?.cancel();
-  //   _timerSlideshow = Timer.periodic(
-  //     Duration(seconds: 2),
-  //     (time) {
-  //       _indexSlideshow++;
-
-  //       if (_indexSlideshow >= _lastIllustrations.length) {
-  //         stopCoverSlideshow();
-  //         return;
-  //       }
-
-  //       // setState(() {
-  //       //   _coverLink =
-  //       //       _lastIllustrations.elementAt(_indexSlideshow).getThumbnail();
-  //       // });
-  //     },
-  //   );
-  // }
-
-  // void stopCoverSlideshow() {
-  //   _timerSlideshow?.cancel();
-  //   // _coverLink = widget.book.getCoverLink();
-  // }
 }
