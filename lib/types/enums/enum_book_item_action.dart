@@ -6,6 +6,9 @@ enum EnumBookItemAction {
   /// Like a book.
   like,
 
+  /// Remove a book from a profile page section.
+  remove,
+
   /// Rename book's title.
   rename,
 
