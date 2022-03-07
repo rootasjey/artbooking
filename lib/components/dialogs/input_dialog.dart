@@ -64,12 +64,15 @@ class InputDialog extends StatelessWidget {
       padding: EdgeInsets.symmetric(
         horizontal: 25.0,
       ),
-      child: OutlinedTextField(
-        label: "description".tr().toUpperCase(),
-        controller: descriptionController,
-        hintText: hintText,
-        onChanged: onDescriptionChanged,
-        onSubmitted: onSubmitted,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: 200.0),
+        child: OutlinedTextField(
+          label: "description".tr().toUpperCase(),
+          controller: descriptionController,
+          hintText: hintText,
+          onChanged: onDescriptionChanged,
+          onSubmitted: onSubmitted,
+        ),
       ),
     );
   }
