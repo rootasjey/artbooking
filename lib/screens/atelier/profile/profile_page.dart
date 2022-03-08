@@ -129,6 +129,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       onShowIllustrationDialog: onShowIllustrationDialog,
       onUpdateSectionItems: tryUpdateSectionItems,
       onShowBookDialog: onShowBookDialog,
+      onDropSection: onDropSection,
     );
   }
 
@@ -672,22 +673,60 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     int index,
     List<String> items,
   ) async {
+    final editedSection = section.copyWith(
+      items: items,
+    );
+
+    _artisticPage.sections.replaceRange(
+      index,
+      index + 1,
+      [editedSection],
+    );
+
     try {
-      final editedSection = section.copyWith(
-        items: items,
-      );
-
-      _artisticPage.sections.replaceRange(
-        index,
-        index + 1,
-        [editedSection],
-      );
-
-      final String userId = getUserId();
-
       await FirebaseFirestore.instance
           .collection("users")
-          .doc(userId)
+          .doc(getUserId())
+          .collection("user_pages")
+          .doc(_artisticPage.id)
+          .update({
+        "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
+      });
+
+      setState(() {});
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
+  void onDropSection(int dropTargetIndex, List<int> dragIndexes) async {
+    final int firstDragIndex = dragIndexes.first;
+    if (dropTargetIndex == firstDragIndex) {
+      return;
+    }
+
+    final sections = _artisticPage.sections;
+
+    if (dropTargetIndex < 0 ||
+        firstDragIndex < 0 ||
+        dropTargetIndex >= sections.length ||
+        firstDragIndex > sections.length) {
+      return;
+    }
+
+    final dropTargetSection = sections.elementAt(dropTargetIndex);
+    final dragSection = sections.elementAt(firstDragIndex);
+
+    setState(() {
+      _artisticPage.sections[firstDragIndex] = dropTargetSection;
+      _artisticPage.sections[dropTargetIndex] = dragSection;
+    });
+
+    try {
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(getUserId())
           .collection("user_pages")
           .doc(_artisticPage.id)
           .update({

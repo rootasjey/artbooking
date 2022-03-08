@@ -32,9 +32,11 @@ class UserIllustrationSection extends StatefulWidget {
     this.isLast = false,
     this.onShowIllustrationDialog,
     this.onUpdateSectionItems,
+    this.usingAsDropTarget = false,
   }) : super(key: key);
 
   final bool isLast;
+  final bool usingAsDropTarget;
   final String userId;
   final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
 
@@ -76,13 +78,29 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
   @override
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
-    final popupMenuEntries = getPopupMenuEntries();
 
     handleReFetch();
 
-    return SliverToBoxAdapter(
+    final EdgeInsets outerPadding =
+        widget.usingAsDropTarget ? const EdgeInsets.all(4.0) : EdgeInsets.zero;
+
+    final BoxDecoration boxDecoration = widget.usingAsDropTarget
+        ? BoxDecoration(
+            borderRadius: BorderRadius.circular(4.0),
+            border: Border.all(
+              color: Theme.of(context).primaryColor,
+              width: 3.0,
+            ),
+            color: Color(widget.section.backgroundColor),
+          )
+        : BoxDecoration(
+            color: Color(widget.section.backgroundColor),
+          );
+
+    return Padding(
+      padding: outerPadding,
       child: Container(
-        color: Color(widget.section.backgroundColor),
+        decoration: boxDecoration,
         child: Stack(
           children: [
             SizedBox(
@@ -95,26 +113,7 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
                 ],
               ),
             ),
-            Positioned(
-              top: 12.0,
-              right: 24.0,
-              child: PopupMenuButton(
-                icon: Opacity(
-                  opacity: 0.8,
-                  child: Icon(
-                    UniconsLine.ellipsis_h,
-                  ),
-                ),
-                itemBuilder: (_) => popupMenuEntries,
-                onSelected: (EnumSectionAction action) {
-                  widget.onPopupMenuItemSelected?.call(
-                    action,
-                    widget.index,
-                    widget.section,
-                  );
-                },
-              ),
-            ),
+            rightPopupMenuButton(),
           ],
         ),
       ),
@@ -204,6 +203,33 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
             icon: Icon(UniconsLine.exchange),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget rightPopupMenuButton() {
+    final popupMenuEntries = getPopupMenuEntries();
+
+    return Positioned(
+      top: 12.0,
+      right: 12.0,
+      child: PopupMenuButton(
+        child: Card(
+          elevation: 2.0,
+          color: Theme.of(context).backgroundColor,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(UniconsLine.ellipsis_h),
+          ),
+        ),
+        itemBuilder: (_) => popupMenuEntries,
+        onSelected: (EnumSectionAction action) {
+          widget.onPopupMenuItemSelected?.call(
+            action,
+            widget.index,
+            widget.section,
+          );
+        },
       ),
     );
   }

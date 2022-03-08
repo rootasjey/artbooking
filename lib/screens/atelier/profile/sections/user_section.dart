@@ -10,7 +10,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:unicons/unicons.dart';
 
 /// A section showing user's public information.
@@ -24,9 +23,11 @@ class UserSection extends StatefulWidget {
     required this.index,
     required this.section,
     this.isLast = false,
+    this.usingAsDropTarget = false,
   }) : super(key: key);
 
   final bool isLast;
+  final bool usingAsDropTarget;
   final String userId;
   final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
   final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
@@ -53,20 +54,41 @@ class _UserSectionState extends State<UserSection> {
   Widget build(BuildContext context) {
     if (_loading) {
       return LoadingView(
+        sliver: false,
         title: Text("loading".tr()),
       );
     }
 
     final double height = MediaQuery.of(context).size.height - 200.0;
-    final popupMenuEntries = getPopupMenuEntries();
 
-    return SliverToBoxAdapter(
-      child: Container(
-        color: Color(widget.section.backgroundColor),
-        padding: const EdgeInsets.only(left: 24.0, top: 60.0, right: 24.0),
-        child: Stack(
-          children: [
-            SizedBox(
+    final EdgeInsets outerPadding =
+        widget.usingAsDropTarget ? const EdgeInsets.all(4.0) : EdgeInsets.zero;
+
+    final BoxDecoration boxDecoration = widget.usingAsDropTarget
+        ? BoxDecoration(
+            borderRadius: BorderRadius.circular(4.0),
+            border: Border.all(
+              color: Theme.of(context).primaryColor,
+              width: 3.0,
+            ),
+            color: Color(widget.section.backgroundColor),
+          )
+        : BoxDecoration(
+            color: Color(widget.section.backgroundColor),
+          );
+
+    return Padding(
+      padding: outerPadding,
+      child: Stack(
+        children: [
+          Container(
+            decoration: boxDecoration,
+            padding: const EdgeInsets.only(
+              left: 24.0,
+              top: 60.0,
+              right: 24.0,
+            ),
+            child: SizedBox(
               height: height,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -75,27 +97,63 @@ class _UserSectionState extends State<UserSection> {
                 ],
               ),
             ),
-            Positioned(
-              right: 0.0,
-              child: PopupMenuButton(
-                icon: Opacity(
-                  opacity: 0.8,
-                  child: Icon(
-                    UniconsLine.ellipsis_h,
-                  ),
-                ),
-                itemBuilder: (_) => popupMenuEntries,
-                onSelected: (EnumSectionAction action) {
-                  widget.onPopupMenuItemSelected?.call(
-                    action,
-                    widget.index,
-                    widget.section,
-                  );
-                },
-              ),
-            ),
-          ],
+          ),
+          rightPopupMenuButton(),
+        ],
+      ),
+    );
+  }
+
+  List<PopupMenuItemIcon<EnumSectionAction>> getPopupMenuEntries() {
+    var popupMenuEntries = widget.popupMenuEntries.sublist(0);
+
+    if (widget.index == 0) {
+      popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);
+    }
+
+    if (widget.isLast) {
+      popupMenuEntries.removeWhere(
+        (x) => x.value == EnumSectionAction.moveDown,
+      );
+    }
+
+    popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.rename);
+    popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.settings);
+
+    popupMenuEntries.add(
+      PopupMenuItemIcon(
+        icon: Icon(UniconsLine.paint_tool),
+        textLabel: "edit_background_color".tr(),
+        value: EnumSectionAction.editBackgroundColor,
+      ),
+    );
+
+    return popupMenuEntries;
+  }
+
+  Widget rightPopupMenuButton() {
+    final popupMenuEntries = getPopupMenuEntries();
+
+    return Positioned(
+      top: 12.0,
+      right: 12.0,
+      child: PopupMenuButton(
+        child: Card(
+          elevation: 2.0,
+          color: Theme.of(context).backgroundColor,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(UniconsLine.ellipsis_h),
+          ),
         ),
+        itemBuilder: (_) => popupMenuEntries,
+        onSelected: (EnumSectionAction action) {
+          widget.onPopupMenuItemSelected?.call(
+            action,
+            widget.index,
+            widget.section,
+          );
+        },
       ),
     );
   }
@@ -182,74 +240,6 @@ class _UserSectionState extends State<UserSection> {
         socialLinks: _userFirestore.socialLinks,
       ),
     );
-  }
-
-  Widget getIcon(String key) {
-    switch (key) {
-      case 'artbooking':
-        return Image.asset(
-          "assets/images/artbooking.png",
-          width: 40.0,
-          height: 40.0,
-        );
-      case 'behance':
-        return FaIcon(FontAwesomeIcons.behance);
-      case 'dribbble':
-        return Icon(UniconsLine.dribbble);
-      case 'facebook':
-        return Icon(UniconsLine.facebook);
-      case 'github':
-        return Icon(UniconsLine.github);
-      case 'gitlab':
-        return FaIcon(FontAwesomeIcons.gitlab);
-      case 'instagram':
-        return Icon(UniconsLine.instagram);
-      case 'linkedin':
-        return Icon(UniconsLine.linkedin);
-      case 'other':
-        return Icon(UniconsLine.question);
-      case 'tiktok':
-        return FaIcon(FontAwesomeIcons.tiktok);
-      case 'twitch':
-        return FaIcon(FontAwesomeIcons.twitch);
-      case 'twitter':
-        return Icon(UniconsLine.twitter);
-      case 'website':
-        return Icon(UniconsLine.globe);
-      case 'wikipedia':
-        return FaIcon(FontAwesomeIcons.wikipediaW);
-      case 'youtube':
-        return Icon(UniconsLine.youtube);
-      default:
-        return Icon(UniconsLine.globe);
-    }
-  }
-
-  List<PopupMenuItemIcon<EnumSectionAction>> getPopupMenuEntries() {
-    var popupMenuEntries = widget.popupMenuEntries.sublist(0);
-
-    if (widget.index == 0) {
-      popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);
-    }
-
-    if (widget.isLast) {
-      popupMenuEntries.removeWhere(
-        (x) => x.value == EnumSectionAction.moveDown,
-      );
-    }
-
-    popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.rename);
-    popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.settings);
-
-    popupMenuEntries.add(
-      PopupMenuItemIcon(
-        icon: Icon(UniconsLine.paint_tool),
-        textLabel: "edit_background_color".tr(),
-        value: EnumSectionAction.editBackgroundColor,
-      ),
-    );
-
-    return popupMenuEntries;
   }
 
   void fetchData() async {

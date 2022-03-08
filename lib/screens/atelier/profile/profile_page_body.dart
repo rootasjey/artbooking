@@ -1,4 +1,5 @@
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/constants/section_ids.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/sections/book_grid_section.dart';
@@ -6,12 +7,14 @@ import 'package:artbooking/screens/atelier/profile/sections/user_illustration_se
 import 'package:artbooking/screens/atelier/profile/sections/user_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/illustration_grid_section.dart';
 import 'package:artbooking/types/artistic_page.dart';
+import 'package:artbooking/types/drag_data.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:unicons/unicons.dart';
 
 class ProfilePageBody extends StatelessWidget {
@@ -27,6 +30,7 @@ class ProfilePageBody extends StatelessWidget {
     this.onShowIllustrationDialog,
     this.onUpdateSectionItems,
     this.onShowBookDialog,
+    this.onDropSection,
   }) : super(key: key);
 
   final bool isOwner;
@@ -36,6 +40,10 @@ class ProfilePageBody extends StatelessWidget {
   final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
 
   final void Function(Section)? onAddSection;
+
+  /// Callback when drag and dropping items on this book card.
+  final void Function(int dropTargetIndex, List<int> dragIndexes)?
+      onDropSection;
   final void Function()? onShowAddSection;
   final void Function({
     required Section section,
@@ -65,10 +73,18 @@ class ProfilePageBody extends StatelessWidget {
     ];
 
     int index = -1;
+    final scrollController = ScrollController();
 
     for (var section in artisticPage.sections) {
       index++;
-      slivers.add(getSectionWidget(section, index));
+      slivers.add(
+        sectionWrapper(
+          section: section,
+          index: index,
+          context: context,
+          scrollController: scrollController,
+        ),
+      );
     }
 
     if (isOwner) {
@@ -77,12 +93,13 @@ class ProfilePageBody extends StatelessWidget {
 
     return Scaffold(
       floatingActionButton: fab(context),
-      body: Stack(
-        children: [
-          CustomScrollView(
-            slivers: slivers,
-          ),
-        ],
+      body: ImprovedScrolling(
+        scrollController: scrollController,
+        enableKeyboardScrolling: true,
+        child: CustomScrollView(
+          controller: scrollController,
+          slivers: slivers,
+        ),
       ),
     );
   }
@@ -138,12 +155,17 @@ class ProfilePageBody extends StatelessWidget {
     );
   }
 
-  Widget getSectionWidget(Section section, int index) {
+  Widget getSectionWidget({
+    required Section section,
+    required int index,
+    bool usingAsDropTarget = false,
+  }) {
     if (section.id == SectionIds.user) {
       return UserSection(
         index: index,
         section: section,
         userId: userId,
+        usingAsDropTarget: usingAsDropTarget,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
         popupMenuEntries: popupMenuEntries,
         isLast: index == artisticPage.sections.length - 1,
@@ -155,6 +177,7 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         userId: userId,
+        usingAsDropTarget: usingAsDropTarget,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
         popupMenuEntries: popupMenuEntries,
         isLast: index == artisticPage.sections.length - 1,
@@ -168,6 +191,7 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         userId: userId,
+        usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
         popupMenuEntries: popupMenuEntries,
@@ -181,6 +205,7 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         userId: userId,
+        usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
         onShowIllustrationDialog: onShowIllustrationDialog,
@@ -189,6 +214,146 @@ class ProfilePageBody extends StatelessWidget {
       );
     }
 
-    return SliverToBoxAdapter();
+    return Container();
+  }
+
+  String getDraggableName(Section section) {
+    String name = section.name;
+    if (name.isEmpty) {
+      name = "section_name.${section.id}".tr();
+    }
+
+    return name;
+  }
+
+  Widget sectionWrapper({
+    required Section section,
+    required int index,
+    required BuildContext context,
+    required ScrollController scrollController,
+  }) {
+    return SliverToBoxAdapter(
+      child: Stack(
+        children: [
+          DragTarget<DragData>(
+            builder: (BuildContext context, candidateItems, rejectedItems) {
+              return getSectionWidget(
+                section: section,
+                index: index,
+                usingAsDropTarget: candidateItems.isNotEmpty,
+              );
+            },
+            onAccept: (DragData dragData) {
+              onDropSection?.call(index, [dragData.index]);
+            },
+            onWillAccept: (DragData? dragData) {
+              if (dragData == null) {
+                return false;
+              }
+
+              if (dragData.type != Section) {
+                return false;
+              }
+
+              return true;
+            },
+          ),
+          Positioned(
+            top: 12.0,
+            left: 12.0,
+            child: Draggable<DragData>(
+              data: DragData(
+                index: index,
+                groupName: "profile-page",
+                type: Section,
+              ),
+              onDragUpdate: (details) => onDragUpdateSection(
+                context: context,
+                details: details,
+                scrollController: scrollController,
+              ),
+              feedback: Card(
+                elevation: 2.0,
+                color: Constants.colors.clairPink,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 4.0),
+                        child: Icon(Utilities.getSectionIcon(section.id)),
+                      ),
+                      Text(
+                        getDraggableName(section),
+                        style: Utilities.fonts.style(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              child: Card(
+                elevation: 2.0,
+                color: Constants.colors.clairPink,
+                child: InkWell(
+                  onTap: () {},
+                  onLongPress: () {},
+                  child: Tooltip(
+                    message: "drag_to_move".tr(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(UniconsLine.draggabledots),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void onDragUpdateSection({
+    required BuildContext context,
+    required DragUpdateDetails details,
+    required ScrollController scrollController,
+  }) async {
+    /// Amount of offset to jump when dragging an element to the edge.
+    final double jumpOffset = 200.0;
+
+    /// Distance to the edge where the scroll viewer starts to jump.
+    final double edgeDistance = 200.0;
+
+    final position = details.globalPosition;
+
+    if (position.dy < edgeDistance) {
+      if (scrollController.offset <= 0) {
+        return;
+      }
+
+      await scrollController.animateTo(
+        scrollController.offset - jumpOffset,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+      );
+
+      return;
+    }
+
+    final windowHeight = MediaQuery.of(context).size.height;
+    if (windowHeight - edgeDistance < position.dy) {
+      if (scrollController.position.atEdge && scrollController.offset != 0) {
+        return;
+      }
+
+      await scrollController.animateTo(
+        scrollController.offset + jumpOffset,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+      );
+    }
   }
 }

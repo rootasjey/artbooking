@@ -1,6 +1,5 @@
-import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/cards/book_card.dart';
-import 'package:artbooking/components/loading_view.dart';
+import 'package:artbooking/components/cards/shimmer_card.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
@@ -33,9 +32,11 @@ class BookGridSection extends StatefulWidget {
     this.isLast = false,
     this.onUpdateSectionItems,
     this.onShowBookDialog,
+    this.usingAsDropTarget = false,
   }) : super(key: key);
 
   final bool isLast;
+  final bool usingAsDropTarget;
   final String userId;
   final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
 
@@ -92,59 +93,54 @@ class _BookGridSectionState extends State<BookGridSection> {
     checkData();
 
     if (_loading) {
-      return LoadingView(title: Text("loading".tr()));
+      return loadingWidget();
     }
 
-    final popupMenuEntries = getPopupMenuEntries();
+    final EdgeInsets outerPadding =
+        widget.usingAsDropTarget ? const EdgeInsets.all(4.0) : EdgeInsets.zero;
 
-    return SliverToBoxAdapter(
-      child: FadeInY(
-        beginY: 24.0,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 70.0,
-            vertical: 24.0,
-          ),
-          child: Stack(
-            children: [
-              Column(
-                children: [
-                  titleSectionWidget(),
-                  maybeHelperText(),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 34.0),
-                    child: GridView.count(
-                      crossAxisCount: 3,
-                      shrinkWrap: true,
-                      mainAxisSpacing: 24.0,
-                      crossAxisSpacing: 24.0,
-                      children: getChildren(),
-                    ),
+    final BoxDecoration boxDecoration = widget.usingAsDropTarget
+        ? BoxDecoration(
+            borderRadius: BorderRadius.circular(4.0),
+            border: Border.all(
+              color: Theme.of(context).primaryColor,
+              width: 3.0,
+            ),
+            color: Color(widget.section.backgroundColor),
+          )
+        : BoxDecoration(
+            color: Color(widget.section.backgroundColor),
+          );
+
+    return Padding(
+      padding: outerPadding,
+      child: Stack(
+        children: [
+          Container(
+            decoration: boxDecoration,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 70.0,
+              vertical: 24.0,
+            ),
+            child: Column(
+              children: [
+                titleSectionWidget(),
+                maybeHelperText(),
+                Padding(
+                  padding: const EdgeInsets.only(top: 34.0),
+                  child: GridView.count(
+                    crossAxisCount: 3,
+                    shrinkWrap: true,
+                    mainAxisSpacing: 24.0,
+                    crossAxisSpacing: 24.0,
+                    children: getChildren(),
                   ),
-                ],
-              ),
-              Positioned(
-                right: 0.0,
-                child: PopupMenuButton(
-                  icon: Opacity(
-                    opacity: 0.8,
-                    child: Icon(
-                      UniconsLine.ellipsis_h,
-                    ),
-                  ),
-                  itemBuilder: (_) => popupMenuEntries,
-                  onSelected: (EnumSectionAction action) {
-                    widget.onPopupMenuItemSelected?.call(
-                      action,
-                      widget.index,
-                      widget.section,
-                    );
-                  },
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+          rightPopupMenuButton(),
+        ],
       ),
     );
   }
@@ -171,8 +167,9 @@ class _BookGridSectionState extends State<BookGridSection> {
 
       return BookCard(
         index: index,
-        heroTag: "${widget.section.id}_${index}_${book.id}",
         canDrag: canDrag,
+        dragGroupName: "${widget.section.id}-${widget.index}",
+        heroTag: "${widget.section.id}-${index}-${book.id}",
         onDrop: onDrop,
         book: book,
         width: width,
@@ -230,6 +227,23 @@ class _BookGridSectionState extends State<BookGridSection> {
     return popupMenuEntries;
   }
 
+  Widget loadingWidget() {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 90.9,
+        vertical: 24.0,
+      ),
+      child: Wrap(
+        spacing: 24.0,
+        runSpacing: 12.0,
+        children: [
+          ShimmerCard(height: 300.0),
+          ShimmerCard(height: 300.0),
+        ],
+      ),
+    );
+  }
+
   Widget maybeHelperText() {
     if (widget.section.dataMode != EnumSectionDataMode.chosen ||
         _books.isNotEmpty) {
@@ -256,6 +270,33 @@ class _BookGridSectionState extends State<BookGridSection> {
           fontSize: 16.0,
           fontWeight: FontWeight.w600,
         ),
+      ),
+    );
+  }
+
+  Widget rightPopupMenuButton() {
+    final popupMenuEntries = getPopupMenuEntries();
+
+    return Positioned(
+      top: 12.0,
+      right: 12.0,
+      child: PopupMenuButton(
+        child: Card(
+          elevation: 2.0,
+          color: Theme.of(context).backgroundColor,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(UniconsLine.ellipsis_h),
+          ),
+        ),
+        itemBuilder: (_) => popupMenuEntries,
+        onSelected: (EnumSectionAction action) {
+          widget.onPopupMenuItemSelected?.call(
+            action,
+            widget.index,
+            widget.section,
+          );
+        },
       ),
     );
   }
@@ -315,9 +356,16 @@ class _BookGridSectionState extends State<BookGridSection> {
 
   /// Update UI without re-loading the whole component.
   void diffBook() async {
+    if (_loading) {
+      return;
+    }
+
+    _loading = true;
+
     final illustrationIds = _books.map((x) => x.id).toList();
     var initialIllustrations = widget.section.items;
     if (listEquals(illustrationIds, initialIllustrations)) {
+      _loading = false;
       return;
     }
 
@@ -329,6 +377,7 @@ class _BookGridSectionState extends State<BookGridSection> {
     _books.removeWhere((x) => !initialIllustrations.contains(x.id));
 
     if (illustrationsToFetch.isEmpty) {
+      _loading = false;
       return;
     }
 
@@ -341,6 +390,7 @@ class _BookGridSectionState extends State<BookGridSection> {
     final futuresResult = await Future.wait(futures);
     setState(() {
       _books.addAll(futuresResult);
+      _loading = false;
     });
   }
 
