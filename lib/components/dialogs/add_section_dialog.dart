@@ -7,8 +7,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
-import 'package:unicons/unicons.dart';
 
+/// Open a dialog showing available sections.
 class AddSectionDialog extends StatefulWidget {
   const AddSectionDialog({
     Key? key,
@@ -157,7 +157,7 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
                     child: Opacity(
                       opacity: 0.8,
                       child: Icon(
-                        getSectionIcon(section.id),
+                        Utilities.getSectionIcon(section.id),
                         size: 32.0,
                       ),
                     ),
@@ -280,21 +280,6 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
       context.showErrorBar(content: Text("books_fetch_more_error".tr()));
     } finally {
       setState(() => _loadingMore = false);
-    }
-  }
-
-  IconData getSectionIcon(String id) {
-    switch (id) {
-      case "C9Z51SG4JeJ5VFUHOagF":
-        return UniconsLine.books;
-      case "ZRsIF2kdKc9xUo0cxfRI":
-        return UniconsLine.picture;
-      case "zYjoMKHm0eoWGBLyzULU":
-        return UniconsLine.user_circle;
-      case "EhS7TTP5ayQ9QzEkZgAf":
-        return UniconsLine.user_square;
-      default:
-        return UniconsLine.books;
     }
   }
 
