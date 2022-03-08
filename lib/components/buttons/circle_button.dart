@@ -33,6 +33,24 @@ class CircleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget child = Ink(
+      child: InkWell(
+        onTap: onTap,
+        child: CircleAvatar(
+          child: icon,
+          backgroundColor: backgroundColor,
+          radius: radius,
+        ),
+      ),
+    );
+
+    if (tooltip != null) {
+      child = Tooltip(
+        message: tooltip,
+        child: child,
+      );
+    }
+
     return Material(
       shape: CircleBorder(
         side: showBorder
@@ -42,19 +60,7 @@ class CircleButton extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       color: Colors.transparent,
       elevation: elevation,
-      child: Tooltip(
-        message: tooltip,
-        child: Ink(
-          child: InkWell(
-            onTap: onTap,
-            child: CircleAvatar(
-              child: icon,
-              backgroundColor: backgroundColor,
-              radius: radius,
-            ),
-          ),
-        ),
-      ),
+      child: child,
     );
   }
 }
