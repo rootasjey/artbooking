@@ -310,6 +310,7 @@
   "dates": "Dates",
   "draft": "Draft",
   "drafts": "Drafts",
+  "drag_to_move": "Drag to move",
   "delete": "Delete",
   "deployment": "Deployment",
   "deployment_description": "Your site will be globally accessible through a robust & fast pipeline. Also upgrades will be done with no downtime and your website won't experience cold start.",

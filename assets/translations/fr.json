@@ -309,6 +309,7 @@
   "dates": "Dates",
   "draft": "Brouillon",
   "drafts": "Brouillons",
+  "drag_to_move": "Glisser pour déplacer",
   "delete": "Supprimer",
   "deployment": "Déploiement",
   "deployment_description": "La mise en ligne de votre sera rapide et robuste. Les mises à jour seront faites sans interrompre votre traffic. Le premier accès de votre site sera rapide (pas de cold start).",
