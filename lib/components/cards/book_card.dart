@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/book/book.dart';
+import 'package:artbooking/types/drag_data.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -35,6 +36,7 @@ class BookCard extends StatefulWidget {
     this.onDragUpdate,
     this.canDrag = false,
     this.asPlaceHolder = false,
+    this.dragGroupName = "",
   }) : super(key: key);
 
   /// If true, this card will be used as a place holder.
@@ -84,6 +86,10 @@ class BookCard extends StatefulWidget {
 
   /// Callback when drag and dropping items on this book card.
   final void Function(int dropTargetIndex, List<int> dragIndexes)? onDrop;
+
+  /// An arbitrary name given to this item's drag group
+  ///  (e.g. "home-books"). Thus to avoid dragging items between sections.
+  final String dragGroupName;
 
   /// An unique tag to identify a single component for animation.
   /// This tag must be unique on the page and among a list.
@@ -144,22 +150,41 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
 
   /// Card wrapper to enable using book card as drop target.
   Widget dropTarget() {
-    return DragTarget<int>(
+    return DragTarget<DragData>(
       builder: (BuildContext context, candidateItems, rejectedItems) {
         return draggableCard(
           usingAsDropTarget: candidateItems.isNotEmpty,
         );
       },
-      onAccept: (int dragIndex) {
-        widget.onDrop?.call(widget.index, [dragIndex]);
+      onAccept: (DragData dragData) {
+        widget.onDrop?.call(widget.index, [dragData.index]);
+      },
+      onWillAccept: (DragData? dragData) {
+        if (dragData == null) {
+          return false;
+        }
+
+        if (dragData.type != BookCard) {
+          return false;
+        }
+
+        if (dragData.groupName != widget.dragGroupName) {
+          return false;
+        }
+
+        return true;
       },
     );
   }
 
   /// Card wrapper to enable dragging.
   Widget draggableCard({bool usingAsDropTarget = false}) {
-    return LongPressDraggable<int>(
-      data: widget.index,
+    return LongPressDraggable<DragData>(
+      data: DragData(
+        index: widget.index,
+        groupName: widget.dragGroupName,
+        type: BookCard,
+      ),
       feedback: draggingCard(),
       childWhenDragging: childWhenDragging(),
       onDragUpdate: widget.onDragUpdate,
