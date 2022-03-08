@@ -1,5 +1,6 @@
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/types/drag_data.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
@@ -35,6 +36,7 @@ class IllustrationCard extends StatefulWidget {
     this.onDragUpdate,
     this.canDrag = false,
     this.asPlaceHolder = false,
+    this.dragGroupName = "",
   }) : super(key: key);
 
   /// Index position in a list, if available.
@@ -82,6 +84,10 @@ class IllustrationCard extends StatefulWidget {
     Illustration,
     String,
   )? onPopupMenuItemSelected;
+
+  /// An arbitrary name given to this item's drag group
+  ///  (e.g. "home-illustrations"). Thus to avoid dragging items between sections.
+  final String dragGroupName;
 
   /// Custom app generated key to perform operations quicker.
   final String illustrationKey;
@@ -168,14 +174,29 @@ class _IllustrationCardState extends State<IllustrationCard>
   }
 
   Widget dropTarget() {
-    return DragTarget<int>(
+    return DragTarget<DragData>(
       builder: (BuildContext context, candidateItems, rejectedItems) {
         return imageCard(
           usingAsDropTarget: candidateItems.isNotEmpty,
         );
       },
-      onAccept: (int dropIndex) {
-        widget.onDrop?.call(widget.index, [dropIndex]);
+      onAccept: (DragData dragData) {
+        widget.onDrop?.call(widget.index, [dragData.index]);
+      },
+      onWillAccept: (DragData? dragData) {
+        if (dragData == null) {
+          return false;
+        }
+
+        if (dragData.type != IllustrationCard) {
+          return false;
+        }
+
+        if (dragData.groupName != widget.dragGroupName) {
+          return false;
+        }
+
+        return true;
       },
     );
   }
@@ -258,8 +279,12 @@ class _IllustrationCardState extends State<IllustrationCard>
     );
 
     if (widget.canDrag) {
-      return LongPressDraggable<int>(
-        data: widget.index,
+      return LongPressDraggable<DragData>(
+        data: DragData(
+          index: widget.index,
+          groupName: widget.dragGroupName,
+          type: IllustrationCard,
+        ),
         feedback: draggingCard(),
         childWhenDragging: childWhenDragging(),
         onDragUpdate: widget.onDragUpdate,
@@ -274,36 +299,41 @@ class _IllustrationCardState extends State<IllustrationCard>
     String textValue = "",
     Function()? onTapPlaceholder,
   }) {
-    return DottedBorder(
-      strokeWidth: 3.0,
-      borderType: BorderType.RRect,
-      radius: Radius.circular(16),
-      color: Theme.of(context).primaryColor.withOpacity(0.6),
-      dashPattern: [8, 4],
-      child: ClipRRect(
-        borderRadius: BorderRadius.all(Radius.circular(16)),
-        child: Card(
-          elevation: 0.0,
-          color: Constants.colors.clairPink.withOpacity(0.6),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
-          ),
-          clipBehavior: Clip.hardEdge,
-          child: InkWell(
-            onTap: onTapPlaceholder,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Opacity(
-                opacity: 0.6,
-                child: Center(
-                  child: Text(
-                    textValue.isNotEmpty
-                        ? textValue
-                        : "illustration_permutation_description".tr(),
-                    textAlign: TextAlign.center,
-                    style: Utilities.fonts.style(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w600,
+    return Container(
+      width: widget.size - 30.0,
+      height: widget.size - 30.0,
+      padding: const EdgeInsets.all(8.0),
+      child: DottedBorder(
+        strokeWidth: 3.0,
+        borderType: BorderType.RRect,
+        radius: Radius.circular(16),
+        color: Theme.of(context).primaryColor.withOpacity(0.6),
+        dashPattern: [8, 4],
+        child: ClipRRect(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+          child: Card(
+            elevation: 0.0,
+            color: Constants.colors.clairPink.withOpacity(0.6),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            clipBehavior: Clip.hardEdge,
+            child: InkWell(
+              onTap: onTapPlaceholder,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Opacity(
+                  opacity: 0.6,
+                  child: Center(
+                    child: Text(
+                      textValue.isNotEmpty
+                          ? textValue
+                          : "illustration_permutation_description".tr(),
+                      textAlign: TextAlign.center,
+                      style: Utilities.fonts.style(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
