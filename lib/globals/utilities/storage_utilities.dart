@@ -1,4 +1,5 @@
 import 'package:artbooking/globals/constants.dart';
+import 'package:artbooking/types/enums/enum_header_separator_tab.dart';
 import 'package:artbooking/types/enums/enum_items_layout.dart';
 import 'package:artbooking/globals/constants/storage_keys_constants.dart';
 import 'package:artbooking/types/enums/enum_license_type.dart';
@@ -133,6 +134,14 @@ class StorageUtilities {
         : EnumSectionConfigTab.backgroundColor;
   }
 
+  EnumHeaderSeparatorTab getHeaderSeparatorTab() {
+    final String key = Constants.storageKeys.headerSeparatorTab;
+    final String? value = _localStorage.getString(key);
+    return value == EnumHeaderSeparatorTab.color.name
+        ? EnumHeaderSeparatorTab.color
+        : EnumHeaderSeparatorTab.shape;
+  }
+
   List<String> getDrafts() {
     List<String> drafts =
         _localStorage.getStringList(Constants.storageKeys.drafts) ?? [];
@@ -198,6 +207,11 @@ class StorageUtilities {
   void saveSectionConfigTab(EnumSectionConfigTab sectionConfigTab) {
     final String key = Constants.storageKeys.sectionConfigTab;
     _localStorage.setString(key, sectionConfigTab.name);
+  }
+
+  void saveHeaderSeparatorTab(EnumHeaderSeparatorTab headerSeparatorTab) {
+    final String key = Constants.storageKeys.headerSeparatorTab;
+    _localStorage.setString(key, headerSeparatorTab.name);
   }
 
   /// Set the expanded state of dashboard side menu.
