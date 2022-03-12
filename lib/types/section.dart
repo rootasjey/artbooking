@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:artbooking/globals/constants.dart';
+import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/types/header_separator.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
@@ -11,15 +13,18 @@ import 'package:artbooking/types/enums/enum_section_size.dart';
 class Section {
   Section({
     required this.backgroundColor,
-    required this.id,
+    required this.createdAt,
+    required this.dataTypes,
     required this.description,
-    required this.dataMode,
-    required this.dataModes,
-    required this.name,
+    required this.dataFetchMode,
+    required this.dataFetchModes,
+    required this.headerSeparator,
+    required this.id,
     required this.items,
+    required this.name,
     required this.size,
     required this.sizes,
-    required this.dataTypes,
+    required this.updatedAt,
   });
 
   /// Id of this section. It matches a specific design.
@@ -28,14 +33,19 @@ class Section {
   /// Section's background color;
   final int backgroundColor;
 
+  /// When this entry was created in Firestore.
+  final DateTime createdAt;
+
   /// Best usage of this section.
   final String description;
 
-  /// How this section's data is populated.
-  final EnumSectionDataMode dataMode;
+  /// How this section's data is fetched (manual, sync).
+  final EnumSectionDataMode dataFetchMode;
 
-  /// Available modes to populate this section's data.
-  final List<EnumSectionDataMode> dataModes;
+  /// Available data fetch modes to populate this section's data.
+  final List<EnumSectionDataMode> dataFetchModes;
+
+  final HeaderSeparator headerSeparator;
 
   /// Human readable name.
   final String name;
@@ -52,45 +62,72 @@ class Section {
   /// What types of data this section consumes.
   final List<EnumSectionDataType> dataTypes;
 
+  /// Last time this license was updated.
+  final DateTime updatedAt;
+
   Section copyWith({
     int? backgroundColor,
     String? id,
+    DateTime? createdAt,
     String? description,
-    EnumSectionDataMode? dataMode,
-    List<EnumSectionDataMode>? dataModes,
+    EnumSectionDataMode? dataFetchMode,
+    List<EnumSectionDataMode>? dataFetchModes,
+    HeaderSeparator? headerSeparator,
     String? name,
     List<String>? items,
     EnumSectionSize? size,
     List<EnumSectionSize>? sizes,
-    List<EnumSectionDataType>? types,
+    List<EnumSectionDataType>? dataTypes,
+    DateTime? updatedAt,
   }) {
     return Section(
       backgroundColor: backgroundColor ?? this.backgroundColor,
-      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      dataTypes: dataTypes ?? this.dataTypes,
       description: description ?? this.description,
-      dataMode: dataMode ?? this.dataMode,
-      dataModes: dataModes ?? this.dataModes,
+      dataFetchMode: dataFetchMode ?? this.dataFetchMode,
+      dataFetchModes: dataFetchModes ?? this.dataFetchModes,
+      headerSeparator: headerSeparator ?? this.headerSeparator,
+      id: id ?? this.id,
       name: name ?? this.name,
       items: items ?? this.items,
       size: size ?? this.size,
       sizes: sizes ?? this.sizes,
-      dataTypes: types ?? this.dataTypes,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       "background_color": backgroundColor,
-      'description': description,
-      "id": id,
-      "data_mode": sectionModeToString(dataMode),
-      "data_modes": sectionModesToStrings(),
+      "data_mode": dataFetchModeToString(dataFetchMode),
+      "data_modes": dataFetchModesToStrings(),
+      "data_types": dataTypesToStrings(),
+      "description": description,
+      "header_separator": headerSeparator.toMap(),
       "name": name,
       "items": items,
       "size": sectionSizeToString(size),
       "sizes": sectionSizesToStrings(),
-      "dataTypes": sectionDataTypesToListString(),
     };
+  }
+
+  factory Section.empty() {
+    return Section(
+      backgroundColor: Constants.colors.lightBackground.value,
+      createdAt: DateTime.now(),
+      id: "",
+      description: "",
+      dataFetchMode: EnumSectionDataMode.chosen,
+      dataFetchModes: [],
+      headerSeparator: HeaderSeparator.empty(),
+      name: "",
+      items: [],
+      size: EnumSectionSize.large,
+      sizes: [],
+      dataTypes: [],
+      updatedAt: DateTime.now(),
+    );
   }
 
   factory Section.fromMap(Map<String, dynamic> map) {
@@ -99,20 +136,23 @@ class Section {
 
     return Section(
       backgroundColor: backgroundColor,
-      id: map['id'] ?? '',
-      description: map['description'] ?? '',
-      dataMode: sectionModeFromString(map['data_mode']),
-      dataModes: sectionModesFromStrings(map['data_modes']),
-      name: map['name'] ?? '',
-      items: map['items'] != null ? List<String>.from(map['items']) : [],
-      size: sectionSizeFromString(map['size']),
-      sizes: sectionSizesFromStrings(map['sizes']),
-      dataTypes: sectionTypesFromString(map['data_types']),
+      createdAt: Utilities.date.fromFirestore(map["created_at"]),
+      dataTypes: stringsToDataTypes(map["data_types"]),
+      description: map["description"] ?? "",
+      dataFetchMode: stringToDataFetchMode(map["data_mode"]),
+      dataFetchModes: stringsToDataFetchModes(map["data_modes"]),
+      headerSeparator: HeaderSeparator.fromMap(map["header_separator"]),
+      id: map["id"] ?? "",
+      items: map["items"] != null ? List<String>.from(map["items"]) : [],
+      name: map["name"] ?? "",
+      size: stringToSize(map["size"]),
+      sizes: stringsToSizes(map["sizes"]),
+      updatedAt: Utilities.date.fromFirestore(map["updated_at"]),
     );
   }
 
-  static String sectionModeToString(EnumSectionDataMode mode) {
-    switch (mode) {
+  static String dataFetchModeToString(EnumSectionDataMode dataFetchMode) {
+    switch (dataFetchMode) {
       case EnumSectionDataMode.chosen:
         return "chosen";
       case EnumSectionDataMode.sync:
@@ -122,7 +162,7 @@ class Section {
     }
   }
 
-  static EnumSectionDataMode sectionModeFromString(String? modeString) {
+  static EnumSectionDataMode stringToDataFetchMode(String? modeString) {
     if (modeString == null) {
       return EnumSectionDataMode.sync;
     }
@@ -137,42 +177,42 @@ class Section {
     }
   }
 
-  List<String> sectionModesToStrings() {
-    if (this.dataModes.isEmpty) {
+  List<String> dataFetchModesToStrings() {
+    if (this.dataFetchModes.isEmpty) {
       return [];
     }
 
     final List<String> modeList = [];
 
-    for (var mode in this.dataModes) {
-      modeList.add(sectionModeToString(mode));
+    for (var mode in this.dataFetchModes) {
+      modeList.add(dataFetchModeToString(mode));
     }
 
     return modeList;
   }
 
-  static List<EnumSectionDataMode> sectionModesFromStrings(
-    dynamic rawModeList,
+  static List<EnumSectionDataMode> stringsToDataFetchModes(
+    dynamic strings,
   ) {
-    if (rawModeList == null) {
+    if (strings == null) {
       return [];
     }
 
-    final List<EnumSectionDataMode> modeList = [];
+    final List<EnumSectionDataMode> dataFetchModes = [];
 
-    for (var modeStr in rawModeList) {
-      modeList.add(sectionModeFromString(modeStr));
+    for (var string in strings) {
+      dataFetchModes.add(stringToDataFetchMode(string));
     }
 
-    return modeList;
+    return dataFetchModes;
   }
 
-  static EnumSectionSize sectionSizeFromString(String? sizeString) {
-    if (sizeString == null) {
+  static EnumSectionSize stringToSize(String? string) {
+    if (string == null) {
       return EnumSectionSize.large;
     }
 
-    switch (sizeString) {
+    switch (string) {
       case "large":
         return EnumSectionSize.large;
       case "medium":
@@ -182,18 +222,18 @@ class Section {
     }
   }
 
-  static List<EnumSectionSize> sectionSizesFromStrings(rawSectionSizes) {
-    if (rawSectionSizes == null) {
+  static List<EnumSectionSize> stringsToSizes(strings) {
+    if (strings == null) {
       return [];
     }
 
-    final List<EnumSectionSize> sectionSizes = [];
+    final List<EnumSectionSize> sizes = [];
 
-    for (var size in rawSectionSizes) {
-      sectionSizes.add(sectionSizeFromString(size));
+    for (var string in strings) {
+      sizes.add(stringToSize(string));
     }
 
-    return sectionSizes;
+    return sizes;
   }
 
   static String sectionSizeToString(EnumSectionSize size) {
@@ -217,16 +257,15 @@ class Section {
     return sectionSizes;
   }
 
-  static List<EnumSectionDataType> sectionTypesFromString(
-      dynamic rawSectionTypes) {
-    if (rawSectionTypes == null) {
+  static List<EnumSectionDataType> stringsToDataTypes(dynamic strings) {
+    if (strings == null) {
       return [];
     }
 
     final List<EnumSectionDataType> dataTypes = [];
 
-    for (String dataType in rawSectionTypes) {
-      switch (dataType) {
+    for (String string in strings) {
+      switch (string) {
         case "books":
           dataTypes.add(EnumSectionDataType.books);
           break;
@@ -244,7 +283,7 @@ class Section {
     return dataTypes;
   }
 
-  List<String> sectionDataTypesToListString() {
+  List<String> dataTypesToStrings() {
     if (this.dataTypes.isEmpty) {
       return [];
     }
@@ -278,9 +317,11 @@ class Section {
   @override
   String toString() {
     return "Section(id: $id,  backgroundColor: $backgroundColor, "
-        "description: $description, dataMode: $dataMode, "
-        "dataModes: $dataModes, name: $name, items: $items, size: $size, "
-        "types: $dataTypes)";
+        "createdAt: ${createdAt.toString()} description: $description, "
+        "dataFetchMode: $dataFetchMode, dataModes: $dataFetchModes, "
+        "headerSeparator: $headerSeparator"
+        "name: $name, items: $items, size: $size, types: $dataTypes, "
+        "updatedAt: ${updatedAt.toString()})";
   }
 
   @override
@@ -289,28 +330,34 @@ class Section {
 
     return other is Section &&
         other.id == id &&
+        other.createdAt == createdAt &&
         other.backgroundColor == backgroundColor &&
         other.description == description &&
-        other.dataMode == dataMode &&
-        listEquals(other.dataModes, dataModes) &&
+        other.dataFetchMode == dataFetchMode &&
+        listEquals(other.dataFetchModes, dataFetchModes) &&
+        other.headerSeparator == headerSeparator &&
         other.name == name &&
         listEquals(other.items, items) &&
         other.size == size &&
         listEquals(other.sizes, sizes) &&
-        listEquals(other.dataTypes, dataTypes);
+        listEquals(other.dataTypes, dataTypes) &&
+        other.updatedAt == updatedAt;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
         backgroundColor.hashCode ^
+        createdAt.hashCode ^
+        dataTypes.hashCode ^
         description.hashCode ^
-        dataMode.hashCode ^
-        dataModes.hashCode ^
+        dataFetchMode.hashCode ^
+        dataFetchModes.hashCode ^
+        headerSeparator.hashCode ^
         name.hashCode ^
         items.hashCode ^
         size.hashCode ^
         sizes.hashCode ^
-        dataTypes.hashCode;
+        updatedAt.hashCode;
   }
 }
