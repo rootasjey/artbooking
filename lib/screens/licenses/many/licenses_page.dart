@@ -10,6 +10,7 @@ import 'package:artbooking/screens/licenses/many/licenses_page_fab.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page_header.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page_body.dart';
 import 'package:artbooking/types/cloud_functions/license_response.dart';
+import 'package:artbooking/types/firestore/doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
@@ -36,10 +37,10 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   bool _hasNext = true;
 
   /// True if loading more style from Firestore.
-  bool _isLoadingMore = false;
+  bool _loadingMore = false;
 
   bool _descending = true;
-  bool _isLoading = false;
+  bool _loading = false;
 
   /// Last fetched document snapshot. Used for pagination.
   DocumentSnapshot<Object>? _lastDocumentSnapshot;
@@ -102,7 +103,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
           ),
           LicensesPageBody(
             licenses: _licenses,
-            isLoading: _isLoading,
+            isLoading: _loading,
             onTap: onTapLicense,
             selectedTab: _selectedTab,
             onDeleteLicense: canManageLicense ? onDeleteLicense : null,
@@ -129,13 +130,13 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     setState(() {
       _lastDocumentSnapshot = null;
       _licenses.clear();
-      _isLoading = true;
+      _loading = true;
     });
 
     try {
       final query = await FirebaseFirestore.instance
-          .collection('licenses')
-          .orderBy('created_at', descending: _descending)
+          .collection("licenses")
+          .orderBy("created_at", descending: _descending)
           .limit(_limit);
 
       listenLicenseEvents(query);
@@ -144,71 +145,72 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
       if (snapshot.size == 0) {
         setState(() {
           _hasNext = false;
-          _isLoading = false;
+          _loading = false;
         });
 
         return;
       }
 
-      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
+      for (DocSnapMap doc in snapshot.docs) {
         final data = doc.data();
-        data['id'] = doc.id;
+        data["id"] = doc.id;
 
         final license = License.fromMap(data);
         _licenses.add(license);
       }
 
-      setState(() {
-        _hasNext = _limit == snapshot.size;
-        _lastDocumentSnapshot = snapshot.docs.last;
-      });
+      _hasNext = _limit == snapshot.size;
+      _lastDocumentSnapshot = snapshot.docs.last;
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     } finally {
-      setState(() => _isLoading = false);
+      setState(() => _loading = false);
     }
   }
 
   /// Fetch more staff licenses on Firestore.
   void fetchMoreStaffLicenses() async {
-    setState(() => _isLoadingMore = true);
+    final lastDocumentSnapshot = _lastDocumentSnapshot;
+    if (_loadingMore || !_hasNext || lastDocumentSnapshot == null) {
+      return;
+    }
+
+    setState(() => _loadingMore = true);
 
     try {
       final snapshot = await FirebaseFirestore.instance
-          .collection('licenses')
+          .collection("licenses")
           .limit(_limit)
-          .orderBy('name', descending: true)
-          .startAfterDocument(_lastDocumentSnapshot!)
+          .orderBy("created_at", descending: _descending)
+          .startAfterDocument(lastDocumentSnapshot)
           .get();
 
       if (snapshot.size == 0) {
         setState(() {
           _hasNext = false;
-          _isLoadingMore = false;
+          _loadingMore = false;
           _lastDocumentSnapshot = null;
         });
 
         return;
       }
 
-      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
+      for (DocSnapMap doc in snapshot.docs) {
         final data = doc.data();
-        data['id'] = doc.id;
+        data["id"] = doc.id;
 
         final license = License.fromMap(data);
         _licenses.add(license);
       }
 
-      setState(() {
-        _hasNext = _limit == snapshot.size;
-        _lastDocumentSnapshot = snapshot.docs.last;
-      });
+      _hasNext = _limit == snapshot.size;
+      _lastDocumentSnapshot = snapshot.docs.last;
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     } finally {
-      setState(() => _isLoadingMore = false);
+      setState(() => _loadingMore = false);
     }
   }
 
@@ -219,17 +221,17 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     setState(() {
       _lastDocumentSnapshot = null;
       _licenses.clear();
-      _isLoading = true;
+      _loading = true;
     });
 
     try {
       final String? uid = ref.read(AppState.userProvider).authUser?.uid;
 
       final query = await FirebaseFirestore.instance
-          .collection('users')
+          .collection("users")
           .doc(uid)
-          .collection('user_licenses')
-          .orderBy('created_at', descending: _descending)
+          .collection("user_licenses")
+          .orderBy("created_at", descending: _descending)
           .limit(_limit);
 
       listenLicenseEvents(query);
@@ -238,75 +240,76 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
       if (snapshot.size == 0) {
         setState(() {
           _hasNext = false;
-          _isLoading = false;
+          _loading = false;
         });
 
         return;
       }
 
-      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
+      for (DocSnapMap doc in snapshot.docs) {
         final data = doc.data();
-        data['id'] = doc.id;
+        data["id"] = doc.id;
 
         final license = License.fromMap(data);
         _licenses.add(license);
       }
 
-      setState(() {
-        _hasNext = _limit == snapshot.size;
-        _lastDocumentSnapshot = snapshot.docs.last;
-      });
+      _hasNext = _limit == snapshot.size;
+      _lastDocumentSnapshot = snapshot.docs.last;
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     } finally {
-      setState(() => _isLoading = false);
+      setState(() => _loading = false);
     }
   }
 
   /// Fetch more user's licenses on Firestore.
   void fetchMoreUserLicenses() async {
-    setState(() => _isLoadingMore = true);
+    final lastDocumentSnapshot = _lastDocumentSnapshot;
+    if (_loadingMore || !_hasNext || lastDocumentSnapshot == null) {
+      return;
+    }
+
+    setState(() => _loadingMore = true);
 
     try {
       final String? uid = ref.read(AppState.userProvider).authUser?.uid;
 
       final snapshot = await FirebaseFirestore.instance
-          .collection('users')
+          .collection("users")
           .doc(uid)
-          .collection('user_licenses')
+          .collection("user_licenses")
           .limit(_limit)
-          .orderBy('name', descending: true)
-          .startAfterDocument(_lastDocumentSnapshot!)
+          .orderBy("created_at", descending: _descending)
+          .startAfterDocument(lastDocumentSnapshot)
           .get();
 
       if (snapshot.size == 0) {
         setState(() {
           _hasNext = false;
-          _isLoadingMore = false;
+          _loadingMore = false;
           _lastDocumentSnapshot = null;
         });
 
         return;
       }
 
-      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
+      for (DocSnapMap doc in snapshot.docs) {
         final data = doc.data();
-        data['id'] = doc.id;
+        data["id"] = doc.id;
 
         final license = License.fromMap(data);
         _licenses.add(license);
       }
 
-      setState(() {
-        _hasNext = _limit == snapshot.size;
-        _lastDocumentSnapshot = snapshot.docs.last;
-      });
+      _hasNext = _limit == snapshot.size;
+      _lastDocumentSnapshot = snapshot.docs.last;
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     } finally {
-      setState(() => _isLoadingMore = false);
+      setState(() => _loadingMore = false);
     }
   }
 
@@ -338,7 +341,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
       return false;
     }
 
-    if (_hasNext && !_isLoadingMore && _lastDocumentSnapshot != null) {
+    if (_hasNext && !_loadingMore && _lastDocumentSnapshot != null) {
       fetchMoreStaffLicenses();
     }
 
@@ -380,9 +383,9 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     }
 
     setState(() {
-      data['id'] = documentChange.doc.id;
-      final illustration = License.fromMap(data);
-      _licenses.insert(0, illustration);
+      data["id"] = documentChange.doc.id;
+      final license = License.fromMap(data);
+      _licenses.insert(0, license);
     });
   }
 
@@ -431,15 +434,15 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
       }
 
       final int index = _licenses.indexWhere(
-        (illustration) => illustration.id == documentChange.doc.id,
+        (x) => x.id == documentChange.doc.id,
       );
 
-      data['id'] = documentChange.doc.id;
-      final updatedIllustration = License.fromMap(data);
+      data["id"] = documentChange.doc.id;
+      final updatedLicense = License.fromMap(data);
 
       setState(() {
         _licenses.removeAt(index);
-        _licenses.insert(index, updatedIllustration);
+        _licenses.insert(index, updatedLicense);
       });
     } on Exception catch (error) {
       Utilities.logger.e(
@@ -455,7 +458,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     await showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => EditLicensePage(
-        licenseId: '',
+        licenseId: "",
         type: _selectedTab,
       ),
     );

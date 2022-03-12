@@ -1,4 +1,5 @@
 import 'package:artbooking/globals/utilities.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:unicons/unicons.dart';
@@ -8,15 +9,17 @@ class LicensePageDates extends StatelessWidget {
     Key? key,
     required this.createdAt,
     required this.updatedAt,
+    this.padding = EdgeInsets.zero,
   }) : super(key: key);
 
   final DateTime createdAt;
   final DateTime updatedAt;
+  final EdgeInsets padding;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 32.0),
+      padding: padding,
       child: Opacity(
         opacity: 0.4,
         child: Column(
@@ -31,7 +34,7 @@ class LicensePageDates extends StatelessWidget {
                     child: Icon(UniconsLine.play),
                   ),
                   Text(
-                    "created ${Jiffy(createdAt).fromNow()}",
+                    "date_created_ago".tr(args: [Jiffy(createdAt).fromNow()]),
                     style: Utilities.fonts.style(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w400,
@@ -47,7 +50,7 @@ class LicensePageDates extends StatelessWidget {
                   child: Icon(UniconsLine.arrow_circle_up),
                 ),
                 Text(
-                  "updated ${Jiffy(updatedAt).fromNow()}",
+                  "date_updated_ago".tr(args: [Jiffy(updatedAt).fromNow()]),
                   style: Utilities.fonts.style(
                     fontSize: 18.0,
                     fontWeight: FontWeight.w400,

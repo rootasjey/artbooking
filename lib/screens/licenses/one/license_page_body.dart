@@ -49,9 +49,10 @@ class LicensePageBody extends StatelessWidget {
           Opacity(
             opacity: 0.4,
             child: Text(
-              "version: ${license.version}".toUpperCase(),
+              "version_number".tr(args: [license.version]),
               style: Utilities.fonts.style(
-                fontWeight: FontWeight.w500,
+                fontSize: 14.0,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
