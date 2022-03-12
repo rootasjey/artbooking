@@ -79,7 +79,7 @@ class _BookGridSectionState extends State<BookGridSection> {
   @override
   void initState() {
     super.initState();
-    _currentMode = widget.section.dataMode;
+    _currentMode = widget.section.dataFetchMode;
   }
 
   @override
@@ -245,7 +245,7 @@ class _BookGridSectionState extends State<BookGridSection> {
   }
 
   Widget maybeHelperText() {
-    if (widget.section.dataMode != EnumSectionDataMode.chosen ||
+    if (widget.section.dataFetchMode != EnumSectionDataMode.chosen ||
         _books.isNotEmpty) {
       return Container();
     }
@@ -413,7 +413,7 @@ class _BookGridSectionState extends State<BookGridSection> {
   }
 
   void fetchBooks() {
-    if (widget.section.dataMode == EnumSectionDataMode.sync) {
+    if (widget.section.dataFetchMode == EnumSectionDataMode.sync) {
       fetchSyncBooks();
       return;
     }
@@ -488,8 +488,8 @@ class _BookGridSectionState extends State<BookGridSection> {
       return;
     }
 
-    if (_currentMode != widget.section.dataMode) {
-      _currentMode = widget.section.dataMode;
+    if (_currentMode != widget.section.dataFetchMode) {
+      _currentMode = widget.section.dataFetchMode;
       _currentMode == EnumSectionDataMode.sync ? fetchBooks() : null;
     }
 

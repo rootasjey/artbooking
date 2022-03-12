@@ -321,12 +321,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   void tryAddSection(Section section) async {
     try {
-      final dataMode = section.dataModes.isNotEmpty
-          ? section.dataModes.first
+      final dataMode = section.dataFetchModes.isNotEmpty
+          ? section.dataFetchModes.first
           : EnumSectionDataMode.chosen;
 
       final Section editedSection = section.copyWith(
-        dataMode: dataMode,
+        dataFetchMode: dataMode,
         size: EnumSectionSize.large,
       );
 
@@ -566,7 +566,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   ) async {
     try {
       final editedSection = section.copyWith(
-        dataMode: mode,
+        dataFetchMode: mode,
       );
 
       _artisticPage.sections.replaceRange(

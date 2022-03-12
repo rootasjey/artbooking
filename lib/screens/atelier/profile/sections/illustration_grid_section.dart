@@ -85,7 +85,7 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
   @override
   initState() {
     super.initState();
-    _currentMode = widget.section.dataMode;
+    _currentMode = widget.section.dataFetchMode;
   }
 
   @override
@@ -249,7 +249,7 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
   }
 
   Widget maybeHelperText() {
-    if (widget.section.dataMode != EnumSectionDataMode.chosen ||
+    if (widget.section.dataFetchMode != EnumSectionDataMode.chosen ||
         _illustrations.isNotEmpty) {
       return Container();
     }
@@ -480,7 +480,7 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
 
     // _loading = true;
 
-    if (widget.section.dataMode == EnumSectionDataMode.sync) {
+    if (widget.section.dataFetchMode == EnumSectionDataMode.sync) {
       fetchSyncIllustrations();
       return;
     }
@@ -497,8 +497,8 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
       return;
     }
 
-    if (_currentMode != widget.section.dataMode) {
-      _currentMode = widget.section.dataMode;
+    if (_currentMode != widget.section.dataFetchMode) {
+      _currentMode = widget.section.dataFetchMode;
       _currentMode == EnumSectionDataMode.sync ? fetchIllustrations() : null;
     }
 

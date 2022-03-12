@@ -330,7 +330,7 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
 
   Future<void> fetchIllustration() async {
     _loading = true;
-    if (widget.section.dataMode == EnumSectionDataMode.chosen) {
+    if (widget.section.dataFetchMode == EnumSectionDataMode.chosen) {
       await fetchChosenIllustration();
       _loading = false;
       return;
