@@ -7,6 +7,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,7 @@ class AtelierPageWelcome extends ConsumerWidget {
     final userState = ref.watch(AppState.userProvider);
     final userFirestore = userState.firestoreUser;
 
-    String name = 'Anonymous';
+    String name = "Anonymous";
 
     if (userFirestore != null) {
       name = userFirestore.name.isNotEmpty
@@ -46,7 +47,7 @@ class AtelierPageWelcome extends ConsumerWidget {
                       name: name,
                     ),
                     navigationDescription(),
-                    sectionsList(context),
+                    sectionsList(context, userFirestore),
                   ],
                 ),
               ),
@@ -128,8 +129,13 @@ class AtelierPageWelcome extends ConsumerWidget {
     );
   }
 
-  Widget sectionsList(BuildContext context) {
+  Widget sectionsList(BuildContext context, UserFirestore? userFirestore) {
     int index = 0;
+
+    bool canManageSections = false;
+    if (userFirestore != null) {
+      canManageSections = userFirestore.rights.canManageSections;
+    }
 
     final List<Widget> children = [
       AtelierPageCard(
@@ -195,6 +201,16 @@ class AtelierPageWelcome extends ConsumerWidget {
           context.beamToNamed(AtelierLocationContent.licensesRoute);
         },
       ),
+      if (canManageSections)
+        AtelierPageCard(
+          hoverColor: Constants.colors.sections,
+          iconData: UniconsLine.web_grid,
+          textTitle: "sections".tr(),
+          textSubtitle: "sections_subtitle".tr(),
+          onTap: () {
+            context.beamToNamed(AtelierLocationContent.sectionsRoute);
+          },
+        ),
       AtelierPageCard(
         hoverColor: Constants.colors.home,
         iconData: UniconsLine.home,

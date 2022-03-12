@@ -92,15 +92,6 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
   }
 
   Widget bodySidePanel() {
-    final UserFirestore? userFirestore =
-        ref.watch(AppState.userProvider).firestoreUser;
-
-    bool isAdmin = false;
-
-    if (userFirestore != null) {
-      isAdmin = userFirestore.rights.canManageData;
-    }
-
     return SliverPadding(
       padding: EdgeInsets.only(
         left: _isExpanded ? 20.0 : 16.0,
@@ -109,7 +100,7 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
       ),
       sliver: SliverList(
           delegate: SliverChildListDelegate.fixed(
-        getItemList(isAdmin: isAdmin).map((sidePanelItem) {
+        getItemList().map((sidePanelItem) {
           final Color foregroundColor =
               Theme.of(context).textTheme.bodyText1?.color ?? Colors.white;
 
@@ -247,10 +238,10 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
     );
   }
 
-  List<SideMenuItem> getItemList({required bool isAdmin}) {
+  List<SideMenuItem> getItemList() {
     return [
       ...getBaseItemList(),
-      if (isAdmin) ...getAdminItemList(),
+      ...getAdminItemList(),
     ];
   }
 
@@ -302,7 +293,24 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
   }
 
   List<SideMenuItem> getAdminItemList() {
-    return [];
+    final UserFirestore? userFirestore =
+        ref.watch(AppState.userProvider).firestoreUser;
+
+    if (userFirestore == null) {
+      return [];
+    }
+
+    final rights = userFirestore.rights;
+
+    return [
+      if (rights.canManageSections)
+        SideMenuItem(
+          iconData: UniconsLine.web_grid,
+          label: "sections".tr(),
+          hoverColor: Constants.colors.sections,
+          routePath: AtelierLocationContent.sectionsRoute,
+        ),
+    ];
   }
 
   void _setStateListener() => setState(() {});
