@@ -99,7 +99,7 @@ class _EditSectionPageState extends State<EditSectionPage> {
 
   void tryCreateOrUpdateSection() async {
     try {
-      final map = _section.toMap();
+      final map = _section.toMap(withId: false);
       map["updated_at"] = DateTime.now();
 
       if (_section.id.isEmpty) {

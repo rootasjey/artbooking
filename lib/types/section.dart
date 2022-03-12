@@ -97,8 +97,8 @@ class Section {
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {
+  Map<String, dynamic> toMap({bool withId = true}) {
+    final map = {
       "background_color": backgroundColor,
       "data_mode": dataFetchModeToString(dataFetchMode),
       "data_modes": dataFetchModesToStrings(),
@@ -110,6 +110,12 @@ class Section {
       "size": sectionSizeToString(size),
       "sizes": sectionSizesToStrings(),
     };
+
+    if (withId) {
+      map["id"] = id;
+    }
+
+    return map;
   }
 
   factory Section.empty() {
