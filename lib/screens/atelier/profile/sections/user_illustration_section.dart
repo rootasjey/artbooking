@@ -1,5 +1,5 @@
 import 'package:artbooking/components/avatar/better_avatar.dart';
-import 'package:artbooking/components/buttons/circle_button.dart';
+import 'package:artbooking/components/buttons/section_illustration_buttons.dart';
 import 'package:artbooking/components/cards/illustration_card.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/user_social_links_component.dart';
@@ -14,7 +14,6 @@ import 'package:artbooking/types/section.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -79,7 +78,7 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
 
-    handleReFetch();
+    checkData();
 
     final EdgeInsets outerPadding =
         widget.usingAsDropTarget ? const EdgeInsets.all(4.0) : EdgeInsets.zero;
@@ -145,7 +144,7 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
           heroTag: DateTime.now().toString(),
           illustration: Illustration.empty(),
           index: 0,
-          onTap: pickIllustration,
+          onTap: onPickIllustration,
         ),
       );
     }
@@ -173,36 +172,16 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
                 );
               },
             ),
-            illustrationActionButtons(),
+            Positioned(
+              right: 24.0,
+              bottom: 24.0,
+              child: SectionIllustrationButtons(
+                onRemoveIllustration: onRemoveIllustration,
+                onPickIllustration: onPickIllustration,
+              ),
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget illustrationActionButtons() {
-    return Positioned(
-      right: 24.0,
-      bottom: 24.0,
-      child: Wrap(
-        spacing: 12.0,
-        runSpacing: 12.0,
-        children: [
-          CircleButton(
-            elevation: 2.0,
-            showBorder: true,
-            onTap: removeIllustration,
-            tooltip: "illustration_remove".tr(),
-            icon: Icon(UniconsLine.minus),
-          ),
-          CircleButton(
-            elevation: 2.0,
-            showBorder: true,
-            onTap: pickIllustration,
-            tooltip: "illustration_change".tr(),
-            icon: Icon(UniconsLine.exchange),
-          ),
-        ],
       ),
     );
   }
@@ -323,6 +302,32 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
     );
   }
 
+  /// There may be a better way to handle new data.
+  void checkData() {
+    if (_loading) {
+      return;
+    }
+
+    final items = widget.section.items;
+
+    if (items.isEmpty) {
+      if (_illustration.id.isNotEmpty) {
+        setState(() {
+          _illustration = Illustration.empty();
+        });
+      }
+      return;
+    }
+
+    if (_illustration.id != items.first) {
+      _illustration = _illustration.copyWith(
+        id: items.first,
+      );
+
+      fetchIllustration();
+    }
+  }
+
   void fetchData() async {
     await fetchUser();
     await fetchIllustration();
@@ -425,7 +430,7 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
     }
   }
 
-  void pickIllustration() {
+  void onPickIllustration() {
     widget.onShowIllustrationDialog?.call(
       section: widget.section,
       index: widget.index,
@@ -434,37 +439,11 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
     );
   }
 
-  void removeIllustration() {
+  void onRemoveIllustration() {
     widget.onUpdateSectionItems?.call(
       widget.section,
       widget.index,
       [],
     );
-  }
-
-  /// There may be a better way to handle new data.
-  void handleReFetch() {
-    if (_loading) {
-      return;
-    }
-
-    final items = widget.section.items;
-
-    if (items.isEmpty) {
-      if (_illustration.id.isNotEmpty) {
-        setState(() {
-          _illustration = Illustration.empty();
-        });
-      }
-      return;
-    }
-
-    if (_illustration.id != items.first) {
-      _illustration = _illustration.copyWith(
-        id: items.first,
-      );
-
-      fetchIllustration();
-    }
   }
 }
