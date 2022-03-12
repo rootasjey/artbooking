@@ -45,6 +45,9 @@ class ColorsConstants {
   /// Color for projects.
   final Color projects = Colors.amber;
 
+  /// Color for profile page sections.
+  final Color sections = Colors.green.shade700;
+
   /// Color for settings.
   final Color settings = Colors.teal;
 
