@@ -16,10 +16,12 @@ class FontsUtilities {
     double fontSize = 16.0,
     double? height,
     Color? color,
+    Color? backgroundColor,
     TextDecoration? decoration,
   }) {
     return GoogleFonts.nunito(
       color: color,
+      backgroundColor: backgroundColor,
       fontSize: fontSize,
       fontWeight: fontWeight,
       height: height,
