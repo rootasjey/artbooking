@@ -133,6 +133,7 @@ class _BookGridSectionState extends State<BookGridSection> {
                     shrinkWrap: true,
                     mainAxisSpacing: 24.0,
                     crossAxisSpacing: 24.0,
+                    childAspectRatio: 0.8,
                     children: getChildren(),
                   ),
                 ),
@@ -159,8 +160,8 @@ class _BookGridSectionState extends State<BookGridSection> {
           ]
         : [];
 
-    final double width = 300.0;
-    final double height = 342.0;
+    final double width = 330.0;
+    final double height = 380.0;
 
     final children = _books.map((Book book) {
       index++;
