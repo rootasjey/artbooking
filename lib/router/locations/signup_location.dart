@@ -40,7 +40,7 @@ class SignupLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: SignupPage(),
         key: ValueKey(route),
-        title: Utilities.getPageTitle("signup".tr()),
+        title: Utilities.ui.getPageTitle("signup".tr()),
         type: BeamPageType.fadeTransition,
       ),
     ];

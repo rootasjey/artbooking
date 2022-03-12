@@ -282,7 +282,7 @@ class ProfilePageBody extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(right: 4.0),
-                        child: Icon(Utilities.getSectionIcon(section.id)),
+                        child: Icon(Utilities.ui.getSectionIcon(section.id)),
                       ),
                       Text(
                         getDraggableName(section),

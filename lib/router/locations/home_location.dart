@@ -31,14 +31,14 @@ class HomeLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: HomePage(),
         key: ValueKey(route),
-        title: Utilities.getPageTitle("home".tr()),
+        title: Utilities.ui.getPageTitle("home".tr()),
         type: BeamPageType.fadeTransition,
       ),
       if (state.pathPatternSegments.contains("illustrations"))
         BeamPage(
           child: IllustrationsPage(),
           key: ValueKey(illustrationsRoute),
-          title: Utilities.getPageTitle("illustrations".tr()),
+          title: Utilities.ui.getPageTitle("illustrations".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains(":illustrationId"))
@@ -47,14 +47,14 @@ class HomeLocation extends BeamLocation<BeamState> {
             illustrationId: state.pathParameters["illustrationId"]!,
           ),
           key: ValueKey(illustrationRoute),
-          title: Utilities.getPageTitle("illustration".tr()),
+          title: Utilities.ui.getPageTitle("illustration".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains("books"))
         BeamPage(
           child: BooksPage(),
           key: ValueKey(booksRoute),
-          title: Utilities.getPageTitle("books".tr()),
+          title: Utilities.ui.getPageTitle("books".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains(":bookId"))
@@ -63,7 +63,7 @@ class HomeLocation extends BeamLocation<BeamState> {
             bookId: state.pathParameters["bookId"]!,
           ),
           key: ValueKey(bookRoute),
-          title: Utilities.getPageTitle("book".tr()),
+          title: Utilities.ui.getPageTitle("book".tr()),
           type: BeamPageType.fadeTransition,
         ),
     ];

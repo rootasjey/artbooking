@@ -16,7 +16,7 @@ class UndefinedLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: UndefinedPage(),
         key: ValueKey(route),
-        title: Utilities.getPageTitle("404"),
+        title: Utilities.ui.getPageTitle("404"),
         type: BeamPageType.fadeTransition,
       ),
     ];

@@ -15,7 +15,7 @@ class SettingsLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: SettingsPage(),
         key: ValueKey(route),
-        title: Utilities.getPageTitle("settings".tr()),
+        title: Utilities.ui.getPageTitle("settings".tr()),
         type: BeamPageType.fadeTransition,
       ),
     ];

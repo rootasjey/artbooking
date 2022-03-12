@@ -157,7 +157,7 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
                     child: Opacity(
                       opacity: 0.8,
                       child: Icon(
-                        Utilities.getSectionIcon(section.id),
+                        Utilities.ui.getSectionIcon(section.id),
                         size: 32.0,
                       ),
                     ),

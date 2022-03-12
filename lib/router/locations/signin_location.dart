@@ -40,7 +40,7 @@ class SigninLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: SigninPage(),
         key: ValueKey(route),
-        title: Utilities.getPageTitle("signin".tr()),
+        title: Utilities.ui.getPageTitle("signin".tr()),
         type: BeamPageType.fadeTransition,
       ),
     ];

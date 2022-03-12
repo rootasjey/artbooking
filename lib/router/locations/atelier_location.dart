@@ -4,6 +4,8 @@ import 'package:artbooking/screens/atelier/atelier_page_welcome.dart';
 import 'package:artbooking/screens/atelier/atelier_page.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page.dart';
 import 'package:artbooking/screens/likes/likes_page.dart';
+import 'package:artbooking/screens/sections/many/sections_page.dart';
+import 'package:artbooking/screens/sections/one/section_page.dart';
 import 'package:artbooking/screens/settings/delete_account/delete_account_page.dart';
 import 'package:artbooking/screens/illustrations/illustration_page.dart';
 import 'package:artbooking/screens/licenses/one/license_page.dart';
@@ -58,7 +60,7 @@ class AtelierLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: AtelierPage(),
         key: ValueKey(route),
-        title: Utilities.getPageTitle("atelier".tr()),
+        title: Utilities.ui.getPageTitle("atelier".tr()),
         type: BeamPageType.fadeTransition,
       ),
     ];
@@ -97,6 +99,12 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
   /// Settings route value for this location.
   static const String settingsRoute = "$route/settings";
 
+  /// Sections (profile page) route.
+  static const String sectionsRoute = "$route/sections";
+
+  /// Section (profile page) route.
+  static const String sectionRoute = "$sectionsRoute/:sectionId";
+
   /// Delete account route value for this location.
   static const String deleteAccountRoute = "$settingsRoute/delete/account";
 
@@ -118,6 +126,8 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
         illustrationBookRoute,
         activityRoute,
         profileRoute,
+        sectionsRoute,
+        sectionRoute,
         settingsRoute,
         deleteAccountRoute,
         updateEmailRoute,
@@ -134,21 +144,21 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
       BeamPage(
         child: AtelierPageWelcome(),
         key: ValueKey(route),
-        title: Utilities.getPageTitle("atelier".tr()),
+        title: Utilities.ui.getPageTitle("atelier".tr()),
         type: BeamPageType.fadeTransition,
       ),
       if (state.pathPatternSegments.contains("activity"))
         BeamPage(
           child: ActivityPage(),
           key: ValueKey(activityRoute),
-          title: Utilities.getPageTitle("activity".tr()),
+          title: Utilities.ui.getPageTitle("activity".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains("books"))
         BeamPage(
           child: MyBooksPage(),
           key: ValueKey(booksRoute),
-          title: Utilities.getPageTitle("books_my".tr()),
+          title: Utilities.ui.getPageTitle("books_my".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains(":bookId"))
@@ -157,14 +167,14 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
             bookId: state.pathParameters["bookId"]!,
           ),
           key: ValueKey("$booksRoute/one"),
-          title: Utilities.getPageTitle("book".tr()),
+          title: Utilities.ui.getPageTitle("book".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains("illustrations"))
         BeamPage(
           child: MyIllustrationsPage(),
           key: ValueKey(illustrationsRoute),
-          title: Utilities.getPageTitle("illustrations_my".tr()),
+          title: Utilities.ui.getPageTitle("illustrations_my".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains(":illustrationId"))
@@ -173,42 +183,42 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
             illustrationId: state.pathParameters["illustrationId"]!,
           ),
           key: ValueKey("$illustrationsRoute/one"),
-          title: Utilities.getPageTitle("illustration".tr()),
+          title: Utilities.ui.getPageTitle("illustration".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains("settings"))
         BeamPage(
           child: SettingsPage(),
           key: ValueKey("$settingsRoute"),
-          title: Utilities.getPageTitle("settings".tr()),
+          title: Utilities.ui.getPageTitle("settings".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (isDeleteAccount(state.pathPatternSegments))
         BeamPage(
           child: SettingsPageDeleteAccount(),
           key: ValueKey("$deleteAccountRoute"),
-          title: Utilities.getPageTitle("account_delete".tr()),
+          title: Utilities.ui.getPageTitle("account_delete".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (isUpdateEmail(state.pathPatternSegments))
         BeamPage(
           child: UpdateEmailPage(),
           key: ValueKey("$updateEmailRoute"),
-          title: Utilities.getPageTitle("email_update".tr()),
+          title: Utilities.ui.getPageTitle("email_update".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (isUpdatePassword(state.pathPatternSegments))
         BeamPage(
           child: UpdatePasswordPage(),
           key: ValueKey("$updatePasswordRoute"),
-          title: Utilities.getPageTitle("password_update".tr()),
+          title: Utilities.ui.getPageTitle("password_update".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (isUpdateUsername(state.pathPatternSegments))
         BeamPage(
           child: UpdateUsernamePage(),
           key: ValueKey("$updateUsernameRoute"),
-          title: Utilities.getPageTitle("username_update".tr()),
+          title: Utilities.ui.getPageTitle("username_update".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains("profile"))
@@ -217,31 +227,47 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
             userId: state.pathParameters["userId"] ?? '',
           ),
           key: ValueKey("$profileRoute"),
-          title: Utilities.getPageTitle("profile_my".tr()),
+          title: Utilities.ui.getPageTitle("profile_my".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains("licenses"))
         BeamPage(
           child: LicensesPage(),
           key: ValueKey("$licensesRoute"),
-          title: Utilities.getPageTitle("licenses".tr()),
+          title: Utilities.ui.getPageTitle("licenses".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains(":licenseId"))
         BeamPage(
           child: LicensePage(
             type: getLicenseType(state.routeState),
-            licenseId: state.pathParameters["licenseId"] ?? '',
+            licenseId: state.pathParameters["licenseId"] ?? "",
           ),
           key: ValueKey("$licenseRoute"),
-          title: Utilities.getPageTitle("license".tr()),
+          title: Utilities.ui.getPageTitle("license".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains("likes"))
         BeamPage(
           child: LikesPage(),
           key: ValueKey("$likesRoute"),
-          title: Utilities.getPageTitle("likes".tr()),
+          title: Utilities.ui.getPageTitle("likes".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
+      if (state.pathPatternSegments.contains("sections"))
+        BeamPage(
+          child: SectionsPage(),
+          key: ValueKey("$sectionsRoute"),
+          title: Utilities.ui.getPageTitle("sections".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
+      if (state.pathPatternSegments.contains(":sectionId"))
+        BeamPage(
+          child: SectionPage(
+            sectionId: state.pathParameters["sectionId"] ?? "",
+          ),
+          key: ValueKey("$sectionRoute"),
+          title: Utilities.ui.getPageTitle("section".tr()),
           type: BeamPageType.fadeTransition,
         ),
     ];

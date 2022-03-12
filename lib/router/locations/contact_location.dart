@@ -17,7 +17,7 @@ class ContactLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: ContactPage(),
         key: ValueKey(route),
-        title: Utilities.getPageTitle("contact".tr()),
+        title: Utilities.ui.getPageTitle("contact".tr()),
         type: BeamPageType.fadeTransition,
       ),
     ];

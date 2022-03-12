@@ -17,7 +17,7 @@ class SearchLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: SearchPage(),
         key: ValueKey(route),
-        title: Utilities.getPageTitle("search".tr()),
+        title: Utilities.ui.getPageTitle("search".tr()),
         type: BeamPageType.fadeTransition,
       ),
     ];

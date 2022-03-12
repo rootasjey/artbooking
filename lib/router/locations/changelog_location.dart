@@ -17,7 +17,7 @@ class ChangelogLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: ChangelogPage(),
         key: ValueKey(route),
-        title: Utilities.getPageTitle("changelog".tr()),
+        title: Utilities.ui.getPageTitle("changelog".tr()),
         type: BeamPageType.fadeTransition,
       ),
     ];

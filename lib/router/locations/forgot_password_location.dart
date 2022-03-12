@@ -17,7 +17,7 @@ class ForgotPasswordLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: SettingsPageForgotPassword(),
         key: ValueKey(route),
-        title: Utilities.getPageTitle("password_forgot".tr()),
+        title: Utilities.ui.getPageTitle("password_forgot".tr()),
         type: BeamPageType.fadeTransition,
       ),
     ];

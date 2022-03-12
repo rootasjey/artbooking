@@ -17,7 +17,7 @@ class TosLocation extends BeamLocation<BeamState> {
       BeamPage(
         child: TosPage(),
         key: ValueKey(route),
-        title: Utilities.getPageTitle("tos".tr()),
+        title: Utilities.ui.getPageTitle("tos".tr()),
         type: BeamPageType.fadeTransition,
       ),
     ];

@@ -3,17 +3,17 @@ import 'package:artbooking/globals/utilities/crop_editor_utilities.dart';
 import 'package:artbooking/globals/utilities/date_utilities.dart';
 import 'package:artbooking/globals/utilities/flash_utilities.dart';
 import 'package:artbooking/globals/utilities/fonts_utilities.dart';
+import 'package:artbooking/globals/utilities/navigation_utilities.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:artbooking/globals/utilities/storage_utilities.dart';
 import 'package:artbooking/globals/utilities/language_utilities.dart';
 import 'package:artbooking/globals/utilities/size_utilities.dart';
+import 'package:artbooking/globals/utilities/ui_utilities.dart';
 import 'package:artbooking/types/book/book_illustration.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/widgets.dart';
 import 'package:logger/logger.dart';
-import 'package:unicons/unicons.dart';
 
 class Utilities {
   /// Beautiful logger.
@@ -28,6 +28,8 @@ class Utilities {
   static const search = const SearchUtilities();
   static const size = const SizeUtils();
   static const storage = const StorageUtilities();
+  static const ui = const UIUtilities();
+  static const navigation = const NavigationUtilities();
 
   /// Generate an unique key for illustrations in book (frontend).
   static String generateIllustrationKey(BookIllustration bookIllustration) {
@@ -91,25 +93,5 @@ class Utilities {
 
     data['id'] = docSnapshot.id;
     return UserFirestore.fromMap(data);
-  }
-
-  static String getPageTitle(String trailingText) {
-    final base = "ArtBooking •";
-    return "$base $trailingText";
-  }
-
-  static IconData getSectionIcon(String id) {
-    switch (id) {
-      case "C9Z51SG4JeJ5VFUHOagF":
-        return UniconsLine.books;
-      case "ZRsIF2kdKc9xUo0cxfRI":
-        return UniconsLine.picture;
-      case "zYjoMKHm0eoWGBLyzULU":
-        return UniconsLine.user_circle;
-      case "EhS7TTP5ayQ9QzEkZgAf":
-        return UniconsLine.user_square;
-      default:
-        return UniconsLine.books;
-    }
   }
 }
