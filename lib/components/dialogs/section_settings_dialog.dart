@@ -1,13 +1,13 @@
 import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/buttons/dark_outlined_button.dart';
+import 'package:artbooking/components/dialogs/colors_selector.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
-import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/types/data_fetch_mode_tile_data.dart';
 import 'package:artbooking/types/enums/enum_section_config_tab.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/named_color.dart';
 import 'package:artbooking/types/section.dart';
+import 'package:artbooking/types/tile_data.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -23,10 +23,19 @@ class SectionSettingsDialog extends StatefulWidget {
     this.showDataMode = true,
   }) : super(key: key);
 
+  /// If false, hide data fetch mode tab.
   final bool showDataMode;
+
+  /// Current editing section.
   final Section section;
+
+  /// Section's idnex position in a list (if any).
   final int index;
+
+  /// Called when changes are validated
   final void Function(NamedColor, int, Section)? onValidate;
+
+  /// Called after selecting a new data fetch mode.
   final void Function(
     Section,
     int,
@@ -69,117 +78,10 @@ class _SectionSettingsDialogState extends State<SectionSettingsDialog> {
       return dataFetchWidget();
     }
 
-    return colorsListWidget();
-  }
-
-  Widget colorsListWidget() {
-    int index = 0;
-
-    return CustomScrollView(
-      slivers: [
-        SliverList(
-          delegate: SliverChildListDelegate.fixed([
-            Opacity(
-              opacity: 0.6,
-              child: Text(
-                "section_background_color_chose".tr(),
-                textAlign: TextAlign.center,
-                style: Utilities.fonts.style(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Wrap(
-                  spacing: 12.0,
-                  runSpacing: 12.0,
-                  alignment: WrapAlignment.center,
-                  children: [
-                    NamedColor(
-                      name: "Clair Pink",
-                      color: Constants.colors.clairPink,
-                    ),
-                    NamedColor(
-                      name: "Light Blue",
-                      color: Constants.colors.lightBackground,
-                    ),
-                    NamedColor(
-                      name: "Blue 100",
-                      color: Colors.blue.shade100,
-                    ),
-                    NamedColor(
-                      name: "Green 100",
-                      color: Colors.green.shade100,
-                    ),
-                    NamedColor(
-                      name: "Lime 100",
-                      color: Colors.lime.shade100,
-                    ),
-                    NamedColor(
-                      name: "Amber 100",
-                      color: Colors.amber.shade100,
-                    ),
-                    NamedColor(
-                      name: "Yellow 100",
-                      color: Colors.yellow.shade100,
-                    ),
-                    NamedColor(
-                      name: "Deep Orange 100",
-                      color: Colors.deepOrange.shade100,
-                    ),
-                    NamedColor(
-                      name: "Orange 100",
-                      color: Colors.orange.shade100,
-                    ),
-                    NamedColor(
-                      name: "Red 100",
-                      color: Colors.red.shade100,
-                    ),
-                    NamedColor(
-                      name: "Pink 100",
-                      color: Colors.pink.shade100,
-                    ),
-                    NamedColor(
-                      name: "Deep Purple 100",
-                      color: Colors.deepPurple.shade100,
-                    ),
-                    NamedColor(
-                      name: "Purple 100",
-                      color: Colors.purple.shade100,
-                    ),
-                    NamedColor(
-                      name: "Indigo 100",
-                      color: Colors.indigo.shade100,
-                    ),
-                    NamedColor(
-                      name: "Grey 100",
-                      color: Colors.grey.shade100,
-                    ),
-                    NamedColor(
-                      name: "White 54",
-                      color: Colors.white54,
-                    ),
-                    NamedColor(
-                      name: "Black 26",
-                      color: Colors.black26,
-                    ),
-                  ].map((NamedColor namedColor) {
-                    index++;
-                    return FadeInY(
-                      beginY: 12.0,
-                      delay: Duration(milliseconds: 50 * index),
-                      child: colorCard(
-                        namedColor,
-                        context,
-                      ),
-                    );
-                  }).toList(),
-                )),
-          ]),
-        ),
-      ],
+    return ColorsSelector(
+      selectedColorInt: widget.section.backgroundColor,
+      onTapNamedColor: onTapNamedColor,
+      subtitle: "section_background_color_chose".tr(),
     );
   }
 
@@ -195,7 +97,7 @@ class _SectionSettingsDialogState extends State<SectionSettingsDialog> {
               child: Opacity(
                 opacity: 0.6,
                 child: Text(
-                  "section_data_mode_chose".tr(),
+                  "section_data_mode_choose".tr(),
                   textAlign: TextAlign.center,
                   style: Utilities.fonts.style(
                     fontSize: 16.0,
@@ -205,17 +107,17 @@ class _SectionSettingsDialogState extends State<SectionSettingsDialog> {
               ),
             ),
             ...[
-              DataFetchModeTileData(
-                name: "data_fetch_mode_chosen".tr(),
-                description: "data_fetch_mode_chosen_description".tr(),
+              TileData<EnumSectionDataMode>(
+                name: "data_fetch_mode_title.chosen".tr(),
+                description: "data_fetch_mode_description.chosen".tr(),
                 iconData: UniconsLine.list_ol,
-                mode: EnumSectionDataMode.chosen,
+                type: EnumSectionDataMode.chosen,
               ),
-              DataFetchModeTileData(
-                name: "data_fetch_mode_sync".tr(),
-                description: "data_fetch_mode_sync_description".tr(),
+              TileData<EnumSectionDataMode>(
+                name: "data_fetch_mode.sync".tr(),
+                description: "data_fetch_mode_description.sync".tr(),
                 iconData: UniconsLine.sync_icon,
-                mode: EnumSectionDataMode.sync,
+                type: EnumSectionDataMode.sync,
               ),
             ].map((data) {
               index++;
@@ -230,11 +132,11 @@ class _SectionSettingsDialogState extends State<SectionSettingsDialog> {
     );
   }
 
-  Widget dataFetchModeTile(DataFetchModeTileData data) {
+  Widget dataFetchModeTile(TileData<EnumSectionDataMode> data) {
     final double cardWidth = 100.0;
     final double cardHeight = 100.0;
 
-    final bool selected = widget.section.dataMode == data.mode;
+    final bool selected = widget.section.dataFetchMode == data.type;
     final Color primaryColor = Theme.of(context).primaryColor;
     final BorderSide borderSide = selected
         ? BorderSide(color: primaryColor, width: 2.0)
@@ -381,45 +283,6 @@ class _SectionSettingsDialogState extends State<SectionSettingsDialog> {
     );
   }
 
-  Widget colorCard(NamedColor namedColor, BuildContext context) {
-    final bool selected =
-        widget.section.backgroundColor == namedColor.color.value;
-    final Color primaryColor = Theme.of(context).primaryColor;
-    final BorderSide borderSide = selected
-        ? BorderSide(color: primaryColor, width: 2.0)
-        : BorderSide.none;
-
-    return Column(
-      children: [
-        SizedBox(
-          width: 100.0,
-          height: 100.0,
-          child: Card(
-            color: namedColor.color,
-            shape: RoundedRectangleBorder(
-              side: borderSide,
-              borderRadius: BorderRadius.circular(4.0),
-            ),
-            child: InkWell(
-              onTap: () => onTapNamedColor(namedColor),
-            ),
-          ),
-        ),
-        Opacity(
-          opacity: 0.7,
-          child: Text(
-            namedColor.name,
-            style: Utilities.fonts.style(
-              fontSize: 14.0,
-              fontWeight: FontWeight.w600,
-              color: selected ? primaryColor : null,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   /// Load this specific component saved data (e.g. last selected tab).
   void loadSavedData() {
     _selectedTab = Utilities.storage.getSectionConfigTab();
@@ -437,12 +300,12 @@ class _SectionSettingsDialogState extends State<SectionSettingsDialog> {
     Utilities.storage.saveSectionConfigTab(selectedTab);
   }
 
-  void onTapFetchMode(DataFetchModeTileData data) {
+  void onTapFetchMode(TileData<EnumSectionDataMode> data) {
     Beamer.of(context).popRoute();
     widget.onDataFetchModeChanged?.call(
       widget.section,
       widget.index,
-      data.mode,
+      data.type,
     );
   }
 
