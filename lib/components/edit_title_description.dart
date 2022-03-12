@@ -1,29 +1,42 @@
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/types/license/license.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 
-class EditLicensePageTextInputs extends StatelessWidget {
-  const EditLicensePageTextInputs({
+/// A component which contains 2 text inputs,
+/// first for the title, second for the description.
+class EditTitleDescription extends StatelessWidget {
+  const EditTitleDescription({
     Key? key,
-    required this.license,
     this.onDescriptionChanged,
     this.onTitleChanged,
+    this.initialName = "",
+    this.initialDescription = "",
+    this.descriptionHintText = "",
   }) : super(key: key);
 
-  final License license;
+  final String initialName;
+  final String initialDescription;
+  final String descriptionHintText;
   final void Function(String)? onDescriptionChanged;
   final void Function(String)? onTitleChanged;
 
   @override
   Widget build(BuildContext context) {
     final _clairPink = Constants.colors.clairPink;
-    var _nameTextController = TextEditingController();
-    var _descriptionTextController = TextEditingController();
+    final _nameTextController = TextEditingController();
+    final _descriptionTextController = TextEditingController();
 
-    _nameTextController.text = license.name;
-    _descriptionTextController.text = license.description;
+    _nameTextController.text = initialName;
+    _descriptionTextController.text = initialDescription;
+
+    _nameTextController.selection = TextSelection.fromPosition(
+      TextPosition(offset: initialName.length),
+    );
+
+    _descriptionTextController.selection = TextSelection.fromPosition(
+      TextPosition(offset: initialDescription.length),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,7 +116,7 @@ class EditLicensePageTextInputs extends StatelessWidget {
                     controller: _descriptionTextController,
                     onChanged: onDescriptionChanged,
                     decoration: InputDecoration(
-                      hintText: "license_description_sample".tr(),
+                      hintText: descriptionHintText,
                       filled: true,
                       isDense: true,
                       fillColor: _clairPink,

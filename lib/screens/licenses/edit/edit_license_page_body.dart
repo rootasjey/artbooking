@@ -1,8 +1,8 @@
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
-import 'package:artbooking/screens/licenses/edit/edit_license_page_text_inputs.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page_links.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page_usage.dart';
+import 'package:artbooking/components/edit_title_description.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:artbooking/types/license/license_links.dart';
 import 'package:artbooking/types/license/license_usage.dart';
@@ -29,6 +29,7 @@ class EditLicensePageBody extends StatelessWidget {
   /// True if we create a new license. It's an update therwise.
   final bool isNewLicense;
   final License license;
+
   final void Function(LicenseUsage)? onUsageValueChange;
   final void Function(LicenseLinks)? onLinkValueChange;
   final void Function()? onValidate;
@@ -55,8 +56,10 @@ class EditLicensePageBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          EditLicensePageTextInputs(
-            license: license,
+          EditTitleDescription(
+            descriptionHintText: "license_description_sample".tr(),
+            initialDescription: license.description,
+            initialName: license.name,
             onTitleChanged: onTitleChanged,
             onDescriptionChanged: onDescriptionChanged,
           ),

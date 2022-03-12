@@ -2,7 +2,7 @@ import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page_body.dart';
-import 'package:artbooking/screens/licenses/edit/edit_license_page_header.dart';
+import 'package:artbooking/components/edit_item_sheet_header.dart';
 import 'package:artbooking/types/cloud_functions/license_response.dart';
 import 'package:artbooking/types/firestore/document_map.dart';
 import 'package:artbooking/types/firestore/document_snapshot_map.dart';
@@ -47,6 +47,12 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
   }
 
   @override
+  void dispose() {
+    _license = License.empty();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
@@ -56,9 +62,11 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
               padding: const EdgeInsets.all(60.0),
               child: Column(
                 children: [
-                  EditLicensePageHeader(
-                    licenseId: _license.id,
-                    licenseName: _license.name,
+                  EditItemSheetHeader(
+                    itemId: _license.id,
+                    itemName: _license.name,
+                    subtitleCreate: "license_create".tr(),
+                    subtitleEdit: "license_edit_existing".tr(),
                   ),
                   EditLicensePageBody(
                     license: _license,
