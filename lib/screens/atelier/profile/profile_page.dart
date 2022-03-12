@@ -16,6 +16,7 @@ import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_section_size.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
+import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/named_color.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:beamer/beamer.dart';
@@ -49,7 +50,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   bool _emptyProfile = false;
 
   /// Main user's artistic page.
-  var _artisticPage = ArtisticPage.empty();
+  var _profilePage = ArtisticPage.empty();
+
+  /// Listens to book's updates.
+  QuerySnapshotStreamSubscription? _profilePageSubscription;
 
   final _popupMenuEntries = <PopupMenuItemIcon<EnumSectionAction>>[
     PopupMenuItemIcon(
@@ -83,6 +87,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   void initState() {
     super.initState();
     tryFetchPage();
+  }
+
+  @override
+  void dispose() {
+    _profilePageSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -121,7 +131,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     return ProfilePageBody(
       userId: getUserId(),
       isOwner: isOwner,
-      artisticPage: _artisticPage,
+      artisticPage: _profilePage,
       onAddSection: tryAddSection,
       popupMenuEntries: _popupMenuEntries,
       onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -144,6 +154,28 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   String getUserName() {
     return ref.read(AppState.userProvider).firestoreUser?.name ?? '';
+  }
+
+  void listenProfilePage(Query<Map<String, dynamic>> query) {
+    _profilePageSubscription?.cancel();
+    _profilePageSubscription = query.snapshots().skip(1).listen((snapshot) {
+      if (snapshot.docs.isEmpty) {
+        return;
+      }
+
+      final doc = snapshot.docs.first;
+      if (!doc.exists) {
+        return;
+      }
+
+      setState(() {
+        final data = doc.data();
+        data["id"] = doc.id;
+        _profilePage = ArtisticPage.fromMap(data);
+      });
+    }, onError: (error) {
+      Utilities.logger.e(error);
+    });
   }
 
   void onPopupMenuItemSelected(
@@ -330,15 +362,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         size: EnumSectionSize.large,
       );
 
-      _artisticPage.sections.add(editedSection);
+      _profilePage.sections.add(editedSection);
 
       await FirebaseFirestore.instance
           .collection("users")
           .doc(getUserId())
           .collection("user_pages")
-          .doc(_artisticPage.id)
+          .doc(_profilePage.id)
           .update({
-        "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
+        "sections": _profilePage.sections.map((x) => x.toMap()).toList(),
       });
 
       setState(() {});
@@ -350,15 +382,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   void tryDeleteSection(Section section, int index) async {
     try {
-      _artisticPage.sections.removeAt(index);
+      _profilePage.sections.removeAt(index);
 
       await FirebaseFirestore.instance
           .collection("users")
           .doc(getUserId())
           .collection("user_pages")
-          .doc(_artisticPage.id)
+          .doc(_profilePage.id)
           .update({
-        "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
+        "sections": _profilePage.sections.map((x) => x.toMap()).toList(),
       });
 
       setState(() {});
@@ -373,21 +405,21 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     required int index,
     required int newIndex,
   }) async {
-    if (newIndex < 0 || newIndex >= _artisticPage.sections.length) {
+    if (newIndex < 0 || newIndex >= _profilePage.sections.length) {
       return;
     }
 
     try {
-      _artisticPage.sections.removeAt(index);
-      _artisticPage.sections.insert(newIndex, section);
+      _profilePage.sections.removeAt(index);
+      _profilePage.sections.insert(newIndex, section);
 
       await FirebaseFirestore.instance
           .collection("users")
           .doc(getUserId())
           .collection("user_pages")
-          .doc(_artisticPage.id)
+          .doc(_profilePage.id)
           .update({
-        "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
+        "sections": _profilePage.sections.map((x) => x.toMap()).toList(),
       });
 
       setState(() {});
@@ -409,7 +441,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         name: name,
       );
 
-      _artisticPage.sections.replaceRange(
+      _profilePage.sections.replaceRange(
         index,
         index + 1,
         [editedSection],
@@ -419,9 +451,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           .collection("users")
           .doc(getUserId())
           .collection("user_pages")
-          .doc(_artisticPage.id)
+          .doc(_profilePage.id)
           .update({
-        "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
+        "sections": _profilePage.sections.map((x) => x.toMap()).toList(),
       });
 
       setState(() {});
@@ -512,14 +544,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   void tryFetchPage() async {
     final userId = getUserId();
+
     if (userId.isEmpty) {
       context.showErrorBar(
         content: Text("error_user_no_id".tr()),
       );
 
-      setState(() {
-        _hasErrors = true;
-      });
+      setState(() => _hasErrors = true);
       return;
     }
 
@@ -530,13 +561,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     });
 
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final query = FirebaseFirestore.instance
           .collection("users")
           .doc(userId)
           .collection("user_pages")
           .where("type", isEqualTo: "profile")
-          .limit(1)
-          .get();
+          .limit(1);
+
+      listenProfilePage(query);
+
+      final snapshot = await query.get();
 
       if (snapshot.size == 0) {
         _emptyProfile = true;
@@ -547,7 +581,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       final map = doc.data();
       map["id"] = doc.id;
 
-      _artisticPage = ArtisticPage.fromMap(map);
+      _profilePage = ArtisticPage.fromMap(map);
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
@@ -569,7 +603,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         dataFetchMode: mode,
       );
 
-      _artisticPage.sections.replaceRange(
+      _profilePage.sections.replaceRange(
         index,
         index + 1,
         [editedSection],
@@ -581,9 +615,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           .collection("users")
           .doc(userId)
           .collection("user_pages")
-          .doc(_artisticPage.id)
+          .doc(_profilePage.id)
           .update({
-        "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
+        "sections": _profilePage.sections.map((x) => x.toMap()).toList(),
       });
 
       setState(() {});
@@ -603,7 +637,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         backgroundColor: selectedNamedColor.color.value,
       );
 
-      _artisticPage.sections.replaceRange(
+      _profilePage.sections.replaceRange(
         index,
         index + 1,
         [editedSection],
@@ -615,9 +649,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           .collection("users")
           .doc(userId)
           .collection("user_pages")
-          .doc(_artisticPage.id)
+          .doc(_profilePage.id)
           .update({
-        "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
+        "sections": _profilePage.sections.map((x) => x.toMap()).toList(),
       });
 
       setState(() {});
@@ -644,7 +678,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         items: combinedItems,
       );
 
-      _artisticPage.sections.replaceRange(
+      _profilePage.sections.replaceRange(
         index,
         index + 1,
         [editedSection],
@@ -656,9 +690,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           .collection("users")
           .doc(userId)
           .collection("user_pages")
-          .doc(_artisticPage.id)
+          .doc(_profilePage.id)
           .update({
-        "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
+        "sections": _profilePage.sections.map((x) => x.toMap()).toList(),
       });
 
       setState(() {});
@@ -677,7 +711,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       items: items,
     );
 
-    _artisticPage.sections.replaceRange(
+    _profilePage.sections.replaceRange(
       index,
       index + 1,
       [editedSection],
@@ -688,9 +722,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           .collection("users")
           .doc(getUserId())
           .collection("user_pages")
-          .doc(_artisticPage.id)
+          .doc(_profilePage.id)
           .update({
-        "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
+        "sections": _profilePage.sections.map((x) => x.toMap()).toList(),
       });
 
       setState(() {});
@@ -706,7 +740,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       return;
     }
 
-    final sections = _artisticPage.sections;
+    final sections = _profilePage.sections;
 
     if (dropTargetIndex < 0 ||
         firstDragIndex < 0 ||
@@ -719,8 +753,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final dragSection = sections.elementAt(firstDragIndex);
 
     setState(() {
-      _artisticPage.sections[firstDragIndex] = dropTargetSection;
-      _artisticPage.sections[dropTargetIndex] = dragSection;
+      _profilePage.sections[firstDragIndex] = dropTargetSection;
+      _profilePage.sections[dropTargetIndex] = dragSection;
     });
 
     try {
@@ -728,9 +762,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           .collection("users")
           .doc(getUserId())
           .collection("user_pages")
-          .doc(_artisticPage.id)
+          .doc(_profilePage.id)
           .update({
-        "sections": _artisticPage.sections.map((x) => x.toMap()).toList(),
+        "sections": _profilePage.sections.map((x) => x.toMap()).toList(),
       });
 
       setState(() {});
