@@ -1,5 +1,6 @@
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/section.dart';
 import 'package:flutter/widgets.dart';
 
 /// State helper to keep track of passing arguments
@@ -24,4 +25,10 @@ class NavigationStateHelper {
   /// This state's property allow us to pass image data
   /// outside the page's state (because of the router behavior).
   static ImageProvider<Object>? imageToEdit;
+
+  /// Last section selected.
+  /// This should be affected before navigating to SectionPage.
+  /// This state's property allow us to pass section data
+  /// outside the page's state (because of the router behavior).
+  static Section? section;
 }
