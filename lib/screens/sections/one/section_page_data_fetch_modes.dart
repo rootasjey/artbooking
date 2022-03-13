@@ -5,8 +5,8 @@ import 'package:artbooking/types/tile_data.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-class SectionPageDataModes extends StatelessWidget {
-  const SectionPageDataModes({
+class SectionPageDataFetchModes extends StatelessWidget {
+  const SectionPageDataFetchModes({
     Key? key,
     required this.dataModes,
     this.padding = EdgeInsets.zero,

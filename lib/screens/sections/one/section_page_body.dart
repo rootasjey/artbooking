@@ -3,7 +3,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/licenses/one/license_page_dates.dart';
 import 'package:artbooking/screens/sections/one/section_page_actions.dart';
 import 'package:artbooking/screens/sections/one/section_page_background.dart';
-import 'package:artbooking/screens/sections/one/section_page_data_modes.dart';
+import 'package:artbooking/screens/sections/one/section_page_data_fetch_modes.dart';
 import 'package:artbooking/screens/sections/one/section_page_data_types.dart';
 import 'package:artbooking/screens/sections/one/section_page_header_separtor.dart';
 import 'package:artbooking/screens/sections/one/section_page_title.dart';
@@ -90,7 +90,7 @@ class SectionPageBody extends StatelessWidget {
                   SectionPageBackground(
                     backgroundColor: section.backgroundColor,
                   ),
-                  SectionPageDataModes(
+                  SectionPageDataFetchModes(
                     dataModes: section.dataFetchModes,
                     padding: const EdgeInsets.only(top: 24.0),
                   ),
