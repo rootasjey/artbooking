@@ -127,7 +127,7 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
           Container(
             decoration: boxDecoration,
             padding: const EdgeInsets.symmetric(
-              horizontal: 90.9,
+              horizontal: 90.0,
               vertical: 24.0,
             ),
             child: Center(
@@ -309,7 +309,7 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
     final title = widget.section.name;
     final description = widget.section.description;
 
-    if (title.isEmpty) {
+    if (title.isEmpty && description.isEmpty) {
       return Container();
     }
 

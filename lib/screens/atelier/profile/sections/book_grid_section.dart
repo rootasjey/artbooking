@@ -306,7 +306,7 @@ class _BookGridSectionState extends State<BookGridSection> {
     final title = widget.section.name;
     final description = widget.section.description;
 
-    if (title.isEmpty) {
+    if (title.isEmpty && description.isEmpty) {
       return Container();
     }
 

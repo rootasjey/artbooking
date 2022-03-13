@@ -17,24 +17,27 @@ import 'package:unicons/unicons.dart';
 class UserSection extends StatefulWidget {
   const UserSection({
     Key? key,
+    required this.index,
+    required this.section,
     required this.userId,
     this.onPopupMenuItemSelected,
     this.popupMenuEntries = const [],
-    required this.index,
-    required this.section,
     this.isLast = false,
     this.usingAsDropTarget = false,
   }) : super(key: key);
 
   final bool isLast;
   final bool usingAsDropTarget;
-  final String userId;
-  final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
-  final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
 
   /// Section's position in the layout (e.g. 0 is the first).
   final int index;
+
+  final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
+
   final Section section;
+  final String userId;
+
+  final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
 
   @override
   State<UserSection> createState() => _UserSectionState();
