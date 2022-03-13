@@ -153,6 +153,8 @@ class UIUtilities {
         return UniconsLine.picture;
       case "JkX8jqMnIWk3ZEiqVsbQ":
         return UniconsLine.horizontal_distribution_center;
+      case "jViQYrNutT4id5OBrR5f":
+        return UniconsLine.space_key;
       default:
         return UniconsLine.books;
     }

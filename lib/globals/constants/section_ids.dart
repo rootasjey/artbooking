@@ -8,4 +8,5 @@ class SectionIds {
   static const String userWithIllustration = "EhS7TTP5ayQ9QzEkZgAf";
   static const String poster = "m35wDDwpYmePxRx22qnV";
   static const String illustrationRow = "JkX8jqMnIWk3ZEiqVsbQ";
+  static const String spacing = "jViQYrNutT4id5OBrR5f";
 }
