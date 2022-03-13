@@ -16,7 +16,7 @@ import 'package:unicons/unicons.dart';
 
 /// A component representing an illustration with its main content (an image).
 class IllustrationCard extends StatefulWidget {
-  /// A component representing an illustration with its main content (an image).
+  /// Create a new illustration card.
   const IllustrationCard({
     Key? key,
     required this.heroTag,
@@ -37,6 +37,7 @@ class IllustrationCard extends StatefulWidget {
     this.canDrag = false,
     this.asPlaceHolder = false,
     this.dragGroupName = "",
+    this.padding = EdgeInsets.zero,
   }) : super(key: key);
 
   /// Index position in a list, if available.
@@ -64,6 +65,9 @@ class IllustrationCard extends StatefulWidget {
 
   /// Card's size (width = height).
   final double size;
+
+  /// Card's padding.
+  final EdgeInsets padding;
 
   /// Trigger when the user double taps on this card.
   final void Function()? onDoubleTap;
@@ -160,14 +164,17 @@ class _IllustrationCardState extends State<IllustrationCard>
       child = loadingCard();
     }
 
-    return Hero(
-      tag: widget.heroTag,
-      child: SizedBox(
-        width: widget.size,
-        height: widget.size,
-        child: ScaleTransition(
-          scale: _scaleAnimation,
-          child: child,
+    return Padding(
+      padding: widget.padding,
+      child: Hero(
+        tag: widget.heroTag,
+        child: SizedBox(
+          width: widget.size,
+          height: widget.size,
+          child: ScaleTransition(
+            scale: _scaleAnimation,
+            child: child,
+          ),
         ),
       ),
     );
