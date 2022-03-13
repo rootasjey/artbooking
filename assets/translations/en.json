@@ -939,7 +939,8 @@
     "zYjoMKHm0eoWGBLyzULU": "Your profile presentation centered.",
     "EhS7TTP5ayQ9QzEkZgAf": "A section with an illustration on on side, and your profile presentation on the other side.",
     "m35wDDwpYmePxRx22qnV": "An illustration poster of the current widow size (cover fit).",
-    "JkX8jqMnIWk3ZEiqVsbQ": "A single row of illustrations which can be horizontally scrolled."
+    "JkX8jqMnIWk3ZEiqVsbQ": "A single row of illustrations which can be horizontally scrolled.",
+    "jViQYrNutT4id5OBrR5f": "A blank space of 100px height and taking the whole screen width."
   },
   "section_edit_existing": "Update this existing section.",
   "section_name": {
@@ -948,7 +949,8 @@
     "zYjoMKHm0eoWGBLyzULU": "User",
     "EhS7TTP5ayQ9QzEkZgAf": "Illustration / User",
     "m35wDDwpYmePxRx22qnV": "Poster",
-    "JkX8jqMnIWk3ZEiqVsbQ": "Illustration Row"
+    "JkX8jqMnIWk3ZEiqVsbQ": "Illustration Row",
+    "jViQYrNutT4id5OBrR5f": "Spacing"
   },
   "section_rename": "Rename section",
   "section_rename_description": "Give a new description to this section.",

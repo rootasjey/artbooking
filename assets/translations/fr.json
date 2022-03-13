@@ -938,7 +938,8 @@
     "zYjoMKHm0eoWGBLyzULU": "Votre présentation de profile centrée.",
     "EhS7TTP5ayQ9QzEkZgAf": "Un caroussel d'illustrations sur la gauche, et votre présentation de profile sur la droite.",
     "m35wDDwpYmePxRx22qnV": "Un poster d'illustration ayant la taille de la fenêtre actuelle (remplissage cover).",
-    "JkX8jqMnIWk3ZEiqVsbQ": "Une ligne d'illustrations pouvant être parcourue horizontalement."
+    "JkX8jqMnIWk3ZEiqVsbQ": "Une ligne d'illustrations pouvant être parcourue horizontalement.",
+    "jViQYrNutT4id5OBrR5f": "Espacement de 100px de hauteur et prenant la largeur de la fenêtre."
   },
   "section_edit_existing": "Mettre à jour une section existante.",
   "section_names": {
@@ -947,7 +948,8 @@
     "zYjoMKHm0eoWGBLyzULU": "Présentation Utilisateur",
     "EhS7TTP5ayQ9QzEkZgAf": "Illustration / Utilisateur",
     "m35wDDwpYmePxRx22qnV": "Poster",
-    "JkX8jqMnIWk3ZEiqVsbQ": "Ligne d'illustrations"
+    "JkX8jqMnIWk3ZEiqVsbQ": "Ligne d'illustrations",
+    "jViQYrNutT4id5OBrR5f": "Espacement"
   },
   "section_rename": "Renommer cette section",
   "section_rename_description": "Éditer la description.",
