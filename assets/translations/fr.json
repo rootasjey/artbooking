@@ -937,7 +937,8 @@
     "ZRsIF2kdKc9xUo0cxfRI": "Une grille d'illustrations composée de 2 lignes de 3 colonnes.",
     "zYjoMKHm0eoWGBLyzULU": "Votre présentation de profile centrée.",
     "EhS7TTP5ayQ9QzEkZgAf": "Un caroussel d'illustrations sur la gauche, et votre présentation de profile sur la droite.",
-    "m35wDDwpYmePxRx22qnV": "Un poster d'illustration ayant la taille de la fenêtre actuelle (remplissage cover)."
+    "m35wDDwpYmePxRx22qnV": "Un poster d'illustration ayant la taille de la fenêtre actuelle (remplissage cover).",
+    "JkX8jqMnIWk3ZEiqVsbQ": "Une ligne d'illustrations pouvant être parcourue horizontalement."
   },
   "section_edit_existing": "Mettre à jour une section existante.",
   "section_names": {
@@ -945,7 +946,8 @@
     "ZRsIF2kdKc9xUo0cxfRI": "Grille 3x2 d'illustrations",
     "zYjoMKHm0eoWGBLyzULU": "Présentation Utilisateur",
     "EhS7TTP5ayQ9QzEkZgAf": "Illustration / Utilisateur",
-    "m35wDDwpYmePxRx22qnV": "Poster"
+    "m35wDDwpYmePxRx22qnV": "Poster",
+    "JkX8jqMnIWk3ZEiqVsbQ": "Ligne d'illustrations"
   },
   "section_rename": "Renommer cette section",
   "section_rename_description": "Éditer la description.",
