@@ -114,7 +114,7 @@ class _SectionSettingsDialogState extends State<SectionSettingsDialog> {
                 type: EnumSectionDataMode.chosen,
               ),
               TileData<EnumSectionDataMode>(
-                name: "data_fetch_mode.sync".tr(),
+                name: "data_fetch_mode_title.sync".tr(),
                 description: "data_fetch_mode_description.sync".tr(),
                 iconData: UniconsLine.sync_icon,
                 type: EnumSectionDataMode.sync,
