@@ -17,6 +17,10 @@ class SectionPageDataTypes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (dataTypes.isEmpty) {
+      return Container();
+    }
+
     return Padding(
       padding: padding,
       child: Column(

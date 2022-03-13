@@ -17,6 +17,10 @@ class SectionPageDataFetchModes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (dataModes.isEmpty) {
+      return Container();
+    }
+
     return Padding(
       padding: padding,
       child: Column(
