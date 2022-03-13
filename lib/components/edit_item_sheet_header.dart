@@ -18,8 +18,9 @@ class EditItemSheetHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String headerTitleValue =
-        itemName.isEmpty ? "new".tr() : "edit".tr() + " $itemName";
+    final String headerTitleValue = itemId.isEmpty
+        ? "create".tr() + " $itemName"
+        : "edit".tr() + " $itemName";
 
     final String headerSubtitle =
         itemId.isEmpty ? subtitleCreate : subtitleEdit;
