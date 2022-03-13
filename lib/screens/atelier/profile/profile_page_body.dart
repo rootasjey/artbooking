@@ -3,6 +3,7 @@ import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/constants/section_ids.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/sections/book_grid_section.dart';
+import 'package:artbooking/screens/atelier/profile/sections/illustration_row_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/poster_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/user_illustration_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/user_section.dart';
@@ -219,6 +220,20 @@ class ProfilePageBody extends StatelessWidget {
       return PosterSection(
         index: index,
         section: section,
+        usingAsDropTarget: usingAsDropTarget,
+        isLast: index == artisticPage.sections.length - 1,
+        onPopupMenuItemSelected: onPopupMenuItemSelected,
+        onShowIllustrationDialog: onShowIllustrationDialog,
+        popupMenuEntries: popupMenuEntries,
+        onUpdateSectionItems: onUpdateSectionItems,
+      );
+    }
+
+    if (section.id == SectionIds.illustrationRow) {
+      return IllustrationRowSection(
+        index: index,
+        section: section,
+        userId: userId,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,

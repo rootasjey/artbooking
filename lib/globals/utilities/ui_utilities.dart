@@ -151,6 +151,8 @@ class UIUtilities {
         return UniconsLine.user_square;
       case "m35wDDwpYmePxRx22qnV":
         return UniconsLine.picture;
+      case "JkX8jqMnIWk3ZEiqVsbQ":
+        return UniconsLine.horizontal_distribution_center;
       default:
         return UniconsLine.books;
     }
