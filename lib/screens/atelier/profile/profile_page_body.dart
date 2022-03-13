@@ -366,7 +366,7 @@ class ProfilePageBody extends StatelessWidget {
     final double jumpOffset = 200.0;
 
     /// Distance to the edge where the scroll viewer starts to jump.
-    final double edgeDistance = 200.0;
+    final double edgeDistance = 50.0;
 
     final position = details.globalPosition;
 
