@@ -61,7 +61,7 @@ class EditSectionBackground extends StatelessWidget {
           titleValue: "Update background color",
           body: ConstrainedBox(
             constraints: BoxConstraints(
-              maxHeight: 360.0,
+              maxHeight: 420.0,
               maxWidth: 400.0,
             ),
             child: ColorsSelector(
