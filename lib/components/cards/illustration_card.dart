@@ -38,6 +38,7 @@ class IllustrationCard extends StatefulWidget {
     this.asPlaceHolder = false,
     this.dragGroupName = "",
     this.padding = EdgeInsets.zero,
+    this.useIconPlaceholder = false,
   }) : super(key: key);
 
   /// Index position in a list, if available.
@@ -45,6 +46,9 @@ class IllustrationCard extends StatefulWidget {
 
   /// If true, this card will be used as a place holder.
   final bool asPlaceHolder;
+
+  /// If true, a "plus" icon will be used as the placeholder child.
+  final bool useIconPlaceholder;
 
   /// If true, the card will be marked with a check circle.
   final bool selected;
@@ -140,12 +144,9 @@ class _IllustrationCardState extends State<IllustrationCard>
   @override
   Widget build(BuildContext context) {
     if (widget.asPlaceHolder) {
-      return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: childWhenDragging(
-          textValue: "illustration_add_new".tr(),
-          onTapPlaceholder: widget.onTap,
-        ),
+      return childWhenDragging(
+        textValue: "illustration_add_new".tr(),
+        onTapPlaceholder: widget.onTap,
       );
     }
 
@@ -332,15 +333,8 @@ class _IllustrationCardState extends State<IllustrationCard>
                 child: Opacity(
                   opacity: 0.6,
                   child: Center(
-                    child: Text(
-                      textValue.isNotEmpty
-                          ? textValue
-                          : "illustration_permutation_description".tr(),
-                      textAlign: TextAlign.center,
-                      style: Utilities.fonts.style(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    child: getVisualChild(
+                      textValue: textValue,
                     ),
                   ),
                 ),
@@ -348,6 +342,25 @@ class _IllustrationCardState extends State<IllustrationCard>
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget getVisualChild({
+    required String textValue,
+  }) {
+    if (widget.useIconPlaceholder) {
+      return Icon(UniconsLine.plus);
+    }
+
+    return Text(
+      textValue.isNotEmpty
+          ? textValue
+          : "illustration_permutation_description".tr(),
+      textAlign: TextAlign.center,
+      style: Utilities.fonts.style(
+        fontSize: 18.0,
+        fontWeight: FontWeight.w600,
       ),
     );
   }
