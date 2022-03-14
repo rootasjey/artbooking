@@ -8,11 +8,13 @@ import 'package:flutter/foundation.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_section_data_type.dart';
 import 'package:artbooking/types/enums/enum_section_size.dart';
+import 'package:flutter/material.dart';
 
 /// Building block for Pages.
 class Section {
   Section({
     required this.backgroundColor,
+    required this.textColor,
     required this.createdAt,
     required this.dataTypes,
     required this.description,
@@ -32,6 +34,9 @@ class Section {
 
   /// Section's background color;
   final int backgroundColor;
+
+  /// Section's text color;
+  final int textColor;
 
   /// When this entry was created in Firestore.
   final DateTime createdAt;
@@ -67,6 +72,7 @@ class Section {
 
   Section copyWith({
     int? backgroundColor,
+    int? textColor,
     String? id,
     DateTime? createdAt,
     String? description,
@@ -93,6 +99,7 @@ class Section {
       items: items ?? this.items,
       size: size ?? this.size,
       sizes: sizes ?? this.sizes,
+      textColor: textColor ?? this.textColor,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
@@ -109,6 +116,7 @@ class Section {
       "items": items,
       "size": sectionSizeToString(size),
       "sizes": sectionSizesToStrings(),
+      "text_color": textColor,
     };
 
     if (withId) {
@@ -122,16 +130,17 @@ class Section {
     return Section(
       backgroundColor: Constants.colors.lightBackground.value,
       createdAt: DateTime.now(),
-      id: "",
-      description: "",
       dataFetchMode: EnumSectionDataMode.chosen,
       dataFetchModes: [],
+      dataTypes: [],
+      description: "",
       headerSeparator: HeaderSeparator.empty(),
+      id: "",
       name: "",
       items: [],
       size: EnumSectionSize.large,
       sizes: [],
-      dataTypes: [],
+      textColor: Colors.black.value,
       updatedAt: DateTime.now(),
     );
   }
@@ -139,6 +148,8 @@ class Section {
   factory Section.fromMap(Map<String, dynamic> map) {
     final int backgroundColor =
         map["background_color"] ?? Constants.colors.lightBackground.value;
+
+    final int textColor = map["text_color"] ?? Colors.black.value;
 
     return Section(
       backgroundColor: backgroundColor,
@@ -153,6 +164,7 @@ class Section {
       name: map["name"] ?? "",
       size: stringToSize(map["size"]),
       sizes: stringsToSizes(map["sizes"]),
+      textColor: textColor,
       updatedAt: Utilities.date.fromFirestore(map["updated_at"]),
     );
   }
@@ -326,8 +338,8 @@ class Section {
         "createdAt: ${createdAt.toString()} description: $description, "
         "dataFetchMode: $dataFetchMode, dataModes: $dataFetchModes, "
         "headerSeparator: $headerSeparator"
-        "name: $name, items: $items, size: $size, types: $dataTypes, "
-        "updatedAt: ${updatedAt.toString()})";
+        "name: $name, items: $items, size: $size, textColor: $textColor "
+        "types: $dataTypes, updatedAt: ${updatedAt.toString()})";
   }
 
   @override
@@ -338,15 +350,16 @@ class Section {
         other.id == id &&
         other.createdAt == createdAt &&
         other.backgroundColor == backgroundColor &&
-        other.description == description &&
         other.dataFetchMode == dataFetchMode &&
         listEquals(other.dataFetchModes, dataFetchModes) &&
+        listEquals(other.dataTypes, dataTypes) &&
+        other.description == description &&
         other.headerSeparator == headerSeparator &&
         other.name == name &&
         listEquals(other.items, items) &&
         other.size == size &&
         listEquals(other.sizes, sizes) &&
-        listEquals(other.dataTypes, dataTypes) &&
+        other.textColor == textColor &&
         other.updatedAt == updatedAt;
   }
 
@@ -364,6 +377,7 @@ class Section {
         items.hashCode ^
         size.hashCode ^
         sizes.hashCode ^
+        textColor.hashCode ^
         updatedAt.hashCode;
   }
 }
