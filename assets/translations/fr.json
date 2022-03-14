@@ -1014,6 +1014,8 @@
   "text_color": "Couleur de texte",
   "text_color_choose": "Choisissez une nouvelle couleur de text",
   "text_color_default": "Couleur de text par défault",
+  "text_color_edit": "Éditer la couleur du text",
+  "text_color_update": "Mettre à jour la couleur du text",
   "text_enter": "Cliquer ici pour ajouter du texte",
   "text_field_counter_caracters": "{} caractères ",
   "text_field_counter_unsaved_changes": "• Modifications non sauvegardées",

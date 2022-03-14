@@ -1,8 +1,10 @@
 import 'package:artbooking/components/dialogs/add_section_dialog.dart';
+import 'package:artbooking/components/dialogs/colors_selector.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/section_settings_dialog.dart';
 import 'package:artbooking/components/dialogs/select_books_dialog.dart';
 import 'package:artbooking/components/dialogs/select_illustrations_dialog.dart';
+import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/app_state.dart';
@@ -214,6 +216,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       case EnumSectionAction.editBackgroundColor:
         onShowEditSectionSettings(section, index, showDataMode: false);
         break;
+      case EnumSectionAction.editTextColor:
+        onShowColorDialog(section, index);
+        break;
       case EnumSectionAction.setSyncDataMode:
         tryUpdateDataFetchMode(
           section,
@@ -266,6 +271,35 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           onValidate: selectType == EnumSelectType.add
               ? (items) => tryAddSectionItems(section, index, items)
               : (items) => tryUpdateSectionItems(section, index, items),
+        );
+      },
+    );
+  }
+
+  void onShowColorDialog(Section section, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ThemedDialog(
+          useRawDialog: true,
+          titleValue: "text_color_update".tr(),
+          body: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: 420.0,
+              maxWidth: 400.0,
+            ),
+            child: ColorsSelector(
+              subtitle: "text_color_choose".tr(),
+              selectedColorInt: section.textColor,
+              onTapNamedColor: (NamedColor namedColor) {
+                tryUpdateTextColor(namedColor, index, section);
+                Beamer.of(context).popRoute();
+              },
+            ),
+          ),
+          textButtonValidation: "close".tr(),
+          onCancel: Beamer.of(context).popRoute,
+          onValidate: Beamer.of(context).popRoute,
         );
       },
     );
@@ -699,6 +733,40 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     try {
       final editedSection = section.copyWith(
         backgroundColor: selectedNamedColor.color.value,
+      );
+
+      _profilePage.sections.replaceRange(
+        index,
+        index + 1,
+        [editedSection],
+      );
+
+      final String userId = getUserId();
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_pages")
+          .doc(_profilePage.id)
+          .update({
+        "sections": _profilePage.sections.map((x) => x.toMap()).toList(),
+      });
+
+      setState(() {});
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
+  void tryUpdateTextColor(
+    NamedColor selectedNamedColor,
+    int index,
+    Section section,
+  ) async {
+    try {
+      final editedSection = section.copyWith(
+        textColor: selectedNamedColor.color.value,
       );
 
       _profilePage.sections.replaceRange(

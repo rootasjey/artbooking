@@ -108,7 +108,6 @@ class H1Section extends StatelessWidget {
 
     return Text(
       section.name,
-      // textAlign: TextAlign.left,
       style: Utilities.fonts.style(
         fontSize: 24.0,
         fontWeight: FontWeight.w600,
@@ -146,6 +145,14 @@ class H1Section extends StatelessWidget {
         icon: Icon(UniconsLine.edit_alt),
         textLabel: "title_edit".tr(),
         value: EnumSectionAction.renameTitle,
+      ),
+    );
+
+    _popupMenuEntries.add(
+      PopupMenuItemIcon(
+        icon: Icon(UniconsLine.font),
+        textLabel: "text_color_edit".tr(),
+        value: EnumSectionAction.editTextColor,
       ),
     );
 

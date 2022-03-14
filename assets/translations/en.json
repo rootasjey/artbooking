@@ -1015,6 +1015,7 @@
   "text_color": "Text color",
   "text_color_choose": "Pick a new text color",
   "text_color_default": "Default text color",
+  "text_color_edit": "Edit text color",
   "text_color_update": "Update text color",
   "text_enter": "Click to enter some text",
   "text_field_counter_caracters": "{} characters ",
