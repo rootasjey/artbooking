@@ -109,7 +109,7 @@ class H1Section extends StatelessWidget {
     return Text(
       section.name,
       style: Utilities.fonts.style(
-        fontSize: 24.0,
+        fontSize: 32.0,
         fontWeight: FontWeight.w600,
         color: Color(section.textColor),
       ),
