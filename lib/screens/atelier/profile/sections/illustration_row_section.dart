@@ -192,7 +192,7 @@ class _IllustrationRowSectionState extends State<IllustrationRowSection> {
     if ((children.length % 3 != 0 && children.length < 6) || children.isEmpty) {
       children.add(
         IllustrationCard(
-          asPlaceHolder: true,
+          useAsPlaceHolder: true,
           heroTag: "empty_${DateTime.now()}",
           illustration: Illustration.empty(),
           index: index,

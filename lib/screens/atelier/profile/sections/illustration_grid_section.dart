@@ -189,7 +189,7 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
     if ((children.length % 3 != 0 && children.length < 6) || children.isEmpty) {
       children.add(
         IllustrationCard(
-          asPlaceHolder: true,
+          useAsPlaceHolder: true,
           heroTag: "empty_${DateTime.now()}",
           illustration: Illustration.empty(),
           index: index,
@@ -410,7 +410,6 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
 
     final futuresResult = await Future.wait(futures);
     setState(() {
-      // _illustrations.clear();
       _illustrations.addAll(futuresResult);
       _loading = false;
     });
@@ -443,7 +442,6 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
       _loading = true;
       _illustrations.clear();
     });
-    // _illustrations.clear();
 
     try {
       final illustrationsSnapshot = await FirebaseFirestore.instance
@@ -477,8 +475,6 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
     if (_loading) {
       return;
     }
-
-    // _loading = true;
 
     if (widget.section.dataFetchMode == EnumSectionDataMode.sync) {
       fetchSyncIllustrations();

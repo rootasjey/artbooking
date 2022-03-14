@@ -164,7 +164,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
     if (_illustrations.isEmpty) {
       return wrapInResponsiveCard(
         child: IllustrationCard(
-          asPlaceHolder: true,
+          useAsPlaceHolder: true,
           useIconPlaceholder: true,
           heroTag: "empty_${DateTime.now()}",
           illustration: Illustration.empty(),
@@ -279,7 +279,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
     for (var i = 0; i < placeholderMaxCount; i++) {
       children.add(
         IllustrationCard(
-          asPlaceHolder: true,
+          useAsPlaceHolder: true,
           useIconPlaceholder: true,
           heroTag: "empty_${DateTime.now()}",
           illustration: Illustration.empty(),
