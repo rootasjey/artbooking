@@ -86,6 +86,14 @@ class UIUtilities {
         name: "Black 26",
         color: Colors.black26,
       ),
+      NamedColor(
+        name: "White",
+        color: Colors.white,
+      ),
+      NamedColor(
+        name: "Black",
+        color: Colors.black,
+      ),
     ];
   }
 
@@ -119,6 +127,8 @@ class UIUtilities {
         return UniconsLine.book_medical;
       case EnumSectionDataType.illustrations:
         return UniconsLine.picture;
+      case EnumSectionDataType.text:
+        return UniconsLine.text;
       case EnumSectionDataType.user:
         return UniconsLine.user;
       default:
