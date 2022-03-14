@@ -1,7 +1,7 @@
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/edit_title_description.dart';
-import 'package:artbooking/screens/sections/edit/edit_section_background.dart';
+import 'package:artbooking/screens/sections/edit/color_card_picker.dart';
 import 'package:artbooking/screens/sections/edit/edit_section_data_fetch_modes.dart';
 import 'package:artbooking/screens/sections/edit/edit_section_data_types.dart';
 import 'package:artbooking/screens/sections/edit/edit_section_header_separator.dart';
@@ -27,6 +27,7 @@ class EditSectionPageBody extends StatelessWidget {
     this.onDataFetchModesChanged,
     this.onDataTypesChanged,
     this.onShowHeaderSeparatorDialog,
+    this.onTextColorChanged,
   }) : super(key: key);
 
   final bool loading;
@@ -38,6 +39,7 @@ class EditSectionPageBody extends StatelessWidget {
   final Section section;
 
   final void Function(NamedColor)? onBackgroundColorChanged;
+  final void Function(NamedColor)? onTextColorChanged;
   final void Function(
     EnumSectionDataMode mode,
     bool selected,
@@ -81,10 +83,25 @@ class EditSectionPageBody extends StatelessWidget {
             onTitleChanged: onTitleChanged,
             onDescriptionChanged: onDescriptionChanged,
           ),
-          EditSectionBackground(
-            backgroundColor: section.backgroundColor,
-            onValueChanged: onBackgroundColorChanged,
-            padding: const EdgeInsets.only(top: 42.0, left: 6.0),
+          Wrap(
+            children: [
+              ColorCardPicker(
+                name: "background_color_default".tr(),
+                dialogTextTitle: "background_color_update".tr(),
+                dialogTextSubtitle: "section_background_color_choose".tr(),
+                backgroundColor: section.backgroundColor,
+                onValueChanged: onBackgroundColorChanged,
+                padding: const EdgeInsets.only(top: 42.0, left: 6.0),
+              ),
+              ColorCardPicker(
+                dialogTextTitle: "text_color_update".tr(),
+                dialogTextSubtitle: "text_color_choose".tr(),
+                name: "text_color_default".tr(),
+                backgroundColor: section.textColor,
+                onValueChanged: onTextColorChanged,
+                padding: const EdgeInsets.only(top: 42.0, left: 6.0),
+              ),
+            ],
           ),
           EditSectionDataFetchModes(
             dataModes: section.dataFetchModes,

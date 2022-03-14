@@ -1,8 +1,8 @@
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/licenses/one/license_page_dates.dart';
+import 'package:artbooking/screens/sections/edit/color_card_picker.dart';
 import 'package:artbooking/screens/sections/one/section_page_actions.dart';
-import 'package:artbooking/screens/sections/one/section_page_background.dart';
 import 'package:artbooking/screens/sections/one/section_page_data_fetch_modes.dart';
 import 'package:artbooking/screens/sections/one/section_page_data_types.dart';
 import 'package:artbooking/screens/sections/one/section_page_header_separtor.dart';
@@ -87,8 +87,21 @@ class SectionPageBody extends StatelessWidget {
                     updatedAt: section.updatedAt,
                     padding: const EdgeInsets.only(bottom: 24.0),
                   ),
-                  SectionPageBackground(
-                    backgroundColor: section.backgroundColor,
+                  Wrap(
+                    children: [
+                      ColorCardPicker(
+                        backgroundColor: section.backgroundColor,
+                        name: "background_color".tr(),
+                        dialogTextTitle: "",
+                        dialogTextSubtitle: "",
+                      ),
+                      ColorCardPicker(
+                        backgroundColor: section.textColor,
+                        name: "text_color".tr(),
+                        dialogTextTitle: "",
+                        dialogTextSubtitle: "",
+                      ),
+                    ],
                   ),
                   SectionPageDataFetchModes(
                     dataModes: section.dataFetchModes,

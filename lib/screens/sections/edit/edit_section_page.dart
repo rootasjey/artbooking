@@ -71,6 +71,7 @@ class _EditSectionPageState extends State<EditSectionPage> {
                 isNew: widget.section.id.isEmpty,
                 onValidate: tryCreateOrUpdateSection,
                 onBackgroundColorChanged: onBackgroundColorChanged,
+                onTextColorChanged: onTextColorChanged,
                 onDescriptionChanged: onDescriptionChanged,
                 onTitleChanged: onTitleChanged,
                 onDataFetchModesChanged: onDataFetchModesChanged,
@@ -140,6 +141,14 @@ class _EditSectionPageState extends State<EditSectionPage> {
     setState(() {
       _section = _section.copyWith(
         backgroundColor: namedColor.color.value,
+      );
+    });
+  }
+
+  void onTextColorChanged(NamedColor namedColor) {
+    setState(() {
+      _section = _section.copyWith(
+        textColor: namedColor.color.value,
       );
     });
   }

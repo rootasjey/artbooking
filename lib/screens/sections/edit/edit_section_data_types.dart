@@ -55,6 +55,7 @@ class EditSectionDataTypes extends StatelessWidget {
     return [
       EnumSectionDataType.books,
       EnumSectionDataType.illustrations,
+      EnumSectionDataType.text,
       EnumSectionDataType.user
     ].map((EnumSectionDataType dataType) {
       return TileData<EnumSectionDataType>(

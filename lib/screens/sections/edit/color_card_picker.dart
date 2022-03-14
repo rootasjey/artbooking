@@ -6,20 +6,35 @@ import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-class EditSectionBackground extends StatelessWidget {
-  const EditSectionBackground({
+class ColorCardPicker extends StatelessWidget {
+  const ColorCardPicker({
     Key? key,
     required this.backgroundColor,
+    required this.name,
+    required this.dialogTextTitle,
+    required this.dialogTextSubtitle,
     this.onValueChanged,
     this.padding = EdgeInsets.zero,
   }) : super(key: key);
 
   final EdgeInsets padding;
   final int backgroundColor;
+
+  /// To which element this color belongs to?
+  final String name;
+  final String dialogTextTitle;
+  final String dialogTextSubtitle;
+
   final void Function(NamedColor)? onValueChanged;
 
   @override
   Widget build(BuildContext context) {
+    final luminance = Color(backgroundColor).computeLuminance();
+    final Color textColor = luminance > 0.5 ? Colors.black : Colors.white;
+
+    final _onTap =
+        onValueChanged != null ? () => showColorDialog(context) : null;
+
     return Padding(
       padding: padding,
       child: SizedBox(
@@ -29,7 +44,7 @@ class EditSectionBackground extends StatelessWidget {
           elevation: 4.0,
           color: Color(backgroundColor),
           child: InkWell(
-            onTap: () => showColorDialog(context),
+            onTap: _onTap,
             child: Opacity(
               opacity: 0.6,
               child: Padding(
@@ -37,8 +52,9 @@ class EditSectionBackground extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "background_color_default".tr(),
+                    name,
                     style: Utilities.fonts.style(
+                      color: textColor,
                       fontSize: 14.0,
                       fontWeight: FontWeight.w600,
                     ),
@@ -58,14 +74,14 @@ class EditSectionBackground extends StatelessWidget {
       builder: (BuildContext context) {
         return ThemedDialog(
           useRawDialog: true,
-          titleValue: "Update background color",
+          titleValue: dialogTextTitle,
           body: ConstrainedBox(
             constraints: BoxConstraints(
               maxHeight: 420.0,
               maxWidth: 400.0,
             ),
             child: ColorsSelector(
-              subtitle: "section_background_color_chose".tr(),
+              subtitle: dialogTextSubtitle,
               selectedColorInt: backgroundColor,
               onTapNamedColor: (NamedColor namedColor) {
                 onValueChanged?.call(namedColor);

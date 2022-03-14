@@ -81,7 +81,7 @@ class _SectionSettingsDialogState extends State<SectionSettingsDialog> {
     return ColorsSelector(
       selectedColorInt: widget.section.backgroundColor,
       onTapNamedColor: onTapNamedColor,
-      subtitle: "section_background_color_chose".tr(),
+      subtitle: "section_background_color_choose".tr(),
     );
   }
 
