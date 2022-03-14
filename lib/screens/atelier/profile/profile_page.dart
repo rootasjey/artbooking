@@ -41,7 +41,7 @@ class ProfilePage extends ConsumerStatefulWidget {
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
   /// True if this page is currently loading.
-  bool _isLoading = false;
+  bool _loading = false;
 
   /// True if there was an error while loading the user's profile page.
   bool _hasErrors = false;
@@ -55,6 +55,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   /// Listens to book's updates.
   QuerySnapshotStreamSubscription? _profilePageSubscription;
 
+  /// Section's popup menu entries.
   final _popupMenuEntries = <PopupMenuItemIcon<EnumSectionAction>>[
     PopupMenuItemIcon(
       icon: Icon(UniconsLine.edit_alt),
@@ -108,7 +109,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       );
     }
 
-    if (_isLoading) {
+    if (_loading) {
       return Scaffold(
         body: LoadingView(
           sliver: false,
@@ -574,7 +575,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     }
 
     setState(() {
-      _isLoading = true;
+      _loading = true;
       _hasErrors = false;
       _emptyProfile = false;
     });
@@ -618,7 +619,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     }
 
     setState(() {
-      _isLoading = true;
+      _loading = true;
       _hasErrors = false;
       _emptyProfile = false;
     });
@@ -651,7 +652,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       _hasErrors = true;
     } finally {
       setState(() {
-        _isLoading = false;
+        _loading = false;
       });
     }
   }
