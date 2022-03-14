@@ -90,13 +90,13 @@ class SectionPageBody extends StatelessWidget {
                   Wrap(
                     children: [
                       ColorCardPicker(
-                        backgroundColor: section.backgroundColor,
+                        selectedColor: section.backgroundColor,
                         name: "background_color".tr(),
                         dialogTextTitle: "",
                         dialogTextSubtitle: "",
                       ),
                       ColorCardPicker(
-                        backgroundColor: section.textColor,
+                        selectedColor: section.textColor,
                         name: "text_color".tr(),
                         dialogTextTitle: "",
                         dialogTextSubtitle: "",

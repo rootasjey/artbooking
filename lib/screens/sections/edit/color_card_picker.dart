@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 class ColorCardPicker extends StatelessWidget {
   const ColorCardPicker({
     Key? key,
-    required this.backgroundColor,
+    required this.selectedColor,
     required this.name,
     required this.dialogTextTitle,
     required this.dialogTextSubtitle,
@@ -18,7 +18,7 @@ class ColorCardPicker extends StatelessWidget {
   }) : super(key: key);
 
   final EdgeInsets padding;
-  final int backgroundColor;
+  final int selectedColor;
 
   /// To which element this color belongs to?
   final String name;
@@ -29,7 +29,7 @@ class ColorCardPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final luminance = Color(backgroundColor).computeLuminance();
+    final luminance = Color(selectedColor).computeLuminance();
     final Color textColor = luminance > 0.5 ? Colors.black : Colors.white;
 
     final _onTap =
@@ -42,7 +42,7 @@ class ColorCardPicker extends StatelessWidget {
         height: 140.0,
         child: Card(
           elevation: 4.0,
-          color: Color(backgroundColor),
+          color: Color(selectedColor),
           child: InkWell(
             onTap: _onTap,
             child: Opacity(
@@ -82,7 +82,7 @@ class ColorCardPicker extends StatelessWidget {
             ),
             child: ColorsSelector(
               subtitle: dialogTextSubtitle,
-              selectedColorInt: backgroundColor,
+              selectedColorInt: selectedColor,
               onTapNamedColor: (NamedColor namedColor) {
                 onValueChanged?.call(namedColor);
                 Beamer.of(context).popRoute();
