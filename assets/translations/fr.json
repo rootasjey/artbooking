@@ -331,6 +331,7 @@
   "deployment": "Déploiement",
   "deployment_description": "La mise en ligne de votre sera rapide et robuste. Les mises à jour seront faites sans interrompre votre traffic. Le premier accès de votre site sera rapide (pas de cold start).",
   "description": "Description",
+  "description_enter": "Tapez une description",
   "design_creation": "Création de design",
   "design_creation_description": "Nous créerons un design personnalisé pour vous.",
   "design_integration": "Intégration de design",
@@ -943,7 +944,8 @@
     "m35wDDwpYmePxRx22qnV": "Un poster d'illustration ayant la taille de la fenêtre actuelle (remplissage cover).",
     "JkX8jqMnIWk3ZEiqVsbQ": "Une ligne d'illustrations pouvant être parcourue horizontalement.",
     "jViQYrNutT4id5OBrR5f": "Espacement de 100px de hauteur et prenant la largeur de la fenêtre.",
-    "sRRimeMwmBcinT6AT5qp": "Une grande carte d'illustration sur la gauche avec un groupe de 4 petites cartes sur la droite."
+    "sRRimeMwmBcinT6AT5qp": "Une grande carte d'illustration sur la gauche avec un groupe de 4 petites cartes sur la droite.",
+    "nkjVOlmYvS72hKiBFL3W": "Text H1"
   },
   "section_edit_existing": "Mettre à jour une section existante.",
   "section_names": {
@@ -954,10 +956,12 @@
     "m35wDDwpYmePxRx22qnV": "Poster",
     "JkX8jqMnIWk3ZEiqVsbQ": "Ligne d'illustrations",
     "jViQYrNutT4id5OBrR5f": "Espacement",
-    "sRRimeMwmBcinT6AT5qp": "Fenêtre d'illustrations"
+    "sRRimeMwmBcinT6AT5qp": "Fenêtre d'illustrations",
+    "nkjVOlmYvS72hKiBFL3W": "H1"
   },
   "section_rename": "Renommer cette section",
   "section_rename_description": "Éditer la description.",
+  "section_title_edit_description": "Définissez une nouvelle valeur pour le contenu de cette section.",
   "sections": "Sections",
   "sections_description": "Visualisez et gérer (créez, mettez à jour, supprimez) toutes les sections des pages de profile.",
   "sections_loading": "Chargement des sections",
@@ -1010,6 +1014,7 @@
   "text_color": "Couleur de texte",
   "text_color_choose": "Choisissez une nouvelle couleur de text",
   "text_color_default": "Couleur de text par défault",
+  "text_enter": "Cliquer ici pour ajouter du texte",
   "text_field_counter_caracters": "{} caractères ",
   "text_field_counter_unsaved_changes": "• Modifications non sauvegardées",
   "thank_you_exclamation": "Merci !",
@@ -1028,7 +1033,9 @@
   "theme_automatic": "Automatic theme",
   "theme_manual_description": "Choisissez votre thème manuellement",
   "title": "Titre",
+  "title_edit": "Éditer le titre",
   "title_empty_forbidden_restrictions": "Le titre ne peut pas être vide. @:title_restrictions",
+  "title_enter": "Tapez un titre",
   "title_restrictions": "Veuillez entrer un titre comportant plus de 3 caractères.",
   "topic": "Sujet",
   "topic_add": "Ajouter un sujet",

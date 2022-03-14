@@ -331,6 +331,7 @@
   "deployment": "Deployment",
   "deployment_description": "Your site will be globally accessible through a robust & fast pipeline. Also upgrades will be done with no downtime and your website won't experience cold start.",
   "description": "Description",
+  "description_enter": "Enter a description",
   "design_creation": "Design creation",
   "design_creation_description": "We will craft a personalized design for you.",
   "design_integration": "Design integration",
@@ -944,7 +945,8 @@
     "m35wDDwpYmePxRx22qnV": "An illustration poster of the current widow size (cover fit).",
     "JkX8jqMnIWk3ZEiqVsbQ": "A single row of illustrations which can be horizontally scrolled.",
     "jViQYrNutT4id5OBrR5f": "A blank space of 100px height and taking the whole screen width.",
-    "sRRimeMwmBcinT6AT5qp": "A large illustration card on the left, and a group of 4 small cards on the right."
+    "sRRimeMwmBcinT6AT5qp": "A large illustration card on the left, and a group of 4 small cards on the right.",
+    "nkjVOlmYvS72hKiBFL3W": "H1 text title component"
   },
   "section_edit_existing": "Update this existing section.",
   "section_name": {
@@ -955,10 +957,12 @@
     "m35wDDwpYmePxRx22qnV": "Poster",
     "JkX8jqMnIWk3ZEiqVsbQ": "Illustration Row",
     "jViQYrNutT4id5OBrR5f": "Spacing",
-    "sRRimeMwmBcinT6AT5qp": "Illustration Window"
+    "sRRimeMwmBcinT6AT5qp": "Illustration Window",
+    "nkjVOlmYvS72hKiBFL3W": "H1"
   },
   "section_rename": "Rename section",
   "section_rename_description": "Give a new description to this section.",
+  "section_title_edit_description": "Set a new value for this section content.",
   "sections": "Sections",
   "sections_description": "View and manage (create, update, delete) all profile page sections.",
   "sections_loading": "Loading sections",
@@ -1012,6 +1016,7 @@
   "text_color_choose": "Pick a new text color",
   "text_color_default": "Default text color",
   "text_color_update": "Update text color",
+  "text_enter": "Click to enter some text",
   "text_field_counter_caracters": "{} characters ",
   "text_field_counter_unsaved_changes": "• Unsaved changes",
   "thank_you_exclamation": "Thank you!",
@@ -1030,7 +1035,9 @@
   "theme_automatic": "Automatic theme",
   "theme_manual_description": "Choose your theme manually",
   "title": "Title",
+  "title_edit": "Edit title",
   "title_empty_forbidden_restrictions": "Title cannot be empty. @:title_restrictions",
+  "title_enter": "Enter a title",
   "title_restrictions": "Please enter a title with more than 3 characters.",
   "topic": "Topic",
   "topic_add": "Add topic",
