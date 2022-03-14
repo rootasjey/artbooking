@@ -4,6 +4,7 @@ import 'package:artbooking/globals/constants/section_ids.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/sections/book_grid_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/illustration_row_section.dart';
+import 'package:artbooking/screens/atelier/profile/sections/illustration_window_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/poster_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/spacing_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/user_illustration_section.dart';
@@ -252,6 +253,19 @@ class ProfilePageBody extends StatelessWidget {
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
         popupMenuEntries: popupMenuEntries,
+      );
+    }
+
+    if (section.id == SectionIds.illustrationWindow) {
+      return IllustrationWindowSection(
+        index: index,
+        section: section,
+        userId: userId,
+        usingAsDropTarget: usingAsDropTarget,
+        isLast: index == artisticPage.sections.length - 1,
+        onShowIllustrationDialog: onShowIllustrationDialog,
+        popupMenuEntries: popupMenuEntries,
+        onPopupMenuItemSelected: onPopupMenuItemSelected,
       );
     }
 

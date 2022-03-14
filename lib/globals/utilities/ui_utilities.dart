@@ -155,6 +155,8 @@ class UIUtilities {
         return UniconsLine.horizontal_distribution_center;
       case "jViQYrNutT4id5OBrR5f":
         return UniconsLine.space_key;
+      case "sRRimeMwmBcinT6AT5qp":
+        return UniconsLine.th;
       default:
         return UniconsLine.books;
     }
