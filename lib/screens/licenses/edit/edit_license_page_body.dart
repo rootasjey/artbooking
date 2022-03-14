@@ -60,6 +60,7 @@ class EditLicensePageBody extends StatelessWidget {
             descriptionHintText: "license_description_sample".tr(),
             initialDescription: license.description,
             initialName: license.name,
+            titleHintText: "Attribution 4.0 International",
             onTitleChanged: onTitleChanged,
             onDescriptionChanged: onDescriptionChanged,
           ),

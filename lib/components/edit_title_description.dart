@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 /// A component which contains 2 text inputs,
 /// first for the title, second for the description.
-class EditTitleDescription extends StatelessWidget {
+class EditTitleDescription extends StatefulWidget {
   const EditTitleDescription({
     Key? key,
     this.onDescriptionChanged,
@@ -13,31 +13,42 @@ class EditTitleDescription extends StatelessWidget {
     this.initialName = "",
     this.initialDescription = "",
     this.descriptionHintText = "",
+    this.titleHintText = "",
   }) : super(key: key);
 
   final String initialName;
   final String initialDescription;
+  final String titleHintText;
   final String descriptionHintText;
   final void Function(String)? onDescriptionChanged;
   final void Function(String)? onTitleChanged;
 
   @override
+  State<EditTitleDescription> createState() => _EditTitleDescriptionState();
+}
+
+class _EditTitleDescriptionState extends State<EditTitleDescription> {
+  final _clairPink = Constants.colors.clairPink;
+  final _nameTextController = TextEditingController();
+  final _descriptionTextController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _nameTextController.text = widget.initialName;
+    _descriptionTextController.text = widget.initialDescription;
+  }
+
+  @override
+  void dispose() {
+    _nameTextController.dispose();
+    _descriptionTextController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final _clairPink = Constants.colors.clairPink;
-    final _nameTextController = TextEditingController();
-    final _descriptionTextController = TextEditingController();
-
-    _nameTextController.text = initialName;
-    _descriptionTextController.text = initialDescription;
-
-    _nameTextController.selection = TextSelection.fromPosition(
-      TextPosition(offset: initialName.length),
-    );
-
-    _descriptionTextController.selection = TextSelection.fromPosition(
-      TextPosition(offset: initialDescription.length),
-    );
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -70,9 +81,9 @@ class EditTitleDescription extends StatelessWidget {
                     fontSize: 24.0,
                     fontWeight: FontWeight.w700,
                   ),
-                  onChanged: onTitleChanged,
+                  onChanged: widget.onTitleChanged,
                   decoration: InputDecoration(
-                    hintText: "Attribution 4.0 International",
+                    hintText: widget.titleHintText,
                     filled: true,
                     isDense: true,
                     fillColor: _clairPink,
@@ -111,12 +122,12 @@ class EditTitleDescription extends StatelessWidget {
                 ),
                 SizedBox(
                   width: Utilities.size.isMobileSize(context) ? 300.0 : 600.0,
-                  child: TextFormField(
+                  child: TextField(
                     maxLines: null,
                     controller: _descriptionTextController,
-                    onChanged: onDescriptionChanged,
+                    onChanged: widget.onDescriptionChanged,
                     decoration: InputDecoration(
-                      hintText: descriptionHintText,
+                      hintText: widget.descriptionHintText,
                       filled: true,
                       isDense: true,
                       fillColor: _clairPink,

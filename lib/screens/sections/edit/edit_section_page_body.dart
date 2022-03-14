@@ -80,6 +80,8 @@ class EditSectionPageBody extends StatelessWidget {
           EditTitleDescription(
             initialDescription: section.description,
             initialName: section.name,
+            titleHintText: "title_enter".tr(),
+            descriptionHintText: "description_enter".tr(),
             onTitleChanged: onTitleChanged,
             onDescriptionChanged: onDescriptionChanged,
           ),
