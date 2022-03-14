@@ -187,6 +187,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       case EnumSectionAction.rename:
         showRenameSectionDialog(section, index);
         break;
+      case EnumSectionAction.renameTitle:
+        showRenameTitleDialog(section, index);
+        break;
       case EnumSectionAction.moveUp:
         tryMoveSection(
           section: section,
@@ -351,6 +354,34 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
+  void showRenameTitleDialog(Section section, int index) {
+    final _nameController = TextEditingController();
+
+    _nameController.text = section.name;
+
+    showDialog(
+      context: context,
+      builder: (context) => InputDialog.singleInput(
+        nameController: _nameController,
+        submitButtonValue: "rename".tr(),
+        subtitleValue: "section_title_edit_description".tr(),
+        titleValue: "title_edit".tr().toUpperCase(),
+        onCancel: Beamer.of(context).popRoute,
+        textInputAction: TextInputAction.newline,
+        maxLines: null,
+        validateOnEnter: false,
+        onSubmitted: (value) {
+          tryRenameTitle(
+            section: section,
+            index: index,
+            name: _nameController.text,
+          );
+          Beamer.of(context).popRoute();
+        },
+      ),
+    );
+  }
+
   void tryAddSection(Section section) async {
     try {
       final dataMode = section.dataFetchModes.isNotEmpty
@@ -438,6 +469,38 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     try {
       final editedSection = section.copyWith(
         description: description,
+        name: name,
+      );
+
+      _profilePage.sections.replaceRange(
+        index,
+        index + 1,
+        [editedSection],
+      );
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(getUserId())
+          .collection("user_pages")
+          .doc(_profilePage.id)
+          .update({
+        "sections": _profilePage.sections.map((x) => x.toMap()).toList(),
+      });
+
+      setState(() {});
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
+  void tryRenameTitle({
+    required Section section,
+    required int index,
+    required String name,
+  }) async {
+    try {
+      final editedSection = section.copyWith(
         name: name,
       );
 

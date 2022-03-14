@@ -1,4 +1,5 @@
 import 'package:artbooking/globals/constants.dart';
+import 'package:artbooking/globals/constants/section_ids.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_section_data_type.dart';
 import 'package:artbooking/types/enums/enum_separator_shape.dart';
@@ -151,22 +152,24 @@ class UIUtilities {
 
   IconData getSectionIcon(String id) {
     switch (id) {
-      case "C9Z51SG4JeJ5VFUHOagF":
+      case SectionIds.bookGrid:
         return UniconsLine.books;
-      case "ZRsIF2kdKc9xUo0cxfRI":
+      case SectionIds.illustrationGrid:
         return UniconsLine.images;
-      case "zYjoMKHm0eoWGBLyzULU":
+      case SectionIds.user:
         return UniconsLine.user_circle;
-      case "EhS7TTP5ayQ9QzEkZgAf":
+      case SectionIds.userWithIllustration:
         return UniconsLine.user_square;
-      case "m35wDDwpYmePxRx22qnV":
+      case SectionIds.poster:
         return UniconsLine.picture;
-      case "JkX8jqMnIWk3ZEiqVsbQ":
+      case SectionIds.illustrationRow:
         return UniconsLine.horizontal_distribution_center;
-      case "jViQYrNutT4id5OBrR5f":
+      case SectionIds.spacing:
         return UniconsLine.space_key;
-      case "sRRimeMwmBcinT6AT5qp":
+      case SectionIds.illustrationWindow:
         return UniconsLine.th;
+      case SectionIds.h1:
+        return UniconsLine.text;
       default:
         return UniconsLine.books;
     }
