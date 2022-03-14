@@ -125,7 +125,7 @@ class InputDialog extends StatelessWidget {
     final String? label,
     String? hintText,
     final TextInputAction? textInputAction,
-    final void Function(String)? onSubmitInput,
+    final bool validateOnEnter = true,
   }) {
     if (hintText == null &&
         nameController != null &&
@@ -167,7 +167,7 @@ class InputDialog extends StatelessWidget {
               onChanged: onNameChanged,
               maxLines: maxLines,
               textInputAction: textInputAction,
-              onSubmitted: onSubmitInput,
+              onSubmitted: validateOnEnter ? onSubmitted : null,
             ),
           ),
         ),

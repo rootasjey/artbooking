@@ -467,11 +467,6 @@ class UserSocialLinksComponent extends StatelessWidget {
         subtitleValue: "link_update_description".tr(),
         titleValue: "link_update".tr().toUpperCase(),
         onCancel: Beamer.of(context).popRoute,
-        onSubmitInput: (value) {
-          final newUserSocialLinks = onValidate.call(value);
-          onLinkChanged?.call(newUserSocialLinks);
-          Beamer.of(context).popRoute();
-        },
         onSubmitted: (value) {
           final newUserSocialLinks = onValidate.call(value);
           onLinkChanged?.call(newUserSocialLinks);
