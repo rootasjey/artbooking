@@ -6,6 +6,9 @@ enum EnumSectionDataType {
   /// This section displays books.
   books,
 
-  /// This section displays user's data..
+  /// This section displays text data.
+  text,
+
+  /// This section displays user's data.
   user,
 }
