@@ -246,7 +246,7 @@ class _IllustrationCardState extends State<IllustrationCard>
                   onTap: widget.onTap,
                   // onLongPress: onLongPressImage,
                   onHover: onHoverImage,
-                  onDoubleTap: onDoubleTap,
+                  onDoubleTap: widget.onDoubleTap != null ? onDoubleTap : null,
                   child: Stack(
                     children: [
                       multiSelectIndicator(),

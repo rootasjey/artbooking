@@ -69,17 +69,23 @@ class IllustrationsPageBody extends StatelessWidget {
           (context, index) {
             final illustration = illustrations.elementAt(index);
 
+            final _onDoubleTap = onDoubleTap != null
+                ? () => onDoubleTap?.call(illustration, index)
+                : null;
+
+            final popupMenuEntries = illustration.liked
+                ? unlikePopupMenuEntries
+                : likePopupMenuEntries;
+
             return IllustrationCard(
               index: index,
               heroTag: illustration.id,
               illustration: illustration,
               onTap: () => onTapIllustrationCard?.call(illustration),
-              onDoubleTap: () => onDoubleTap?.call(illustration, index),
-              onTapLike: () => onDoubleTap?.call(illustration, index),
+              onDoubleTap: _onDoubleTap,
+              onTapLike: _onDoubleTap,
               onPopupMenuItemSelected: onPopupMenuItemSelected,
-              popupMenuEntries: illustration.liked
-                  ? unlikePopupMenuEntries
-                  : likePopupMenuEntries,
+              popupMenuEntries: popupMenuEntries,
             );
           },
           childCount: illustrations.length,

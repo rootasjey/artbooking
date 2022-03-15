@@ -14,7 +14,6 @@ import 'package:artbooking/screens/illustrations/illustration_page_fab.dart';
 import 'package:artbooking/types/firestore/doc_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/json_types.dart';
-import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
@@ -88,10 +87,10 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
 
   @override
   Widget build(BuildContext context) {
-    final UserFirestore? userFirestore =
-        ref.watch(AppState.userProvider).firestoreUser;
+    final String? userId = ref.watch(AppState.userProvider).firestoreUser?.id;
 
-    final bool isOwner = userFirestore?.id == _illustration.userId;
+    final bool authenticated = userId != null && userId.isNotEmpty;
+    final bool isOwner = userId == _illustration.userId;
 
     return HeroControllerScope(
       controller: HeroController(),
@@ -117,7 +116,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
                       illustration: _illustration,
                       onShowEditMetadataPanel: onShowEditMetadataPanel,
                       onGoToEditImagePage: onGoToEditImagePage,
-                      onLike: onLike,
+                      onLike: authenticated ? onLike : null,
                       onShare: onShare,
                       liked: _liked,
                     ),
@@ -194,9 +193,12 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
   }
 
   void fetchLike() async {
-    try {
-      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+    if (userId == null || userId.isEmpty) {
+      return;
+    }
 
+    try {
       _likeSubscription = await FirebaseFirestore.instance
           .collection("users")
           .doc(userId)

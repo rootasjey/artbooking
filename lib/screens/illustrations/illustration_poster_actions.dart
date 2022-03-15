@@ -41,20 +41,22 @@ class IllustrationPosterActions extends StatelessWidget {
           spacing: 16.0,
           alignment: WrapAlignment.center,
           children: [
-            IconButton(
-              tooltip: liked ? "unlike".tr() : "like".tr(),
-              icon: Icon(
-                liked ? FontAwesomeIcons.solidHeart : UniconsLine.heart,
+            if (onLike != null)
+              IconButton(
+                tooltip: liked ? "unlike".tr() : "like".tr(),
+                icon: Icon(
+                  liked ? FontAwesomeIcons.solidHeart : UniconsLine.heart,
+                ),
+                iconSize: liked ? 18.0 : 24.0,
+                color: liked ? Theme.of(context).secondaryHeaderColor : null,
+                onPressed: onLike,
               ),
-              iconSize: liked ? 18.0 : 24.0,
-              color: liked ? Theme.of(context).secondaryHeaderColor : null,
-              onPressed: onLike,
-            ),
-            IconButton(
-              tooltip: "share".tr(),
-              icon: Icon(UniconsLine.share),
-              onPressed: onShare,
-            ),
+            if (onShare != null)
+              IconButton(
+                tooltip: "share".tr(),
+                icon: Icon(UniconsLine.share),
+                onPressed: onShare,
+              ),
             ...getOwnerActions(),
           ],
         ),

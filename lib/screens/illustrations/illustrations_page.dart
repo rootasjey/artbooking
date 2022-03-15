@@ -12,6 +12,7 @@ import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/illustration/popup_entry_illustration.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
@@ -45,8 +46,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
   QuerySnapshotStreamSubscription? _likeSubscription;
 
   /// Items when opening the popup.
-  final List<PopupMenuEntry<EnumIllustrationItemAction>> _likePopupMenuEntries =
-      [
+  final List<PopupEntryIllustration> _likePopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumIllustrationItemAction.like,
       icon: Icon(UniconsLine.heart),
@@ -55,8 +55,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
   ];
 
   /// Items when opening the popup.
-  final List<PopupMenuEntry<EnumIllustrationItemAction>>
-      _unlikePopupMenuEntries = [
+  final List<PopupEntryIllustration> _unlikePopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumIllustrationItemAction.unlike,
       icon: Icon(UniconsLine.heart_break),
@@ -81,6 +80,11 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final String? userId = ref.watch(AppState.userProvider).firestoreUser?.id;
+    final bool authenticated = userId != null && userId.isNotEmpty;
+    final List<PopupEntryIllustration> likePopupMenuEntries =
+        authenticated ? _likePopupMenuEntries : [];
+
     return HeroControllerScope(
       controller: HeroController(),
       child: Scaffold(
@@ -108,9 +112,9 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
               IllustrationsPageBody(
                 loading: _loading,
                 illustrations: _illustrations,
-                onDoubleTap: onDoubleTapIllustrationItem,
+                onDoubleTap: authenticated ? onDoubleTapIllustrationItem : null,
                 onTapIllustrationCard: onTapIllustration,
-                likePopupMenuEntries: _likePopupMenuEntries,
+                likePopupMenuEntries: likePopupMenuEntries,
                 unlikePopupMenuEntries: _unlikePopupMenuEntries,
                 onPopupMenuItemSelected: onPopupMenuItemSelected,
               ),
@@ -168,7 +172,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
 
   Future<bool> fetchLike(String illustrationId) async {
     final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
-    if (userId == null) {
+    if (userId == null || userId.isEmpty) {
       return false;
     }
 
@@ -267,7 +271,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
   /// Listen to Firestore illustration' like events for sync purpose.
   void listenLikeEvents() {
     String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
-    if (userId == null) {
+    if (userId == null || userId.isEmpty) {
       return;
     }
 
