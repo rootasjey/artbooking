@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:artbooking/actions/books.dart';
-import 'package:artbooking/components/application_bar/user_section/application_bar_auth_user.dart';
+import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
@@ -157,74 +157,63 @@ class _MyBookPageState extends ConsumerState<BookPage> {
 
   @override
   Widget build(BuildContext context) {
-    final firestoreUser = ref.read(AppState.userProvider).firestoreUser;
-    final String? userId = firestoreUser?.id;
+    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
     final bool authenticated = userId != null && userId.isNotEmpty;
     final bool owner = _book.userId == userId;
-    final String avatarUrl = firestoreUser?.getProfilePicture() ?? "";
 
     return Scaffold(
       floatingActionButton: BookPageFab(
         show: _showFab,
         scrollController: _scrollController,
       ),
-      body: Stack(
-        children: [
-          NotificationListener<ScrollNotification>(
-            onNotification: onScrollNotification,
-            child: CustomScrollView(
-              controller: _scrollController,
-              slivers: <Widget>[
-                BookPageHeader(
-                  book: _book,
-                  forceMultiSelect: _forceMultiSelect,
-                  liked: _liked,
-                  authenticated: authenticated,
-                  multiSelectedItems: _multiSelectedItems,
-                  onLike: onLike,
-                  onAddToBook: showAddGroupToBook,
-                  onClearMultiSelect: onClearMultiSelect,
-                  onConfirmDeleteBook: onConfirmDeleteBook,
-                  onConfirmRemoveGroup: onConfirmRemoveGroup,
-                  onMultiSelectAll: onMultiSelectAll,
-                  onToggleMultiSelect: onToggleMultiSelect,
-                  onShowDatesDialog: onShowDatesDialog,
-                  onShowRenameBookDialog: onShowRenameBookDialog,
-                  onUploadToThisBook: onUploadToThisBook,
-                  onUpdateVisibility: onUpdateVisibility,
-                  owner: owner,
-                ),
-                BookPageBody(
-                  loading: _loading,
-                  hasError: _hasError,
-                  forceMultiSelect: _forceMultiSelect,
-                  illustrationMap: _illustrationMap,
-                  bookIllustrations: _book.illustrations,
-                  multiSelectedItems: _multiSelectedItems,
-                  popupMenuEntries: _popupMenuEntries,
-                  onBrowseIllustrations: onBrowseIllustrations,
-                  onDragUpdateBook: onDragUpdateBook,
-                  onPopupMenuItemSelected: onPopupMenuItemSelected,
-                  onTapIllustrationCard: onTapIllustrationCard,
-                  onUploadToThisBook: onUploadToThisBook,
-                  onDropIllustration: onDropIllustration,
-                  owner: owner,
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.only(bottom: 100.0),
-                ),
-              ],
+      body: NotificationListener<ScrollNotification>(
+        onNotification: onScrollNotification,
+        child: CustomScrollView(
+          controller: _scrollController,
+          slivers: <Widget>[
+            ApplicationBar(
+              minimal: true,
             ),
-          ),
-          Positioned(
-            top: 8.0,
-            right: 0.0,
-            child: ApplicationBarAuthUser(
-              onSignOut: onSignOut,
-              avatarURL: avatarUrl,
+            BookPageHeader(
+              book: _book,
+              forceMultiSelect: _forceMultiSelect,
+              liked: _liked,
+              authenticated: authenticated,
+              multiSelectedItems: _multiSelectedItems,
+              onLike: onLike,
+              onAddToBook: showAddGroupToBook,
+              onClearMultiSelect: onClearMultiSelect,
+              onConfirmDeleteBook: onConfirmDeleteBook,
+              onConfirmRemoveGroup: onConfirmRemoveGroup,
+              onMultiSelectAll: onMultiSelectAll,
+              onToggleMultiSelect: onToggleMultiSelect,
+              onShowDatesDialog: onShowDatesDialog,
+              onShowRenameBookDialog: onShowRenameBookDialog,
+              onUploadToThisBook: onUploadToThisBook,
+              onUpdateVisibility: onUpdateVisibility,
+              owner: owner,
             ),
-          ),
-        ],
+            BookPageBody(
+              loading: _loading,
+              hasError: _hasError,
+              forceMultiSelect: _forceMultiSelect,
+              illustrationMap: _illustrationMap,
+              bookIllustrations: _book.illustrations,
+              multiSelectedItems: _multiSelectedItems,
+              popupMenuEntries: _popupMenuEntries,
+              onBrowseIllustrations: onBrowseIllustrations,
+              onDragUpdateBook: onDragUpdateBook,
+              onPopupMenuItemSelected: onPopupMenuItemSelected,
+              onTapIllustrationCard: onTapIllustrationCard,
+              onUploadToThisBook: onUploadToThisBook,
+              onDropIllustration: onDropIllustration,
+              owner: owner,
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: 100.0),
+            ),
+          ],
+        ),
       ),
     );
   }
