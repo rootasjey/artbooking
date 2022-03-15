@@ -25,6 +25,7 @@ class IllustrationPoster extends StatefulWidget {
     this.onShowEditMetadataPanel,
     this.onGoToEditImagePage,
     this.updatingImage = false,
+    this.heroTag = "",
   }) : super(key: key);
 
   /// True if the image is being updated
@@ -52,6 +53,11 @@ class IllustrationPoster extends StatefulWidget {
 
   /// This component's data.
   final Illustration illustration;
+
+  /// Custom hero tag.
+  /// To use when default `illustration.id` hero tag is not enough
+  /// (Use-case: inside a book where there can be duplicated illustrations).
+  final String heroTag;
 
   @override
   _IllustrationPosterState createState() => _IllustrationPosterState();
@@ -89,6 +95,9 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
       fetchHighResImage();
     }
 
+    final heroTag =
+        widget.heroTag.isNotEmpty ? widget.heroTag : illustration.id;
+
     return Column(
       children: [
         ConstrainedBox(
@@ -97,7 +106,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
             maxHeight: maxHeight,
           ),
           child: Hero(
-            tag: illustration.id,
+            tag: heroTag,
             child: Card(
               elevation: 6.0,
               clipBehavior: Clip.antiAlias,

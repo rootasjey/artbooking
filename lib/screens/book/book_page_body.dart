@@ -54,6 +54,7 @@ class BookPageBody extends StatelessWidget {
     Illustration,
     String,
   )? onPopupMenuItemSelected;
+
   final void Function(String, Illustration)? onTapIllustrationCard;
 
   /// Upload a new illustration and add it to this book.
@@ -113,9 +114,14 @@ class BookPageBody extends StatelessWidget {
               return Container();
             }
 
+            final onTap = () => onTapIllustrationCard?.call(
+                  key,
+                  illustration,
+                );
+
             return IllustrationCard(
               index: index,
-              heroTag: illustration.id,
+              heroTag: key,
               illustration: illustration,
               key: ValueKey(key),
               illustrationKey: key,
@@ -124,10 +130,7 @@ class BookPageBody extends StatelessWidget {
               canDrag: owner,
               onDragUpdate: onDragUpdateBook,
               onDrop: onDropIllustration,
-              onTap: () => onTapIllustrationCard?.call(
-                key,
-                illustration,
-              ),
+              onTap: onTap,
               onPopupMenuItemSelected: owner ? onPopupMenuItemSelected : null,
               popupMenuEntries: owner ? popupMenuEntries : [],
             );

@@ -621,7 +621,10 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     });
   }
 
-  void navigateToIllustrationPage(Illustration illustration) {
+  void navigateToIllustrationPage(
+    Illustration illustration,
+    String illustrationKey,
+  ) {
     final location = Beamer.of(context)
         .beamingHistory
         .last
@@ -648,6 +651,9 @@ class _MyBookPageState extends ConsumerState<BookPage> {
       data: {
         "bookId": _book.id,
         "illustrationId": illustration.id,
+      },
+      routeState: {
+        "heroTag": illustrationKey,
       },
     );
   }
@@ -1014,7 +1020,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     Illustration illustration,
   ) {
     if (_multiSelectedItems.isEmpty && !_forceMultiSelect) {
-      navigateToIllustrationPage(illustration);
+      navigateToIllustrationPage(illustration, illustrationKey);
       return;
     }
 

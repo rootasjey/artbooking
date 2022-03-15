@@ -66,6 +66,7 @@ class HomeLocation extends BeamLocation<BeamState> {
         BeamPage(
           child: IllustrationPage(
             illustrationId: state.pathParameters["illustrationId"]!,
+            heroTag: getHeroTag(state.routeState),
           ),
           key: ValueKey(illustrationRoute),
           title: Utilities.ui.getPageTitle("illustration".tr()),
@@ -82,5 +83,14 @@ class HomeLocation extends BeamLocation<BeamState> {
           type: BeamPageType.fadeTransition,
         ),
     ];
+  }
+
+  String getHeroTag(Object? routeState) {
+    if (routeState == null) {
+      return "";
+    }
+
+    final mapState = routeState as Map<String, dynamic>;
+    return mapState["heroTag"] ?? "";
   }
 }

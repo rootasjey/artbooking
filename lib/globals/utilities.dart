@@ -36,7 +36,7 @@ class Utilities {
     final String id = bookIllustration.id;
     DateTime createdAt = bookIllustration.createdAt;
 
-    return "$id--${createdAt.millisecondsSinceEpoch}";
+    return "$id-${createdAt.millisecondsSinceEpoch}";
   }
 
   static String getStringWithUnit(int usedBytes) {

@@ -30,10 +30,14 @@ class IllustrationPage extends ConsumerStatefulWidget {
   const IllustrationPage({
     Key? key,
     required this.illustrationId,
+    this.heroTag = "",
   }) : super(key: key);
 
   /// Illustration's id, used if direct navigation by url.
   final String illustrationId;
+
+  /// Custom hero tag (if `illustration.id` default tag is not unique).
+  final String heroTag;
 
   @override
   _IllustrationPageState createState() => _IllustrationPageState();
@@ -112,6 +116,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
                     IllustrationPageBody(
                       isOwner: isOwner,
                       isLoading: _isLoading,
+                      heroTag: widget.heroTag,
                       updatingImage: _updatingImage,
                       illustration: _illustration,
                       onShowEditMetadataPanel: onShowEditMetadataPanel,

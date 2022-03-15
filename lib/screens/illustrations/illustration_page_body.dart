@@ -17,6 +17,7 @@ class IllustrationPageBody extends StatelessWidget {
     this.onShowEditMetadataPanel,
     this.onGoToEditImagePage,
     this.updatingImage = false,
+    this.heroTag = "",
   }) : super(key: key);
 
   final bool isLoading;
@@ -28,6 +29,9 @@ class IllustrationPageBody extends StatelessWidget {
   final Function()? onShowEditMetadataPanel;
   final Function()? onGoToEditImagePage;
   final Illustration illustration;
+
+  /// Custom hero tag (if `illustration.id` default tag is not unique).
+  final String heroTag;
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +74,7 @@ class IllustrationPageBody extends StatelessWidget {
             onGoToEditImagePage: onGoToEditImagePage,
             onLike: onLike,
             onShare: onShare,
+            heroTag: heroTag,
           ),
         ]),
       ),
