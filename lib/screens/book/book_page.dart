@@ -158,7 +158,9 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   @override
   Widget build(BuildContext context) {
     final firestoreUser = ref.read(AppState.userProvider).firestoreUser;
-    final bool owner = _book.userId == firestoreUser?.id;
+    final String? userId = firestoreUser?.id;
+    final bool authenticated = userId != null && userId.isNotEmpty;
+    final bool owner = _book.userId == userId;
     final String avatarUrl = firestoreUser?.getProfilePicture() ?? "";
 
     return Scaffold(
@@ -177,6 +179,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
                   book: _book,
                   forceMultiSelect: _forceMultiSelect,
                   liked: _liked,
+                  authenticated: authenticated,
                   multiSelectedItems: _multiSelectedItems,
                   onLike: onLike,
                   onAddToBook: showAddGroupToBook,
@@ -391,7 +394,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
           continue;
         }
 
-        illustrationData['id'] = illustrationSnapshot.id;
+        illustrationData["id"] = illustrationSnapshot.id;
         final illustration = Illustration.fromMap(illustrationData);
 
         _illustrationMap.putIfAbsent(
@@ -403,10 +406,16 @@ class _MyBookPageState extends ConsumerState<BookPage> {
       } catch (error) {
         Utilities.logger.e(error);
         illustrationsErrors.add(bookIllustration.id);
+
+        final missingIllustration = Illustration.empty();
+        _illustrationMap.putIfAbsent(
+          Utilities.generateIllustrationKey(bookIllustration),
+          () => missingIllustration,
+        );
       }
     }
 
-    checkFetchErrors(illustrationsErrors);
+    // checkFetchErrors(illustrationsErrors);
   }
 
   void fetchIllustrationsAndListenToUpdates() {
@@ -460,9 +469,12 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   }
 
   void fetchLike() async {
-    try {
-      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+    if (userId == null || userId.isEmpty) {
+      return;
+    }
 
+    try {
       _likeSubscription = await FirebaseFirestore.instance
           .collection("users")
           .doc(userId)

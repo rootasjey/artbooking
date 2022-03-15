@@ -64,16 +64,22 @@ class BooksPageBody extends StatelessWidget {
           (context, index) {
             final book = books.elementAt(index);
 
+            final onDoubleTapOrNull = onDoubleTap != null
+                ? () => onDoubleTap?.call(book, index)
+                : null;
+
+            final popupMenuEntries =
+                book.liked ? unlikePopupMenuEntries : likePopupMenuEntries;
+
             return BookCard(
               book: book,
               index: index,
               heroTag: book.id,
               onTap: () => onTap?.call(book),
-              onDoubleTap: () => onDoubleTap?.call(book, index),
-              onTapLike: () => onDoubleTap?.call(book, index),
+              onDoubleTap: onDoubleTapOrNull,
+              onTapLike: onDoubleTapOrNull,
               onPopupMenuItemSelected: onPopupMenuItemSelected,
-              popupMenuEntries:
-                  book.liked ? unlikePopupMenuEntries : likePopupMenuEntries,
+              popupMenuEntries: popupMenuEntries,
               onLongPress: onLongPressBook,
             );
           },

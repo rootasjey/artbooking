@@ -7,6 +7,7 @@ import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/book/books_page_body.dart';
 import 'package:artbooking/screens/book/books_page_fab.dart';
 import 'package:artbooking/types/book/book.dart';
+import 'package:artbooking/types/book/popup_entry_book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/firestore/doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
@@ -83,6 +84,12 @@ class _BooksPageState extends ConsumerState<BooksPage> {
 
   @override
   Widget build(BuildContext context) {
+    final String? userId = ref.watch(AppState.userProvider).firestoreUser?.id;
+    final bool isAuth = userId != null && userId.isNotEmpty;
+    final onDoubleTapOrNull = isAuth ? onDoubleTapBookItem : null;
+    final likeEntries = isAuth ? _likePopupMenuEntries : <PopupEntryBook>[];
+    final unlikeEntries = isAuth ? _unlikePopupMenuEntries : <PopupEntryBook>[];
+
     return Scaffold(
       floatingActionButton: BooksPageFab(
         show: _showFab,
@@ -109,9 +116,9 @@ class _BooksPageState extends ConsumerState<BooksPage> {
               loading: _loading,
               books: _books,
               onTap: onTapBook,
-              onDoubleTap: onDoubleTapBookItem,
-              likePopupMenuEntries: _likePopupMenuEntries,
-              unlikePopupMenuEntries: _unlikePopupMenuEntries,
+              onDoubleTap: onDoubleTapOrNull,
+              likePopupMenuEntries: likeEntries,
+              unlikePopupMenuEntries: unlikeEntries,
               onPopupMenuItemSelected: onPopupMenuItemSelected,
             ),
             SliverPadding(
@@ -124,8 +131,12 @@ class _BooksPageState extends ConsumerState<BooksPage> {
   }
 
   Future<bool> fetchLike(String bookId) async {
+    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+    if (userId == null || userId.isEmpty) {
+      return false;
+    }
+
     try {
-      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
       final snapshot = await FirebaseFirestore.instance
           .collection("users")
           .doc(userId)
@@ -172,8 +183,8 @@ class _BooksPageState extends ConsumerState<BooksPage> {
 
       for (DocSnapMap document in snapshot.docs) {
         final data = document.data();
-        data['id'] = document.id;
-        data['liked'] = await fetchLike(document.id);
+        data["id"] = document.id;
+        data["liked"] = await fetchLike(document.id);
 
         _books.add(Book.fromMap(data));
       }
@@ -218,8 +229,8 @@ class _BooksPageState extends ConsumerState<BooksPage> {
 
       for (DocSnapMap document in snapshot.docs) {
         final data = document.data();
-        data['id'] = document.id;
-        data['liked'] = await fetchLike(document.id);
+        data["id"] = document.id;
+        data["liked"] = await fetchLike(document.id);
 
         _books.add(Book.fromMap(data));
       }
@@ -260,10 +271,10 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     );
   }
 
-  /// Listen to illustrations' likes for sync purpose.
+  /// Listen to books' likes for sync purpose.
   void listenLikeEvents() {
     String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
-    if (userId == null) {
+    if (userId == null || userId.isEmpty) {
       return;
     }
 

@@ -30,11 +30,13 @@ class BookPageHeader extends StatelessWidget {
     this.onUploadToThisBook,
     this.owner = false,
     this.onUpdateVisibility,
+    this.authenticated = false,
   }) : super(key: key);
 
   final Book book;
   final bool liked;
   final bool owner;
+  final bool authenticated;
   final bool forceMultiSelect;
 
   /// Currently selected illustrations.
@@ -54,24 +56,6 @@ class BookPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String updatedAtStr = "";
-
-    if (DateTime.now().difference(book.updatedAt).inDays > 60) {
-      updatedAtStr = "date_updated_on".tr(
-        args: [
-          Jiffy(book.updatedAt).yMMMMEEEEd,
-        ],
-      );
-    } else {
-      updatedAtStr = "date_updated_ago".tr(
-        args: [Jiffy(book.updatedAt).fromNow()],
-      );
-    }
-
-    final Color color = book.illustrations.isEmpty
-        ? Theme.of(context).secondaryHeaderColor
-        : Theme.of(context).primaryColor;
-
     return SliverPadding(
       padding: const EdgeInsets.only(
         top: 60.0,
@@ -80,10 +64,7 @@ class BookPageHeader extends StatelessWidget {
       ),
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
-          Wrap(
-            spacing: 24.0,
-            runSpacing: 24.0,
-            crossAxisAlignment: WrapCrossAlignment.center,
+          Row(
             children: [
               Hero(
                 tag: book.id,
@@ -105,95 +86,7 @@ class BookPageHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Opacity(
-                    opacity: 0.6,
-                    child: IconButton(
-                      tooltip: "back".tr(),
-                      onPressed: Beamer.of(context).beamBack,
-                      icon: Icon(UniconsLine.arrow_left),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Opacity(
-                          opacity: 0.8,
-                          child: Text(
-                            book.name,
-                            style: Utilities.fonts.style(
-                              fontSize: 40.0,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                        Opacity(
-                          opacity: 0.6,
-                          child: Text(
-                            book.description,
-                            style: Utilities.fonts.style(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        InkWell(
-                          onTap: onShowDatesDialog,
-                          child: Opacity(
-                            opacity: 0.6,
-                            child: Text(
-                              updatedAtStr,
-                              style: Utilities.fonts.style(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Opacity(
-                              opacity: 0.8,
-                              child: Text(
-                                "illustrations_count"
-                                    .plural(book.illustrations.length),
-                                style: Utilities.fonts.style(
-                                  color: color,
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            if (liked)
-                              IconButton(
-                                tooltip: "unlike".tr(),
-                                icon: Icon(
-                                  FontAwesomeIcons.solidHeart,
-                                ),
-                                iconSize: 18.0,
-                                color: Theme.of(context).secondaryHeaderColor,
-                                onPressed: onLike,
-                              )
-                            else
-                              IconButton(
-                                tooltip: "like".tr(),
-                                icon: Icon(
-                                  UniconsLine.heart,
-                                ),
-                                onPressed: onLike,
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+              rightRow(context),
             ],
           ),
           if (owner)
@@ -228,6 +121,127 @@ class BookPageHeader extends StatelessWidget {
               ),
             ),
         ]),
+      ),
+    );
+  }
+
+  Widget likeButton(BuildContext context) {
+    if (!authenticated) {
+      return Container();
+    }
+
+    if (liked) {
+      return IconButton(
+        tooltip: "unlike".tr(),
+        icon: Icon(
+          FontAwesomeIcons.solidHeart,
+        ),
+        iconSize: 18.0,
+        color: Theme.of(context).secondaryHeaderColor,
+        onPressed: onLike,
+      );
+    }
+
+    return IconButton(
+      tooltip: "like".tr(),
+      icon: Icon(
+        UniconsLine.heart,
+      ),
+      onPressed: onLike,
+    );
+  }
+
+  Widget rightRow(BuildContext context) {
+    String updatedAtStr = "";
+
+    if (DateTime.now().difference(book.updatedAt).inDays > 60) {
+      updatedAtStr = "date_updated_on".tr(
+        args: [
+          Jiffy(book.updatedAt).yMMMMEEEEd,
+        ],
+      );
+    } else {
+      updatedAtStr = "date_updated_ago".tr(
+        args: [Jiffy(book.updatedAt).fromNow()],
+      );
+    }
+
+    final Color color = book.illustrations.isEmpty
+        ? Theme.of(context).secondaryHeaderColor
+        : Theme.of(context).primaryColor;
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Opacity(
+            opacity: 0.6,
+            child: IconButton(
+              tooltip: "back".tr(),
+              onPressed: Beamer.of(context).beamBack,
+              icon: Icon(UniconsLine.arrow_left),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Opacity(
+                  opacity: 0.8,
+                  child: Text(
+                    book.name,
+                    style: Utilities.fonts.style(
+                      fontSize: 40.0,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                Opacity(
+                  opacity: 0.6,
+                  child: Text(
+                    book.description,
+                    style: Utilities.fonts.style(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: onShowDatesDialog,
+                  child: Opacity(
+                    opacity: 0.6,
+                    child: Text(
+                      updatedAtStr,
+                      style: Utilities.fonts.style(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Opacity(
+                      opacity: 0.8,
+                      child: Text(
+                        "illustrations_count".plural(book.illustrations.length),
+                        style: Utilities.fonts.style(
+                          color: color,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    likeButton(context),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

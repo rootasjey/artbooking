@@ -390,6 +390,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
 
   Widget frontCard({bool usingAsDropTarget = false}) {
     final Color primaryColor = Theme.of(context).primaryColor;
+    final onDoubleTapOrNull = widget.onDoubleTap != null ? onDoubleTap : null;
 
     return Container(
       width: widget.width - 60.0,
@@ -423,7 +424,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
                         fit: BoxFit.cover,
                         child: InkWell(
                           onTap: widget.onTap,
-                          onDoubleTap: onDoubleTap,
+                          onDoubleTap: onDoubleTapOrNull,
                           // onLongPress: onLongPress,
                           onHover: onHover,
                           child: Stack(
