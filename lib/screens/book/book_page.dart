@@ -622,10 +622,26 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   }
 
   void navigateToIllustrationPage(Illustration illustration) {
+    final location = Beamer.of(context)
+        .beamingHistory
+        .last
+        .history
+        .last
+        .routeInformation
+        .location;
+
     NavigationStateHelper.illustration = illustration;
-    final String route = AtelierLocationContent.illustrationBookRoute
-        .replaceFirst(":bookId", _book.id)
-        .replaceFirst(":illustrationId", illustration.id);
+    String route = "";
+
+    if (location != null && location.contains("atelier")) {
+      route = AtelierLocationContent.illustrationBookRoute
+          .replaceFirst(":bookId", _book.id)
+          .replaceFirst(":illustrationId", illustration.id);
+    } else {
+      route = HomeLocation.illustrationBookRoute
+          .replaceFirst(":bookId", _book.id)
+          .replaceFirst(":illustrationId", illustration.id);
+    }
 
     Beamer.of(context).beamToNamed(
       route,

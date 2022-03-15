@@ -1,4 +1,5 @@
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/screens/atelier/profile/profile_page.dart';
 import 'package:artbooking/screens/book/book_page.dart';
 import 'package:artbooking/screens/book/books_page.dart';
 import 'package:artbooking/screens/home/home_page.dart';
@@ -10,11 +11,13 @@ import 'package:flutter/widgets.dart';
 
 class HomeLocation extends BeamLocation<BeamState> {
   /// Main root value for this location.
-  static const String route = '/';
-  static const String illustrationsRoute = '/illustrations';
-  static const String illustrationRoute = '/illustrations/:illustrationId';
-  static const String booksRoute = '/books';
-  static const String bookRoute = '/books/:bookId';
+  static const String route = "/";
+  static const String illustrationsRoute = "/illustrations";
+  static const String illustrationRoute = "$illustrationsRoute/:illustrationId";
+  static const String booksRoute = "/books";
+  static const String bookRoute = "$booksRoute/:bookId";
+  static const String userProfileRoute = "/users/:userId";
+  static const String illustrationBookRoute = "$bookRoute/:illustrationId/";
 
   @override
   List<String> get pathPatterns => [
@@ -23,6 +26,8 @@ class HomeLocation extends BeamLocation<BeamState> {
         illustrationRoute,
         booksRoute,
         bookRoute,
+        illustrationBookRoute,
+        userProfileRoute,
       ];
 
   @override
@@ -34,6 +39,22 @@ class HomeLocation extends BeamLocation<BeamState> {
         title: Utilities.ui.getPageTitle("home".tr()),
         type: BeamPageType.fadeTransition,
       ),
+      if (state.pathPatternSegments.contains("books"))
+        BeamPage(
+          child: BooksPage(),
+          key: ValueKey(booksRoute),
+          title: Utilities.ui.getPageTitle("books".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
+      if (state.pathPatternSegments.contains(":bookId"))
+        BeamPage(
+          child: BookPage(
+            bookId: state.pathParameters["bookId"]!,
+          ),
+          key: ValueKey(bookRoute),
+          title: Utilities.ui.getPageTitle("book".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
       if (state.pathPatternSegments.contains("illustrations"))
         BeamPage(
           child: IllustrationsPage(),
@@ -50,20 +71,14 @@ class HomeLocation extends BeamLocation<BeamState> {
           title: Utilities.ui.getPageTitle("illustration".tr()),
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathPatternSegments.contains("books"))
+      if (state.pathPatternSegments.contains("users") &&
+          state.pathPatternSegments.contains(":userId"))
         BeamPage(
-          child: BooksPage(),
-          key: ValueKey(booksRoute),
-          title: Utilities.ui.getPageTitle("books".tr()),
-          type: BeamPageType.fadeTransition,
-        ),
-      if (state.pathPatternSegments.contains(":bookId"))
-        BeamPage(
-          child: BookPage(
-            bookId: state.pathParameters["bookId"]!,
+          child: ProfilePage(
+            userId: state.pathParameters["userId"] ?? '',
           ),
-          key: ValueKey(bookRoute),
-          title: Utilities.ui.getPageTitle("book".tr()),
+          key: ValueKey("$userProfileRoute"),
+          title: Utilities.ui.getPageTitle("profile".tr()),
           type: BeamPageType.fadeTransition,
         ),
     ];
