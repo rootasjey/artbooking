@@ -1,4 +1,4 @@
-import 'package:beamer/beamer.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
@@ -11,7 +11,7 @@ class IllustrationPageHeader extends StatelessWidget {
       children: [
         IconButton(
           color: Theme.of(context).primaryColor,
-          onPressed: Beamer.of(context).beamBack,
+          onPressed: () => Utilities.navigation.back(context),
           icon: Icon(UniconsLine.arrow_left),
         ),
       ],
