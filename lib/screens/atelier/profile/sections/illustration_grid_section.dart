@@ -2,8 +2,6 @@ import 'package:artbooking/components/cards/illustration_card.dart';
 import 'package:artbooking/components/cards/shimmer_card.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/router/locations/atelier_location.dart';
-import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
@@ -11,7 +9,6 @@ import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/firestore/doc_snap_map.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/section.dart';
-import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flash/src/flash_helper.dart';
@@ -173,14 +170,16 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
     final children = _illustrations.map((Illustration illustration) {
       index++;
 
+      final heroTag = "${widget.section.id}-${index}-${illustration.id}";
+
       return IllustrationCard(
         canDrag: canDrag,
         onDrop: onDrop,
         dragGroupName: "${widget.section.id}-${widget.index}",
-        heroTag: "${widget.section.id}-${index}-${illustration.id}",
+        heroTag: heroTag,
         illustration: illustration,
         index: index,
-        onTap: () => navigateToIllustrationPage(illustration),
+        onTap: () => navigateToIllustrationPage(illustration, heroTag),
         popupMenuEntries: popupMenuEntries,
         onPopupMenuItemSelected: onIllustrationItemSelected,
       );
@@ -190,7 +189,7 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
       children.add(
         IllustrationCard(
           useAsPlaceHolder: true,
-          heroTag: "empty_${DateTime.now()}",
+          heroTag: "empty-${DateTime.now()}",
           illustration: Illustration.empty(),
           index: index,
           onTap: () => widget.onShowIllustrationDialog?.call(
@@ -503,16 +502,11 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
     }
   }
 
-  void navigateToIllustrationPage(Illustration illustration) {
-    NavigationStateHelper.illustration = illustration;
-    Beamer.of(context).beamToNamed(
-      AtelierLocationContent.illustrationRoute.replaceFirst(
-        ":illustrationId",
-        illustration.id,
-      ),
-      data: {
-        "illustrationId": illustration.id,
-      },
+  void navigateToIllustrationPage(Illustration illustration, String heroTag) {
+    Utilities.navigation.profileToIllustration(
+      context,
+      illustration: illustration,
+      heroTag: heroTag,
     );
   }
 

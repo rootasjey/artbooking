@@ -95,6 +95,8 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
 
   /// Profile route value for this location.
   static const String profileRoute = "$route/profile";
+  static const String profileIllustrationRoute =
+      "$profileRoute/:illustrationId";
 
   /// Settings route value for this location.
   static const String settingsRoute = "$route/settings";
@@ -136,6 +138,7 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
         licensesRoute,
         licenseRoute,
         likesRoute,
+        profileIllustrationRoute,
       ];
 
   @override
@@ -152,6 +155,15 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
           child: ActivityPage(),
           key: ValueKey(activityRoute),
           title: Utilities.ui.getPageTitle("activity".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
+      if (state.pathPatternSegments.contains("profile"))
+        BeamPage(
+          child: ProfilePage(
+            userId: state.pathParameters["userId"] ?? '',
+          ),
+          key: ValueKey("$profileRoute"),
+          title: Utilities.ui.getPageTitle("profile".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains("books"))
@@ -181,6 +193,7 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
         BeamPage(
           child: IllustrationPage(
             illustrationId: state.pathParameters["illustrationId"]!,
+            heroTag: Utilities.navigation.getHeroTag(state.routeState),
           ),
           key: ValueKey("$illustrationsRoute/one"),
           title: Utilities.ui.getPageTitle("illustration".tr()),
@@ -219,15 +232,6 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
           child: UpdateUsernamePage(),
           key: ValueKey("$updateUsernameRoute"),
           title: Utilities.ui.getPageTitle("username_update".tr()),
-          type: BeamPageType.fadeTransition,
-        ),
-      if (state.pathPatternSegments.contains("profile"))
-        BeamPage(
-          child: ProfilePage(
-            userId: state.pathParameters["userId"] ?? '',
-          ),
-          key: ValueKey("$profileRoute"),
-          title: Utilities.ui.getPageTitle("profile_my".tr()),
           type: BeamPageType.fadeTransition,
         ),
       if (state.pathPatternSegments.contains("licenses"))

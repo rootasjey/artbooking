@@ -4,8 +4,6 @@ import 'package:artbooking/components/cards/illustration_card.dart';
 import 'package:artbooking/components/cards/shimmer_card.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/router/locations/atelier_location.dart';
-import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
@@ -13,7 +11,6 @@ import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/firestore/doc_snap_map.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/section.dart';
-import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flash/src/flash_helper.dart';
@@ -159,6 +156,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
   }
 
   Widget leftRow() {
+    final int index = 0;
     final double size = 400.0;
 
     if (_illustrations.isEmpty) {
@@ -168,7 +166,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
           useIconPlaceholder: true,
           heroTag: "empty_${DateTime.now()}",
           illustration: Illustration.empty(),
-          index: 0,
+          index: index,
           size: size,
           onTap: () => widget.onShowIllustrationDialog?.call(
             section: widget.section,
@@ -193,18 +191,18 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
             : [];
 
     final firstIllustration = _illustrations.first;
+    final heroTag = "${widget.section.id}-${index}-${firstIllustration.id}";
 
     return wrapInResponsiveCard(
       child: IllustrationCard(
-        heroTag: "section-${widget.section.id}-"
-            "illustration-0-${firstIllustration.id}",
+        heroTag: heroTag,
         illustration: firstIllustration,
-        index: 0,
+        index: index,
         size: size,
         canDrag: canDrag,
         onDrop: onDrop,
         dragGroupName: "${widget.section.id}-${widget.index}",
-        onTap: () => navigateToIllustrationPage(firstIllustration),
+        onTap: () => navigateToIllustrationPage(firstIllustration, heroTag),
         popupMenuEntries: popupMenuEntries,
         onPopupMenuItemSelected: onIllustrationItemSelected,
       ),
@@ -259,16 +257,17 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
     final children = _illustrations.skip(1).map((Illustration illustration) {
       index++;
 
+      final heroTag = "${widget.section.id}-${index}-${illustration.id}";
+
       return IllustrationCard(
         canDrag: canDrag,
         onDrop: onDrop,
         dragGroupName: "${widget.section.id}-${widget.index}",
-        heroTag: "section-${widget.section.id}-"
-            "illustration-$index-${illustration.id}",
+        heroTag: heroTag,
         illustration: illustration,
         index: index,
         size: size,
-        onTap: () => navigateToIllustrationPage(illustration),
+        onTap: () => navigateToIllustrationPage(illustration, heroTag),
         popupMenuEntries: popupMenuEntries,
         onPopupMenuItemSelected: onIllustrationItemSelected,
       );
@@ -595,16 +594,11 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
     }
   }
 
-  void navigateToIllustrationPage(Illustration illustration) {
-    NavigationStateHelper.illustration = illustration;
-    Beamer.of(context).beamToNamed(
-      AtelierLocationContent.illustrationRoute.replaceFirst(
-        ":illustrationId",
-        illustration.id,
-      ),
-      data: {
-        "illustrationId": illustration.id,
-      },
+  void navigateToIllustrationPage(Illustration illustration, String heroTag) {
+    Utilities.navigation.profileToIllustration(
+      context,
+      illustration: illustration,
+      heroTag: heroTag,
     );
   }
 
