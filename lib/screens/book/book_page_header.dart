@@ -31,6 +31,7 @@ class BookPageHeader extends StatelessWidget {
     this.owner = false,
     this.onUpdateVisibility,
     this.authenticated = false,
+    this.heroTag = "",
   }) : super(key: key);
 
   final Book book;
@@ -54,8 +55,13 @@ class BookPageHeader extends StatelessWidget {
   final void Function()? onUploadToThisBook;
   final void Function(EnumContentVisibility)? onUpdateVisibility;
 
+  /// Custom hero tag (if `book.id` default tag is not unique).
+  final String heroTag;
+
   @override
   Widget build(BuildContext context) {
+    final String bookHeroTag = heroTag.isNotEmpty ? heroTag : book.id;
+
     return SliverPadding(
       padding: const EdgeInsets.only(
         top: 60.0,
@@ -67,7 +73,7 @@ class BookPageHeader extends StatelessWidget {
           Row(
             children: [
               Hero(
-                tag: book.id,
+                tag: bookHeroTag,
                 child: SizedBox(
                   height: 260.0,
                   width: 200.0,

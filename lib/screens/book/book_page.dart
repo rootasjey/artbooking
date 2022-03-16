@@ -38,10 +38,14 @@ class BookPage extends ConsumerStatefulWidget {
   const BookPage({
     Key? key,
     required this.bookId,
+    this.heroTag = "",
   }) : super(key: key);
 
   /// Book's id.
   final String bookId;
+
+  /// Custom hero tag (if `book.id` default tag is not unique).
+  final String heroTag;
 
   @override
   _MyBookPageState createState() => _MyBookPageState();
@@ -178,6 +182,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
               book: _book,
               forceMultiSelect: _forceMultiSelect,
               liked: _liked,
+              heroTag: widget.heroTag,
               authenticated: authenticated,
               multiSelectedItems: _multiSelectedItems,
               onLike: onLike,
@@ -625,26 +630,8 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     Illustration illustration,
     String illustrationKey,
   ) {
-    final location = Beamer.of(context)
-        .beamingHistory
-        .last
-        .history
-        .last
-        .routeInformation
-        .location;
-
     NavigationStateHelper.illustration = illustration;
-    String route = "";
-
-    if (location != null && location.contains("atelier")) {
-      route = AtelierLocationContent.illustrationBookRoute
-          .replaceFirst(":bookId", _book.id)
-          .replaceFirst(":illustrationId", illustration.id);
-    } else {
-      route = HomeLocation.illustrationBookRoute
-          .replaceFirst(":bookId", _book.id)
-          .replaceFirst(":illustrationId", illustration.id);
-    }
+    final String route = getIllustratioinNavRoute(illustration);
 
     Beamer.of(context).beamToNamed(
       route,
@@ -656,6 +643,38 @@ class _MyBookPageState extends ConsumerState<BookPage> {
         "heroTag": illustrationKey,
       },
     );
+  }
+
+  String getIllustratioinNavRoute(Illustration illustration) {
+    final location = Beamer.of(context)
+        .beamingHistory
+        .last
+        .history
+        .last
+        .routeInformation
+        .location;
+
+    if (location == null) {
+      return HomeLocation.illustrationBookRoute
+          .replaceFirst(":bookId", _book.id)
+          .replaceFirst(":illustrationId", illustration.id);
+    }
+
+    if (location.contains("atelier") && location.contains("profile")) {
+      return AtelierLocationContent.profileIllustrationBookRoute
+          .replaceFirst(":bookId", _book.id)
+          .replaceFirst(":illustrationId", illustration.id);
+    }
+
+    if (location.contains("atelier")) {
+      return AtelierLocationContent.illustrationBookRoute
+          .replaceFirst(":bookId", _book.id)
+          .replaceFirst(":illustrationId", illustration.id);
+    }
+
+    return HomeLocation.illustrationBookRoute
+        .replaceFirst(":bookId", _book.id)
+        .replaceFirst(":illustrationId", illustration.id);
   }
 
   void onBrowseIllustrations() {

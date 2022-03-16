@@ -2,8 +2,6 @@ import 'package:artbooking/components/cards/book_card.dart';
 import 'package:artbooking/components/cards/shimmer_card.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/router/locations/atelier_location.dart';
-import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
@@ -11,7 +9,6 @@ import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/firestore/doc_snap_map.dart';
 import 'package:artbooking/types/section.dart';
-import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flash/src/flash_helper.dart';
@@ -166,16 +163,18 @@ class _BookGridSectionState extends State<BookGridSection> {
     final children = _books.map((Book book) {
       index++;
 
+      final heroTag = "${widget.section.id}-${index}-${book.id}";
+
       return BookCard(
         index: index,
         canDrag: canDrag,
         dragGroupName: "${widget.section.id}-${widget.index}",
-        heroTag: "${widget.section.id}-${index}-${book.id}",
+        heroTag: heroTag,
         onDrop: onDrop,
         book: book,
         width: width,
         height: height,
-        onTap: () => navigateToBookPage(book),
+        onTap: () => navigateToBookPage(book, heroTag),
         popupMenuEntries: popupMenuEntries,
         onPopupMenuItemSelected: onBookItemSelected,
       );
@@ -499,16 +498,11 @@ class _BookGridSectionState extends State<BookGridSection> {
     }
   }
 
-  void navigateToBookPage(Book book) {
-    NavigationStateHelper.book = book;
-    Beamer.of(context).beamToNamed(
-      AtelierLocationContent.bookRoute.replaceFirst(
-        ":bookId",
-        book.id,
-      ),
-      data: {
-        "bookId": book.id,
-      },
+  void navigateToBookPage(Book book, String heroTag) {
+    Utilities.navigation.profileToBook(
+      context,
+      book: book,
+      heroTag: heroTag,
     );
   }
 

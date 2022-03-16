@@ -1,5 +1,6 @@
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
+import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/widgets.dart';
@@ -24,6 +25,23 @@ class NavigationUtilities {
 
     final mapState = routeState as Map<String, dynamic>;
     return mapState["heroTag"] ?? "";
+  }
+
+  /// Navigate from a profile page to a book page.
+  void profileToBook(
+    BuildContext context, {
+    required Book book,
+    required String heroTag,
+  }) {
+    NavigationStateHelper.book = book;
+    Beamer.of(context).beamToNamed(
+      AtelierLocationContent.profileBookRoute.replaceFirst(
+        ":bookId",
+        book.id,
+      ),
+      data: {"bookId": book.id},
+      routeState: {"heroTag": heroTag},
+    );
   }
 
   /// Navigate from a profile page to an illustration page.

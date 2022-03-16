@@ -95,8 +95,23 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
 
   /// Profile route value for this location.
   static const String profileRoute = "$route/profile";
+
+  /// A specific route for books
+  /// belonging to a profile page. This route existence
+  /// allow to keep scroll state & assure hero transition.
+  static const String profileBookRoute = "$profileRoute/b/:bookId";
+
+  /// A specific route for illustration inside a book,
+  /// belonging to a profile page. This route existence
+  /// allow to keep scroll state & assure hero transition.
+  static const String profileIllustrationBookRoute =
+      "$profileBookRoute/i/:illustrationId";
+
+  /// A specific route for illustrations
+  /// belonging to a profile page. This route existence
+  /// allow to keep scroll state & assure hero transition.
   static const String profileIllustrationRoute =
-      "$profileRoute/:illustrationId";
+      "$profileRoute/i/:illustrationId";
 
   /// Settings route value for this location.
   static const String settingsRoute = "$route/settings";
@@ -139,6 +154,8 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
         licenseRoute,
         likesRoute,
         profileIllustrationRoute,
+        profileBookRoute,
+        profileIllustrationBookRoute,
       ];
 
   @override
@@ -177,6 +194,7 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
         BeamPage(
           child: BookPage(
             bookId: state.pathParameters["bookId"]!,
+            heroTag: Utilities.navigation.getHeroTag(state.routeState),
           ),
           key: ValueKey("$booksRoute/one"),
           title: Utilities.ui.getPageTitle("book".tr()),
