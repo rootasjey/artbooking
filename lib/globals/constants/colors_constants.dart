@@ -45,6 +45,9 @@ class ColorsConstants {
   /// Color for projects.
   final Color projects = Colors.amber;
 
+  /// 3th color.
+  final Color tertiary = Colors.amber;
+
   /// Color for profile page sections.
   final Color sections = Colors.green.shade700;
 
