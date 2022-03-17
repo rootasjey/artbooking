@@ -163,7 +163,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   Widget build(BuildContext context) {
     final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
     final bool authenticated = userId != null && userId.isNotEmpty;
-    final bool owner = _book.userId == userId;
+    final bool isOwner = (_book.userId == userId) && _book.userId.isNotEmpty;
 
     return Scaffold(
       floatingActionButton: BookPageFab(
@@ -196,7 +196,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
               onShowRenameBookDialog: onShowRenameBookDialog,
               onUploadToThisBook: onUploadToThisBook,
               onUpdateVisibility: onUpdateVisibility,
-              owner: owner,
+              isOwner: isOwner,
             ),
             BookPageBody(
               loading: _loading,
@@ -212,7 +212,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
               onTapIllustrationCard: onTapIllustrationCard,
               onUploadToThisBook: onUploadToThisBook,
               onDropIllustration: onDropIllustration,
-              owner: owner,
+              isOwner: isOwner,
             ),
             SliverPadding(
               padding: const EdgeInsets.only(bottom: 100.0),
