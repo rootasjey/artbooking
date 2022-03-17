@@ -92,22 +92,25 @@ class Illustration {
   /// Define who can read or write this illustration.
   final EnumContentVisibility visibility;
 
-  factory Illustration.empty() {
+  factory Illustration.empty({
+    String id = "",
+    String userId = "",
+  }) {
     return Illustration(
       artMovements: const [],
       createdAt: DateTime.now(),
-      description: '',
+      description: "",
       dimensions: Dimensions.empty(),
-      extension: '',
-      id: '',
+      extension: "",
+      id: id,
       license: License.empty(),
-      name: '',
+      name: "",
       size: 0,
-      lore: '',
+      lore: "",
       topics: const [],
       updatedAt: DateTime.now(),
       links: IllustrationLinks.empty(),
-      userId: '',
+      userId: userId,
       userCustomIndex: 0,
       version: 0,
       visibility: EnumContentVisibility.private,
