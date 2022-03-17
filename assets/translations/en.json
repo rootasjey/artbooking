@@ -178,7 +178,8 @@
     "other": "Illustrations will still exist outside of this book."
   },
   "book_loading": "Loading book",
-  "book_no_illustrations": "You haven't added any illustration to this book yet. You can add one from your illustrations page.",
+  "book_no_illustration": "This book is currently empty.",
+  "book_owner_no_illustrations": "You haven't added any illustration to this book yet. You can add one from your illustrations page.",
   "book_permutation_description": "Drop this book on another one to permute them.",
   "book_rename": "Rename book",
   "book_rename_description": "Give a new name or description to this book.",
@@ -1065,6 +1066,7 @@
   "undefined_page_route_suffix": " does not exist.",
   "undefined_page_quote": "It is by getting lost that we learn.",
   "undefined_page_quote_2": "When we are lost, what matters is to find our way back.",
+  "under_construction": "Under construction",
   "unknown": "Unknown",
   "unlike": "Unlike",
   "unpublish": "Unpublish",

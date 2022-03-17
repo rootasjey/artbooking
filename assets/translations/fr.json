@@ -176,7 +176,8 @@
     "other": "Lss illustrations en elles-même continueront d'exister en dehors de ce book."
   },
   "book_loading": "Chargement du book",
-  "book_no_illustrations": "Vous avez ajouté aucune illustrations à ce book pour le moment. Vous pouvez en ajouter depuis votre page d'illustrations.",
+  "book_no_illustration": "Ce book est vide pour l'instant.",
+  "book_owner_no_illustration": "Vous avez ajouté aucune illustrations à ce book pour le moment. Vous pouvez en ajouter depuis votre page d'illustrations.",
   "book_permutation_description": "Déposez ce book sur un autre pour les permutter.",
   "book_quebert": "La Vérité sur l'Affaire Harry Quebert",
   "book_rename": "Renommer ce book",
@@ -1064,6 +1065,7 @@
   "undefined_page_route_suffix": " n'existe pas.",
   "undefined_page_quote": "C'est en se perdant qu'on apprend.",
   "undefined_page_quote_2": "Quand nous nous perdons, ce qui compte est de retrouver notre chemin.",
+  "under_construction": "En construction",
   "unknown": "Inconnu(e)",
   "unlike": "Je n'aime plus",
   "unpublish": "Rendre non-public",
