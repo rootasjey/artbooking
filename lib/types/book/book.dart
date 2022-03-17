@@ -93,12 +93,17 @@ class Book {
   /// Control if other people can view this book.
   final EnumContentVisibility visibility;
 
-  factory Book.empty() {
+  factory Book.empty({
+    String id = "",
+    String name = "",
+  }) {
     return Book(
+      id: id,
+      name: name,
       cover: BookCover.empty(),
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-      userId: '',
+      userId: "",
     );
   }
 
