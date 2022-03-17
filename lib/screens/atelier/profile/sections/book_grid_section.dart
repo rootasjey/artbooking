@@ -432,6 +432,7 @@ class _BookGridSectionState extends State<BookGridSection> {
         return Book.empty(
           id: id,
           name: "?",
+          userId: widget.userId,
         );
       }
 
@@ -442,6 +443,7 @@ class _BookGridSectionState extends State<BookGridSection> {
       return Book.empty(
         id: id,
         name: "?",
+        userId: widget.userId,
       );
     }
   }
@@ -487,8 +489,9 @@ class _BookGridSectionState extends State<BookGridSection> {
       final bookSnapshot = await FirebaseFirestore.instance
           .collection("books")
           .where("user_id", isEqualTo: widget.userId)
+          .where("visibility", isEqualTo: "public")
           .limit(6)
-          .orderBy("updated_at", descending: true)
+          .orderBy("user_custom_index", descending: true)
           .get();
 
       if (bookSnapshot.size == 0) {
@@ -500,7 +503,7 @@ class _BookGridSectionState extends State<BookGridSection> {
 
       for (DocSnapMap document in bookSnapshot.docs) {
         final data = document.data();
-        data['id'] = document.id;
+        data["id"] = document.id;
         _books.add(Book.fromMap(data));
       }
     } catch (error) {

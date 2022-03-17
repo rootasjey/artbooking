@@ -456,14 +456,20 @@ class _IllustrationRowSectionState extends State<IllustrationRowSection> {
 
       final data = snapshot.data();
       if (!snapshot.exists || data == null) {
-        return Illustration.empty();
+        return Illustration.empty(
+          id: id,
+          userId: widget.userId,
+        );
       }
 
       data["id"] = snapshot.id;
       return Illustration.fromMap(data);
     } catch (error) {
       Utilities.logger.e(error);
-      return Illustration.empty();
+      return Illustration.empty(
+        id: id,
+        userId: widget.userId,
+      );
     }
   }
 
@@ -474,7 +480,6 @@ class _IllustrationRowSectionState extends State<IllustrationRowSection> {
       _loading = true;
       _illustrations.clear();
     });
-    // _illustrations.clear();
 
     try {
       final illustrationsSnapshot = await FirebaseFirestore.instance
@@ -508,8 +513,6 @@ class _IllustrationRowSectionState extends State<IllustrationRowSection> {
     if (_loading) {
       return;
     }
-
-    // _loading = true;
 
     if (widget.section.dataFetchMode == EnumSectionDataMode.sync) {
       fetchSyncIllustrations();

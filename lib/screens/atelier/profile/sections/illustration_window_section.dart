@@ -555,14 +555,20 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
 
       final data = snapshot.data();
       if (!snapshot.exists || data == null) {
-        return Illustration.empty();
+        return Illustration.empty(
+          id: id,
+          userId: widget.userId,
+        );
       }
 
       data["id"] = snapshot.id;
       return Illustration.fromMap(data);
     } catch (error) {
       Utilities.logger.e(error);
-      return Illustration.empty();
+      return Illustration.empty(
+        id: id,
+        userId: widget.userId,
+      );
     }
   }
 
