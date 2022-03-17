@@ -19,7 +19,7 @@ class IllustrationLinks {
       original:
           "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Fillustrations%2Fmissing_illustration_2048.png?alt=media&token=558532de-9cea-4968-8578-d35b81192c84",
       share: ShareLinks.empty(),
-      storage: '',
+      storage: "",
       thumbnails: ThumbnailLinks.empty(),
     );
   }
@@ -30,9 +30,9 @@ class IllustrationLinks {
     }
 
     return IllustrationLinks(
-      original: data['original'] ?? '',
+      original: data['original'] ?? "",
       share: ShareLinks.fromMap(data['share']),
-      storage: data['storage'] ?? '',
+      storage: data['storage'] ?? "",
       thumbnails: ThumbnailLinks.fromMap(data['thumbnails']),
     );
   }

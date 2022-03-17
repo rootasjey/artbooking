@@ -195,10 +195,6 @@ class _PosterSectionState extends State<PosterSection> {
       return;
     }
 
-    // if (_loading == true) {
-    //   return;
-    // }
-
     _loading = true;
     final String illustrationId = widget.section.items.first;
 
