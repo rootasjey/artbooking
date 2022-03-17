@@ -1,3 +1,4 @@
+import 'package:artbooking/components/buttons/circle_button.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/constants/section_ids.dart';
@@ -98,13 +99,31 @@ class ProfilePageBody extends StatelessWidget {
 
     return Scaffold(
       floatingActionButton: fab(context),
-      body: ImprovedScrolling(
-        scrollController: scrollController,
-        enableKeyboardScrolling: true,
-        child: CustomScrollView(
-          controller: scrollController,
-          slivers: slivers,
-        ),
+      body: Stack(
+        children: [
+          ImprovedScrolling(
+            scrollController: scrollController,
+            enableKeyboardScrolling: true,
+            child: CustomScrollView(
+              controller: scrollController,
+              slivers: slivers,
+            ),
+          ),
+          Positioned(
+            top: 16.0,
+            left: 64.0,
+            child: CircleButton(
+              tooltip: "back".tr(),
+              elevation: 2.0,
+              backgroundColor: Constants.colors.tertiary,
+              onTap: () => Utilities.navigation.back(context),
+              icon: Icon(
+                UniconsLine.arrow_left,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -170,6 +189,7 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         userId: userId,
+        isOwner: isOwner,
         usingAsDropTarget: usingAsDropTarget,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
         popupMenuEntries: popupMenuEntries,
@@ -182,6 +202,7 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         userId: userId,
+        isOwner: isOwner,
         usingAsDropTarget: usingAsDropTarget,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
         popupMenuEntries: popupMenuEntries,
@@ -196,6 +217,7 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         userId: userId,
+        isOwner: isOwner,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -210,6 +232,7 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         userId: userId,
+        isOwner: isOwner,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -223,6 +246,7 @@ class ProfilePageBody extends StatelessWidget {
       return PosterSection(
         index: index,
         section: section,
+        isOwner: isOwner,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -237,6 +261,7 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         userId: userId,
+        isOwner: isOwner,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -250,6 +275,7 @@ class ProfilePageBody extends StatelessWidget {
       return SpacingSection(
         index: index,
         section: section,
+        isOwner: isOwner,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -261,6 +287,7 @@ class ProfilePageBody extends StatelessWidget {
       return H1Section(
         index: index,
         section: section,
+        isOwner: isOwner,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -273,6 +300,7 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         userId: userId,
+        isOwner: isOwner,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onShowIllustrationDialog: onShowIllustrationDialog,
@@ -299,6 +327,15 @@ class ProfilePageBody extends StatelessWidget {
     required BuildContext context,
     required ScrollController scrollController,
   }) {
+    if (!isOwner) {
+      return SliverToBoxAdapter(
+        child: getSectionWidget(
+          section: section,
+          index: index,
+        ),
+      );
+    }
+
     return SliverToBoxAdapter(
       child: Stack(
         children: [

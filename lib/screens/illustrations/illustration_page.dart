@@ -4,6 +4,8 @@ import 'package:animations/animations.dart';
 import 'package:artbooking/components/custom_scroll_behavior.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/screens/edit_image/edit_image_page.dart';
 import 'package:artbooking/screens/illustrations/edit/edit_illustration_page.dart';
 import 'package:artbooking/screens/illustrations/illustration_page_body.dart';
@@ -14,6 +16,7 @@ import 'package:artbooking/screens/illustrations/illustration_page_fab.dart';
 import 'package:artbooking/types/firestore/doc_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/json_types.dart';
+import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
@@ -124,6 +127,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
                       onLike: authenticated ? onLike : null,
                       onShare: onShare,
                       liked: _liked,
+                      onTapUser: onTapUser,
                     ),
                   ],
                 ),
@@ -396,5 +400,35 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
   void goToEditImagePage() async {
     await Beamer.of(context).popRoute();
     onGoToEditImagePage();
+  }
+
+  void onTapUser(UserFirestore userFirestore) {
+    final String route = getUserRoute(userFirestore);
+    Beamer.of(context).beamToNamed(
+      route,
+      data: {"userId": userFirestore.id},
+    );
+  }
+
+  String getUserRoute(UserFirestore userFirestore) {
+    final location = Beamer.of(context)
+        .beamingHistory
+        .last
+        .history
+        .last
+        .routeInformation
+        .location;
+
+    if (location == null) {
+      return HomeLocation.profileRoute
+          .replaceFirst(":userId", userFirestore.id);
+    }
+
+    if (location.contains("atelier")) {
+      return AtelierLocationContent.profileRoute
+          .replaceFirst(":userId", userFirestore.id);
+    }
+
+    return HomeLocation.profileRoute.replaceFirst(":userId", userFirestore.id);
   }
 }

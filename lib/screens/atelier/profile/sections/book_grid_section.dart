@@ -21,19 +21,23 @@ import 'package:unicons/unicons.dart';
 class BookGridSection extends StatefulWidget {
   const BookGridSection({
     Key? key,
+    required this.index,
+    required this.section,
     required this.userId,
     this.onPopupMenuItemSelected,
     this.popupMenuEntries = const [],
-    required this.index,
-    required this.section,
     this.isLast = false,
     this.onUpdateSectionItems,
     this.onShowBookDialog,
     this.usingAsDropTarget = false,
+    this.isOwner = false,
   }) : super(key: key);
 
   final bool isLast;
   final bool usingAsDropTarget;
+
+  /// True if the current authenticated user is the owner.
+  final bool isOwner;
   final String userId;
   final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
 
@@ -145,7 +149,7 @@ class _BookGridSectionState extends State<BookGridSection> {
 
   List<Widget> getChildren() {
     int index = -1;
-    final bool canDrag = _currentMode == EnumSectionDataMode.chosen;
+    final bool canDrag = getCanDrag();
     final onDrop = canDrag ? onDropBook : null;
     final List<PopupMenuEntry<EnumBookItemAction>> popupMenuEntries = canDrag
         ? [
@@ -180,7 +184,8 @@ class _BookGridSectionState extends State<BookGridSection> {
       );
     }).toList();
 
-    if ((children.length % 3 != 0 && children.length < 6) || children.isEmpty) {
+    if (widget.isOwner && (children.length % 3 != 0 && children.length < 6) ||
+        children.isEmpty) {
       children.add(
         BookCard(
           asPlaceHolder: true,
@@ -275,6 +280,10 @@ class _BookGridSectionState extends State<BookGridSection> {
   }
 
   Widget rightPopupMenuButton() {
+    if (!widget.isOwner) {
+      return Container();
+    }
+
     final popupMenuEntries = getPopupMenuEntries();
 
     return Positioned(
@@ -354,6 +363,25 @@ class _BookGridSectionState extends State<BookGridSection> {
     );
   }
 
+  /// (BAD) Check for changes and fetch new data a change is detected.
+  /// WARNING: This is anti-pattern to `setState()` inside of a `build()` method.
+  void checkData() {
+    if (_firstExecution) {
+      _firstExecution = false;
+      fetchBooks();
+      return;
+    }
+
+    if (_currentMode != widget.section.dataFetchMode) {
+      _currentMode = widget.section.dataFetchMode;
+      _currentMode == EnumSectionDataMode.sync ? fetchBooks() : null;
+    }
+
+    if (_currentMode == EnumSectionDataMode.chosen) {
+      diffBook();
+    }
+  }
+
   /// Update UI without re-loading the whole component.
   void diffBook() async {
     if (_loading) {
@@ -362,28 +390,28 @@ class _BookGridSectionState extends State<BookGridSection> {
 
     _loading = true;
 
-    final illustrationIds = _books.map((x) => x.id).toList();
-    var initialIllustrations = widget.section.items;
-    if (listEquals(illustrationIds, initialIllustrations)) {
+    final bookIds = _books.map((x) => x.id).toList();
+    var initialBooks = widget.section.items;
+    if (listEquals(bookIds, initialBooks)) {
       _loading = false;
       return;
     }
 
     // Ignore illustrations which are still in the list.
-    final illustrationsToFetch = initialIllustrations.sublist(0)
-      ..removeWhere((x) => illustrationIds.contains(x));
+    final booksToFetch = initialBooks.sublist(0)
+      ..removeWhere((x) => bookIds.contains(x));
 
     // Remove illustrations which are not in the list anymore.
-    _books.removeWhere((x) => !initialIllustrations.contains(x.id));
+    _books.removeWhere((x) => !initialBooks.contains(x.id));
 
-    if (illustrationsToFetch.isEmpty) {
+    if (booksToFetch.isEmpty) {
       _loading = false;
       return;
     }
 
     // Fetch new illustrations.
     final List<Future<Book>> futures = [];
-    for (final id in illustrationsToFetch) {
+    for (final id in booksToFetch) {
       futures.add(fetchBook(id));
     }
 
@@ -401,14 +429,20 @@ class _BookGridSectionState extends State<BookGridSection> {
 
       final data = snapshot.data();
       if (!snapshot.exists || data == null) {
-        return Book.empty();
+        return Book.empty(
+          id: id,
+          name: "?",
+        );
       }
 
       data["id"] = snapshot.id;
       return Book.fromMap(data);
     } catch (error) {
       Utilities.logger.e(error);
-      return Book.empty();
+      return Book.empty(
+        id: id,
+        name: "?",
+      );
     }
   }
 
@@ -479,23 +513,12 @@ class _BookGridSectionState extends State<BookGridSection> {
     }
   }
 
-  /// (BAD) Check for changes and fetch new data a change is detected.
-  /// WARNING: This is anti-pattern to `setState()` inside of a `build()` method.
-  void checkData() {
-    if (_firstExecution) {
-      _firstExecution = false;
-      fetchBooks();
-      return;
+  bool getCanDrag() {
+    if (!widget.isOwner) {
+      return false;
     }
 
-    if (_currentMode != widget.section.dataFetchMode) {
-      _currentMode = widget.section.dataFetchMode;
-      _currentMode == EnumSectionDataMode.sync ? fetchBooks() : null;
-    }
-
-    if (_currentMode == EnumSectionDataMode.chosen) {
-      diffBook();
-    }
+    return _currentMode == EnumSectionDataMode.chosen;
   }
 
   void navigateToBookPage(Book book, String heroTag) {
@@ -503,6 +526,7 @@ class _BookGridSectionState extends State<BookGridSection> {
       context,
       book: book,
       heroTag: heroTag,
+      userId: widget.userId,
     );
   }
 

@@ -32,10 +32,14 @@ class IllustrationWindowSection extends StatefulWidget {
     this.onShowIllustrationDialog,
     this.onUpdateSectionItems,
     this.usingAsDropTarget = false,
+    this.isOwner = false,
   }) : super(key: key);
 
-  final bool isLast;
   final bool usingAsDropTarget;
+
+  /// True if the current authenticated user is the owner.
+  final bool isLast;
+  final bool isOwner;
   final int index;
   final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
 
@@ -177,7 +181,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
       );
     }
 
-    final bool canDrag = _currentMode == EnumSectionDataMode.chosen;
+    final bool canDrag = getCanDrag();
     final onDrop = canDrag ? onDropIllustration : null;
     final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries =
         canDrag
@@ -239,9 +243,9 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
 
   List<Widget> getChildren() {
     int index = 0;
-    final size = 200.0;
+    final double size = 200.0;
 
-    final bool canDrag = _currentMode == EnumSectionDataMode.chosen;
+    final bool canDrag = getCanDrag();
     final onDrop = canDrag ? onDropIllustration : null;
     final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries =
         canDrag
@@ -254,7 +258,9 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
               ]
             : [];
 
-    final children = _illustrations.skip(1).map((Illustration illustration) {
+    List<IllustrationCard> children = _illustrations.skip(1).map((
+      Illustration illustration,
+    ) {
       index++;
 
       final heroTag = "${widget.section.id}-${index}-${illustration.id}";
@@ -272,6 +278,18 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
         onPopupMenuItemSelected: onIllustrationItemSelected,
       );
     }).toList();
+
+    children = addMaybePlaceholder(children, size);
+    return children;
+  }
+
+  List<IllustrationCard> addMaybePlaceholder(
+    List<IllustrationCard> children,
+    double size,
+  ) {
+    if (!widget.isOwner) {
+      return children;
+    }
 
     final int placeholderMaxCount = min(4, 5 - _illustrations.length);
 
@@ -292,7 +310,6 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
         ),
       );
     }
-
     return children;
   }
 
@@ -370,6 +387,10 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
   }
 
   Widget rightPopupMenuButton() {
+    if (!widget.isOwner) {
+      return Container();
+    }
+
     final popupMenuEntries = getPopupMenuEntries();
 
     return Positioned(
@@ -444,6 +465,25 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
         ),
       ],
     );
+  }
+
+  /// (BAD) Check for changes and fetch new data a change is detected.
+  /// WARNING: This is anti-pattern to `setState()` inside of a `build()` method.
+  void checkData() {
+    if (_firstExecution) {
+      _firstExecution = false;
+      fetchIllustrations();
+      return;
+    }
+
+    if (_currentMode != widget.section.dataFetchMode) {
+      _currentMode = widget.section.dataFetchMode;
+      _currentMode == EnumSectionDataMode.sync ? fetchIllustrations() : null;
+    }
+
+    if (_currentMode == EnumSectionDataMode.chosen) {
+      diffIllustration();
+    }
   }
 
   /// Update UI without re-loading the whole component.
@@ -575,23 +615,12 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
     fetchChosenIllustrations();
   }
 
-  /// (BAD) Check for changes and fetch new data a change is detected.
-  /// /// WARNING: This is anti-pattern to `setState()` inside of a `build()` method.
-  void checkData() {
-    if (_firstExecution) {
-      _firstExecution = false;
-      fetchIllustrations();
-      return;
+  bool getCanDrag() {
+    if (!widget.isOwner) {
+      return false;
     }
 
-    if (_currentMode != widget.section.dataFetchMode) {
-      _currentMode = widget.section.dataFetchMode;
-      _currentMode == EnumSectionDataMode.sync ? fetchIllustrations() : null;
-    }
-
-    if (_currentMode == EnumSectionDataMode.chosen) {
-      diffIllustration();
-    }
+    return _currentMode == EnumSectionDataMode.chosen;
   }
 
   void navigateToIllustrationPage(Illustration illustration, String heroTag) {
@@ -599,6 +628,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
       context,
       illustration: illustration,
       heroTag: heroTag,
+      userId: widget.userId,
     );
   }
 

@@ -16,8 +16,19 @@ class HomeLocation extends BeamLocation<BeamState> {
   static const String illustrationRoute = "$illustrationsRoute/:illustrationId";
   static const String booksRoute = "/books";
   static const String bookRoute = "$booksRoute/:bookId";
-  static const String userProfileRoute = "/users/:userId";
+  static const String profileRoute = "/users/:userId";
   static const String illustrationBookRoute = "$bookRoute/:illustrationId/";
+
+  /// A specific route for books
+  /// belonging to a profile page. This route existence
+  /// allow to keep scroll state & assure hero transition.
+  static const String profileBookRoute = "$profileRoute/b/:bookId";
+
+  /// A specific route for illustrations
+  /// belonging to a profile page. This route existence
+  /// allow to keep scroll state & assure hero transition.
+  static const String profileIllustrationRoute =
+      "$profileRoute/i/:illustrationId";
 
   @override
   List<String> get pathPatterns => [
@@ -27,7 +38,9 @@ class HomeLocation extends BeamLocation<BeamState> {
         booksRoute,
         bookRoute,
         illustrationBookRoute,
-        userProfileRoute,
+        profileRoute,
+        profileBookRoute,
+        profileIllustrationRoute,
       ];
 
   @override
@@ -39,6 +52,16 @@ class HomeLocation extends BeamLocation<BeamState> {
         title: Utilities.ui.getPageTitle("home".tr()),
         type: BeamPageType.fadeTransition,
       ),
+      if (state.pathPatternSegments.contains("users") &&
+          state.pathPatternSegments.contains(":userId"))
+        BeamPage(
+          child: ProfilePage(
+            userId: state.pathParameters["userId"] ?? "",
+          ),
+          key: ValueKey("$profileRoute"),
+          title: Utilities.ui.getPageTitle("profile".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
       if (state.pathPatternSegments.contains("books"))
         BeamPage(
           child: BooksPage(),
@@ -70,16 +93,6 @@ class HomeLocation extends BeamLocation<BeamState> {
           ),
           key: ValueKey(illustrationRoute),
           title: Utilities.ui.getPageTitle("illustration".tr()),
-          type: BeamPageType.fadeTransition,
-        ),
-      if (state.pathPatternSegments.contains("users") &&
-          state.pathPatternSegments.contains(":userId"))
-        BeamPage(
-          child: ProfilePage(
-            userId: state.pathParameters["userId"] ?? '',
-          ),
-          key: ValueKey("$userProfileRoute"),
-          title: Utilities.ui.getPageTitle("profile".tr()),
           type: BeamPageType.fadeTransition,
         ),
     ];

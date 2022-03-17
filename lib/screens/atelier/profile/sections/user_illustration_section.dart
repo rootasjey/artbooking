@@ -32,9 +32,13 @@ class UserIllustrationSection extends StatefulWidget {
     this.onShowIllustrationDialog,
     this.onUpdateSectionItems,
     this.usingAsDropTarget = false,
+    this.isOwner = false,
   }) : super(key: key);
 
   final bool isLast;
+
+  /// True if the current authenticated user is the owner.
+  final bool isOwner;
   final bool usingAsDropTarget;
   final String userId;
   final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
@@ -187,6 +191,10 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
   }
 
   Widget rightPopupMenuButton() {
+    if (!widget.isOwner) {
+      return Container();
+    }
+
     final popupMenuEntries = getPopupMenuEntries();
 
     return Positioned(

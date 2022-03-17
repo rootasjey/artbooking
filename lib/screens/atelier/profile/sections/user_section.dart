@@ -24,9 +24,13 @@ class UserSection extends StatefulWidget {
     this.popupMenuEntries = const [],
     this.isLast = false,
     this.usingAsDropTarget = false,
+    this.isOwner = false,
   }) : super(key: key);
 
   final bool isLast;
+
+  /// True if the current authenticated user is the owner.
+  final bool isOwner;
   final bool usingAsDropTarget;
 
   /// Section's position in the layout (e.g. 0 is the first).
@@ -135,6 +139,10 @@ class _UserSectionState extends State<UserSection> {
   }
 
   Widget rightPopupMenuButton() {
+    if (!widget.isOwner) {
+      return Container();
+    }
+
     final popupMenuEntries = getPopupMenuEntries();
 
     return Positioned(

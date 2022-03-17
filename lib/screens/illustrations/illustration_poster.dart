@@ -98,6 +98,9 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
     final heroTag =
         widget.heroTag.isNotEmpty ? widget.heroTag : illustration.id;
 
+    final onTapUserOrNull =
+        widget.onTapUser != null ? () => widget.onTapUser?.call(_user) : null;
+
     return Column(
       children: [
         ConstrainedBox(
@@ -146,7 +149,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
               ),
             ),
             InkWell(
-              onTap: () => widget.onTapUser?.call(_user),
+              onTap: onTapUserOrNull,
               child: Opacity(
                 opacity: 0.6,
                 child: Text(
@@ -237,6 +240,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
       }
 
       setState(() {
+        data["id"] = widget.illustration.userId;
         _user = UserFirestore.fromMap(data);
       });
 

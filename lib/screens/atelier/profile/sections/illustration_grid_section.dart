@@ -30,9 +30,13 @@ class IllustrationGridSection extends StatefulWidget {
     this.onShowIllustrationDialog,
     this.onUpdateSectionItems,
     this.usingAsDropTarget = false,
+    this.isOwner = false,
   }) : super(key: key);
 
   final bool isLast;
+
+  /// True if the current authenticated user is the owner.
+  final bool isOwner;
   final bool usingAsDropTarget;
   final int index;
   final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
@@ -154,7 +158,7 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
 
   List<Widget> getChildren() {
     int index = -1;
-    final bool canDrag = _currentMode == EnumSectionDataMode.chosen;
+    final bool canDrag = getCanDrag();
     final onDrop = canDrag ? onDropIllustration : null;
     final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries =
         canDrag
@@ -185,7 +189,8 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
       );
     }).toList();
 
-    if ((children.length % 3 != 0 && children.length < 6) || children.isEmpty) {
+    if (widget.isOwner && (children.length % 3 != 0 && children.length < 6) ||
+        children.isEmpty) {
       children.add(
         IllustrationCard(
           useAsPlaceHolder: true,
@@ -278,6 +283,10 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
   }
 
   Widget rightPopupMenuButton() {
+    if (!widget.isOwner) {
+      return Container();
+    }
+
     final popupMenuEntries = getPopupMenuEntries();
 
     return Positioned(
@@ -352,6 +361,25 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
         ),
       ],
     );
+  }
+
+  /// (BAD) Check for changes and fetch new data a change is detected.
+  /// WARNING: This is anti-pattern to `setState()` inside of a `build()` method.
+  void checkData() {
+    if (_firstExecution) {
+      _firstExecution = false;
+      fetchIllustrations();
+      return;
+    }
+
+    if (_currentMode != widget.section.dataFetchMode) {
+      _currentMode = widget.section.dataFetchMode;
+      _currentMode == EnumSectionDataMode.sync ? fetchIllustrations() : null;
+    }
+
+    if (_currentMode == EnumSectionDataMode.chosen) {
+      diffIllustration();
+    }
   }
 
   /// Update UI without re-loading the whole component.
@@ -483,23 +511,12 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
     fetchChosenIllustrations();
   }
 
-  /// (BAD) Check for changes and fetch new data a change is detected.
-  /// /// WARNING: This is anti-pattern to `setState()` inside of a `build()` method.
-  void checkData() {
-    if (_firstExecution) {
-      _firstExecution = false;
-      fetchIllustrations();
-      return;
+  bool getCanDrag() {
+    if (!widget.isOwner) {
+      return false;
     }
 
-    if (_currentMode != widget.section.dataFetchMode) {
-      _currentMode = widget.section.dataFetchMode;
-      _currentMode == EnumSectionDataMode.sync ? fetchIllustrations() : null;
-    }
-
-    if (_currentMode == EnumSectionDataMode.chosen) {
-      diffIllustration();
-    }
+    return _currentMode == EnumSectionDataMode.chosen;
   }
 
   void navigateToIllustrationPage(Illustration illustration, String heroTag) {
@@ -507,6 +524,7 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
       context,
       illustration: illustration,
       heroTag: heroTag,
+      userId: widget.userId,
     );
   }
 

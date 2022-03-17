@@ -2,6 +2,7 @@ import 'package:artbooking/components/icons/animated_app_icon.dart';
 import 'package:artbooking/screens/illustrations/illustration_page_header.dart';
 import 'package:artbooking/screens/illustrations/illustration_poster.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +19,7 @@ class IllustrationPageBody extends StatelessWidget {
     this.onGoToEditImagePage,
     this.updatingImage = false,
     this.heroTag = "",
+    this.onTapUser,
   }) : super(key: key);
 
   final bool isLoading;
@@ -28,6 +30,10 @@ class IllustrationPageBody extends StatelessWidget {
   final Function()? onShare;
   final Function()? onShowEditMetadataPanel;
   final Function()? onGoToEditImagePage;
+
+  /// Callback when tapping on this illustration's owner.
+  final void Function(UserFirestore)? onTapUser;
+
   final Illustration illustration;
 
   /// Custom hero tag (if `illustration.id` default tag is not unique).
@@ -74,6 +80,7 @@ class IllustrationPageBody extends StatelessWidget {
             onGoToEditImagePage: onGoToEditImagePage,
             onLike: onLike,
             onShare: onShare,
+            onTapUser: onTapUser,
             heroTag: heroTag,
           ),
         ]),
