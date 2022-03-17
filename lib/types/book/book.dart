@@ -96,6 +96,7 @@ class Book {
   factory Book.empty({
     String id = "",
     String name = "",
+    String userId = "",
   }) {
     return Book(
       id: id,
@@ -103,7 +104,7 @@ class Book {
       cover: BookCover.empty(),
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-      userId: "",
+      userId: userId,
     );
   }
 
