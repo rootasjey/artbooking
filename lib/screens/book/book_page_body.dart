@@ -22,7 +22,7 @@ class BookPageBody extends StatelessWidget {
     this.hasError = false,
     this.onPopupMenuItemSelected,
     this.onTapIllustrationCard,
-    this.owner = false,
+    this.isOwner = false,
     this.onUploadToThisBook,
     this.onBrowseIllustrations,
     this.onDropIllustration,
@@ -39,8 +39,11 @@ class BookPageBody extends StatelessWidget {
 
   final List<BookIllustration> bookIllustrations;
 
+  /// True if the page is currently loading.
   final bool loading;
-  final bool owner;
+
+  /// True if the current authenticated user is the owner of this book.
+  final bool isOwner;
 
   /// Currently selected illustrations.
   final IllustrationMap multiSelectedItems;
@@ -90,6 +93,7 @@ class BookPageBody extends StatelessWidget {
       return BookPageBodyEmpty(
         onBrowseIllustrations: onBrowseIllustrations,
         onUploadToThisBook: onUploadToThisBook,
+        isOwner: isOwner,
       );
     }
 
@@ -127,12 +131,12 @@ class BookPageBody extends StatelessWidget {
               illustrationKey: key,
               selected: selected,
               selectionMode: selectionMode,
-              canDrag: owner,
+              canDrag: isOwner,
               onDragUpdate: onDragUpdateBook,
               onDrop: onDropIllustration,
               onTap: onTap,
-              onPopupMenuItemSelected: owner ? onPopupMenuItemSelected : null,
-              popupMenuEntries: owner ? popupMenuEntries : [],
+              onPopupMenuItemSelected: isOwner ? onPopupMenuItemSelected : null,
+              popupMenuEntries: isOwner ? popupMenuEntries : [],
             );
           },
           childCount: bookIllustrations.length,

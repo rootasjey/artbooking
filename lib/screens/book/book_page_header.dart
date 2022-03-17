@@ -28,7 +28,7 @@ class BookPageHeader extends StatelessWidget {
     this.onToggleMultiSelect,
     this.onShowRenameBookDialog,
     this.onUploadToThisBook,
-    this.owner = false,
+    this.isOwner = false,
     this.onUpdateVisibility,
     this.authenticated = false,
     this.heroTag = "",
@@ -36,7 +36,7 @@ class BookPageHeader extends StatelessWidget {
 
   final Book book;
   final bool liked;
-  final bool owner;
+  final bool isOwner;
   final bool authenticated;
   final bool forceMultiSelect;
 
@@ -95,7 +95,7 @@ class BookPageHeader extends StatelessWidget {
               rightRow(context),
             ],
           ),
-          if (owner)
+          if (isOwner)
             Padding(
               padding: const EdgeInsets.only(
                 top: 32.0,

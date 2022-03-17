@@ -10,7 +10,11 @@ class BookPageBodyEmpty extends StatelessWidget {
     Key? key,
     this.onUploadToThisBook,
     this.onBrowseIllustrations,
+    this.isOwner = false,
   }) : super(key: key);
+
+  /// True if the current authenticated user is the owner of this book.
+  final bool isOwner;
 
   /// Upload a new illustration and add it to this book.
   final void Function()? onUploadToThisBook;
@@ -48,7 +52,9 @@ class BookPageBodyEmpty extends StatelessWidget {
                   Opacity(
                     opacity: 0.6,
                     child: Text(
-                      "new_start_sentence".tr().toUpperCase(),
+                      isOwner
+                          ? "new_start_sentence".tr().toUpperCase()
+                          : "under_construction".tr().toUpperCase(),
                       textAlign: TextAlign.center,
                       style: Utilities.fonts.style(
                         fontSize: 16.0,
@@ -63,7 +69,9 @@ class BookPageBodyEmpty extends StatelessWidget {
                     child: Opacity(
                       opacity: 0.4,
                       child: Text(
-                        "book_no_illustrations".tr(),
+                        isOwner
+                            ? "book_owner_no_illustration".tr()
+                            : "book_no_illustration".tr(),
                         textAlign: TextAlign.center,
                         style: Utilities.fonts.style(
                           fontSize: 16.0,
@@ -71,37 +79,38 @@ class BookPageBodyEmpty extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 24.0),
-                    child: Column(
-                      children: [
-                        IconButton(
-                          tooltip: "book_upload_illustration".tr(),
-                          onPressed: onUploadToThisBook,
-                          icon: Icon(UniconsLine.upload),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: TextDivider(
-                            text: Opacity(
-                              opacity: 0.6,
-                              child: Text(
-                                "or".tr().toUpperCase(),
-                                style: Utilities.fonts.style(
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeight.w600,
+                  if (isOwner)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 24.0),
+                      child: Column(
+                        children: [
+                          IconButton(
+                            tooltip: "book_upload_illustration".tr(),
+                            onPressed: onUploadToThisBook,
+                            icon: Icon(UniconsLine.upload),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: TextDivider(
+                              text: Opacity(
+                                opacity: 0.6,
+                                child: Text(
+                                  "or".tr().toUpperCase(),
+                                  style: Utilities.fonts.style(
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        DarkTextButton(
-                          onPressed: onBrowseIllustrations,
-                          child: Text("illustrations_yours_browse".tr()),
-                        ),
-                      ],
+                          DarkTextButton(
+                            onPressed: onBrowseIllustrations,
+                            child: Text("illustrations_yours_browse".tr()),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
