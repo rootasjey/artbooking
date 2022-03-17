@@ -210,8 +210,8 @@ class _IllustrationCardState extends State<IllustrationCard>
   }
 
   Widget imageCard({bool usingAsDropTarget = false}) {
-    String imageUrl = widget.illustration.getThumbnail();
-    Color defaultColor = Colors.transparent;
+    final String imageUrl = widget.illustration.getThumbnail();
+    final Color defaultColor = Colors.transparent;
     final Color primaryColor = Theme.of(context).primaryColor;
 
     BorderSide borderSide = BorderSide.none;
@@ -220,7 +220,7 @@ class _IllustrationCardState extends State<IllustrationCard>
       borderSide = BorderSide(color: primaryColor, width: 4.0);
     }
 
-    final Widget cardChild = Card(
+    Widget cardChild = Card(
       color: widget.selected ? primaryColor : defaultColor,
       elevation: _elevation,
       shape: RoundedRectangleBorder(
@@ -287,7 +287,7 @@ class _IllustrationCardState extends State<IllustrationCard>
     );
 
     if (widget.canDrag) {
-      return LongPressDraggable<DragData>(
+      cardChild = LongPressDraggable<DragData>(
         data: DragData(
           index: widget.index,
           groupName: widget.dragGroupName,
@@ -296,6 +296,13 @@ class _IllustrationCardState extends State<IllustrationCard>
         feedback: draggingCard(),
         childWhenDragging: childWhenDragging(),
         onDragUpdate: widget.onDragUpdate,
+        child: cardChild,
+      );
+    }
+
+    if (widget.illustration.id.isEmpty) {
+      cardChild = Opacity(
+        opacity: 0.4,
         child: cardChild,
       );
     }
