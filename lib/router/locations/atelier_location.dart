@@ -37,7 +37,7 @@ class AtelierLocation extends BeamLocation<BeamState> {
   @override
   List<BeamGuard> get guards => [
         BeamGuard(
-          pathPatterns: [route],
+          pathPatterns: [route, routeWildCard],
           check: (context, location) {
             final providerContainer = ProviderScope.containerOf(
               context,
