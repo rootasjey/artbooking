@@ -73,6 +73,7 @@ class HomeLocation extends BeamLocation<BeamState> {
         BeamPage(
           child: BookPage(
             bookId: state.pathParameters["bookId"]!,
+            heroTag: Utilities.navigation.getHeroTag(state.routeState),
           ),
           key: ValueKey(bookRoute),
           title: Utilities.ui.getPageTitle("book".tr()),

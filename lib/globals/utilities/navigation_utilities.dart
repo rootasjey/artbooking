@@ -94,7 +94,10 @@ class NavigationUtilities {
     NavigationStateHelper.book = book;
     Beamer.of(context).beamToNamed(
       route,
-      data: {"bookId": book.id},
+      data: {
+        "userId": userId,
+        "bookId": book.id,
+      },
       routeState: {"heroTag": heroTag},
     );
   }
