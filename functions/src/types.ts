@@ -161,7 +161,7 @@ interface DeleteOneLicenseParams {
 
 interface GenerateImageThumbsResult {
   dimensions: ImageDimensions;
-  thumbnails: ThumbnailUrls;
+  thumbnails: ThumbnailLinks;
 }
 
 /** Image's size, orientation & extension. */
@@ -292,6 +292,23 @@ interface License {
   version: string;
 }
 
+interface MasterpieceLinks {
+  original: string,
+  share: { 
+    read: string, 
+    write: string, 
+  },
+  storage: string,
+  thumbnails: {
+    xs: string,
+    s: string,
+    m: string,
+    l: string,
+    xl: string,
+    xxl: string,
+  }
+}
+
 interface NotifFuncParams {
   userId: string;
   userData: any;
@@ -320,14 +337,6 @@ interface BookIllustration {
   };
 }
 
-interface ThumbnailUrls {
-  [key: string]: String,
-  t360: String;
-  t480: String;
-  t720: String;
-  t1080: String;
-}
-
 interface ReorderBookIllustrationsParams {
   /** Book's id. */
   book_id: string;
@@ -337,6 +346,16 @@ interface ReorderBookIllustrationsParams {
 
   /** Indexes of illustrations being dragged.  */
   drag_indexes: number[];
+}
+
+interface ThumbnailLinks {
+  [key: string]: String,
+  xs: String;
+  s: String;
+  m: String;
+  l: String;
+  xl: String;
+  xxl: String;
 }
 
 interface UpdateBookIllustrationsParams {

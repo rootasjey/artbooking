@@ -36,6 +36,163 @@ interface GenerateImageThumbsParams {
 }
 
 /**
+ * Use this function in the admin console to migrate data scheme.
+ */
+export const migrateIllustrationThumbnails = functions
+  .region(cloudRegions.eu)
+  .https
+  .onRequest(async (req, resp) => {
+    const illustrationSnap = await firestore
+      .collection("illustrations")
+      .get()
+
+    let count = 0
+    for await (const illustrationDoc of illustrationSnap.docs) {
+      const illustrationData = illustrationDoc.data()
+      const links = illustrationData.links
+      const directory = `users/${illustrationData.user_id}/illustrations/${illustrationDoc.id}`
+
+      const [files] = await adminApp.storage()
+      .bucket()
+      .getFiles({
+        directory,
+      });
+
+
+      links.thumbnails = {
+        xs: "",
+        s: "",
+        m: "",
+        l: "",
+        xl: "",
+        xxl: "",
+      }
+
+      for await (const file of files) {
+        if (file.name.indexOf("/original") > -1) {
+          const [metadataOriginal] = await file.getMetadata();
+        
+          const downloadTokenOriginal = metadataOriginal.metadata?.firebaseStorageDownloadTokens ?? '';
+          const firebaseDownloadUrlOriginal = createPersistentDownloadUrl(
+            file.bucket.name,
+            file.name, 
+            downloadTokenOriginal,
+          );
+          
+          links.original = firebaseDownloadUrlOriginal
+          continue
+        }
+
+        const thumbIndex = file.name.indexOf("thumb@")
+        if (thumbIndex < 0) { continue }
+
+        const dotIndex = file.name.lastIndexOf(".")
+        const sizeName = file.name.substring(thumbIndex +6, dotIndex)
+
+        const [metadata] = await file.getMetadata();
+        
+        const downloadToken = metadata.metadata?.firebaseStorageDownloadTokens ?? '';
+        const firebaseDownloadUrl = createPersistentDownloadUrl(
+          file.bucket.name,
+          file.name, 
+          downloadToken,
+        );
+
+        links.thumbnails[sizeName] = firebaseDownloadUrl
+      }
+
+      await illustrationDoc.ref.update(illustrationData)
+      count++
+      functions.logger.info(`updated illustration: ${illustrationDoc.id}`)
+    }
+
+    functions.logger.info(`regenerate links for ${count} illustration(s)`)
+    resp.status(200).send("done")
+  })
+
+/**
+ * Use this function in the admin console to migrate data scheme.
+ */
+export const migrateStorageThumbnails = functions
+  .region(cloudRegions.eu)
+  .https
+  .onRequest(async (req, resp) => {
+    const [files] = await adminApp.storage()
+      .bucket()
+      .getFiles({
+        directory: `users/`
+      });
+
+    // const sizeMap: Record<string, string> = {
+    //   360: "xs",
+    //   480: "s",
+    //   720: "m",
+    //   1024: "l",
+    //   1080: "l",
+    //   1920: "xl",
+    //   2400: "xxl",
+    //   xs: "xs",
+    //   s: "s",
+    //   m: "m",
+    //   l: "l",
+    //   xl: "xl",
+    //   xxl: "xxl",
+    // }
+
+    // const newSizeMap: Record<string, string> = {
+    //   xs: "xs",
+    //   s: "s",
+    //   m: "m",
+    //   l: "l",
+    //   xl: "xl",
+    //   xxl: "xxl",
+    // }
+
+    let cursor = 0;
+    const skipped = 0
+    const maxCount = 400
+    
+    for await (const file of files) {
+      if (cursor > maxCount) { break }
+      const filePath = file.name
+
+      const containsImages = filePath.indexOf("images/") > -1
+      const containsIllustrations = filePath.indexOf("illustrations/") > -1
+      
+      if (containsImages && !containsIllustrations) {
+        const destination = filePath.replace("images/", "illustrations/")
+        await file.move(destination)
+        functions.logger.info(`moved: ${filePath} → ${destination}`)
+        cursor++
+      }
+
+      // const thumbIndex = file.name.indexOf("thumb@")
+      
+      // if (thumbIndex > -1) {
+      //   const dotIndex = file.name.lastIndexOf(".")
+      //   const ext = file.name.substring(dotIndex)
+      //   const size = file.name.substring(thumbIndex +6, dotIndex)
+      //   let sizeName = sizeMap[size]
+
+      //   if (newSizeMap[size]) { skipped++; continue }
+
+      //   const prefix = file.name.substring(0, thumbIndex)
+        
+      //   const oldName = file.name
+      //   const dest = `${prefix}thumb@${sizeName}${ext}`
+      //   await file.rename(dest)
+
+      //   functions.logger.info(`ext: ${ext} | size: ${size} | sizeName: ${sizeName}`)
+      //   functions.logger.info(`renamed: ${oldName} → ${dest}`)
+      //   cursor++
+      // }
+    }
+
+    functions.logger.info(`moved ${cursor} file(s) | skpped ${skipped}`)
+    resp.status(200).send("done")
+  })
+
+/**
  * Check an illustration document in Firestore from its id [illustrationId].
  * If the document has missing properties, try to populate them from storage file.
  * If there's no corresponding storage file, delete the firestore document.
@@ -116,13 +273,13 @@ export const checkProperties = functions
     const firstFile = files[0];
     const [metadata] = await firstFile.getMetadata();
 
-    const thumbnails: ThumbnailUrls = {
-      t1080: '',
-      t1920: '',
-      t2400: '',
-      t360: '',
-      t480: '',
-      t720: '',
+    const thumbnails: ThumbnailLinks = {
+      xs: '',
+      s: '',
+      m: '',
+      l: '',
+      xl: '',
+      xxl: '',
     };
 
     /** Image's original url from Firebase Storage. */
@@ -138,7 +295,7 @@ export const checkProperties = functions
       const link = createPersistentDownloadUrl(bucketName, file.name, downloadToken)
 
       if (atIndex > -1) { // thumbnails
-        thumbnails[`t${sizeStr}`] = link;
+        thumbnails[`${sizeStr}`] = link;
       } else { // original image
         originalLink = link
         storagePath = file.name || '';
@@ -220,12 +377,12 @@ export const createOne = functions
           },
           storage: '',
           thumbnails: {
-            t360: '',
-            t480: '',
-            t720: '',
-            t1080: '',
-            t1920: '',
-            t2400: '',
+            xs: '',
+            s: '',
+            m: '',
+            l: '',
+            xl: '',
+            xxl: '',
           },
         },
         lore: '',
@@ -1146,14 +1303,23 @@ async function generateImageThumbs(
     visibility, 
   } = params;
 
-  const thumbnails: ThumbnailUrls = {
-    t1080: '',
-    t1920: '',
-    t2400: '',
-    t360: '',
-    t480: '',
-    t720: '',
+  const thumbnails: ThumbnailLinks = {
+    xs: '',
+    s: '',
+    m: '',
+    l: '',
+    xl: '',
+    xxl: '',
   };
+
+  const thumbnailSizes = {
+    xs: 360,
+    s: 480,
+    m: 720,
+    l: 1024,
+    xl: 1920,
+    xxl: 2400,
+  }
 
   const allowedExt = ['jpg', 'jpeg', 'png', 'webp', 'tiff'];
 
@@ -1191,26 +1357,23 @@ async function generateImageThumbs(
   }
 
   // 3. Resize the images and define an array of upload promises.
-  const sizes = Object
-    .keys(thumbnails)
-    .map((key) => parseInt(key.replace('t', '')));
+  const uploadPromises = Object.entries(thumbnailSizes)
+    .map(async ([sizeName, size]) => {
+      const thumbName = `thumb@${sizeName}.${extension}`;
+      const thumbPath = join(workingDir, thumbName);
 
-  const uploadPromises = sizes.map(async (size) => {
-    const thumbName = `thumb@${size}.${extension}`;
-    const thumbPath = join(workingDir, thumbName);
+      // Resize source image.
+      await sharp(tmpFilePath)
+        .resize(size, size, { withoutEnlargement: true })
+        .toFile(thumbPath);
 
-    // Resize source image.
-    await sharp(tmpFilePath)
-      .resize(size, size, { withoutEnlargement: true })
-      .toFile(thumbPath);
-
-    return bucket.upload(thumbPath, {
-      destination: join(bucketDir, thumbName),
-      metadata: {
-        metadata: objectMeta.metadata,
-      },
-      public: visibility === 'public',
-    });
+      return bucket.upload(thumbPath, {
+        destination: join(bucketDir, thumbName),
+        metadata: {
+          metadata: objectMeta.metadata,
+        },
+        public: visibility === 'public',
+      });
   });
 
   // 4. Run the upload operations.
@@ -1224,7 +1387,7 @@ async function generateImageThumbs(
   for await (const upResp of uploadResponses) {
     const upFile = upResp[0];
     let key = upFile.name.split('/').pop() || '';
-    key = key.substring(0, key.lastIndexOf('.')).replace('thumb@', 't');
+    key = key.substring(0, key.lastIndexOf('.')).replace('thumb@', '');
 
     const metadataResponse = await upFile.getMetadata();
     const metadata = metadataResponse[0];

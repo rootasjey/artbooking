@@ -17,6 +17,47 @@ const firebaseTools = require('firebase-tools');
 const firestore = adminApp.firestore();
 
 /**
+ * Use this function in the admin console to migrate data scheme.
+ */
+export const migrateCover = functions
+  .region(cloudRegions.eu)
+  .https
+  .onRequest(async (req, resp) => {
+    const bookSnap = await firestore
+      .collection("books")
+      .get()
+
+    for await (const bookDoc of bookSnap.docs) {
+      const bookData = bookDoc.data()
+      const bookCover = bookData.cover
+      const link = bookCover.link ?? bookCover.s
+      
+      const cover = {
+        links: {
+          original: "",
+          share: { read: "", write: "" },
+          storage: "",
+          thumbnails: {
+            xs: link,
+            s: link,
+            m: link,
+            l: link,
+            xl: link,
+            xxl: link,
+          },
+        },
+        mode: bookCover.mode,
+        updated_at: bookCover.updated_at,
+      }
+
+      functions.logger.info(`updating book ${bookDoc.id} | link: ${bookCover.link}`)
+      await bookDoc.ref.update({ cover })
+    }
+
+    resp.status(200).send("done")
+  })
+
+/**
  * Add illustrations to a list of existing books.
  */
 export const addIllustrations = functions
@@ -78,9 +119,9 @@ export const addIllustrations = functions
     const bookIllustrations: BookIllustration[] = bookData.illustrations;
     let newBookIllustrations = bookIllustrations.concat(newIllustrations);
     
-    let bookCoverLink = bookData.cover?.link
+    let bookCoverLinks = bookData.cover?.links
     if (bookData.cover?.mode === BookCoverMode.lastIllustrationAdded) {
-      bookCoverLink = await getBookThumbnailLink(newBookIllustrations);
+      bookCoverLinks = await getBookCoverLinks(newBookIllustrations);
     }
     
     if (newBookIllustrations.length > 100) {
@@ -91,7 +132,7 @@ export const addIllustrations = functions
     await bookSnapshot.ref.update({
       count: newBookIllustrations.length,
       cover: { 
-        link: bookCoverLink, 
+        links: bookCoverLinks,
         mode: bookData.cover?.mode ?? BookCoverMode.lastIllustrationAdded,
         updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
       },
@@ -143,7 +184,7 @@ export const createOne = functions
     description = typeof description === 'string' ? description : '';
 
     const bookIllustrations = await createBookIllustrations(illustration_ids);
-    const bookThumbnailLink: string = await getBookThumbnailLink(bookIllustrations);
+    const bookCoverLinks = await getBookCoverLinks(bookIllustrations);
     const user_custom_index = await getNextBookIndex(userAuth.uid)
 
     const addedBookDoc = await firestore
@@ -152,7 +193,7 @@ export const createOne = functions
         count: bookIllustrations.length,
         cover: {
           mode: BookCoverMode.lastIllustrationAdded,
-          link: bookThumbnailLink,
+          links: bookCoverLinks,
           updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
         },
         created_at: adminApp.firestore.FieldValue.serverTimestamp(),
@@ -420,9 +461,9 @@ export const removeDeletedIllustrations = functions
     );
 
     
-    let bookCoverLink = bookData.cover?.link
+    let bookCoverLinks = bookData.cover?.links
     if (bookData.cover?.mode === BookCoverMode.lastIllustrationAdded) {
-      bookCoverLink = await getBookThumbnailLink(newBookIllustrations);
+      bookCoverLinks = await getBookCoverLinks(newBookIllustrations);
     }
 
     if (newBookIllustrations.length > 100) {
@@ -433,7 +474,7 @@ export const removeDeletedIllustrations = functions
     await bookSnapshot.ref.update({
       count: newBookIllustrations.length,
       cover: { 
-        link: bookCoverLink, 
+        links: bookCoverLinks, 
         mode: bookData.cover?.mode ?? BookCoverMode.lastIllustrationAdded,
         updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
       },
@@ -513,15 +554,15 @@ export const removeIllustrations = functions
     const newBookIllustrations = bookIllustrations
       .filter(illustration => !illustration_ids.includes(illustration.id));
 
-    let bookCoverLink = bookData.cover?.link
+    let bookCoverLinks = bookData.cover?.links
     if (bookData.cover?.mode === BookCoverMode.lastIllustrationAdded) {
-      bookCoverLink = await getBookThumbnailLink(newBookIllustrations);
+      bookCoverLinks = await getBookCoverLinks(newBookIllustrations);
     }
 
     await bookSnapshot.ref.update({
       count: newBookIllustrations.length,
       cover: {
-        link: bookCoverLink,
+        links: bookCoverLinks,
         mode: bookData.cover?.mode ?? BookCoverMode.lastIllustrationAdded,
         updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
       },
@@ -666,13 +707,19 @@ export const setCover = functions
       )
     }
 
-    const thumbnails = illustrationData.urls.thumbnails;
+    const illustrationLinks = illustrationData.links;
+    const coverLinks: MasterpieceLinks = {
+      original: illustrationLinks.original,
+      share: { read: "", write: "" },
+      storage: illustrationLinks.storage,
+      thumbnails: illustrationLinks.thumbnails,
+    }
 
     await bookSnapshot.ref.update({
       cover: {
         id: illustrationSnapshot.id,
+        links: coverLinks,
         mode: BookCoverMode.chosenIllustration,
-        url: thumbnails.t720 || thumbnails.t480 || thumbnails.t360,
         updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
       },
       updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
@@ -949,18 +996,32 @@ async function createBookIllustrations(ids: string[]) {
 /**
  * Return the last added illustration thumbnail in the array.
  * @param bookIllustrations Array of illustrations.
- * @returns Thumbnail link of the last added illustration in this book.
+ * @returns Thumbnail links of the last added illustration in this book.
  */
-async function getBookThumbnailLink(
+async function getBookCoverLinks(
   bookIllustrations: BookIllustration[],
-): Promise<string> {
+): Promise<MasterpieceLinks> {
+  const defaultLinks: MasterpieceLinks = {
+    original: "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Fbooks%2Fdefault%2Fbook_cover_original.png?alt=media&token=81d7ff5f-c92f-4159-9716-25066bcc39b1",
+    share: { read: "", write: "" },
+    storage: "/static/images/books/default",
+    thumbnails: {
+      xs: "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Fbooks%2Fdefault%2Fbook_cover_xs.png?alt=media&token=4a6dc7aa-35de-47be-ad2e-74f3b899c54f",
+      s: "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Fbooks%2Fdefault%2Fbook_cover_s.png?alt=media&token=59bb7c4d-d220-41d5-b493-4c09690d4dd3",
+      m: "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Fbooks%2Fdefault%2Fbook_cover_m.png?alt=media&token=46edc8dd-cb55-4814-a579-06019ff76e7f",
+      l: "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Fbooks%2Fdefault%2Fbook_cover_l.png?alt=media&token=68bfd99c-ccc8-4624-9d96-39988713afe6",
+      xl: "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Fbooks%2Fdefault%2Fbook_cover_xl.png?alt=media&token=c02d42dc-ccbf-491f-ae76-bed4f2f4e20f",
+      xxl: "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Fbooks%2Fdefault%2Fbook_cover_xxl.png?alt=media&token=f96cf2c7-0e8c-4852-a53d-9ae477120161",
+    },
+  }
+
   if (bookIllustrations.length === 0) {
-    return '';
+    return defaultLinks;
   }
 
   const lastAddedIllustration = bookIllustrations[bookIllustrations.length - 1];
   if (!lastAddedIllustration.id) {
-    return '';
+    return defaultLinks;
   }
 
   const illustrationSnapshot = await firestore
@@ -970,11 +1031,10 @@ async function getBookThumbnailLink(
 
   const illustrationData = illustrationSnapshot.data();
   if (!illustrationSnapshot.exists || !illustrationData) {
-    return '';
+    return defaultLinks;
   }
 
-  const thumbnails = illustrationData.links.thumbnails;
-  return thumbnails.t480 || thumbnails.t360 || thumbnails.t720;
+  return illustrationData.links;
 }
 
 async function getNextBookIndex(userId: string) {
