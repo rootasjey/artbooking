@@ -17,47 +17,6 @@ const firebaseTools = require('firebase-tools');
 const firestore = adminApp.firestore();
 
 /**
- * Use this function in the admin console to migrate data scheme.
- */
-export const migrateCover = functions
-  .region(cloudRegions.eu)
-  .https
-  .onRequest(async (req, resp) => {
-    const bookSnap = await firestore
-      .collection("books")
-      .get()
-
-    for await (const bookDoc of bookSnap.docs) {
-      const bookData = bookDoc.data()
-      const bookCover = bookData.cover
-      const link = bookCover.link ?? bookCover.s
-      
-      const cover = {
-        links: {
-          original: "",
-          share: { read: "", write: "" },
-          storage: "",
-          thumbnails: {
-            xs: link,
-            s: link,
-            m: link,
-            l: link,
-            xl: link,
-            xxl: link,
-          },
-        },
-        mode: bookCover.mode,
-        updated_at: bookCover.updated_at,
-      }
-
-      functions.logger.info(`updating book ${bookDoc.id} | link: ${bookCover.link}`)
-      await bookDoc.ref.update({ cover })
-    }
-
-    resp.status(200).send("done")
-  })
-
-/**
  * Add illustrations to a list of existing books.
  */
 export const addIllustrations = functions
