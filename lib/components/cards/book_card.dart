@@ -35,12 +35,12 @@ class BookCard extends StatefulWidget {
     this.onDrop,
     this.onDragUpdate,
     this.canDrag = false,
-    this.asPlaceHolder = false,
+    this.useAsPlaceholder = false,
     this.dragGroupName = "",
   }) : super(key: key);
 
   /// If true, this card will be used as a place holder.
-  final bool asPlaceHolder;
+  final bool useAsPlaceholder;
 
   /// Book's data for this card.
   final Book book;
@@ -126,7 +126,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.asPlaceHolder) {
+    if (widget.useAsPlaceholder) {
       return childWhenDragging(
         textValue: "book_add_new".tr(),
         onTapPlaceholder: widget.onTap,

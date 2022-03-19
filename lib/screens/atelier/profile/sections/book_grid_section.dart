@@ -188,7 +188,7 @@ class _BookGridSectionState extends State<BookGridSection> {
         children.isEmpty) {
       children.add(
         BookCard(
-          asPlaceHolder: true,
+          useAsPlaceholder: true,
           heroTag: "empty_${DateTime.now()}",
           width: width,
           height: height,
