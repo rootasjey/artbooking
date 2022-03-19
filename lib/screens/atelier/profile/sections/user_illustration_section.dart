@@ -144,7 +144,7 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
     if (_illustration.id.isEmpty) {
       return Expanded(
         child: IllustrationCard(
-          useAsPlaceHolder: true,
+          useAsPlaceholder: true,
           heroTag: DateTime.now().toString(),
           illustration: Illustration.empty(),
           index: 0,

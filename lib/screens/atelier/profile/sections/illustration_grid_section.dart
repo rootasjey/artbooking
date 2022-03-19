@@ -193,7 +193,7 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
         children.isEmpty) {
       children.add(
         IllustrationCard(
-          useAsPlaceHolder: true,
+          useAsPlaceholder: true,
           heroTag: "empty-${DateTime.now()}",
           illustration: Illustration.empty(),
           index: index,

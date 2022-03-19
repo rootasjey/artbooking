@@ -35,7 +35,7 @@ class IllustrationCard extends StatefulWidget {
     this.onDrop,
     this.onDragUpdate,
     this.canDrag = false,
-    this.useAsPlaceHolder = false,
+    this.useAsPlaceholder = false,
     this.useIconPlaceholder = false,
     this.dragGroupName = "",
     this.padding = EdgeInsets.zero,
@@ -45,7 +45,7 @@ class IllustrationCard extends StatefulWidget {
   final int index;
 
   /// If true, this card will be used as a placeholder.
-  final bool useAsPlaceHolder;
+  final bool useAsPlaceholder;
 
   /// If true, a "plus" icon will be used as the placeholder child.
   final bool useIconPlaceholder;
@@ -143,7 +143,7 @@ class _IllustrationCardState extends State<IllustrationCard>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.useAsPlaceHolder) {
+    if (widget.useAsPlaceholder) {
       return childWhenDragging(
         textValue: "illustration_add_new".tr(),
         onTapPlaceholder: widget.onTap,
