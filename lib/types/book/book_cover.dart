@@ -2,24 +2,28 @@ import 'dart:convert';
 
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums/enum_book_cover_mode.dart';
+import 'package:artbooking/types/illustration/share_links.dart';
+import 'package:artbooking/types/illustration/thumbnail_links.dart';
+import 'package:artbooking/types/masterpiece_links.dart';
 
 class BookCover {
   const BookCover({
     required this.mode,
-    required this.link,
     required this.updatedAt,
+    required this.links,
   });
 
   final BookCoverMode mode;
-  final String link;
   final DateTime? updatedAt;
+  final MasterpieceLinks links;
 
   factory BookCover.empty() {
     return BookCover(
       mode: BookCoverMode.lastIllustrationAdded,
-      link: "https://firebasestorage.googleapis.com/v0/b/"
-          "artbooking-54d22.appspot.com/o/static%2Fimages%2Fbook_cover_512x683.png"
-          "?alt=media&token=d77bc23b-90d7-4663-be3a-e878c6403e51",
+      links: MasterpieceLinks(
+        share: ShareLinks.empty(),
+        thumbnails: ThumbnailLinks(),
+      ),
       updatedAt: DateTime.now(),
     );
   }
@@ -30,9 +34,9 @@ class BookCover {
     }
 
     return BookCover(
-      link: data["link"],
-      updatedAt: Utilities.date.fromFirestore(data["updated_at"]),
       mode: parseBookCoverMode(data["mode"]),
+      links: MasterpieceLinks.fromMap(data["links"]),
+      updatedAt: Utilities.date.fromFirestore(data["updated_at"]),
     );
   }
 
@@ -51,12 +55,12 @@ class BookCover {
 
   BookCover copyWith({
     BookCoverMode? mode,
-    String? link,
+    MasterpieceLinks? links,
     DateTime? updatedAt,
   }) {
     return BookCover(
       mode: mode ?? this.mode,
-      link: link ?? this.link,
+      links: links ?? this.links,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
@@ -64,7 +68,7 @@ class BookCover {
   Map<String, dynamic> toMap() {
     return {
       "mode": modeToString(),
-      "link": link,
+      "links": links.toMap(),
     };
   }
 
@@ -88,7 +92,7 @@ class BookCover {
 
   @override
   String toString() =>
-      "BookCover(mode: $mode, link: $link, updatedAt: $updatedAt)";
+      "BookCover(mode: $mode, links: $links, updatedAt: $updatedAt)";
 
   @override
   bool operator ==(Object other) {
@@ -96,10 +100,10 @@ class BookCover {
 
     return other is BookCover &&
         other.mode == mode &&
-        other.link == link &&
+        other.links == links &&
         other.updatedAt == updatedAt;
   }
 
   @override
-  int get hashCode => mode.hashCode ^ link.hashCode ^ updatedAt.hashCode;
+  int get hashCode => mode.hashCode ^ links.hashCode ^ updatedAt.hashCode;
 }

@@ -1,24 +1,24 @@
-import 'package:artbooking/types/illustration/illustration_links.dart';
+import 'package:artbooking/types/masterpiece_links.dart';
 
 class IllustrationVersion {
-  String? id;
-  String? name;
-  DateTime? createdAt;
-  IllustrationLinks? urls;
-
   IllustrationVersion({
-    this.createdAt,
-    this.id,
-    this.name,
-    this.urls,
+    required this.createdAt,
+    required this.id,
+    required this.name,
+    required this.links,
   });
+
+  final String id;
+  final String name;
+  final DateTime createdAt;
+  final MasterpieceLinks links;
 
   factory IllustrationVersion.fromMap(Map<String, dynamic> data) {
     return IllustrationVersion(
-      id: data['id'],
-      name: data['name'],
-      createdAt: data['created_at'],
-      urls: IllustrationLinks.fromMap(data['links']),
+      id: data["id"],
+      name: data["name"],
+      createdAt: data["created_at"],
+      links: MasterpieceLinks.fromMap(data["links"]),
     );
   }
 }

@@ -1,11 +1,12 @@
 import 'dart:convert';
 
+import 'package:artbooking/types/illustration/thumbnail_links.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/illustration/dimensions.dart';
-import 'package:artbooking/types/illustration/illustration_links.dart';
+import 'package:artbooking/types/masterpiece_links.dart';
 import 'package:artbooking/types/illustration/illustration_version.dart';
 import 'package:artbooking/types/license/license.dart';
 
@@ -73,7 +74,7 @@ class Illustration {
   final DateTime updatedAt;
 
   /// This illustration's urls.
-  final IllustrationLinks links;
+  final MasterpieceLinks links;
 
   final String userId;
 
@@ -109,7 +110,11 @@ class Illustration {
       lore: "",
       topics: const [],
       updatedAt: DateTime.now(),
-      links: IllustrationLinks.empty(),
+      links: MasterpieceLinks.empty(
+        original:
+            "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Fillustrations%2Fmissing_illustration_2048.png?alt=media&token=558532de-9cea-4968-8578-d35b81192c84",
+        thumbnailLinks: ThumbnailLinks.empty(),
+      ),
       userId: userId,
       userCustomIndex: 0,
       version: 0,
@@ -119,60 +124,65 @@ class Illustration {
 
   factory Illustration.fromMap(Map<String, dynamic> data) {
     return Illustration(
-      artMovements: parseArtMovements(data['art_movements']),
-      createdAt: Utilities.date.fromFirestore(data['created_at']),
-      description: data['description'] ?? '',
-      dimensions: Dimensions.fromMap(data['dimensions']),
-      extension: data['extension'] ?? '',
-      id: data['id'] ?? '',
-      license: License.fromMap(data['license']),
-      liked: data['liked'] ?? false,
-      links: IllustrationLinks.fromMap(data['links']),
-      lore: data['lore'] ?? '',
-      name: data['name'] ?? '',
-      size: data['size'] ?? 0,
-      topics: parseTopics(data['topics']),
-      updatedAt: Utilities.date.fromFirestore(data['updated_at']),
-      userId: data['user_id'] ?? '',
+      artMovements: parseArtMovements(data["art_movements"]),
+      createdAt: Utilities.date.fromFirestore(data["created_at"]),
+      description: data["description"] ?? "",
+      dimensions: Dimensions.fromMap(data["dimensions"]),
+      extension: data["extension"] ?? "",
+      id: data["id"] ?? "",
+      license: License.fromMap(data["license"]),
+      liked: data["liked"] ?? false,
+      links: MasterpieceLinks.fromMap(data["links"]),
+      lore: data["lore"] ?? "",
+      name: data["name"] ?? "",
+      size: data["size"] ?? 0,
+      topics: parseTopics(data["topics"]),
+      updatedAt: Utilities.date.fromFirestore(data["updated_at"]),
+      userId: data["user_id"] ?? "",
       userCustomIndex: data["user_custom_index"] ?? 0,
-      version: data['version'] ?? 0,
-      visibility: parseVisibility(data['visibility']),
+      version: data["version"] ?? 0,
+      visibility: parseVisibility(data["visibility"]),
     );
   }
 
   String getHDThumbnail() {
-    final t720 = links.thumbnails.t720;
-    if (t720.isNotEmpty) {
-      return t720;
+    final small = links.thumbnails.m;
+    if (small.isNotEmpty) {
+      return small;
     }
 
-    final t1080 = links.thumbnails.t1080;
-    if (t1080.isNotEmpty) {
-      return t1080;
+    final large = links.thumbnails.l;
+    if (large.isNotEmpty) {
+      return large;
     }
 
     return links.original;
   }
 
   String getThumbnail() {
-    final t360 = links.thumbnails.t360;
-    if (t360.isNotEmpty) {
-      return t360;
+    final extraSmall = links.thumbnails.xs;
+    if (extraSmall.isNotEmpty) {
+      return extraSmall;
     }
 
-    final t480 = links.thumbnails.t480;
-    if (t480.isNotEmpty) {
-      return t480;
+    final small = links.thumbnails.s;
+    if (small.isNotEmpty) {
+      return small;
     }
 
-    final t720 = links.thumbnails.t720;
-    if (t720.isNotEmpty) {
-      return t720;
+    final medium = links.thumbnails.m;
+    if (medium.isNotEmpty) {
+      return medium;
     }
 
-    final t1080 = links.thumbnails.t1080;
-    if (t1080.isNotEmpty) {
-      return t1080;
+    final large = links.thumbnails.l;
+    if (large.isNotEmpty) {
+      return large;
+    }
+
+    final extraLarge = links.thumbnails.xxl;
+    if (extraLarge.isNotEmpty) {
+      return extraLarge;
     }
 
     return links.original;
@@ -208,13 +218,13 @@ class Illustration {
 
   static EnumContentVisibility parseVisibility(String? stringVisiblity) {
     switch (stringVisiblity) {
-      case 'acl':
+      case "acl":
         return EnumContentVisibility.acl;
-      case 'archived':
+      case "archived":
         return EnumContentVisibility.archived;
-      case 'private':
+      case "private":
         return EnumContentVisibility.private;
-      case 'public':
+      case "public":
         return EnumContentVisibility.public;
       default:
         return EnumContentVisibility.private;
@@ -230,7 +240,7 @@ class Illustration {
     License? license,
     bool? liked,
     String? name,
-    IllustrationLinks? links,
+    MasterpieceLinks? links,
     String? lore,
     int? size,
     List<String>? styles,

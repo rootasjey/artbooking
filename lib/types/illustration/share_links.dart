@@ -11,8 +11,8 @@ class ShareLinks {
 
   factory ShareLinks.empty() {
     return ShareLinks(
-      read: '',
-      write: '',
+      read: "",
+      write: "",
     );
   }
 
@@ -22,8 +22,8 @@ class ShareLinks {
     }
 
     return ShareLinks(
-      read: map['read'] ?? '',
-      write: map['write'] ?? '',
+      read: map["read"] ?? "",
+      write: map["write"] ?? "",
     );
   }
 
@@ -39,8 +39,8 @@ class ShareLinks {
 
   Map<String, dynamic> toMap() {
     return {
-      'read': read,
-      'write': write,
+      "read": read,
+      "write": write,
     };
   }
 
@@ -50,7 +50,7 @@ class ShareLinks {
       ShareLinks.fromMap(json.decode(source));
 
   @override
-  String toString() => 'ShareLinks(read: $read, write: $write)';
+  String toString() => "ShareLinks(read: $read, write: $write)";
 
   @override
   bool operator ==(Object other) {

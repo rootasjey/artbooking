@@ -110,20 +110,20 @@ class Book {
 
   factory Book.fromMap(Map<String, dynamic> data) {
     return Book(
-      count: data['count']?.toInt() ?? 0,
-      cover: BookCover.fromMap(data['cover']),
-      createdAt: Utilities.date.fromFirestore(data['created_at']),
-      description: data['description'] ?? '',
-      id: data['id'] ?? '',
-      illustrations: parseIllustrations(data['illustrations']),
-      layout: parseLayout(data['layout']),
-      layoutOrientation: parseOrientation(data['layout_orientation']),
-      liked: data['liked'] ?? false,
-      name: data['name'] ?? '',
-      updatedAt: Utilities.date.fromFirestore(data['updated_at']),
-      userId: data['user_id'] ?? '',
+      count: data["count"]?.toInt() ?? 0,
+      cover: BookCover.fromMap(data["cover"]),
+      createdAt: Utilities.date.fromFirestore(data["created_at"]),
+      description: data["description"] ?? "",
+      id: data["id"] ?? "",
+      illustrations: parseIllustrations(data["illustrations"]),
+      layout: parseLayout(data["layout"]),
+      layoutOrientation: parseOrientation(data["layout_orientation"]),
+      liked: data["liked"] ?? false,
+      name: data["name"] ?? "",
+      updatedAt: Utilities.date.fromFirestore(data["updated_at"]),
+      userId: data["user_id"] ?? "",
       userCustomIndex: data["user_custom_index"] ?? 0,
-      visibility: parseStringVisibility(data['visibility']),
+      visibility: parseStringVisibility(data["visibility"]),
     );
   }
 
@@ -146,14 +146,24 @@ class Book {
   /// auto (set to the last uploaded illustration),
   /// or default if the book is empty.
   String getCoverLink() {
-    if (cover.link.isNotEmpty) {
-      return cover.link;
+    final thumbnails = cover.links.thumbnails;
+    if (thumbnails.s.isNotEmpty) {
+      return thumbnails.s;
     }
 
-    return "https://firebasestorage.googleapis.com/"
-        "v0/b/artbooking-54d22.appspot.com/o/static"
-        "%2Fimages%2Fbook_cover_512x683.png"
-        "?alt=media&token=d77bc23b-90d7-4663-be3a-e878c6403e51";
+    if (thumbnails.m.isNotEmpty) {
+      return thumbnails.m;
+    }
+
+    if (thumbnails.xs.isNotEmpty) {
+      return thumbnails.xs;
+    }
+
+    if (thumbnails.l.isNotEmpty) {
+      return thumbnails.l;
+    }
+
+    return "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Fbooks%2Fmissing%2Fmissing_book_s.png?alt=media&token=ae32c8e3-af10-4e98-98dc-d4f144779ec9";
   }
 
   String layoutOrientationToString() {
