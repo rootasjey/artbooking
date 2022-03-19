@@ -392,75 +392,78 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     final Color primaryColor = Theme.of(context).primaryColor;
     final onDoubleTapOrNull = widget.onDoubleTap != null ? onDoubleTap : null;
 
-    return Container(
-      width: widget.width - 60.0,
-      height: widget.height - _captionHeight,
-      padding: const EdgeInsets.only(right: 12.0),
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: Card(
-          color: widget.selected ? primaryColor : Colors.transparent,
-          elevation: _elevation,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(_cardRadius),
-            side: usingAsDropTarget
-                ? BorderSide(color: primaryColor, width: 4.0)
-                : BorderSide.none,
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Stack(
-            children: [
-              ExtendedImage.network(
-                widget.book.getCoverLink(),
-                fit: BoxFit.cover,
-                width: widget.width - 60.0,
-                height: widget.height - _captionHeight,
-                clearMemoryCacheWhenDispose: true,
-                loadStateChanged: (state) {
-                  switch (state.extendedImageLoadState) {
-                    case LoadState.completed:
-                      return Ink.image(
-                        image: state.imageProvider,
-                        fit: BoxFit.cover,
-                        child: InkWell(
-                          onTap: widget.onTap,
-                          onDoubleTap: onDoubleTapOrNull,
-                          // onLongPress: onLongPress,
-                          onHover: onHover,
-                          child: Stack(
-                            children: [
-                              multiSelectIndicator(),
-                            ],
+    return Opacity(
+      opacity: widget.book.available ? 1.0 : 0.9,
+      child: Container(
+        width: widget.width - 60.0,
+        height: widget.height - _captionHeight,
+        padding: const EdgeInsets.only(right: 12.0),
+        child: ScaleTransition(
+          scale: _scaleAnimation,
+          child: Card(
+            color: widget.selected ? primaryColor : Colors.transparent,
+            elevation: _elevation,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(_cardRadius),
+              side: usingAsDropTarget
+                  ? BorderSide(color: primaryColor, width: 4.0)
+                  : BorderSide.none,
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Stack(
+              children: [
+                ExtendedImage.network(
+                  widget.book.getCoverLink(),
+                  fit: BoxFit.cover,
+                  width: widget.width - 60.0,
+                  height: widget.height - _captionHeight,
+                  clearMemoryCacheWhenDispose: true,
+                  loadStateChanged: (state) {
+                    switch (state.extendedImageLoadState) {
+                      case LoadState.completed:
+                        return Ink.image(
+                          image: state.imageProvider,
+                          fit: BoxFit.cover,
+                          child: InkWell(
+                            onTap: widget.onTap,
+                            onDoubleTap: onDoubleTapOrNull,
+                            // onLongPress: onLongPress,
+                            onHover: onHover,
+                            child: Stack(
+                              children: [
+                                multiSelectIndicator(),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    case LoadState.loading:
-                      return loadingCard();
-                    case LoadState.failed:
-                      return InkWell(
-                        child: Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text(
-                              "image_load_failed".tr(),
-                              style: Utilities.fonts.style(
-                                fontWeight: FontWeight.w700,
+                        );
+                      case LoadState.loading:
+                        return loadingCard();
+                      case LoadState.failed:
+                        return InkWell(
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                "image_load_failed".tr(),
+                                style: Utilities.fonts.style(
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        onTap: () {
-                          state.reLoadImage();
-                        },
-                      );
-                    default:
-                      return state.completedWidget;
-                  }
-                },
-              ),
-              likeOverlay(),
-              likeAnimationOverlay(),
-            ],
+                          onTap: () {
+                            state.reLoadImage();
+                          },
+                        );
+                      default:
+                        return state.completedWidget;
+                    }
+                  },
+                ),
+                likeOverlay(),
+                likeAnimationOverlay(),
+              ],
+            ),
           ),
         ),
       ),

@@ -178,7 +178,7 @@ class _BookGridSectionState extends State<BookGridSection> {
         book: book,
         width: width,
         height: height,
-        onTap: () => navigateToBookPage(book, heroTag),
+        onTap: book.available ? () => navigateToBookPage(book, heroTag) : null,
         popupMenuEntries: popupMenuEntries,
         onPopupMenuItemSelected: onBookItemSelected,
       );
@@ -430,6 +430,7 @@ class _BookGridSectionState extends State<BookGridSection> {
       final data = snapshot.data();
       if (!snapshot.exists || data == null) {
         return Book.empty(
+          available: false,
           id: id,
           name: "?",
           userId: widget.userId,
@@ -441,6 +442,7 @@ class _BookGridSectionState extends State<BookGridSection> {
     } catch (error) {
       Utilities.logger.e(error);
       return Book.empty(
+        available: false,
         id: id,
         name: "?",
         userId: widget.userId,

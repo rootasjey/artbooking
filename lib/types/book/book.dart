@@ -11,21 +11,26 @@ import 'package:artbooking/types/enums/enum_content_visibility.dart';
 
 class Book {
   const Book({
-    this.count = 0,
     required this.cover,
     required this.createdAt,
     required this.updatedAt,
     required this.userId,
-    this.description = '',
-    this.id = '',
+    this.available = true,
+    this.count = 0,
+    this.description = "",
+    this.id = "",
     this.illustrations = const [],
     this.layout = EnumBookLayout.grid,
     this.layoutOrientation = EnumBookLayoutOrientation.vertical,
     this.liked = false,
-    this.name = '',
+    this.name = "",
     this.userCustomIndex = 0,
     this.visibility = EnumContentVisibility.private,
   });
+
+  /// If false, the book may have a visibility preventing access.
+  /// Or this book may be deleted;
+  final bool available;
 
   /// Number of illustrations in this book.
   final int count;
@@ -97,8 +102,10 @@ class Book {
     String id = "",
     String name = "",
     String userId = "",
+    bool available = false,
   }) {
     return Book(
+      available: available,
       id: id,
       name: name,
       cover: BookCover.empty(),
@@ -268,6 +275,7 @@ class Book {
   }
 
   Book copyWith({
+    bool? available,
     int? count,
     BookCover? cover,
     DateTime? createdAt,
@@ -284,6 +292,7 @@ class Book {
     EnumContentVisibility? visibility,
   }) {
     return Book(
+      available: available ?? this.available,
       count: count ?? this.count,
       cover: cover ?? this.cover,
       createdAt: createdAt ?? this.createdAt,
@@ -303,19 +312,19 @@ class Book {
 
   Map<String, dynamic> toMap() {
     return {
-      'count': count,
-      'cover': cover.toMap(),
-      'createdAt': createdAt.millisecondsSinceEpoch,
-      'description': description,
-      'id': id,
-      'illustrations': illustrations.map((x) => x.toMap()).toList(),
-      'layout': layoutToString(),
-      'layoutOrientation': layoutOrientationToString(),
-      'liked': liked,
-      'name': name,
-      'user_id': userId,
-      'userCustomIndex': userCustomIndex,
-      'visibility': visibility.name,
+      "count": count,
+      "cover": cover.toMap(),
+      "createdAt": createdAt.millisecondsSinceEpoch,
+      "description": description,
+      "id": id,
+      "illustrations": illustrations.map((x) => x.toMap()).toList(),
+      "layout": layoutToString(),
+      "layoutOrientation": layoutOrientationToString(),
+      "liked": liked,
+      "name": name,
+      "user_id": userId,
+      "userCustomIndex": userCustomIndex,
+      "visibility": visibility.name,
     };
   }
 
@@ -325,11 +334,12 @@ class Book {
 
   @override
   String toString() {
-    return 'Book(count: $count, cover: $cover, createdAt: $createdAt, '
-        'description: $description, id: $id, illustrations: $illustrations, '
-        'layout: $layout, layoutOrientation: $layoutOrientation, liked: $liked, '
-        'name: $name, updatedAt: $updatedAt, userId: $userId, '
-        'userCustomIndex: $userCustomIndex visibility: $visibility)';
+    return "Book(available: $available, count: $count, cover: $cover, "
+        "createdAt: $createdAt, description: $description, id: $id, "
+        "illustrations: $illustrations, layout: $layout, "
+        "layoutOrientation: $layoutOrientation, liked: $liked, name: $name,"
+        " updatedAt: $updatedAt, userId: $userId, "
+        "userCustomIndex: $userCustomIndex visibility: $visibility)";
   }
 
   @override
