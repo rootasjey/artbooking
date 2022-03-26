@@ -36,6 +36,91 @@ interface GenerateImageThumbsParams {
 }
 
 /**
+ * Update illustration's `staff_review.approved` field.
+ * This field allow a illustration to be displayed in public space according to EULA (CGU).
+ */
+ export const approve = functions
+ .region(cloudRegions.eu)
+ .https
+ .onCall(async (params: ApproveIllustrationParams, context) => {
+   const userAuth = context.auth
+   const { illustration_id, approved } = params
+
+   if (!userAuth) {
+     throw new functions.https.HttpsError(
+       'unauthenticated',
+       `The function must be called from an authenticated user.`,
+     );
+   }
+
+   if (typeof illustration_id !== 'string') {
+     throw new functions.https.HttpsError(
+       'invalid-argument', 
+       `The function must be called with a valid [illustration_id] parameter ` +
+       `(string) which is the illustration's id.`,
+     );
+   }
+
+   if (typeof approved !== 'boolean') {
+     throw new functions.https.HttpsError(
+       'invalid-argument', 
+       `The function must be called with a valid [approved] parameter ` +
+       `(boolean) indicating if this illustration must be approved or not.`,
+     );
+   }
+
+   const userSnapshot = await firestore
+     .collection("users")
+     .doc(userAuth.uid)
+     .get()
+
+   const userData = userSnapshot.data()
+   if (!userSnapshot.exists || !userData) {
+     throw new functions.https.HttpsError(
+       'permission-denied',
+       `You have no permission to perform this action.`
+     )
+   }
+
+   const manageReview: boolean = userData.rights['user:manage_reviews']
+   if (!manageReview) {
+     throw new functions.https.HttpsError(
+       'permission-denied',
+       `You have no permission to perform this action.`
+     )
+   }
+
+   const illustrationSnapshot = await firestore
+     .collection("illustrations")
+     .doc(illustration_id)
+     .get()
+
+   const illustrationData = illustrationSnapshot.data()
+   if (!illustrationSnapshot.exists || !illustrationData) {
+     throw new functions.https.HttpsError(
+       'not-found',
+       `The target illustration [${illustration_id}] does not exist. ` +
+       `It may have beend deleted.`,
+     )
+   }
+
+   await illustrationSnapshot.ref.update({ 
+      staff_review: {
+        approved: approved,
+        updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+        user_id: userAuth.uid,
+      },
+    })
+
+   return {
+     illustration: { id: illustration_id },
+     success: true,
+     user: { id: userAuth.uid },
+     error: {},
+   }
+ })
+
+/**
  * Check an illustration document in Firestore from its id [illustrationId].
  * If the document has missing properties, try to populate them from storage file.
  * If there's no corresponding storage file, delete the firestore document.

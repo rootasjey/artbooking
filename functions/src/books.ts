@@ -115,6 +115,90 @@ export const addIllustrations = functions
   });
 
 /**
+ * Update book's `staff_review.approved` field.
+ * This field allow a book to be displayed in public space according to EULA (CGU).
+ */
+export const approve = functions
+  .region(cloudRegions.eu)
+  .https
+  .onCall(async (params: ApproveBookParams, context) => {
+    const userAuth = context.auth
+    const { book_id, approved } = params
+
+    if (!userAuth) {
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        `The function must be called from an authenticated user.`,
+      );
+    }
+
+    if (typeof book_id !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument', 
+        `The function must be called with a valid [book_id] parameter ` +
+        `(string) which is the book's id.`,
+      );
+    }
+
+    if (typeof approved !== 'boolean') {
+      throw new functions.https.HttpsError(
+        'invalid-argument', 
+        `The function must be called with a valid [approved] parameter ` +
+        `(boolean) indicating if this book must be approved or not.`,
+      );
+    }
+
+    const userSnapshot = await firestore
+      .collection("users")
+      .doc(userAuth.uid)
+      .get()
+
+    const userData = userSnapshot.data()
+    if (!userSnapshot.exists || !userData) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        `You have no permission to perform this action.`
+      )
+    }
+
+    const manageReview: boolean = userData.rights['user:manage_reviews']
+    if (!manageReview) {
+      throw new functions.https.HttpsError(
+        'permission-denied',
+        `You have no permission to perform this action.`
+      )
+    }
+
+    const bookSnapshot = await firestore
+      .collection("books")
+      .doc(book_id)
+      .get()
+
+    const bookData = bookSnapshot.data()
+    if (!bookSnapshot.exists || !bookData) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        `The target book [${book_id}] does not exist. It may have beend deleted.`,
+      )
+    }
+
+    await bookSnapshot.ref.update({ 
+      staff_review: {
+        approved: approved,
+        updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+        user_id: userAuth.uid,
+      },
+    })
+
+    return {
+      book: { id: book_id },
+      success: true,
+      user: { id: userAuth.uid },
+      error: {},
+    }
+  })
+
+/**
  * Create a book document in Firestore.
  */
 export const createOne = functions

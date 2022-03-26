@@ -84,6 +84,20 @@ enum EnumLicenseType {
   user = 'user',
 }
 
+interface ApproveBookParams {
+  /** Target book to update. */
+  book_id: string;
+  /** Approved status. */
+  approved: boolean;
+}
+
+interface ApproveIllustrationParams {
+  /** Target illustration to update. */
+  illustration_id: string;
+  /** Approved status. */
+  approved: boolean;
+}
+
 interface CheckPropertiesParams {
   illustration_id: string;
 }
