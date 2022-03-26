@@ -17,11 +17,13 @@ class UploadPanelItemCard extends ConsumerStatefulWidget {
     required this.customUploadTask,
     this.onCancel,
     this.onDone,
+    this.onTap,
   }) : super(key: key);
 
   final CustomUploadTask customUploadTask;
-  final VoidCallback? onCancel;
-  final VoidCallback? onDone;
+  final void Function()? onCancel;
+  final void Function()? onDone;
+  final void Function()? onTap;
 
   @override
   _UploadItemCardState createState() => _UploadItemCardState();
@@ -68,7 +70,7 @@ class _UploadItemCardState extends ConsumerState<UploadPanelItemCard> {
       elevation: _elevation,
       color: Constants.colors.clairPink,
       child: InkWell(
-        onTap: () {},
+        onTap: widget.onTap,
         onHover: (isHover) {
           setState(() {
             _isHover = isHover;

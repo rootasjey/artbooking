@@ -1,22 +1,27 @@
 import 'package:artbooking/components/upload_panel/upload_panel_item_card.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
 import 'package:artbooking/globals/app_state.dart';
+import 'package:beamer/beamer.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class UploadWindowBody extends ConsumerWidget {
   const UploadWindowBody({
     Key? key,
-    required this.isExpanded,
+    required this.expanded,
     required this.uploadTaskList,
+    this.onToggleExpanded,
   }) : super(key: key);
 
-  final bool isExpanded;
+  final bool expanded;
   final List<CustomUploadTask> uploadTaskList;
+  final void Function()? onToggleExpanded;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (!isExpanded) {
+    if (!expanded) {
       return Container();
     }
 
@@ -35,6 +40,29 @@ class UploadWindowBody extends ConsumerWidget {
             children: uploadTaskList.map((customUploadTask) {
               return UploadPanelItemCard(
                 customUploadTask: customUploadTask,
+                onTap: () {
+                  final String illustrationId =
+                      customUploadTask.illustrationId ?? "";
+
+                  if (illustrationId.isEmpty) {
+                    return;
+                  }
+
+                  if (customUploadTask.task?.snapshot.state ==
+                      TaskState.success) {
+                    onToggleExpanded?.call();
+
+                    final String route =
+                        AtelierLocationContent.illustrationRoute.replaceFirst(
+                      ":illustrationId",
+                      illustrationId,
+                    );
+
+                    Beamer.of(context).beamToNamed(route, data: {
+                      "illustrationId": illustrationId,
+                    });
+                  }
+                },
                 onCancel: () {
                   final int bytesTransferred =
                       customUploadTask.task?.snapshot.bytesTransferred ?? 0;

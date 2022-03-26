@@ -17,7 +17,7 @@ class UploadWindow extends ConsumerStatefulWidget {
 }
 
 class _UploadWindowState extends ConsumerState<UploadWindow> {
-  bool _isExpanded = false;
+  bool _expanded = false;
 
   double _width = 260.0;
   double _height = 100.0;
@@ -59,22 +59,7 @@ class _UploadWindowState extends ConsumerState<UploadWindow> {
         height: _height,
         duration: 150.milliseconds,
         child: InkWell(
-          onTap: () {
-            if (_isExpanded) {
-              setState(() {
-                _width = _initialWidth;
-                _height = _initialHeight;
-                _isExpanded = false;
-              });
-              return;
-            }
-
-            setState(() {
-              _width = _maxWidth;
-              _height = _maxHeight;
-              _isExpanded = true;
-            });
-          },
+          onTap: onToggleExpanded,
           child: SingleChildScrollView(
             controller: _scrollController,
             child: Column(
@@ -89,7 +74,8 @@ class _UploadWindowState extends ConsumerState<UploadWindow> {
                   percent: percent,
                 ),
                 UploadWindowBody(
-                  isExpanded: _isExpanded,
+                  expanded: _expanded,
+                  onToggleExpanded: onToggleExpanded,
                   uploadTaskList: uploadTaskList,
                 ),
               ],
@@ -98,5 +84,22 @@ class _UploadWindowState extends ConsumerState<UploadWindow> {
         ),
       ),
     );
+  }
+
+  void onToggleExpanded() {
+    if (_expanded) {
+      setState(() {
+        _width = _initialWidth;
+        _height = _initialHeight;
+        _expanded = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _width = _maxWidth;
+      _height = _maxHeight;
+      _expanded = true;
+    });
   }
 }
