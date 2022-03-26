@@ -6,6 +6,26 @@ import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class IllustrationsActions {
+  static Future<IllustrationResponse> approve({
+    required String illustrationId,
+    required bool approved,
+  }) async {
+    try {
+      final response = await Utilities.cloud.fun("illustrations-approve").call({
+        "illustration_id": illustrationId,
+        "approved": approved,
+      });
+
+      return IllustrationResponse.fromJSON(response.data);
+    } on FirebaseFunctionsException catch (exception) {
+      Utilities.logger.e(exception);
+      return IllustrationResponse.fromException(exception);
+    } catch (error) {
+      Utilities.logger.e(error);
+      return IllustrationResponse.fromMessage(error.toString());
+    }
+  }
+
   /// Check an illustration document in Firestore from its id [illustrationId].
   /// If the document has missing properties, try to populate them from storage file.
   /// If there's no corresponding storage file, delete the firestore document.

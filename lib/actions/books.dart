@@ -26,6 +26,26 @@ class BooksActions {
     }
   }
 
+  static Future<BookResponse> approve({
+    required String bookId,
+    required bool approved,
+  }) async {
+    try {
+      final response = await Utilities.cloud.fun("books-approve").call({
+        "book_id": bookId,
+        "approved": approved,
+      });
+
+      return BookResponse.fromJSON(response.data);
+    } on FirebaseFunctionsException catch (exception) {
+      Utilities.logger.e(exception);
+      return BookResponse.fromException(exception);
+    } catch (error) {
+      Utilities.logger.e(error);
+      return BookResponse.fromMessage(error.toString());
+    }
+  }
+
   static Future<BookResponse> createOne({
     required String name,
     String description = "",
