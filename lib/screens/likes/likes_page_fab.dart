@@ -21,7 +21,7 @@ class LikesPageFab extends StatelessWidget {
       onPressed: () {
         scrollController.animateTo(
           0.0,
-          duration: const Duration(seconds: 1),
+          duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
       },
