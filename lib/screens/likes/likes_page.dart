@@ -123,7 +123,7 @@ class _LikesPageState extends ConsumerState<LikesPage> {
     );
   }
 
-  /// Fetch staff license on Firestore.
+  /// Fetch liked books or illustrations on Firestore.
   void fetchLikes() async {
     _likeSubscription?.cancel();
 

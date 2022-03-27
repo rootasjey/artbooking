@@ -1,19 +1,19 @@
 class PartialUser {
+  PartialUser({
+    this.id = "",
+    this.name = "",
+    this.email = "",
+  });
+
   final String id;
   final String name;
   final String email;
 
-  PartialUser({
-    this.id = '',
-    this.name = '',
-    this.email = '',
-  });
-
   factory PartialUser.empty() {
     return PartialUser(
-      id: '',
-      name: '',
-      email: '',
+      id: "",
+      name: "",
+      email: "",
     );
   }
 
@@ -23,9 +23,9 @@ class PartialUser {
     }
 
     return PartialUser(
-      id: data['id'] ?? '',
-      name: data['name'] ?? '',
-      email: data['email'] ?? '',
+      id: data["id"] ?? "",
+      name: data["name"] ?? "",
+      email: data["email"] ?? "",
     );
   }
 }

@@ -8,7 +8,7 @@ class BookResponse {
   BookResponse({
     required this.book,
     required this.error,
-    this.message = '',
+    this.message = "",
     this.success = false,
     required this.user,
   });
@@ -39,10 +39,10 @@ class BookResponse {
 
   factory BookResponse.fromJSON(Map<dynamic, dynamic> data) {
     return BookResponse(
-      book: MinimalObjectId.fromJSON(data['book']),
-      success: data['success'] ?? true,
-      user: PartialUser.fromJSON(data['user']),
-      error: CloudFunctionsError.fromJSON(data['error']),
+      book: MinimalObjectId.fromJSON(data["book"]),
+      success: data["success"] ?? true,
+      user: PartialUser.fromJSON(data["user"]),
+      error: CloudFunctionsError.fromJSON(data["error"]),
     );
   }
 

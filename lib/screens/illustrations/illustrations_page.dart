@@ -134,9 +134,10 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
 
     try {
       final QueryMap query = FirebaseFirestore.instance
-          .collection('illustrations')
-          .where('visibility', isEqualTo: 'public')
-          .orderBy('created_at', descending: _descending)
+          .collection("illustrations")
+          .where("visibility", isEqualTo: "public")
+          .where("staff_review.approved", isEqualTo: true)
+          .orderBy("created_at", descending: _descending)
           .limit(_limit);
 
       listenIllustrationEvents(query);
@@ -153,8 +154,8 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
 
       for (DocSnapMap document in snapshot.docs) {
         final data = document.data();
-        data['id'] = document.id;
-        data['liked'] = await fetchLike(document.id);
+        data["id"] = document.id;
+        data["liked"] = await fetchLike(document.id);
 
         _illustrations.add(Illustration.fromMap(data));
       }
@@ -205,9 +206,10 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
 
     try {
       final QueryMap query = await FirebaseFirestore.instance
-          .collection('illustrations')
-          .where('visibility', isEqualTo: 'public')
-          .orderBy('created_at', descending: _descending)
+          .collection("illustrations")
+          .where("visibility", isEqualTo: "public")
+          .where("staff_review.approved", isEqualTo: true)
+          .orderBy("created_at", descending: _descending)
           .limit(_limit)
           .startAfterDocument(_lastDocument!);
 
@@ -225,8 +227,8 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
 
       for (DocSnapMap document in snapshot.docs) {
         final data = document.data();
-        data['id'] = document.id;
-        data['liked'] = await fetchLike(document.id);
+        data["id"] = document.id;
+        data["liked"] = await fetchLike(document.id);
 
         _illustrations.add(Illustration.fromMap(data));
       }
@@ -315,7 +317,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
     }
 
     setState(() {
-      data['id'] = documentChange.doc.id;
+      data["id"] = documentChange.doc.id;
       final illustration = Illustration.fromMap(data);
       _illustrations.insert(0, illustration);
     });
@@ -448,8 +450,8 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
         (illustration) => illustration.id == documentChange.doc.id,
       );
 
-      data['id'] = documentChange.doc.id;
-      data['liked'] = await fetchLike(documentChange.doc.id);
+      data["id"] = documentChange.doc.id;
+      data["liked"] = await fetchLike(documentChange.doc.id);
       final updatedIllustration = Illustration.fromMap(data);
 
       setState(() {
