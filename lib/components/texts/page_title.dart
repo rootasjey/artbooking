@@ -1,5 +1,4 @@
 import 'package:artbooking/globals/utilities.dart';
-import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
@@ -68,7 +67,7 @@ class PageTitle extends StatelessWidget {
                   child: Opacity(
                     opacity: 0.8,
                     child: IconButton(
-                      onPressed: Beamer.of(context).popRoute,
+                      onPressed: () => Utilities.navigation.back(context),
                       icon: Icon(UniconsLine.arrow_left),
                     ),
                   ),
