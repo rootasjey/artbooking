@@ -3,8 +3,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
-class IllustrationsPageEmpty extends StatelessWidget {
-  const IllustrationsPageEmpty({Key? key}) : super(key: key);
+class BooksPageEmpty extends StatelessWidget {
+  const BooksPageEmpty({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +39,29 @@ class IllustrationsPageEmpty extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "illustrations_empty".tr(),
+                  "books_public_empty".tr(),
+                  style: Utilities.fonts.style(
+                    fontSize: 26.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            Stack(
+              children: [
+                Positioned(
+                  bottom: 6.0,
+                  left: 0.0,
+                  right: 0.0,
+                  child: SizedBox(
+                    height: 8.0,
+                    child: Container(
+                      color: Colors.pink.withOpacity(0.4),
+                    ),
+                  ),
+                ),
+                Text(
+                  "come_back_later".tr(),
                   style: Utilities.fonts.style(
                     fontSize: 26.0,
                     fontWeight: FontWeight.w600,

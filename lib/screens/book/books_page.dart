@@ -166,6 +166,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
       final query = FirebaseFirestore.instance
           .collection("books")
           .where("visibility", isEqualTo: "public")
+          .where("staff_review.approved", isEqualTo: true)
           .orderBy("updated_at", descending: _descending)
           .limit(_limit);
 
@@ -195,6 +196,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
       });
     } catch (error) {
       Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
     } finally {
       setState(() => _loading = false);
     }
@@ -213,6 +215,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
       final snapshot = await FirebaseFirestore.instance
           .collection("books")
           .where("visibility", isEqualTo: "public")
+          .where("staff_review.approved", isEqualTo: true)
           .orderBy("updated_at", descending: _descending)
           .limit(_limit)
           .startAfterDocument(lastDocument)

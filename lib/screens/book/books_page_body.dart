@@ -1,5 +1,6 @@
 import 'package:artbooking/components/cards/book_card.dart';
 import 'package:artbooking/components/icons/animated_app_icon.dart';
+import 'package:artbooking/screens/book/books_page_empty.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -43,12 +44,7 @@ class BooksPageBody extends StatelessWidget {
     }
 
     if (books.isEmpty) {
-      return SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text("books_public_empty".tr()),
-        ),
-      );
+      return BooksPageEmpty();
     }
 
     return SliverPadding(
