@@ -5,6 +5,7 @@ import 'package:artbooking/globals/constants/storage_keys_constants.dart';
 import 'package:artbooking/types/enums/enum_license_type.dart';
 import 'package:artbooking/types/enums/enum_like_type.dart';
 import 'package:artbooking/types/enums/enum_section_config_tab.dart';
+import 'package:artbooking/types/enums/enum_tab_data_type.dart';
 import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 
@@ -126,6 +127,21 @@ class StorageUtilities {
         : EnumLikeType.illustration;
   }
 
+  EnumTabDataType getReviewTab() {
+    final String key = Constants.storageKeys.dashboardReviewTab;
+    final String? value = _localStorage.getString(key);
+    return value == EnumTabDataType.books.name
+        ? EnumTabDataType.books
+        : EnumTabDataType.illustrations;
+  }
+
+  /// Retrieve saved value for hide disapproved items on review page.
+  bool getReviewHideDisapproved() {
+    final String key = Constants.storageKeys.reviewHideDisapproved;
+    final bool? value = _localStorage.getBool(key);
+    return value ?? false;
+  }
+
   EnumSectionConfigTab getSectionConfigTab() {
     final String key = Constants.storageKeys.sectionConfigTab;
     final String? value = _localStorage.getString(key);
@@ -202,6 +218,17 @@ class StorageUtilities {
 
   void saveItemsStyle({String? pageRoute, EnumItemsLayout? style}) {
     _localStorage.setString('items_style_$pageRoute', style.toString());
+  }
+
+  void saveReviewTab(EnumTabDataType reviewTab) {
+    final String key = Constants.storageKeys.dashboardReviewTab;
+    _localStorage.setString(key, reviewTab.name);
+  }
+
+  /// Save value for hide disapproved items on review page.
+  void saveReviewHideDisapproved(bool hide) {
+    final String key = Constants.storageKeys.reviewHideDisapproved;
+    _localStorage.setBool(key, hide);
   }
 
   void saveSectionConfigTab(EnumSectionConfigTab sectionConfigTab) {

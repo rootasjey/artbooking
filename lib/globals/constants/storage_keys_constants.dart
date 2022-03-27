@@ -8,6 +8,7 @@ class StorageKeys {
   final String dashboardLikesTab = "dashboard_likes_tab";
   final String dashboardIllustrationsTab = "dashboard_illustrations_tab";
   final String dashboardBooksTab = "dashboard_books_tab";
+  final String dashboardReviewTab = "dashboard_review_tab";
   final String drafts = "drafts";
   final String email = "email";
   final String firstLaunch = "first_launch";
@@ -21,6 +22,7 @@ class StorageKeys {
   final String onOpenNotificationPath = "on_open_notification_path";
   final String notificationsActivated = "notifications_activated";
   final String quoteIdNotification = "quote_id_notification";
+  final String reviewHideDisapproved = "review_hide_disapproved";
   final String sendPushOnNewNotification = "send_push_on_new_notification";
   final String sectionConfigTab = "section_config_tab";
   final String password = "password";
