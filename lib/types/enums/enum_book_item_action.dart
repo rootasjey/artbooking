@@ -1,7 +1,15 @@
 /// Actions for an illustration item.
 enum EnumBookItemAction {
+  /// Allow this book to be shown on public spaces (admin action).
+  /// Challenges and contests may be different from public spaces.
+  approve,
+
   /// Delete this book from database.
   delete,
+
+  /// Prevent this book to be visible in public spaces (admin action).
+  /// Challenges and contests may be different from public spaces.
+  disapprove,
 
   /// Like a book.
   like,
