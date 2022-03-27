@@ -3,6 +3,7 @@ import 'package:artbooking/router/locations/signin_location.dart';
 import 'package:artbooking/screens/atelier/atelier_page_welcome.dart';
 import 'package:artbooking/screens/atelier/atelier_page.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page.dart';
+import 'package:artbooking/screens/atelier/review/review_page.dart';
 import 'package:artbooking/screens/likes/likes_page.dart';
 import 'package:artbooking/screens/sections/many/sections_page.dart';
 import 'package:artbooking/screens/sections/one/section_page.dart';
@@ -113,6 +114,10 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
   static const String profileIllustrationRoute =
       "$profileRoute/i/:illustrationId";
 
+  /// Staff route to review & approve books & illustrations
+  /// to be display in public spaces (according to EULA).
+  static const String reviewRoute = "$route/review";
+
   /// Settings route value for this location.
   static const String settingsRoute = "$route/settings";
 
@@ -156,6 +161,7 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
         profileIllustrationRoute,
         profileBookRoute,
         profileIllustrationBookRoute,
+        reviewRoute,
       ];
 
   @override
@@ -290,6 +296,13 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
           ),
           key: ValueKey("$sectionRoute"),
           title: Utilities.ui.getPageTitle("section".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
+      if (state.pathPatternSegments.contains("review"))
+        BeamPage(
+          child: ReviewPage(),
+          key: ValueKey("$reviewRoute"),
+          title: Utilities.ui.getPageTitle("review".tr()),
           type: BeamPageType.fadeTransition,
         ),
     ];

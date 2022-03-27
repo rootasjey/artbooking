@@ -133,8 +133,10 @@ class AtelierPageWelcome extends ConsumerWidget {
     int index = 0;
 
     bool canManageSections = false;
+    bool canManageReviews = false;
     if (userFirestore != null) {
       canManageSections = userFirestore.rights.canManageSections;
+      canManageReviews = userFirestore.rights.canManageReviews;
     }
 
     final List<Widget> children = [
@@ -201,6 +203,16 @@ class AtelierPageWelcome extends ConsumerWidget {
           context.beamToNamed(AtelierLocationContent.licensesRoute);
         },
       ),
+      if (canManageReviews)
+        AtelierPageCard(
+          hoverColor: Constants.colors.review,
+          iconData: UniconsLine.image_check,
+          textTitle: "review".tr(),
+          textSubtitle: "review_subtitle".tr(),
+          onTap: () {
+            context.beamToNamed(AtelierLocationContent.reviewRoute);
+          },
+        ),
       if (canManageSections)
         AtelierPageCard(
           hoverColor: Constants.colors.sections,

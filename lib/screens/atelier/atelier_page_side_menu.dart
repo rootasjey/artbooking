@@ -303,6 +303,13 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
     final rights = userFirestore.rights;
 
     return [
+      if (rights.canManageReviews)
+        SideMenuItem(
+          iconData: UniconsLine.image_check,
+          label: "review".tr(),
+          hoverColor: Constants.colors.review,
+          routePath: AtelierLocationContent.reviewRoute,
+        ),
       if (rights.canManageSections)
         SideMenuItem(
           iconData: UniconsLine.web_grid,
