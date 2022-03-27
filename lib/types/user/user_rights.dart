@@ -8,6 +8,7 @@ class UserRights {
     this.canManageLicenses = false,
     this.canManageSections = false,
     this.canManageUsers = false,
+    this.canManageReviews = false,
   });
 
   /// If true, the current user can manage app data.
@@ -19,6 +20,9 @@ class UserRights {
   /// True if the current user can manage (add, remove, edit) art movements.
   final bool canManageArtMovements;
 
+  /// True if the current user can approve & unapprove books & illustrations.
+  final bool canManageReviews;
+
   /// True if the current user can manage (add, remove, edit) sections.
   final bool canManageSections;
 
@@ -28,10 +32,12 @@ class UserRights {
   UserRights copyWith({
     bool? isAdmin,
     bool? canManageLicense,
+    bool? canManageReviews,
   }) {
     return UserRights(
       canManageData: isAdmin ?? this.canManageData,
       canManageLicenses: canManageLicense ?? this.canManageLicenses,
+      canManageReviews: canManageReviews ?? this.canManageReviews,
     );
   }
 
@@ -42,6 +48,7 @@ class UserRights {
       'user:manage_licenses': canManageLicenses,
       'user:manage_sections': canManageUsers,
       'user:manage_users': canManageUsers,
+      'user:manage_reviews': canManageReviews,
     };
   }
 
@@ -55,11 +62,12 @@ class UserRights {
     }
 
     return UserRights(
-      canManageArtMovements: map['user:manage_art_movements'] ?? false,
-      canManageData: map['user:manage_data'] ?? false,
-      canManageLicenses: map['user:manage_licenses'] ?? false,
-      canManageSections: map['user:manage_sections'] ?? false,
-      canManageUsers: map['user:manage_users'] ?? false,
+      canManageArtMovements: map["user:manage_art_movements"] ?? false,
+      canManageData: map["user:manage_data"] ?? false,
+      canManageLicenses: map["user:manage_licenses"] ?? false,
+      canManageSections: map["user:manage_sections"] ?? false,
+      canManageUsers: map["user:manage_users"] ?? false,
+      canManageReviews: map["user:manage_reviews"] ?? false,
     );
   }
 
@@ -70,9 +78,10 @@ class UserRights {
 
   @override
   String toString() =>
-      'UserRights(canManageArtMovements: $canManageArtMovements, '
-      'canManageData: $canManageData, canManageLicenses: $canManageLicenses, '
-      'canManageSections: $canManageSections, canManageUsers: $canManageUsers)';
+      "UserRights(canManageArtMovements: $canManageArtMovements, "
+      "canManageData: $canManageData, canManageLicenses: $canManageLicenses, "
+      "canManageReviews: $canManageReviews "
+      "canManageSections: $canManageSections, canManageUsers: $canManageUsers)";
 
   @override
   bool operator ==(Object other) {
@@ -83,6 +92,7 @@ class UserRights {
         other.canManageData == canManageData &&
         other.canManageSections == canManageSections &&
         other.canManageSections == canManageSections &&
+        other.canManageReviews == canManageReviews &&
         other.canManageUsers == canManageUsers;
   }
 
@@ -92,5 +102,6 @@ class UserRights {
       canManageData.hashCode ^
       canManageLicenses.hashCode ^
       canManageSections.hashCode ^
+      canManageReviews.hashCode ^
       canManageUsers.hashCode;
 }
