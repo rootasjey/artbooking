@@ -14,22 +14,19 @@ class OutlinedTextField extends StatelessWidget {
     this.autofocus = true,
     this.maxLines = 1,
     this.textInputAction,
+    this.keyboardType,
+    this.focusNode,
+    this.obscureText = false,
   }) : super(key: key);
 
   final bool autofocus;
+  final bool obscureText;
 
   final BoxConstraints constraints;
 
+  final FocusNode? focusNode;
+
   final int? maxLines;
-
-  /// The label will be displayed on top of the input.
-  final String? label;
-
-  /// A controller to manipulate the input component.
-  final TextEditingController? controller;
-
-  /// The [hintText] will be displayed inside the input.
-  final String hintText;
 
   /// Fires when the user modify the input's value.
   final Function(String)? onChanged;
@@ -37,7 +34,18 @@ class OutlinedTextField extends StatelessWidget {
   /// Fires when the user send/validate the input's value.
   final Function(String)? onSubmitted;
 
+  /// The [hintText] will be displayed inside the input.
+  final String hintText;
+
+  /// The label will be displayed on top of the input.
+  final String? label;
+
+  /// A controller to manipulate the input component.
+  final TextEditingController? controller;
+
   final TextInputAction? textInputAction;
+
+  final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
@@ -65,10 +73,13 @@ class OutlinedTextField extends StatelessWidget {
         ConstrainedBox(
           constraints: constraints,
           child: TextField(
+            focusNode: focusNode,
             autofocus: autofocus,
             controller: controller,
             maxLines: maxLines,
+            obscureText: obscureText,
             textInputAction: textInputAction,
+            keyboardType: keyboardType,
             onChanged: onChanged,
             onSubmitted: onSubmitted,
             style: Utilities.fonts.style(
