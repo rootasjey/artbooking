@@ -1,7 +1,6 @@
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 
 class AppIcon extends StatefulWidget {
   AppIcon({
@@ -25,8 +24,8 @@ class _AppIconState extends State<AppIcon> {
       child: InkWell(
         borderRadius: BorderRadius.circular(12.0),
         onTap: onTap,
-        child: Lottie.asset(
-          "assets/images/app_icon/icon_animation.json",
+        child: Image.asset(
+          "assets/images/app_icon/circle_512x512.png",
           width: widget.size,
           height: widget.size,
         ),

@@ -97,8 +97,10 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
-    - assets/images/app_icon/512.png
+    - assets/images/app_icon/square_512x512.png
+    - assets/images/app_icon/circle_512x512.png
     - assets/images/app_icon/icon_animation.json
+    - assets/animations/waves.json
     - assets/translations/
     - assets/cfg/
 
