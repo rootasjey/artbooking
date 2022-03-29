@@ -36,22 +36,26 @@ class DarkElevatedButton extends StatelessWidget {
   static Widget large({
     Function()? onPressed,
     required Widget child,
+    EdgeInsets margin = EdgeInsets.zero,
   }) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        primary: Colors.black87,
-        minimumSize: Size(320.0, 0.0),
-        textStyle: Utilities.fonts.style(
-          fontWeight: FontWeight.w500,
+    return Padding(
+      padding: margin,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          primary: Colors.black87,
+          minimumSize: Size(320.0, 0.0),
+          textStyle: Utilities.fonts.style(
+            fontWeight: FontWeight.w500,
+          ),
         ),
-      ),
-      onPressed: onPressed,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16.0,
-          vertical: 12.0,
+        onPressed: onPressed,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+            vertical: 12.0,
+          ),
+          child: child,
         ),
-        child: child,
       ),
     );
   }
