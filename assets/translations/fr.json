@@ -378,6 +378,7 @@
   "email_doesnt_exist": "Désolés, cette adresse email n'existe pas.",
   "email_empty_forbidden": "L'email ne peut pas être vide",
   "email_empty_no_valid": "Le champ email est vide. Veuillez saisir une adresse email valide.",
+  "email_enter_valid": "Veuillez entrer un email valide.",
   "email_new": "Nouvel email",
   "email_not_available": "Cette adresse email n'est pas disponible",
   "email_not_valid": "L'email saisie n'est pas valide",

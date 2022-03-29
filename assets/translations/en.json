@@ -377,6 +377,7 @@
   "email_current": "Current email",
   "email_doesnt_exist": "Sorry, this email doesn't exist.",
   "email_empty_forbidden": "Email cannot be empty",
+  "email_enter_valid": "Please enter a valid email.",
   "email_new": "New email",
   "email_not_available": "This email address is not available",
   "email_not_valid": "The value entered is not a valid email address",
