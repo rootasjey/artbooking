@@ -18,6 +18,9 @@ class FontsUtilities {
     Color? color,
     Color? backgroundColor,
     TextDecoration? decoration,
+    TextDecorationStyle? decorationStyle,
+    Color? decorationColor,
+    double? decorationThickness,
   }) {
     return GoogleFonts.nunito(
       color: color,
@@ -26,6 +29,9 @@ class FontsUtilities {
       fontWeight: fontWeight,
       height: height,
       decoration: decoration,
+      decorationStyle: decorationStyle,
+      decorationColor: decorationColor,
+      decorationThickness: decorationThickness,
     );
   }
 
