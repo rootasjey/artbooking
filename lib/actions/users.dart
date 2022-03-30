@@ -1,7 +1,7 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:artbooking/types/cloud_functions/cloud_functions_error.dart';
 import 'package:artbooking/types/cloud_functions/create_account_response.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -10,14 +10,12 @@ class UsersActions {
   /// Check email availability accross the app.
   static Future<bool> checkEmailAvailability(String email) async {
     try {
-      final callable = FirebaseFunctions.instanceFor(
-        app: Firebase.app(),
-        region: 'europe-west3',
-      ).httpsCallable('users-checkEmailAvailability');
+      final response = await Utilities.cloud
+          .fun("users-checkEmailAvailability")
+          .call({"email": email});
 
-      final resp = await callable.call({'email': email});
-      final isOk = resp.data['isAvailable'] as bool?;
-      return isOk ?? false;
+      final isAvailable = response.data["isAvailable"] as bool?;
+      return isAvailable ?? false;
     } on FirebaseFunctionsException catch (exception) {
       debugPrint("[code: ${exception.code}] - ${exception.message}");
       return false;
@@ -29,20 +27,15 @@ class UsersActions {
 
   /// Create a new account.
   static Future<CreateAccountResponse> createAccount({
-    /*required*/ required String email,
+    required String email,
     required String username,
     required String password,
   }) async {
     try {
-      final callable = FirebaseFunctions.instanceFor(
-        app: Firebase.app(),
-        region: 'europe-west3',
-      ).httpsCallable('users-createAccount');
-
-      final response = await callable.call({
-        'username': username,
-        'password': password,
-        'email': email,
+      final response = await Utilities.cloud.fun("users-createAccount").call({
+        "username": username,
+        "password": password,
+        "email": email,
       });
 
       return CreateAccountResponse.fromJSON(response.data);
@@ -76,14 +69,12 @@ class UsersActions {
   /// Check username availability.
   static Future<bool> checkUsernameAvailability(String username) async {
     try {
-      final callable = FirebaseFunctions.instanceFor(
-        app: Firebase.app(),
-        region: 'europe-west3',
-      ).httpsCallable('users-checkUsernameAvailability');
+      final response = await Utilities.cloud
+          .fun("users-checkUsernameAvailability")
+          .call({"usernname": username});
 
-      final resp = await callable.call({'name': username});
-      final isOk = resp.data['isAvailable'] as bool?;
-      return isOk ?? false;
+      final isAvailable = response.data["isAvailable"] as bool?;
+      return isAvailable ?? false;
     } on FirebaseFunctionsException catch (exception) {
       debugPrint("[code: ${exception.code}] - ${exception.message}");
       return false;
