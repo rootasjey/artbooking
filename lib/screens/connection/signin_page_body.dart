@@ -1,12 +1,12 @@
 import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/buttons/dark_text_button.dart';
-import 'package:artbooking/components/loading_view.dart';
+import 'package:artbooking/components/icons/animated_app_icon.dart';
 import 'package:artbooking/components/texts/outlined_text_field.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/forgot_password_location.dart';
 import 'package:artbooking/router/locations/signup_location.dart';
-import 'package:artbooking/screens/connection/signin_page_header.dart';
+import 'package:artbooking/screens/connection/connection_page_header.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -17,15 +17,15 @@ class SigninPageBody extends StatefulWidget {
   const SigninPageBody({
     Key? key,
     this.connecting = false,
-    this.trySignin,
+    this.tryConnect,
     this.onEmailChanged,
     this.onPasswordChanged,
-    this.validEmail = true,
+    this.emailValid = true,
   }) : super(key: key);
 
   final bool connecting;
-  final bool validEmail;
-  final void Function()? trySignin;
+  final bool emailValid;
+  final void Function()? tryConnect;
   final void Function(String)? onEmailChanged;
   final void Function(String)? onPasswordChanged;
 
@@ -49,31 +49,12 @@ class _SigninPageBodyState extends State<SigninPageBody> {
   @override
   Widget build(BuildContext context) {
     if (widget.connecting) {
-      return SliverPadding(
-        padding: const EdgeInsets.only(
-          top: 100.0,
-          bottom: 300.0,
-        ),
-        sliver: SliverList(
-          delegate: SliverChildListDelegate.fixed([
-            Column(
-              children: <Widget>[
-                SizedBox(
-                  width: 320.0,
-                  child: LoadingView(
-                    sliver: false,
-                    title: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Opacity(
-                        opacity: 0.6,
-                        child: Text("signin_dot".tr()),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ]),
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 100.0, bottom: 300.0),
+          child: AnimatedAppIcon(
+            textTitle: "signing_in".tr() + "...",
+          ),
         ),
       );
     }
@@ -95,7 +76,10 @@ class _SigninPageBodyState extends State<SigninPageBody> {
               width: 320.0,
               child: Column(
                 children: <Widget>[
-                  SigninPageHeader(),
+                  ConnectionPageHeader(
+                    title: "signin".tr(),
+                    subtitle: "signin_existing_account".tr(),
+                  ),
                   FadeInY(
                     delay: Duration(milliseconds: 50),
                     beginY: 50.0,
@@ -112,7 +96,7 @@ class _SigninPageBodyState extends State<SigninPageBody> {
                       ),
                     ),
                   ),
-                  if (!widget.validEmail)
+                  if (!widget.emailValid)
                     Align(
                       alignment: Alignment.topLeft,
                       child: Padding(
@@ -134,12 +118,11 @@ class _SigninPageBodyState extends State<SigninPageBody> {
                         obscureText: true,
                         focusNode: _passwordNode,
                         label: "password".tr().toUpperCase(),
-                        hintText: "•••",
                         controller: _passwordController,
                         textInputAction: TextInputAction.next,
                         keyboardType: TextInputType.emailAddress,
                         onChanged: widget.onPasswordChanged,
-                        onSubmitted: (value) => widget.trySignin?.call(),
+                        onSubmitted: (value) => widget.tryConnect?.call(),
                       ),
                     ),
                   ),
@@ -171,7 +154,7 @@ class _SigninPageBodyState extends State<SigninPageBody> {
                   ),
                   DarkElevatedButton.large(
                     margin: const EdgeInsets.only(top: 30.0),
-                    onPressed: () {},
+                    onPressed: widget.tryConnect,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

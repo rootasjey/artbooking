@@ -21,10 +21,16 @@ class SigninPage extends ConsumerStatefulWidget {
 }
 
 class _SigninPageState extends ConsumerState<SigninPage> {
+  /// If true, the app is connecting the user.
   bool _connecting = false;
-  bool _validEmail = true;
 
+  /// True if the current email value is valid.
+  bool _emailValid = true;
+
+  /// Typed user's email.
   String _email = "";
+
+  /// Typed user's password.
   String _password = "";
 
   @override
@@ -42,9 +48,10 @@ class _SigninPageState extends ConsumerState<SigninPage> {
           ApplicationBar(),
           SigninPageBody(
             connecting: _connecting,
-            trySignin: trySignin,
             onEmailChanged: onEmailChanged,
-            validEmail: _validEmail,
+            onPasswordChanged: onPasswordChanged,
+            tryConnect: tryConnect,
+            emailValid: _emailValid,
           ),
         ],
       ),
@@ -75,7 +82,7 @@ class _SigninPageState extends ConsumerState<SigninPage> {
     return true;
   }
 
-  void trySignin() async {
+  void tryConnect() async {
     if (!checkInputsFormat()) {
       return;
     }
@@ -115,7 +122,7 @@ class _SigninPageState extends ConsumerState<SigninPage> {
     _email = value.trim();
 
     setState(() {
-      _validEmail = UsersActions.checkEmailFormat(_email);
+      _emailValid = UsersActions.checkEmailFormat(_email);
     });
   }
 

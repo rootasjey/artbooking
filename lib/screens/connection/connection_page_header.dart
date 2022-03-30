@@ -1,12 +1,18 @@
 import 'package:artbooking/components/animations/fade_in_x.dart';
 import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
-class SigninPageHeader extends StatelessWidget {
-  const SigninPageHeader({Key? key}) : super(key: key);
+class ConnectionPageHeader extends StatelessWidget {
+  const ConnectionPageHeader({
+    Key? key,
+    required this.title,
+    required this.subtitle,
+  }) : super(key: key);
+
+  final String title;
+  final String subtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +38,7 @@ class SigninPageHeader extends StatelessWidget {
             FadeInY(
               beginY: 50.0,
               child: Text(
-                "signin".tr(),
+                title,
                 textAlign: TextAlign.center,
                 style: Utilities.fonts.style(
                   fontSize: 25.0,
@@ -46,7 +52,7 @@ class SigninPageHeader extends StatelessWidget {
               child: Opacity(
                 opacity: 0.6,
                 child: Text(
-                  "signin_existing_account".tr(),
+                  subtitle,
                   overflow: TextOverflow.ellipsis,
                   style: Utilities.fonts.style(
                     fontWeight: FontWeight.w400,
