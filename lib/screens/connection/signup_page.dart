@@ -1,22 +1,18 @@
 import 'dart:async';
 
-import 'package:artbooking/components/buttons/dark_text_button.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
+import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/home_location.dart';
-import 'package:artbooking/router/locations/signin_location.dart';
 import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/screens/connection/signup_page_body.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:artbooking/actions/users.dart';
-import 'package:artbooking/components/animations/fade_in_x.dart';
-import 'package:artbooking/components/animations/fade_in_y.dart';
-import 'package:artbooking/components/loading_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
-import 'package:unicons/unicons.dart';
 
 class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({Key? key}) : super(key: key);
@@ -26,485 +22,61 @@ class SignupPage extends ConsumerStatefulWidget {
 }
 
 class _SignupPageState extends ConsumerState<SignupPage> {
-  bool _isCheckingEmail = false;
-  bool _isCheckingName = false;
-  bool _isSigningUp = false;
+  bool _checkingEmail = false;
+  bool _checkingUsername = false;
+  bool _loading = false;
 
-  final _confirmPasswordNode = FocusNode();
-  final _passwordNode = FocusNode();
-  final _usernameNode = FocusNode();
-
-  String _confirmPassword = '';
-  String _email = '';
-  String _emailErrorMessage = '';
-  String _nameErrorMessage = '';
-  String _password = '';
-  String _username = '';
+  String _confirmPassword = "";
+  String _confirmPasswordHint = "";
+  String _email = "";
+  String _emailHint = "";
+  String _password = "";
+  String _passwordHint = "";
+  String _username = "";
+  String _usernameHint = "";
 
   Timer? _emailTimer;
-  Timer? _nameTimer;
+  Timer? _usernameTimer;
 
   @override
   void dispose() {
+    _emailTimer?.cancel();
+    _usernameTimer?.cancel();
     super.dispose();
-    _usernameNode.dispose();
-    _passwordNode.dispose();
-    _confirmPasswordNode.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: showArgumentsDialog,
+        label: Text(
+          "why".tr().toLowerCase(),
+          style: Utilities.fonts.style(
+            fontSize: 14.0,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        // icon: Icon(UniconsLine.question),
+      ),
       body: CustomScrollView(
         slivers: [
           ApplicationBar(),
-          SliverPadding(
-            padding: const EdgeInsets.only(
-              top: 100.0,
-              bottom: 300.0,
-            ),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate.fixed([
-                Column(
-                  children: <Widget>[
-                    SizedBox(
-                      width: 300.0,
-                      child: body(),
-                    ),
-                  ],
-                ),
-              ]),
-            ),
+          SignupPageBody(
+            loading: _loading,
+            checkingEmail: _checkingEmail,
+            checkingUsername: _checkingUsername,
+            onUsernameChanged: onUsernameChanged,
+            onEmailChanged: onEmailChanged,
+            onConfirmPasswordChanged: onConfirmPasswordChanged,
+            onPasswordChanged: onPasswordChanged,
+            createAccount: createAccount,
+            usernameHint: _usernameHint,
+            emailErrorMessage: _emailHint,
+            confirmPasswordHint: _confirmPasswordHint,
+            passwordHint: _passwordHint,
           ),
         ],
-      ),
-    );
-  }
-
-  Widget body() {
-    if (_isSigningUp) {
-      return Padding(
-        padding: const EdgeInsets.only(top: 80.0),
-        child: LoadingView(
-          sliver: false,
-          title: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Opacity(
-              opacity: 0.6,
-              child: Text("signup_dot".tr()),
-            ),
-          ),
-        ),
-      );
-    }
-
-    return idleContainer();
-  }
-
-  Widget emailInput() {
-    return FadeInY(
-      delay: 0.milliseconds,
-      beginY: 50.0,
-      child: Padding(
-        padding: EdgeInsets.only(top: 60.0),
-        child: TextFormField(
-          autofocus: true,
-          textInputAction: TextInputAction.next,
-          decoration: InputDecoration(
-            icon: Icon(UniconsLine.envelope),
-            labelText: "email".tr(),
-          ),
-          keyboardType: TextInputType.emailAddress,
-          onChanged: (value) async {
-            _email = value;
-
-            setState(() {
-              _isCheckingEmail = true;
-            });
-
-            final isWellFormatted = UsersActions.checkEmailFormat(_email);
-
-            if (!isWellFormatted) {
-              setState(() {
-                _isCheckingEmail = false;
-                _emailErrorMessage = "email_not_valid".tr();
-              });
-
-              return;
-            }
-
-            if (_emailTimer != null) {
-              _emailTimer!.cancel();
-              _emailTimer = null;
-            }
-
-            _emailTimer = Timer(1.seconds, () async {
-              final isAvailable = await UsersActions.checkEmailAvailability(
-                _email,
-              );
-
-              if (!isAvailable) {
-                setState(() {
-                  _isCheckingEmail = false;
-                  _emailErrorMessage = "email_not_available".tr();
-                });
-
-                return;
-              }
-
-              setState(() {
-                _isCheckingEmail = false;
-                _emailErrorMessage = '';
-              });
-            });
-          },
-          onFieldSubmitted: (_) => _usernameNode.requestFocus(),
-          validator: (value) {
-            if (value!.isEmpty) {
-              return "email_empty_forbidden".tr();
-            }
-
-            return null;
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget emailInputError() {
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: 8.0,
-        left: 40.0,
-      ),
-      child: Text(
-        _emailErrorMessage,
-        style: TextStyle(
-          color: Colors.red.shade300,
-        ),
-      ),
-    );
-  }
-
-  Widget header() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        FadeInX(
-          beginX: 10.0,
-          delay: 100.milliseconds,
-          child: Padding(
-            padding: const EdgeInsets.only(
-              right: 20.0,
-            ),
-            child: IconButton(
-              onPressed: Beamer.of(context).popBeamLocation,
-              icon: Icon(UniconsLine.arrow_left),
-            ),
-          ),
-        ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              FadeInY(
-                beginY: 50.0,
-                child: Text(
-                  "signup".tr(),
-                  textAlign: TextAlign.center,
-                  style: Utilities.fonts.style(
-                    fontSize: 25.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              FadeInY(
-                delay: 50.milliseconds,
-                beginY: 20.0,
-                child: Opacity(
-                  opacity: 0.6,
-                  child: Text(
-                    "account_create_new".tr(),
-                    style: Utilities.fonts.style(
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget idleContainer() {
-    return Column(
-      children: <Widget>[
-        header(),
-        emailInput(),
-        if (_isCheckingEmail) emailProgress(),
-        if (_emailErrorMessage.isNotEmpty) emailInputError(),
-        nameInput(),
-        if (_isCheckingName) nameProgress(),
-        if (_nameErrorMessage.isNotEmpty) nameInputError(),
-        passwordInput(),
-        confirmPasswordInput(),
-        validationButton(),
-        alreadyHaveAccountButton(),
-      ],
-    );
-  }
-
-  Widget emailProgress() {
-    return Container(
-      padding: const EdgeInsets.only(
-        left: 40.0,
-      ),
-      child: LinearProgressIndicator(),
-    );
-  }
-
-  Widget nameInput() {
-    return FadeInY(
-      delay: 100.milliseconds,
-      beginY: 50.0,
-      child: Padding(
-        padding: EdgeInsets.only(top: 30.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            TextFormField(
-              focusNode: _usernameNode,
-              decoration: InputDecoration(
-                icon: Icon(UniconsLine.user),
-                labelText: "username".tr(),
-              ),
-              textInputAction: TextInputAction.next,
-              onChanged: (value) async {
-                setState(() {
-                  _username = value;
-                  _isCheckingName = true;
-                });
-
-                final isWellFormatted =
-                    UsersActions.checkUsernameFormat(_username);
-
-                if (!isWellFormatted) {
-                  setState(() {
-                    _isCheckingName = false;
-                    _nameErrorMessage = _username.length < 3
-                        ? "input_minimum_char".tr()
-                        : "input_valid_format".tr();
-                  });
-
-                  return;
-                }
-
-                if (_nameTimer != null) {
-                  _nameTimer!.cancel();
-                  _nameTimer = null;
-                }
-
-                _nameTimer = Timer(1.seconds, () async {
-                  final isAvailable =
-                      await UsersActions.checkUsernameAvailability(
-                    _username,
-                  );
-
-                  if (!isAvailable) {
-                    setState(() {
-                      _isCheckingName = false;
-                      _nameErrorMessage = "name_unavailable".tr();
-                    });
-
-                    return;
-                  }
-
-                  setState(() {
-                    _isCheckingName = false;
-                    _nameErrorMessage = '';
-                  });
-                });
-              },
-              onFieldSubmitted: (_) => _passwordNode.requestFocus(),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return "name_empty_forbidden".tr();
-                }
-
-                return null;
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget nameInputError() {
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: 8.0,
-        left: 40.0,
-      ),
-      child: Text(_nameErrorMessage,
-          style: TextStyle(
-            color: Colors.red.shade300,
-          )),
-    );
-  }
-
-  Widget nameProgress() {
-    return Container(
-      padding: const EdgeInsets.only(
-        left: 40.0,
-      ),
-      child: LinearProgressIndicator(),
-    );
-  }
-
-  Widget passwordInput() {
-    return FadeInY(
-      delay: 200.milliseconds,
-      beginY: 50.0,
-      child: Padding(
-        padding: EdgeInsets.only(top: 30.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            TextFormField(
-              focusNode: _passwordNode,
-              textInputAction: TextInputAction.next,
-              decoration: InputDecoration(
-                icon: Icon(UniconsLine.lock_open_alt),
-                labelText: "password".tr(),
-              ),
-              obscureText: true,
-              onChanged: (value) {
-                if (value.length == 0) {
-                  return;
-                }
-                _password = value;
-              },
-              onFieldSubmitted: (_) => _confirmPasswordNode.requestFocus(),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return "password_empty_forbidden".tr();
-                }
-
-                return null;
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget confirmPasswordInput() {
-    return FadeInY(
-      delay: 400.milliseconds,
-      beginY: 50.0,
-      child: Padding(
-        padding: EdgeInsets.only(top: 30.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            TextFormField(
-              focusNode: _confirmPasswordNode,
-              decoration: InputDecoration(
-                icon: Icon(UniconsLine.lock),
-                labelText: "password_confirm".tr(),
-              ),
-              obscureText: true,
-              onChanged: (value) {
-                if (value.length == 0) {
-                  return;
-                }
-                _confirmPassword = value;
-              },
-              onFieldSubmitted: (value) => signUpProcess(),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return "password_confirm_empty_forbidden".tr();
-                }
-
-                if (_confirmPassword != _password) {
-                  return "passwords_dont_match".tr();
-                }
-
-                return null;
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget validationButton() {
-    return FadeInY(
-      delay: 500.milliseconds,
-      beginY: 50.0,
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 60.0),
-          child: ElevatedButton(
-            onPressed: () => signUpProcess(),
-            style: ElevatedButton.styleFrom(
-              primary: Theme.of(context).primaryColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(7.0),
-                ),
-              ),
-            ),
-            child: Container(
-              width: 250.0,
-              padding: const EdgeInsets.all(15.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    "signup".tr().toUpperCase(),
-                    style: Utilities.fonts.style(
-                      color: Colors.white,
-                      fontSize: 15.0,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
-                    child: Icon(UniconsLine.arrow_right),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget alreadyHaveAccountButton() {
-    return FadeInY(
-      delay: 630.milliseconds,
-      beginY: 30.0,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: DarkTextButton(
-          onPressed: () => context.beamToNamed(SigninLocation.route),
-          child: Opacity(
-            opacity: 0.6,
-            child: Text(
-              "account_already_own".tr(),
-              style: TextStyle(
-                decoration: TextDecoration.underline,
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -521,11 +93,11 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     return true;
   }
 
-  void signUpProcess() async {
-    setState(() => _isSigningUp = true);
+  void createAccount() async {
+    setState(() => _loading = true);
 
     if (!await checkInputs()) {
-      setState(() => _isSigningUp = false);
+      setState(() => _loading = false);
       return;
     }
 
@@ -536,9 +108,8 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                 username: _username,
                 password: _password,
               );
-      ;
 
-      setState(() => _isSigningUp = false);
+      setState(() => _loading = false);
 
       if (createAccountResponse.success) {
         Beamer.of(context).beamToNamed(HomeLocation.route);
@@ -553,13 +124,9 @@ class _SignupPageState extends ConsumerState<SignupPage> {
       }
 
       context.showErrorBar(content: Text(message));
-
-      context.beamToNamed(HomeLocation.route);
     } catch (error) {
       Utilities.logger.e(error);
-
-      setState(() => _isSigningUp = false);
-
+      setState(() => _loading = false);
       context.showErrorBar(
         content: Text("account_create_error".tr()),
       );
@@ -620,5 +187,160 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     }
 
     return true;
+  }
+
+  void onConfirmPasswordChanged(String value) {
+    _confirmPassword = value;
+
+    if (_confirmPassword.isEmpty) {
+      _confirmPasswordHint = "password_confirm_empty_forbidden".tr();
+    } else if (_confirmPassword != _password) {
+      _confirmPasswordHint = "passwords_dont_match".tr();
+    } else {
+      _confirmPasswordHint = "";
+    }
+
+    setState(() {});
+  }
+
+  void onEmailChanged(String value) async {
+    _email = value.trim();
+
+    final isWellFormatted = UsersActions.checkEmailFormat(_email);
+
+    if (!isWellFormatted) {
+      setState(() {
+        _emailHint = "email_not_valid".tr();
+      });
+
+      return;
+    }
+
+    setState(() {
+      _checkingEmail = true;
+      _emailHint = "";
+    });
+
+    if (_emailTimer != null) {
+      _emailTimer?.cancel();
+      _emailTimer = null;
+    }
+
+    _emailTimer = Timer(1.seconds, () async {
+      final isAvailable = await UsersActions.checkEmailAvailability(
+        _email,
+      );
+
+      setState(() {
+        _checkingEmail = false;
+        _emailHint = isAvailable ? "" : "email_not_available".tr();
+      });
+    });
+  }
+
+  void onPasswordChanged(String value) {
+    _password = value.trim();
+
+    if (_password.isEmpty) {
+      _passwordHint = "password_empty_forbidden".tr();
+    } else {
+      _passwordHint = "";
+    }
+  }
+
+  void onUsernameChanged(String value) async {
+    _username = value.trim();
+
+    final isWellFormatted = UsersActions.checkUsernameFormat(_username);
+
+    if (!isWellFormatted) {
+      setState(() {
+        _usernameHint = _username.length < 3
+            ? "input_minimum_char".tr()
+            : "input_valid_format".tr();
+      });
+
+      return;
+    }
+
+    setState(() {
+      _checkingUsername = true;
+      _usernameHint = "";
+    });
+
+    if (_usernameTimer != null) {
+      _usernameTimer?.cancel();
+      _usernameTimer = null;
+    }
+
+    _usernameTimer = Timer(1.seconds, () async {
+      final isAvailable = await UsersActions.checkUsernameAvailability(
+        _username,
+      );
+
+      setState(() {
+        _checkingUsername = false;
+        _usernameHint = isAvailable ? "" : "name_unavailable".tr();
+      });
+    });
+  }
+
+  void showArgumentsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return ThemedDialog(
+          onCancel: Beamer.of(context).popRoute,
+          titleValue: "account_create_why".tr(),
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Opacity(
+                    opacity: 0.6,
+                    child: Text(
+                      "account_create_arguments.preview".tr(),
+                      style: Utilities.fonts.style(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+                textArgument("account_create_arguments.community".tr()),
+                textArgument("account_create_arguments.create_book".tr()),
+                textArgument("account_create_arguments.profile_page".tr()),
+                textArgument("account_create_arguments.stats".tr()),
+                textArgument(
+                  "account_create_arguments.upload_illustration".tr(),
+                ),
+              ],
+            ),
+          ),
+          textButtonValidation: "thank_you_exclamation".tr(),
+          onValidate: Beamer.of(context).popRoute,
+        );
+      },
+    );
+  }
+
+  Widget textArgument(String text) {
+    final Color color = Colors.amber;
+
+    return Row(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: CircleAvatar(radius: 4.0, backgroundColor: color),
+        ),
+        Text(
+          text,
+          style: Utilities.fonts.style(fontWeight: FontWeight.w600),
+        ),
+      ],
+    );
   }
 }
