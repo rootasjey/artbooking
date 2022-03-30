@@ -40,8 +40,8 @@ export const checkEmailAvailability = functions
     if (typeof email !== 'string' || email.length === 0) {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called with one (string)
-         argument [email] which is the email to check.`,
+        `The function must be called with one (string) ` +
+        `argument [email] which is the email to check.`,
       );
     }
 
@@ -65,33 +65,33 @@ export const checkUsernameAvailability = functions
   .region(cloudRegions.eu)
   .https
   .onCall(async (data) => {
-    const name: string = data.name;
+    const usernname: string = data.usernname;
 
-    if (typeof name !== 'string' || name.length === 0) {
+    if (typeof usernname !== 'string' || usernname.length === 0) {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called with one (string)
-         argument "name" which is the name to check.`,
+        `The function must be called with one (string) ` +
+        `argument "usernname" which is the usernname to check.`,
       );
     }
 
-    if (!validateNameFormat(name)) {
+    if (!validateNameFormat(usernname)) {
       throw new functions.https.HttpsError(
         'invalid-argument',
-        `The function must be called with a valid [name]
-         with at least 3 alpha-numeric characters (underscore is allowed) (A-Z, 0-9, _).`,
+        `The function must be called with a valid [usernname] ` +
+        `with at least 3 alpha-numeric characters (underscore is allowed) (A-Z, 0-9, _).`,
       );
     }
 
-    const nameSnap = await firestore
+    const snapshot = await firestore
       .collection(USERS_COLLECTION_NAME)
-      .where('name_lower_case', '==', name.toLowerCase())
+      .where('name_lower_case', '==', usernname.toLowerCase())
       .limit(1)
       .get();
 
     return {
-      name: name,
-      isAvailable: nameSnap.empty,
+      usernname: usernname,
+      isAvailable: snapshot.empty,
     };
   });
 
@@ -951,6 +951,11 @@ function getRandomProfilePictureLink(): string {
     })
 }
 
+/**
+ * Return true if an user ewist with the specified email. Return false otherwise.
+ * @param email Email to check.
+ * @returns Return a boolean. True if the email is already used. False otherwise.
+ */
 async function isUserExistsByEmail(email: string) {
   const emailSnapshot = await firestore
     .collection(USERS_COLLECTION_NAME)
