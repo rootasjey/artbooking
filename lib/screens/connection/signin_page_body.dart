@@ -53,7 +53,7 @@ class _SigninPageBodyState extends State<SigninPageBody> {
         child: Padding(
           padding: const EdgeInsets.only(top: 100.0, bottom: 300.0),
           child: AnimatedAppIcon(
-            textTitle: "signing_in".tr() + "...",
+            textTitle: "connecting".tr() + "...",
           ),
         ),
       );
