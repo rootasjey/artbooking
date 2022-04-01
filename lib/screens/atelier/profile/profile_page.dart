@@ -219,6 +219,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       case EnumSectionAction.editTextColor:
         onShowColorDialog(section, index);
         break;
+      case EnumSectionAction.editBorderColor:
+        onShowBorderColorDialog(section, index);
+        break;
       case EnumSectionAction.setSyncDataMode:
         tryUpdateDataFetchMode(
           section,
@@ -290,6 +293,35 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ),
             child: ColorsSelector(
               subtitle: "text_color_choose".tr(),
+              selectedColorInt: section.textColor,
+              onTapNamedColor: (NamedColor namedColor) {
+                tryUpdateTextColor(namedColor, index, section);
+                Beamer.of(context).popRoute();
+              },
+            ),
+          ),
+          textButtonValidation: "close".tr(),
+          onCancel: Beamer.of(context).popRoute,
+          onValidate: Beamer.of(context).popRoute,
+        );
+      },
+    );
+  }
+
+  void onShowBorderColorDialog(Section section, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ThemedDialog(
+          useRawDialog: true,
+          titleValue: "border_color_update".tr(),
+          body: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: 420.0,
+              maxWidth: 400.0,
+            ),
+            child: ColorsSelector(
+              subtitle: "border_color_choose".tr(),
               selectedColorInt: section.textColor,
               onTapNamedColor: (NamedColor namedColor) {
                 tryUpdateTextColor(namedColor, index, section);

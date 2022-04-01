@@ -11,4 +11,5 @@ class SectionIds {
   static const String spacing = "jViQYrNutT4id5OBrR5f";
   static const String illustrationWindow = "sRRimeMwmBcinT6AT5qp";
   static const String h1 = "nkjVOlmYvS72hKiBFL3W";
+  static const String borderedPoster = "nEVqIfIUBnjYwNFRzghW";
 }

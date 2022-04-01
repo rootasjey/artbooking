@@ -154,6 +154,8 @@ class UIUtilities {
     switch (id) {
       case SectionIds.bookGrid:
         return UniconsLine.books;
+      case SectionIds.borderedPoster:
+        return UniconsLine.image;
       case SectionIds.illustrationGrid:
         return UniconsLine.images;
       case SectionIds.user:

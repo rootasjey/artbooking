@@ -2,6 +2,7 @@ enum EnumSectionAction {
   changeDataMode,
   delete,
   editBackgroundColor,
+  editBorderColor,
   editTextColor,
   expand,
   moveDown,

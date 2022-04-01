@@ -4,6 +4,7 @@ import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/constants/section_ids.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/sections/book_grid_section.dart';
+import 'package:artbooking/screens/atelier/profile/sections/bordered_poster_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/h1_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/illustration_row_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/illustration_window_section.dart';
@@ -232,6 +233,20 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         userId: userId,
+        isOwner: isOwner,
+        usingAsDropTarget: usingAsDropTarget,
+        isLast: index == artisticPage.sections.length - 1,
+        onPopupMenuItemSelected: onPopupMenuItemSelected,
+        onShowIllustrationDialog: onShowIllustrationDialog,
+        popupMenuEntries: popupMenuEntries,
+        onUpdateSectionItems: onUpdateSectionItems,
+      );
+    }
+
+    if (section.id == SectionIds.borderedPoster) {
+      return BorderedPosterSection(
+        index: index,
+        section: section,
         isOwner: isOwner,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
