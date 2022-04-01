@@ -278,6 +278,9 @@
   "books_subtitle": "Browse created art books.",
   "books_sync_description": "Or you can sync this section with your most recent books (you can tap this text).",
   "books_task": "Books task",
+  "border_color_choose": "Pick a new border color",
+  "border_color_edit": "Edit border color",
+  "border_color_update": "Update border color",
   "brightness": "Brightness",
   "brightness_auto": "Auto",
   "cancel": "Cancel",
@@ -982,7 +985,8 @@
     "JkX8jqMnIWk3ZEiqVsbQ": "A single row of illustrations which can be horizontally scrolled.",
     "jViQYrNutT4id5OBrR5f": "A blank space of 100px height and taking the whole screen width.",
     "sRRimeMwmBcinT6AT5qp": "A large illustration card on the left, and a group of 4 small cards on the right.",
-    "nkjVOlmYvS72hKiBFL3W": "H1 text title component"
+    "nkjVOlmYvS72hKiBFL3W": "H1 text title component",
+    "nEVqIfIUBnjYwNFRzghW": "A large bordered illustration taking ~80% of the screen."
   },
   "section_edit_existing": "Update this existing section.",
   "section_name": {
@@ -994,7 +998,8 @@
     "JkX8jqMnIWk3ZEiqVsbQ": "Illustration Row",
     "jViQYrNutT4id5OBrR5f": "Spacing",
     "sRRimeMwmBcinT6AT5qp": "Illustration Window",
-    "nkjVOlmYvS72hKiBFL3W": "H1"
+    "nkjVOlmYvS72hKiBFL3W": "H1",
+    "nEVqIfIUBnjYwNFRzghW": "Bordered Poster"
   },
   "section_rename": "Rename section",
   "section_rename_description": "Give a new description to this section.",

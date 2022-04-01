@@ -278,6 +278,9 @@
   "books_subtitle": "Parcourez les books créés.",
   "books_sync_description": "Ou vous pouvez syncrhoniser cette section avec vos books les plus récentes (vous pouvez cliquer sur ce texte).",
   "books_task": "Tâche de books",
+  "border_color_choose": "Choisissez une nouvelle couleur de bordures",
+  "border_color_edit": "Modifier la couleur des bordures",
+  "border_color_update": "Mettre à jour la couleur des bordures",
   "brightness": "Luminosité",
   "brightness_auto": "Automatique",
   "cancel": "Annuler",
@@ -981,10 +984,11 @@
     "JkX8jqMnIWk3ZEiqVsbQ": "Une ligne d'illustrations pouvant être parcourue horizontalement.",
     "jViQYrNutT4id5OBrR5f": "Espacement de 100px de hauteur et prenant la largeur de la fenêtre.",
     "sRRimeMwmBcinT6AT5qp": "Une grande carte d'illustration sur la gauche avec un groupe de 4 petites cartes sur la droite.",
-    "nkjVOlmYvS72hKiBFL3W": "Text H1"
+    "nkjVOlmYvS72hKiBFL3W": "Text H1",
+    "nEVqIfIUBnjYwNFRzghW": "Une large illustration encadrée d'une bordure et prenant ~80% de l'écran."
   },
   "section_edit_existing": "Mettre à jour une section existante.",
-  "section_names": {
+  "section_name": {
     "C9Z51SG4JeJ5VFUHOagF": "Grille 3x2 de books",
     "ZRsIF2kdKc9xUo0cxfRI": "Grille 3x2 d'illustrations",
     "zYjoMKHm0eoWGBLyzULU": "Présentation Utilisateur",
@@ -993,7 +997,8 @@
     "JkX8jqMnIWk3ZEiqVsbQ": "Ligne d'illustrations",
     "jViQYrNutT4id5OBrR5f": "Espacement",
     "sRRimeMwmBcinT6AT5qp": "Fenêtre d'illustrations",
-    "nkjVOlmYvS72hKiBFL3W": "H1"
+    "nkjVOlmYvS72hKiBFL3W": "H1",
+    "nEVqIfIUBnjYwNFRzghW": "Poster encadré"
   },
   "section_rename": "Renommer cette section",
   "section_rename_description": "Éditer la description.",
