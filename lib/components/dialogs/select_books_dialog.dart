@@ -8,7 +8,6 @@ import 'package:artbooking/types/json_types.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
@@ -22,9 +21,13 @@ class SelectBooksDialog extends StatefulWidget {
     required this.userId,
     this.onValidate,
     this.maxPick = 6,
+    this.admin = false,
   });
 
   final bool autoFocus;
+
+  /// If true, show all approved books in dialog.
+  final bool admin;
 
   /// When the operation complete (illustrations has been added to books).
   final void Function()? onComplete;
@@ -44,6 +47,7 @@ class _SelectBooksDialogState extends State<SelectBooksDialog> {
   bool _loading = false;
   bool _hasNext = false;
   bool _loadingMore = false;
+  bool _descending = true;
 
   DocumentSnapshot? _lastDocument;
 
@@ -349,17 +353,51 @@ class _SelectBooksDialogState extends State<SelectBooksDialog> {
     });
   }
 
+  Query<Map<String, dynamic>> getFetchQuery() {
+    if (widget.admin) {
+      return FirebaseFirestore.instance
+          .collection("books")
+          .where("visibility", isEqualTo: "public")
+          .where("staff_review.approved", isEqualTo: true)
+          .orderBy("created_at", descending: _descending)
+          .limit(_limit);
+    }
+
+    return FirebaseFirestore.instance
+        .collection("books")
+        .where("user_id", isEqualTo: widget.userId)
+        .limit(_limit)
+        .orderBy("updated_at", descending: _descending);
+  }
+
+  Query<Map<String, dynamic>> getFetchMoreQuery(
+    DocumentSnapshot<Object?> lastDocument,
+  ) {
+    if (widget.admin) {
+      return FirebaseFirestore.instance
+          .collection("books")
+          .where("visibility", isEqualTo: "public")
+          .where("staff_review.approved", isEqualTo: true)
+          .orderBy("created_at", descending: _descending)
+          .startAfterDocument(lastDocument)
+          .limit(_limit);
+    }
+
+    return FirebaseFirestore.instance
+        .collection("books")
+        .where("user_id", isEqualTo: widget.userId)
+        .limit(_limit)
+        .orderBy("updated_at", descending: _descending)
+        .startAfterDocument(lastDocument);
+  }
+
   Future fetchBooks() async {
     _books.clear();
     setState(() => _loading = true);
 
     try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection("books")
-          .where("user_id", isEqualTo: FirebaseAuth.instance.currentUser?.uid)
-          .limit(_limit)
-          .orderBy("updated_at", descending: true)
-          .get();
+      final query = getFetchQuery();
+      final snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
         _hasNext = false;
@@ -393,13 +431,8 @@ class _SelectBooksDialogState extends State<SelectBooksDialog> {
     setState(() => _loadingMore = true);
 
     try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection("books")
-          .where("user_id", isEqualTo: FirebaseAuth.instance.currentUser?.uid)
-          .limit(_limit)
-          .orderBy("updated_at", descending: true)
-          .startAfterDocument(lastDocument)
-          .get();
+      final query = getFetchMoreQuery(lastDocument);
+      final snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
         _hasNext = false;
