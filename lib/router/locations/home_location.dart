@@ -1,8 +1,8 @@
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/screens/atelier/profile/modular_page.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page.dart';
 import 'package:artbooking/screens/book/book_page.dart';
 import 'package:artbooking/screens/book/books_page.dart';
-import 'package:artbooking/screens/home/home_page.dart';
 import 'package:artbooking/screens/illustrations/illustration_page.dart';
 import 'package:artbooking/screens/illustrations/illustrations_page.dart';
 import 'package:beamer/beamer.dart';
@@ -47,7 +47,7 @@ class HomeLocation extends BeamLocation<BeamState> {
   List<BeamPage> buildPages(BuildContext context, BeamState state) {
     return [
       BeamPage(
-        child: HomePage(),
+        child: ModularPage(pageId: "home"),
         key: ValueKey(route),
         title: Utilities.ui.getPageTitle("home".tr()),
         type: BeamPageType.fadeTransition,
