@@ -5,6 +5,7 @@ import 'package:artbooking/screens/sections/edit/edit_section_page_body.dart';
 import 'package:artbooking/types/enums/enum_header_separator_tab.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_section_data_type.dart';
+import 'package:artbooking/types/enums/enum_section_visibility.dart';
 import 'package:artbooking/types/header_separator.dart';
 import 'package:artbooking/types/named_color.dart';
 import 'package:artbooking/types/section.dart';
@@ -77,6 +78,7 @@ class _EditSectionPageState extends State<EditSectionPage> {
                 onDataFetchModesChanged: onDataFetchModesChanged,
                 onDataTypesChanged: onDataTypesChanged,
                 onShowHeaderSeparatorDialog: onShowHeaderSeparatorDialog,
+                onVisibilityChanged: onVisibilityChanged,
               ),
             ],
           ),
@@ -186,5 +188,13 @@ class _EditSectionPageState extends State<EditSectionPage> {
     }
 
     setState(() {});
+  }
+
+  void onVisibilityChanged(EnumSectionVisibility visibility) {
+    setState(() {
+      _section = _section.copyWith(
+        visibility: visibility,
+      );
+    });
   }
 }

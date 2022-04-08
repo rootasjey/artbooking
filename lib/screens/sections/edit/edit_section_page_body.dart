@@ -5,9 +5,11 @@ import 'package:artbooking/screens/sections/edit/color_card_picker.dart';
 import 'package:artbooking/screens/sections/edit/edit_section_data_fetch_modes.dart';
 import 'package:artbooking/screens/sections/edit/edit_section_data_types.dart';
 import 'package:artbooking/screens/sections/edit/edit_section_header_separator.dart';
+import 'package:artbooking/screens/sections/edit/edit_section_visibility.dart';
 import 'package:artbooking/types/enums/enum_header_separator_tab.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_section_data_type.dart';
+import 'package:artbooking/types/enums/enum_section_visibility.dart';
 import 'package:artbooking/types/named_color.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:easy_localization/src/public_ext.dart';
@@ -28,6 +30,7 @@ class EditSectionPageBody extends StatelessWidget {
     this.onDataTypesChanged,
     this.onShowHeaderSeparatorDialog,
     this.onTextColorChanged,
+    this.onVisibilityChanged,
   }) : super(key: key);
 
   final bool loading;
@@ -49,6 +52,10 @@ class EditSectionPageBody extends StatelessWidget {
     EnumSectionDataType dataType,
     bool selected,
   )? onDataTypesChanged;
+
+  final void Function(
+    EnumSectionVisibility visibility,
+  )? onVisibilityChanged;
 
   final void Function()? onValidate;
   final void Function(String)? onTitleChanged;
@@ -84,6 +91,11 @@ class EditSectionPageBody extends StatelessWidget {
             descriptionHintText: "description_enter".tr(),
             onTitleChanged: onTitleChanged,
             onDescriptionChanged: onDescriptionChanged,
+          ),
+          EditSectionVisibility(
+            visibility: section.visibility,
+            onValueChanged: onVisibilityChanged,
+            padding: const EdgeInsets.only(left: 12.0, top: 24.0),
           ),
           Wrap(
             children: [
