@@ -1322,8 +1322,8 @@ async function generateImageThumbs(
     
     const downloadToken = metadata.metadata?.firebaseStorageDownloadTokens ?? '';
     const firebaseDownloadUrl = createPersistentDownloadUrl(
-      objectMeta.bucket, 
-      filepath, 
+      objectMeta.bucket,  
+      upFile.name,
       downloadToken,
     );
       
