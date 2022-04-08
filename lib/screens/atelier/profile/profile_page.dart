@@ -1,3 +1,4 @@
+import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/dialogs/add_section_dialog.dart';
 import 'package:artbooking/components/dialogs/colors_selector.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
@@ -12,7 +13,6 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_body.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_empty.dart';
-import 'package:artbooking/screens/atelier/profile/profile_page_error.dart';
 import 'package:artbooking/types/artistic_page.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
@@ -101,7 +101,21 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     if (_hasErrors) {
-      return ProfilePageError();
+      return Scaffold(
+        body: CustomScrollView(
+          slivers: [
+            ApplicationBar(),
+            SliverToBoxAdapter(
+              child: Center(
+                child: Text(
+                  "profile_page_loading_error".tr(),
+                  style: Utilities.fonts.style(),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
     if (_emptyProfile) {
@@ -134,6 +148,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     return ProfilePageBody(
       userId: getUserId(),
       isOwner: isOwner,
+      showBackButton: true,
       artisticPage: _profilePage,
       onAddSection: tryAddSection,
       popupMenuEntries: _popupMenuEntries,
@@ -324,7 +339,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               subtitle: "border_color_choose".tr(),
               selectedColorInt: section.textColor,
               onTapNamedColor: (NamedColor namedColor) {
-                tryUpdateTextColor(namedColor, index, section);
+                tryUpdateBorderColor(namedColor, index, section);
                 Beamer.of(context).popRoute();
               },
             ),
@@ -603,7 +618,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       final snapshot = await FirebaseFirestore.instance
           .collection("sections")
           .limit(limit)
-          .orderBy('created_at', descending: descending)
+          .orderBy("created_at", descending: descending)
           .get();
 
       if (snapshot.size == 0) {
@@ -779,6 +794,36 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           .collection("users")
           .doc(userId)
           .collection("user_pages")
+          .doc(_profilePage.id)
+          .update({
+        "sections": _profilePage.sections.map((x) => x.toMap()).toList(),
+      });
+
+      setState(() {});
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
+  void tryUpdateBorderColor(
+    NamedColor selectedNamedColor,
+    int index,
+    Section section,
+  ) async {
+    try {
+      final editedSection = section.copyWith(
+        borderColor: selectedNamedColor.color.value,
+      );
+
+      _profilePage.sections.replaceRange(
+        index,
+        index + 1,
+        [editedSection],
+      );
+
+      await FirebaseFirestore.instance
+          .collection("pages")
           .doc(_profilePage.id)
           .update({
         "sections": _profilePage.sections.map((x) => x.toMap()).toList(),
