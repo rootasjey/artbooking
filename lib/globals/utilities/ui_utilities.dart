@@ -20,12 +20,20 @@ class UIUtilities {
   List<NamedColor> getBackgroundSectionColors() {
     return [
       NamedColor(
+        name: "Transparent",
+        color: Colors.transparent,
+      ),
+      NamedColor(
         name: "Clair Pink",
         color: Constants.colors.clairPink,
       ),
       NamedColor(
         name: "Light Blue",
         color: Constants.colors.lightBackground,
+      ),
+      NamedColor(
+        name: "Blue",
+        color: Colors.blue,
       ),
       NamedColor(
         name: "Blue 100",
@@ -38,6 +46,10 @@ class UIUtilities {
       NamedColor(
         name: "Lime 100",
         color: Colors.lime.shade100,
+      ),
+      NamedColor(
+        name: "Amber",
+        color: Colors.amber,
       ),
       NamedColor(
         name: "Amber 100",
@@ -60,12 +72,24 @@ class UIUtilities {
         color: Colors.red.shade100,
       ),
       NamedColor(
+        name: "Pink",
+        color: Colors.pink,
+      ),
+      NamedColor(
         name: "Pink 100",
         color: Colors.pink.shade100,
       ),
       NamedColor(
+        name: "Deep Purple",
+        color: Colors.deepPurple,
+      ),
+      NamedColor(
         name: "Deep Purple 100",
         color: Colors.deepPurple.shade100,
+      ),
+      NamedColor(
+        name: "Purple",
+        color: Colors.purple,
       ),
       NamedColor(
         name: "Purple 100",
@@ -152,6 +176,8 @@ class UIUtilities {
 
   IconData getSectionIcon(String id) {
     switch (id) {
+      case SectionIds.appBar:
+        return UniconsLine.panorama_h_alt;
       case SectionIds.bookGrid:
         return UniconsLine.books;
       case SectionIds.borderedPoster:
