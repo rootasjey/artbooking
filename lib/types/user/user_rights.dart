@@ -9,6 +9,7 @@ class UserRights {
     this.canManageSections = false,
     this.canManageUsers = false,
     this.canManageReviews = false,
+    this.canManagePages = false,
   });
 
   /// If true, the current user can manage app data.
@@ -19,6 +20,9 @@ class UserRights {
 
   /// True if the current user can manage (add, remove, edit) art movements.
   final bool canManageArtMovements;
+
+  /// True if the current user can edit application's pages.
+  final bool canManagePages;
 
   /// True if the current user can approve & unapprove books & illustrations.
   final bool canManageReviews;
@@ -33,11 +37,13 @@ class UserRights {
     bool? isAdmin,
     bool? canManageLicense,
     bool? canManageReviews,
+    bool? canManagePages,
   }) {
     return UserRights(
       canManageData: isAdmin ?? this.canManageData,
       canManageLicenses: canManageLicense ?? this.canManageLicenses,
       canManageReviews: canManageReviews ?? this.canManageReviews,
+      canManagePages: canManagePages ?? this.canManagePages,
     );
   }
 
@@ -49,6 +55,7 @@ class UserRights {
       'user:manage_sections': canManageUsers,
       'user:manage_users': canManageUsers,
       'user:manage_reviews': canManageReviews,
+      'user:manage_pages': canManagePages,
     };
   }
 
@@ -68,6 +75,7 @@ class UserRights {
       canManageSections: map["user:manage_sections"] ?? false,
       canManageUsers: map["user:manage_users"] ?? false,
       canManageReviews: map["user:manage_reviews"] ?? false,
+      canManagePages: map["user:manage_pages"] ?? false,
     );
   }
 
@@ -80,7 +88,7 @@ class UserRights {
   String toString() =>
       "UserRights(canManageArtMovements: $canManageArtMovements, "
       "canManageData: $canManageData, canManageLicenses: $canManageLicenses, "
-      "canManageReviews: $canManageReviews "
+      "canManageReviews: $canManageReviews, canManagePages: $canManagePages"
       "canManageSections: $canManageSections, canManageUsers: $canManageUsers)";
 
   @override
@@ -90,6 +98,7 @@ class UserRights {
     return other is UserRights &&
         other.canManageArtMovements == canManageArtMovements &&
         other.canManageData == canManageData &&
+        other.canManagePages == canManagePages &&
         other.canManageSections == canManageSections &&
         other.canManageSections == canManageSections &&
         other.canManageReviews == canManageReviews &&
@@ -101,6 +110,7 @@ class UserRights {
       canManageArtMovements.hashCode ^
       canManageData.hashCode ^
       canManageLicenses.hashCode ^
+      canManagePages.hashCode ^
       canManageSections.hashCode ^
       canManageReviews.hashCode ^
       canManageUsers.hashCode;
