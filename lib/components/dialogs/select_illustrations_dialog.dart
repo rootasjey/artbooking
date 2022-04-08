@@ -21,10 +21,14 @@ class SelectIllustrationsDialog extends StatefulWidget {
     this.autoFocus = false,
     this.onValidate,
     this.maxPick = 6,
+    this.admin = false,
   }) : super(key: key);
 
   /// Maximum number of illustrations that can be choosen.
   final int maxPick;
+
+  /// If true, show all approved illustrations in dialog.
+  final bool admin;
 
   /// If true, this widget will request focus on load.
   final bool autoFocus;
@@ -44,6 +48,7 @@ class _SelectIllustrationsDialogState extends State<SelectIllustrationsDialog> {
   bool _loading = false;
   bool _loadingMore = false;
   bool _hasNext = true;
+  bool _descending = true;
 
   final List<Illustration> _illustrations = [];
   final Map<String, bool> _selectedIllustrationIds = Map();
@@ -306,6 +311,46 @@ class _SelectIllustrationsDialogState extends State<SelectIllustrationsDialog> {
     Beamer.of(context).popRoute();
   }
 
+  Query<Map<String, dynamic>> getFetchQuery() {
+    if (widget.admin) {
+      return FirebaseFirestore.instance
+          .collection("illustrations")
+          .where("visibility", isEqualTo: "public")
+          .where("staff_review.approved", isEqualTo: true)
+          .orderBy("created_at", descending: _descending)
+          .limit(_limit);
+    }
+
+    return FirebaseFirestore.instance
+        .collection("illustrations")
+        .where("user_id", isEqualTo: widget.userId)
+        .where("visibility", isEqualTo: "public")
+        .orderBy("user_custom_index", descending: true)
+        .limit(_limit);
+  }
+
+  Query<Map<String, dynamic>> getFetchMoreQuery(
+    DocumentSnapshot<Object?> lastDocument,
+  ) {
+    if (widget.admin) {
+      return FirebaseFirestore.instance
+          .collection("illustrations")
+          .where("visibility", isEqualTo: "public")
+          .where("staff_review.approved", isEqualTo: true)
+          .orderBy("created_at", descending: _descending)
+          .startAfterDocument(lastDocument)
+          .limit(_limit);
+    }
+
+    return FirebaseFirestore.instance
+        .collection("illustrations")
+        .where("user_id", isEqualTo: widget.userId)
+        .where("visibility", isEqualTo: "public")
+        .orderBy("user_custom_index", descending: true)
+        .limit(_limit)
+        .startAfterDocument(lastDocument);
+  }
+
   void fetchPublicIllustrations() async {
     setState(() {
       _loading = true;
@@ -314,13 +359,8 @@ class _SelectIllustrationsDialogState extends State<SelectIllustrationsDialog> {
     });
 
     try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection("illustrations")
-          .where("user_id", isEqualTo: widget.userId)
-          .where("visibility", isEqualTo: "public")
-          .orderBy("user_custom_index", descending: true)
-          .limit(_limit)
-          .get();
+      final query = getFetchQuery();
+      final snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
         _hasNext = false;
@@ -352,14 +392,8 @@ class _SelectIllustrationsDialogState extends State<SelectIllustrationsDialog> {
     _loadingMore = true;
 
     try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection("illustrations")
-          .where("user_id", isEqualTo: widget.userId)
-          .where("visibility", isEqualTo: "public")
-          .orderBy("user_custom_index", descending: true)
-          .limit(_limit)
-          .startAfterDocument(lastDocument)
-          .get();
+      final query = getFetchMoreQuery(lastDocument);
+      final snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
         _hasNext = false;
