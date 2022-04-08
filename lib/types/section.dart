@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/types/enums/enum_section_visibility.dart';
 import 'package:artbooking/types/header_separator.dart';
 import 'package:flutter/foundation.dart';
 
@@ -14,6 +15,7 @@ import 'package:flutter/material.dart';
 class Section {
   Section({
     required this.backgroundColor,
+    required this.borderColor,
     required this.textColor,
     required this.createdAt,
     required this.dataTypes,
@@ -27,6 +29,7 @@ class Section {
     required this.size,
     required this.sizes,
     required this.updatedAt,
+    required this.visibility,
   });
 
   /// Id of this section. It matches a specific design.
@@ -34,6 +37,9 @@ class Section {
 
   /// Section's background color;
   final int backgroundColor;
+
+  /// Section's border color;
+  final int borderColor;
 
   /// Section's text color;
   final int textColor;
@@ -70,8 +76,11 @@ class Section {
   /// Last time this license was updated.
   final DateTime updatedAt;
 
+  final EnumSectionVisibility visibility;
+
   Section copyWith({
     int? backgroundColor,
+    int? borderColor,
     int? textColor,
     String? id,
     DateTime? createdAt,
@@ -85,9 +94,11 @@ class Section {
     List<EnumSectionSize>? sizes,
     List<EnumSectionDataType>? dataTypes,
     DateTime? updatedAt,
+    EnumSectionVisibility? visibility,
   }) {
     return Section(
       backgroundColor: backgroundColor ?? this.backgroundColor,
+      borderColor: borderColor ?? this.borderColor,
       createdAt: createdAt ?? this.createdAt,
       dataTypes: dataTypes ?? this.dataTypes,
       description: description ?? this.description,
@@ -101,12 +112,14 @@ class Section {
       sizes: sizes ?? this.sizes,
       textColor: textColor ?? this.textColor,
       updatedAt: updatedAt ?? this.updatedAt,
+      visibility: visibility ?? this.visibility,
     );
   }
 
   Map<String, dynamic> toMap({bool withId = true}) {
     final map = {
       "background_color": backgroundColor,
+      "border_color": borderColor,
       "data_mode": dataFetchModeToString(dataFetchMode),
       "data_modes": dataFetchModesToStrings(),
       "data_types": dataTypesToStrings(),
@@ -117,6 +130,7 @@ class Section {
       "size": sectionSizeToString(size),
       "sizes": sectionSizesToStrings(),
       "text_color": textColor,
+      "visibility": visibilityToString(),
     };
 
     if (withId) {
@@ -129,6 +143,7 @@ class Section {
   factory Section.empty() {
     return Section(
       backgroundColor: Constants.colors.lightBackground.value,
+      borderColor: Constants.colors.lightBackground.value,
       createdAt: DateTime.now(),
       dataFetchMode: EnumSectionDataMode.chosen,
       dataFetchModes: [],
@@ -142,6 +157,7 @@ class Section {
       sizes: [],
       textColor: Colors.black.value,
       updatedAt: DateTime.now(),
+      visibility: EnumSectionVisibility.public,
     );
   }
 
@@ -149,10 +165,13 @@ class Section {
     final int backgroundColor =
         map["background_color"] ?? Constants.colors.lightBackground.value;
 
+    final int borderColor = map["border_color"] ?? Colors.transparent.value;
+
     final int textColor = map["text_color"] ?? Colors.black.value;
 
     return Section(
       backgroundColor: backgroundColor,
+      borderColor: borderColor,
       createdAt: Utilities.date.fromFirestore(map["created_at"]),
       dataTypes: stringsToDataTypes(map["data_types"]),
       description: map["description"] ?? "",
@@ -166,6 +185,7 @@ class Section {
       sizes: stringsToSizes(map["sizes"]),
       textColor: textColor,
       updatedAt: Utilities.date.fromFirestore(map["updated_at"]),
+      visibility: stringToVisibility(map["visibility"]),
     );
   }
 
@@ -177,6 +197,21 @@ class Section {
         return "sync";
       default:
         return "sync";
+    }
+  }
+
+  static EnumSectionVisibility stringToVisibility(String? visibilityString) {
+    if (visibilityString == null) {
+      return EnumSectionVisibility.public;
+    }
+
+    switch (visibilityString) {
+      case "public":
+        return EnumSectionVisibility.public;
+      case "staff":
+        return EnumSectionVisibility.staff;
+      default:
+        return EnumSectionVisibility.public;
     }
   }
 
@@ -327,6 +362,17 @@ class Section {
     return listString;
   }
 
+  String visibilityToString() {
+    switch (visibility) {
+      case EnumSectionVisibility.public:
+        return "public";
+      case EnumSectionVisibility.staff:
+        return "staff";
+      default:
+        return "public";
+    }
+  }
+
   String toJson() => json.encode(toMap());
 
   factory Section.fromJson(String source) =>
@@ -335,11 +381,13 @@ class Section {
   @override
   String toString() {
     return "Section(id: $id,  backgroundColor: $backgroundColor, "
+        "borderColor: $borderColor"
         "createdAt: ${createdAt.toString()} description: $description, "
         "dataFetchMode: $dataFetchMode, dataModes: $dataFetchModes, "
         "headerSeparator: $headerSeparator"
         "name: $name, items: $items, size: $size, textColor: $textColor "
-        "types: $dataTypes, updatedAt: ${updatedAt.toString()})";
+        "types: $dataTypes, updatedAt: ${updatedAt.toString()},"
+        "visibility: ${visibility.name})";
   }
 
   @override
@@ -348,6 +396,7 @@ class Section {
 
     return other is Section &&
         other.id == id &&
+        other.borderColor == borderColor &&
         other.createdAt == createdAt &&
         other.backgroundColor == backgroundColor &&
         other.dataFetchMode == dataFetchMode &&
@@ -360,13 +409,15 @@ class Section {
         other.size == size &&
         listEquals(other.sizes, sizes) &&
         other.textColor == textColor &&
-        other.updatedAt == updatedAt;
+        other.updatedAt == updatedAt &&
+        other.visibility == visibility;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
         backgroundColor.hashCode ^
+        borderColor ^
         createdAt.hashCode ^
         dataTypes.hashCode ^
         description.hashCode ^
@@ -378,6 +429,7 @@ class Section {
         size.hashCode ^
         sizes.hashCode ^
         textColor.hashCode ^
-        updatedAt.hashCode;
+        updatedAt.hashCode ^
+        visibility.hashCode;
   }
 }
