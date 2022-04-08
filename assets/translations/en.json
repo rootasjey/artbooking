@@ -524,6 +524,7 @@
   "hobbies_my": "My hobbies",
   "hobbies_my_description": "I like to draw, play video games, watch movies & TV series, and read books (among other things).",
   "home": "Home",
+  "home_loading_error": "There was an issue while loading home page.",
   "home_subtitle": "Go to the hall",
   "hub": "Hub",
   "hub_subtitle": "The entrance of your atelier",
@@ -880,6 +881,7 @@
   "profile": "Profile",
   "profile_my": "My profile",
   "profile_page_loading": "Loading profile page",
+  "profile_page_loading_error": "There was an error while loading this profile page. Please try again later.",
   "profile_picture_choose": "Choose a profile picture",
   "profile_picture_edit": "Edit profile picture",
   "profile_picture": "Profile picture",
@@ -985,8 +987,11 @@
     "JkX8jqMnIWk3ZEiqVsbQ": "A single row of illustrations which can be horizontally scrolled.",
     "jViQYrNutT4id5OBrR5f": "A blank space of 100px height and taking the whole screen width.",
     "sRRimeMwmBcinT6AT5qp": "A large illustration card on the left, and a group of 4 small cards on the right.",
-    "nkjVOlmYvS72hKiBFL3W": "H1 text title component",
-    "nEVqIfIUBnjYwNFRzghW": "A large bordered illustration taking ~80% of the screen."
+    "nkjVOlmYvS72hKiBFL3W": "H1 text title component.",
+    "nEVqIfIUBnjYwNFRzghW": "A large bordered illustration taking ~80% of the screen.",
+    "KcIljzzIj9ak2OWqKssM": "Application bar. A top bar menu.",
+    "fbYCOEsdDIhHJqtgBOxI": "H4 text component.",
+    "Ia4ELuQRoVF4pQ9nh5Nw": "A title + description component."
   },
   "section_edit_existing": "Update this existing section.",
   "section_name": {
@@ -999,7 +1004,10 @@
     "jViQYrNutT4id5OBrR5f": "Spacing",
     "sRRimeMwmBcinT6AT5qp": "Illustration Window",
     "nkjVOlmYvS72hKiBFL3W": "H1",
-    "nEVqIfIUBnjYwNFRzghW": "Bordered Poster"
+    "nEVqIfIUBnjYwNFRzghW": "Bordered Poster",
+    "KcIljzzIj9ak2OWqKssM": "AppBar",
+    "fbYCOEsdDIhHJqtgBOxI": "H4",
+    "Ia4ELuQRoVF4pQ9nh5Nw": "Title + Description"
   },
   "section_rename": "Rename section",
   "section_rename_description": "Give a new description to this section.",
@@ -1100,6 +1108,7 @@
   "tos_7": "Your continued use of our website will be regarded as acceptance of our practices around privacy and personal information. If you have any questions about how we handle user data and personal information, feel free to contact us.",
   "tos_8": "This policy is effective as of 1 May 2020.",
   "tos_created_with": "Privacy Policy created with GetTerms.",
+  "try_again_later": "Please try again later.",
   "type": "Type",
   "undefined_page_get_back": "Return on the way",
   "undefined_page_route_prefix": "Route for ",
@@ -1149,6 +1158,7 @@
   "visibility_private_description": "Only you will have access to this content.",
   "visibility_public": "Public",
   "visibility_public_description": "Everyone can view this content.",
+  "visibility_staff": "Staff",
   "web": "Web",
   "website": "Website",
   "website_dev": "Website development",

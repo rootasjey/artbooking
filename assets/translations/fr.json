@@ -517,6 +517,7 @@
   "hint_project_transfert": "Nous vous transferons le projet complet après sa réalisation. Vous devrez vous occuper du déploiement, de l'hébergement, et du nom de domaine entre autres.",
   "hire_me": "Engagez moi",
   "home": "Accueil",
+  "home_loading_error": "Une erreur de chargement est survenue lors de l'affichage de la page d'accueil.",
   "home_subtitle": "Aller au hall",
   "hobbies": "Centres d'intérêt",
   "hobbies_description": "Ce que j'aime faire sur mon temps libre:",
@@ -880,6 +881,7 @@
   "profile": "Profile",
   "profile_my": "Mon profile",
   "profile_page_loading": "Chargement de la page de profile",
+  "profile_page_loading_error": "Il y a eu une erreur lors du chargement de la page de profile. Veuillez réessayer plus tard.",
   "profile_picture_choose": "Choisissez une photo de profile",
   "profile_picture_edit": "Éditer la photo de profile",
   "profile_picture_description": "Rogner, Redimensionner, Pivoter votre photo de profile.",
@@ -985,7 +987,10 @@
     "jViQYrNutT4id5OBrR5f": "Espacement de 100px de hauteur et prenant la largeur de la fenêtre.",
     "sRRimeMwmBcinT6AT5qp": "Une grande carte d'illustration sur la gauche avec un groupe de 4 petites cartes sur la droite.",
     "nkjVOlmYvS72hKiBFL3W": "Text H1",
-    "nEVqIfIUBnjYwNFRzghW": "Une large illustration encadrée d'une bordure et prenant ~80% de l'écran."
+    "nEVqIfIUBnjYwNFRzghW": "Une large illustration encadrée d'une bordure et prenant ~80% de l'écran.",
+    "KcIljzzIj9ak2OWqKssM": "Bar d'application.",
+    "fbYCOEsdDIhHJqtgBOxI": "Text H4",
+    "Ia4ELuQRoVF4pQ9nh5Nw": "Un componsant ayant un titre et une description."
   },
   "section_edit_existing": "Mettre à jour une section existante.",
   "section_name": {
@@ -998,7 +1003,10 @@
     "jViQYrNutT4id5OBrR5f": "Espacement",
     "sRRimeMwmBcinT6AT5qp": "Fenêtre d'illustrations",
     "nkjVOlmYvS72hKiBFL3W": "H1",
-    "nEVqIfIUBnjYwNFRzghW": "Poster encadré"
+    "nEVqIfIUBnjYwNFRzghW": "Poster encadré",
+    "KcIljzzIj9ak2OWqKssM": "AppBar",
+    "fbYCOEsdDIhHJqtgBOxI": "H4",
+    "Ia4ELuQRoVF4pQ9nh5Nw": "Title + Description"
   },
   "section_rename": "Renommer cette section",
   "section_rename_description": "Éditer la description.",
@@ -1099,6 +1107,7 @@
   "tos_7": "Votre utilisation prolongée de notre site web et nos applications sera comprise comme l'acceptation et l'adhésion à nos conditions générales d'utilisation, notre politique de confidentialité, ainsi que nos pratiques concernant l'utilisation de vos données. Si vous avez des questions à propos de l'utilisaiton des données personnelles et de vos données, vous pouvez nous contacter à feedback@fig.style.",
   "tos_8": "Cette politique est applicable depuis le 1 Mai 2020.",
   "tos_created_with": "Politique de confidentialité créée avec GetTerms.",
+  "try_again_later": "Veuillez réessayer ultérieurement.",
   "type": "Type",
   "undefined_page_get_back": "Retourner sur les rails",
   "undefined_page_route_prefix": "L'URL ",
@@ -1148,6 +1157,7 @@
   "visibility_private_description": "Seulement vous aurez accès à ce contenu.",
   "visibility_public": "Public",
   "visibility_public_description": "Tout le monde pourra voir ce contenu.",
+  "visibility_staff": "Staff",
   "web": "Web",
   "website": "Website",
   "website_dev": "Dévelopement de site web",
