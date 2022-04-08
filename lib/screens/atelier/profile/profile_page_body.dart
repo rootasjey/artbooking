@@ -1,3 +1,4 @@
+import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/buttons/circle_button.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants.dart';
@@ -6,10 +7,12 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/sections/book_grid_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/bordered_poster_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/h1_section.dart';
+import 'package:artbooking/screens/atelier/profile/sections/h4_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/illustration_row_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/illustration_window_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/poster_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/spacing_section.dart';
+import 'package:artbooking/screens/atelier/profile/sections/title_description_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/user_illustration_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/user_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/illustration_grid_section.dart';
@@ -38,9 +41,11 @@ class ProfilePageBody extends StatelessWidget {
     this.onUpdateSectionItems,
     this.onShowBookDialog,
     this.onDropSection,
+    this.showBackButton = false,
   }) : super(key: key);
 
   final bool isOwner;
+  final bool showBackButton;
   final String userId;
   final ArtisticPage artisticPage;
   final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
@@ -74,9 +79,13 @@ class ProfilePageBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool hasAppBar =
+        artisticPage.sections.any((element) => element.id == SectionIds.appBar);
+
     final List<Widget> slivers = [
       // Sliver issue: https://github.com/flutter/flutter/issues/55170
       SliverToBoxAdapter(),
+      if (hasAppBar) ApplicationBar(),
     ];
 
     int index = -1;
@@ -110,20 +119,21 @@ class ProfilePageBody extends StatelessWidget {
               slivers: slivers,
             ),
           ),
-          Positioned(
-            top: 16.0,
-            left: 64.0,
-            child: CircleButton(
-              tooltip: "back".tr(),
-              elevation: 2.0,
-              backgroundColor: Constants.colors.tertiary,
-              onTap: () => Utilities.navigation.back(context),
-              icon: Icon(
-                UniconsLine.arrow_left,
-                color: Colors.black,
+          if (showBackButton)
+            Positioned(
+              top: 16.0,
+              left: 64.0,
+              child: CircleButton(
+                tooltip: "back".tr(),
+                elevation: 2.0,
+                backgroundColor: Constants.colors.tertiary,
+                onTap: () => Utilities.navigation.back(context),
+                icon: Icon(
+                  UniconsLine.arrow_left,
+                  color: Colors.black,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -300,6 +310,30 @@ class ProfilePageBody extends StatelessWidget {
 
     if (section.id == SectionIds.h1) {
       return H1Section(
+        index: index,
+        section: section,
+        isOwner: isOwner,
+        usingAsDropTarget: usingAsDropTarget,
+        isLast: index == artisticPage.sections.length - 1,
+        onPopupMenuItemSelected: onPopupMenuItemSelected,
+        popupMenuEntries: popupMenuEntries,
+      );
+    }
+
+    if (section.id == SectionIds.h4) {
+      return H4Section(
+        index: index,
+        section: section,
+        isOwner: isOwner,
+        usingAsDropTarget: usingAsDropTarget,
+        isLast: index == artisticPage.sections.length - 1,
+        onPopupMenuItemSelected: onPopupMenuItemSelected,
+        popupMenuEntries: popupMenuEntries,
+      );
+    }
+
+    if (section.id == SectionIds.titleDescription) {
+      return TitleDescriptionSection(
         index: index,
         section: section,
         isOwner: isOwner,

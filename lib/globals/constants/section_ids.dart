@@ -12,4 +12,7 @@ class SectionIds {
   static const String illustrationWindow = "sRRimeMwmBcinT6AT5qp";
   static const String h1 = "nkjVOlmYvS72hKiBFL3W";
   static const String borderedPoster = "nEVqIfIUBnjYwNFRzghW";
+  static const String appBar = "KcIljzzIj9ak2OWqKssM";
+  static const String h4 = "fbYCOEsdDIhHJqtgBOxI";
+  static const String titleDescription = "Ia4ELuQRoVF4pQ9nh5Nw";
 }
