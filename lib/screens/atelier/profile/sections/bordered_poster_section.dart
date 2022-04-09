@@ -1,12 +1,16 @@
 import 'package:artbooking/components/buttons/section_illustration_buttons.dart';
 import 'package:artbooking/components/cards/illustration_card.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/section.dart';
+import 'package:artbooking/types/user/user_firestore.dart';
+import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flash/flash.dart';
@@ -63,10 +67,13 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
   bool _loading = false;
   var _illustration = Illustration.empty();
 
+  /// Illustration's owner.
+  var _user = UserFirestore.empty();
+
   @override
   void initState() {
     super.initState();
-    fetchChosenIllustration();
+    fetch();
   }
 
   @override
@@ -97,47 +104,88 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
       );
     }
 
-    return Stack(
-      children: [
-        Container(
-          width: size.width,
-          height: size.height,
-          padding: const EdgeInsets.all(16.0),
-          color: Color(widget.section.backgroundColor),
-          child: Container(
-            decoration: ShapeDecoration(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6.0),
-                side: BorderSide(
-                  width: 6.0,
-                  color: Color(widget.section.textColor),
+    final double space = 90.0;
+    final String heroTag = "${widget.section.id}-${_illustration.id}";
+
+    return Center(
+      child: Stack(
+        children: [
+          Hero(
+            tag: heroTag,
+            child: Container(
+              width: size.width - space,
+              height: size.height - space,
+              padding: const EdgeInsets.all(16.0),
+              color: Color(widget.section.backgroundColor),
+              child: Container(
+                decoration: ShapeDecoration(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6.0),
+                    side: BorderSide(
+                      width: 6.0,
+                      color: Color(widget.section.borderColor),
+                    ),
+                  ),
+                ),
+                child: Card(
+                  elevation: 12.0,
+                  margin: const EdgeInsets.all(8.0),
+                  clipBehavior: Clip.hardEdge,
+                  color: Constants.colors.clairPink,
+                  child: Ink.image(
+                    image: NetworkImage(
+                      _illustration.getHDThumbnail(),
+                    ),
+                    width: size.width,
+                    height: size.height,
+                    fit: BoxFit.cover,
+                    child: InkWell(
+                      onTap: () => onTapIllustration(heroTag),
+                    ),
+                  ),
                 ),
               ),
             ),
-            child: Card(
-              elevation: 6.0,
-              margin: const EdgeInsets.all(8.0),
-              clipBehavior: Clip.hardEdge,
-              color: Colors.transparent,
-              child: Image.network(
-                _illustration.getHDThumbnail(),
-                width: size.width,
-                height: size.height,
-                fit: BoxFit.cover,
-              ),
+          ),
+          Positioned(
+            bottom: 40.0,
+            left: 40.0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  " ${_illustration.name} ",
+                  style: Utilities.fonts.style(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                    backgroundColor: Colors.black26,
+                  ),
+                ),
+                InkWell(
+                  onTap: () => onTapUser(_user),
+                  child: Text(
+                    " ${'made_by'.tr().toLowerCase()} ${_user.name} ",
+                    style: Utilities.fonts.style(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                      backgroundColor: Colors.black26,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-        Positioned(
-          right: 48.0,
-          bottom: 48.0,
-          child: SectionIllustrationButtons(
-            onRemoveIllustration: onRemoveIllustration,
-            onPickIllustration: onPickIllustration,
+          Positioned(
+            right: 48.0,
+            bottom: 48.0,
+            child: SectionIllustrationButtons(
+              onRemoveIllustration: onRemoveIllustration,
+              onPickIllustration: onPickIllustration,
+            ),
           ),
-        ),
-        rightPopupMenuButton(),
-      ],
+          rightPopupMenuButton(),
+        ],
+      ),
     );
   }
 
@@ -221,6 +269,43 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
     }
   }
 
+  void fetch() async {
+    await fetchChosenIllustration();
+    fetchAuthor();
+  }
+
+  /// Fetch author from Firestore doc public data (fast).
+  Future<bool> fetchAuthor() async {
+    if (_illustration.userId.isEmpty) {
+      return false;
+    }
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(_illustration.userId)
+          .collection("user_public_fields")
+          .doc("base")
+          .get();
+
+      final Json? data = snapshot.data();
+
+      if (!snapshot.exists || data == null) {
+        return false;
+      }
+
+      setState(() {
+        data["id"] = _illustration.userId;
+        _user = UserFirestore.fromMap(data);
+      });
+
+      return true;
+    } catch (error) {
+      Utilities.logger.e(error);
+      return false;
+    }
+  }
+
   Future<void> fetchChosenIllustration() async {
     if (widget.section.items.isEmpty) {
       return;
@@ -267,6 +352,25 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
       widget.section,
       widget.index,
       [],
+    );
+  }
+
+  void onTapUser(UserFirestore userFirestore) {
+    final String route =
+        HomeLocation.profileRoute.replaceFirst(":userId", userFirestore.id);
+
+    Beamer.of(context).beamToNamed(
+      route,
+      data: {"userId": userFirestore.id},
+    );
+  }
+
+  void onTapIllustration(String heroTag) {
+    Utilities.navigation.profileToIllustration(
+      context,
+      illustration: _illustration,
+      heroTag: heroTag,
+      userId: _illustration.userId,
     );
   }
 }

@@ -14,6 +14,7 @@ class HomeLocation extends BeamLocation<BeamState> {
   static const String route = "/";
   static const String illustrationsRoute = "/illustrations";
   static const String illustrationRoute = "$illustrationsRoute/:illustrationId";
+  static const String directIllustrationRoute = "/i/:illustrationId";
   static const String booksRoute = "/books";
   static const String bookRoute = "$booksRoute/:bookId";
   static const String profileRoute = "/users/:userId";
@@ -41,6 +42,7 @@ class HomeLocation extends BeamLocation<BeamState> {
         profileRoute,
         profileBookRoute,
         profileIllustrationRoute,
+        directIllustrationRoute,
       ];
 
   @override

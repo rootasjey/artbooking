@@ -66,6 +66,13 @@ class NavigationUtilities {
         .routeInformation
         .location;
 
+    if (location == "/" || userId.isEmpty) {
+      return HomeLocation.directIllustrationRoute.replaceFirst(
+        ":illustrationId",
+        illustration.id,
+      );
+    }
+
     if (location == null) {
       return HomeLocation.profileIllustrationRoute
           .replaceFirst(":userId", userId)
