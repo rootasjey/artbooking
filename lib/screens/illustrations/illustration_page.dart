@@ -163,7 +163,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
 
     try {
       final query = FirebaseFirestore.instance
-          .collection('illustrations')
+          .collection("illustrations")
           .doc(widget.illustrationId);
 
       listenToIllustrationChanges(query);
@@ -174,14 +174,15 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
       if (!snapshot.exists || data == null) {
         context.showErrorBar(
           content: Text(
-            "The illustration with the id ${widget.illustrationId} doesn't exist.",
+            "The illustration with the id ${widget.illustrationId} "
+            "doesn't exist.",
           ),
         );
 
         return;
       }
 
-      data['id'] = snapshot.id;
+      data["id"] = snapshot.id;
 
       setState(() {
         _illustration = Illustration.fromMap(data);

@@ -1,3 +1,4 @@
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';
@@ -80,6 +81,8 @@ class EditImagePageHeader extends StatelessWidget {
                         "edit_image_suggestion".tr(),
                         style: Utilities.fonts.style(
                           fontWeight: FontWeight.w600,
+                          backgroundColor:
+                              Constants.colors.tertiary.withOpacity(0.3),
                         ),
                       ),
                       style: TextButton.styleFrom(
