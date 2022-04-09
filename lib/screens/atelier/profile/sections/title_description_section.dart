@@ -58,7 +58,6 @@ class TitleDescriptionSection extends StatelessWidget {
         children: [
           Container(
             decoration: boxDecoration,
-            padding: const EdgeInsets.only(bottom: 24.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -116,7 +115,7 @@ class TitleDescriptionSection extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.only(
-            top: 12.0,
+            top: 24.0,
           ),
           child: Opacity(
             opacity: 0.6,
@@ -131,14 +130,17 @@ class TitleDescriptionSection extends StatelessWidget {
             ),
           ),
         ),
-        Text(
-          section.description,
-          textAlign: TextAlign.center,
-          overflow: TextOverflow.clip,
-          style: Utilities.fonts.style(
-            fontSize: 64.0,
-            fontWeight: FontWeight.w200,
-            color: Color(section.textColor),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Text(
+            section.description,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.clip,
+            style: Utilities.fonts.style(
+              fontSize: 64.0,
+              fontWeight: FontWeight.w200,
+              color: Color(section.textColor),
+            ),
           ),
         ),
       ],
