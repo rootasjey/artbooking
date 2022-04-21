@@ -386,6 +386,7 @@ export const onCreatePublicInfo = functions
       .doc(BASE_DOCUMENT_NAME)
       .create({
         created_at: adminApp.firestore.FieldValue.serverTimestamp(),
+        id: user_id_path_param,
         location: data.location,
         name: data.name,
         profile_picture: data.profile_picture,
