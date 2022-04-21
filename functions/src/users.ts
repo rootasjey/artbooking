@@ -385,11 +385,14 @@ export const onCreatePublicInfo = functions
       .collection(USER_PUBLIC_FIELDS_COLLECTION_NAME)
       .doc(BASE_DOCUMENT_NAME)
       .create({
+        created_at: adminApp.firestore.FieldValue.serverTimestamp(),
         location: data.location,
         name: data.name,
         profile_picture: data.profile_picture,
         lore: data.lore,
         social_links: data.social_links,
+        type: "base",
+        updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
       });
   })
 
@@ -421,6 +424,7 @@ export const onUpdatePublicInfo = functions
         name: afterData.name,
         profile_picture: afterData.profile_picture,
         social_links: afterData.social_links,
+        updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
       });
   })
 
