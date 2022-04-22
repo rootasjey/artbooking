@@ -6,6 +6,7 @@ import 'package:artbooking/globals/constants/section_ids.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/sections/book_grid_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/bordered_poster_section.dart';
+import 'package:artbooking/screens/atelier/profile/sections/featured_artists_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/h1_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/h4_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/illustration_row_section.dart';
@@ -346,6 +347,20 @@ class ProfilePageBody extends StatelessWidget {
 
     if (section.id == SectionIds.illustrationWindow) {
       return IllustrationWindowSection(
+        index: index,
+        section: section,
+        userId: userId,
+        isOwner: isOwner,
+        usingAsDropTarget: usingAsDropTarget,
+        isLast: index == artisticPage.sections.length - 1,
+        onShowIllustrationDialog: onShowIllustrationDialog,
+        popupMenuEntries: popupMenuEntries,
+        onPopupMenuItemSelected: onPopupMenuItemSelected,
+      );
+    }
+
+    if (section.id == SectionIds.featuredArtist) {
+      return FeaturedArtistsSection(
         index: index,
         section: section,
         userId: userId,

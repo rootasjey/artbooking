@@ -15,4 +15,5 @@ class SectionIds {
   static const String appBar = "KcIljzzIj9ak2OWqKssM";
   static const String h4 = "fbYCOEsdDIhHJqtgBOxI";
   static const String titleDescription = "Ia4ELuQRoVF4pQ9nh5Nw";
+  static const String featuredArtist = "i9OIQ45t6yPVPyewH2V9";
 }

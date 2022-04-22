@@ -10,6 +10,7 @@ enum EnumSectionAction {
   rename,
   renameTitle,
   selectBooks,
+  selectArtists,
   selectIllustrations,
   setChosenDataMode,
   setSyncDataMode,

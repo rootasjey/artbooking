@@ -3,6 +3,7 @@ import 'package:artbooking/components/dialogs/add_section_dialog.dart';
 import 'package:artbooking/components/dialogs/colors_selector.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/section_settings_dialog.dart';
+import 'package:artbooking/components/dialogs/select_artist_dialog.dart';
 import 'package:artbooking/components/dialogs/select_books_dialog.dart';
 import 'package:artbooking/components/dialogs/select_illustrations_dialog.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
@@ -293,6 +294,13 @@ class _ModularPageState extends ConsumerState<ModularPage> {
           selectType: EnumSelectType.add,
         );
         break;
+      case EnumSectionAction.selectArtists:
+        onShowArtistDialog(
+          section: section,
+          index: index,
+          selectType: EnumSelectType.add,
+        );
+        break;
       default:
     }
   }
@@ -303,6 +311,34 @@ class _ModularPageState extends ConsumerState<ModularPage> {
       builder: (context) {
         return AddSectionDialog(
           onAddSection: tryAddSection,
+        );
+      },
+    );
+  }
+
+  void onShowArtistDialog({
+    required Section section,
+    required int index,
+    required EnumSelectType selectType,
+    int maxPick = 6,
+  }) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final UserFirestore? user =
+            ref.read(AppState.userProvider).firestoreUser;
+
+        final String userId = user?.id ?? "";
+        final bool canManagePages = user?.rights.canManagePages ?? false;
+
+        return SelectArtistDialog(
+          autoFocus: true,
+          maxPick: maxPick,
+          userId: userId,
+          admin: canManagePages,
+          onValidate: selectType == EnumSelectType.add
+              ? (items) => tryAddSectionItems(section, index, items)
+              : (items) => tryUpdateSectionItems(section, index, items),
         );
       },
     );
