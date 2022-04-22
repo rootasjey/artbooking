@@ -86,6 +86,25 @@
   "art_movements_subtitle": "Tapotez pour sélectionner ou désélectionner un mouvement artistique. Appuyez longuement pour afficher une œuvre associée.",
   "art_movements_update_fail": "Désolés, nous n'avons pas pu mettre à jour vos mouvements artistiques. Veuillez réessayer plus tard.",
   "art_movements_update_out_of_range": "Veuillez utiliser au maximum 5 mouvements artistiques. Vous avez essayé d'en mettre {}.",
+  "artist": "artiste",
+  "artists": "artistes",
+  "artist_select": {
+    "zero": "Sélectionner cet•te artiste",
+    "one": "Sélectionner cet•te artiste",
+    "two": "Sélectionner ces artistes",
+    "many": "Sélectionner ces artistes",
+    "other": "Sélectionner ces artistes"
+  },
+  "artists_select_count": {
+    "zero": "Sélectionner {} artiste",
+    "one": "Sélectionner {} artiste",
+    "two": "Sélectionner {} artistes",
+    "few": "Sélectionner {} artistes",
+    "many": "Sélectionner {} artistes",
+    "other": "Sélectionner {} artistes"
+  },
+  "artists_choose_featured": "Choisissez les artistes à mettre en avant.",
+  "artists_pick_description": "Vous pouvez choisir quel•les artistes apparaîtront dans cette seciont.",
   "artworks": "Œures d'art",
   "atelier": "Atelier",
   "atelier_greetings": "On voulait juste vous dire bonjour 👋",
@@ -990,7 +1009,9 @@
     "nEVqIfIUBnjYwNFRzghW": "Une large illustration encadrée d'une bordure et prenant ~80% de l'écran.",
     "KcIljzzIj9ak2OWqKssM": "Bar d'application.",
     "fbYCOEsdDIhHJqtgBOxI": "Text H4",
-    "Ia4ELuQRoVF4pQ9nh5Nw": "Un componsant ayant un titre et une description."
+    "Ia4ELuQRoVF4pQ9nh5Nw": "Un componsant ayant un titre et une description.",
+    "i9OIQ45t6yPVPyewH2V9": "Une liste arbitraire d'artistes spécifiquement sélectioné.e.s. Cliquer sur les avatarss renvoie sur la page de profile de l'artist.."
+
   },
   "section_edit_existing": "Mettre à jour une section existante.",
   "section_name": {
@@ -1006,7 +1027,8 @@
     "nEVqIfIUBnjYwNFRzghW": "Poster encadré",
     "KcIljzzIj9ak2OWqKssM": "AppBar",
     "fbYCOEsdDIhHJqtgBOxI": "H4",
-    "Ia4ELuQRoVF4pQ9nh5Nw": "Title + Description"
+    "Ia4ELuQRoVF4pQ9nh5Nw": "Title + Description",
+    "i9OIQ45t6yPVPyewH2V9": "Featured Artists"
   },
   "section_rename": "Renommer cette section",
   "section_rename_description": "Éditer la description.",

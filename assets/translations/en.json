@@ -86,6 +86,25 @@
   "art_movements_subtitle": "Tap to select or unselect a style. Long tap for image preview.",
   "art_movements_update_fail": "Sorry, we couldn't update your illustration's art movements. Please try again later.",
   "art_movements_update_out_of_range": "Please use no more than 5 art movements. You tried to set {} art movements.",
+  "artist": "artist",
+  "artists": "artists",
+  "artist_select": {
+    "zero": "Select this artist",
+    "one": "Select this artist",
+    "two": "Select these artists",
+    "many": "Select these artists",
+    "other": "Select these artists"
+  },
+  "artist_select_count": {
+    "zero": "Select {} artist",
+    "one": "Select {} artist",
+    "two": "Select {} artists",
+    "few": "Select {} artists",
+    "many": "Select {} artists",
+    "other": "Select {} artists"
+  },
+  "artists_choose_featured": "Choose featured artists.",
+  "artists_pick_description": "You can pick artists who will be shown in this section.",
   "artworks": "Artworks",
   "atelier": "Atelier",
   "atelier_greetings": "We just wanted to say hello 👋",
@@ -991,7 +1010,8 @@
     "nEVqIfIUBnjYwNFRzghW": "A large bordered illustration taking ~80% of the screen.",
     "KcIljzzIj9ak2OWqKssM": "Application bar. A top bar menu.",
     "fbYCOEsdDIhHJqtgBOxI": "H4 text component.",
-    "Ia4ELuQRoVF4pQ9nh5Nw": "A title + description component."
+    "Ia4ELuQRoVF4pQ9nh5Nw": "A title + description component.",
+    "i9OIQ45t6yPVPyewH2V9": "A component showing featured artists linking to their profile page."
   },
   "section_edit_existing": "Update this existing section.",
   "section_name": {
@@ -1007,7 +1027,8 @@
     "nEVqIfIUBnjYwNFRzghW": "Bordered Poster",
     "KcIljzzIj9ak2OWqKssM": "AppBar",
     "fbYCOEsdDIhHJqtgBOxI": "H4",
-    "Ia4ELuQRoVF4pQ9nh5Nw": "Title + Description"
+    "Ia4ELuQRoVF4pQ9nh5Nw": "Title + Description",
+    "i9OIQ45t6yPVPyewH2V9": "Featured Artists"
   },
   "section_rename": "Rename section",
   "section_rename_description": "Give a new description to this section.",
