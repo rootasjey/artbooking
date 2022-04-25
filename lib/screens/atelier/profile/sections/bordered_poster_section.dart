@@ -28,13 +28,15 @@ class BorderedPosterSection extends StatefulWidget {
     this.onPopupMenuItemSelected,
     this.onShowIllustrationDialog,
     this.onUpdateSectionItems,
-    this.isOwner = false,
+    this.editMode = false,
   }) : super(key: key);
 
   final bool isLast;
 
-  /// True if the current authenticated user is the owner.
-  final bool isOwner;
+  /// If true, the current authenticated user is the owner and
+  /// this section can be edited.
+  final bool editMode;
+
   final bool usingAsDropTarget;
 
   final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
@@ -110,8 +112,7 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
     return Center(
       child: Stack(
         children: [
-          Hero(
-            tag: heroTag,
+          Center(
             child: Container(
               width: size.width - space,
               height: size.height - space,
@@ -127,60 +128,68 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
                     ),
                   ),
                 ),
-                child: Card(
-                  elevation: 12.0,
-                  margin: const EdgeInsets.all(8.0),
-                  clipBehavior: Clip.hardEdge,
-                  color: Constants.colors.clairPink,
-                  child: Ink.image(
-                    image: NetworkImage(
-                      _illustration.getHDThumbnail(),
+                child: Stack(
+                  children: [
+                    Hero(
+                      tag: heroTag,
+                      child: Card(
+                        elevation: 12.0,
+                        margin: const EdgeInsets.all(8.0),
+                        clipBehavior: Clip.hardEdge,
+                        color: Constants.colors.clairPink,
+                        child: Ink.image(
+                          image: NetworkImage(
+                            _illustration.getHDThumbnail(),
+                          ),
+                          width: size.width,
+                          height: size.height,
+                          fit: BoxFit.cover,
+                          child: InkWell(
+                            onTap: () => onTapIllustration(heroTag),
+                          ),
+                        ),
+                      ),
                     ),
-                    width: size.width,
-                    height: size.height,
-                    fit: BoxFit.cover,
-                    child: InkWell(
-                      onTap: () => onTapIllustration(heroTag),
+                    Positioned(
+                      bottom: 24.0,
+                      left: 24.0,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            " ${_illustration.name} ",
+                            style: Utilities.fonts.style(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                              backgroundColor: Colors.black26,
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () => onTapUser(_user),
+                            child: Text(
+                              " ${'made_by'.tr().toLowerCase()} ${_user.name} ",
+                              style: Utilities.fonts.style(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                                backgroundColor: Colors.black26,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                    if (widget.editMode)
+                      Positioned(
+                        right: 24.0,
+                        bottom: 24.0,
+                        child: SectionIllustrationButtons(
+                          onRemoveIllustration: onRemoveIllustration,
+                          onPickIllustration: onPickIllustration,
+                        ),
+                      ),
+                  ],
                 ),
               ),
-            ),
-          ),
-          Positioned(
-            bottom: 40.0,
-            left: 40.0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  " ${_illustration.name} ",
-                  style: Utilities.fonts.style(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                    backgroundColor: Colors.black26,
-                  ),
-                ),
-                InkWell(
-                  onTap: () => onTapUser(_user),
-                  child: Text(
-                    " ${'made_by'.tr().toLowerCase()} ${_user.name} ",
-                    style: Utilities.fonts.style(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                      backgroundColor: Colors.black26,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            right: 48.0,
-            bottom: 48.0,
-            child: SectionIllustrationButtons(
-              onRemoveIllustration: onRemoveIllustration,
-              onPickIllustration: onPickIllustration,
             ),
           ),
           rightPopupMenuButton(),
@@ -214,7 +223,7 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
   }
 
   Widget rightPopupMenuButton() {
-    if (!widget.isOwner) {
+    if (!widget.editMode) {
       return Container();
     }
 

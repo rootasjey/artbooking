@@ -17,13 +17,15 @@ class H4Section extends StatelessWidget {
     this.popupMenuEntries = const [],
     this.isLast = false,
     this.usingAsDropTarget = false,
-    this.isOwner = false,
+    this.editMode = false,
   }) : super(key: key);
+
+  /// If true, the current authenticated user is the owner and
+  /// this section can be edited.
+  final bool editMode;
 
   final bool isLast;
 
-  /// True if the current authenticated user is the owner.
-  final bool isOwner;
   final bool usingAsDropTarget;
 
   /// Section's position in the layout (e.g. 0 is the first).
@@ -64,7 +66,7 @@ class H4Section extends StatelessWidget {
               children: [
                 Flexible(
                   child: InkWell(
-                    onTap: isOwner ? onTapTitle : null,
+                    onTap: editMode ? onTapTitle : null,
                     child: textChild(),
                   ),
                 ),
@@ -163,7 +165,7 @@ class H4Section extends StatelessWidget {
   }
 
   Widget rightPopupMenuButton(BuildContext context) {
-    if (!isOwner) {
+    if (!editMode) {
       return Container();
     }
 

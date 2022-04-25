@@ -17,13 +17,14 @@ class TitleDescriptionSection extends StatelessWidget {
     this.popupMenuEntries = const [],
     this.isLast = false,
     this.usingAsDropTarget = false,
-    this.isOwner = false,
+    this.editMode = false,
   }) : super(key: key);
 
-  final bool isLast;
+  /// If true, the current authenticated user is the owner and
+  /// this section can be edited.
+  final bool editMode;
 
-  /// True if the current authenticated user is the owner.
-  final bool isOwner;
+  final bool isLast;
   final bool usingAsDropTarget;
 
   /// Section's position in the layout (e.g. 0 is the first).
@@ -63,7 +64,7 @@ class TitleDescriptionSection extends StatelessWidget {
               children: [
                 Flexible(
                   child: InkWell(
-                    onTap: isOwner ? onTapTitle : null,
+                    onTap: editMode ? onTapTitle : null,
                     child: titleChild(),
                   ),
                 ),
@@ -202,7 +203,7 @@ class TitleDescriptionSection extends StatelessWidget {
   }
 
   Widget rightPopupMenuButton(BuildContext context) {
-    if (!isOwner) {
+    if (!editMode) {
       return Container();
     }
 

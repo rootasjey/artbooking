@@ -1,5 +1,6 @@
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/buttons/circle_button.dart';
+import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/constants/section_ids.dart';
@@ -22,7 +23,6 @@ import 'package:artbooking/types/drag_data.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/section.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
@@ -37,16 +37,23 @@ class ProfilePageBody extends StatelessWidget {
     this.popupMenuEntries = const [],
     this.onAddSection,
     this.isOwner = false,
+    this.editMode = false,
     this.onShowAddSection,
     this.onShowIllustrationDialog,
     this.onUpdateSectionItems,
     this.onShowBookDialog,
     this.onDropSection,
     this.showBackButton = false,
+    this.onToggleEditMode,
   }) : super(key: key);
 
   final bool isOwner;
   final bool showBackButton;
+
+  /// If true, the current user is an admin or owner and can add, remove, and edit
+  /// this page sections.
+  final bool editMode;
+
   final String userId;
   final ArtisticPage artisticPage;
   final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
@@ -55,8 +62,10 @@ class ProfilePageBody extends StatelessWidget {
   final void Function(Section)? onAddSection;
 
   /// Callback when drag and dropping items on this book card.
-  final void Function(int dropTargetIndex, List<int> dragIndexes)?
-      onDropSection;
+  final void Function(
+    int dropTargetIndex,
+    List<int> dragIndexes,
+  )? onDropSection;
   final void Function()? onShowAddSection;
   final void Function({
     required Section section,
@@ -77,6 +86,8 @@ class ProfilePageBody extends StatelessWidget {
     int index,
     List<String> items,
   )? onUpdateSectionItems;
+
+  final void Function()? onToggleEditMode;
 
   @override
   Widget build(BuildContext context) {
@@ -105,11 +116,17 @@ class ProfilePageBody extends StatelessWidget {
     }
 
     if (isOwner) {
-      slivers.add(newSectionButton(context));
+      slivers.add(
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 42.0),
+          ),
+        ),
+      );
     }
 
     return Scaffold(
-      floatingActionButton: fab(context),
+      // floatingActionButton: fab(context),
       body: Stack(
         children: [
           ImprovedScrolling(
@@ -135,45 +152,62 @@ class ProfilePageBody extends StatelessWidget {
                 ),
               ),
             ),
+          if (isOwner)
+            Positioned(
+              left: 0.0,
+              bottom: 0.0,
+              right: 0.0,
+              child: editPanel(context, scrollController),
+            ),
         ],
       ),
     );
   }
 
-  Widget newSectionButton(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16.0,
-            vertical: 32.0,
-          ),
-          child: DottedBorder(
-            strokeWidth: 3.0,
-            borderType: BorderType.RRect,
-            radius: Radius.circular(8),
-            color: Theme.of(context).primaryColor.withOpacity(0.6),
-            dashPattern: [8, 4],
-            child: InkWell(
-              onTap: onShowAddSection,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24.0,
-                  vertical: 16.0,
-                ),
-                child: Opacity(
-                  opacity: 0.6,
-                  child: Text(
-                    "section_add_new".tr(),
-                    style: Utilities.fonts.style(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
+  Widget editPanel(BuildContext context, ScrollController scrollController) {
+    return Material(
+      elevation: 4.0,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 8.0,
+        ),
+        height: 60.0,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: DarkElevatedButton.iconOnly(
+                child: Icon(UniconsLine.arrow_up),
+                onPressed: () {
+                  scrollController.animateTo(
+                    0.0,
+                    duration: Duration(milliseconds: 250),
+                    curve: Curves.decelerate,
+                  );
+                },
               ),
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: DarkElevatedButton.icon(
+                iconData: UniconsLine.plus,
+                labelValue: "Add new section",
+                foreground: Theme.of(context).textTheme.bodyText2?.color,
+                onPressed: onShowAddSection,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: DarkElevatedButton.icon(
+                iconData: editMode ? UniconsLine.pen : UniconsLine.eye,
+                labelValue: editMode ? "edit_mode".tr() : "view_mode".tr(),
+                foreground: Theme.of(context).textTheme.bodyText2?.color,
+                onPressed: onToggleEditMode,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -201,7 +235,7 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         userId: userId,
-        isOwner: isOwner,
+        editMode: editMode,
         usingAsDropTarget: usingAsDropTarget,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
         popupMenuEntries: popupMenuEntries,
@@ -214,7 +248,7 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         userId: userId,
-        isOwner: isOwner,
+        editMode: editMode,
         usingAsDropTarget: usingAsDropTarget,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
         popupMenuEntries: popupMenuEntries,
@@ -229,7 +263,7 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         userId: userId,
-        isOwner: isOwner,
+        editMode: editMode,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -244,7 +278,7 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         userId: userId,
-        isOwner: isOwner,
+        editMode: editMode,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -258,7 +292,7 @@ class ProfilePageBody extends StatelessWidget {
       return BorderedPosterSection(
         index: index,
         section: section,
-        isOwner: isOwner,
+        editMode: editMode,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -272,7 +306,7 @@ class ProfilePageBody extends StatelessWidget {
       return PosterSection(
         index: index,
         section: section,
-        isOwner: isOwner,
+        editMode: editMode,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -287,7 +321,7 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         userId: userId,
-        isOwner: isOwner,
+        editMode: editMode,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -301,7 +335,7 @@ class ProfilePageBody extends StatelessWidget {
       return SpacingSection(
         index: index,
         section: section,
-        isOwner: isOwner,
+        editMode: editMode,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -313,7 +347,7 @@ class ProfilePageBody extends StatelessWidget {
       return H1Section(
         index: index,
         section: section,
-        isOwner: isOwner,
+        editMode: editMode,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -325,7 +359,7 @@ class ProfilePageBody extends StatelessWidget {
       return H4Section(
         index: index,
         section: section,
-        isOwner: isOwner,
+        editMode: editMode,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -337,7 +371,7 @@ class ProfilePageBody extends StatelessWidget {
       return TitleDescriptionSection(
         index: index,
         section: section,
-        isOwner: isOwner,
+        editMode: editMode,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -350,7 +384,7 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         userId: userId,
-        isOwner: isOwner,
+        editMode: editMode,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onShowIllustrationDialog: onShowIllustrationDialog,
@@ -364,7 +398,7 @@ class ProfilePageBody extends StatelessWidget {
         index: index,
         section: section,
         userId: userId,
-        isOwner: isOwner,
+        editMode: editMode,
         usingAsDropTarget: usingAsDropTarget,
         isLast: index == artisticPage.sections.length - 1,
         onShowIllustrationDialog: onShowIllustrationDialog,
@@ -391,7 +425,7 @@ class ProfilePageBody extends StatelessWidget {
     required BuildContext context,
     required ScrollController scrollController,
   }) {
-    if (!isOwner) {
+    if (!editMode) {
       return SliverToBoxAdapter(
         child: getSectionWidget(
           section: section,

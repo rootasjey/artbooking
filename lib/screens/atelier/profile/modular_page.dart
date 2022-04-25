@@ -55,6 +55,10 @@ class _ModularPageState extends ConsumerState<ModularPage> {
   /// True if the target user has no page.
   bool _isEmpty = false;
 
+  /// If true, the current user is an admin and can add, remove, and edit
+  /// this page sections.
+  bool _editMode = true;
+
   /// Modular page.
   var _modularPage = ArtisticPage.empty();
 
@@ -152,6 +156,8 @@ class _ModularPageState extends ConsumerState<ModularPage> {
       isOwner: canManagePages,
       artisticPage: _modularPage,
       onAddSection: tryAddSection,
+      editMode: _editMode,
+      onToggleEditMode: onToggleEditMode,
       popupMenuEntries: _popupMenuEntries,
       onPopupMenuItemSelected: onPopupMenuItemSelected,
       onShowAddSection: onShowAddSection,
@@ -938,5 +944,18 @@ class _ModularPageState extends ConsumerState<ModularPage> {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     }
+  }
+
+  void onToggleEditMode() {
+    final UserFirestore? user = ref.read(AppState.userProvider).firestoreUser;
+    final bool canManagePages = user?.rights.canManagePages ?? false;
+
+    if (!canManagePages) {
+      return;
+    }
+
+    setState(() {
+      _editMode = !_editMode;
+    });
   }
 }

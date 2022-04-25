@@ -30,15 +30,19 @@ class BookGridSection extends StatefulWidget {
     this.onUpdateSectionItems,
     this.onShowBookDialog,
     this.usingAsDropTarget = false,
-    this.isOwner = false,
+    this.editMode = false,
   }) : super(key: key);
 
+  /// If true, the current authenticated user is the owner and
+  /// this section can be edited.
+  final bool editMode;
+
   final bool isLast;
+
   final bool usingAsDropTarget;
 
-  /// True if the current authenticated user is the owner.
-  final bool isOwner;
   final String userId;
+
   final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
 
   final void Function({
@@ -184,7 +188,7 @@ class _BookGridSectionState extends State<BookGridSection> {
       );
     }).toList();
 
-    if (widget.isOwner && (children.length % 3 != 0 && children.length < 6) ||
+    if (widget.editMode && (children.length % 3 != 0 && children.length < 6) ||
         children.isEmpty) {
       children.add(
         BookCard(
@@ -280,7 +284,7 @@ class _BookGridSectionState extends State<BookGridSection> {
   }
 
   Widget rightPopupMenuButton() {
-    if (!widget.isOwner) {
+    if (!widget.editMode) {
       return Container();
     }
 
@@ -519,7 +523,7 @@ class _BookGridSectionState extends State<BookGridSection> {
   }
 
   bool getCanDrag() {
-    if (!widget.isOwner) {
+    if (!widget.editMode) {
       return false;
     }
 
