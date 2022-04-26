@@ -2,6 +2,7 @@ import 'package:artbooking/components/avatar/better_avatar.dart';
 import 'package:artbooking/components/cards/shimmer_card.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/types/enums/enum_artist_item_action.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
@@ -10,6 +11,7 @@ import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
+import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
@@ -175,21 +177,7 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
 
     final List<Widget> children = _users.map((UserFirestore artist) {
       index++;
-      // final heroTag = "${widget.section.id}-${index}-${userFirestore.id}";
 
-      // return IllustrationCard(
-      //   canDrag: canDrag,
-      //   onDrop: onDrop,
-      //   dragGroupName: "${widget.section.id}-${widget.index}",
-      //   heroTag: heroTag,
-      //   illustration: userFirestore,
-      //   index: index,
-      //   size: size,
-      //   onTap: () => navigateToProfilePage(userFirestore, heroTag),
-      //   padding: const EdgeInsets.only(right: 24.0),
-      //   popupMenuEntries: popupMenuEntries,
-      //   onPopupMenuItemSelected: onIllustrationItemSelected,
-      // );
       return BetterAvatar(
         index: index,
         canDrag: canDrag,
@@ -513,15 +501,13 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
     return _currentMode == EnumSectionDataMode.chosen;
   }
 
-  void goToArtistPage(UserFirestore artist) {}
-
-  void navigateToProfilePage(Illustration illustration, String heroTag) {
-    // Utilities.navigation.profileToIllustration(
-    //   context,
-    //   illustration: illustration,
-    //   heroTag: heroTag,
-    //   userId: widget.userId,
-    // );
+  void goToArtistPage(UserFirestore artist) {
+    Beamer.of(context).beamToNamed(
+      HomeLocation.profileRoute.replaceFirst(":userId", artist.id),
+      routeState: {
+        "userId": artist.id,
+      },
+    );
   }
 
   void onDropAvatar(int dropTargetIndex, List<int> dragIndexes) {
