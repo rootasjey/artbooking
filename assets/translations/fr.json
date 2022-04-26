@@ -318,6 +318,8 @@
   "color_primary": "Couleur primaire",
   "color_secondary": "Couleur secondaire",
   "colors": "Couleurs",
+  "company_by": "par Codingbox, SASU",
+  "company_made_in": "Codé en France avec",
   "confirm": "Confirmer",
   "connecting": "Connecxion",
   "contact": "Contact",
@@ -697,6 +699,7 @@
   "language_update_error": "Désolés, il y a eu une erreur durant la mise à jour de la langue.",
   "large": "Grande",
   "learn_more": "En savoir plus",
+  "legal": "Légal",
   "license": "Licence",
   "license_create": "Créer une nouvelle licence.",
   "license_create_error": "Ops. Nous sommes désolés, nous n'avons pas pu créer votre nouvelle licence.Veuillez réessayer ultérieurement.",
@@ -1011,8 +1014,8 @@
     "KcIljzzIj9ak2OWqKssM": "Bar d'application.",
     "fbYCOEsdDIhHJqtgBOxI": "Text H4",
     "Ia4ELuQRoVF4pQ9nh5Nw": "Un componsant ayant un titre et une description.",
-    "i9OIQ45t6yPVPyewH2V9": "Une liste arbitraire d'artistes spécifiquement sélectioné.e.s. Cliquer sur les avatarss renvoie sur la page de profile de l'artist.."
-
+    "i9OIQ45t6yPVPyewH2V9": "Une liste arbitraire d'artistes spécifiquement sélectioné.e.s. Cliquer sur les avatarss renvoie sur la page de profile de l'artist..",
+    "Qn3xnQFhflIunbULCdu4": "Une section, généralement placée en bas de page, présentant les liens principaux de l'application, les pages d'informations, et des mentions légales ennuyantes."
   },
   "section_edit_existing": "Mettre à jour une section existante.",
   "section_name": {
@@ -1029,7 +1032,8 @@
     "KcIljzzIj9ak2OWqKssM": "AppBar",
     "fbYCOEsdDIhHJqtgBOxI": "H4",
     "Ia4ELuQRoVF4pQ9nh5Nw": "Title + Description",
-    "i9OIQ45t6yPVPyewH2V9": "Featured Artists"
+    "i9OIQ45t6yPVPyewH2V9": "Featured Artists",
+    "Qn3xnQFhflIunbULCdu4": "Footer"
   },
   "section_rename": "Renommer cette section",
   "section_rename_description": "Éditer la description.",
