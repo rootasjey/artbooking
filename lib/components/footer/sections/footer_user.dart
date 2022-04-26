@@ -5,7 +5,7 @@ import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:artbooking/components/footer/footer_link.dart';
-import 'package:artbooking/components/footer/footer_section.dart';
+import 'package:artbooking/components/footer/footer_column.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/settings_location.dart';
 import 'package:artbooking/router/locations/signin_location.dart';
@@ -17,7 +17,7 @@ class FooterUser extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return FooterSection(
+    return FooterColumn(
       titleValue: "user".tr().toUpperCase(),
       children: getItems(context, ref).map(
         (item) {

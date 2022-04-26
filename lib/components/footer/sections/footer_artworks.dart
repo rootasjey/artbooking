@@ -1,7 +1,7 @@
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:artbooking/components/footer/footer_link.dart';
-import 'package:artbooking/components/footer/footer_section.dart';
+import 'package:artbooking/components/footer/footer_column.dart';
 import 'package:artbooking/types/footer_link_data.dart';
 
 class FooterArtworks extends StatelessWidget {
@@ -9,7 +9,7 @@ class FooterArtworks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FooterSection(
+    return FooterColumn(
       titleValue: "artworks".tr().toUpperCase(),
       children: getItems(context).map(
         (item) {

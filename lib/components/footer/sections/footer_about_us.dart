@@ -2,7 +2,7 @@ import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:artbooking/components/footer/footer_link.dart';
-import 'package:artbooking/components/footer/footer_section.dart';
+import 'package:artbooking/components/footer/footer_column.dart';
 import 'package:artbooking/router/locations/about_location.dart';
 import 'package:artbooking/router/locations/contact_location.dart';
 import 'package:artbooking/types/footer_link_data.dart';
@@ -13,7 +13,7 @@ class FooterAboutUs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FooterSection(
+    return FooterColumn(
       titleValue: "about".tr().toUpperCase(),
       children: getItems(context).map(
         (item) {

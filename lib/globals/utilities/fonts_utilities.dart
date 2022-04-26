@@ -10,7 +10,7 @@ class FontsUtilities {
 
   static String? fontFamily = GoogleFonts.nunito().fontFamily;
 
-  /// Return main text style for this app.
+  /// Return main text style.
   TextStyle style({
     FontWeight fontWeight = FontWeight.w400,
     double fontSize = 16.0,
@@ -23,6 +23,31 @@ class FontsUtilities {
     double? decorationThickness,
   }) {
     return GoogleFonts.nunito(
+      color: color,
+      backgroundColor: backgroundColor,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      height: height,
+      decoration: decoration,
+      decorationStyle: decorationStyle,
+      decorationColor: decorationColor,
+      decorationThickness: decorationThickness,
+    );
+  }
+
+  /// Second text style.
+  TextStyle style2({
+    FontWeight fontWeight = FontWeight.w400,
+    double fontSize = 16.0,
+    double? height,
+    Color? color,
+    Color? backgroundColor,
+    TextDecoration? decoration,
+    TextDecorationStyle? decorationStyle,
+    Color? decorationColor,
+    double? decorationThickness,
+  }) {
+    return GoogleFonts.sourceCodePro(
       color: color,
       backgroundColor: backgroundColor,
       fontSize: fontSize,

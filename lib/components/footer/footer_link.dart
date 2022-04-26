@@ -17,7 +17,7 @@ class FooterLink extends StatelessWidget {
   Widget build(BuildContext context) {
     final Widget textComponent = Text(
       label,
-      style: Utilities.fonts.style(
+      style: Utilities.fonts.style2(
         fontSize: 16.0,
         fontWeight: FontWeight.w400,
       ),

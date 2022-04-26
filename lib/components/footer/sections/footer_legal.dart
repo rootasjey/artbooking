@@ -1,10 +1,8 @@
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
-import 'package:artbooking/components/icons/app_icon.dart';
-import 'package:artbooking/components/footer/footer_company_watermark.dart';
 import 'package:artbooking/components/footer/footer_link.dart';
-import 'package:artbooking/components/footer/footer_section.dart';
+import 'package:artbooking/components/footer/footer_column.dart';
 import 'package:artbooking/router/locations/tos_location.dart';
 import 'package:artbooking/types/footer_link_data.dart';
 
@@ -16,19 +14,10 @@ class FooterLegal extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AppIcon(size: 30.0),
-              FooterCompanyWatermark(),
-            ],
-          ),
-        ),
-        FooterSection(
+        FooterColumn(
+          titleValue: "legal".tr().toUpperCase(),
           children: getItems(context).map(
-            (item) {
+            (FooterLinkData item) {
               return FooterLink(
                 label: item.label,
                 heroTag: item.heroTag,

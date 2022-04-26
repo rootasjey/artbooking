@@ -1,14 +1,14 @@
 import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 
-class FooterSection extends StatelessWidget {
-  const FooterSection({
+class FooterColumn extends StatelessWidget {
+  const FooterColumn({
     Key? key,
-    this.titleValue,
+    this.titleValue = "",
     required this.children,
   }) : super(key: key);
 
-  final String? titleValue;
+  final String titleValue;
   final List<Widget> children;
 
   @override
@@ -16,7 +16,7 @@ class FooterSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (titleValue != null)
+        if (titleValue.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(
               left: 14.0,
@@ -25,10 +25,10 @@ class FooterSection extends StatelessWidget {
             child: Opacity(
               opacity: 0.8,
               child: Text(
-                titleValue!,
-                style: Utilities.fonts.style(
+                titleValue,
+                style: Utilities.fonts.style2(
                   fontSize: 18.0,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
             ),
