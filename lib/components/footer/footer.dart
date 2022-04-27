@@ -29,10 +29,6 @@ class Footer extends ConsumerStatefulWidget {
 class _FooterState extends ConsumerState<Footer> {
   @override
   Widget build(BuildContext context) {
-    // final width = MediaQuery.of(context).size.width;
-    // final WrapAlignment alignment =
-    //     width < 700.0 ? WrapAlignment.spaceBetween : WrapAlignment.spaceAround;
-
     double horizontal = 60.0;
     WrapAlignment alignment = WrapAlignment.spaceAround;
 

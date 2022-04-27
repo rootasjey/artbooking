@@ -7,6 +7,8 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
+import 'package:wave/config.dart';
+import 'package:wave/wave.dart';
 
 /// A spacing section of 100px height and window screen width.
 class FooterSection extends StatelessWidget {
@@ -49,26 +51,41 @@ class FooterSection extends StatelessWidget {
               color: Theme.of(context).primaryColor,
               width: 3.0,
             ),
-            color: Color(section.backgroundColor),
+            color: Colors.transparent,
           )
         : BoxDecoration(
-            color: Color(section.backgroundColor),
+            color: Colors.transparent,
           );
 
-    return Padding(
-      padding: outerPadding,
-      child: Stack(
-        children: [
-          Container(
-            decoration: boxDecoration,
-            padding: const EdgeInsets.all(
-              24.0,
-            ),
-            child: Footer(),
+    return Stack(
+      children: [
+        Padding(
+          padding: outerPadding,
+          child: Stack(
+            children: [
+              WaveWidget(
+                config: CustomConfig(
+                  colors: [
+                    Colors.white70,
+                    Colors.white54,
+                    Colors.white30,
+                    Colors.white24,
+                  ],
+                  durations: [35000, 19440, 10800, 6000],
+                  heightPercentages: [0.20, 0.23, 0.25, 0.30],
+                ),
+                size: Size(double.maxFinite, 620.0),
+              ),
+              Container(
+                decoration: boxDecoration,
+                padding: const EdgeInsets.all(24.0),
+                child: Footer(),
+              ),
+              rightPopupMenuButton(context),
+            ],
           ),
-          rightPopupMenuButton(context),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
