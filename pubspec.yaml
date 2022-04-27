@@ -72,6 +72,7 @@ dependencies:
   url_strategy: 0.2.0
   verbal_expressions: 1.0.0
   waterfall_flow: 3.0.2
+  wave: 0.2.0
 
 dev_dependencies:
   build_runner:
