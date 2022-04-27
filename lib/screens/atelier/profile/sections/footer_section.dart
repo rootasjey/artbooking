@@ -74,7 +74,7 @@ class FooterSection extends StatelessWidget {
                   durations: [35000, 19440, 10800, 6000],
                   heightPercentages: [0.20, 0.23, 0.25, 0.30],
                 ),
-                size: Size(double.maxFinite, 620.0),
+                size: Size(double.maxFinite, 640.0),
               ),
               Container(
                 decoration: boxDecoration,
