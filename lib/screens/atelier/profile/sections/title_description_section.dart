@@ -65,7 +65,7 @@ class TitleDescriptionSection extends StatelessWidget {
                 Flexible(
                   child: InkWell(
                     onTap: editMode ? onTapTitle : null,
-                    child: titleChild(),
+                    child: titleChild(context),
                   ),
                 ),
               ],
@@ -77,8 +77,8 @@ class TitleDescriptionSection extends StatelessWidget {
     );
   }
 
-  Widget titleChild() {
-    if (section.name.isEmpty) {
+  Widget titleChild(BuildContext context) {
+    if (section.name.isEmpty && section.description.isEmpty) {
       return Center(
         child: Opacity(
           opacity: 0.6,
@@ -108,6 +108,8 @@ class TitleDescriptionSection extends StatelessWidget {
       );
     }
 
+    final double width = MediaQuery.of(context).size.width;
+
     return Column(
       children: [
         Container(
@@ -115,14 +117,11 @@ class TitleDescriptionSection extends StatelessWidget {
           color: Color(section.borderColor),
         ),
         Padding(
-          padding: const EdgeInsets.only(
-            top: 24.0,
-          ),
+          padding: const EdgeInsets.only(top: 24.0),
           child: Opacity(
             opacity: 0.6,
             child: Text(
               section.name,
-              textAlign: TextAlign.center,
               style: Utilities.fonts.style(
                 fontSize: 18.0,
                 fontWeight: FontWeight.w700,
@@ -131,11 +130,11 @@ class TitleDescriptionSection extends StatelessWidget {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        Container(
+          padding: EdgeInsets.zero,
+          width: width / 1.5,
           child: Text(
             section.description,
-            textAlign: TextAlign.center,
             overflow: TextOverflow.clip,
             style: Utilities.fonts.style(
               fontSize: 64.0,
@@ -143,6 +142,35 @@ class TitleDescriptionSection extends StatelessWidget {
               color: Color(section.textColor),
             ),
           ),
+        ),
+        Wrap(
+          spacing: 12.0,
+          children: [
+            Container(
+              height: 8.0,
+              width: 8.0,
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+            ),
+            Container(
+              height: 8.0,
+              width: 8.0,
+              decoration: BoxDecoration(
+                color: Color(section.borderColor),
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+            ),
+            Container(
+              height: 8.0,
+              width: 8.0,
+              decoration: BoxDecoration(
+                color: Theme.of(context).secondaryHeaderColor,
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+            ),
+          ],
         ),
       ],
     );
