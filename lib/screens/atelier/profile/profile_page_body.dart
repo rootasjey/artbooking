@@ -13,6 +13,7 @@ import 'package:artbooking/screens/atelier/profile/sections/h1_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/h4_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/illustration_row_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/illustration_window_section.dart';
+import 'package:artbooking/screens/atelier/profile/sections/news_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/poster_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/spacing_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/title_description_section.dart';
@@ -410,6 +411,18 @@ class ProfilePageBody extends StatelessWidget {
 
     if (section.id == SectionIds.footer) {
       return FooterSection(
+        index: index,
+        section: section,
+        editMode: editMode,
+        usingAsDropTarget: usingAsDropTarget,
+        isLast: index == artisticPage.sections.length - 1,
+        popupMenuEntries: popupMenuEntries,
+        onPopupMenuItemSelected: onPopupMenuItemSelected,
+      );
+    }
+
+    if (section.id == SectionIds.news) {
+      return NewsSection(
         index: index,
         section: section,
         editMode: editMode,
