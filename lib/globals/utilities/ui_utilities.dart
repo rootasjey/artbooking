@@ -174,6 +174,17 @@ class UIUtilities {
     }
   }
 
+  IconData getPostIcon(String id) {
+    switch (id) {
+      case "eye":
+        return UniconsLine.eye;
+      case "image":
+        return UniconsLine.image;
+      default:
+        return UniconsLine.newspaper;
+    }
+  }
+
   IconData getSectionIcon(String id) {
     switch (id) {
       case SectionIds.appBar:
