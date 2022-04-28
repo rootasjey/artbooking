@@ -87,10 +87,10 @@ class IllustrationCard extends StatefulWidget {
 
   /// Callback function when popup menu item entries are tapped.
   final void Function(
-    EnumIllustrationItemAction,
-    int,
-    Illustration,
-    String,
+    EnumIllustrationItemAction action,
+    int index,
+    Illustration illustration,
+    String illustrationKey,
   )? onPopupMenuItemSelected;
 
   /// An arbitrary name given to this item's drag group
