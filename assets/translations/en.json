@@ -1016,7 +1016,8 @@
     "fbYCOEsdDIhHJqtgBOxI": "H4 text component.",
     "Ia4ELuQRoVF4pQ9nh5Nw": "A title + description component.",
     "i9OIQ45t6yPVPyewH2V9": "A component showing featured artists linking to their profile page.",
-    "Qn3xnQFhflIunbULCdu4": "A section, often at the bottom of the page, presenting main application links, about page, and some boring legal stuff."
+    "Qn3xnQFhflIunbULCdu4": "A section, often at the bottom of the page, presenting main application links, about page, and some boring legal stuff.",
+    "dv9CuYRappSfnh5FiLfQ": "Last published posts on various topics (app updates, challenges, artist's work)."
   },
   "section_edit_existing": "Update this existing section.",
   "section_name": {
@@ -1034,7 +1035,8 @@
     "fbYCOEsdDIhHJqtgBOxI": "H4",
     "Ia4ELuQRoVF4pQ9nh5Nw": "Title + Description",
     "i9OIQ45t6yPVPyewH2V9": "Featured Artists",
-    "Qn3xnQFhflIunbULCdu4": "Footer"
+    "Qn3xnQFhflIunbULCdu4": "Footer",
+    "dv9CuYRappSfnh5FiLfQ": "News"
   },
   "section_rename": "Rename section",
   "section_rename_description": "Give a new description to this section.",
