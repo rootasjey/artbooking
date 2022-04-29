@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:url_strategy/url_strategy.dart';
+import 'package:window_manager/window_manager.dart';
 
 void main() async {
   LicenseRegistry.addLicense(() async* {
@@ -53,6 +54,18 @@ void main() async {
   setPathUrlStrategy();
 
   final savedThemeMode = await AdaptiveTheme.getThemeMode();
+
+  await windowManager.ensureInitialized();
+
+  windowManager.waitUntilReadyToShow(
+    WindowOptions(
+      size: Size(1200, 1000),
+      titleBarStyle: TitleBarStyle.hidden,
+    ),
+    () async {
+      await windowManager.show();
+    },
+  );
 
   return runApp(
     ProviderScope(
