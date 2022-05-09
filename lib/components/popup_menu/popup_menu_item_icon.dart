@@ -1,17 +1,19 @@
 import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
+import 'package:unicons/unicons.dart';
 
 /// A PopupMenuItem with a leading icon.
 class PopupMenuItemIcon<T> extends PopupMenuItem<T> {
   PopupMenuItemIcon({
     Key? key,
+    required this.icon,
+    required this.textLabel,
     this.enabled = true,
     this.height = kMinInteractiveDimension,
-    required this.icon,
     this.mouseCursor,
     this.padding,
-    required this.textLabel,
     this.value,
+    this.selected = false,
   }) : super(
           key: key,
           value: value,
@@ -38,6 +40,7 @@ class PopupMenuItemIcon<T> extends PopupMenuItem<T> {
                       ),
                     ),
                   ),
+                  if (selected) Icon(UniconsLine.check),
                 ],
               ),
             ),
@@ -51,4 +54,5 @@ class PopupMenuItemIcon<T> extends PopupMenuItem<T> {
   final double height;
   final EdgeInsets? padding;
   final MouseCursor? mouseCursor;
+  final bool selected;
 }
