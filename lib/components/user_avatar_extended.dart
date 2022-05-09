@@ -1,31 +1,35 @@
-import 'dart:collection';
-
 import 'package:artbooking/components/avatar/better_avatar.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/router/locations/home_location.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
+import 'package:beamer/beamer.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class AuthorHeader extends StatefulWidget {
-  final String authorId;
+/// A component showing user's avatar, name, and location.
+/// Tapping on the avatar will redirect to user's profile page.
+class UserAvatarExtended extends StatefulWidget {
+  final String userId;
   final EdgeInsets padding;
 
-  const AuthorHeader({
+  const UserAvatarExtended({
     Key? key,
-    required this.authorId,
+    required this.userId,
     this.padding = EdgeInsets.zero,
   }) : super(key: key);
 
   @override
-  _AuthorHeaderState createState() => _AuthorHeaderState();
+  _UserAvatarExtendedState createState() => _UserAvatarExtendedState();
 }
 
-class _AuthorHeaderState extends State<AuthorHeader> {
+class _UserAvatarExtendedState extends State<UserAvatarExtended> {
   UserFirestore _user = UserFirestore.empty();
 
   @override
   void initState() {
     super.initState();
-    fetch();
+    fetchAuthor();
   }
 
   @override
@@ -50,7 +54,7 @@ class _AuthorHeaderState extends State<AuthorHeader> {
                 Colors.grey,
                 BlendMode.saturation,
               ),
-              onTap: () {},
+              onTap: goToUserProfile,
             ),
           ),
           Padding(
@@ -86,22 +90,35 @@ class _AuthorHeaderState extends State<AuthorHeader> {
     );
   }
 
-  void fetch() async {
+  /// Fetch author from Firestore doc public data (fast).
+  void fetchAuthor() async {
     try {
-      final resp = await Utilities.cloud.fun('users-fetchUser').call({
-        'userId': widget.authorId,
-      });
+      final snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(widget.userId)
+          .collection("user_public_fields")
+          .doc("base")
+          .get();
 
-      final hashMap = LinkedHashMap.from(resp.data);
-      final data = Utilities.cloud.convertFromFun(hashMap);
+      final Json? data = snapshot.data();
 
-      if (!mounted) {
+      if (!snapshot.exists || data == null) {
         return;
       }
 
-      setState(() => _user = UserFirestore.fromMap(data));
+      setState(() {
+        data["id"] = widget.userId;
+        _user = UserFirestore.fromMap(data);
+      });
     } catch (error) {
       Utilities.logger.e(error);
     }
+  }
+
+  void goToUserProfile() {
+    Beamer.of(context).beamToNamed(
+      HomeLocation.profileRoute.replaceFirst(":userId", widget.userId),
+      data: {"userId": widget.userId},
+    );
   }
 }
