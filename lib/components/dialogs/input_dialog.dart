@@ -116,10 +116,10 @@ class InputDialog extends StatelessWidget {
     final Key? key,
     required final String titleValue,
     required final String subtitleValue,
+    required final void Function() onCancel,
     final TextEditingController? nameController,
     final void Function(String)? onNameChanged,
     final void Function(String)? onSubmitted,
-    required final void Function() onCancel,
     final int? maxLines = 1,
     final String submitButtonValue = '',
     final String? label,
@@ -141,6 +141,8 @@ class InputDialog extends StatelessWidget {
 
     final String buttonTextValue =
         submitButtonValue.isNotEmpty ? submitButtonValue : "create".tr();
+
+    String textfieldValue = "";
 
     return SimpleDialog(
       key: key,
@@ -164,7 +166,10 @@ class InputDialog extends StatelessWidget {
               label: label,
               controller: nameController,
               hintText: hintText,
-              onChanged: onNameChanged,
+              onChanged: (String value) {
+                textfieldValue = value;
+                onNameChanged?.call(value);
+              },
               maxLines: maxLines,
               textInputAction: textInputAction,
               onSubmitted: validateOnEnter ? onSubmitted : null,
@@ -175,8 +180,7 @@ class InputDialog extends StatelessWidget {
           padding: EdgeInsets.all(24.0),
           child: DarkElevatedButton.large(
             onPressed: () {
-              final String value = nameController?.text ?? '';
-              onSubmitted?.call(value);
+              onSubmitted?.call(textfieldValue);
             },
             child: Text(buttonTextValue),
           ),
