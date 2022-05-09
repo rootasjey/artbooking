@@ -53,6 +53,7 @@ class TitleDialog extends StatelessWidget {
                       opacity: 0.4,
                       child: Text(
                         subtitleValue,
+                        textAlign: TextAlign.center,
                         style: Utilities.fonts.style(
                           color: Colors.black,
                           fontWeight: FontWeight.w700,
