@@ -555,10 +555,16 @@ export const onStorageUpload = functions
     if (!customMetadata) { return; }
 
     const { firestoreId, visibility, target } = customMetadata;
-    if (target === 'profile_picture') {
+    const fileType = customMetadata.file_type;
+
+    if (fileType === "profile_picture" && target === "profile_picture") {
       return await setUserProfilePicture(objectMeta);
     }
     
+    if (fileType !== "illustration") {
+      return;
+    }
+
     const filepath = objectMeta.name || '';
     const filename = filepath.split('/').pop() || '';
     const storageUrl = filepath;
