@@ -60,6 +60,25 @@ class FontsUtilities {
     );
   }
 
+  /// Secondary title's font style.
+  /// Eventually for blog post title.
+  TextStyle body3({
+    FontWeight fontWeight = FontWeight.w400,
+    double fontSize = 16.0,
+    double? height,
+    Color? color,
+    TextDecoration? decoration,
+  }) {
+    return GoogleFonts.robotoSlab(
+      color: color,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      height: height,
+      decoration: decoration,
+    );
+  }
+
+  /// Primary title's font style.
   TextStyle titleStyle({
     FontWeight fontWeight = FontWeight.w400,
     double fontSize = 16.0,
@@ -73,6 +92,49 @@ class FontsUtilities {
       fontWeight: fontWeight,
       height: height,
       decoration: decoration,
+    );
+  }
+
+  /// Tertiary title's font style.
+  /// Eventually for blog post title.
+  TextStyle title2({
+    FontWeight fontWeight = FontWeight.w400,
+    double fontSize = 16.0,
+    double? height,
+    Color? color,
+    TextDecoration? decoration,
+  }) {
+    return GoogleFonts.oleoScriptSwashCaps(
+      color: color,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      height: height,
+      decoration: decoration,
+    );
+  }
+
+  /// Can be used for blog post body.
+  TextStyle title3({
+    FontWeight fontWeight = FontWeight.w400,
+    double fontSize = 16.0,
+    double? height,
+    Color? color,
+    Color? backgroundColor,
+    TextDecoration? decoration,
+    TextDecorationStyle? decorationStyle,
+    Color? decorationColor,
+    double? decorationThickness,
+  }) {
+    return GoogleFonts.playfairDisplay(
+      color: color,
+      backgroundColor: backgroundColor,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      height: height,
+      decoration: decoration,
+      decorationStyle: decorationStyle,
+      decorationColor: decorationColor,
+      decorationThickness: decorationThickness,
     );
   }
 }
