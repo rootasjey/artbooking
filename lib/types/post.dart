@@ -11,34 +11,38 @@ class Post {
     required this.publishedAt,
     required this.updatedAt,
     required this.visibility,
-    this.authors = const [],
+    this.content = "",
     this.description = "",
+    this.iconData = "",
+    this.id = "",
     this.languages = const [],
     this.name = "",
     this.storagePath = "",
-    this.id = "",
     this.tags = const [],
     this.translations = const [],
+    this.userIds = const [],
     this.wordCount = 0,
-    this.iconData = "",
-    this.content = "",
   });
 
-  final List<String> authors;
+  /// Firebase Storage file content.
+  /// This property doesn't exist in Firestore.
+  final String content;
   final DateTime createdAt;
   final String description;
+  final String iconData;
   final List<String> languages;
   final String name;
-  final String storagePath;
   final String id;
   final DateTime publishedAt;
+  final String storagePath;
   final List<String> tags;
   final List<String> translations;
-  final EnumContentVisibility visibility;
   final DateTime updatedAt;
+
+  /// Author ids of this post.
+  final List<String> userIds;
+  final EnumContentVisibility visibility;
   final int wordCount;
-  final String iconData;
-  final String content;
 
   factory Post.empty() {
     return Post(
@@ -50,44 +54,43 @@ class Post {
   }
 
   Post copyWith({
-    List<String>? authors,
+    String? content,
     DateTime? createdAt,
     String? description,
+    String? iconData,
+    String? id,
     List<String>? languages,
     String? name,
-    String? storagePath,
-    String? id,
-    String? iconData,
-    String? content,
     DateTime? publishedAt,
+    String? storagePath,
     List<String>? tags,
     List<String>? translations,
-    EnumContentVisibility? visibility,
+    List<String>? userIds,
     DateTime? updatedAt,
+    EnumContentVisibility? visibility,
     int? wordCount,
   }) {
     return Post(
-      authors: authors ?? this.authors,
       createdAt: createdAt ?? this.createdAt,
       description: description ?? this.description,
-      iconData: iconData ?? this.iconData,
       content: content ?? this.content,
+      iconData: iconData ?? this.iconData,
+      id: id ?? this.id,
       languages: languages ?? this.languages,
       name: name ?? this.name,
       storagePath: storagePath ?? this.storagePath,
-      id: id ?? this.id,
       publishedAt: publishedAt ?? this.publishedAt,
       tags: tags ?? this.tags,
       translations: translations ?? this.translations,
-      visibility: visibility ?? this.visibility,
       updatedAt: updatedAt ?? this.updatedAt,
+      userIds: userIds ?? this.userIds,
+      visibility: visibility ?? this.visibility,
       wordCount: wordCount ?? this.wordCount,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'authors': authors,
       'content': content,
       'created_at': createdAt.millisecondsSinceEpoch,
       'description': description,
@@ -97,15 +100,16 @@ class Post {
       'storagePath': storagePath,
       'id': id,
       'published_at': createdAt.millisecondsSinceEpoch,
-      'tags': tags,
+      'tags': listToMapStringBool(tags),
       'translations': translations,
       'visibility': visibility.name,
       'updated_at': updatedAt.millisecondsSinceEpoch,
+      'userIds': listToMapStringBool(userIds),
       'wordCount': wordCount,
     };
   }
 
-  Map<String, bool> tagsToMap() {
+  Map<String, bool> listToMapStringBool(List<String> list) {
     final map = <String, bool>{};
 
     for (final String tag in tags) {
@@ -121,7 +125,6 @@ class Post {
     }
 
     return Post(
-      authors: parseMapToArray(map["authors"]),
       content: map["content"] ?? "",
       createdAt: Utilities.date.fromFirestore(map["created_at"]),
       description: map["description"] ?? "",
@@ -135,6 +138,7 @@ class Post {
       translations: parseMapToArray(map["translations"]),
       visibility: parseVisibility(map["visibility"]),
       updatedAt: Utilities.date.fromFirestore(map["updated_at"]),
+      userIds: parseMapToArray(map["user_ids"]),
       wordCount: map["word_count"]?.toInt() ?? 0,
     );
   }
@@ -178,11 +182,11 @@ class Post {
 
   @override
   String toString() {
-    return "Post(authors: $authors, content: $content, createdAt: $createdAt, "
+    return "Post(content: $content, createdAt: $createdAt, "
         "description: $description, iconData: $iconData, languages: $languages, "
         "name: $name, pubslihedAt: $publishedAt, id: $id, tags: $tags, "
-        "storagePath: $storagePath, translations: $translations, "
-        "updatedAt: $updatedAt, visibility: $visibility, wordCount: $wordCount)";
+        "storagePath: $storagePath, translations: $translations, updatedAt: $updatedAt, "
+        "userIds: $userIds, visibility: $visibility, wordCount: $wordCount)";
   }
 
   @override
@@ -191,7 +195,6 @@ class Post {
 
     return other is Post &&
         content == content &&
-        listEquals(other.authors, authors) &&
         other.createdAt == createdAt &&
         other.description == description &&
         listEquals(other.languages, languages) &&
@@ -203,24 +206,25 @@ class Post {
         listEquals(other.translations, translations) &&
         other.visibility == visibility &&
         other.updatedAt == updatedAt &&
+        listEquals(other.userIds, userIds) &&
         other.wordCount == wordCount;
   }
 
   @override
   int get hashCode {
-    return authors.hashCode ^
-        content.hashCode ^
+    return content.hashCode ^
         createdAt.hashCode ^
         description.hashCode ^
+        id.hashCode ^
         languages.hashCode ^
         name.hashCode ^
-        storagePath.hashCode ^
-        id.hashCode ^
         publishedAt.hashCode ^
+        storagePath.hashCode ^
         tags.hashCode ^
         translations.hashCode ^
-        visibility.hashCode ^
         updatedAt.hashCode ^
+        userIds.hashCode ^
+        visibility.hashCode ^
         wordCount.hashCode;
   }
 }
