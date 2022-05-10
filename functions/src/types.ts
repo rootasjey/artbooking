@@ -102,10 +102,12 @@ interface CheckPropertiesParams {
   illustration_id: string;
 }
 
-interface CreateUserAccountParams {
-  email: string;
-  password: string;
-  username: string;
+interface CreatePostParams {
+  /** Post's id to copy attribute from. */
+  duplicate_post_id: string;
+
+  /** Language of this post. */
+  language: string;
 }
 
 interface CreateBookParams {
@@ -123,6 +125,12 @@ interface CreateIllustrationParams {
 interface CreateOneLicenseParams {
   /** License's data. */
   license: License;
+}
+
+interface CreateUserAccountParams {
+  email: string;
+  password: string;
+  username: string;
 }
 
 interface DataUpdateParams {
@@ -171,6 +179,11 @@ interface DeleteOneLicenseParams {
 
   /** License to delete. */
   license_id: string;
+}
+
+interface DeletePostParams {
+  /** Post's id. */
+  post_id: string;
 }
 
 interface GenerateImageThumbsResult {
