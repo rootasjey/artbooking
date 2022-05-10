@@ -376,7 +376,8 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
             SettableMetadata(
               customMetadata: {
                 "extension": extension,
-                "firestoreId": illustrationId,
+                "firestore_id": illustrationId,
+                "file_type": "illustration",
                 "userId": userId,
                 "visibility": "public",
               },

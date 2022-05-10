@@ -259,7 +259,8 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
         SettableMetadata(
           customMetadata: {
             "extension": extension,
-            "firestoreId": illustrationId,
+            "firestore_id": illustrationId,
+            "file_type": "illustration",
             "userId": userId,
             "visibility": "public",
           },

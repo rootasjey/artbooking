@@ -171,9 +171,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       final metadata = SettableMetadata(
         contentType: mimeFromExtension(extension),
         customMetadata: {
-          'extension': extension,
-          'userId': uid,
-          'target': heroTag,
+          "extension": extension,
+          "userId": uid,
+          "target": "profile_picture",
+          "file_type": "profile_picture",
         },
       );
 
@@ -282,9 +283,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       final metadata = SettableMetadata(
         contentType: mime(fileName),
         customMetadata: {
-          'extension': extension,
-          'userId': authUser.uid,
-          'target': 'profile_picture',
+          "extension": extension,
+          "userId": authUser.uid,
+          "target": "profile_picture",
+          "file_type": "profile_picture",
         },
       );
 
