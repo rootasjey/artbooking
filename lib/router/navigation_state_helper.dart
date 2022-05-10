@@ -1,5 +1,6 @@
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/post.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:flutter/widgets.dart';
 
@@ -25,6 +26,12 @@ class NavigationStateHelper {
   /// This state's property allow us to pass image data
   /// outside the page's state (because of the router behavior).
   static ImageProvider<Object>? imageToEdit;
+
+  /// Last post selected.
+  /// This should be affected before navigating to PostPage.
+  /// This state's property allow us to pass post data
+  /// outside the page's state (because of the router behavior).
+  static Post? post;
 
   /// Last section selected.
   /// This should be affected before navigating to SectionPage.

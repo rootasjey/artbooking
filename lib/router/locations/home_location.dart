@@ -5,6 +5,7 @@ import 'package:artbooking/screens/book/book_page.dart';
 import 'package:artbooking/screens/book/books_page.dart';
 import 'package:artbooking/screens/illustrations/illustration_page.dart';
 import 'package:artbooking/screens/illustrations/illustrations_page.dart';
+import 'package:artbooking/screens/post_page.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/widgets.dart';
@@ -31,6 +32,8 @@ class HomeLocation extends BeamLocation<BeamState> {
   static const String profileIllustrationRoute =
       "$profileRoute/i/:illustrationId";
 
+  static const String postRoute = "/posts/:postId";
+
   @override
   List<String> get pathPatterns => [
         route,
@@ -43,6 +46,7 @@ class HomeLocation extends BeamLocation<BeamState> {
         profileBookRoute,
         profileIllustrationRoute,
         directIllustrationRoute,
+        postRoute,
       ];
 
   @override
@@ -96,6 +100,17 @@ class HomeLocation extends BeamLocation<BeamState> {
           ),
           key: ValueKey(illustrationRoute),
           title: Utilities.ui.getPageTitle("illustration".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
+      if (state.pathPatternSegments.contains("posts") &&
+          state.pathPatternSegments.contains(":postId"))
+        BeamPage(
+          child: PostPage(
+            postId: state.pathParameters["postId"]!,
+            // heroTag: Utilities.navigation.getHeroTag(state.routeState),
+          ),
+          key: ValueKey(postRoute),
+          title: Utilities.ui.getPageTitle("post".tr()),
           type: BeamPageType.fadeTransition,
         ),
     ];

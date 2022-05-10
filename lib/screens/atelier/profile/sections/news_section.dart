@@ -3,15 +3,17 @@ import 'package:artbooking/components/cards/shimmer_card.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/router/locations/home_location.dart';
+import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/enums/enum_post_item_action.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/post.dart';
 import 'package:artbooking/types/section.dart';
+import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
@@ -187,7 +189,7 @@ class _NewsSectionState extends State<NewsSection> {
         post: post,
         index: index,
         heroTag: heroTag,
-        onTap: navigateToIllustrationPage,
+        onTap: goToPostPage,
         popupMenuEntries: popupMenuEntries,
         onPopupMenuItemSelected: onPostItemSelected,
       );
@@ -377,7 +379,15 @@ class _NewsSectionState extends State<NewsSection> {
     return _currentMode == EnumSectionDataMode.chosen;
   }
 
-  void navigateToIllustrationPage(Post post, String heroTag) {}
+  void goToPostPage(Post post, String heroTag) {
+    NavigationStateHelper.post = post;
+    Beamer.of(context).beamToNamed(
+      HomeLocation.postRoute.replaceFirst(":postId", post.id),
+      routeState: {
+        "postId": post.id,
+      },
+    );
+  }
 
   void onPostItemSelected(
     EnumPostItemAction action,
