@@ -36,7 +36,7 @@ class SeparatorColorCard extends StatelessWidget {
                   opacity: 0.6,
                   child: Text(
                     "color".tr(),
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       color: foreground,
                       fontWeight: FontWeight.w600,
                     ),

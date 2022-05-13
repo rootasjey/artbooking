@@ -190,7 +190,7 @@ class _UserSectionState extends State<UserSection> {
               padding: const EdgeInsets.only(top: 16.0),
               child: Text(
                 _userFirestore.name,
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontSize: 24.0,
                   fontWeight: FontWeight.w600,
                 ),
@@ -212,7 +212,7 @@ class _UserSectionState extends State<UserSection> {
                   opacity: 0.6,
                   child: Text(
                     _userFirestore.location,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w600,
                     ),
@@ -233,7 +233,7 @@ class _UserSectionState extends State<UserSection> {
                 opacity: 0.6,
                 child: Text(
                   _userFirestore.bio,
-                  style: Utilities.fonts.style(),
+                  style: Utilities.fonts.body(),
                 ),
               ),
             ),

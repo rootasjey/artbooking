@@ -17,7 +17,7 @@ class ExpansionTileCardTitle extends StatelessWidget {
       opacity: opacity,
       child: Text(
         textValue,
-        style: Utilities.fonts.style(
+        style: Utilities.fonts.body(
           fontSize: 20.0,
           fontWeight: FontWeight.w700,
         ),

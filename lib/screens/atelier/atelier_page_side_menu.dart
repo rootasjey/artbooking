@@ -138,7 +138,7 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
                 ),
                 child: Text(
                   sidePanelItem.label,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     color: textColor,
                     fontSize: 16.0,
                     fontWeight: fontWeight,

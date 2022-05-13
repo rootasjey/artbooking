@@ -23,7 +23,7 @@ class MyBooksPageTitle extends StatelessWidget {
           opacity: 0.8,
           child: Text(
             "books".tr(),
-            style: Utilities.fonts.style(
+            style: Utilities.fonts.body(
               fontSize: 30.0,
               fontWeight: FontWeight.w800,
             ),
@@ -33,7 +33,7 @@ class MyBooksPageTitle extends StatelessWidget {
           opacity: 0.3,
           child: Text(
             " •",
-            style: Utilities.fonts.style(
+            style: Utilities.fonts.body(
               color: Theme.of(context).secondaryHeaderColor,
               fontSize: 30.0,
               fontWeight: FontWeight.w800,
@@ -59,7 +59,7 @@ class MyBooksPageTitle extends StatelessWidget {
                   ),
                   Text(
                     selectedTab.name,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 30.0,
                       fontWeight: FontWeight.w700,
                     ),
@@ -110,7 +110,7 @@ class MyBooksPageTitle extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Text(
                     "books_${visibilityTab.name}_word".tr().toLowerCase(),
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       color: selected ? Theme.of(context).primaryColor : null,
                       fontSize: 26.0,
                       fontWeight: FontWeight.w600,

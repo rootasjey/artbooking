@@ -27,7 +27,7 @@ class AnimatedAppIcon extends StatelessWidget {
               opacity: 0.6,
               child: Text(
                 textTitle,
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontWeight: FontWeight.w700,
                 ),
               ),

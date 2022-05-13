@@ -103,7 +103,7 @@ class _UploadItemCardState extends ConsumerState<UploadPanelItemCard> {
       opacity: 0.8,
       child: Text(
         widget.customUploadTask.name,
-        style: Utilities.fonts.style(
+        style: Utilities.fonts.body(
           fontSize: 18.0,
           fontWeight: FontWeight.w700,
         ),
@@ -176,7 +176,7 @@ class _UploadItemCardState extends ConsumerState<UploadPanelItemCard> {
         opacity: 0.6,
         child: Text(
           "${percent.round()}%",
-          style: Utilities.fonts.style(
+          style: Utilities.fonts.body(
             fontWeight: FontWeight.w600,
           ),
         ),

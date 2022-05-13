@@ -105,7 +105,7 @@ class _HeaderSeparatorDialogState extends State<HeaderSeparatorDialog> {
         children: [
           Text(
             "header_separator".tr().toUpperCase(),
-            style: Utilities.fonts.style(
+            style: Utilities.fonts.body(
               color: Colors.black,
               fontWeight: FontWeight.w700,
             ),
@@ -173,7 +173,7 @@ class _HeaderSeparatorDialogState extends State<HeaderSeparatorDialog> {
                 child: Text(
                   "header_separator_shape_choose".tr(),
                   textAlign: TextAlign.center,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 16.0,
                     fontWeight: FontWeight.w700,
                   ),

@@ -103,14 +103,14 @@ class UpdateUsernamePageBody extends StatelessWidget {
                                     opacity: 0.6,
                                     child: Text(
                                       "username_current".tr(),
-                                      style: Utilities.fonts.style(
+                                      style: Utilities.fonts.body(
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ),
                                   Text(
                                     username,
-                                    style: Utilities.fonts.style(
+                                    style: Utilities.fonts.body(
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -164,7 +164,7 @@ class UpdateUsernamePageBody extends StatelessWidget {
                       opacity: nameErrorMessage.isEmpty ? 0.0 : 1.0,
                       child: Text(
                         nameErrorMessage,
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           color: Theme.of(context).secondaryHeaderColor,
                           fontSize: 14.0,
                           fontWeight: FontWeight.w600,
@@ -192,7 +192,7 @@ class UpdateUsernamePageBody extends StatelessWidget {
                         padding: const EdgeInsets.all(14.0),
                         child: Text(
                           "username_update".tr().toUpperCase(),
-                          style: Utilities.fonts.style(
+                          style: Utilities.fonts.body(
                             fontSize: 15.0,
                             fontWeight: FontWeight.bold,
                           ),

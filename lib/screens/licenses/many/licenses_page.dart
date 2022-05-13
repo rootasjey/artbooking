@@ -478,7 +478,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
               opacity: 0.8,
               child: Text(
                 "license_delete".tr().toUpperCase(),
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -493,14 +493,14 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
                 child: Text.rich(
                   TextSpan(
                     text: "license_delete_are_you_sure".tr(),
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 24.0,
                       fontWeight: FontWeight.w500,
                     ),
                     children: [
                       TextSpan(
                         text: license.name,
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           fontSize: 24.0,
                           fontWeight: FontWeight.w500,
                           color: Theme.of(context).secondaryHeaderColor,

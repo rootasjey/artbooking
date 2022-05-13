@@ -56,7 +56,7 @@ class BookPageBodyEmpty extends StatelessWidget {
                           ? "new_start_sentence".tr().toUpperCase()
                           : "under_construction".tr().toUpperCase(),
                       textAlign: TextAlign.center,
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w700,
                       ),
@@ -73,7 +73,7 @@ class BookPageBodyEmpty extends StatelessWidget {
                             ? "book_owner_no_illustration".tr()
                             : "book_no_illustration".tr(),
                         textAlign: TextAlign.center,
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           fontSize: 16.0,
                         ),
                       ),
@@ -96,7 +96,7 @@ class BookPageBodyEmpty extends StatelessWidget {
                                 opacity: 0.6,
                                 child: Text(
                                   "or".tr().toUpperCase(),
-                                  style: Utilities.fonts.style(
+                                  style: Utilities.fonts.body(
                                     fontSize: 14.0,
                                     fontWeight: FontWeight.w600,
                                   ),

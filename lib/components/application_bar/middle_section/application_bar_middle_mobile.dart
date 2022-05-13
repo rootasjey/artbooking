@@ -22,7 +22,7 @@ class ApplicationBarMiddleMobile extends ConsumerWidget {
           child: PopupMenuButton<String>(
             child: Text(
               "sections".toUpperCase(),
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 color: Colors.black,
                 fontSize: 18.0,
               ),

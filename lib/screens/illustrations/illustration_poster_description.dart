@@ -23,7 +23,7 @@ class IllustrationPosterDescription extends StatelessWidget {
         children: [
           Text(
             "description".tr().toUpperCase(),
-            style: Utilities.fonts.style(
+            style: Utilities.fonts.body(
               fontSize: 14.0,
               color: Theme.of(context).primaryColor,
               fontWeight: FontWeight.w700,
@@ -34,7 +34,7 @@ class IllustrationPosterDescription extends StatelessWidget {
             opacity: 0.6,
             child: Text(
               description,
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontSize: 18.0,
                 fontWeight: FontWeight.w500,
               ),

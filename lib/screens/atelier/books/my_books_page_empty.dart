@@ -53,7 +53,7 @@ class MyBooksPageEmpty extends StatelessWidget {
                   selectedTab == EnumVisibilityTab.active
                       ? "books_my_empty".tr()
                       : "books_my_empty_archived".tr(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 26.0,
                     fontWeight: FontWeight.w600,
                   ),
@@ -69,7 +69,7 @@ class MyBooksPageEmpty extends StatelessWidget {
                   selectedTab == EnumVisibilityTab.active
                       ? "books_my_empty_subtitle".tr()
                       : "books_my_empty_archived_subtitle".tr(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 16.0,
                   ),
                 ),

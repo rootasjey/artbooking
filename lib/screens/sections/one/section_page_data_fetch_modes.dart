@@ -32,7 +32,7 @@ class SectionPageDataFetchModes extends StatelessWidget {
               opacity: 0.6,
               child: Text(
                 "section_data_fetch_modes".tr(),
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontWeight: FontWeight.w700,
                 ),
               ),

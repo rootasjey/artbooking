@@ -42,7 +42,7 @@ class SheetHeader extends StatelessWidget {
                 opacity: 0.4,
                 child: Text(
                   title,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 14.0,
                     fontWeight: FontWeight.w600,
                   ),
@@ -51,7 +51,7 @@ class SheetHeader extends StatelessWidget {
               if (subtitle != null)
                 Text(
                   subtitle!,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 18.0,
                     fontWeight: FontWeight.w500,
                   ),

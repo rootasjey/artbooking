@@ -142,7 +142,7 @@ class _BetterAvatarState extends State<BetterAvatar>
           if (widget.title.isNotEmpty)
             Text(
               widget.title,
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontSize: 16.0,
                 fontWeight: FontWeight.w600,
               ),

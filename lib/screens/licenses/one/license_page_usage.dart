@@ -26,7 +26,7 @@ class LicensePageUsage extends StatelessWidget {
             opacity: 0.6,
             child: Text(
               "Usage".toUpperCase(),
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontSize: 20.0,
                 fontWeight: FontWeight.w700,
               ),
@@ -172,7 +172,7 @@ class LicensePageUsage extends StatelessWidget {
             opacity: 0.8,
             child: Text(
               "${usageString.toUpperCase()} : $usageInfoStr",
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 color: Colors.black,
                 fontWeight: FontWeight.w700,
               ),
@@ -186,7 +186,7 @@ class LicensePageUsage extends StatelessWidget {
                 opacity: 0.4,
                 child: Text(
                   "license_usages.$usageString".tr(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     color: Colors.black,
                     fontWeight: FontWeight.w700,
                   ),
@@ -207,7 +207,7 @@ class LicensePageUsage extends StatelessWidget {
   }
 
   TextStyle getTextStyle() {
-    return Utilities.fonts.style(
+    return Utilities.fonts.body(
       fontSize: 14.0,
       fontWeight: FontWeight.w600,
     );

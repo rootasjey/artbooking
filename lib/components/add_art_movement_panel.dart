@@ -204,7 +204,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                         children: [
                           Text(
                             "art_movements_available".tr(),
-                            style: Utilities.fonts.style(
+                            style: Utilities.fonts.body(
                               fontSize: 22.0,
                               fontWeight: FontWeight.w600,
                             ),
@@ -213,7 +213,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                             opacity: 0.5,
                             child: Text(
                               "art_movements_subtitle".tr(),
-                              style: Utilities.fonts.style(
+                              style: Utilities.fonts.body(
                                 height: 1.0,
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.w600,
@@ -293,7 +293,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                       opacity: 0.8,
                       child: Text(
                         _selectedArtMovementPreview.name.toUpperCase(),
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -309,7 +309,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                 opacity: 0.6,
                 child: Text(
                   _selectedArtMovementPreview.description,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -363,7 +363,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                     Expanded(
                       child: Text(
                         artMovement.name.toUpperCase(),
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
                             color: selected ? _secondaryColor : null),
@@ -374,7 +374,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
               ),
               subtitle: Text(
                 artMovement.description,
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -415,7 +415,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                     Expanded(
                       child: Text(
                         artMovement.name.toUpperCase(),
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w700,
                             color: selected ? _secondaryColor : null),
@@ -426,7 +426,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
               ),
               subtitle: Text(
                 artMovement.description,
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -502,7 +502,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
               label: Text("clear".tr()),
               style: TextButton.styleFrom(
                 primary: Colors.black54,
-                textStyle: Utilities.fonts.style(
+                textStyle: Utilities.fonts.body(
                   fontWeight: FontWeight.w600,
                 ),
               ),

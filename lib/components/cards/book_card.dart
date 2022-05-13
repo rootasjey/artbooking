@@ -248,7 +248,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
                               ? textValue
                               : "book_permutation_description".tr(),
                           textAlign: TextAlign.center,
-                          style: Utilities.fonts.style(
+                          style: Utilities.fonts.body(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w600,
                           ),
@@ -374,7 +374,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
                   illustration.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 14.0,
                     fontWeight: FontWeight.w800,
                   ),
@@ -445,7 +445,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
                               padding: const EdgeInsets.all(16.0),
                               child: Text(
                                 "image_load_failed".tr(),
-                                style: Utilities.fonts.style(
+                                style: Utilities.fonts.body(
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),

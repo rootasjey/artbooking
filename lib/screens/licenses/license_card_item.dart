@@ -56,7 +56,7 @@ class LicenseCardItem extends StatelessWidget {
                         opacity: 0.8,
                         child: Text(
                           license.name,
-                          style: Utilities.fonts.style(
+                          style: Utilities.fonts.body(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w600,
                           ),
@@ -69,7 +69,7 @@ class LicenseCardItem extends StatelessWidget {
                         opacity: 0.6,
                         child: Text(
                           license.description,
-                          style: Utilities.fonts.style(
+                          style: Utilities.fonts.body(
                             fontSize: 14.0,
                           ),
                         ),

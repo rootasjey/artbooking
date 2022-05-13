@@ -96,7 +96,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
                       opacity: 0.7,
                       child: Text(
                         "card_click_to_expand".tr(),
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           color: Theme.of(context).secondaryHeaderColor,
                           fontWeight: FontWeight.w600,
                         ),

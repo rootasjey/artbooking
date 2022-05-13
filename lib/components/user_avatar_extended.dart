@@ -67,7 +67,7 @@ class _UserAvatarExtendedState extends State<UserAvatarExtended> {
                   opacity: 0.8,
                   child: Text(
                     _user.name,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w600,
                     ),
@@ -77,7 +77,7 @@ class _UserAvatarExtendedState extends State<UserAvatarExtended> {
                   opacity: 0.4,
                   child: Text(
                     _user.location,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontWeight: FontWeight.w600,
                     ),
                   ),

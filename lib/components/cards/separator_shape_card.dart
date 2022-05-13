@@ -50,7 +50,7 @@ class SeparatorShapeCard extends StatelessWidget {
                   opacity: 0.4,
                   child: Text(
                     "shape".tr(),
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -59,7 +59,7 @@ class SeparatorShapeCard extends StatelessWidget {
                   "header_separator_shape"
                           ".${separatorType.name}"
                       .tr(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontWeight: FontWeight.w600,
                   ),
                 ),

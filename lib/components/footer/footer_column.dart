@@ -26,7 +26,7 @@ class FooterColumn extends StatelessWidget {
               opacity: 0.8,
               child: Text(
                 titleValue,
-                style: Utilities.fonts.style2(
+                style: Utilities.fonts.body2(
                   fontSize: 18.0,
                   fontWeight: FontWeight.w800,
                 ),

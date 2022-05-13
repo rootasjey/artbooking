@@ -52,7 +52,7 @@ class EditImagePageHeader extends StatelessWidget {
                           isProcessing
                               ? "${'changes_applying'.tr()}..."
                               : "edit_image".tr(),
-                          style: Utilities.fonts.style(
+                          style: Utilities.fonts.body(
                             fontSize: 24.0,
                             fontWeight: FontWeight.w700,
                             color: isProcessing
@@ -68,7 +68,7 @@ class EditImagePageHeader extends StatelessWidget {
                         opacity: 0.4,
                         child: Text(
                           "edit_image_description".tr(),
-                          style: Utilities.fonts.style(
+                          style: Utilities.fonts.body(
                             fontSize: 14.0,
                             fontWeight: FontWeight.w700,
                           ),
@@ -79,7 +79,7 @@ class EditImagePageHeader extends StatelessWidget {
                       onPressed: goToEditIllustrationMetada,
                       child: Text(
                         "edit_image_suggestion".tr(),
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           fontWeight: FontWeight.w600,
                           backgroundColor:
                               Constants.colors.tertiary.withOpacity(0.3),

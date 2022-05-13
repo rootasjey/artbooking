@@ -79,7 +79,7 @@ class _HomePageRoadmapState extends State<HomePageRoadmap> {
   Widget title() {
     return Text(
       "roadmap".tr(),
-      style: Utilities.fonts.titleStyle(
+      style: Utilities.fonts.title(
         fontSize: 90.0,
         fontWeight: FontWeight.w600,
       ),
@@ -91,7 +91,7 @@ class _HomePageRoadmapState extends State<HomePageRoadmap> {
       opacity: 0.4,
       child: Text(
         "roadmap_description".tr(),
-        style: Utilities.fonts.style(
+        style: Utilities.fonts.body(
           fontSize: 20.0,
           fontWeight: FontWeight.w600,
         ),
@@ -141,7 +141,7 @@ class _HomePageRoadmapState extends State<HomePageRoadmap> {
                     children: [
                       Text(
                         _processItems[index].title,
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           fontWeight: FontWeight.w700,
                           color: getColor(index),
                         ),
@@ -150,7 +150,7 @@ class _HomePageRoadmapState extends State<HomePageRoadmap> {
                         opacity: 0.6,
                         child: Text(
                           _processItems[index].deadline,
-                          style: Utilities.fonts.style(
+                          style: Utilities.fonts.body(
                             fontSize: 14.0,
                             fontWeight: FontWeight.w400,
                             color: getColor(index),
@@ -297,12 +297,12 @@ class _HomePageRoadmapState extends State<HomePageRoadmap> {
               title!.toUpperCase(),
             ),
           ),
-          titleTextStyle: Utilities.fonts.style(
+          titleTextStyle: Utilities.fonts.body(
             fontSize: 14.0,
             color: Colors.black,
             fontWeight: FontWeight.w700,
           ),
-          contentTextStyle: Utilities.fonts.style(
+          contentTextStyle: Utilities.fonts.body(
             fontSize: 18.0,
             color: Colors.black,
             fontWeight: FontWeight.w600,
@@ -342,7 +342,7 @@ class _HomePageRoadmapState extends State<HomePageRoadmap> {
               style: ElevatedButton.styleFrom(
                 elevation: 0.0,
                 primary: Colors.black,
-                textStyle: Utilities.fonts.style(
+                textStyle: Utilities.fonts.body(
                   fontWeight: FontWeight.w600,
                 ),
                 shape: RoundedRectangleBorder(

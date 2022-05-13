@@ -136,7 +136,7 @@ class _ModularPageState extends ConsumerState<ModularPage> {
           title: Center(
             child: Text(
               "profile_page_loading".tr() + "...",
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontSize: 26.0,
                 fontWeight: FontWeight.w600,
               ),

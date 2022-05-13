@@ -37,7 +37,7 @@ class _ElevatedListTileState extends State<ElevatedListTile> {
           tileColor: Theme.of(context).backgroundColor,
           title: Text(
             widget.titleValue,
-            style: Utilities.fonts.style(
+            style: Utilities.fonts.body(
               fontWeight: FontWeight.w600,
             ),
           ),

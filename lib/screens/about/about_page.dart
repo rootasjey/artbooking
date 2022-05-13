@@ -34,7 +34,7 @@ class _AboutPageState extends State<AboutPage> {
   );
 
   final titleOpacity = 0.9;
-  final titleStyle = Utilities.fonts.style(
+  final titleStyle = Utilities.fonts.body(
     fontSize: 20.0,
     fontWeight: FontWeight.w600,
   );

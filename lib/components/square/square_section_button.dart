@@ -56,7 +56,7 @@ class _SquareSectionButtonState extends State<SquareSectionButton> {
                   Text(
                     widget.textValue,
                     textAlign: TextAlign.center,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w600,
                     ),

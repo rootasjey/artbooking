@@ -40,7 +40,7 @@ class ColorCard extends StatelessWidget {
           opacity: 0.7,
           child: Text(
             namedColor.name,
-            style: Utilities.fonts.style(
+            style: Utilities.fonts.body(
               fontSize: 14.0,
               fontWeight: FontWeight.w600,
               color: selected ? primaryColor : null,

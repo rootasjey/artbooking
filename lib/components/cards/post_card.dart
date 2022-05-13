@@ -102,7 +102,7 @@ class _PostCardState extends State<PostCard> {
                     child: Text(
                       post.name,
                       maxLines: 2,
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w800,
                         backgroundColor: _textBgColor,
@@ -116,7 +116,7 @@ class _PostCardState extends State<PostCard> {
                     post.description,
                     maxLines: 5,
                     textAlign: TextAlign.center,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 15.0,
                       fontWeight: FontWeight.w600,
                     ),

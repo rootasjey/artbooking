@@ -163,7 +163,7 @@ class _LicensePageState extends ConsumerState<SectionPage> {
               opacity: 0.8,
               child: Text(
                 "section_delete".tr().toUpperCase(),
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -178,14 +178,14 @@ class _LicensePageState extends ConsumerState<SectionPage> {
                 child: Text.rich(
                   TextSpan(
                     text: "section_delete_description".tr(),
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 24.0,
                       fontWeight: FontWeight.w500,
                     ),
                     children: [
                       TextSpan(
                         text: section.name,
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           fontSize: 24.0,
                           fontWeight: FontWeight.w500,
                           color: Theme.of(context).secondaryHeaderColor,

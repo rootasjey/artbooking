@@ -130,7 +130,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
           opacity: 0.8,
           child: Text(
             illustration.name,
-            style: Utilities.fonts.style(
+            style: Utilities.fonts.body(
               fontSize: 20.0,
               fontWeight: FontWeight.w700,
             ),
@@ -142,7 +142,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
               opacity: 0.4,
               child: Text(
                 "made_by".tr(),
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontSize: 14.0,
                   fontWeight: FontWeight.w600,
                 ),
@@ -154,7 +154,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
                 opacity: 0.6,
                 child: Text(
                   " ${_user.name} ",
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 14.0,
                     fontWeight: FontWeight.w600,
                   ),
@@ -163,7 +163,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
             ),
             Text(
               "• ",
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 color: Theme.of(context).primaryColor,
                 fontSize: 14.0,
                 fontWeight: FontWeight.w600,
@@ -175,7 +175,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
                 opacity: 0.6,
                 child: Text(
                   Jiffy(illustration.updatedAt).fromNow(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 14.0,
                     fontWeight: FontWeight.w600,
                   ),
@@ -265,7 +265,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
               opacity: 0.8,
               child: Text(
                 "dates".tr().toUpperCase(),
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -284,7 +284,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
                   Text.rich(
                     TextSpan(
                       text: "• ${'date_created_at'.tr()} ",
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context)
@@ -296,7 +296,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
                       children: [
                         TextSpan(
                           text: Jiffy(widget.illustration.createdAt).fromNow(),
-                          style: Utilities.fonts.style(
+                          style: Utilities.fonts.body(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w600,
                             color: Theme.of(context)
@@ -312,7 +312,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
                   Text.rich(
                     TextSpan(
                       text: "• ${'date_updated_at'.tr()} ",
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context)
@@ -324,7 +324,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
                       children: [
                         TextSpan(
                           text: Jiffy(widget.illustration.updatedAt).fromNow(),
-                          style: Utilities.fonts.style(
+                          style: Utilities.fonts.body(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w600,
                             color: Theme.of(context)

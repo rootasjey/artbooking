@@ -198,7 +198,7 @@ class BookPageHeader extends StatelessWidget {
                   opacity: 0.8,
                   child: Text(
                     book.name,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 40.0,
                       fontWeight: FontWeight.w800,
                     ),
@@ -208,7 +208,7 @@ class BookPageHeader extends StatelessWidget {
                   opacity: 0.6,
                   child: Text(
                     book.description,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 16.0,
                       fontWeight: FontWeight.w600,
                     ),
@@ -220,7 +220,7 @@ class BookPageHeader extends StatelessWidget {
                     opacity: 0.6,
                     child: Text(
                       updatedAtStr,
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w600,
                       ),
@@ -234,7 +234,7 @@ class BookPageHeader extends StatelessWidget {
                       opacity: 0.8,
                       child: Text(
                         "illustrations_count".plural(book.illustrations.length),
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           color: color,
                           fontSize: 16.0,
                           fontWeight: FontWeight.w600,

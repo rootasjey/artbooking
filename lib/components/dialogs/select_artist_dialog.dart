@@ -83,7 +83,7 @@ class _SelectArtistDialogState extends State<SelectArtistDialog> {
             opacity: 0.8,
             child: Text(
               "artists".tr().toUpperCase(),
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 color: Colors.black,
                 fontWeight: FontWeight.w700,
               ),
@@ -96,7 +96,7 @@ class _SelectArtistDialogState extends State<SelectArtistDialog> {
               child: Text(
                 "artists_choose_featured".tr(),
                 textAlign: TextAlign.center,
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   color: Colors.black,
                   fontWeight: FontWeight.w700,
                 ),
@@ -124,7 +124,7 @@ class _SelectArtistDialogState extends State<SelectArtistDialog> {
                 opacity: 0.8,
                 child: Text(
                   "loading".tr(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -217,7 +217,7 @@ class _SelectArtistDialogState extends State<SelectArtistDialog> {
                 child: Text(
                   artist.name,
                   overflow: TextOverflow.ellipsis,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 16.0,
                     fontWeight: FontWeight.w600,
                   ),

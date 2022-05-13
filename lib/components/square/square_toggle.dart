@@ -54,7 +54,7 @@ class _SquareToggleState extends State<SquareToggle> {
               opacity: 0.6,
               child: Text(
                 _isActive ? "on".tr().toUpperCase() : "off".tr().toUpperCase(),
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
                 ),

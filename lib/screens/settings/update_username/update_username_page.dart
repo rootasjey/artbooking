@@ -131,7 +131,7 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
             opacity: 0.6,
             child: Text(
               "username_current".tr(),
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -146,7 +146,7 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
                   opacity: 0.6,
                   child: Text(
                     _username,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -160,7 +160,7 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
                   opacity: 0.4,
                   child: Text(
                     "username_choose_description".tr(),
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontWeight: FontWeight.w500,
                     ),
                   ),

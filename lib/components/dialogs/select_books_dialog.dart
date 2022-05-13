@@ -84,7 +84,7 @@ class _SelectBooksDialogState extends State<SelectBooksDialog> {
             opacity: 0.8,
             child: Text(
               "books".tr().toUpperCase(),
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 color: Colors.black,
                 fontWeight: FontWeight.w700,
               ),
@@ -97,7 +97,7 @@ class _SelectBooksDialogState extends State<SelectBooksDialog> {
               child: Text(
                 "books_choose_add_illustrations_in".tr(),
                 textAlign: TextAlign.center,
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   color: Colors.black,
                   fontWeight: FontWeight.w700,
                 ),
@@ -125,7 +125,7 @@ class _SelectBooksDialogState extends State<SelectBooksDialog> {
                 opacity: 0.8,
                 child: Text(
                   "loading".tr(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -233,7 +233,7 @@ class _SelectBooksDialogState extends State<SelectBooksDialog> {
                               child: Text(
                                 book.name,
                                 maxLines: 1,
-                                style: Utilities.fonts.style(
+                                style: Utilities.fonts.body(
                                   color: textColor,
                                   fontWeight: FontWeight.w800,
                                 ),
@@ -244,7 +244,7 @@ class _SelectBooksDialogState extends State<SelectBooksDialog> {
                               child: Text(
                                 book.description,
                                 maxLines: 1,
-                                style: Utilities.fonts.style(
+                                style: Utilities.fonts.body(
                                   color: textColor,
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.w600,
@@ -256,7 +256,7 @@ class _SelectBooksDialogState extends State<SelectBooksDialog> {
                               child: Text(
                                 "illustrations_count".plural(book.count),
                                 maxLines: 1,
-                                style: Utilities.fonts.style(
+                                style: Utilities.fonts.body(
                                   color: textColor,
                                   fontSize: 14.0,
                                   fontWeight: FontWeight.w600,
@@ -268,7 +268,7 @@ class _SelectBooksDialogState extends State<SelectBooksDialog> {
                               child: Text(
                                 updatedAt,
                                 maxLines: 1,
-                                style: Utilities.fonts.style(
+                                style: Utilities.fonts.body(
                                   color: textColor,
                                   fontSize: 13.0,
                                   fontWeight: FontWeight.w500,

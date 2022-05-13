@@ -31,7 +31,7 @@ class IllustrationPageFab extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Text(
           "edit".tr(),
-          style: Utilities.fonts.style(
+          style: Utilities.fonts.body(
             fontWeight: FontWeight.w600,
           ),
         ),

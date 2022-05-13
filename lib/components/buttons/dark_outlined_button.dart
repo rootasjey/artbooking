@@ -40,7 +40,7 @@ class DarkOutlinedButton extends StatelessWidget {
               )
             : null,
         primary: selected ? primaryColor : baseColor.withOpacity(0.4),
-        textStyle: Utilities.fonts.style(
+        textStyle: Utilities.fonts.body(
           fontWeight: FontWeight.w600,
         ),
       ),

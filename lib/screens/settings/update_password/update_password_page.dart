@@ -66,7 +66,7 @@ class _UpdatePasswordPageState extends ConsumerState<UpdatePasswordPage> {
           backgroundColor: Constants.colors.clairPink,
           title: Text(
             "password_tips".tr(),
-            style: Utilities.fonts.style(
+            style: Utilities.fonts.body(
               fontSize: 14.0,
               fontWeight: FontWeight.w600,
             ),

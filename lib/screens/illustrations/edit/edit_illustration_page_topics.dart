@@ -60,7 +60,7 @@ class EditIllustrationPageTopics extends StatelessWidget {
                       opacity: 0.8,
                       child: Text(topic),
                     ),
-                    labelStyle: Utilities.fonts.style(
+                    labelStyle: Utilities.fonts.body(
                       fontWeight: FontWeight.w600,
                     ),
                     labelPadding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -90,7 +90,7 @@ class EditIllustrationPageTopics extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Text(
                       "topics".tr(),
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontWeight: FontWeight.w600,
                       ),
                     ),

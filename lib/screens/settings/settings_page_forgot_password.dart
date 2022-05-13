@@ -204,7 +204,7 @@ class _SettingsPageForgotPasswordState
                 child: Text(
                   "password_forgot".tr(),
                   textAlign: TextAlign.center,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 25.0,
                     fontWeight: FontWeight.w700,
                   ),
@@ -218,7 +218,7 @@ class _SettingsPageForgotPasswordState
                     "password_forgot_reset_process".tr(),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 3,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontWeight: FontWeight.w400,
                     ),
                   ),

@@ -28,7 +28,7 @@ class LicensesPageHeader extends StatelessWidget {
             opacity: 0.8,
             child: Text(
               "licenses".tr(),
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontSize: 30.0,
                 fontWeight: FontWeight.w800,
               ),
@@ -38,7 +38,7 @@ class LicensesPageHeader extends StatelessWidget {
             opacity: 0.4,
             child: Text(
               "license_tab_description".tr(),
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontSize: 16.0,
                 fontWeight: FontWeight.w600,
               ),

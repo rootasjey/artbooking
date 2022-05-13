@@ -42,7 +42,7 @@ class LikesPageEmpty extends StatelessWidget {
                 selectedTab == EnumLikeType.book
                     ? "like_book_empty".tr()
                     : "like_illustration_empty".tr(),
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontSize: 26.0,
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).primaryColor,
@@ -60,7 +60,7 @@ class LikesPageEmpty extends StatelessWidget {
                       selectedTab == EnumLikeType.book
                           ? "like_book_empty_browse".tr()
                           : "like_illustration_empty_browse".tr(),
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontSize: 16.0,
                       ),
                     ),

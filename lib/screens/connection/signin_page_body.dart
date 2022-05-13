@@ -103,7 +103,7 @@ class _SigninPageBodyState extends State<SigninPageBody> {
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
                           "email_enter_valid".tr(),
-                          style: Utilities.fonts.style(
+                          style: Utilities.fonts.body(
                             color: Theme.of(context).secondaryHeaderColor,
                           ),
                         ),
@@ -160,7 +160,7 @@ class _SigninPageBodyState extends State<SigninPageBody> {
                       children: [
                         Text(
                           "signin".tr().toUpperCase(),
-                          style: Utilities.fonts.style(
+                          style: Utilities.fonts.body(
                             color: Colors.white,
                             fontSize: 15.0,
                             fontWeight: FontWeight.w700,

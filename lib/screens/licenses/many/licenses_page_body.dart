@@ -35,7 +35,7 @@ class LicensesPageBody extends StatelessWidget {
         sliver: true,
         title: Text(
           "licenses_loading".tr() + "...",
-          style: Utilities.fonts.style(
+          style: Utilities.fonts.body(
             fontSize: 32.0,
             fontWeight: FontWeight.w600,
           ),
@@ -67,7 +67,7 @@ class LicensesPageBody extends StatelessWidget {
                 selectedTab == EnumLicenseType.staff
                     ? "license_staff_empty_create".tr()
                     : "license_personal_empty_create".tr(),
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontSize: 26.0,
                   fontWeight: FontWeight.w500,
                 ),

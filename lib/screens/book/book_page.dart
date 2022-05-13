@@ -701,7 +701,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
                 opacity: 0.8,
                 child: Text(
                   "book_delete".plural(1).toUpperCase(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     color: Colors.black,
                     fontWeight: FontWeight.w700,
                   ),
@@ -715,7 +715,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
                   child: Text(
                     "book_delete_description".plural(1),
                     textAlign: TextAlign.center,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
                     ),
@@ -949,7 +949,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
                 ),
                 child: Text(
                   "Dates".toUpperCase(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -969,7 +969,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
                   opacity: 0.6,
                   child: Text(
                     createdAtStr,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 16.0,
                       fontWeight: FontWeight.w600,
                     ),
@@ -984,7 +984,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
                   opacity: 0.6,
                   child: Text(
                     updatedAtStr,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 16.0,
                       fontWeight: FontWeight.w600,
                     ),

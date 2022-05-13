@@ -91,7 +91,7 @@ class EditIllustrationPagePresentation extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Text(
                       "title".tr(),
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -106,7 +106,7 @@ class EditIllustrationPagePresentation extends StatelessWidget {
                     keyboardType: TextInputType.multiline,
                     textInputAction: TextInputAction.next,
                     textCapitalization: TextCapitalization.sentences,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 24.0,
                       fontWeight: FontWeight.w700,
                     ),
@@ -143,7 +143,7 @@ class EditIllustrationPagePresentation extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Text(
                       "description".tr(),
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -188,7 +188,7 @@ class EditIllustrationPagePresentation extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Text(
                       "story".tr(),
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -288,7 +288,7 @@ class EditIllustrationPagePresentation extends StatelessWidget {
         text: "text_field_counter_caracters".tr(args: [
           currentTextValue.length.toString(),
         ]),
-        style: Utilities.fonts.style(
+        style: Utilities.fonts.body(
           fontWeight: FontWeight.w600,
         ),
         children: [
@@ -296,7 +296,7 @@ class EditIllustrationPagePresentation extends StatelessWidget {
             TextSpan(
               // text: "• Unsaved changes",
               text: "text_field_counter_unsaved_changes".tr(),
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 color: Theme.of(context).secondaryHeaderColor,
               ),
             ),

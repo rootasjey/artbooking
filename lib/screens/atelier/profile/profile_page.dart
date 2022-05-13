@@ -109,7 +109,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               child: Center(
                 child: Text(
                   "profile_page_loading_error".tr(),
-                  style: Utilities.fonts.style(),
+                  style: Utilities.fonts.body(),
                 ),
               ),
             ),
@@ -132,7 +132,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           title: Center(
             child: Text(
               "profile_page_loading".tr() + "...",
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontSize: 26.0,
                 fontWeight: FontWeight.w600,
               ),

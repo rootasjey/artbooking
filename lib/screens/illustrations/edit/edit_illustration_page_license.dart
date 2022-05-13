@@ -80,7 +80,7 @@ class EditIllustrationPageLicense extends StatelessWidget {
                               opacity: 0.6,
                               child: Text(
                                 "license_current".tr().toUpperCase(),
-                                style: Utilities.fonts.style(
+                                style: Utilities.fonts.body(
                                   color: Theme.of(context).primaryColor,
                                   fontWeight: FontWeight.w800,
                                 ),
@@ -92,7 +92,7 @@ class EditIllustrationPageLicense extends StatelessWidget {
                                 license.name.isEmpty
                                     ? "license_none".tr()
                                     : license.name,
-                                style: Utilities.fonts.style(
+                                style: Utilities.fonts.body(
                                   fontSize: 18.0,
                                   fontWeight: FontWeight.w700,
                                 ),

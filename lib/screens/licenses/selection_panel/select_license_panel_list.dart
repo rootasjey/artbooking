@@ -52,7 +52,7 @@ class SelectLicensePanelList extends StatelessWidget {
                       ? "license_search_result_empty".tr()
                       : "license_personal_empty_create".tr(),
                   textAlign: TextAlign.center,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 24.0,
                     fontWeight: FontWeight.w400,
                   ),
@@ -104,7 +104,7 @@ class SelectLicensePanelList extends StatelessWidget {
                     Expanded(
                       child: Text(
                         currentLicense.name.toUpperCase(),
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           fontSize: 18.0,
                           fontWeight: FontWeight.w700,
                           color: selected
@@ -118,7 +118,7 @@ class SelectLicensePanelList extends StatelessWidget {
               ),
               subtitle: Text(
                 currentLicense.description,
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontWeight: FontWeight.w600,
                 ),
               ),

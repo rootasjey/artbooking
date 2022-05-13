@@ -28,7 +28,7 @@ class EditSectionVisibility extends StatelessWidget {
             opacity: 0.6,
             child: Text(
               "visibility".tr(),
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -49,7 +49,7 @@ class EditSectionVisibility extends StatelessWidget {
                 child: Center(
                   child: Text(
                     "visibility_${visibility.name}".tr().toUpperCase(),
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                     ),

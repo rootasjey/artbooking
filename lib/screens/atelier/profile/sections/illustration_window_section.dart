@@ -380,7 +380,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
             ),
           ],
         ),
-        style: Utilities.fonts.style(
+        style: Utilities.fonts.body(
           fontSize: 16.0,
           fontWeight: FontWeight.w600,
         ),
@@ -438,7 +438,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
                   opacity: 0.6,
                   child: Text(
                     title,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w600,
                     ),
@@ -449,7 +449,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
                   opacity: 0.4,
                   child: Text(
                     description,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w600,
                     ),

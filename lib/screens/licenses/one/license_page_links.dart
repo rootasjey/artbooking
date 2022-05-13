@@ -29,7 +29,7 @@ class LicensePageLinks extends StatelessWidget {
             opacity: 0.6,
             child: Text(
               "Links".toUpperCase(),
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontSize: 20.0,
                 fontWeight: FontWeight.w700,
               ),
@@ -49,7 +49,7 @@ class LicensePageLinks extends StatelessWidget {
                 ),
                 text: Text(
                   "website",
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 14.0,
                     fontWeight: FontWeight.w600,
                   ),
@@ -64,7 +64,7 @@ class LicensePageLinks extends StatelessWidget {
                 ),
                 text: Text(
                   "wikipedia",
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 14.0,
                     fontWeight: FontWeight.w600,
                   ),

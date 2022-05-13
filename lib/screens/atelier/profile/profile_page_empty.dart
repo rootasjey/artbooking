@@ -42,7 +42,7 @@ class ProfilePageEmpty extends StatelessWidget {
                           child: Text.rich(
                             TextSpan(
                               text: "${username} ",
-                              style: Utilities.fonts.style(
+                              style: Utilities.fonts.body(
                                 color: Theme.of(context).primaryColor,
                                 fontSize: 34.0,
                                 fontWeight: FontWeight.w600,
@@ -50,7 +50,7 @@ class ProfilePageEmpty extends StatelessWidget {
                               children: [
                                 TextSpan(
                                     text: "has no profile page.",
-                                    style: Utilities.fonts.style(
+                                    style: Utilities.fonts.body(
                                       fontSize: 34.0,
                                       fontWeight: FontWeight.w600,
                                       color: Theme.of(context)

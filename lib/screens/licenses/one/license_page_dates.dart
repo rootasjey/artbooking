@@ -35,7 +35,7 @@ class LicensePageDates extends StatelessWidget {
                   ),
                   Text(
                     "date_created_ago".tr(args: [Jiffy(createdAt).fromNow()]),
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w400,
                     ),
@@ -51,7 +51,7 @@ class LicensePageDates extends StatelessWidget {
                 ),
                 Text(
                   "date_updated_ago".tr(args: [Jiffy(updatedAt).fromNow()]),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 18.0,
                     fontWeight: FontWeight.w400,
                   ),

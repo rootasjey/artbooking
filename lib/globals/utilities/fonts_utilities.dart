@@ -11,7 +11,7 @@ class FontsUtilities {
   static String? fontFamily = GoogleFonts.nunito().fontFamily;
 
   /// Return main text style.
-  TextStyle style({
+  TextStyle body({
     FontWeight fontWeight = FontWeight.w400,
     double fontSize = 16.0,
     double? height,
@@ -36,7 +36,7 @@ class FontsUtilities {
   }
 
   /// Second text style.
-  TextStyle style2({
+  TextStyle body2({
     FontWeight fontWeight = FontWeight.w400,
     double fontSize = 16.0,
     double? height,
@@ -79,7 +79,7 @@ class FontsUtilities {
   }
 
   /// Primary title's font style.
-  TextStyle titleStyle({
+  TextStyle title({
     FontWeight fontWeight = FontWeight.w400,
     double fontSize = 16.0,
     double? height,

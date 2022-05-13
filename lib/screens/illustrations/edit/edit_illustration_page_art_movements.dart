@@ -57,7 +57,7 @@ class EditIllustrationPageArtMovements extends StatelessWidget {
                         child: Text(artMovement),
                       ),
                       labelStyle:
-                          Utilities.fonts.style(fontWeight: FontWeight.w700),
+                          Utilities.fonts.body(fontWeight: FontWeight.w700),
                       elevation: 2.0,
                       deleteIconColor: Theme.of(context)
                           .secondaryHeaderColor

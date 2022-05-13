@@ -79,14 +79,14 @@ class UpdatePasswordPageBody extends StatelessWidget {
                     opacity: 0.6,
                     child: Text(
                       "password_choosing_good".tr(),
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
                   subtitle: Text(
                     "password_choosing_good_desc".tr(),
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w500,
                     ),
@@ -187,7 +187,7 @@ class UpdatePasswordPageBody extends StatelessWidget {
               ),
               child: Text(
                 "password_update".tr().toUpperCase(),
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontSize: 15.0,
                   fontWeight: FontWeight.bold,
                 ),

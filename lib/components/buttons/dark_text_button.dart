@@ -21,7 +21,7 @@ class DarkTextButton extends StatelessWidget {
       ),
       style: TextButton.styleFrom(
         primary: Theme.of(context).textTheme.bodyText1?.color,
-        textStyle: Utilities.fonts.style(
+        textStyle: Utilities.fonts.body(
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -36,7 +36,7 @@ class DarkTextButton extends StatelessWidget {
       style: TextButton.styleFrom(
         primary: Colors.black87,
         minimumSize: Size(200.0, 0.0),
-        textStyle: Utilities.fonts.style(
+        textStyle: Utilities.fonts.body(
           fontWeight: FontWeight.w500,
         ),
       ),

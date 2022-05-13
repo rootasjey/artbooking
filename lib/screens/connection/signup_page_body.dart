@@ -137,7 +137,7 @@ class _SignupPageBodyState extends State<SignupPageBody> {
                 if (widget.usernameHint.isNotEmpty)
                   Text(
                     widget.usernameHint,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       color: Theme.of(context).secondaryHeaderColor,
                     ),
                   ),
@@ -166,7 +166,7 @@ class _SignupPageBodyState extends State<SignupPageBody> {
                 if (widget.emailErrorMessage.isNotEmpty)
                   Text(
                     widget.emailErrorMessage,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       color: Theme.of(context).secondaryHeaderColor,
                     ),
                   ),
@@ -223,14 +223,14 @@ class _SignupPageBodyState extends State<SignupPageBody> {
               if (widget.passwordHint.isNotEmpty)
                 Text(
                   widget.passwordHint,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     color: Theme.of(context).secondaryHeaderColor,
                   ),
                 ),
               if (widget.confirmPasswordHint.isNotEmpty)
                 Text(
                   widget.confirmPasswordHint,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     color: Theme.of(context).secondaryHeaderColor,
                   ),
                 ),
@@ -249,7 +249,7 @@ class _SignupPageBodyState extends State<SignupPageBody> {
                 children: [
                   Text(
                     "account_create".tr().toUpperCase(),
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       color: Colors.white,
                       fontSize: 15.0,
                       fontWeight: FontWeight.w700,
@@ -328,7 +328,7 @@ class _SignupPageBodyState extends State<SignupPageBody> {
     return RotateAnimatedText(
       text,
       duration: Duration(seconds: 5),
-      textStyle: Utilities.fonts.style(
+      textStyle: Utilities.fonts.body(
         fontSize: 14.0,
         fontWeight: FontWeight.w700,
         height: 2,

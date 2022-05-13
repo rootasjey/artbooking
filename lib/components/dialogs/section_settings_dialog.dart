@@ -99,7 +99,7 @@ class _SectionSettingsDialogState extends State<SectionSettingsDialog> {
                 child: Text(
                   "section_data_mode_choose".tr(),
                   textAlign: TextAlign.center,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 16.0,
                     fontWeight: FontWeight.w700,
                   ),
@@ -189,7 +189,7 @@ class _SectionSettingsDialogState extends State<SectionSettingsDialog> {
                               child: Text(
                                 data.name,
                                 maxLines: 1,
-                                style: Utilities.fonts.style(
+                                style: Utilities.fonts.body(
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
@@ -199,7 +199,7 @@ class _SectionSettingsDialogState extends State<SectionSettingsDialog> {
                               child: Text(
                                 data.description,
                                 maxLines: 3,
-                                style: Utilities.fonts.style(
+                                style: Utilities.fonts.body(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -226,7 +226,7 @@ class _SectionSettingsDialogState extends State<SectionSettingsDialog> {
         children: [
           Text(
             "section_configure".tr().toUpperCase(),
-            style: Utilities.fonts.style(
+            style: Utilities.fonts.body(
               color: Colors.black,
               fontWeight: FontWeight.w700,
             ),

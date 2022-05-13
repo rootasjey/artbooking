@@ -40,7 +40,7 @@ class IllustrationsPageEmpty extends StatelessWidget {
                 ),
                 Text(
                   "illustrations_empty".tr(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 26.0,
                     fontWeight: FontWeight.w600,
                   ),
@@ -54,7 +54,7 @@ class IllustrationsPageEmpty extends StatelessWidget {
                 opacity: 0.4,
                 child: Text(
                   "empty_data_reload_suggestion".tr(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 16.0,
                   ),
                 ),

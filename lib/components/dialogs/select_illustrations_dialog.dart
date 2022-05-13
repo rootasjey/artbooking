@@ -87,7 +87,7 @@ class _SelectIllustrationsDialogState extends State<SelectIllustrationsDialog> {
             opacity: 0.8,
             child: Text(
               "illustrations".tr().toUpperCase(),
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 color: Colors.black,
                 fontWeight: FontWeight.w700,
               ),
@@ -103,7 +103,7 @@ class _SelectIllustrationsDialogState extends State<SelectIllustrationsDialog> {
                   args: ["${widget.maxPick}"],
                 ),
                 textAlign: TextAlign.center,
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   color: Colors.black,
                   fontWeight: FontWeight.w700,
                 ),
@@ -133,7 +133,7 @@ class _SelectIllustrationsDialogState extends State<SelectIllustrationsDialog> {
                 opacity: 0.8,
                 child: Text(
                   "loading".tr(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -160,7 +160,7 @@ class _SelectIllustrationsDialogState extends State<SelectIllustrationsDialog> {
                 opacity: 0.8,
                 child: Text(
                   "illustrations_my_empty".tr(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -169,7 +169,7 @@ class _SelectIllustrationsDialogState extends State<SelectIllustrationsDialog> {
                 opacity: 0.4,
                 child: Text(
                   "illustrations_my_empty_subtitle".tr(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontWeight: FontWeight.w500,
                   ),
                 ),

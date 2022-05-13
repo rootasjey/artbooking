@@ -61,7 +61,7 @@ class DeleteAccountPageState extends ConsumerState<SettingsPageDeleteAccount> {
             opacity: 0.6,
             child: Text(
               "account_deletion_after".tr().toUpperCase(),
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -75,7 +75,7 @@ class DeleteAccountPageState extends ConsumerState<SettingsPageDeleteAccount> {
                 children: <Widget>[
                   Text(
                     "• " + "account_deletion_point_1".tr(),
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 16.0,
                       fontWeight: FontWeight.w600,
                     ),
@@ -83,7 +83,7 @@ class DeleteAccountPageState extends ConsumerState<SettingsPageDeleteAccount> {
                   Padding(padding: const EdgeInsets.only(top: 15.0)),
                   Text(
                     "• " + "account_deletion_point_2".tr(),
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 16.0,
                       fontWeight: FontWeight.w600,
                     ),

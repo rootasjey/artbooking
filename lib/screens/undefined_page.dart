@@ -46,7 +46,7 @@ class _UndefinedPageState extends State<UndefinedPage> {
                     child: RichText(
                       text: TextSpan(
                         text: "undefined_page_route_prefix".tr(),
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           fontSize: 18.0,
                           fontWeight: FontWeight.w700,
                           color: Theme.of(context).textTheme.bodyText1?.color,
@@ -54,7 +54,7 @@ class _UndefinedPageState extends State<UndefinedPage> {
                         children: [
                           TextSpan(
                             text: location,
-                            style: Utilities.fonts.style(
+                            style: Utilities.fonts.body(
                               fontWeight: FontWeight.w700,
                               color: Theme.of(context).secondaryHeaderColor,
                             ),
@@ -102,7 +102,7 @@ class _UndefinedPageState extends State<UndefinedPage> {
                                 opacity: 0.8,
                                 child: Text(
                                   "undefined_page_quote".tr(),
-                                  style: Utilities.fonts.style(
+                                  style: Utilities.fonts.body(
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.w600,
                                   ),

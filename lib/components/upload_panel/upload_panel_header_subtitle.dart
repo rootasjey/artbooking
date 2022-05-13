@@ -36,7 +36,7 @@ class UploadPanelHeaderSubtitle extends ConsumerWidget {
       opacity: 0.6,
       child: Text(
         getWindowSubtitle(),
-        style: Utilities.fonts.style(
+        style: Utilities.fonts.body(
           fontWeight: FontWeight.w600,
         ),
       ),

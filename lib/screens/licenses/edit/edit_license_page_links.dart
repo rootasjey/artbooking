@@ -33,7 +33,7 @@ class EditLicensePageLinks extends StatelessWidget {
               opacity: 0.6,
               child: Text(
                 "links".tr().toUpperCase(),
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontSize: 20.0,
                   fontWeight: FontWeight.w700,
                 ),
@@ -67,7 +67,7 @@ class EditLicensePageLinks extends StatelessWidget {
                 ),
                 text: Text(
                   "website",
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 14.0,
                     fontWeight: FontWeight.w600,
                   ),
@@ -96,7 +96,7 @@ class EditLicensePageLinks extends StatelessWidget {
                 ),
                 text: Text(
                   "wikipedia",
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 14.0,
                     fontWeight: FontWeight.w600,
                   ),
@@ -132,7 +132,7 @@ class EditLicensePageLinks extends StatelessWidget {
               child: Text.rich(
                 TextSpan(
                   text: "${'url_edit'.tr().toUpperCase()} ",
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     color: Theme.of(context)
                         .textTheme
                         .bodyText2
@@ -142,7 +142,7 @@ class EditLicensePageLinks extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: dialogTitle.toUpperCase(),
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         color: Theme.of(context).textTheme.bodyText2?.color,
                         fontWeight: FontWeight.w700,
                       ),
@@ -163,7 +163,7 @@ class EditLicensePageLinks extends StatelessWidget {
                   controller: _nameTextController,
                   keyboardType: TextInputType.url,
                   textCapitalization: TextCapitalization.none,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 16.0,
                     fontWeight: FontWeight.w600,
                   ),

@@ -36,7 +36,7 @@ class ColorsSelector extends StatelessWidget {
                 child: Text(
                   subtitle,
                   textAlign: TextAlign.center,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 16.0,
                     fontWeight: FontWeight.w700,
                   ),

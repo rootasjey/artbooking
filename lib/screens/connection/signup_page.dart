@@ -52,7 +52,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
         onPressed: showArgumentsDialog,
         label: Text(
           "why".tr().toLowerCase(),
-          style: Utilities.fonts.style(
+          style: Utilities.fonts.body(
             fontSize: 14.0,
             fontWeight: FontWeight.w700,
           ),
@@ -303,7 +303,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     opacity: 0.6,
                     child: Text(
                       "account_create_arguments.preview".tr(),
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontSize: 18.0,
                         fontWeight: FontWeight.w500,
                       ),
@@ -338,7 +338,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
         ),
         Text(
           text,
-          style: Utilities.fonts.style(fontWeight: FontWeight.w600),
+          style: Utilities.fonts.body(fontWeight: FontWeight.w600),
         ),
       ],
     );

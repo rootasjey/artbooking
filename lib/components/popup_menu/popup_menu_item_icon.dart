@@ -35,7 +35,7 @@ class PopupMenuItemIcon<T> extends PopupMenuItem<T> {
                   Expanded(
                     child: Text(
                       textLabel,
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontWeight: FontWeight.w600,
                       ),
                     ),

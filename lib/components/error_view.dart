@@ -27,7 +27,7 @@ class ErrorView extends StatelessWidget {
           ),
           Text(
             title,
-            style: Utilities.fonts.style(
+            style: Utilities.fonts.body(
               fontSize: 24.0,
               fontWeight: FontWeight.w400,
               color: Theme.of(context).primaryColor.withOpacity(0.9),
@@ -40,7 +40,7 @@ class ErrorView extends StatelessWidget {
                 opacity: 0.6,
                 child: Text(
                   subtitle,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontWeight: FontWeight.w700,
                     backgroundColor: Constants.colors.tertiary,
                   ),

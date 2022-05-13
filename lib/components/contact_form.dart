@@ -286,7 +286,7 @@ class _ContactFormState extends State<ContactForm> {
                 children: [
                   TextSpan(
                     text: email,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       color: Theme.of(context).primaryColor,
                       fontWeight: FontWeight.w600,
                     ),
@@ -311,7 +311,7 @@ class _ContactFormState extends State<ContactForm> {
           children: [
             Text(
               "YVELINES, FRANCE",
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontSize: 16.0,
                 fontWeight: FontWeight.w600,
               ),
@@ -412,7 +412,7 @@ class _ContactFormState extends State<ContactForm> {
         child: Text(
           "send".tr(),
           textAlign: TextAlign.center,
-          style: Utilities.fonts.style(
+          style: Utilities.fonts.body(
             fontSize: 18.0,
             fontWeight: FontWeight.w600,
           ),

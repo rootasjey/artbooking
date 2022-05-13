@@ -88,7 +88,7 @@ class _SectionCardItemState extends State<SectionCardItem> {
                     child: Text(
                       "section_name.${section.id}".tr(),
                       maxLines: 2,
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w800,
                         backgroundColor: _textBgColor,
@@ -102,7 +102,7 @@ class _SectionCardItemState extends State<SectionCardItem> {
                     "section_description.${section.id}".tr(),
                     maxLines: 5,
                     textAlign: TextAlign.center,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 15.0,
                       fontWeight: FontWeight.w600,
                     ),

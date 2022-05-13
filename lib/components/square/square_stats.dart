@@ -124,7 +124,7 @@ class _SquareStatsState extends State<SquareStats> {
           ),
           child: Text(
             "Available soon",
-            style: Utilities.fonts.style(
+            style: Utilities.fonts.body(
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -139,7 +139,7 @@ class _SquareStatsState extends State<SquareStats> {
       opacity: 0.9,
       child: Text(
         widget.count.toString(),
-        style: Utilities.fonts.style(
+        style: Utilities.fonts.body(
           color: _textColor,
           fontSize: 40.0,
           fontWeight: FontWeight.w600,
@@ -169,7 +169,7 @@ class _SquareStatsState extends State<SquareStats> {
       opacity: 0.7,
       child: Text(
         widget.textTitle,
-        style: Utilities.fonts.style(
+        style: Utilities.fonts.body(
           color: _textColor,
           fontSize: 20.0,
           fontWeight: FontWeight.w700,

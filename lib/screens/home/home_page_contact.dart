@@ -49,7 +49,7 @@ class _HomePageContactState extends State<HomePageContact> {
   Widget title() {
     return Text(
       "contact_keep_touch".tr(),
-      style: Utilities.fonts.style(
+      style: Utilities.fonts.body(
         fontSize: 80.0,
         height: 0.9,
         fontWeight: FontWeight.w800,

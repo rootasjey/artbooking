@@ -304,7 +304,7 @@ class _NewsSectionState extends State<NewsSection> {
                   opacity: 0.9,
                   child: Text(
                     title,
-                    style: Utilities.fonts.style2(
+                    style: Utilities.fonts.body2(
                       fontSize: 78.0,
                       fontWeight: FontWeight.w800,
                     ),
@@ -315,7 +315,7 @@ class _NewsSectionState extends State<NewsSection> {
                   opacity: 0.4,
                   child: Text(
                     description,
-                    style: Utilities.fonts.style2(
+                    style: Utilities.fonts.body2(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w600,
                     ),

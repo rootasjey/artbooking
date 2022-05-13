@@ -45,7 +45,7 @@ class SelectLicensePanelMoreInfo extends StatelessWidget {
                       opacity: 0.8,
                       child: Text(
                         license.name.toUpperCase(),
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -60,7 +60,7 @@ class SelectLicensePanelMoreInfo extends StatelessWidget {
                 opacity: 0.6,
                 child: Text(
                   license.description,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontWeight: FontWeight.w500,
                   ),
                 ),

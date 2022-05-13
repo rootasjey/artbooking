@@ -40,7 +40,7 @@ class VisibilityButton extends StatelessWidget {
             child: Center(
               child: Text(
                 "visibility_${visibility.name}".tr().toUpperCase(),
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
                 ),
@@ -82,13 +82,13 @@ class VisibilityButton extends StatelessWidget {
       child: ListTile(
         title: Text(
           titleValue,
-          style: Utilities.fonts.style(
+          style: Utilities.fonts.body(
             fontWeight: FontWeight.w600,
           ),
         ),
         subtitle: Text(
           subtitleValue,
-          style: Utilities.fonts.style(
+          style: Utilities.fonts.body(
             fontSize: 14.0,
             fontWeight: FontWeight.w500,
           ),

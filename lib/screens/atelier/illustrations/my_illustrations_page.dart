@@ -195,7 +195,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                         _multiSelectedItems.length,
                       )
                       .toUpperCase(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     color: Colors.black,
                     fontWeight: FontWeight.w700,
                   ),
@@ -211,7 +211,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                       _multiSelectedItems.length,
                     ),
                     textAlign: TextAlign.center,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
                     ),
@@ -234,7 +234,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                         "multi_items_selected".plural(
                           _multiSelectedItems.length,
                         ),
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           fontSize: 14.0,
                           fontWeight: FontWeight.w700,
                         ),
@@ -879,7 +879,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                         "multi_items_selected".plural(
                           _multiSelectedItems.length,
                         ),
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           fontSize: 14.0,
                           fontWeight: FontWeight.w700,
                         ),
@@ -895,7 +895,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                       "illustration_visibility_choose".plural(
                         _multiSelectedItems.length,
                       ),
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontSize: 16.0,
                       ),
                     ),

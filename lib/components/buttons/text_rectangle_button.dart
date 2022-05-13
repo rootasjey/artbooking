@@ -24,7 +24,7 @@ class TextRectangleButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         primary: primary,
         shape: RoundedRectangleBorder(),
-        textStyle: Utilities.fonts.style(
+        textStyle: Utilities.fonts.body(
           fontWeight: FontWeight.w600,
         ),
         side: BorderSide(

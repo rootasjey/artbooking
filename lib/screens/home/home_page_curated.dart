@@ -25,7 +25,7 @@ class _HomePageCuratedState extends State<HomePageCurated> {
       children: [
         Text(
           "Curated",
-          style: Utilities.fonts.titleStyle(
+          style: Utilities.fonts.title(
             fontSize: 80.0,
             height: 1.0,
           ),
@@ -34,7 +34,7 @@ class _HomePageCuratedState extends State<HomePageCurated> {
           opacity: 0.6,
           child: Text(
             "Lastest handpicked illustrations.",
-            style: Utilities.fonts.style(
+            style: Utilities.fonts.body(
               fontSize: 18.0,
               fontWeight: FontWeight.w600,
             ),

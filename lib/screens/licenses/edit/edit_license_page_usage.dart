@@ -32,7 +32,7 @@ class EditLicensePageUsage extends StatelessWidget {
               opacity: 0.6,
               child: Text(
                 "Usage".toUpperCase(),
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontSize: 20.0,
                   fontWeight: FontWeight.w700,
                 ),
@@ -340,14 +340,14 @@ class EditLicensePageUsage extends StatelessWidget {
             child: Text.rich(
               TextSpan(
                 text: usageString.toUpperCase() + " : ",
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   color: Theme.of(context).textTheme.bodyText2?.color,
                   fontWeight: FontWeight.w700,
                 ),
                 children: [
                   TextSpan(
                     text: usageInfoStr,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       color: Theme.of(context)
                           .textTheme
                           .bodyText2
@@ -371,7 +371,7 @@ class EditLicensePageUsage extends StatelessWidget {
                     opacity: 0.4,
                     child: Text(
                       "license_usages.$usageString".tr(),
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         color: Colors.black,
                         fontWeight: FontWeight.w700,
                       ),
@@ -411,7 +411,7 @@ class EditLicensePageUsage extends StatelessWidget {
   }
 
   TextStyle getTextStyle() {
-    return Utilities.fonts.style(
+    return Utilities.fonts.body(
       fontSize: 14.0,
       fontWeight: FontWeight.w600,
     );

@@ -94,7 +94,7 @@ class DeleteAccountPageBody extends StatelessWidget {
                             children: <Widget>[
                               Text(
                                 "are_you_sure".tr(),
-                                style: Utilities.fonts.style(
+                                style: Utilities.fonts.body(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 16.0,
                                 ),
@@ -105,7 +105,7 @@ class DeleteAccountPageBody extends StatelessWidget {
                                   padding: const EdgeInsets.only(top: 0.0),
                                   child: Text(
                                     "action_irreversible".tr(),
-                                    style: Utilities.fonts.style(
+                                    style: Utilities.fonts.body(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 14.0,
                                     ),
@@ -167,7 +167,7 @@ class DeleteAccountPageBody extends StatelessWidget {
                   ),
                   child: Text(
                     "account_delete".tr().toUpperCase(),
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 15.0,
                       fontWeight: FontWeight.bold,
                     ),

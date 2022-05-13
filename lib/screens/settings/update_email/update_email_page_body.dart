@@ -114,7 +114,7 @@ class UpdateEmailPageBody extends StatelessWidget {
                                   ),
                                   Text(
                                     currentEmail,
-                                    style: Utilities.fonts.style(
+                                    style: Utilities.fonts.body(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -173,7 +173,7 @@ class UpdateEmailPageBody extends StatelessWidget {
                       opacity: errorMessage.isEmpty ? 0.0 : 1.0,
                       child: Text(
                         errorMessage,
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           color: Theme.of(context).secondaryHeaderColor,
                           fontSize: 14.0,
                           fontWeight: FontWeight.w600,
@@ -234,7 +234,7 @@ class UpdateEmailPageBody extends StatelessWidget {
                 },
                 child: Text(
                   "email_update".tr().toUpperCase(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 15.0,
                     fontWeight: FontWeight.w600,
                   ),

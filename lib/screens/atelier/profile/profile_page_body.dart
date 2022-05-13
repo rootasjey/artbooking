@@ -514,7 +514,7 @@ class ProfilePageBody extends StatelessWidget {
                       ),
                       Text(
                         getDraggableName(section),
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           fontWeight: FontWeight.w600,
                         ),
                       ),

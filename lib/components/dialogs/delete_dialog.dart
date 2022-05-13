@@ -34,7 +34,7 @@ class DeleteDialog extends StatelessWidget {
             opacity: 0.8,
             child: Text(
               titleValue,
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 color: Colors.black,
                 fontWeight: FontWeight.w700,
               ),
@@ -48,7 +48,7 @@ class DeleteDialog extends StatelessWidget {
               child: Text(
                 descriptionValue,
                 textAlign: TextAlign.center,
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   color: Colors.black,
                   fontWeight: FontWeight.w700,
                 ),
@@ -71,7 +71,7 @@ class DeleteDialog extends StatelessWidget {
                       "multi_items_selected".plural(
                         count,
                       ),
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontSize: 14.0,
                         fontWeight: FontWeight.w700,
                       ),

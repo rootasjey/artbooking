@@ -19,7 +19,7 @@ class SectionPageTitle extends StatelessWidget {
           tag: sectionId,
           child: Text(
             "section_name.${sectionId}".tr(),
-            style: Utilities.fonts.style(
+            style: Utilities.fonts.body(
               fontSize: 32.0,
               fontWeight: FontWeight.w700,
             ),
@@ -32,7 +32,7 @@ class SectionPageTitle extends StatelessWidget {
             opacity: 0.6,
             child: Text(
               "section_description.${sectionId}".tr(),
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontSize: 18.0,
                 fontWeight: FontWeight.w400,
               ),

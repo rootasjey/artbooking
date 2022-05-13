@@ -44,7 +44,7 @@ class PageTitle extends StatelessWidget {
         opacity: 0.8,
         child: Text(
           titleValue ?? '',
-          style: Utilities.fonts.style(
+          style: Utilities.fonts.body(
             fontSize: 30.0,
             fontWeight: FontWeight.w800,
           ),
@@ -82,7 +82,7 @@ class PageTitle extends StatelessWidget {
                       opacity: 0.4,
                       child: Text(
                         subtitleValue,
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           fontSize: 16.0,
                           fontWeight: FontWeight.w600,
                         ),

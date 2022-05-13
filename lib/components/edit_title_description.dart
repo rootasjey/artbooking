@@ -63,7 +63,7 @@ class _EditTitleDescriptionState extends State<EditTitleDescription> {
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: Text(
                     "title".tr(),
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -77,7 +77,7 @@ class _EditTitleDescriptionState extends State<EditTitleDescription> {
                   keyboardType: TextInputType.multiline,
                   textInputAction: TextInputAction.next,
                   textCapitalization: TextCapitalization.sentences,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 24.0,
                     fontWeight: FontWeight.w700,
                   ),
@@ -114,7 +114,7 @@ class _EditTitleDescriptionState extends State<EditTitleDescription> {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Text(
                       "description".tr(),
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontWeight: FontWeight.w600,
                       ),
                     ),

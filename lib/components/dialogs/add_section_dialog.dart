@@ -56,7 +56,7 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
           children: [
             Text(
               "section_add_new".tr().toUpperCase(),
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 color: Colors.black,
                 fontWeight: FontWeight.w700,
               ),
@@ -68,7 +68,7 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
                 child: Text(
                   "section_add_new_description".tr(),
                   textAlign: TextAlign.center,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     color: Colors.black,
                     fontWeight: FontWeight.w700,
                   ),
@@ -96,7 +96,7 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
                 opacity: 0.8,
                 child: Text(
                   "loading".tr(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -183,7 +183,7 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
                               child: Text(
                                 "section_name.${section.id}".tr(),
                                 maxLines: 1,
-                                style: Utilities.fonts.style(
+                                style: Utilities.fonts.body(
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
@@ -193,7 +193,7 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
                               child: Text(
                                 "section_description.${section.id}".tr(),
                                 maxLines: 3,
-                                style: Utilities.fonts.style(
+                                style: Utilities.fonts.body(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.w600,
                                 ),

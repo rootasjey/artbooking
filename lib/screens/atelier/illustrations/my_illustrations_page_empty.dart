@@ -65,7 +65,7 @@ class MyIllustrationsPageEmpty extends ConsumerWidget {
                   selectedTab == EnumVisibilityTab.active
                       ? "illustrations_my_empty".tr()
                       : "illustrations_my_empty_archived".tr(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 26.0,
                     fontWeight: FontWeight.w600,
                   ),
@@ -81,7 +81,7 @@ class MyIllustrationsPageEmpty extends ConsumerWidget {
                   selectedTab == EnumVisibilityTab.active
                       ? "illustrations_my_empty_subtitle".tr()
                       : "illustrations_my_empty_archived_subtitle".tr(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 16.0,
                   ),
                 ),

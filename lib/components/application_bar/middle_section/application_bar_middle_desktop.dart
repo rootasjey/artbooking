@@ -28,7 +28,7 @@ class ApplicationBarMiddleDesktop extends ConsumerWidget {
               opacity: 0.8,
               child: Text(
                 buttonData.textValue,
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   color: bodyTextColor,
                   fontWeight: FontWeight.w600,
                 ),

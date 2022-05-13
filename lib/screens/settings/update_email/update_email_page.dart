@@ -144,7 +144,7 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
             opacity: 0.6,
             child: Text(
               "email_current".tr(),
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -154,7 +154,7 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
               opacity: 0.6,
               child: Text(
                 email,
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontWeight: FontWeight.bold,
                 ),
               ),

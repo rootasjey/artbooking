@@ -89,7 +89,7 @@ class _AtelierPageCardState extends State<AtelierPageCard> {
             opacity: 0.6,
             child: Text(
               widget.textTitle,
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontSize: 18.0,
                 fontWeight: FontWeight.w600,
               ),
@@ -101,7 +101,7 @@ class _AtelierPageCardState extends State<AtelierPageCard> {
               widget.textSubtitle,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontSize: 14.0,
                 fontWeight: FontWeight.w600,
               ),

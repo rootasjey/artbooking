@@ -101,7 +101,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         children: [
           TextSpan(
             text: " $name",
-            style: Utilities.fonts.style(
+            style: Utilities.fonts.body(
               color: color,
               fontSize: 18.0,
               fontWeight: FontWeight.w600,
@@ -109,7 +109,7 @@ class AtelierPageWelcome extends ConsumerWidget {
           ),
         ],
       ),
-      style: Utilities.fonts.style(
+      style: Utilities.fonts.body(
         fontSize: 18.0,
         fontWeight: FontWeight.w600,
       ),
@@ -121,7 +121,7 @@ class AtelierPageWelcome extends ConsumerWidget {
       opacity: 0.4,
       child: Text(
         "dashboard_sections_navigation".tr(),
-        style: Utilities.fonts.style(
+        style: Utilities.fonts.body(
           fontSize: 16.0,
           fontWeight: FontWeight.w600,
         ),

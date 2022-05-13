@@ -46,7 +46,7 @@ class _HomePageHeroState extends State<HomePageHero> {
   Widget title() {
     return Text(
       "ArtBooking",
-      style: Utilities.fonts.titleStyle(
+      style: Utilities.fonts.title(
         fontSize: 90.0,
         fontWeight: FontWeight.w600,
       ),
@@ -58,7 +58,7 @@ class _HomePageHeroState extends State<HomePageHero> {
       opacity: 0.6,
       child: Text(
         "Take a deep breath of inspiration",
-        style: Utilities.fonts.style(
+        style: Utilities.fonts.body(
           fontSize: 18.0,
           fontWeight: FontWeight.w600,
         ),
@@ -89,7 +89,7 @@ class _HomePageHeroState extends State<HomePageHero> {
             opacity: 0.6,
             child: Text(
               "We're still in beta",
-              style: Utilities.fonts.style(),
+              style: Utilities.fonts.body(),
             ),
           ),
         ),

@@ -30,7 +30,7 @@ class ActivityPageUsedStorage extends StatelessWidget {
             TextSpan(text: "space_total_used".tr()),
             TextSpan(
               text: " $usedSpace",
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 color: Theme.of(context).primaryColor,
                 fontWeight: FontWeight.w600,
               ),

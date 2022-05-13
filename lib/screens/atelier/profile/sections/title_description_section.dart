@@ -96,7 +96,7 @@ class TitleDescriptionSection extends StatelessWidget {
                 ),
                 child: Text(
                   "text_enter".tr(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 18.0,
                     fontWeight: FontWeight.w600,
                   ),
@@ -122,7 +122,7 @@ class TitleDescriptionSection extends StatelessWidget {
             opacity: 0.6,
             child: Text(
               section.name,
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontSize: 18.0,
                 fontWeight: FontWeight.w700,
                 color: Color(section.textColor),
@@ -136,7 +136,7 @@ class TitleDescriptionSection extends StatelessWidget {
           child: Text(
             section.description,
             overflow: TextOverflow.clip,
-            style: Utilities.fonts.style(
+            style: Utilities.fonts.body(
               fontSize: 64.0,
               fontWeight: FontWeight.w200,
               color: Color(section.textColor),

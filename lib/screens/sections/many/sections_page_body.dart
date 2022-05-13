@@ -32,7 +32,7 @@ class SectionsPageBody extends StatelessWidget {
         sliver: true,
         title: Text(
           "sections_loading".tr() + "...",
-          style: Utilities.fonts.style(
+          style: Utilities.fonts.body(
             fontSize: 32.0,
             fontWeight: FontWeight.w600,
           ),

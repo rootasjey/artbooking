@@ -295,7 +295,7 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
       padding: const EdgeInsets.all(24.0),
       child: Text(
         "artists_pick_description".tr(),
-        style: Utilities.fonts.style(
+        style: Utilities.fonts.body(
           fontSize: 16.0,
           fontWeight: FontWeight.w600,
         ),
@@ -353,7 +353,7 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
                   opacity: 0.6,
                   child: Text(
                     title,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w600,
                     ),
@@ -364,7 +364,7 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
                   opacity: 0.4,
                   child: Text(
                     description,
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w600,
                     ),

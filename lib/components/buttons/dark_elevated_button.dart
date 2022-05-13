@@ -26,7 +26,7 @@ class DarkElevatedButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         primary: Colors.black,
         shape: RoundedRectangleBorder(),
-        textStyle: Utilities.fonts.style(
+        textStyle: Utilities.fonts.body(
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -44,7 +44,7 @@ class DarkElevatedButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           primary: Colors.black87,
           minimumSize: Size(320.0, 0.0),
-          textStyle: Utilities.fonts.style(
+          textStyle: Utilities.fonts.body(
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -80,7 +80,7 @@ class DarkElevatedButton extends StatelessWidget {
         padding: const EdgeInsets.only(right: 8.0),
         child: Text(
           labelValue,
-          style: Utilities.fonts.style(
+          style: Utilities.fonts.body(
             color: foreground,
             fontWeight: FontWeight.w700,
           ),
@@ -112,7 +112,7 @@ class DarkElevatedButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4.0),
         ),
-        textStyle: Utilities.fonts.style(
+        textStyle: Utilities.fonts.body(
           fontWeight: FontWeight.w600,
         ),
       ),

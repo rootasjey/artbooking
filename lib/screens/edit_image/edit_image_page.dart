@@ -97,7 +97,7 @@ class _EditImagePageState extends ConsumerState<EditImagePage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isProcessing ? null : validateEdit,
         label: Text("save".tr()),
-        extendedTextStyle: Utilities.fonts.style(
+        extendedTextStyle: Utilities.fonts.body(
           fontWeight: FontWeight.w700,
         ),
         icon: Icon(UniconsLine.save),
@@ -158,7 +158,7 @@ class _EditImagePageState extends ConsumerState<EditImagePage> {
                               opacity: 0.6,
                               child: Text(
                                 "panel_edit".tr().toUpperCase(),
-                                style: Utilities.fonts.style(
+                                style: Utilities.fonts.body(
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.w700,
                                 ),

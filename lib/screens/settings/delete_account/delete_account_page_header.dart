@@ -18,7 +18,7 @@ class DeleteAccountPageHeader extends StatelessWidget {
               opacity: 0.8,
               child: Text(
                 "settings".tr() + ": ",
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontSize: 24.0,
                   fontWeight: FontWeight.w700,
                 ),
@@ -28,7 +28,7 @@ class DeleteAccountPageHeader extends StatelessWidget {
               opacity: 0.8,
               child: Text(
                 "account_delete".tr(),
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   color: Theme.of(context).primaryColor,
                   fontSize: 24.0,
                   fontWeight: FontWeight.w700,

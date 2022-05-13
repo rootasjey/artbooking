@@ -62,7 +62,7 @@ class DataFetchModeCard extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Text(
                       data.name,
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -71,7 +71,7 @@ class DataFetchModeCard extends StatelessWidget {
                     opacity: 0.4,
                     child: Text(
                       data.description,
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontSize: 14.0,
                       ),
                     ),

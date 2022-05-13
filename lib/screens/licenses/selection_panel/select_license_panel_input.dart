@@ -88,7 +88,7 @@ class SelectLicensePanelInput extends StatelessWidget {
                   label: Text("clear".tr()),
                   style: TextButton.styleFrom(
                     primary: Colors.black54,
-                    textStyle: Utilities.fonts.style(
+                    textStyle: Utilities.fonts.body(
                       fontWeight: FontWeight.w600,
                     ),
                   ),

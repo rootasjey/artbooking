@@ -98,7 +98,7 @@ class H4Section extends StatelessWidget {
                 ),
                 child: Text(
                   "text_enter".tr(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 18.0,
                     fontWeight: FontWeight.w600,
                   ),
@@ -113,7 +113,7 @@ class H4Section extends StatelessWidget {
     return Text(
       section.name,
       textAlign: TextAlign.center,
-      style: Utilities.fonts.style(
+      style: Utilities.fonts.body(
         fontSize: 32.0,
         fontWeight: FontWeight.w500,
         color: Color(section.textColor),

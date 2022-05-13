@@ -40,7 +40,7 @@ class _HomePageQuoteState extends State<HomePageQuote> {
               Text(
                 "Your imagination"
                 " is the only limit.",
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontSize: fontSize,
                   fontWeight: FontWeight.w700,
                 ),
@@ -97,7 +97,7 @@ class _HomePageQuoteState extends State<HomePageQuote> {
               children: [
                 Text(
                   "More quotes".toUpperCase(),
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontSize: 14.0,
                     fontWeight: FontWeight.w600,
                   ),

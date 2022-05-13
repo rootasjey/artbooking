@@ -25,7 +25,7 @@ class FooterCompanyWatermark extends StatelessWidget {
               children: [
                 TextSpan(
                   text: "artbooking 2021 - ${DateTime.now().year}",
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context)
                         .textTheme
@@ -48,7 +48,7 @@ class FooterCompanyWatermark extends StatelessWidget {
                 ),
                 TextSpan(
                   text: "\n" + "company_by".tr(),
-                  style: Utilities.fonts.style2(
+                  style: Utilities.fonts.body2(
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context)
                         .textTheme
@@ -76,7 +76,7 @@ class FooterCompanyWatermark extends StatelessWidget {
               children: [
                 TextSpan(
                   text: "company_made_in".tr(),
-                  style: Utilities.fonts.style2(
+                  style: Utilities.fonts.body2(
                     fontWeight: FontWeight.w500,
                   ),
                 ),

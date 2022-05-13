@@ -42,7 +42,7 @@ class TitleDialog extends StatelessWidget {
                       opacity: 0.8,
                       child: Text(
                         titleValue,
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           color: Colors.black,
                           fontWeight: FontWeight.w700,
                         ),
@@ -54,7 +54,7 @@ class TitleDialog extends StatelessWidget {
                       child: Text(
                         subtitleValue,
                         textAlign: TextAlign.center,
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           color: Colors.black,
                           fontWeight: FontWeight.w700,
                         ),

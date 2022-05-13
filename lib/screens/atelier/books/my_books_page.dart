@@ -833,7 +833,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                         "multi_items_selected".plural(
                           _multiSelectedItems.length,
                         ),
-                        style: Utilities.fonts.style(
+                        style: Utilities.fonts.body(
                           fontSize: 14.0,
                           fontWeight: FontWeight.w700,
                         ),
@@ -849,7 +849,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                       "book_visibility_choose".plural(
                         _multiSelectedItems.length,
                       ),
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontSize: 16.0,
                       ),
                     ),

@@ -158,7 +158,7 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
                         children: [
                           Text(
                             " ${_illustration.name} ",
-                            style: Utilities.fonts.style(
+                            style: Utilities.fonts.body(
                               color: Colors.white,
                               fontWeight: FontWeight.w500,
                               backgroundColor: Colors.black26,
@@ -168,7 +168,7 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
                             onTap: () => onTapUser(_user),
                             child: Text(
                               " ${'made_by'.tr().toLowerCase()} ${_user.name} ",
-                              style: Utilities.fonts.style(
+                              style: Utilities.fonts.body(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500,
                                 backgroundColor: Colors.black26,

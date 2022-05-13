@@ -194,7 +194,7 @@ class _PostPageState extends ConsumerState<PostPage> {
             _post.visibility == EnumContentVisibility.public
                 ? "published".tr()
                 : "visibility_private".tr(),
-            style: Utilities.fonts.style(
+            style: Utilities.fonts.body(
               color: baseColor,
               fontWeight: FontWeight.w700,
             ),

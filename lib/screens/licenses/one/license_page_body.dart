@@ -50,7 +50,7 @@ class LicensePageBody extends StatelessWidget {
             opacity: 0.4,
             child: Text(
               "version_number".tr(args: [license.version]),
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontSize: 14.0,
                 fontWeight: FontWeight.w700,
               ),
@@ -60,7 +60,7 @@ class LicensePageBody extends StatelessWidget {
             tag: license.name,
             child: Text(
               license.name,
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontSize: 32.0,
                 fontWeight: FontWeight.w700,
               ),
@@ -70,7 +70,7 @@ class LicensePageBody extends StatelessWidget {
             opacity: 0.6,
             child: Text(
               license.description,
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 fontSize: 18.0,
                 fontWeight: FontWeight.w400,
               ),

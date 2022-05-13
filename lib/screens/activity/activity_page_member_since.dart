@@ -35,7 +35,7 @@ class ActivityPageMemberSince extends StatelessWidget {
             TextSpan(text: "member_since".tr()),
             TextSpan(
               text: " ${Jiffy(createdAt).format('MMMM yyyy')}",
-              style: Utilities.fonts.style(
+              style: Utilities.fonts.body(
                 color: Theme.of(context).primaryColor,
                 fontWeight: FontWeight.w600,
               ),

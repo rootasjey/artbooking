@@ -40,7 +40,7 @@ class ConnectionPageHeader extends StatelessWidget {
               child: Text(
                 title,
                 textAlign: TextAlign.center,
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontSize: 25.0,
                   fontWeight: FontWeight.w700,
                 ),
@@ -54,7 +54,7 @@ class ConnectionPageHeader extends StatelessWidget {
                 child: Text(
                   subtitle,
                   overflow: TextOverflow.ellipsis,
-                  style: Utilities.fonts.style(
+                  style: Utilities.fonts.body(
                     fontWeight: FontWeight.w400,
                   ),
                 ),

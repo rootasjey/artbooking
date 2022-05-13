@@ -20,7 +20,7 @@ class ExpansionTileCardDescription extends StatelessWidget {
         opacity: 0.6,
         child: Text(
           textValue,
-          style: Utilities.fonts.style(),
+          style: Utilities.fonts.body(),
         ),
       ),
     );

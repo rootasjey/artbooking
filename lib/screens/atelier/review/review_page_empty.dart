@@ -40,7 +40,7 @@ class ReviewPageEmpty extends StatelessWidget {
                 selectedTab == EnumTabDataType.books
                     ? "review_book_empty".tr()
                     : "review_illustration_empty".tr(),
-                style: Utilities.fonts.style(
+                style: Utilities.fonts.body(
                   fontSize: 26.0,
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).primaryColor,
@@ -56,7 +56,7 @@ class ReviewPageEmpty extends StatelessWidget {
                     selectedTab == EnumTabDataType.books
                         ? "review_book_empty_subtitle".tr()
                         : "review_illustration_empty_subtitle".tr(),
-                    style: Utilities.fonts.style(
+                    style: Utilities.fonts.body(
                       fontSize: 16.0,
                     ),
                   ),

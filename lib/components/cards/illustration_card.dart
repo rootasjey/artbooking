@@ -269,7 +269,7 @@ class _IllustrationCardState extends State<IllustrationCard>
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
                       "image_load_failed".tr(),
-                      style: Utilities.fonts.style(
+                      style: Utilities.fonts.body(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -365,7 +365,7 @@ class _IllustrationCardState extends State<IllustrationCard>
           ? textValue
           : "illustration_permutation_description".tr(),
       textAlign: TextAlign.center,
-      style: Utilities.fonts.style(
+      style: Utilities.fonts.body(
         fontSize: 18.0,
         fontWeight: FontWeight.w600,
       ),
