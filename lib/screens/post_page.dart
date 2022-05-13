@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:artbooking/components/application_bar/application_bar.dart';
+import 'package:artbooking/components/buttons/lang_popup_menu_button.dart';
 import 'package:artbooking/components/user_avatar_extended.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/loading_view.dart';
@@ -146,11 +147,35 @@ class _PostPageState extends ConsumerState<PostPage> {
               titleWidget(canEdit: canEdit),
               dateWidget(),
               tagsWidget(canEdit: canEdit),
-              pubWidget(canEdit: canEdit),
+              pubAndLangWidgets(canEdit: canEdit),
               authorsWidget(),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget pubAndLangWidgets({bool canEdit = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12.0),
+      child: Row(
+        children: [
+          pubWidget(canEdit: canEdit),
+          Container(
+            height: 40.0,
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: VerticalDivider(
+              width: 2.0,
+              thickness: 2.0,
+            ),
+          ),
+          LangPopupMenuButton(
+            outlined: true,
+            lang: _post.language,
+            onLangChanged: updatePostLang,
+          ),
+        ],
       ),
     );
   }
@@ -175,53 +200,50 @@ class _PostPageState extends ConsumerState<PostPage> {
         Theme.of(context).textTheme.bodyText2?.color?.withOpacity(0.4) ??
             Colors.black;
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 24.0),
-      child: PopupMenuButton(
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 12.0,
-            vertical: 6.0,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(3.0),
-            border: Border.all(
-              color: baseColor.withOpacity(0.3),
-              width: 2.0,
-            ),
-          ),
-          child: Text(
-            _post.visibility == EnumContentVisibility.public
-                ? "published".tr()
-                : "visibility_private".tr(),
-            style: Utilities.fonts.body(
-              color: baseColor,
-              fontWeight: FontWeight.w700,
-            ),
+    return PopupMenuButton(
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 12.0,
+          vertical: 6.0,
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(3.0),
+          border: Border.all(
+            color: baseColor.withOpacity(0.3),
+            width: 2.0,
           ),
         ),
-        onSelected: (EnumContentVisibility visibility) {
-          if (_post.visibility == visibility) {
-            return;
-          }
-
-          updatePostVisibility(visibility);
-        },
-        itemBuilder: (_) => [
-          PopupMenuItemIcon(
-            icon: Icon(UniconsLine.keyhole_square),
-            textLabel: "make_private".tr(),
-            value: EnumContentVisibility.private,
-            selected: _post.visibility == EnumContentVisibility.private,
+        child: Text(
+          _post.visibility == EnumContentVisibility.public
+              ? "published".tr()
+              : "visibility_private".tr(),
+          style: Utilities.fonts.body(
+            color: baseColor,
+            fontWeight: FontWeight.w700,
           ),
-          PopupMenuItemIcon(
-            icon: Icon(UniconsLine.envelope_upload_alt),
-            textLabel: "publish".tr(),
-            value: EnumContentVisibility.public,
-            selected: _post.visibility == EnumContentVisibility.public,
-          ),
-        ],
+        ),
       ),
+      onSelected: (EnumContentVisibility visibility) {
+        if (_post.visibility == visibility) {
+          return;
+        }
+
+        updatePostVisibility(visibility);
+      },
+      itemBuilder: (_) => [
+        PopupMenuItemIcon(
+          icon: Icon(UniconsLine.keyhole_square),
+          textLabel: "make_private".tr(),
+          value: EnumContentVisibility.private,
+          selected: _post.visibility == EnumContentVisibility.private,
+        ),
+        PopupMenuItemIcon(
+          icon: Icon(UniconsLine.envelope_upload_alt),
+          textLabel: "publish".tr(),
+          value: EnumContentVisibility.public,
+          selected: _post.visibility == EnumContentVisibility.public,
+        ),
+      ],
     );
   }
 
@@ -652,6 +674,29 @@ class _PostPageState extends ConsumerState<PostPage> {
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _saving = false);
+    }
+  }
+
+  void updatePostLang(String newLanguage) async {
+    setState(() => _saving = true);
+    final String prevLanguage = _post.language;
+
+    try {
+      _post = _post.copyWith(language: newLanguage);
+
+      await FirebaseFirestore.instance
+          .collection("posts")
+          .doc(_post.id)
+          .update({
+        "language": newLanguage,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+
+      _post = _post.copyWith(language: prevLanguage);
     } finally {
       setState(() => _saving = false);
     }
