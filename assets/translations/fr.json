@@ -879,6 +879,7 @@
   "post_delete_description": "Supprimer cet article ? Cette action est irreversible.",
   "post_delete_failed": "Désolés, nous n'avons pas pu supprimer cet article. Veuillez réessayer plus tard.",
   "post_deleting": "Suppression de l'article...",
+  "post_description": "Description de l'article...",
   "post_edit": "Modifier un article",
   "post_fetch_error": "Une erreur est survenue lors du chargement de l'article.",
   "post_loading_error": "Une erreur est survenue. L'article' a peut-être été supprimé ou il y a eu un problème de connexion.",

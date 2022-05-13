@@ -879,6 +879,7 @@
   "post_delete_description": "Delete this post? This action is irreversible.",
   "post_delete_failed": "Sorry, we couldn't delete this post. Try later.",
   "post_deleting": "Deleting post...",
+  "post_description": "Post description...",
   "post_edit": "Edit post",
   "post_fetch_error": "There was an error while fetching the post.",
   "post_loading_error": "An error occurred. Maybe the post doesn't exist anymore or there's a network issue.",
