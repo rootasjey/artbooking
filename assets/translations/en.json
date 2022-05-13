@@ -369,6 +369,7 @@
   "date_created_ago": "Created {}",
   "date_created_at": "Created",
   "date_created_on": "Created on {}",
+  "date_last_update": "Last update",
   "date_select": "Select a date",
   "date_updated_ago": "Updated {}",
   "date_updated_at": "Updated",
