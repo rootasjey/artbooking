@@ -11,6 +11,9 @@ import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
+import 'package:artbooking/types/firestore/document_map.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/post.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
@@ -60,7 +63,14 @@ class _PostPageState extends ConsumerState<PostPage> {
     horizontal: 24,
   );
 
+  /// Post's document subcription.
+  /// We use this stream to listen to document fields updates.
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _postSubscription;
+
+  /// Used to add delay to post's metadata update.
   Timer? _metadataUpdateTimer;
+
+  /// Used to add delay to post's content update.
   Timer? _contentUpdateTimer;
 
   @override
@@ -73,6 +83,8 @@ class _PostPageState extends ConsumerState<PostPage> {
       _post = navPost;
       _titleController.text = _post.name;
       fetchPost();
+      listenToDocumentChanges(
+          FirebaseFirestore.instance.collection("posts").doc(widget.postId));
     } else {
       fetchPostMetadata().whenComplete(fetchPost);
     }
@@ -84,6 +96,7 @@ class _PostPageState extends ConsumerState<PostPage> {
     _contentUpdateTimer?.cancel();
     _titleController.dispose();
     _document.dispose();
+    _postSubscription?.cancel();
     super.dispose();
   }
 
@@ -384,9 +397,7 @@ class _PostPageState extends ConsumerState<PostPage> {
       return;
     }
 
-    setState(() {
-      _loading = true;
-    });
+    setState(() => _loading = true);
 
     try {
       final Reference file =
@@ -438,11 +449,6 @@ class _PostPageState extends ConsumerState<PostPage> {
     savePostContent();
   }
 
-  /// Return the custom (user-generated) metadata specified by [key].
-  String getCustomMetaValue(FullMetadata metadata, String key) {
-    return metadata.customMetadata?[key] ?? "";
-  }
-
   void savePostContent() async {
     setState(() => _saving = true);
 
@@ -467,15 +473,14 @@ class _PostPageState extends ConsumerState<PostPage> {
   }
 
   Future fetchPostMetadata() async {
-    setState(() {
-      _loading = true;
-    });
+    setState(() => _loading = true);
 
     try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection("posts")
-          .doc(widget.postId)
-          .get();
+      final DocumentMap query =
+          FirebaseFirestore.instance.collection("posts").doc(widget.postId);
+
+      listenToDocumentChanges(query);
+      final DocumentSnapshotMap snapshot = await query.get();
 
       final map = snapshot.data();
       if (!snapshot.exists || map == null) {
@@ -487,10 +492,33 @@ class _PostPageState extends ConsumerState<PostPage> {
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
-      setState(() {
-        _loading = false;
-      });
+      setState(() => _loading = false);
     }
+  }
+
+  void listenToDocumentChanges(DocumentReference<Map<String, dynamic>> query) {
+    _postSubscription?.cancel();
+    _postSubscription = query.snapshots().skip(1).listen((snapshot) {
+      final Json? map = snapshot.data();
+
+      if (!snapshot.exists || map == null) {
+        return;
+      }
+
+      setState(() {
+        _post = Post.fromMap(map).copyWith(
+          content: _post.content,
+        );
+
+        if (_titleController.text != _post.name) {
+          _titleController.text = _post.name;
+        }
+      });
+    }, onError: (error) {
+      Utilities.logger.e(error);
+    }, onDone: () {
+      _postSubscription?.cancel();
+    });
   }
 
   void onDeleteTag(String tag) async {
