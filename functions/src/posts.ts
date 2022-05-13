@@ -40,6 +40,7 @@ export const createOne = functions
           type: "uniconsline",
           updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
         },
+        language,
         languages: {
           [language]: true,
         },
@@ -269,6 +270,10 @@ function atLeastOnePropertyChanged(snapshot: functions.Change<functions.firestor
   }
 
   if (afterData.visibility !== beforeData.visibility) {
+    return true;
+  }
+
+  if (afterData.language !== beforeData.language) {
     return true;
   }
 
