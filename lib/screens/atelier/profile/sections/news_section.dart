@@ -9,6 +9,13 @@ import 'package:artbooking/types/enums/enum_post_item_action.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
+import 'package:artbooking/types/firestore/doc_snap_map.dart';
+import 'package:artbooking/types/firestore/document_change_map.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
+import 'package:artbooking/types/firestore/query_map.dart';
+import 'package:artbooking/types/firestore/query_snap_map.dart';
+import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/post.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:beamer/beamer.dart';
@@ -82,6 +89,10 @@ class _NewsSectionState extends State<NewsSection> {
   /// Otherwise, simply do a data diff. and update only some UI parts.
   var _currentMode = EnumSectionDataMode.sync;
 
+  /// News posts collection subscription.
+  /// We use this stream to listen to collection changes (add, update, delete).
+  QuerySnapshotStreamSubscription? _postSubscription;
+
   @override
   initState() {
     super.initState();
@@ -91,6 +102,7 @@ class _NewsSectionState extends State<NewsSection> {
   @override
   void dispose() {
     _posts.clear();
+    _postSubscription?.cancel();
     super.dispose();
   }
 
@@ -348,19 +360,21 @@ class _NewsSectionState extends State<NewsSection> {
 
   void fetchSyncPosts() async {
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final QueryMap query = await FirebaseFirestore.instance
           .collection("posts")
           .where("visibility", isEqualTo: "public")
           .orderBy("published_at", descending: true)
-          .limit(4)
-          .get();
+          .limit(4);
+
+      listenToCollectionChanges(query);
+      final QuerySnapMap snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
         return;
       }
 
-      for (var doc in snapshot.docs) {
-        final map = doc.data();
+      for (final DocSnapMap doc in snapshot.docs) {
+        final Json map = doc.data();
         map["id"] = doc.id;
         _posts.add(Post.fromMap(map));
       }
@@ -387,6 +401,55 @@ class _NewsSectionState extends State<NewsSection> {
         "postId": post.id,
       },
     );
+  }
+
+  void listenToCollectionChanges(Query<Map<String, dynamic>> query) {
+    _postSubscription?.cancel();
+    _postSubscription = query.snapshots().skip(1).listen((snapshot) {
+      for (DocumentChangeMap documentChange in snapshot.docChanges) {
+        switch (documentChange.type) {
+          case DocumentChangeType.added:
+            onAddStreamingNews(documentChange);
+            break;
+          case DocumentChangeType.modified:
+            onUpdateStreamingNews(documentChange);
+            break;
+          case DocumentChangeType.removed:
+            onRemoveStreamingNews(documentChange);
+            break;
+        }
+      }
+
+      setState(() {});
+    });
+  }
+
+  void onAddStreamingNews(DocumentChangeMap documentChange) {
+    final DocumentSnapshotMap doc = documentChange.doc;
+    final Json? map = doc.data();
+    if (map == null) {
+      return;
+    }
+
+    map["id"] = doc.id;
+    _posts.add(Post.fromMap(map));
+  }
+
+  void onRemoveStreamingNews(DocumentChangeMap documentChange) {
+    _posts.removeWhere((p) => p.id == documentChange.doc.id);
+  }
+
+  void onUpdateStreamingNews(DocumentChangeMap documentChange) {
+    final DocumentSnapshotMap doc = documentChange.doc;
+    final Json? newMap = doc.data();
+    if (newMap == null) {
+      return;
+    }
+
+    newMap["id"] = doc.id;
+
+    final int index = _posts.indexWhere((p) => p.id == doc.id);
+    _posts.replaceRange(index, index + 1, [Post.fromMap(newMap)]);
   }
 
   void onPostItemSelected(
