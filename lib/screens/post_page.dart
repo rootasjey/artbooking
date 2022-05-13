@@ -278,13 +278,16 @@ class _PostPageState extends ConsumerState<PostPage> {
   }
 
   Widget dateWidget() {
-    return Wrap(
-      spacing: 12.0,
-      runSpacing: 12.0,
-      children: [
-        publishedAtWidget(),
-        updatedAtWidget(),
-      ],
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Wrap(
+        spacing: 12.0,
+        runSpacing: 12.0,
+        children: [
+          publishedAtWidget(),
+          updatedAtWidget(),
+        ],
+      ),
     );
   }
 
@@ -295,11 +298,14 @@ class _PostPageState extends ConsumerState<PostPage> {
         ? Jiffy(publishedAt).yMMMEd
         : Jiffy(publishedAt).fromNow();
 
-    return Text(
-      createdAtStr,
-      style: Utilities.fonts.body3(
-        fontSize: 16.0,
-        fontWeight: FontWeight.w400,
+    return Opacity(
+      opacity: 0.8,
+      child: Text(
+        createdAtStr,
+        style: Utilities.fonts.body3(
+          fontSize: 16.0,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -317,11 +323,14 @@ class _PostPageState extends ConsumerState<PostPage> {
         ? Jiffy(updatedAt).format("dd/MM/yy")
         : Jiffy(updatedAt).fromNow();
 
-    return Text(
-      "($updatedAtStr)",
-      style: Utilities.fonts.body3(
-        fontSize: 16.0,
-        fontWeight: FontWeight.w400,
+    return Opacity(
+      opacity: 0.8,
+      child: Text(
+        "(" + "date_last_update".tr() + ": $updatedAtStr)",
+        style: Utilities.fonts.body3(
+          fontSize: 16.0,
+          fontWeight: FontWeight.w400,
+        ),
       ),
     );
   }
@@ -429,24 +438,23 @@ class _PostPageState extends ConsumerState<PostPage> {
     savePostContent();
   }
 
+  /// Return the custom (user-generated) metadata specified by [key].
+  String getCustomMetaValue(FullMetadata metadata, String key) {
+    return metadata.customMetadata?[key] ?? "";
+  }
+
   void savePostContent() async {
     setState(() => _saving = true);
 
     try {
       final Reference ref =
           FirebaseStorage.instance.ref("posts/${_post.id}/content.md");
-      // ref.putString(_post.content);
-      final UploadTask uploadTask = ref.putData(
-        Uint8List.fromList(_post.content.codeUnits),
-        // SettableMetadata(
-        //   customMetadata: {
-        //     "file_type": "post",
-        //     "owner": _post.userIds.first,
-        //     "${_post.userIds.first}": "write",
-        //     "post_id": _post.id,
-        //     "visibility": _post.visibility.name,
-        //   },
-        // ),
+
+      final FullMetadata metadata = await ref.getMetadata();
+
+      final UploadTask uploadTask = ref.putString(
+        _post.content,
+        metadata: SettableMetadata(customMetadata: metadata.customMetadata),
       );
 
       await uploadTask;
