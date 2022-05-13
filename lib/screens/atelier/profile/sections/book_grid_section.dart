@@ -7,7 +7,7 @@ import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
-import 'package:artbooking/types/firestore/doc_snap_map.dart';
+import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -507,7 +507,7 @@ class _BookGridSectionState extends State<BookGridSection> {
         return;
       }
 
-      for (DocSnapMap document in bookSnapshot.docs) {
+      for (QueryDocSnapMap document in bookSnapshot.docs) {
         final data = document.data();
         data["id"] = document.id;
         _books.add(Book.fromMap(data));

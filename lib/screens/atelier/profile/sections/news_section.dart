@@ -9,7 +9,7 @@ import 'package:artbooking/types/enums/enum_post_item_action.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
-import 'package:artbooking/types/firestore/doc_snap_map.dart';
+import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
@@ -373,7 +373,7 @@ class _NewsSectionState extends State<NewsSection> {
         return;
       }
 
-      for (final DocSnapMap doc in snapshot.docs) {
+      for (final QueryDocSnapMap doc in snapshot.docs) {
         final Json map = doc.data();
         map["id"] = doc.id;
         _posts.add(Post.fromMap(map));

@@ -6,7 +6,7 @@ import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/cloud_functions/illustrations_response.dart';
-import 'package:artbooking/types/firestore/doc_snap_map.dart';
+import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:beamer/beamer.dart';
@@ -457,7 +457,7 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
         return;
       }
 
-      for (DocSnapMap document in snapshot.docs) {
+      for (QueryDocSnapMap document in snapshot.docs) {
         final Json map = document.data();
         map['id'] = document.id;
 
@@ -497,7 +497,7 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
         return;
       }
 
-      for (DocSnapMap document in snapshot.docs) {
+      for (QueryDocSnapMap document in snapshot.docs) {
         final Json map = document.data();
         map['id'] = document.id;
 

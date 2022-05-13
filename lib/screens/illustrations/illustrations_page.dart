@@ -7,7 +7,7 @@ import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/illustrations/illustrations_page_body.dart';
 import 'package:artbooking/screens/illustrations/illustrations_page_fab.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
-import 'package:artbooking/types/firestore/doc_snap_map.dart';
+import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
@@ -152,7 +152,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
         return;
       }
 
-      for (DocSnapMap document in snapshot.docs) {
+      for (QueryDocSnapMap document in snapshot.docs) {
         final data = document.data();
         data["id"] = document.id;
         data["liked"] = await fetchLike(document.id);
@@ -225,7 +225,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
         return;
       }
 
-      for (DocSnapMap document in snapshot.docs) {
+      for (QueryDocSnapMap document in snapshot.docs) {
         final data = document.data();
         data["id"] = document.id;
         data["liked"] = await fetchLike(document.id);

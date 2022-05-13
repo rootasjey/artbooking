@@ -10,7 +10,7 @@ import 'package:artbooking/screens/licenses/many/licenses_page_fab.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page_header.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page_body.dart';
 import 'package:artbooking/types/cloud_functions/license_response.dart';
-import 'package:artbooking/types/firestore/doc_snap_map.dart';
+import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
@@ -151,7 +151,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
         return;
       }
 
-      for (DocSnapMap doc in snapshot.docs) {
+      for (QueryDocSnapMap doc in snapshot.docs) {
         final data = doc.data();
         data["id"] = doc.id;
 
@@ -196,7 +196,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
         return;
       }
 
-      for (DocSnapMap doc in snapshot.docs) {
+      for (QueryDocSnapMap doc in snapshot.docs) {
         final data = doc.data();
         data["id"] = doc.id;
 
@@ -246,7 +246,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
         return;
       }
 
-      for (DocSnapMap doc in snapshot.docs) {
+      for (QueryDocSnapMap doc in snapshot.docs) {
         final data = doc.data();
         data["id"] = doc.id;
 
@@ -295,7 +295,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
         return;
       }
 
-      for (DocSnapMap doc in snapshot.docs) {
+      for (QueryDocSnapMap doc in snapshot.docs) {
         final data = doc.data();
         data["id"] = doc.id;
 

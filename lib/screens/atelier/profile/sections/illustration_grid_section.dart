@@ -6,7 +6,7 @@ import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
-import 'package:artbooking/types/firestore/doc_snap_map.dart';
+import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -493,7 +493,7 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
         return;
       }
 
-      for (DocSnapMap document in illustrationsSnapshot.docs) {
+      for (QueryDocSnapMap document in illustrationsSnapshot.docs) {
         final data = document.data();
         data["id"] = document.id;
         _illustrations.add(Illustration.fromMap(data));

@@ -1,6 +1,6 @@
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/types/firestore/doc_snap_map.dart';
+import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -230,7 +230,7 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
         return;
       }
 
-      for (DocSnapMap document in snapshot.docs) {
+      for (QueryDocSnapMap document in snapshot.docs) {
         final map = document.data();
         map["id"] = document.id;
         _sections.add(Section.fromMap(map));
@@ -267,7 +267,7 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
         return;
       }
 
-      for (DocSnapMap document in snapshot.docs) {
+      for (QueryDocSnapMap document in snapshot.docs) {
         final map = document.data();
         map["id"] = document.id;
         _sections.add(Section.fromMap(map));

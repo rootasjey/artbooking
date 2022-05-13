@@ -9,7 +9,7 @@ import 'package:artbooking/screens/book/books_page_fab.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/book/popup_entry_book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
-import 'package:artbooking/types/firestore/doc_snap_map.dart';
+import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
@@ -182,7 +182,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
         return;
       }
 
-      for (DocSnapMap document in snapshot.docs) {
+      for (QueryDocSnapMap document in snapshot.docs) {
         final data = document.data();
         data["id"] = document.id;
         data["liked"] = await fetchLike(document.id);
@@ -230,7 +230,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
         return;
       }
 
-      for (DocSnapMap document in snapshot.docs) {
+      for (QueryDocSnapMap document in snapshot.docs) {
         final data = document.data();
         data["id"] = document.id;
         data["liked"] = await fetchLike(document.id);

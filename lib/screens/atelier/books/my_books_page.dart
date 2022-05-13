@@ -19,7 +19,7 @@ import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/enums/enum_visibility_tab.dart';
-import 'package:artbooking/types/firestore/doc_snap_map.dart';
+import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
@@ -345,7 +345,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         return;
       }
 
-      for (DocSnapMap document in snapshot.docs) {
+      for (QueryDocSnapMap document in snapshot.docs) {
         final data = document.data();
         data['id'] = document.id;
         _books.add(Book.fromMap(data));
@@ -385,7 +385,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         return;
       }
 
-      for (DocSnapMap document in snapshot.docs) {
+      for (QueryDocSnapMap document in snapshot.docs) {
         final data = document.data();
         data['id'] = document.id;
 

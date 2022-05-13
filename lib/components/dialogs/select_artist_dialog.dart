@@ -2,7 +2,7 @@ import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/types/firestore/doc_snap_map.dart';
+import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
@@ -302,7 +302,7 @@ class _SelectArtistDialogState extends State<SelectArtistDialog> {
         return;
       }
 
-      for (DocSnapMap document in snapshot.docs) {
+      for (QueryDocSnapMap document in snapshot.docs) {
         final Json map = document.data();
         final artist = UserFirestore.fromMap(map);
         _artists.add(artist);
@@ -341,7 +341,7 @@ class _SelectArtistDialogState extends State<SelectArtistDialog> {
         return;
       }
 
-      for (DocSnapMap document in snapshot.docs) {
+      for (QueryDocSnapMap document in snapshot.docs) {
         final Json map = document.data();
         final artist = UserFirestore.fromMap(map);
         _artists.add(artist);

@@ -6,7 +6,7 @@ import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/sections/edit/edit_section_page.dart';
 import 'package:artbooking/screens/sections/many/sections_page_body.dart';
 import 'package:artbooking/screens/sections/many/sections_page_header.dart';
-import 'package:artbooking/types/firestore/doc_snap_map.dart';
+import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
@@ -114,7 +114,7 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
         return;
       }
 
-      for (DocSnapMap doc in snapshot.docs) {
+      for (QueryDocSnapMap doc in snapshot.docs) {
         final data = doc.data();
         data["id"] = doc.id;
 
@@ -158,7 +158,7 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
         return;
       }
 
-      for (DocSnapMap doc in snapshot.docs) {
+      for (QueryDocSnapMap doc in snapshot.docs) {
         final data = doc.data();
         data["id"] = doc.id;
 
