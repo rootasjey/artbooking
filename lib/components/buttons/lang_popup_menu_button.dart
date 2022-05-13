@@ -14,13 +14,28 @@ class LangPopupMenuButton extends StatelessWidget {
     this.opacity = 1.0,
     this.margin = EdgeInsets.zero,
     this.padding = const EdgeInsets.all(8.0),
+    this.outlined = false,
   }) : super(key: key);
 
+  /// If true, the button will be outlined. It will show a text button otherwise.
+  final bool outlined;
+
+  /// Current selected language.
   final String lang;
+
+  /// Called when language has changed.
   final Function(String) onLangChanged;
+
+  /// Widget's opacity.
   final double opacity;
+
+  /// Widget's margin.
   final EdgeInsets margin;
+
+  /// Widget's padding.
   final EdgeInsets padding;
+
+  /// Widget's elevation.
   final double elevation;
 
   @override
@@ -35,17 +50,7 @@ class LangPopupMenuButton extends StatelessWidget {
           opacity: opacity,
           child: PopupMenuButton<String>(
             tooltip: "language_change".tr(),
-            child: Padding(
-              padding: padding,
-              child: Text(
-                lang.toUpperCase(),
-                style: Utilities.fonts.body(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w700,
-                  color: Theme.of(context).textTheme.bodyText1?.color,
-                ),
-              ),
-            ),
+            child: outlined ? outlinedButton(context) : textButton(context),
             onSelected: onLangChanged,
             itemBuilder: (context) => Utilities.lang.available().map(
               (languageCode) {
@@ -94,5 +99,46 @@ class LangPopupMenuButton extends StatelessWidget {
     }
 
     return null;
+  }
+
+  Widget outlinedButton(BuildContext context) {
+    final Color baseColor =
+        Theme.of(context).textTheme.bodyText2?.color?.withOpacity(0.4) ??
+            Colors.black;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12.0,
+        vertical: 6.0,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(3.0),
+        border: Border.all(
+          color: baseColor.withOpacity(0.3),
+          width: 2.0,
+        ),
+      ),
+      child: Text(
+        Utilities.lang.toFullString(lang),
+        style: Utilities.fonts.body(
+          color: baseColor,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+
+  Widget textButton(BuildContext context) {
+    return Padding(
+      padding: padding,
+      child: Text(
+        lang.toUpperCase(),
+        style: Utilities.fonts.body(
+          fontSize: 16.0,
+          fontWeight: FontWeight.w700,
+          color: Theme.of(context).textTheme.bodyText1?.color,
+        ),
+      ),
+    );
   }
 }
