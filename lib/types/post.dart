@@ -12,6 +12,7 @@ class Post {
     required this.updatedAt,
     required this.visibility,
     this.content = "",
+    this.language = "en",
     this.description = "",
     this.iconData = "",
     this.id = "",
@@ -27,6 +28,9 @@ class Post {
   /// Firebase Storage file content.
   /// This property doesn't exist in Firestore.
   final String content;
+
+  /// Post's language.
+  final String language;
   final DateTime createdAt;
   final String description;
   final String iconData;
@@ -59,6 +63,7 @@ class Post {
     String? description,
     String? iconData,
     String? id,
+    String? language,
     List<String>? languages,
     String? name,
     DateTime? publishedAt,
@@ -76,6 +81,7 @@ class Post {
       content: content ?? this.content,
       iconData: iconData ?? this.iconData,
       id: id ?? this.id,
+      language: language ?? this.language,
       languages: languages ?? this.languages,
       name: name ?? this.name,
       storagePath: storagePath ?? this.storagePath,
@@ -95,6 +101,7 @@ class Post {
       'created_at': createdAt.millisecondsSinceEpoch,
       'description': description,
       'icon_data': iconData,
+      'language': language,
       'languages': languages,
       'name': name,
       'storagePath': storagePath,
@@ -130,6 +137,7 @@ class Post {
       description: map["description"] ?? "",
       iconData: map["icon_data"] ?? "",
       languages: parseMapToArray(map["languages"]),
+      language: map["language"] ?? "en",
       name: map["name"] ?? "",
       storagePath: map["storage_path"] ?? "",
       id: map["id"] ?? "",
@@ -183,10 +191,11 @@ class Post {
   @override
   String toString() {
     return "Post(content: $content, createdAt: $createdAt, "
-        "description: $description, iconData: $iconData, languages: $languages, "
-        "name: $name, pubslihedAt: $publishedAt, id: $id, tags: $tags, "
-        "storagePath: $storagePath, translations: $translations, updatedAt: $updatedAt, "
-        "userIds: $userIds, visibility: $visibility, wordCount: $wordCount)";
+        "description: $description, iconData: $iconData, language: $language, "
+        "languages: $languages, name: $name, pubslihedAt: $publishedAt, id: $id, "
+        "tags: $tags, storagePath: $storagePath, translations: $translations, "
+        "updatedAt: $updatedAt, userIds: $userIds, visibility: $visibility, "
+        "wordCount: $wordCount)";
   }
 
   @override
@@ -197,11 +206,12 @@ class Post {
         content == content &&
         other.createdAt == createdAt &&
         other.description == description &&
+        other.id == id &&
+        other.language == language &&
         listEquals(other.languages, languages) &&
         other.name == name &&
-        other.storagePath == storagePath &&
-        other.id == id &&
         other.publishedAt == publishedAt &&
+        other.storagePath == storagePath &&
         listEquals(other.tags, tags) &&
         listEquals(other.translations, translations) &&
         other.visibility == visibility &&
@@ -216,6 +226,7 @@ class Post {
         createdAt.hashCode ^
         description.hashCode ^
         id.hashCode ^
+        language.hashCode ^
         languages.hashCode ^
         name.hashCode ^
         publishedAt.hashCode ^
