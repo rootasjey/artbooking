@@ -382,16 +382,18 @@ class _PostPageState extends ConsumerState<PostPage> {
     final children = <Widget>[];
 
     for (final String tag in _post.tags) {
-      children.add(Chip(
-        label: Opacity(
-          opacity: 0.8,
-          child: Text(
-            tag,
-            style: Utilities.fonts.body3(),
+      children.add(
+        Chip(
+          label: Opacity(
+            opacity: 0.8,
+            child: Text(
+              tag,
+              style: Utilities.fonts.body3(),
+            ),
           ),
+          onDeleted: canEdit ? () => onDeleteTag(tag) : null,
         ),
-        onDeleted: canEdit ? () => onDeleteTag(tag) : null,
-      ));
+      );
     }
 
     if (canEdit) {
@@ -504,6 +506,31 @@ class _PostPageState extends ConsumerState<PostPage> {
     }
   }
 
+  Future fetchPostMetadata() async {
+    setState(() => _loading = true);
+
+    try {
+      final DocumentMap query =
+          FirebaseFirestore.instance.collection("posts").doc(widget.postId);
+
+      listenToDocumentChanges(query);
+      final DocumentSnapshotMap snapshot = await query.get();
+
+      final Json? map = snapshot.data();
+      if (!snapshot.exists || map == null) {
+        return;
+      }
+
+      map["id"] = snapshot.id;
+      _post = Post.fromMap(map);
+      _titleController.text = _post.name;
+    } catch (error) {
+      Utilities.logger.e(error);
+    } finally {
+      setState(() => _loading = false);
+    }
+  }
+
   void onPostContentChange() {
     _post = _post.copyWith(
       content: serializeDocumentToMarkdown(_document),
@@ -535,30 +562,6 @@ class _PostPageState extends ConsumerState<PostPage> {
     }
   }
 
-  Future fetchPostMetadata() async {
-    setState(() => _loading = true);
-
-    try {
-      final DocumentMap query =
-          FirebaseFirestore.instance.collection("posts").doc(widget.postId);
-
-      listenToDocumentChanges(query);
-      final DocumentSnapshotMap snapshot = await query.get();
-
-      final map = snapshot.data();
-      if (!snapshot.exists || map == null) {
-        return;
-      }
-
-      _post = Post.fromMap(map);
-      _titleController.text = _post.name;
-    } catch (error) {
-      Utilities.logger.e(error);
-    } finally {
-      setState(() => _loading = false);
-    }
-  }
-
   void listenToDocumentChanges(DocumentReference<Map<String, dynamic>> query) {
     _postSubscription?.cancel();
     _postSubscription = query.snapshots().skip(1).listen((snapshot) {
@@ -571,6 +574,7 @@ class _PostPageState extends ConsumerState<PostPage> {
       setState(() {
         _post = Post.fromMap(map).copyWith(
           content: _post.content,
+          id: _post.id,
         );
 
         if (_titleController.text != _post.name) {
