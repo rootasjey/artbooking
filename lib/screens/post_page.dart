@@ -57,7 +57,10 @@ class _PostPageState extends ConsumerState<PostPage> {
   var _document = MutableDocument();
 
   /// Input controller for post's title (metadata).
-  var _titleController = TextEditingController();
+  final _titleController = TextEditingController();
+
+  /// Input controller for post's description (metadata).
+  final _descriptionController = TextEditingController();
 
   final _pagePadding = const EdgeInsets.symmetric(
     vertical: 56,
@@ -83,6 +86,7 @@ class _PostPageState extends ConsumerState<PostPage> {
     if (navPost != null && navPost.id == widget.postId) {
       _post = navPost;
       _titleController.text = _post.name;
+      _descriptionController.text = _post.description;
       fetchPost();
       listenToDocumentChanges(
           FirebaseFirestore.instance.collection("posts").doc(widget.postId));
@@ -96,6 +100,7 @@ class _PostPageState extends ConsumerState<PostPage> {
     _metadataUpdateTimer?.cancel();
     _contentUpdateTimer?.cancel();
     _titleController.dispose();
+    _descriptionController.dispose();
     _document.dispose();
     _postSubscription?.cancel();
     super.dispose();
@@ -130,6 +135,110 @@ class _PostPageState extends ConsumerState<PostPage> {
     );
   }
 
+  Widget authorsWidget() {
+    if (_post.userIds.isEmpty || _post.userIds.first.isEmpty) {
+      return Container();
+    }
+
+    return UserAvatarExtended(
+      userId: _post.userIds.first,
+      padding: const EdgeInsets.only(top: 24.0),
+    );
+  }
+
+  Widget body({bool canEdit = false}) {
+    if (_post.content.isEmpty) {
+      return SliverToBoxAdapter();
+    }
+
+    if (_loading) {
+      return LoadingView(
+        title: Text(
+          "loading".tr(),
+        ),
+      );
+    }
+
+    if (!canEdit) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: _pagePadding,
+          child: SingleColumnDocumentLayout(
+            presenter: SingleColumnLayoutPresenter(
+              document: _document,
+              componentBuilders: defaultComponentBuilders,
+              pipeline: [
+                SingleColumnStylesheetStyler(stylesheet: defaultStylesheet),
+              ],
+            ),
+            componentBuilders: defaultComponentBuilders,
+          ),
+        ),
+      );
+    }
+
+    return SliverToBoxAdapter(
+      child: SuperEditor(
+        editor: _documentEditor,
+        stylesheet: defaultStylesheet.copyWith(
+          documentPadding: const EdgeInsets.symmetric(
+            vertical: 56,
+            horizontal: 24,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget dateWidget() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Wrap(
+        spacing: 12.0,
+        runSpacing: 12.0,
+        children: [
+          publishedAtWidget(),
+          updatedAtWidget(),
+        ],
+      ),
+    );
+  }
+
+  Widget descriptionWidget({bool canEdit = false}) {
+    if (!canEdit && _post.description.isNotEmpty) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 8.0),
+        child: Text(
+          _post.description,
+          style: Utilities.fonts.title3(
+            fontSize: 14.0,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Opacity(
+        opacity: 0.6,
+        child: TextField(
+          controller: _descriptionController,
+          style: Utilities.fonts.body(
+            fontSize: 14.0,
+            fontWeight: FontWeight.w700,
+          ),
+          maxLines: null,
+          onChanged: onTitleChanged,
+          decoration: InputDecoration(
+            hintText: "post_description".tr(),
+            border: InputBorder.none,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget header({bool canEdit = false}) {
     return SliverToBoxAdapter(
       child: Center(
@@ -145,6 +254,7 @@ class _PostPageState extends ConsumerState<PostPage> {
                 icon: Icon(UniconsLine.arrow_left),
               ),
               titleWidget(canEdit: canEdit),
+              descriptionWidget(canEdit: canEdit),
               dateWidget(),
               tagsWidget(canEdit: canEdit),
               pubAndLangWidgets(canEdit: canEdit),
@@ -177,17 +287,6 @@ class _PostPageState extends ConsumerState<PostPage> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget authorsWidget() {
-    if (_post.userIds.isEmpty || _post.userIds.first.isEmpty) {
-      return Container();
-    }
-
-    return UserAvatarExtended(
-      userId: _post.userIds.first,
-      padding: const EdgeInsets.only(top: 24.0),
     );
   }
 
@@ -312,20 +411,6 @@ class _PostPageState extends ConsumerState<PostPage> {
     );
   }
 
-  Widget dateWidget() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Wrap(
-        spacing: 12.0,
-        runSpacing: 12.0,
-        children: [
-          publishedAtWidget(),
-          updatedAtWidget(),
-        ],
-      ),
-    );
-  }
-
   Widget publishedAtWidget() {
     final publishedAt = _post.publishedAt;
     final createdAtDiff = DateTime.now().difference(publishedAt);
@@ -365,50 +450,6 @@ class _PostPageState extends ConsumerState<PostPage> {
         style: Utilities.fonts.body3(
           fontSize: 16.0,
           fontWeight: FontWeight.w400,
-        ),
-      ),
-    );
-  }
-
-  Widget body({bool canEdit = false}) {
-    if (_post.content.isEmpty) {
-      return SliverToBoxAdapter();
-    }
-
-    if (_loading) {
-      return LoadingView(
-        title: Text(
-          "loading".tr(),
-        ),
-      );
-    }
-
-    if (!canEdit) {
-      return SliverToBoxAdapter(
-        child: Padding(
-          padding: _pagePadding,
-          child: SingleColumnDocumentLayout(
-            presenter: SingleColumnLayoutPresenter(
-              document: _document,
-              componentBuilders: defaultComponentBuilders,
-              pipeline: [
-                SingleColumnStylesheetStyler(stylesheet: defaultStylesheet),
-              ],
-            ),
-            componentBuilders: defaultComponentBuilders,
-          ),
-        ),
-      );
-    }
-
-    return SliverToBoxAdapter(
-      child: SuperEditor(
-        editor: _documentEditor,
-        stylesheet: defaultStylesheet.copyWith(
-          documentPadding: const EdgeInsets.symmetric(
-            vertical: 56,
-            horizontal: 24,
-          ),
         ),
       ),
     );
@@ -580,7 +621,10 @@ class _PostPageState extends ConsumerState<PostPage> {
       await FirebaseFirestore.instance
           .collection("posts")
           .doc(_post.id)
-          .update({"name": _titleController.text});
+          .update({
+        "name": _titleController.text,
+        "description": _descriptionController.text,
+      });
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
