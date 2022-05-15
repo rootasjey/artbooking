@@ -65,7 +65,7 @@ export const createOne = functions
     });
 
     const fileRef = adminApp.storage().bucket().file(storage_path);
-    await fileRef.create();
+    await fileRef.save("");
     await fileRef.setMetadata({
       metadata: {
         owner: uid,
@@ -73,7 +73,14 @@ export const createOne = functions
         visibility: "private",
         [uid]: "write"
       },
-    })
+    });
+
+    return {
+      post: {
+        id: postDoc.id,
+      },
+      success: true,
+    };
   })
 
 /**
@@ -162,9 +169,9 @@ export const deleteOne = functions
     };
   })
 
-  /**
-   * Update `updated_at` field of the Firestore document when the file's content has changed.
-   */
+/**
+ * Update `updated_at` field of the Firestore document when the file's content has changed.
+ */
 export const onUpdatePostContent = functions
   .region(cloudRegions.eu)
   .storage
