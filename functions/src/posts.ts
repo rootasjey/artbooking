@@ -29,6 +29,7 @@ export const createOne = functions
         acl: {
           [uid]: "owner",
         },
+        character_count: 0,
         cover: {
           path: "",
           updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
