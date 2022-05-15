@@ -537,6 +537,7 @@ class _PostPageState extends ConsumerState<PostPage> {
     );
 
     savePostContent();
+    updateMetrics();
   }
 
   void savePostContent() async {
@@ -745,6 +746,34 @@ class _PostPageState extends ConsumerState<PostPage> {
       context.showErrorBar(content: Text(error.toString()));
 
       _post = _post.copyWith(language: prevLanguage);
+    } finally {
+      setState(() => _saving = false);
+    }
+  }
+
+  /// Update post's character & word count.
+  void updateMetrics() async {
+    final regExp = RegExp(r"[\w-._]+");
+    final Iterable<RegExpMatch> wordMatches = regExp.allMatches(_post.content);
+
+    _post = _post.copyWith(
+      characterCount: _post.content.length,
+      wordCount: wordMatches.length,
+    );
+
+    setState(() => _saving = true);
+
+    try {
+      await FirebaseFirestore.instance
+          .collection("posts")
+          .doc(_post.id)
+          .update({
+        "character_count": _post.characterCount,
+        "word_count": _post.wordCount,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
     } finally {
       setState(() => _saving = false);
     }
