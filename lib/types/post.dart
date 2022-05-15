@@ -11,6 +11,7 @@ class Post {
     required this.publishedAt,
     required this.updatedAt,
     required this.visibility,
+    this.characterCount = 0,
     this.content = "",
     this.language = "en",
     this.description = "",
@@ -29,23 +30,48 @@ class Post {
   /// This property doesn't exist in Firestore.
   final String content;
 
-  /// Post's language.
-  final String language;
+  /// Date when this post was created.
   final DateTime createdAt;
+
+  /// Number of character in this post's content.
+  final int characterCount;
+
+  /// Post description, subtitle or catch phrase.
   final String description;
   final String iconData;
+
+  /// Post's language.
+  final String language;
   final List<String> languages;
+
+  /// Post's title.
   final String name;
+
+  /// Post's unique Fireastore id.
   final String id;
+
+  /// Date when it was published.
   final DateTime publishedAt;
+
+  /// Firebase Storage path.
   final String storagePath;
+
+  /// Post's topics.
   final List<String> tags;
+
+  /// Translated posts (same content).
   final List<String> translations;
+
+  /// Date when this post was last updated.
   final DateTime updatedAt;
 
   /// Author ids of this post.
   final List<String> userIds;
+
+  /// Defines which user can see this post.
   final EnumContentVisibility visibility;
+
+  /// Number of words in this post's content.
   final int wordCount;
 
   factory Post.empty() {
@@ -59,6 +85,7 @@ class Post {
 
   Post copyWith({
     String? content,
+    int? characterCount,
     DateTime? createdAt,
     String? description,
     String? iconData,
@@ -76,6 +103,7 @@ class Post {
     int? wordCount,
   }) {
     return Post(
+      characterCount: characterCount ?? this.characterCount,
       createdAt: createdAt ?? this.createdAt,
       description: description ?? this.description,
       content: content ?? this.content,
@@ -97,6 +125,7 @@ class Post {
 
   Map<String, dynamic> toMap() {
     return {
+      'character_count': characterCount,
       'content': content,
       'created_at': createdAt.millisecondsSinceEpoch,
       'description': description,
@@ -132,6 +161,7 @@ class Post {
     }
 
     return Post(
+      characterCount: map["character_count"]?.toInt() ?? 0,
       content: map["content"] ?? "",
       createdAt: Utilities.date.fromFirestore(map["created_at"]),
       description: map["description"] ?? "",
@@ -190,7 +220,7 @@ class Post {
 
   @override
   String toString() {
-    return "Post(content: $content, createdAt: $createdAt, "
+    return "Post(content: $content, createdAt: $createdAt, characterCount: $characterCount, "
         "description: $description, iconData: $iconData, language: $language, "
         "languages: $languages, name: $name, pubslihedAt: $publishedAt, id: $id, "
         "tags: $tags, storagePath: $storagePath, translations: $translations, "
@@ -203,7 +233,8 @@ class Post {
     if (identical(this, other)) return true;
 
     return other is Post &&
-        content == content &&
+        other.characterCount == characterCount &&
+        other.content == content &&
         other.createdAt == createdAt &&
         other.description == description &&
         other.id == id &&
@@ -222,7 +253,8 @@ class Post {
 
   @override
   int get hashCode {
-    return content.hashCode ^
+    return characterCount.hashCode ^
+        content.hashCode ^
         createdAt.hashCode ^
         description.hashCode ^
         id.hashCode ^
