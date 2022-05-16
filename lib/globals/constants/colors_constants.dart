@@ -17,6 +17,8 @@ class ColorsConstants {
 
   final Color dark = Color(0xFF303030);
 
+  final Color drafts = Colors.amber.shade600;
+
   final Color delete = Colors.pink;
 
   /// Color for email.
