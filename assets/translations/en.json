@@ -518,6 +518,9 @@
   "formation_degree": "I've a master degree in Computer Science from Versailles University. There, I learned design pattern, J2EE, Algorithm, Security & Cryptography, data integration, among other things.",
   "formation_benefits": "I learnt how to work on multiple projects, alone and in a group. Most of the projects were great and challenging.",
   "freelancer_profiles": "Below are my freelancer profiles",
+  "fun_sentences": {
+    "wood": "Please wait while we cut some wood."
+  },
   "future_dev": "Future development",
   "future_dev_list": "Future development list",
   "galleries": "Galleries",
@@ -874,7 +877,7 @@
   "post_create_error": "Sorry, there was an issue while creating the post.",
   "post_create_error_database": "Sorry, there was an issue while creating the post in database.",
   "post_create_error_storage": "Sorry, there was an issue while creating the post in storage.",
-  "post_creating": "Creating post...",
+  "post_creating": "Creating new post...",
   "post_delete": "Delete post",
   "post_delete_description": "Delete this post? This action is irreversible.",
   "post_delete_failed": "Sorry, we couldn't delete this post. Try later.",

@@ -518,6 +518,9 @@
   "formation_degree": "J'ai un diplôme de Master en Informatique de l'Université de Versailles. J'y ai appris les design patterns, le J2EE, l'agorithmie, la sécurité et la cryptographie, l'intégration de données, entre autres.",
   "formation_benefits": "J'ai appris à travailler sur des projets multiples, seul et en groupe.",
   "freelancer_profiles": "Ci-dessous se trouvent mes profiles de freelance",
+  "fun_sentences": {
+    "wood": "Veuillez patienter pendant que nous coupons du bois."
+  },
   "future_dev": "Futurs developpements",
   "future_dev_list": "Liste des futurs developpements",
   "galleries": "Galeries",
@@ -874,7 +877,7 @@
   "post_create_error": "Désolés, nous avons rencontré un problème lors de la création de l'article.",
   "post_create_error_database": "Désolé, une erreur est survenue lors de la création de l'article en base de données.",
   "post_create_error_storage": "Désolé, une erreur est survenue lors de la création de l'article dans l'espace de stockage.",
-  "post_creating": "Création de l'article...",
+  "post_creating": "Création d'un nouvel l'article...",
   "post_delete": "Supprimer l'article",
   "post_delete_description": "Supprimer cet article ? Cette action est irreversible.",
   "post_delete_failed": "Désolés, nous n'avons pas pu supprimer cet article. Veuillez réessayer plus tard.",
