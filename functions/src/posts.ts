@@ -65,7 +65,7 @@ export const createOne = functions
     });
 
     const fileRef = adminApp.storage().bucket().file(storage_path);
-    await fileRef.save("");
+    await fileRef.save("Once upon a time...");
     await fileRef.setMetadata({
       metadata: {
         owner: uid,
