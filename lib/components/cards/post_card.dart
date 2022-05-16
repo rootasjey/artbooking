@@ -14,8 +14,18 @@ class PostCard extends StatefulWidget {
     this.heroTag = "",
     this.popupMenuEntries = const [],
     this.onPopupMenuItemSelected,
+    this.width = 260.0,
+    this.height = 300.0,
+    this.descriptionMaxLines = 5,
+    this.borderColor = Colors.transparent,
   }) : super(key: key);
 
+  final Color borderColor;
+
+  final double width;
+  final double height;
+
+  final int descriptionMaxLines;
   final int index;
   final void Function(Post post, String heroTag)? onTap;
 
@@ -49,16 +59,22 @@ class _PostCardState extends State<PostCard> {
   double _borderWidth = 2.0;
 
   @override
+  void initState() {
+    super.initState();
+    _borderColor = widget.borderColor;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final post = widget.post;
 
-    if (_borderColor == Colors.pink) {
-      _borderColor = Theme.of(context).primaryColor.withOpacity(0.6);
-    }
+    // if (_borderColor == Colors.pink) {
+    //   _borderColor = Theme.of(context).primaryColor.withOpacity(0.6);
+    // }
 
     return SizedBox(
-      width: 260.0,
-      height: 300.0,
+      width: widget.width,
+      height: widget.height,
       child: Card(
         elevation: _elevation,
         color: Theme.of(context).backgroundColor,
@@ -75,8 +91,8 @@ class _PostCardState extends State<PostCard> {
             setState(() {
               _elevation = isHover ? 4.0 : 2.0;
               _borderColor = isHover
-                  ? Theme.of(context).primaryColor
-                  : Theme.of(context).primaryColor.withOpacity(0.6);
+                  ? widget.borderColor
+                  : widget.borderColor.withOpacity(0.6);
               _borderWidth = isHover ? 3.0 : 2.0;
               _textBgColor = isHover ? Colors.amber : Colors.transparent;
             });
@@ -114,8 +130,9 @@ class _PostCardState extends State<PostCard> {
                   opacity: 0.4,
                   child: Text(
                     post.description,
-                    maxLines: 5,
+                    maxLines: widget.descriptionMaxLines,
                     textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
                     style: Utilities.fonts.body(
                       fontSize: 15.0,
                       fontWeight: FontWeight.w600,
