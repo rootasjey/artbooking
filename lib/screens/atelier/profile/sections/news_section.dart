@@ -1,5 +1,9 @@
+// ignore: unused_import
+import 'package:artbooking/components/buttons/dark_text_button.dart';
+import 'package:artbooking/components/cards/create_post_card.dart';
 import 'package:artbooking/components/cards/post_card.dart';
 import 'package:artbooking/components/cards/shimmer_card.dart';
+import 'package:artbooking/components/icons/animated_app_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -20,7 +24,9 @@ import 'package:artbooking/types/post.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
@@ -78,6 +84,9 @@ class _NewsSectionState extends State<NewsSection> {
   /// True if fetching data.
   bool _loading = false;
 
+  /// True if currently creating a new post.
+  bool _creatingPost = false;
+
   /// Courcircuit initState.
   /// If first execution, do a whole data fetch.
   /// Otherwise, try a data diff. and udpdate only some UI parts.
@@ -114,6 +123,10 @@ class _NewsSectionState extends State<NewsSection> {
 
     if (_loading) {
       return loadingWidget();
+    }
+
+    if (_creatingPost) {
+      return creatingWidget();
     }
 
     final EdgeInsets outerPadding =
@@ -177,9 +190,39 @@ class _NewsSectionState extends State<NewsSection> {
     );
   }
 
+  Widget creatingWidget() {
+    return Center(
+      child: Column(
+        children: [
+          AnimatedAppIcon(),
+          Opacity(
+            opacity: 0.8,
+            child: Text(
+              // "Creating new post...",
+              "post_creating".tr() + "...",
+              style: Utilities.fonts.body3(
+                fontSize: 42.0,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Opacity(
+            opacity: 0.4,
+            child: Text(
+              "fun_sentences.wood".tr(),
+              style: Utilities.fonts.body(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   List<Widget> getChildren() {
     int index = -1;
-    // final size = 200.0;
 
     final List<PopupMenuEntry<EnumPostItemAction>> popupMenuEntries =
         widget.editMode
@@ -192,20 +235,28 @@ class _NewsSectionState extends State<NewsSection> {
               ]
             : [];
 
-    final children = _posts.map((Post post) {
-      index++;
+    final List<Widget> children = [
+      CreatePostCard(
+        borderColor: Constants.colors.tertiary,
+        onTap: createNewPost,
+      ),
+    ];
 
+    for (final Post post in _posts) {
+      index++;
       final heroTag = "${widget.section.id}-${index}-${post.id}";
 
-      return PostCard(
-        post: post,
-        index: index,
-        heroTag: heroTag,
-        onTap: goToPostPage,
-        popupMenuEntries: popupMenuEntries,
-        onPopupMenuItemSelected: onPostItemSelected,
+      children.add(
+        PostCard(
+          post: post,
+          index: index,
+          heroTag: heroTag,
+          onTap: goToPostPage,
+          popupMenuEntries: popupMenuEntries,
+          onPopupMenuItemSelected: onPostItemSelected,
+        ),
       );
-    }).toList();
+    }
 
     return children;
   }
@@ -344,6 +395,38 @@ class _NewsSectionState extends State<NewsSection> {
 
     if (_currentMode == EnumSectionDataMode.chosen) {
       // diffIllustration();
+    }
+  }
+
+  void createNewPost() async {
+    setState(() => _creatingPost = true);
+
+    try {
+      final HttpsCallableResult<dynamic> response =
+          await Utilities.cloud.fun("posts-createOne").call({
+        "language": context.locale.languageCode,
+      });
+
+      final bool success = response.data["success"];
+
+      if (!success) {
+        throw ErrorDescription("post_create_error".tr());
+      }
+
+      final String postId = response.data["post"]["id"];
+
+      NavigationStateHelper.post = null;
+      Beamer.of(context).beamToNamed(
+        HomeLocation.postRoute.replaceFirst(":postId", postId),
+        routeState: {
+          "postId": postId,
+        },
+      );
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _creatingPost = false);
     }
   }
 
