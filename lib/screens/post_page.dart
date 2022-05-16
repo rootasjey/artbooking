@@ -87,11 +87,11 @@ class _PostPageState extends ConsumerState<PostPage> {
       _post = navPost;
       _titleController.text = _post.name;
       _descriptionController.text = _post.description;
-      fetchPost();
+      fetchPostContent();
       listenToDocumentChanges(
           FirebaseFirestore.instance.collection("posts").doc(widget.postId));
     } else {
-      fetchPostMetadata().whenComplete(fetchPost);
+      fetchPostMetadata().whenComplete(fetchPostContent);
     }
   }
 
@@ -401,11 +401,30 @@ class _PostPageState extends ConsumerState<PostPage> {
         ActionChip(
           tooltip: "tag_add".tr(),
           elevation: 2.0,
-          label: Icon(UniconsLine.plus, size: 16.0),
+          label: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_post.tags.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Opacity(
+                    opacity: 0.8,
+                    child: Text(
+                      "tag_add".tr().toLowerCase(),
+                      style: Utilities.fonts.body(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              Icon(UniconsLine.plus, size: 16.0),
+            ],
+          ),
           onPressed: showAddTagModal,
         ),
       );
     }
+
     return Wrap(
       spacing: 12.0,
       runSpacing: 12.0,
@@ -415,15 +434,15 @@ class _PostPageState extends ConsumerState<PostPage> {
 
   Widget publishedAtWidget() {
     final publishedAt = _post.publishedAt;
-    final createdAtDiff = DateTime.now().difference(publishedAt);
-    final createdAtStr = createdAtDiff.inDays > 20
+    final publishedAtDiff = DateTime.now().difference(publishedAt);
+    final publishedAtStr = publishedAtDiff.inDays > 20
         ? Jiffy(publishedAt).yMMMEd
         : Jiffy(publishedAt).fromNow();
 
     return Opacity(
       opacity: 0.8,
       child: Text(
-        createdAtStr,
+        publishedAtStr,
         style: Utilities.fonts.body3(
           fontSize: 16.0,
           fontWeight: FontWeight.w600,
@@ -434,9 +453,19 @@ class _PostPageState extends ConsumerState<PostPage> {
 
   Widget updatedAtWidget() {
     final updatedAt = _post.updatedAt;
-    final updateBeforePub = Jiffy(updatedAt).isSameOrBefore(_post.publishedAt);
+    final bool updateSameOrBeforePub =
+        Jiffy(updatedAt).isSameOrBefore(_post.publishedAt);
 
-    if (updateBeforePub || updatedAt.difference(_post.publishedAt).inDays < 2) {
+    final bool updatePubDiff =
+        updatedAt.difference(_post.publishedAt).inMinutes < 30;
+
+    final bool dateTooClose = updateSameOrBeforePub || updatePubDiff;
+
+    if (_post.visibility == EnumContentVisibility.public && dateTooClose) {
+      return Container();
+    }
+
+    if (updatedAt.difference(_post.createdAt).inMinutes < 10) {
       return Container();
     }
 
@@ -457,7 +486,7 @@ class _PostPageState extends ConsumerState<PostPage> {
     );
   }
 
-  void fetchPost() async {
+  void fetchPostContent() async {
     if (_post.id.isEmpty) {
       return;
     }
@@ -477,6 +506,10 @@ class _PostPageState extends ConsumerState<PostPage> {
 
       for (final uint in uintList) {
         content += String.fromCharCode(uint);
+      }
+
+      if (content.isEmpty) {
+        content = "Start typing here...";
       }
 
       setState(() {
