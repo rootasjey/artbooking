@@ -7,15 +7,19 @@ class DarkOutlinedButton extends StatelessWidget {
     this.onPressed,
     required this.child,
     this.selected = false,
+    this.accentColor,
   }) : super(key: key);
 
+  final bool selected;
+  final Color? accentColor;
   final Function()? onPressed;
   final Widget child;
-  final bool selected;
 
   @override
   Widget build(BuildContext context) {
     final Color primaryColor = Theme.of(context).primaryColor;
+    final Color _accentColor =
+        accentColor != null ? accentColor! : primaryColor;
     final Color baseColor =
         Theme.of(context).textTheme.bodyText2?.color?.withOpacity(0.6) ??
             Colors.black;
@@ -35,11 +39,11 @@ class DarkOutlinedButton extends StatelessWidget {
         ),
         side: selected
             ? BorderSide(
-                color: primaryColor,
+                color: _accentColor,
                 width: 2.0,
               )
             : null,
-        primary: selected ? primaryColor : baseColor.withOpacity(0.4),
+        primary: selected ? _accentColor : baseColor.withOpacity(0.4),
         textStyle: Utilities.fonts.body(
           fontWeight: FontWeight.w600,
         ),
