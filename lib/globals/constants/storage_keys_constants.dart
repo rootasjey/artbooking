@@ -5,6 +5,7 @@ class StorageKeys {
   final String brightness = "brightness";
   final String dashboardSideMenuExpanded = "dashboard_side_menu_expanded";
   final String dashboardLicensesTab = "dashboard_licenses_tab";
+  final String dashboardPostTab = "dashboard_post_tab";
   final String dashboardLikesTab = "dashboard_likes_tab";
   final String dashboardIllustrationsTab = "dashboard_illustrations_tab";
   final String dashboardBooksTab = "dashboard_books_tab";

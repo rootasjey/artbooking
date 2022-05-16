@@ -1,4 +1,5 @@
 import 'package:artbooking/globals/constants.dart';
+import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/enums/enum_header_separator_tab.dart';
 import 'package:artbooking/types/enums/enum_items_layout.dart';
 import 'package:artbooking/globals/constants/storage_keys_constants.dart';
@@ -101,6 +102,14 @@ class StorageUtilities {
     return value == EnumLicenseType.staff.name
         ? EnumLicenseType.staff
         : EnumLicenseType.user;
+  }
+
+  EnumContentVisibility getPostTab() {
+    final String key = Constants.storageKeys.dashboardPostTab;
+    final String? value = _localStorage.getString(key);
+    return value == EnumContentVisibility.public.name
+        ? EnumContentVisibility.public
+        : EnumContentVisibility.private;
   }
 
   EnumVisibilityTab getBooksTab() {
@@ -209,6 +218,11 @@ class StorageUtilities {
   void saveLicenseTab(EnumLicenseType licenseTab) {
     final String key = Constants.storageKeys.dashboardLicensesTab;
     _localStorage.setString(key, licenseTab.name);
+  }
+
+  void savePostTab(EnumContentVisibility postTab) {
+    final String key = Constants.storageKeys.dashboardPostTab;
+    _localStorage.setString(key, postTab.name);
   }
 
   void saveLikesTab(EnumLikeType likeTab) {
