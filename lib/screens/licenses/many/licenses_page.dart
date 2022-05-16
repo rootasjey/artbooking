@@ -69,7 +69,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   initState() {
     super.initState();
     loadPreferences();
-    fetchLicense();
+    fetchLicenses();
   }
 
   @override
@@ -115,7 +115,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     );
   }
 
-  void fetchLicense() {
+  void fetchLicenses() {
     if (_selectedTab == EnumLicenseType.staff) {
       return fetchStaffLicenses();
     }
