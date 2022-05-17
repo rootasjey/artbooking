@@ -293,6 +293,13 @@ class _AboutPageState extends State<AboutPage> {
             hoverColor: Theme.of(context).secondaryHeaderColor,
             baseColor: baseColor,
           ),
+          AboutPageCreditItem(
+            textValue: "Lottie animations from Yogesh Pal",
+            onTap: () => launch("https://lottiefiles.com/99680-3-dots-loading"),
+            iconData: UniconsLine.star,
+            hoverColor: Theme.of(context).secondaryHeaderColor,
+            baseColor: baseColor,
+          ),
         ],
       ),
     );
