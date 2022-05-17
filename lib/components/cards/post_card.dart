@@ -2,6 +2,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums/enum_post_item_action.dart';
 import 'package:artbooking/types/post.dart';
 import 'package:flutter/material.dart';
+import 'package:unicons/unicons.dart';
 
 class PostCard extends StatefulWidget {
   const PostCard({
@@ -68,10 +69,6 @@ class _PostCardState extends State<PostCard> {
   Widget build(BuildContext context) {
     final post = widget.post;
 
-    // if (_borderColor == Colors.pink) {
-    //   _borderColor = Theme.of(context).primaryColor.withOpacity(0.6);
-    // }
-
     return SizedBox(
       width: widget.width,
       height: widget.height,
@@ -97,52 +94,83 @@ class _PostCardState extends State<PostCard> {
               _textBgColor = isHover ? Colors.amber : Colors.transparent;
             });
           },
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: Opacity(
-                    opacity: 0.6,
-                    child: Icon(
-                      Utilities.ui.getPostIcon(post.id),
-                      size: 32.0,
-                    ),
-                  ),
-                ),
-                Hero(
-                  tag: post.id,
-                  child: Opacity(
-                    opacity: 0.8,
-                    child: Text(
-                      post.name,
-                      maxLines: 2,
-                      style: Utilities.fonts.body(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w800,
-                        backgroundColor: _textBgColor,
+          child: Stack(
+            children: [
+              Positioned(
+                left: 0.0,
+                right: 0.0,
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: Opacity(
+                          opacity: 0.6,
+                          child: Icon(
+                            Utilities.ui.getPostIcon(post.id),
+                            size: 32.0,
+                          ),
+                        ),
                       ),
-                    ),
+                      Hero(
+                        tag: post.id,
+                        child: Opacity(
+                          opacity: 0.8,
+                          child: Text(
+                            post.name,
+                            maxLines: 2,
+                            style: Utilities.fonts.body(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w800,
+                              backgroundColor: _textBgColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Opacity(
+                        opacity: 0.4,
+                        child: Text(
+                          post.description,
+                          maxLines: widget.descriptionMaxLines,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          style: Utilities.fonts.body(
+                            fontSize: 15.0,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                Opacity(
-                  opacity: 0.4,
-                  child: Text(
-                    post.description,
-                    maxLines: widget.descriptionMaxLines,
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                    style: Utilities.fonts.body(
-                      fontSize: 15.0,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+              ),
+              if (widget.popupMenuEntries.isNotEmpty)
+                Positioned(
+                  bottom: 10.0,
+                  right: 10.0,
+                  child: popupMenuButton(),
                 ),
-              ],
-            ),
+            ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget popupMenuButton() {
+    return Opacity(
+      opacity: 0.8,
+      child: PopupMenuButton<EnumPostItemAction>(
+        icon: Icon(UniconsLine.ellipsis_h),
+        onSelected: (EnumPostItemAction action) {
+          widget.onPopupMenuItemSelected?.call(
+            action,
+            widget.index,
+            widget.post,
+          );
+        },
+        itemBuilder: (_) => widget.popupMenuEntries,
       ),
     );
   }
