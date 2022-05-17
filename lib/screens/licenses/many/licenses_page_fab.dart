@@ -6,9 +6,12 @@ class LicensesPageFab extends StatelessWidget {
     Key? key,
     required this.show,
     this.onPressed,
+    this.tooltip,
   }) : super(key: key);
+
   final bool show;
   final void Function()? onPressed;
+  final String? tooltip;
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +21,7 @@ class LicensesPageFab extends StatelessWidget {
 
     return FloatingActionButton(
       onPressed: onPressed,
+      tooltip: tooltip,
       child: Icon(UniconsLine.plus),
       backgroundColor: Theme.of(context).secondaryHeaderColor,
     );
