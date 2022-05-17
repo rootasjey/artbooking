@@ -140,26 +140,19 @@ export const deleteOne = functions
     }
 
     // Delete files from Cloud Storage
-    // const dir = await adminApp.storage()
-    //   .bucket()
-    //   .getFiles({
-    //     directory: `posts/${post_id}`
-    //   });
-
-    // const files = dir[0];
-    // for await (const file of files) {
-    //   await file.delete();
-    // }
+    await adminApp.storage()
+      .bucket()
+      .deleteFiles({
+        prefix: `posts/${post_id}/`,
+      });
 
     await firebaseTools.firestore
       .delete(`posts/${post_id}`, {
         project: process.env.GCLOUD_PROJECT,
         recursive: true,
         yes: true,
+        force: true,
       });
-
-
-    await postSnap.ref.delete();
 
     return {
       post: {
