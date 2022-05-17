@@ -11,10 +11,10 @@ class IllustrationsPageBody extends StatelessWidget {
     Key? key,
     required this.loading,
     required this.illustrations,
-    this.onTapIllustrationCard,
     required this.likePopupMenuEntries,
-    this.onPopupMenuItemSelected,
     required this.unlikePopupMenuEntries,
+    this.onTapIllustrationCard,
+    this.onPopupMenuItemSelected,
     this.onDoubleTap,
   }) : super(key: key);
 

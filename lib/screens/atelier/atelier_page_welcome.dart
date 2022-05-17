@@ -134,9 +134,12 @@ class AtelierPageWelcome extends ConsumerWidget {
 
     bool canManageSections = false;
     bool canManageReviews = false;
+    bool canManagePosts = false;
+
     if (userFirestore != null) {
       canManageSections = userFirestore.rights.canManageSections;
       canManageReviews = userFirestore.rights.canManageReviews;
+      canManagePosts = userFirestore.rights.canManagePosts;
     }
 
     final List<Widget> children = [
@@ -221,6 +224,16 @@ class AtelierPageWelcome extends ConsumerWidget {
           textSubtitle: "sections_subtitle".tr(),
           onTap: () {
             context.beamToNamed(AtelierLocationContent.sectionsRoute);
+          },
+        ),
+      if (canManagePosts)
+        AtelierPageCard(
+          hoverColor: Constants.colors.sections,
+          iconData: UniconsLine.file_edit_alt,
+          textTitle: "posts".tr(),
+          textSubtitle: "posts_presentation_subtitle".tr(),
+          onTap: () {
+            context.beamToNamed(AtelierLocationContent.postsRoute);
           },
         ),
       AtelierPageCard(

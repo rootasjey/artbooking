@@ -310,6 +310,12 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
           hoverColor: Constants.colors.review,
           routePath: AtelierLocationContent.reviewRoute,
         ),
+      if (rights.canManagePosts)
+        SideMenuItem(
+            iconData: UniconsLine.file_edit_alt,
+            label: "posts".tr(),
+            hoverColor: Constants.colors.sections,
+            routePath: AtelierLocationContent.postsRoute),
       if (rights.canManageSections)
         SideMenuItem(
           iconData: UniconsLine.web_grid,

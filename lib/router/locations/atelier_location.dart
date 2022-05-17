@@ -5,6 +5,8 @@ import 'package:artbooking/screens/atelier/atelier_page.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page.dart';
 import 'package:artbooking/screens/atelier/review/review_page.dart';
 import 'package:artbooking/screens/likes/likes_page.dart';
+import 'package:artbooking/screens/post_page.dart';
+import 'package:artbooking/screens/posts/many/posts_page.dart';
 import 'package:artbooking/screens/sections/many/sections_page.dart';
 import 'package:artbooking/screens/sections/one/section_page.dart';
 import 'package:artbooking/screens/settings/delete_account/delete_account_page.dart';
@@ -94,6 +96,9 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
 
   static const String likesRoute = "$route/likes";
 
+  static const String postsRoute = "$route/posts";
+  static const String postRoute = "$postsRoute/:postId";
+
   /// Profile route value for this location.
   static const String profileRoute = "$route/profile";
 
@@ -162,6 +167,8 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
         profileBookRoute,
         profileIllustrationBookRoute,
         reviewRoute,
+        postsRoute,
+        postRoute,
       ];
 
   @override
@@ -303,6 +310,22 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
           child: ReviewPage(),
           key: ValueKey("$reviewRoute"),
           title: Utilities.ui.getPageTitle("review".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
+      if (state.pathPatternSegments.contains("posts"))
+        BeamPage(
+          child: PostsPage(),
+          key: ValueKey("$postsRoute"),
+          title: Utilities.ui.getPageTitle("posts".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
+      if (state.pathPatternSegments.contains(":postId"))
+        BeamPage(
+          child: PostPage(
+            postId: state.pathParameters["postId"] ?? "",
+          ),
+          key: ValueKey("$postRoute"),
+          title: Utilities.ui.getPageTitle("post".tr()),
           type: BeamPageType.fadeTransition,
         ),
     ];
