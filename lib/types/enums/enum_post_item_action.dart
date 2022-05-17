@@ -1,4 +1,6 @@
 enum EnumPostItemAction {
+  create,
+  delete,
   edit,
   remove,
 
