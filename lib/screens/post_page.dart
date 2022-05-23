@@ -292,7 +292,7 @@ class _PostPageState extends ConsumerState<PostPage> {
           maxLines: null,
           onChanged: onTitleChanged,
           decoration: InputDecoration(
-            hintText: "post_description".tr(),
+            hintText: "post_description".tr() + "...",
             border: InputBorder.none,
           ),
         ),
