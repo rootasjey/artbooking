@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
+import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -9,7 +10,7 @@ import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page_fab.dart';
 import 'package:artbooking/screens/posts/many/posts_page_body.dart';
 import 'package:artbooking/screens/posts/many/posts_page_header.dart';
-import 'package:artbooking/types/cloud_functions/license_response.dart';
+import 'package:artbooking/types/cloud_functions/post_response.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/enums/enum_post_item_action.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
@@ -17,7 +18,6 @@ import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/json_types.dart';
-import 'package:artbooking/types/enums/enum_license_type.dart';
 import 'package:artbooking/types/popup_entry_post.dart';
 import 'package:artbooking/types/post.dart';
 import 'package:artbooking/types/user/user.dart';
@@ -43,8 +43,14 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
   /// True if loading more style from Firestore.
   bool _loadingMore = false;
 
+  /// Posts displayed order.
   bool _descending = true;
+
+  /// True if the data is loading.
   bool _loading = false;
+
+  /// True if currently creating a new post.
+  bool _creating = false;
 
   /// Last fetched document snapshot. Used for pagination.
   DocumentSnapshot<Object>? _lastDocumentSnapshot;
@@ -96,16 +102,18 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
   @override
   Widget build(BuildContext context) {
     final User user = ref.watch(AppState.userProvider);
-    final bool canManageStaffLicense =
-        user.firestoreUser?.rights.canManageLicenses ?? false;
+    final bool canManagePosts =
+        user.firestoreUser?.rights.canManagePosts ?? false;
 
-    final bool canManageLicense =
-        _selectedTab == EnumLicenseType.staff ? canManageStaffLicense : true;
+    if (_creating) {
+      return creatingWidget();
+    }
 
     return Scaffold(
       floatingActionButton: LicensesPageFab(
-        show: canManageLicense,
-        onPressed: openNewLicenseDialog,
+        show: canManagePosts,
+        onPressed: tryCreatePost,
+        tooltip: "post_create".tr(),
       ),
       body: CustomScrollView(
         slivers: <Widget>[
@@ -119,11 +127,35 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
             loading: _loading,
             onTap: onTapPost,
             selectedTab: _selectedTab,
-            onDeletePost: canManageLicense ? onDeletePost : null,
-            onCreatePost: openNewLicenseDialog,
+            onDeletePost: canManagePosts ? onDeletePost : null,
+            onCreatePost: tryCreatePost,
             popupMenuEntries: _postPopupMenuEntries,
             onPopupMenuItemSelected: onPopupMenuItemSelected,
           )
+        ],
+      ),
+    );
+  }
+
+  Widget creatingWidget() {
+    final double marginTop = MediaQuery.of(context).size.height / 3;
+
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          ApplicationBar(),
+          SliverPadding(
+            padding: EdgeInsets.only(top: marginTop),
+            sliver: LoadingView(
+              title: Text(
+                "post_creating".tr() + "...",
+                style: Utilities.fonts.body(
+                  fontSize: 32.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -422,12 +454,10 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
   }
 
   void onTapPost(Post post) {
-    final route =
-        AtelierLocationContent.postRoute.replaceFirst(':postId', post.id);
-
-    Beamer.of(context).beamToNamed(route, data: {
-      'postId': post.id,
-    });
+    Beamer.of(context).beamToNamed(
+      AtelierLocationContent.postRoute.replaceFirst(":postId", post.id),
+      data: {"postId": post.id},
+    );
   }
 
   /// Fire when a new document has been updated in Firestore.
@@ -460,14 +490,33 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
     }
   }
 
-  void openNewLicenseDialog() async {
-    // await showCupertinoModalBottomSheet(
-    //   context: context,
-    //   builder: (context) => EditLicensePage(
-    //     licenseId: "",
-    //     type: _selectedTab,
-    //   ),
-    // );
+  void tryCreatePost() async {
+    setState(() => _creating = true);
+
+    try {
+      final response = await Utilities.cloud.fun("posts-createOne").call({
+        "language": context.locale.languageCode,
+      });
+
+      final bool success = response.data["success"];
+
+      if (!success) {
+        throw ErrorDescription("post_create_error".tr());
+      }
+
+      final String createdPostId = response.data["post"]["id"];
+      Beamer.of(context).beamToNamed(
+        AtelierLocationContent.postRoute.replaceFirst(":postId", createdPostId),
+        data: {
+          "postId": createdPostId,
+        },
+      );
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _creating = false);
+    }
   }
 
   void showDeleteConfirmDialog(Post post, int index) {
@@ -531,7 +580,6 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
   }
 
   void tryDeletePost(Post post, int index) async {
-    Utilities.logger.i("deleting post ${post.id}");
     setState(() => _posts.removeAt(index));
 
     try {
@@ -539,7 +587,7 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
         "post_id": post.id,
       });
 
-      final data = LicenseResponse.fromJSON(response.data);
+      final data = PostResponse.fromJSON(response.data);
       if (data.success) {
         return;
       }
