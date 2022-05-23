@@ -3,15 +3,19 @@ import 'dart:typed_data';
 
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/buttons/lang_popup_menu_button.dart';
+import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/user_avatar_extended.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
-import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
+import 'package:artbooking/types/cloud_functions/post_response.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
+import 'package:artbooking/types/enums/enum_post_item_action.dart';
 import 'package:artbooking/types/firestore/document_map.dart';
 import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/json_types.dart';
@@ -25,6 +29,7 @@ import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:lottie/lottie.dart';
 import 'package:super_editor/super_editor.dart';
 import 'package:unicons/unicons.dart';
 
@@ -42,10 +47,12 @@ class PostPage extends ConsumerStatefulWidget {
 
 class _PostPageState extends ConsumerState<PostPage> {
   /// True if the post is being loaded.
-  var _loading = false;
+  bool _loading = false;
 
   /// True if the post is being saved.
-  var _saving = false;
+  bool _saving = false;
+
+  bool _deleting = false;
 
   /// Post model.
   var _post = Post.empty();
@@ -112,6 +119,10 @@ class _PostPageState extends ConsumerState<PostPage> {
         ref.watch(AppState.userProvider).firestoreUser;
     final canManagePosts = userFirestore?.rights.canManagePosts ?? false;
 
+    if (_deleting) {
+      return deletingWidget();
+    }
+
     return Scaffold(
       body: Stack(
         children: [
@@ -122,12 +133,38 @@ class _PostPageState extends ConsumerState<PostPage> {
               body(canEdit: canManagePosts),
             ],
           ),
+          Positioned(
+            top: 100.0,
+            right: 46.0,
+            child: PopupMenuButton(
+              icon: Icon(UniconsLine.setting),
+              tooltip: "post_settings".tr(),
+              itemBuilder: (_) => [
+                PopupMenuItemIcon(
+                  value: EnumPostItemAction.delete,
+                  icon: Icon(UniconsLine.trash_alt),
+                  textLabel: "delete".tr(),
+                ),
+              ],
+              onSelected: (EnumPostItemAction action) {
+                switch (action) {
+                  case EnumPostItemAction.delete:
+                    showDeleteConfirm();
+                    break;
+                  default:
+                }
+              },
+            ),
+          ),
           if (_saving)
             Positioned(
               top: 120.0,
-              right: 20.0,
-              child: PopupProgressIndicator(
-                message: "post_saving".tr() + "...",
+              right: 40.0,
+              child: Lottie.asset(
+                "assets/animations/dots.json",
+                repeat: true,
+                width: 100.0,
+                height: 100.0,
               ),
             ),
         ],
@@ -199,6 +236,28 @@ class _PostPageState extends ConsumerState<PostPage> {
         children: [
           publishedAtWidget(),
           updatedAtWidget(),
+        ],
+      ),
+    );
+  }
+
+  Widget deletingWidget() {
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          ApplicationBar(),
+          SliverPadding(
+            padding: const EdgeInsets.only(top: 120.0),
+            sliver: LoadingView(
+              title: Text(
+                "post_delete".tr(),
+                style: Utilities.fonts.body(
+                  fontSize: 32.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -810,5 +869,64 @@ class _PostPageState extends ConsumerState<PostPage> {
     } finally {
       setState(() => _saving = false);
     }
+  }
+
+  void showDeleteConfirm() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return DeleteDialog(
+          titleValue: "post_delete".tr(),
+          descriptionValue: "post_delete_description".tr(),
+          onValidate: tryDeletePost,
+        );
+      },
+    );
+  }
+
+  void tryDeletePost() async {
+    setState(() => _deleting = true);
+
+    try {
+      final response = await Utilities.cloud.fun("posts-deleteOne").call({
+        "post_id": _post.id,
+      });
+
+      final data = PostResponse.fromJSON(response.data);
+
+      if (data.success) {
+        _deleting = false;
+        navigateBack();
+        return;
+      }
+
+      throw ErrorDescription("post_delete_failed".tr());
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+      setState(() => _deleting = false);
+    }
+  }
+
+  void navigateBack() {
+    final location = Beamer.of(context)
+        .beamingHistory
+        .last
+        .history
+        .last
+        .routeInformation
+        .location;
+
+    if (location == null) {
+      Beamer.of(context).beamToNamed(AtelierLocationContent.postsRoute);
+      return;
+    }
+
+    if (location.contains("atelier")) {
+      Beamer.of(context).beamToNamed(AtelierLocationContent.postsRoute);
+      return;
+    }
+
+    Beamer.of(context).beamToNamed(HomeLocation.route);
   }
 }
