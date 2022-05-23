@@ -242,15 +242,17 @@ class _PostPageState extends ConsumerState<PostPage> {
   }
 
   Widget deletingWidget() {
+    final double marginTop = MediaQuery.of(context).size.height / 3;
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           ApplicationBar(),
           SliverPadding(
-            padding: const EdgeInsets.only(top: 120.0),
+            padding: EdgeInsets.only(top: marginTop),
             sliver: LoadingView(
               title: Text(
-                "post_delete".tr(),
+                "post_deleting".tr() + "...",
                 style: Utilities.fonts.body(
                   fontSize: 32.0,
                   fontWeight: FontWeight.w600,
