@@ -1,4 +1,5 @@
 import 'package:artbooking/actions/illustrations.dart';
+import 'package:artbooking/components/resizer/frame.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/drag_data.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
@@ -33,7 +34,9 @@ class IllustrationCard extends StatefulWidget {
     this.onDoubleTap,
     this.onTapLike,
     this.onDrop,
+    this.onGrowUp,
     this.onDragUpdate,
+    this.onResizeEnd,
     this.canDrag = false,
     this.useAsPlaceholder = false,
     this.useIconPlaceholder = false,
@@ -75,6 +78,18 @@ class IllustrationCard extends StatefulWidget {
 
   /// Trigger when the user double taps on this card.
   final void Function()? onDoubleTap;
+
+  /// Trigger when this illustration card' resize ends.
+  final void Function(
+    Size endSize,
+    Size originalSize,
+    DragEndDetails details,
+    int index,
+  )? onResizeEnd;
+
+  /// Function callback to handle illustration card grows up.
+  /// This fires after onTap on a button.
+  final void Function(int index)? onGrowUp;
 
   /// Trigger when the user taps on this card.
   final void Function()? onTap;
@@ -250,14 +265,10 @@ class _IllustrationCardState extends State<IllustrationCard>
                   child: Stack(
                     children: [
                       multiSelectIndicator(),
-                      if (widget.popupMenuEntries.isNotEmpty)
-                        Positioned(
-                          bottom: 10.0,
-                          right: 10.0,
-                          child: popupMenuButton(),
-                        ),
                       likeOverlay(),
                       likeAnimationOverlay(),
+                      borderOverlay(),
+                      popupMenuButton(),
                     ],
                   ),
                 ),
@@ -522,7 +533,11 @@ class _IllustrationCardState extends State<IllustrationCard>
   }
 
   Widget popupMenuButton() {
-    return Opacity(
+    if (widget.popupMenuEntries.isEmpty) {
+      return Container();
+    }
+
+    final Widget child = Opacity(
       opacity: _showPopupMenu ? 1.0 : 0.0,
       child: PopupMenuButton<EnumIllustrationItemAction>(
         icon: MirrorAnimation<Color?>(
@@ -548,6 +563,20 @@ class _IllustrationCardState extends State<IllustrationCard>
         },
         itemBuilder: (_) => widget.popupMenuEntries,
       ),
+    );
+
+    if (widget.canDrag) {
+      return Positioned(
+        top: 10.0,
+        right: 10.0,
+        child: child,
+      );
+    }
+
+    return Positioned(
+      bottom: 10.0,
+      right: 10.0,
+      child: child,
     );
   }
 
@@ -598,6 +627,28 @@ class _IllustrationCardState extends State<IllustrationCard>
       widget.illustrationKey,
       widget.illustration,
       widget.selected,
+    );
+  }
+
+  Widget borderOverlay() {
+    if (!_showPopupMenu) {
+      return Container();
+    }
+
+    return Resizer(
+      onTap: () => widget.onGrowUp?.call(widget.index),
+      onResizeEnd: (endSize, originalSize, details) {
+        widget.onResizeEnd?.call(endSize, originalSize, details, widget.index);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Theme.of(context).primaryColor,
+            width: 4.0,
+          ),
+          borderRadius: BorderRadius.circular(16.0),
+        ),
+      ),
     );
   }
 }
