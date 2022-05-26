@@ -4,6 +4,8 @@ import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums/enum_section_visibility.dart';
 import 'package:artbooking/types/header_separator.dart';
+import 'package:artbooking/types/illustration/sized_illustration.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
@@ -15,7 +17,9 @@ import 'package:flutter/material.dart';
 class Section {
   Section({
     required this.backgroundColor,
+    required this.complexItems,
     required this.borderColor,
+    this.hasComplexItems = false,
     required this.textColor,
     required this.createdAt,
     required this.dataTypes,
@@ -25,12 +29,17 @@ class Section {
     required this.headerSeparator,
     required this.id,
     required this.items,
+    required this.maxItems,
     required this.name,
     required this.size,
     required this.sizes,
     required this.updatedAt,
     required this.visibility,
   });
+
+  /// True if this section has complex items = items with more than an id property.
+  /// This will modify the behaviour of saving & loading items data.
+  final bool hasComplexItems;
 
   /// Id of this section. It matches a specific design.
   final String id;
@@ -40,6 +49,10 @@ class Section {
 
   /// Section's border color;
   final int borderColor;
+
+  /// Number of selectable items.
+  /// If -1, there’s no limit of items that can be displayed.
+  final int maxItems;
 
   /// Section's text color;
   final int textColor;
@@ -64,6 +77,8 @@ class Section {
   /// Item ids. Can match books or illustrations.
   final List<String> items;
 
+  final List<SizedIllustration> complexItems;
+
   /// How large should this sectionn be?
   final EnumSectionSize size;
 
@@ -80,7 +95,9 @@ class Section {
 
   Section copyWith({
     int? backgroundColor,
+    List<SizedIllustration>? complexItems,
     int? borderColor,
+    bool? hasComplexItems,
     int? textColor,
     String? id,
     DateTime? createdAt,
@@ -88,6 +105,7 @@ class Section {
     EnumSectionDataMode? dataFetchMode,
     List<EnumSectionDataMode>? dataFetchModes,
     HeaderSeparator? headerSeparator,
+    int? maxItems,
     String? name,
     List<String>? items,
     EnumSectionSize? size,
@@ -98,14 +116,17 @@ class Section {
   }) {
     return Section(
       backgroundColor: backgroundColor ?? this.backgroundColor,
+      complexItems: complexItems ?? this.complexItems,
       borderColor: borderColor ?? this.borderColor,
       createdAt: createdAt ?? this.createdAt,
       dataTypes: dataTypes ?? this.dataTypes,
       description: description ?? this.description,
       dataFetchMode: dataFetchMode ?? this.dataFetchMode,
       dataFetchModes: dataFetchModes ?? this.dataFetchModes,
+      hasComplexItems: hasComplexItems ?? this.hasComplexItems,
       headerSeparator: headerSeparator ?? this.headerSeparator,
       id: id ?? this.id,
+      maxItems: maxItems ?? this.maxItems,
       name: name ?? this.name,
       items: items ?? this.items,
       size: size ?? this.size,
@@ -119,12 +140,15 @@ class Section {
   Map<String, dynamic> toMap({bool withId = true}) {
     final map = {
       "background_color": backgroundColor,
+      "complex_items": seralizeComplexItems(),
       "border_color": borderColor,
       "data_mode": dataFetchModeToString(dataFetchMode),
       "data_modes": dataFetchModesToStrings(),
       "data_types": dataTypesToStrings(),
       "description": description,
+      "has_complex_items": hasComplexItems,
       "header_separator": headerSeparator.toMap(),
+      "max_items": maxItems,
       "name": name,
       "items": items,
       "size": sectionSizeToString(size),
@@ -140,17 +164,30 @@ class Section {
     return map;
   }
 
+  List<Json> seralizeComplexItems() {
+    final List<Json> illustrations = [];
+
+    for (final SizedIllustration item in complexItems) {
+      illustrations.add(item.toMap());
+    }
+
+    return illustrations;
+  }
+
   factory Section.empty() {
     return Section(
       backgroundColor: Constants.colors.lightBackground.value,
+      complexItems: [],
       borderColor: Constants.colors.lightBackground.value,
       createdAt: DateTime.now(),
       dataFetchMode: EnumSectionDataMode.chosen,
       dataFetchModes: [],
       dataTypes: [],
       description: "",
+      hasComplexItems: false,
       headerSeparator: HeaderSeparator.empty(),
       id: "",
+      maxItems: 6,
       name: "",
       items: [],
       size: EnumSectionSize.large,
@@ -171,14 +208,17 @@ class Section {
 
     return Section(
       backgroundColor: backgroundColor,
+      complexItems: deserializeComplexItems(map["complex_items"]),
       borderColor: borderColor,
       createdAt: Utilities.date.fromFirestore(map["created_at"]),
       dataTypes: stringsToDataTypes(map["data_types"]),
       description: map["description"] ?? "",
       dataFetchMode: stringToDataFetchMode(map["data_mode"]),
       dataFetchModes: stringsToDataFetchModes(map["data_modes"]),
+      hasComplexItems: map["has_complex_items"] ?? false,
       headerSeparator: HeaderSeparator.fromMap(map["header_separator"]),
       id: map["id"] ?? "",
+      maxItems: map["max_items"] ?? 6,
       items: map["items"] != null ? List<String>.from(map["items"]) : [],
       name: map["name"] ?? "",
       size: stringToSize(map["size"]),
@@ -187,6 +227,20 @@ class Section {
       updatedAt: Utilities.date.fromFirestore(map["updated_at"]),
       visibility: stringToVisibility(map["visibility"]),
     );
+  }
+
+  static List<SizedIllustration> deserializeComplexItems(dynamic map) {
+    if (map == null) {
+      return [];
+    }
+
+    final List<SizedIllustration> complexItems = [];
+
+    for (final item in map) {
+      complexItems.add(SizedIllustration.fromMap(item));
+    }
+
+    return complexItems;
   }
 
   static String dataFetchModeToString(EnumSectionDataMode dataFetchMode) {
@@ -237,7 +291,7 @@ class Section {
 
     final List<String> modeList = [];
 
-    for (var mode in this.dataFetchModes) {
+    for (final mode in this.dataFetchModes) {
       modeList.add(dataFetchModeToString(mode));
     }
 
@@ -381,13 +435,13 @@ class Section {
   @override
   String toString() {
     return "Section(id: $id,  backgroundColor: $backgroundColor, "
-        "borderColor: $borderColor"
+        "complexItems: $complexItems, borderColor: $borderColor"
         "createdAt: ${createdAt.toString()} description: $description, "
         "dataFetchMode: $dataFetchMode, dataModes: $dataFetchModes, "
-        "headerSeparator: $headerSeparator"
-        "name: $name, items: $items, size: $size, textColor: $textColor "
-        "types: $dataTypes, updatedAt: ${updatedAt.toString()},"
-        "visibility: ${visibility.name})";
+        "hasComplexItems: $hasComplexItems, headerSeparator: $headerSeparator"
+        "maxItems: $maxItems, name: $name, items: $items, size: $size, "
+        "textColor: $textColor, types: $dataTypes, "
+        "updatedAt: ${updatedAt.toString()}, visibility: ${visibility.name})";
   }
 
   @override
@@ -396,6 +450,7 @@ class Section {
 
     return other is Section &&
         other.id == id &&
+        listEquals(other.complexItems, complexItems) &&
         other.borderColor == borderColor &&
         other.createdAt == createdAt &&
         other.backgroundColor == backgroundColor &&
@@ -403,7 +458,9 @@ class Section {
         listEquals(other.dataFetchModes, dataFetchModes) &&
         listEquals(other.dataTypes, dataTypes) &&
         other.description == description &&
+        other.hasComplexItems == hasComplexItems &&
         other.headerSeparator == headerSeparator &&
+        other.maxItems == maxItems &&
         other.name == name &&
         listEquals(other.items, items) &&
         other.size == size &&
@@ -417,13 +474,16 @@ class Section {
   int get hashCode {
     return id.hashCode ^
         backgroundColor.hashCode ^
+        complexItems.hashCode ^
         borderColor ^
         createdAt.hashCode ^
         dataTypes.hashCode ^
         description.hashCode ^
         dataFetchMode.hashCode ^
         dataFetchModes.hashCode ^
+        hasComplexItems.hashCode ^
         headerSeparator.hashCode ^
+        maxItems.hashCode ^
         name.hashCode ^
         items.hashCode ^
         size.hashCode ^
