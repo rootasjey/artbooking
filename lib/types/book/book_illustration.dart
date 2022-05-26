@@ -42,8 +42,8 @@ class BookIllustration {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'createdAt': createdAt.millisecondsSinceEpoch,
-      'scaleFactor': scaleFactor.toMap(),
+      'created_at': createdAt.millisecondsSinceEpoch,
+      'scale_factor': scaleFactor.toMap(),
     };
   }
 
