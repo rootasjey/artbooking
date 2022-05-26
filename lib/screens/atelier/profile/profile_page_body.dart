@@ -13,6 +13,7 @@ import 'package:artbooking/screens/atelier/profile/sections/h1_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/h4_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/illustration_row_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/illustration_window_section.dart';
+import 'package:artbooking/screens/atelier/profile/sections/mozaic_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/news_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/poster_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/spacing_section.dart';
@@ -430,6 +431,21 @@ class ProfilePageBody extends StatelessWidget {
         isLast: index == artisticPage.sections.length - 1,
         popupMenuEntries: popupMenuEntries,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
+      );
+    }
+
+    if (section.id == SectionIds.mozaic) {
+      return MozaicSection(
+        index: index,
+        section: section,
+        userId: userId,
+        editMode: editMode,
+        usingAsDropTarget: usingAsDropTarget,
+        isLast: index == artisticPage.sections.length - 1,
+        onShowIllustrationDialog: onShowIllustrationDialog,
+        popupMenuEntries: popupMenuEntries,
+        onPopupMenuItemSelected: onPopupMenuItemSelected,
+        onUpdateSectionItems: onUpdateSectionItems,
       );
     }
 

@@ -16,11 +16,13 @@ import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_body.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_empty.dart';
 import 'package:artbooking/types/artistic_page.dart';
+import 'package:artbooking/types/book/scale_factor.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_section_size.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/firestore/doc_snapshot_stream_subscription.dart';
+import 'package:artbooking/types/illustration/sized_illustration.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/named_color.dart';
 import 'package:artbooking/types/section.dart';
@@ -886,21 +888,38 @@ class _ModularPageState extends ConsumerState<ModularPage> {
       List<String> combinedItems = section.items;
       combinedItems.addAll(newItems);
 
-      if (combinedItems.length > 6) {
-        combinedItems = combinedItems.sublist(0, 6);
+      if (combinedItems.length > section.maxItems) {
+        combinedItems = combinedItems.sublist(0, section.maxItems);
       }
 
-      final editedSection = section.copyWith(
+      Section editedSection = section.copyWith(
         items: combinedItems,
       );
+
+      if (section.hasComplexItems) {
+        List<SizedIllustration> addedComplexItems = newItems
+            .map(
+              (String id) => SizedIllustration(
+                id: id,
+                scaleFactor: ScaleFactor(),
+              ),
+            )
+            .toList();
+
+        if (addedComplexItems.length > section.maxItems) {
+          addedComplexItems = addedComplexItems.sublist(0, section.maxItems);
+        }
+
+        editedSection = editedSection.copyWith(
+          complexItems: editedSection.complexItems..addAll(addedComplexItems),
+        );
+      }
 
       _modularPage.sections.replaceRange(
         index,
         index + 1,
         [editedSection],
       );
-
-      // final String userId = getUserId();
 
       await FirebaseFirestore.instance
           .collection("pages")
