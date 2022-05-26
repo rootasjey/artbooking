@@ -1032,7 +1032,8 @@
     "Ia4ELuQRoVF4pQ9nh5Nw": "Un componsant ayant un titre et une description.",
     "i9OIQ45t6yPVPyewH2V9": "Une liste arbitraire d'artistes spécifiquement sélectioné.e.s. Cliquer sur les avatarss renvoie sur la page de profile de l'artist..",
     "Qn3xnQFhflIunbULCdu4": "Une section, généralement placée en bas de page, présentant les liens principaux de l'application, les pages d'informations, et des mentions légales ennuyantes.",
-    "dv9CuYRappSfnh5FiLfQ": "Les derniers articles publiés sur divers sujets (mise à jour de l'application, challenges, le travail d'un artist)."
+    "dv9CuYRappSfnh5FiLfQ": "Les derniers articles publiés sur divers sujets (mise à jour de l'application, challenges, le travail d'un artist).",
+    "OfmMRxHRgBHRsRiC9Ask": "Une grille d'illustrations contenant des éléments de tailles variables."
   },
   "section_edit_existing": "Mettre à jour une section existante.",
   "section_name": {
@@ -1051,7 +1052,8 @@
     "Ia4ELuQRoVF4pQ9nh5Nw": "Title + Description",
     "i9OIQ45t6yPVPyewH2V9": "Featured Artists",
     "Qn3xnQFhflIunbULCdu4": "Footer",
-    "dv9CuYRappSfnh5FiLfQ": "News"
+    "dv9CuYRappSfnh5FiLfQ": "News",
+    "OfmMRxHRgBHRsRiC9Ask": "Mozaïc"
   },
   "section_rename": "Renommer cette section",
   "section_rename_description": "Éditer la description.",

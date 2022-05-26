@@ -1033,7 +1033,8 @@
     "Ia4ELuQRoVF4pQ9nh5Nw": "A title + description component.",
     "i9OIQ45t6yPVPyewH2V9": "A component showing featured artists linking to their profile page.",
     "Qn3xnQFhflIunbULCdu4": "A section, often at the bottom of the page, presenting main application links, about page, and some boring legal stuff.",
-    "dv9CuYRappSfnh5FiLfQ": "Last published posts on various topics (app updates, challenges, artist's work)."
+    "dv9CuYRappSfnh5FiLfQ": "Last published posts on various topics (app updates, challenges, artist's work).",
+    "OfmMRxHRgBHRsRiC9Ask": "A grid of illustrations with variable sized items."
   },
   "section_edit_existing": "Update this existing section.",
   "section_name": {
@@ -1052,7 +1053,8 @@
     "Ia4ELuQRoVF4pQ9nh5Nw": "Title + Description",
     "i9OIQ45t6yPVPyewH2V9": "Featured Artists",
     "Qn3xnQFhflIunbULCdu4": "Footer",
-    "dv9CuYRappSfnh5FiLfQ": "News"
+    "dv9CuYRappSfnh5FiLfQ": "News",
+    "OfmMRxHRgBHRsRiC9Ask": "Mozaïc"
   },
   "section_rename": "Rename section",
   "section_rename_description": "Give a new description to this section.",
