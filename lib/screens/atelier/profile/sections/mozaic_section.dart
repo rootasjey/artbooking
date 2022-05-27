@@ -4,6 +4,7 @@ import 'package:artbooking/components/cards/illustration_card.dart';
 import 'package:artbooking/components/cards/shimmer_card.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/screens/atelier/profile/popup_menu_button_section.dart';
 import 'package:artbooking/types/book/scale_factor.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
@@ -92,9 +93,6 @@ class _MozaicSectionState extends State<MozaicSection> {
   /// Otherwise, simply do a data diff. and update only some UI parts.
   var _currentMode = EnumSectionDataMode.sync;
 
-  final List<int> crossAxisCellList = [2, 1, 1, 2, 2];
-  final List<int> mainAxisCellList = [2, 1, 1, 3, 2];
-
   @override
   initState() {
     super.initState();
@@ -141,7 +139,7 @@ class _MozaicSectionState extends State<MozaicSection> {
             decoration: boxDecoration,
             padding: const EdgeInsets.symmetric(
               horizontal: 48.0,
-              vertical: 24.0,
+              vertical: 32.0,
             ),
             child: Column(
               children: [
@@ -344,29 +342,15 @@ class _MozaicSectionState extends State<MozaicSection> {
       return Container();
     }
 
-    final popupMenuEntries = getPopupMenuEntries();
-
-    return Positioned(
-      top: 12.0,
-      right: 12.0,
-      child: PopupMenuButton(
-        child: Card(
-          elevation: 2.0,
-          color: Theme.of(context).backgroundColor,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Icon(UniconsLine.ellipsis_h),
-          ),
-        ),
-        itemBuilder: (_) => popupMenuEntries,
-        onSelected: (EnumSectionAction action) {
-          widget.onPopupMenuItemSelected?.call(
-            action,
-            widget.index,
-            widget.section,
-          );
-        },
-      ),
+    return PopupMenuButtonSection(
+      itemBuilder: (_) => getPopupMenuEntries(),
+      onSelected: (EnumSectionAction action) {
+        widget.onPopupMenuItemSelected?.call(
+          action,
+          widget.index,
+          widget.section,
+        );
+      },
     );
   }
 
@@ -378,45 +362,41 @@ class _MozaicSectionState extends State<MozaicSection> {
       return Container();
     }
 
-    return Column(
-      children: [
-        InkWell(
+    return Align(
+      alignment: Alignment.topLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 12.0),
+        child: InkWell(
           onTap: onTapTitleDescription,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (title.isNotEmpty)
                 Opacity(
-                  opacity: 0.6,
+                  opacity: 0.8,
                   child: Text(
                     title,
-                    style: Utilities.fonts.body(
-                      fontSize: 18.0,
+                    style: Utilities.fonts.title(
+                      fontSize: 32.0,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
               if (description.isNotEmpty)
                 Opacity(
-                  opacity: 0.4,
+                  opacity: 0.6,
                   child: Text(
                     description,
                     style: Utilities.fonts.body(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w300,
                     ),
                   ),
                 ),
             ],
           ),
         ),
-        SizedBox(
-          width: 200.0,
-          child: Divider(
-            color: Theme.of(context).secondaryHeaderColor,
-            thickness: 4.0,
-          ),
-        ),
-      ],
+      ),
     );
   }
 
