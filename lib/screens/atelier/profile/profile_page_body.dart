@@ -503,8 +503,8 @@ class ProfilePageBody extends StatelessWidget {
             },
           ),
           Positioned(
-            top: 12.0,
-            left: 12.0,
+            top: 24.0,
+            right: 88.0,
             child: Draggable<DragData>(
               data: DragData(
                 index: index,
@@ -538,19 +538,14 @@ class ProfilePageBody extends StatelessWidget {
                   ),
                 ),
               ),
-              child: Card(
-                elevation: 2.0,
-                color: Constants.colors.clairPink,
-                child: InkWell(
-                  onTap: () {},
-                  onLongPress: () {},
-                  child: Tooltip(
-                    message: "drag_to_move".tr(),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Icon(UniconsLine.draggabledots),
-                    ),
-                  ),
+              child: CircleButton(
+                onTap: () {},
+                tooltip: "drag_to_move".tr(),
+                radius: 16.0,
+                icon: Icon(
+                  UniconsLine.draggabledots,
+                  color: Colors.black,
+                  size: 16.0,
                 ),
               ),
             ),
