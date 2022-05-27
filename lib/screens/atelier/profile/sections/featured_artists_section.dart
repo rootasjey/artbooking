@@ -3,6 +3,7 @@ import 'package:artbooking/components/cards/shimmer_card.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/home_location.dart';
+import 'package:artbooking/screens/atelier/profile/popup_menu_button_section.dart';
 import 'package:artbooking/types/enums/enum_artist_item_action.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
@@ -308,29 +309,15 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
       return Container();
     }
 
-    final popupMenuEntries = getPopupMenuEntries();
-
-    return Positioned(
-      top: 12.0,
-      right: 12.0,
-      child: PopupMenuButton(
-        child: Card(
-          elevation: 2.0,
-          color: Theme.of(context).backgroundColor,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Icon(UniconsLine.ellipsis_h),
-          ),
-        ),
-        itemBuilder: (_) => popupMenuEntries,
-        onSelected: (EnumSectionAction action) {
-          widget.onPopupMenuItemSelected?.call(
-            action,
-            widget.index,
-            widget.section,
-          );
-        },
-      ),
+    return PopupMenuButtonSection(
+      itemBuilder: (_) => getPopupMenuEntries(),
+      onSelected: (EnumSectionAction action) {
+        widget.onPopupMenuItemSelected?.call(
+          action,
+          widget.index,
+          widget.section,
+        );
+      },
     );
   }
 

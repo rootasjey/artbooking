@@ -4,6 +4,7 @@ import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/home_location.dart';
+import 'package:artbooking/screens/atelier/profile/popup_menu_button_section.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
@@ -106,7 +107,7 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
       );
     }
 
-    final double space = 90.0;
+    final double space = 80.0;
     final String heroTag = "${widget.section.id}-${_illustration.id}";
 
     return Center(
@@ -116,7 +117,9 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
             child: Container(
               width: size.width - space,
               height: size.height - space,
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(
+                top: 54.0,
+              ),
               color: Color(widget.section.backgroundColor),
               child: Container(
                 decoration: ShapeDecoration(
@@ -227,29 +230,15 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
       return Container();
     }
 
-    final popupMenuEntries = getPopupMenuEntries();
-
-    return Positioned(
-      top: 12.0,
-      right: 12.0,
-      child: PopupMenuButton(
-        child: Card(
-          elevation: 2.0,
-          color: Theme.of(context).backgroundColor,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Icon(UniconsLine.ellipsis_h),
-          ),
-        ),
-        itemBuilder: (_) => popupMenuEntries,
-        onSelected: (EnumSectionAction action) {
-          widget.onPopupMenuItemSelected?.call(
-            action,
-            widget.index,
-            widget.section,
-          );
-        },
-      ),
+    return PopupMenuButtonSection(
+      itemBuilder: (_) => getPopupMenuEntries(),
+      onSelected: (EnumSectionAction action) {
+        widget.onPopupMenuItemSelected?.call(
+          action,
+          widget.index,
+          widget.section,
+        );
+      },
     );
   }
 
