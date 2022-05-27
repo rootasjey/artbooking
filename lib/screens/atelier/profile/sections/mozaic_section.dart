@@ -200,17 +200,15 @@ class _MozaicSectionState extends State<MozaicSection> {
               ]
             : [];
 
-    List<Widget> children = _illustrations.map((
-      Illustration illustration,
-    ) {
+    List<Widget> children = [];
+
+    for (final Illustration illustration in _illustrations) {
       final ScaleFactor scaleFactor =
           widget.section.complexItems[index].scaleFactor;
 
-      index++;
-
       final heroTag = "${widget.section.id}-${index}-${illustration.id}";
 
-      return StaggeredGridTile.count(
+      children.add(StaggeredGridTile.count(
         crossAxisCellCount: scaleFactor.width,
         mainAxisCellCount: scaleFactor.height,
         child: IllustrationCard(
@@ -228,8 +226,10 @@ class _MozaicSectionState extends State<MozaicSection> {
           popupMenuEntries: popupMenuEntries,
           onPopupMenuItemSelected: onIllustrationItemSelected,
         ),
-      );
-    }).toList();
+      ));
+
+      index++;
+    }
 
     children = addMaybePlaceholder(children, size);
     return children;
@@ -252,7 +252,7 @@ class _MozaicSectionState extends State<MozaicSection> {
           useIconPlaceholder: true,
           heroTag: "empty_${DateTime.now()}",
           illustration: Illustration.empty(),
-          index: 1,
+          index: -1,
           size: size + 28.0,
           onTap: () => widget.onShowIllustrationDialog?.call(
             section: widget.section,
@@ -663,10 +663,8 @@ class _MozaicSectionState extends State<MozaicSection> {
     final int widthFactor = originalSize.width ~/ endSize.width;
     final int heightFactor = originalSize.height ~/ endSize.height;
 
-    // NOTE: when creating illustration card widget, index are 1-based
-    // (instead of startint at 0).
     final SizedIllustration sizedIllustration =
-        widget.section.complexItems.elementAt(index - 1);
+        widget.section.complexItems.elementAt(index);
     final ScaleFactor scaleFactor = sizedIllustration.scaleFactor;
 
     int newWidthScaleFactor = scaleFactor.width;
@@ -698,7 +696,7 @@ class _MozaicSectionState extends State<MozaicSection> {
     );
 
     setState(() {
-      widget.section.complexItems[index - 1] = newSizedIllustration;
+      widget.section.complexItems[index] = newSizedIllustration;
     });
 
     widget.onUpdateSectionItems?.call(
@@ -710,7 +708,7 @@ class _MozaicSectionState extends State<MozaicSection> {
 
   void onGrowUp(int index) {
     final SizedIllustration sizedIllustration =
-        widget.section.complexItems.elementAt(index - 1);
+        widget.section.complexItems.elementAt(index);
 
     final ScaleFactor currentScaleFactor = sizedIllustration.scaleFactor;
     final int newWidth = min(currentScaleFactor.width + 1, 4);
@@ -724,7 +722,7 @@ class _MozaicSectionState extends State<MozaicSection> {
     );
 
     setState(() {
-      widget.section.complexItems[index - 1] = newSizedIllustration;
+      widget.section.complexItems[index] = newSizedIllustration;
     });
 
     widget.onUpdateSectionItems?.call(
