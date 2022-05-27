@@ -63,4 +63,30 @@ class CircleButton extends StatelessWidget {
       child: child,
     );
   }
+
+  static Widget withNoEvent({
+    final VoidCallback? onTap,
+    required Icon icon,
+    double radius = 20.0,
+    double elevation = 0.0,
+    Color backgroundColor = Colors.black12,
+    String tooltip = "",
+    bool showBorder = false,
+  }) {
+    return Material(
+      shape: CircleBorder(
+        side: showBorder
+            ? BorderSide(color: Colors.white38, width: 2.0)
+            : BorderSide.none,
+      ),
+      clipBehavior: Clip.antiAlias,
+      color: Colors.transparent,
+      elevation: elevation,
+      child: CircleAvatar(
+        child: icon,
+        backgroundColor: backgroundColor,
+        radius: radius,
+      ),
+    );
+  }
 }
