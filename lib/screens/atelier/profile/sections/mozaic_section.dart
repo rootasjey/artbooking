@@ -186,7 +186,8 @@ class _MozaicSectionState extends State<MozaicSection> {
     int index = 0;
     final double size = 200.0;
 
-    final bool canDrag = getCanDrag();
+    final bool canDrag = getCanDragAndResize();
+    final bool canResize = canDrag;
     final onDrop = canDrag ? onDropIllustration : null;
     final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries =
         canDrag
@@ -213,6 +214,7 @@ class _MozaicSectionState extends State<MozaicSection> {
         crossAxisCellCount: scaleFactor.width,
         mainAxisCellCount: scaleFactor.height,
         child: IllustrationCard(
+          canResize: canResize,
           canDrag: canDrag,
           onDrop: onDrop,
           onResizeEnd: onResizeEnd,
@@ -573,7 +575,7 @@ class _MozaicSectionState extends State<MozaicSection> {
     fetchChosenIllustrations();
   }
 
-  bool getCanDrag() {
+  bool getCanDragAndResize() {
     if (!widget.editMode) {
       return false;
     }
