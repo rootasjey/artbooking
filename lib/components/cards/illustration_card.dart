@@ -38,6 +38,7 @@ class IllustrationCard extends StatefulWidget {
     this.onDragUpdate,
     this.onResizeEnd,
     this.canDrag = false,
+    this.canResize = false,
     this.useAsPlaceholder = false,
     this.useIconPlaceholder = false,
     this.dragGroupName = "",
@@ -63,6 +64,9 @@ class IllustrationCard extends StatefulWidget {
   /// If true, the card can be dragged.
   /// Usually used to re-order items.
   final bool canDrag;
+
+  /// If true, the card can be resized.
+  final bool canResize;
 
   /// Illustration's data for this card.
   final Illustration illustration;
@@ -631,6 +635,10 @@ class _IllustrationCardState extends State<IllustrationCard>
   }
 
   Widget borderOverlay() {
+    if (!widget.canResize) {
+      return Container();
+    }
+
     if (!_showPopupMenu) {
       return Container();
     }
