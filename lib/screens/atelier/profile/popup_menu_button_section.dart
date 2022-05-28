@@ -17,7 +17,7 @@ class PopupMenuButtonSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: 24.0,
+      top: 18.0,
       right: 48.0,
       child: PopupMenuButton(
         child: CircleButton.withNoEvent(

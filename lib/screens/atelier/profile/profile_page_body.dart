@@ -5,24 +5,8 @@ import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/constants/section_ids.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/screens/atelier/profile/sections/book_grid_section.dart';
-import 'package:artbooking/screens/atelier/profile/sections/bordered_poster_section.dart';
-import 'package:artbooking/screens/atelier/profile/sections/featured_artists_section.dart';
-import 'package:artbooking/screens/atelier/profile/sections/footer_section.dart';
-import 'package:artbooking/screens/atelier/profile/sections/h1_section.dart';
-import 'package:artbooking/screens/atelier/profile/sections/h4_section.dart';
-import 'package:artbooking/screens/atelier/profile/sections/illustration_row_section.dart';
-import 'package:artbooking/screens/atelier/profile/sections/illustration_window_section.dart';
-import 'package:artbooking/screens/atelier/profile/sections/mozaic_section.dart';
-import 'package:artbooking/screens/atelier/profile/sections/news_section.dart';
-import 'package:artbooking/screens/atelier/profile/sections/poster_section.dart';
-import 'package:artbooking/screens/atelier/profile/sections/spacing_section.dart';
-import 'package:artbooking/screens/atelier/profile/sections/title_description_section.dart';
-import 'package:artbooking/screens/atelier/profile/sections/user_illustration_section.dart';
-import 'package:artbooking/screens/atelier/profile/sections/user_section.dart';
-import 'package:artbooking/screens/atelier/profile/sections/illustration_grid_section.dart';
+import 'package:artbooking/screens/atelier/profile/section_wrapper.dart';
 import 'package:artbooking/types/artistic_page.dart';
-import 'package:artbooking/types/drag_data.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/section.dart';
@@ -70,6 +54,7 @@ class ProfilePageBody extends StatelessWidget {
     List<int> dragIndexes,
   )? onDropSection;
   final void Function()? onShowAddSection;
+
   final void Function({
     required Section section,
     required int index,
@@ -109,11 +94,19 @@ class ProfilePageBody extends StatelessWidget {
     for (var section in artisticPage.sections) {
       index++;
       slivers.add(
-        sectionWrapper(
+        SectionWrapper(
           section: section,
           index: index,
-          context: context,
           scrollController: scrollController,
+          editMode: editMode,
+          sectionCount: artisticPage.sections.length - 1,
+          userId: userId,
+          onDropSection: onDropSection,
+          popupMenuEntries: popupMenuEntries,
+          onPopupMenuItemSelected: onPopupMenuItemSelected,
+          onUpdateSectionItems: onUpdateSectionItems,
+          onShowBookDialog: onShowBookDialog,
+          onShowIllustrationDialog: onShowIllustrationDialog,
         ),
       );
     }
@@ -226,373 +219,5 @@ class ProfilePageBody extends StatelessWidget {
       backgroundColor: Theme.of(context).primaryColor,
       child: Icon(UniconsLine.plus),
     );
-  }
-
-  Widget getSectionWidget({
-    required Section section,
-    required int index,
-    bool usingAsDropTarget = false,
-  }) {
-    if (section.id == SectionIds.user) {
-      return UserSection(
-        index: index,
-        section: section,
-        userId: userId,
-        editMode: editMode,
-        usingAsDropTarget: usingAsDropTarget,
-        onPopupMenuItemSelected: onPopupMenuItemSelected,
-        popupMenuEntries: popupMenuEntries,
-        isLast: index == artisticPage.sections.length - 1,
-      );
-    }
-
-    if (section.id == SectionIds.illustrationGrid) {
-      return IllustrationGridSection(
-        index: index,
-        section: section,
-        userId: userId,
-        editMode: editMode,
-        usingAsDropTarget: usingAsDropTarget,
-        onPopupMenuItemSelected: onPopupMenuItemSelected,
-        popupMenuEntries: popupMenuEntries,
-        isLast: index == artisticPage.sections.length - 1,
-        onShowIllustrationDialog: onShowIllustrationDialog,
-        onUpdateSectionItems: onUpdateSectionItems,
-      );
-    }
-
-    if (section.id == SectionIds.bookGrid) {
-      return BookGridSection(
-        index: index,
-        section: section,
-        userId: userId,
-        editMode: editMode,
-        usingAsDropTarget: usingAsDropTarget,
-        isLast: index == artisticPage.sections.length - 1,
-        onPopupMenuItemSelected: onPopupMenuItemSelected,
-        popupMenuEntries: popupMenuEntries,
-        onUpdateSectionItems: onUpdateSectionItems,
-        onShowBookDialog: onShowBookDialog,
-      );
-    }
-
-    if (section.id == SectionIds.userWithIllustration) {
-      return UserIllustrationSection(
-        index: index,
-        section: section,
-        userId: userId,
-        editMode: editMode,
-        usingAsDropTarget: usingAsDropTarget,
-        isLast: index == artisticPage.sections.length - 1,
-        onPopupMenuItemSelected: onPopupMenuItemSelected,
-        onShowIllustrationDialog: onShowIllustrationDialog,
-        popupMenuEntries: popupMenuEntries,
-        onUpdateSectionItems: onUpdateSectionItems,
-      );
-    }
-
-    if (section.id == SectionIds.borderedPoster) {
-      return BorderedPosterSection(
-        index: index,
-        section: section,
-        editMode: editMode,
-        usingAsDropTarget: usingAsDropTarget,
-        isLast: index == artisticPage.sections.length - 1,
-        onPopupMenuItemSelected: onPopupMenuItemSelected,
-        onShowIllustrationDialog: onShowIllustrationDialog,
-        popupMenuEntries: popupMenuEntries,
-        onUpdateSectionItems: onUpdateSectionItems,
-      );
-    }
-
-    if (section.id == SectionIds.poster) {
-      return PosterSection(
-        index: index,
-        section: section,
-        editMode: editMode,
-        usingAsDropTarget: usingAsDropTarget,
-        isLast: index == artisticPage.sections.length - 1,
-        onPopupMenuItemSelected: onPopupMenuItemSelected,
-        onShowIllustrationDialog: onShowIllustrationDialog,
-        popupMenuEntries: popupMenuEntries,
-        onUpdateSectionItems: onUpdateSectionItems,
-      );
-    }
-
-    if (section.id == SectionIds.illustrationRow) {
-      return IllustrationRowSection(
-        index: index,
-        section: section,
-        userId: userId,
-        editMode: editMode,
-        usingAsDropTarget: usingAsDropTarget,
-        isLast: index == artisticPage.sections.length - 1,
-        onPopupMenuItemSelected: onPopupMenuItemSelected,
-        onShowIllustrationDialog: onShowIllustrationDialog,
-        popupMenuEntries: popupMenuEntries,
-        onUpdateSectionItems: onUpdateSectionItems,
-      );
-    }
-
-    if (section.id == SectionIds.spacing) {
-      return SpacingSection(
-        index: index,
-        section: section,
-        editMode: editMode,
-        usingAsDropTarget: usingAsDropTarget,
-        isLast: index == artisticPage.sections.length - 1,
-        onPopupMenuItemSelected: onPopupMenuItemSelected,
-        popupMenuEntries: popupMenuEntries,
-      );
-    }
-
-    if (section.id == SectionIds.h1) {
-      return H1Section(
-        index: index,
-        section: section,
-        editMode: editMode,
-        usingAsDropTarget: usingAsDropTarget,
-        isLast: index == artisticPage.sections.length - 1,
-        onPopupMenuItemSelected: onPopupMenuItemSelected,
-        popupMenuEntries: popupMenuEntries,
-      );
-    }
-
-    if (section.id == SectionIds.h4) {
-      return H4Section(
-        index: index,
-        section: section,
-        editMode: editMode,
-        usingAsDropTarget: usingAsDropTarget,
-        isLast: index == artisticPage.sections.length - 1,
-        onPopupMenuItemSelected: onPopupMenuItemSelected,
-        popupMenuEntries: popupMenuEntries,
-      );
-    }
-
-    if (section.id == SectionIds.titleDescription) {
-      return TitleDescriptionSection(
-        index: index,
-        section: section,
-        editMode: editMode,
-        usingAsDropTarget: usingAsDropTarget,
-        isLast: index == artisticPage.sections.length - 1,
-        onPopupMenuItemSelected: onPopupMenuItemSelected,
-        popupMenuEntries: popupMenuEntries,
-      );
-    }
-
-    if (section.id == SectionIds.illustrationWindow) {
-      return IllustrationWindowSection(
-        index: index,
-        section: section,
-        userId: userId,
-        editMode: editMode,
-        usingAsDropTarget: usingAsDropTarget,
-        isLast: index == artisticPage.sections.length - 1,
-        onShowIllustrationDialog: onShowIllustrationDialog,
-        popupMenuEntries: popupMenuEntries,
-        onPopupMenuItemSelected: onPopupMenuItemSelected,
-      );
-    }
-
-    if (section.id == SectionIds.featuredArtist) {
-      return FeaturedArtistsSection(
-        index: index,
-        section: section,
-        userId: userId,
-        editMode: editMode,
-        usingAsDropTarget: usingAsDropTarget,
-        isLast: index == artisticPage.sections.length - 1,
-        onShowIllustrationDialog: onShowIllustrationDialog,
-        popupMenuEntries: popupMenuEntries,
-        onPopupMenuItemSelected: onPopupMenuItemSelected,
-      );
-    }
-
-    if (section.id == SectionIds.footer) {
-      return FooterSection(
-        index: index,
-        section: section,
-        editMode: editMode,
-        usingAsDropTarget: usingAsDropTarget,
-        isLast: index == artisticPage.sections.length - 1,
-        popupMenuEntries: popupMenuEntries,
-        onPopupMenuItemSelected: onPopupMenuItemSelected,
-      );
-    }
-
-    if (section.id == SectionIds.news) {
-      return NewsSection(
-        index: index,
-        section: section,
-        editMode: editMode,
-        usingAsDropTarget: usingAsDropTarget,
-        isLast: index == artisticPage.sections.length - 1,
-        popupMenuEntries: popupMenuEntries,
-        onPopupMenuItemSelected: onPopupMenuItemSelected,
-      );
-    }
-
-    if (section.id == SectionIds.mozaic) {
-      return MozaicSection(
-        index: index,
-        section: section,
-        userId: userId,
-        editMode: editMode,
-        usingAsDropTarget: usingAsDropTarget,
-        isLast: index == artisticPage.sections.length - 1,
-        onShowIllustrationDialog: onShowIllustrationDialog,
-        popupMenuEntries: popupMenuEntries,
-        onPopupMenuItemSelected: onPopupMenuItemSelected,
-        onUpdateSectionItems: onUpdateSectionItems,
-      );
-    }
-
-    return Container();
-  }
-
-  String getDraggableName(Section section) {
-    String name = section.name;
-    if (name.isEmpty) {
-      name = "section_name.${section.id}".tr();
-    }
-
-    return name;
-  }
-
-  Widget sectionWrapper({
-    required Section section,
-    required int index,
-    required BuildContext context,
-    required ScrollController scrollController,
-  }) {
-    if (!editMode) {
-      return SliverToBoxAdapter(
-        child: getSectionWidget(
-          section: section,
-          index: index,
-        ),
-      );
-    }
-
-    return SliverToBoxAdapter(
-      child: Stack(
-        children: [
-          DragTarget<DragData>(
-            builder: (BuildContext context, candidateItems, rejectedItems) {
-              return getSectionWidget(
-                section: section,
-                index: index,
-                usingAsDropTarget: candidateItems.isNotEmpty,
-              );
-            },
-            onAccept: (DragData dragData) {
-              onDropSection?.call(index, [dragData.index]);
-            },
-            onWillAccept: (DragData? dragData) {
-              if (dragData == null) {
-                return false;
-              }
-
-              if (dragData.type != Section) {
-                return false;
-              }
-
-              return true;
-            },
-          ),
-          Positioned(
-            top: 24.0,
-            right: 88.0,
-            child: Draggable<DragData>(
-              data: DragData(
-                index: index,
-                groupName: "profile-page",
-                type: Section,
-              ),
-              onDragUpdate: (details) => onDragUpdateSection(
-                context: context,
-                details: details,
-                scrollController: scrollController,
-              ),
-              feedback: Card(
-                elevation: 2.0,
-                color: Constants.colors.clairPink,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 4.0),
-                        child: Icon(Utilities.ui.getSectionIcon(section.id)),
-                      ),
-                      Text(
-                        getDraggableName(section),
-                        style: Utilities.fonts.body(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              child: CircleButton(
-                onTap: () {},
-                tooltip: "drag_to_move".tr(),
-                radius: 16.0,
-                icon: Icon(
-                  UniconsLine.draggabledots,
-                  color: Colors.black,
-                  size: 16.0,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void onDragUpdateSection({
-    required BuildContext context,
-    required DragUpdateDetails details,
-    required ScrollController scrollController,
-  }) async {
-    /// Amount of offset to jump when dragging an element to the edge.
-    final double jumpOffset = 200.0;
-
-    /// Distance to the edge where the scroll viewer starts to jump.
-    final double edgeDistance = 50.0;
-
-    final position = details.globalPosition;
-
-    if (position.dy < edgeDistance) {
-      if (scrollController.offset <= 0) {
-        return;
-      }
-
-      await scrollController.animateTo(
-        scrollController.offset - jumpOffset,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeIn,
-      );
-
-      return;
-    }
-
-    final windowHeight = MediaQuery.of(context).size.height;
-    if (windowHeight - edgeDistance < position.dy) {
-      if (scrollController.position.atEdge && scrollController.offset != 0) {
-        return;
-      }
-
-      await scrollController.animateTo(
-        scrollController.offset + jumpOffset,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeIn,
-      );
-    }
   }
 }

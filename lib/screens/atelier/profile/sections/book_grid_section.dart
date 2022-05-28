@@ -32,6 +32,7 @@ class BookGridSection extends StatefulWidget {
     this.onShowBookDialog,
     this.usingAsDropTarget = false,
     this.editMode = false,
+    this.isHover = false,
   }) : super(key: key);
 
   /// If true, the current authenticated user is the owner and
@@ -39,6 +40,7 @@ class BookGridSection extends StatefulWidget {
   final bool editMode;
 
   final bool isLast;
+  final bool isHover;
 
   final bool usingAsDropTarget;
 
@@ -285,6 +287,10 @@ class _BookGridSectionState extends State<BookGridSection> {
   }
 
   Widget rightPopupMenuButton() {
+    if (!widget.isHover) {
+      return Container();
+    }
+
     if (!widget.editMode) {
       return Container();
     }

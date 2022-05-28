@@ -30,13 +30,14 @@ class BorderedPosterSection extends StatefulWidget {
     this.onShowIllustrationDialog,
     this.onUpdateSectionItems,
     this.editMode = false,
+    this.isHover = false,
   }) : super(key: key);
-
-  final bool isLast;
 
   /// If true, the current authenticated user is the owner and
   /// this section can be edited.
   final bool editMode;
+  final bool isHover;
+  final bool isLast;
 
   final bool usingAsDropTarget;
 
@@ -110,7 +111,8 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
     final double space = 80.0;
     final String heroTag = "${widget.section.id}-${_illustration.id}";
 
-    return Center(
+    return Container(
+      color: Color(widget.section.backgroundColor),
       child: Stack(
         children: [
           Center(
@@ -226,6 +228,10 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
   }
 
   Widget rightPopupMenuButton() {
+    if (!widget.isHover) {
+      return Container();
+    }
+
     if (!widget.editMode) {
       return Container();
     }

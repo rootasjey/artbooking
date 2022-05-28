@@ -19,12 +19,13 @@ class TitleDescriptionSection extends StatelessWidget {
     this.isLast = false,
     this.usingAsDropTarget = false,
     this.editMode = false,
+    this.isHover = false,
   }) : super(key: key);
 
   /// If true, the current authenticated user is the owner and
   /// this section can be edited.
   final bool editMode;
-
+  final bool isHover;
   final bool isLast;
   final bool usingAsDropTarget;
 
@@ -232,6 +233,10 @@ class TitleDescriptionSection extends StatelessWidget {
   }
 
   Widget rightPopupMenuButton(BuildContext context) {
+    if (!isHover) {
+      return Container();
+    }
+
     if (!editMode) {
       return Container();
     }

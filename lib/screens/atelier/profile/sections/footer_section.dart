@@ -22,6 +22,7 @@ class FooterSection extends StatelessWidget {
     this.isLast = false,
     this.usingAsDropTarget = false,
     this.editMode = false,
+    this.isHover = false,
   }) : super(key: key);
 
   /// If true, the current authenticated user is the owner and
@@ -29,7 +30,7 @@ class FooterSection extends StatelessWidget {
   final bool editMode;
 
   final bool isLast;
-
+  final bool isHover;
   final bool usingAsDropTarget;
 
   /// Section's position in the layout (e.g. 0 is the first).
@@ -60,8 +61,9 @@ class FooterSection extends StatelessWidget {
 
     return Stack(
       children: [
-        Padding(
+        Container(
           padding: outerPadding,
+          color: Color(section.backgroundColor),
           child: Stack(
             children: [
               WaveWidget(
@@ -82,10 +84,10 @@ class FooterSection extends StatelessWidget {
                 padding: const EdgeInsets.all(24.0),
                 child: Footer(),
               ),
-              rightPopupMenuButton(context),
             ],
           ),
         ),
+        rightPopupMenuButton(context),
       ],
     );
   }
@@ -176,6 +178,10 @@ class FooterSection extends StatelessWidget {
   }
 
   Widget rightPopupMenuButton(BuildContext context) {
+    if (!isHover) {
+      return Container();
+    }
+
     if (!editMode) {
       return Container();
     }

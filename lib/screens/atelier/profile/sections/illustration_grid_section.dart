@@ -32,12 +32,13 @@ class IllustrationGridSection extends StatefulWidget {
     this.onUpdateSectionItems,
     this.usingAsDropTarget = false,
     this.editMode = false,
+    this.isHover = false,
   }) : super(key: key);
 
   /// If true, the current authenticated user is the owner and
   /// this section can be edited.
   final bool editMode;
-
+  final bool isHover;
   final bool isLast;
 
   final bool usingAsDropTarget;
@@ -288,6 +289,10 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
   }
 
   Widget rightPopupMenuButton() {
+    if (!widget.isHover) {
+      return Container();
+    }
+
     if (!widget.editMode) {
       return Container();
     }

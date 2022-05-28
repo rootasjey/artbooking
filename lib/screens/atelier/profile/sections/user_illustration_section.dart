@@ -34,13 +34,14 @@ class UserIllustrationSection extends StatefulWidget {
     this.onUpdateSectionItems,
     this.usingAsDropTarget = false,
     this.editMode = false,
+    this.isHover = false,
   }) : super(key: key);
-
-  final bool isLast;
 
   /// If true, the current authenticated user is the owner and
   /// this section can be edited.
   final bool editMode;
+  final bool isLast;
+  final bool isHover;
 
   final bool usingAsDropTarget;
 
@@ -104,13 +105,13 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
             color: Color(widget.section.backgroundColor),
           );
 
-    return Padding(
-      padding: outerPadding,
-      child: Container(
-        decoration: boxDecoration,
-        child: Stack(
-          children: [
-            SizedBox(
+    return Stack(
+      children: [
+        Padding(
+          padding: outerPadding,
+          child: Container(
+            decoration: boxDecoration,
+            child: SizedBox(
               height: height,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -120,10 +121,10 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
                 ],
               ),
             ),
-            rightPopupMenuButton(),
-          ],
+          ),
         ),
-      ),
+        rightPopupMenuButton(),
+      ],
     );
   }
 
@@ -195,6 +196,10 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
   }
 
   Widget rightPopupMenuButton() {
+    if (!widget.isHover) {
+      return Container();
+    }
+
     if (!widget.editMode) {
       return Container();
     }

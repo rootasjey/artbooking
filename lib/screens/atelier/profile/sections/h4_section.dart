@@ -19,12 +19,13 @@ class H4Section extends StatelessWidget {
     this.isLast = false,
     this.usingAsDropTarget = false,
     this.editMode = false,
+    this.isHover = false,
   }) : super(key: key);
 
   /// If true, the current authenticated user is the owner and
   /// this section can be edited.
   final bool editMode;
-
+  final bool isHover;
   final bool isLast;
 
   final bool usingAsDropTarget;
