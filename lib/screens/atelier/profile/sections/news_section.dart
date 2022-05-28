@@ -239,10 +239,11 @@ class _NewsSectionState extends State<NewsSection> {
             : [];
 
     final List<Widget> children = [
-      CreatePostCard(
-        borderColor: Constants.colors.tertiary,
-        onTap: createNewPost,
-      ),
+      if (widget.editMode)
+        CreatePostCard(
+          borderColor: Constants.colors.tertiary,
+          onTap: createNewPost,
+        ),
     ];
 
     for (final Post post in _posts) {

@@ -422,7 +422,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
     return Column(
       children: [
         InkWell(
-          onTap: onTapTitleDescription,
+          onTap: widget.editMode ? onTapTitleDescription : null,
           child: Column(
             children: [
               if (title.isNotEmpty)

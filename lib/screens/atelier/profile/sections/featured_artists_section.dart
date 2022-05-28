@@ -337,7 +337,7 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
     return Column(
       children: [
         InkWell(
-          onTap: onTapTitleDescription,
+          onTap: widget.editMode ? onTapTitleDescription : null,
           child: Column(
             children: [
               if (title.isNotEmpty)

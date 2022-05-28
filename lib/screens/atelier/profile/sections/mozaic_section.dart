@@ -372,7 +372,7 @@ class _MozaicSectionState extends State<MozaicSection> {
       child: Padding(
         padding: const EdgeInsets.only(left: 12.0),
         child: InkWell(
-          onTap: onTapTitleDescription,
+          onTap: widget.editMode ? onTapTitleDescription : null,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
