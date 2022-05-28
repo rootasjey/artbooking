@@ -1,9 +1,10 @@
+import 'package:artbooking/components/buttons/heart_button.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
-class FooterCompanyWatermark extends StatelessWidget {
+class FooterCompanyWatermark extends StatefulWidget {
   const FooterCompanyWatermark({
     Key? key,
     this.padding = const EdgeInsets.only(
@@ -15,9 +16,14 @@ class FooterCompanyWatermark extends StatelessWidget {
   final EdgeInsets padding;
 
   @override
+  State<FooterCompanyWatermark> createState() => _FooterCompanyWatermarkState();
+}
+
+class _FooterCompanyWatermarkState extends State<FooterCompanyWatermark> {
+  @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: padding,
+      padding: widget.padding,
       child: Column(
         children: [
           Text.rich(
@@ -81,10 +87,7 @@ class FooterCompanyWatermark extends StatelessWidget {
                   ),
                 ),
                 WidgetSpan(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 4.0),
-                    child: Icon(UniconsLine.heart, size: 18.0),
-                  ),
+                  child: HeartButton(),
                 ),
               ],
             ),
