@@ -1,6 +1,6 @@
+import 'package:artbooking/components/buttons/heart_button.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:unicons/unicons.dart';
 
 class IllustrationPosterActions extends StatelessWidget {
@@ -42,14 +42,11 @@ class IllustrationPosterActions extends StatelessWidget {
           alignment: WrapAlignment.center,
           children: [
             if (onLike != null)
-              IconButton(
+              HeartButton(
+                asIconButton: true,
+                liked: liked,
                 tooltip: liked ? "unlike".tr() : "like".tr(),
-                icon: Icon(
-                  liked ? FontAwesomeIcons.solidHeart : UniconsLine.heart,
-                ),
-                iconSize: liked ? 18.0 : 24.0,
-                color: liked ? Theme.of(context).secondaryHeaderColor : null,
-                onPressed: onLike,
+                onTap: onLike,
               ),
             if (onShare != null)
               IconButton(
