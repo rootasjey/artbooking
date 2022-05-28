@@ -106,6 +106,7 @@ flutter:
     - assets/images/app_icon/circle_512x512.png
     - assets/images/app_icon/icon_animation.json
     - assets/animations/dots.json
+    - assets/animations/heart.json
     - assets/animations/particles.json
     - assets/animations/waves.json
     - assets/animations/whale.json
