@@ -61,6 +61,8 @@ class _ModularPageState extends ConsumerState<ModularPage> {
   /// this page sections.
   bool _editMode = true;
 
+  bool _showFabToTop = false;
+
   /// Modular page.
   var _modularPage = ArtisticPage.empty();
 
@@ -95,6 +97,8 @@ class _ModularPageState extends ConsumerState<ModularPage> {
       value: EnumSectionAction.settings,
     ),
   ];
+
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -155,6 +159,9 @@ class _ModularPageState extends ConsumerState<ModularPage> {
 
     return ProfilePageBody(
       userId: userId ?? "",
+      scrollController: _scrollController,
+      showFabToTop: _showFabToTop,
+      onToggleFabToTop: onToggleFabToTop,
       isOwner: canManagePages,
       artisticPage: _modularPage,
       onAddSection: tryAddSection,
@@ -976,5 +983,9 @@ class _ModularPageState extends ConsumerState<ModularPage> {
     setState(() {
       _editMode = !_editMode;
     });
+  }
+
+  void onToggleFabToTop(bool show) {
+    setState(() => _showFabToTop = show);
   }
 }

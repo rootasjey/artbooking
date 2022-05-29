@@ -1,10 +1,10 @@
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/buttons/circle_button.dart';
-import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/constants/section_ids.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/screens/atelier/profile/profile_page_fab.dart';
 import 'package:artbooking/screens/atelier/profile/section_wrapper.dart';
 import 'package:artbooking/types/artistic_page.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
@@ -20,11 +20,14 @@ class ProfilePageBody extends StatelessWidget {
     Key? key,
     required this.userId,
     required this.artisticPage,
+    required this.scrollController,
     this.onPopupMenuItemSelected,
     this.popupMenuEntries = const [],
     this.onAddSection,
     this.isOwner = false,
     this.editMode = false,
+    this.showFabToTop = false,
+    this.onToggleFabToTop,
     this.onShowAddSection,
     this.onShowIllustrationDialog,
     this.onUpdateSectionItems,
@@ -36,6 +39,7 @@ class ProfilePageBody extends StatelessWidget {
 
   final bool isOwner;
   final bool showBackButton;
+  final bool showFabToTop;
 
   /// If true, the current user is an admin or owner and can add, remove, and edit
   /// this page sections.
@@ -47,6 +51,7 @@ class ProfilePageBody extends StatelessWidget {
   final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
 
   final void Function(Section)? onAddSection;
+  final void Function(bool show)? onToggleFabToTop;
 
   /// Callback when drag and dropping items on this book card.
   final void Function(
@@ -77,6 +82,8 @@ class ProfilePageBody extends StatelessWidget {
 
   final void Function()? onToggleEditMode;
 
+  final ScrollController scrollController;
+
   @override
   Widget build(BuildContext context) {
     final bool hasAppBar =
@@ -89,7 +96,6 @@ class ProfilePageBody extends StatelessWidget {
     ];
 
     int index = -1;
-    final scrollController = ScrollController();
 
     for (var section in artisticPage.sections) {
       index++;
@@ -122,12 +128,29 @@ class ProfilePageBody extends StatelessWidget {
     }
 
     return Scaffold(
-      // floatingActionButton: fab(context),
+      floatingActionButton: ProfilePageFAB(
+        editMode: editMode,
+        isOwner: isOwner,
+        onToggleEditMode: onToggleEditMode,
+        scrollController: scrollController,
+        showFabToTop: showFabToTop,
+      ),
       body: Stack(
         children: [
           ImprovedScrolling(
             scrollController: scrollController,
             enableKeyboardScrolling: true,
+            onScroll: (double vOffset) {
+              if (vOffset > 200.0 && !showFabToTop) {
+                onToggleFabToTop?.call(true);
+                return;
+              }
+
+              if (vOffset < 200.0 && showFabToTop) {
+                onToggleFabToTop?.call(false);
+                return;
+              }
+            },
             child: CustomScrollView(
               controller: scrollController,
               slivers: slivers,
@@ -148,76 +171,8 @@ class ProfilePageBody extends StatelessWidget {
                 ),
               ),
             ),
-          if (isOwner)
-            Positioned(
-              left: 0.0,
-              bottom: 0.0,
-              right: 0.0,
-              child: editPanel(context, scrollController),
-            ),
         ],
       ),
-    );
-  }
-
-  Widget editPanel(BuildContext context, ScrollController scrollController) {
-    return Material(
-      elevation: 4.0,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16.0,
-          vertical: 8.0,
-        ),
-        height: 60.0,
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: DarkElevatedButton.iconOnly(
-                child: Icon(UniconsLine.arrow_up),
-                onPressed: () {
-                  scrollController.animateTo(
-                    0.0,
-                    duration: Duration(milliseconds: 250),
-                    curve: Curves.decelerate,
-                  );
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: DarkElevatedButton.icon(
-                iconData: UniconsLine.plus,
-                labelValue: "Add new section",
-                foreground: Theme.of(context).textTheme.bodyText2?.color,
-                onPressed: onShowAddSection,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: DarkElevatedButton.icon(
-                iconData: editMode ? UniconsLine.pen : UniconsLine.eye,
-                labelValue: editMode ? "edit_mode".tr() : "view_mode".tr(),
-                foreground: Theme.of(context).textTheme.bodyText2?.color,
-                onPressed: onToggleEditMode,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget fab(BuildContext context) {
-    if (!isOwner) {
-      return Container();
-    }
-
-    return FloatingActionButton(
-      onPressed: onShowAddSection,
-      backgroundColor: Theme.of(context).primaryColor,
-      child: Icon(UniconsLine.plus),
     );
   }
 }

@@ -51,8 +51,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   /// True if the target user has no page.
   bool _emptyProfile = false;
 
+  bool _showFabToTop = false;
+
   /// Main user's artistic page.
   var _profilePage = ArtisticPage.empty();
+  final _scrollController = ScrollController();
 
   /// Listens to book's updates.
   QuerySnapshotStreamSubscription? _profilePageSubscription;
@@ -149,6 +152,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       userId: getUserId(),
       isOwner: isOwner,
       showBackButton: true,
+      scrollController: _scrollController,
+      showFabToTop: _showFabToTop,
+      onToggleFabToTop: onToggleFabToTop,
       artisticPage: _profilePage,
       onAddSection: tryAddSection,
       popupMenuEntries: _popupMenuEntries,
@@ -981,5 +987,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     }
+  }
+
+  void onToggleFabToTop(bool show) {
+    setState(() => _showFabToTop = show);
   }
 }
