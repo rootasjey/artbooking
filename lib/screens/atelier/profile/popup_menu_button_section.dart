@@ -1,5 +1,4 @@
 import 'package:artbooking/components/buttons/circle_button.dart';
-import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
