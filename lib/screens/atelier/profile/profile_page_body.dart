@@ -36,6 +36,7 @@ class ProfilePageBody extends StatelessWidget {
     this.onDropSection,
     this.showBackButton = false,
     this.onToggleEditMode,
+    this.onDropSectionInBetween,
   }) : super(key: key);
 
   final bool isOwner;
@@ -59,6 +60,13 @@ class ProfilePageBody extends StatelessWidget {
     int dropTargetIndex,
     List<int> dragIndexes,
   )? onDropSection;
+
+  /// Callback when dropping a section on a drop zone
+  /// (which is not another section).
+  final void Function(
+    int dropTargetIndex,
+    List<int> dragIndexes,
+  )? onDropSectionInBetween;
 
   final void Function(int index)? onShowAddSection;
 
@@ -116,9 +124,9 @@ class ProfilePageBody extends StatelessWidget {
         slivers.add(
           LineDropZone(
             index: index,
-            usingAsDropTarget: false,
             backgroundColor: color,
             onShowAddSection: onShowAddSection,
+            onDropSection: onDropSectionInBetween,
           ),
         );
       }

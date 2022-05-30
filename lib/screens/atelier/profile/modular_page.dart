@@ -174,6 +174,7 @@ class _ModularPageState extends ConsumerState<ModularPage> {
       onUpdateSectionItems: tryUpdateSectionItems,
       onShowBookDialog: onShowBookDialog,
       onDropSection: onDropSection,
+      onDropSectionInBetween: onDropSectionInBetween,
     );
   }
 
@@ -230,6 +231,45 @@ class _ModularPageState extends ConsumerState<ModularPage> {
     setState(() {
       _modularPage.sections[firstDragIndex] = dropTargetSection;
       _modularPage.sections[dropTargetIndex] = dragSection;
+    });
+
+    try {
+      await FirebaseFirestore.instance
+          .collection("pages")
+          .doc(_modularPage.id)
+          .update({
+        "sections": _modularPage.sections.map((x) => x.toMap()).toList(),
+      });
+
+      setState(() {});
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
+  void onDropSectionInBetween(
+    int dropTargetIndex,
+    List<int> dragIndexes,
+  ) async {
+    final int firstDragIndex = dragIndexes.first;
+    if (dropTargetIndex == firstDragIndex) {
+      return;
+    }
+
+    final sections = _modularPage.sections;
+
+    if (dropTargetIndex < 0 ||
+        firstDragIndex < 0 ||
+        dropTargetIndex >= sections.length ||
+        firstDragIndex > sections.length) {
+      return;
+    }
+
+    final dragSection = sections.elementAt(firstDragIndex);
+
+    setState(() {
+      _modularPage.sections.insert(dropTargetIndex, dragSection);
     });
 
     try {
