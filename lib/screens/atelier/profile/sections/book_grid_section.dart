@@ -287,15 +287,12 @@ class _BookGridSectionState extends State<BookGridSection> {
   }
 
   Widget rightPopupMenuButton() {
-    if (!widget.isHover) {
-      return Container();
-    }
-
     if (!widget.editMode) {
       return Container();
     }
 
     return PopupMenuButtonSection(
+      show: widget.isHover,
       itemBuilder: (_) => getPopupMenuEntries(),
       onSelected: (EnumSectionAction action) {
         widget.onPopupMenuItemSelected?.call(

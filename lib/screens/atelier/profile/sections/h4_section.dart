@@ -172,6 +172,7 @@ class H4Section extends StatelessWidget {
     }
 
     return PopupMenuButtonSection(
+      show: isHover,
       itemBuilder: (_) => getPopupMenuEntries(),
       onSelected: (EnumSectionAction action) {
         onPopupMenuItemSelected?.call(

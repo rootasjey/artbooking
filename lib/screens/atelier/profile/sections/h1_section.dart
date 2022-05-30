@@ -169,15 +169,12 @@ class H1Section extends StatelessWidget {
   }
 
   Widget rightPopupMenuButton(BuildContext context) {
-    if (!isHover) {
-      return Container();
-    }
-
     if (!editMode) {
       return Container();
     }
 
     return PopupMenuButtonSection(
+      show: isHover,
       itemBuilder: (_) => getPopupMenuEntries(),
       onSelected: (EnumSectionAction action) {
         onPopupMenuItemSelected?.call(

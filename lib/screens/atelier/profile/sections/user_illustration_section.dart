@@ -196,15 +196,12 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
   }
 
   Widget rightPopupMenuButton() {
-    if (!widget.isHover) {
-      return Container();
-    }
-
     if (!widget.editMode) {
       return Container();
     }
 
     return PopupMenuButtonSection(
+      show: widget.isHover,
       itemBuilder: (_) => getPopupMenuEntries(),
       onSelected: (EnumSectionAction action) {
         widget.onPopupMenuItemSelected?.call(
