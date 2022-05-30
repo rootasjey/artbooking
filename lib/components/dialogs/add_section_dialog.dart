@@ -12,10 +12,12 @@ import 'package:flutter/material.dart';
 class AddSectionDialog extends StatefulWidget {
   const AddSectionDialog({
     Key? key,
+    this.index = -1,
     this.onAddSection,
   }) : super(key: key);
 
-  final void Function(Section)? onAddSection;
+  final int index;
+  final void Function(Section section, int index)? onAddSection;
 
   @override
   _AddSectionDialogState createState() => _AddSectionDialogState();
@@ -297,6 +299,6 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
 
   _onAddSection(Section section) {
     Beamer.of(context).popRoute();
-    widget.onAddSection?.call(section);
+    widget.onAddSection?.call(section, widget.index);
   }
 }

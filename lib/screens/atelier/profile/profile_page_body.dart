@@ -4,6 +4,7 @@ import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/constants/section_ids.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/screens/atelier/profile/line_drop_zone.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_fab.dart';
 import 'package:artbooking/screens/atelier/profile/section_wrapper.dart';
 import 'package:artbooking/types/artistic_page.dart';
@@ -50,15 +51,16 @@ class ProfilePageBody extends StatelessWidget {
   final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
   final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
 
-  final void Function(Section)? onAddSection;
+  final void Function(Section section, int index)? onAddSection;
   final void Function(bool show)? onToggleFabToTop;
 
-  /// Callback when drag and dropping items on this book card.
+  /// Callback when drag and dropping items on a section.
   final void Function(
     int dropTargetIndex,
     List<int> dragIndexes,
   )? onDropSection;
-  final void Function()? onShowAddSection;
+
+  final void Function(int index)? onShowAddSection;
 
   final void Function({
     required Section section,
@@ -86,8 +88,9 @@ class ProfilePageBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool hasAppBar =
-        artisticPage.sections.any((element) => element.id == SectionIds.appBar);
+    final bool hasAppBar = artisticPage.sections.any(
+      (section) => section.id == SectionIds.appBar,
+    );
 
     final List<Widget> slivers = [
       // Sliver issue: https://github.com/flutter/flutter/issues/55170
@@ -95,10 +98,31 @@ class ProfilePageBody extends StatelessWidget {
       if (hasAppBar) ApplicationBar(),
     ];
 
-    int index = -1;
+    int index = 0;
 
     for (var section in artisticPage.sections) {
-      index++;
+      if (section.id == SectionIds.appBar) {
+        continue;
+      }
+
+      if (editMode) {
+        Color color = Colors.transparent;
+        if (index + 1 < artisticPage.sections.length) {
+          color = Color(
+            artisticPage.sections.elementAt(index + 1).backgroundColor,
+          );
+        }
+
+        slivers.add(
+          LineDropZone(
+            index: index,
+            usingAsDropTarget: false,
+            backgroundColor: color,
+            onShowAddSection: onShowAddSection,
+          ),
+        );
+      }
+
       slivers.add(
         SectionWrapper(
           section: section,
@@ -115,16 +139,8 @@ class ProfilePageBody extends StatelessWidget {
           onShowIllustrationDialog: onShowIllustrationDialog,
         ),
       );
-    }
 
-    if (isOwner) {
-      slivers.add(
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 42.0),
-          ),
-        ),
-      );
+      index++;
     }
 
     return Scaffold(

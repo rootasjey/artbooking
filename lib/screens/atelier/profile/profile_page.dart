@@ -268,11 +268,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     }
   }
 
-  void onShowAddSection() {
+  void onShowAddSection(int index) {
     showDialog(
       context: context,
       builder: (context) {
         return AddSectionDialog(
+          index: index,
           onAddSection: tryAddSection,
         );
       },
@@ -470,7 +471,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
-  void tryAddSection(Section section) async {
+  void tryAddSection(Section section, int index) async {
     try {
       final dataMode = section.dataFetchModes.isNotEmpty
           ? section.dataFetchModes.first
@@ -481,7 +482,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         size: EnumSectionSize.large,
       );
 
-      _profilePage.sections.add(editedSection);
+      if (index == -1) {
+        _profilePage.sections.add(editedSection);
+      } else {
+        _profilePage.sections.insert(index, editedSection);
+      }
 
       await FirebaseFirestore.instance
           .collection("users")
