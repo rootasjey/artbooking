@@ -266,7 +266,7 @@ class _ModularPageState extends ConsumerState<ModularPage> {
       return;
     }
 
-    final dragSection = sections.elementAt(firstDragIndex);
+    final Section dragSection = sections.removeAt(firstDragIndex);
 
     setState(() {
       _modularPage.sections.insert(dropTargetIndex, dragSection);

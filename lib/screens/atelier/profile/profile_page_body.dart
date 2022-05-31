@@ -96,14 +96,10 @@ class ProfilePageBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool hasAppBar = artisticPage.sections.any(
-      (section) => section.id == SectionIds.appBar,
-    );
-
     final List<Widget> slivers = [
       // Sliver issue: https://github.com/flutter/flutter/issues/55170
       SliverToBoxAdapter(),
-      if (hasAppBar) ApplicationBar(),
+      if (artisticPage.hasAppBar) ApplicationBar(),
     ];
 
     int index = 0;
@@ -115,9 +111,9 @@ class ProfilePageBody extends StatelessWidget {
 
       if (editMode) {
         Color color = Colors.transparent;
-        if (index + 1 < artisticPage.sections.length) {
+        if (index < artisticPage.sections.length) {
           color = Color(
-            artisticPage.sections.elementAt(index + 1).backgroundColor,
+            artisticPage.sections.elementAt(index).backgroundColor,
           );
         }
 
