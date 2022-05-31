@@ -11,6 +11,7 @@ class ArtisticPage {
   const ArtisticPage({
     required this.id,
     required this.createdAt,
+    this.hasAppBar = false,
     this.isActive = false,
     this.isDraft = false,
     this.name = '',
@@ -18,6 +19,9 @@ class ArtisticPage {
     required this.updatedAt,
     this.sections = const [],
   });
+
+  /// If true, an application bar will be placed at the top of the page.
+  final bool hasAppBar;
 
   final String id;
   final DateTime createdAt;
@@ -31,6 +35,7 @@ class ArtisticPage {
   ArtisticPage copyWith({
     String? id,
     DateTime? createdAt,
+    bool? hasAppBar,
     bool? isActive,
     bool? isDraft,
     String? name,
@@ -41,6 +46,7 @@ class ArtisticPage {
     return ArtisticPage(
       id: id ?? this.id,
       createdAt: createdAt ?? this.createdAt,
+      hasAppBar: hasAppBar ?? this.hasAppBar,
       isActive: isActive ?? this.isActive,
       isDraft: isDraft ?? this.isDraft,
       name: name ?? this.name,
@@ -54,6 +60,7 @@ class ArtisticPage {
     return {
       'id': id,
       'created_at': createdAt.millisecondsSinceEpoch,
+      'has_app_bar': hasAppBar,
       'is_active': isActive,
       'is_draft': isDraft,
       'name': name,
@@ -67,6 +74,7 @@ class ArtisticPage {
     return ArtisticPage(
       id: '',
       createdAt: DateTime.now(),
+      hasAppBar: false,
       isActive: false,
       isDraft: true,
       name: '',
@@ -80,6 +88,7 @@ class ArtisticPage {
     return ArtisticPage(
       id: map['id'] ?? '',
       createdAt: Utilities.date.fromFirestore(map['created_at']),
+      hasAppBar: map["has_app_bar"] ?? false,
       isActive: map['is_active'] ?? false,
       isDraft: map['is_draft'] ?? false,
       name: map['name'] ?? '',
@@ -120,8 +129,8 @@ class ArtisticPage {
 
   @override
   String toString() {
-    return "Page(id: $id, createdAt: $createdAt, isActive: $isActive, "
-        "isDraft: $isDraft, name: $name, type: $type, "
+    return "Page(id: $id, createdAt: $createdAt, hasAppBar: $hasAppBar,"
+        " isActive: $isActive, isDraft: $isDraft, name: $name, type: $type, "
         "updatedAt: $updatedAt, sections: $sections)";
   }
 
@@ -132,6 +141,7 @@ class ArtisticPage {
     return other is ArtisticPage &&
         other.id == id &&
         other.createdAt == createdAt &&
+        other.hasAppBar == hasAppBar &&
         other.isActive == isActive &&
         other.isDraft == isDraft &&
         other.name == name &&
@@ -144,6 +154,7 @@ class ArtisticPage {
   int get hashCode {
     return id.hashCode ^
         createdAt.hashCode ^
+        hasAppBar.hashCode ^
         isActive.hashCode ^
         isDraft.hashCode ^
         name.hashCode ^
