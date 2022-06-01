@@ -12,6 +12,8 @@ import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
+import 'package:avatar_stack/avatar_stack.dart';
+import 'package:avatar_stack/positions.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -141,14 +143,20 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
                 children: [
                   titleSectionWidget(),
                   maybeHelperText(),
-                  Container(
-                    height: 360.0,
-                    padding: const EdgeInsets.only(top: 34.0),
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      shrinkWrap: true,
-                      itemExtent: 200.0,
-                      children: getChildren(),
+                  SizedBox(
+                    height: 200.0,
+                    child: WidgetStack(
+                      buildInfoWidget: (int additionalItems) {
+                        return CircleAvatar(
+                          child: Text("+$additionalItems"),
+                        );
+                      },
+                      positions: RestrictedPositions(
+                        maxCoverage: 0.7,
+                        minCoverage: 0.6,
+                        align: StackAlign.center,
+                      ),
+                      stackedWidgets: getChildren(),
                     ),
                   ),
                 ],
@@ -163,7 +171,7 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
 
   List<Widget> getChildren() {
     int index = -1;
-    final size = 200.0;
+    final size = 100.0;
 
     final bool canDrag = getCanDrag();
     final onDrop = canDrag ? onDropAvatar : null;
@@ -177,11 +185,12 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
           ]
         : [];
 
-    final List<Widget> children = _users.map((UserFirestore artist) {
-      index++;
+    final List<Widget> children = [];
 
-      return BetterAvatar(
+    for (final UserFirestore artist in _users) {
+      children.add(BetterAvatar(
         index: index,
+        showTitleOnHover: true,
         canDrag: canDrag,
         onDrop: onDrop,
         size: size,
@@ -194,19 +203,15 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
           artist.getProfilePicture(),
         ),
         onTap: () => goToArtistPage(artist),
-        padding: const EdgeInsets.only(right: 24.0),
-      );
-    }).toList();
-
-    final List<Widget> childrenDup = [];
-    childrenDup.addAll(children);
+      ));
+    }
 
     if (widget.editMode && (children.length < 6 || children.isEmpty)) {
-      childrenDup.add(
+      children.add(
         Align(
-          alignment: Alignment.topLeft,
+          alignment: Alignment.topCenter,
           child: BetterAvatar(
-            size: 200.0,
+            size: 100.0,
             image: AssetImage(""),
             useAsPlaceholder: true,
             onTap: () => widget.onPopupMenuItemSelected?.call(
@@ -214,13 +219,12 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
               widget.index,
               widget.section,
             ),
-            padding: const EdgeInsets.only(right: 24.0),
           ),
         ),
       );
     }
 
-    return childrenDup;
+    return children;
   }
 
   void onArtistItemSelected(
@@ -331,45 +335,37 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
       return Container();
     }
 
-    return Column(
-      children: [
-        InkWell(
-          onTap: widget.editMode ? onTapTitleDescription : null,
-          child: Column(
-            children: [
-              if (title.isNotEmpty)
-                Opacity(
-                  opacity: 0.6,
-                  child: Text(
-                    title,
-                    style: Utilities.fonts.body(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w600,
-                    ),
+    return Container(
+      padding: const EdgeInsets.only(bottom: 36.0),
+      child: InkWell(
+        onTap: widget.editMode ? onTapTitleDescription : null,
+        child: Column(
+          children: [
+            if (title.isNotEmpty)
+              Opacity(
+                opacity: 0.8,
+                child: Text(
+                  title,
+                  style: Utilities.fonts.title2(
+                    fontSize: 62.0,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-              if (description.isNotEmpty)
-                Opacity(
-                  opacity: 0.4,
-                  child: Text(
-                    description,
-                    style: Utilities.fonts.body(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w600,
-                    ),
+              ),
+            if (description.isNotEmpty)
+              Opacity(
+                opacity: 0.4,
+                child: Text(
+                  description,
+                  style: Utilities.fonts.body3(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
-        SizedBox(
-          width: 200.0,
-          child: Divider(
-            color: Theme.of(context).secondaryHeaderColor,
-            thickness: 4.0,
-          ),
-        ),
-      ],
+      ),
     );
   }
 
