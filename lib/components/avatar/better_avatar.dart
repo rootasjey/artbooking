@@ -3,6 +3,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/drag_data.dart';
 import 'package:artbooking/types/enums/enum_artist_item_action.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
@@ -24,9 +25,11 @@ class BetterAvatar extends StatefulWidget {
     this.title = "",
     this.padding = EdgeInsets.zero,
     this.dragGroupName = "",
+    this.showTitleOnHover = false,
   });
 
   final bool useAsPlaceholder;
+  final bool showTitleOnHover;
 
   /// Not used if onTap is null.
   final ColorFilter? colorFilter;
@@ -64,6 +67,8 @@ class _BetterAvatarState extends State<BetterAvatar>
     with TickerProviderStateMixin {
   late Animation<double> scaleAnimation;
   late AnimationController scaleAnimationController;
+
+  bool _isHover = false;
 
   late double elevation;
 
@@ -139,14 +144,7 @@ class _BetterAvatarState extends State<BetterAvatar>
           imageContainerWidget(
             usingAsDroptarget: usingAsDroptarget,
           ),
-          if (widget.title.isNotEmpty)
-            Text(
-              widget.title,
-              style: Utilities.fonts.body(
-                fontSize: 16.0,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+          avatarTitle(),
           if (widget.popupMenuEntries.isNotEmpty) popupMenuButton()
         ],
       ),
@@ -219,13 +217,13 @@ class _BetterAvatarState extends State<BetterAvatar>
                   if (isHover) {
                     elevation = (widget.elevation + 1.0) * 2;
                     scaleAnimationController.forward();
-                    setState(() {});
+                    setState(() => _isHover = true);
                     return;
                   }
 
                   elevation = widget.elevation;
                   scaleAnimationController.reverse();
-                  setState(() {});
+                  setState(() => _isHover = false);
                 },
               ),
             ),
@@ -273,7 +271,7 @@ class _BetterAvatarState extends State<BetterAvatar>
       padding: widget.padding,
       child: Material(
         elevation: elevation,
-        color: Theme.of(context).backgroundColor,
+        color: Constants.colors.clairPink,
         clipBehavior: Clip.antiAlias,
         shape: CircleBorder(
           side: BorderSide(
@@ -285,13 +283,17 @@ class _BetterAvatarState extends State<BetterAvatar>
           padding: const EdgeInsets.all(8.0),
           child: Material(
             clipBehavior: Clip.antiAlias,
+            color: Constants.colors.clairPink,
             shape: CircleBorder(),
-            child: InkWell(
-              onTap: widget.onTap,
-              child: SizedBox(
-                width: size,
-                height: size,
-                child: Icon(UniconsLine.plus),
+            child: Tooltip(
+              message: "artist_add_new".tr(),
+              child: InkWell(
+                onTap: widget.onTap,
+                child: SizedBox(
+                  width: size,
+                  height: size,
+                  child: Icon(UniconsLine.plus),
+                ),
               ),
             ),
           ),
@@ -314,6 +316,24 @@ class _BetterAvatarState extends State<BetterAvatar>
         );
       },
       itemBuilder: (_) => widget.popupMenuEntries,
+    );
+  }
+
+  Widget avatarTitle() {
+    if (widget.title.isEmpty) {
+      return Container();
+    }
+
+    if (widget.showTitleOnHover && !_isHover) {
+      return Container();
+    }
+
+    return Text(
+      widget.title,
+      style: Utilities.fonts.body(
+        fontSize: 16.0,
+        fontWeight: FontWeight.w600,
+      ),
     );
   }
 }
