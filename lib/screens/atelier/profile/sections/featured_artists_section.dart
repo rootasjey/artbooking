@@ -264,8 +264,8 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
       popupMenuEntries.add(
         PopupMenuItemIcon(
           icon: Icon(UniconsLine.plus),
-          textLabel: "illustrations_select".tr(),
-          value: EnumSectionAction.selectIllustrations,
+          textLabel: "artists_select".tr(),
+          value: EnumSectionAction.selectArtists,
         ),
       );
     }
