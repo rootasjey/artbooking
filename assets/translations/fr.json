@@ -1067,6 +1067,7 @@
   "security": "Sécurité",
   "security_checks": "Vérifications de sécurité",
   "security_checks_description": "Déployé en HTTPS (chiffrement) et tests de vulnérabilités.",
+  "see_more": "Voir plus",
   "see_you": "Nous espérons vous revoir à nouveau 👋",
   "select_all": "Sélectionner tout",
   "send": "Envoyer",
