@@ -88,7 +88,6 @@
   "art_movements_update_out_of_range": "Veuillez utiliser au maximum 5 mouvements artistiques. Vous avez essayé d'en mettre {}.",
   "artist": "artiste",
   "artist_add_new": "Ajouter un•e nouvel•le artiste",
-  "artists": "artistes",
   "artist_select": {
     "zero": "Sélectionner cet•te artiste",
     "one": "Sélectionner cet•te artiste",
@@ -96,7 +95,7 @@
     "many": "Sélectionner ces artistes",
     "other": "Sélectionner ces artistes"
   },
-  "artists_select_count": {
+  "artist_select_count": {
     "zero": "Sélectionner {} artiste",
     "one": "Sélectionner {} artiste",
     "two": "Sélectionner {} artistes",
@@ -104,6 +103,8 @@
     "many": "Sélectionner {} artistes",
     "other": "Sélectionner {} artistes"
   },
+  "artists": "artistes",
+  "artists_select": "Sélectionner des artistes",
   "artists_choose_featured": "Choisissez les artistes à mettre en avant.",
   "artists_pick_description": "Vous pouvez choisir quel•les artistes apparaîtront dans cette seciont.",
   "artworks": "Œures d'art",

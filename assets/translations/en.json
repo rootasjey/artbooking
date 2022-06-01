@@ -88,7 +88,6 @@
   "art_movements_update_out_of_range": "Please use no more than 5 art movements. You tried to set {} art movements.",
   "artist": "artist",
   "artist_add_new": "Add a new artist",
-  "artists": "artists",
   "artist_select": {
     "zero": "Select this artist",
     "one": "Select this artist",
@@ -104,6 +103,8 @@
     "many": "Select {} artists",
     "other": "Select {} artists"
   },
+  "artists": "artists",
+  "artists_select": "Select artists",
   "artists_choose_featured": "Choose featured artists.",
   "artists_pick_description": "You can pick artists who will be shown in this section.",
   "artworks": "Artworks",
