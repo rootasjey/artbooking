@@ -87,6 +87,7 @@
   "art_movements_update_fail": "Sorry, we couldn't update your illustration's art movements. Please try again later.",
   "art_movements_update_out_of_range": "Please use no more than 5 art movements. You tried to set {} art movements.",
   "artist": "artist",
+  "artist_add_new": "Add a new artist",
   "artists": "artists",
   "artist_select": {
     "zero": "Select this artist",

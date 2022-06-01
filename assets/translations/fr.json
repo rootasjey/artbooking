@@ -87,6 +87,7 @@
   "art_movements_update_fail": "Désolés, nous n'avons pas pu mettre à jour vos mouvements artistiques. Veuillez réessayer plus tard.",
   "art_movements_update_out_of_range": "Veuillez utiliser au maximum 5 mouvements artistiques. Vous avez essayé d'en mettre {}.",
   "artist": "artiste",
+  "artist_add_new": "Ajouter un•e nouvel•le artiste",
   "artists": "artistes",
   "artist_select": {
     "zero": "Sélectionner cet•te artiste",
