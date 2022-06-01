@@ -379,8 +379,8 @@ class _MozaicSectionState extends State<MozaicSection> {
                   child: Text(
                     title,
                     style: Utilities.fonts.title(
-                      fontSize: 32.0,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 42.0,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
@@ -389,9 +389,9 @@ class _MozaicSectionState extends State<MozaicSection> {
                   opacity: 0.6,
                   child: Text(
                     description,
-                    style: Utilities.fonts.body(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w300,
+                    style: Utilities.fonts.body3(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                 ),
