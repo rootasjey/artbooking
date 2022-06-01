@@ -65,37 +65,44 @@ class BetterAvatar extends StatefulWidget {
 
 class _BetterAvatarState extends State<BetterAvatar>
     with TickerProviderStateMixin {
-  late Animation<double> scaleAnimation;
-  late AnimationController scaleAnimationController;
+  late Animation<double> _scaleAnimation;
+  late AnimationController _scaleAnimationController;
+  late AnimationController _rotateAnimationController;
 
   bool _isHover = false;
 
-  late double elevation;
+  late double _elevation;
 
   @override
   void initState() {
     super.initState();
 
-    scaleAnimationController = AnimationController(
+    _scaleAnimationController = AnimationController(
       lowerBound: 0.8,
       upperBound: 1.0,
       duration: 250.milliseconds,
       vsync: this,
     );
 
-    scaleAnimation = CurvedAnimation(
-      parent: scaleAnimationController,
+    _scaleAnimation = CurvedAnimation(
+      parent: _scaleAnimationController,
       curve: Curves.elasticOut,
     );
 
+    _rotateAnimationController = AnimationController(
+      vsync: this,
+      duration: 1000.milliseconds,
+    );
+
     setState(() {
-      elevation = widget.elevation;
+      _elevation = widget.elevation;
     });
   }
 
   @override
   dispose() {
-    scaleAnimationController.dispose();
+    _scaleAnimationController.dispose();
+    _rotateAnimationController.dispose();
     super.dispose();
   }
 
@@ -144,7 +151,7 @@ class _BetterAvatarState extends State<BetterAvatar>
           imageContainerWidget(
             usingAsDroptarget: usingAsDroptarget,
           ),
-          avatarTitle(),
+          titleWidget(),
           if (widget.popupMenuEntries.isNotEmpty) popupMenuButton()
         ],
       ),
@@ -153,7 +160,7 @@ class _BetterAvatarState extends State<BetterAvatar>
 
   Widget imageContainerWidget({bool usingAsDroptarget = false}) {
     Widget avatarImage = ScaleTransition(
-      scale: scaleAnimation,
+      scale: _scaleAnimation,
       child: imageWidget(
         usingAsDroptarget: usingAsDroptarget,
       ),
@@ -187,44 +194,51 @@ class _BetterAvatarState extends State<BetterAvatar>
         ? Constants.colors.tertiary
         : Theme.of(context).primaryColor;
 
-    return Material(
-      elevation: elevation,
-      color: Theme.of(context).backgroundColor,
-      clipBehavior: Clip.antiAlias,
-      shape: CircleBorder(
-        side: BorderSide(
-          color: borderColor,
-          width: 3.0,
+    return RotationTransition(
+      turns: Tween(begin: 0.0, end: -0.1)
+          .curved(Curves.elasticOut)
+          .animate(_rotateAnimationController),
+      child: Material(
+        elevation: _elevation,
+        color: Theme.of(context).backgroundColor,
+        clipBehavior: Clip.antiAlias,
+        shape: CircleBorder(
+          side: BorderSide(
+            color: borderColor,
+            width: 3.0,
+          ),
         ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Material(
-          clipBehavior: Clip.antiAlias,
-          shape: CircleBorder(),
-          child: SizedBox(
-            width: size,
-            height: size,
-            child: Ink.image(
-              image: widget.image,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Material(
+            clipBehavior: Clip.antiAlias,
+            shape: CircleBorder(),
+            child: SizedBox(
               width: size,
               height: size,
-              fit: BoxFit.cover,
-              colorFilter: widget.colorFilter,
-              child: InkWell(
-                onTap: widget.onTap,
-                onHover: (isHover) {
-                  if (isHover) {
-                    elevation = (widget.elevation + 1.0) * 2;
-                    scaleAnimationController.forward();
-                    setState(() => _isHover = true);
-                    return;
-                  }
+              child: Ink.image(
+                image: widget.image,
+                width: size,
+                height: size,
+                fit: BoxFit.cover,
+                colorFilter: widget.colorFilter,
+                child: InkWell(
+                  onTap: widget.onTap,
+                  onHover: (isHover) {
+                    if (isHover) {
+                      _elevation = (widget.elevation + 1.0) * 2;
+                      _scaleAnimationController.forward();
+                      _rotateAnimationController.forward();
+                      setState(() => _isHover = true);
+                      return;
+                    }
 
-                  elevation = widget.elevation;
-                  scaleAnimationController.reverse();
-                  setState(() => _isHover = false);
-                },
+                    _elevation = widget.elevation;
+                    _scaleAnimationController.reverse();
+                    _rotateAnimationController.reverse();
+                    setState(() => _isHover = false);
+                  },
+                ),
               ),
             ),
           ),
@@ -270,7 +284,7 @@ class _BetterAvatarState extends State<BetterAvatar>
     return Padding(
       padding: widget.padding,
       child: Material(
-        elevation: elevation,
+        elevation: _elevation,
         color: Constants.colors.clairPink,
         clipBehavior: Clip.antiAlias,
         shape: CircleBorder(
@@ -319,7 +333,7 @@ class _BetterAvatarState extends State<BetterAvatar>
     );
   }
 
-  Widget avatarTitle() {
+  Widget titleWidget() {
     if (widget.title.isEmpty) {
       return Container();
     }
