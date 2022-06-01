@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 class DarkTextButton extends StatelessWidget {
   const DarkTextButton({
     Key? key,
-    this.onPressed,
     required this.child,
+    this.onPressed,
+    this.backgroundColor,
   }) : super(key: key);
 
   final void Function()? onPressed;
   final Widget child;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +23,7 @@ class DarkTextButton extends StatelessWidget {
       ),
       style: TextButton.styleFrom(
         primary: Theme.of(context).textTheme.bodyText1?.color,
+        backgroundColor: backgroundColor,
         textStyle: Utilities.fonts.body(
           fontWeight: FontWeight.w600,
         ),
