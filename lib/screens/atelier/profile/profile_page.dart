@@ -688,6 +688,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         'sections': sections.map((x) => x.toMap()).toList(),
         'type': 'profile',
         'updated_at': Timestamp.now(),
+        "user_id": userId,
       });
     } catch (error) {
       Utilities.logger.e(error);
