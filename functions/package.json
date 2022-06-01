@@ -22,7 +22,7 @@
     "firebase-tools": "10.1.5",
     "fs-extra": "10.0.0",
     "image-size": "1.0.1",
-    "sharp": "0.30.0"
+    "sharp": "0.30.5"
   },
   "devDependencies": {
     "@types/deep-equal": "1.0.1",
