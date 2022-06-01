@@ -11,12 +11,13 @@ class ArtisticPage {
   const ArtisticPage({
     required this.id,
     required this.createdAt,
+    required this.updatedAt,
+    required this.userId,
     this.hasAppBar = false,
     this.isActive = false,
     this.isDraft = false,
     this.name = '',
     this.type = EnumPageType.profile,
-    required this.updatedAt,
     this.sections = const [],
   });
 
@@ -32,6 +33,10 @@ class ArtisticPage {
   final DateTime updatedAt;
   final List<Section> sections;
 
+  /// User’s page id if this page is of “profile” type.
+  /// Otherwise, admin who created it.
+  final String userId;
+
   ArtisticPage copyWith({
     String? id,
     DateTime? createdAt,
@@ -42,6 +47,7 @@ class ArtisticPage {
     EnumPageType? type,
     DateTime? updatedAt,
     List<Section>? sections,
+    String? userId,
   }) {
     return ArtisticPage(
       id: id ?? this.id,
@@ -53,6 +59,7 @@ class ArtisticPage {
       type: type ?? this.type,
       updatedAt: updatedAt ?? this.updatedAt,
       sections: sections ?? this.sections,
+      userId: userId ?? this.userId,
     );
   }
 
@@ -67,6 +74,7 @@ class ArtisticPage {
       'type': convertTypeToString(),
       'updated_at': updatedAt.millisecondsSinceEpoch,
       'sections': sections.map((x) => x.toMap()).toList(),
+      "userId": userId,
     };
   }
 
@@ -81,6 +89,7 @@ class ArtisticPage {
       type: EnumPageType.profile,
       updatedAt: DateTime.now(),
       sections: [],
+      userId: "",
     );
   }
 
@@ -97,6 +106,7 @@ class ArtisticPage {
       sections: List<Section>.from(
         map['sections']?.map((x) => Section.fromMap(x)),
       ),
+      userId: map["user_id"],
     );
   }
 
@@ -131,7 +141,7 @@ class ArtisticPage {
   String toString() {
     return "Page(id: $id, createdAt: $createdAt, hasAppBar: $hasAppBar,"
         " isActive: $isActive, isDraft: $isDraft, name: $name, type: $type, "
-        "updatedAt: $updatedAt, sections: $sections)";
+        "updatedAt: $updatedAt, sections: $sections, userId: $userId)";
   }
 
   @override
@@ -147,7 +157,8 @@ class ArtisticPage {
         other.name == name &&
         other.type == type &&
         other.updatedAt == updatedAt &&
-        listEquals(other.sections, sections);
+        listEquals(other.sections, sections) &&
+        other.userId == userId;
   }
 
   @override
@@ -160,6 +171,7 @@ class ArtisticPage {
         name.hashCode ^
         type.hashCode ^
         updatedAt.hashCode ^
-        sections.hashCode;
+        sections.hashCode ^
+        userId.hashCode;
   }
 }
