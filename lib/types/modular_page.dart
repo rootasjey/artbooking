@@ -6,9 +6,10 @@ import 'package:flutter/foundation.dart';
 import 'package:artbooking/types/enums/enum_page_type.dart';
 import 'package:artbooking/types/section.dart';
 
-/// Artistic page. Used for user's profile.
-class ArtisticPage {
-  const ArtisticPage({
+/// A page hosting various visual components.
+/// Currently used as home page and user profile page.
+class ModularPage {
+  const ModularPage({
     required this.id,
     required this.createdAt,
     required this.updatedAt,
@@ -37,7 +38,7 @@ class ArtisticPage {
   /// Otherwise, admin who created it.
   final String userId;
 
-  ArtisticPage copyWith({
+  ModularPage copyWith({
     String? id,
     DateTime? createdAt,
     bool? hasAppBar,
@@ -49,7 +50,7 @@ class ArtisticPage {
     List<Section>? sections,
     String? userId,
   }) {
-    return ArtisticPage(
+    return ModularPage(
       id: id ?? this.id,
       createdAt: createdAt ?? this.createdAt,
       hasAppBar: hasAppBar ?? this.hasAppBar,
@@ -78,8 +79,8 @@ class ArtisticPage {
     };
   }
 
-  factory ArtisticPage.empty() {
-    return ArtisticPage(
+  factory ModularPage.empty() {
+    return ModularPage(
       id: "",
       createdAt: DateTime.now(),
       hasAppBar: false,
@@ -93,8 +94,8 @@ class ArtisticPage {
     );
   }
 
-  factory ArtisticPage.fromMap(Map<String, dynamic> map) {
-    return ArtisticPage(
+  factory ModularPage.fromMap(Map<String, dynamic> map) {
+    return ModularPage(
       id: map["id"] ?? "",
       createdAt: Utilities.date.fromFirestore(map["created_at"]),
       hasAppBar: map["has_app_bar"] ?? false,
@@ -136,8 +137,8 @@ class ArtisticPage {
 
   String toJson() => json.encode(toMap());
 
-  factory ArtisticPage.fromJson(String source) =>
-      ArtisticPage.fromMap(json.decode(source));
+  factory ModularPage.fromJson(String source) =>
+      ModularPage.fromMap(json.decode(source));
 
   @override
   String toString() {
@@ -150,7 +151,7 @@ class ArtisticPage {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is ArtisticPage &&
+    return other is ModularPage &&
         other.id == id &&
         other.createdAt == createdAt &&
         other.hasAppBar == hasAppBar &&

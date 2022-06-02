@@ -15,7 +15,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_body.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_empty.dart';
-import 'package:artbooking/types/artistic_page.dart';
+import 'package:artbooking/types/modular_page.dart';
 import 'package:artbooking/types/book/scale_factor.dart';
 import 'package:artbooking/types/enums/enum_navigation_section.dart';
 import 'package:artbooking/types/enums/enum_page_type.dart';
@@ -37,8 +37,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
-class ModularPage extends ConsumerStatefulWidget {
-  const ModularPage({
+class ModularPagePresenter extends ConsumerStatefulWidget {
+  const ModularPagePresenter({
     Key? key,
     required this.pageId,
   }) : super(key: key);
@@ -46,10 +46,10 @@ class ModularPage extends ConsumerStatefulWidget {
   final String pageId;
 
   @override
-  ConsumerState<ModularPage> createState() => _ModularPageState();
+  ConsumerState<ModularPagePresenter> createState() => _ModularPageState();
 }
 
-class _ModularPageState extends ConsumerState<ModularPage> {
+class _ModularPageState extends ConsumerState<ModularPagePresenter> {
   /// True if this page is currently loading.
   bool _loading = false;
 
@@ -66,7 +66,7 @@ class _ModularPageState extends ConsumerState<ModularPage> {
   bool _showFabToTop = false;
 
   /// Modular page.
-  var _modularPage = ArtisticPage.empty();
+  var _modularPage = ModularPage.empty();
 
   /// Listens to book's updates.
   DocSnapshotStreamSubscription? _modularPageSubscription;
@@ -206,7 +206,7 @@ class _ModularPageState extends ConsumerState<ModularPage> {
 
       setState(() {
         data["id"] = snapshot.id;
-        _modularPage = ArtisticPage.fromMap(data);
+        _modularPage = ModularPage.fromMap(data);
       });
     }, onError: (error) {
       Utilities.logger.e(error);
@@ -844,7 +844,7 @@ class _ModularPageState extends ConsumerState<ModularPage> {
       }
 
       map["id"] = snapshot.id;
-      _modularPage = ArtisticPage.fromMap(map);
+      _modularPage = ModularPage.fromMap(map);
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));

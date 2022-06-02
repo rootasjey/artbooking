@@ -7,7 +7,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/line_drop_zone.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_fab.dart';
 import 'package:artbooking/screens/atelier/profile/section_wrapper.dart';
-import 'package:artbooking/types/artistic_page.dart';
+import 'package:artbooking/types/modular_page.dart';
 import 'package:artbooking/types/enums/enum_navigation_section.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
@@ -50,7 +50,7 @@ class ProfilePageBody extends StatelessWidget {
   final bool editMode;
 
   final String userId;
-  final ArtisticPage artisticPage;
+  final ModularPage artisticPage;
   final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
   final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
 

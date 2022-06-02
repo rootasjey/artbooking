@@ -13,7 +13,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_body.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_empty.dart';
-import 'package:artbooking/types/artistic_page.dart';
+import 'package:artbooking/types/modular_page.dart';
 import 'package:artbooking/types/enums/enum_navigation_section.dart';
 import 'package:artbooking/types/enums/enum_page_type.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
@@ -56,7 +56,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   bool _showFabToTop = false;
 
   /// Main user's artistic page.
-  var _profilePage = ArtisticPage.empty();
+  var _profilePage = ModularPage.empty();
   final _scrollController = ScrollController();
 
   /// Listens to book's updates.
@@ -198,7 +198,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       setState(() {
         final data = doc.data();
         data["id"] = doc.id;
-        _profilePage = ArtisticPage.fromMap(data);
+        _profilePage = ModularPage.fromMap(data);
       });
     }, onError: (error) {
       Utilities.logger.e(error);
@@ -814,7 +814,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       final map = doc.data();
       map["id"] = doc.id;
 
-      _profilePage = ArtisticPage.fromMap(map);
+      _profilePage = ModularPage.fromMap(map);
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
