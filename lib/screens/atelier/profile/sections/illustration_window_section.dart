@@ -1,11 +1,13 @@
 import 'dart:math';
 
+import 'package:artbooking/components/buttons/dark_text_button.dart';
 import 'package:artbooking/components/cards/illustration_card.dart';
 import 'package:artbooking/components/cards/shimmer_card.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/popup_menu_button_section.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
+import 'package:artbooking/types/enums/enum_navigation_section.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
@@ -35,6 +37,7 @@ class IllustrationWindowSection extends StatefulWidget {
     this.usingAsDropTarget = false,
     this.editMode = false,
     this.isHover = false,
+    this.onNavigateFromSection,
   }) : super(key: key);
 
   /// If true, the current authenticated user is the owner and
@@ -68,6 +71,10 @@ class IllustrationWindowSection extends StatefulWidget {
   /// Section's position in the layout (e.g. 0 is the first).
   final Section section;
   final String userId;
+
+  final void Function(
+    EnumNavigationSection enumNavigationSection,
+  )? onNavigateFromSection;
 
   @override
   State<IllustrationWindowSection> createState() =>
@@ -139,6 +146,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
             ),
             child: Center(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   titleSectionWidget(),
                   maybeHelperText(),
@@ -416,44 +424,47 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
       return Container();
     }
 
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        InkWell(
-          onTap: widget.editMode ? onTapTitleDescription : null,
-          child: Column(
-            children: [
-              if (title.isNotEmpty)
-                Opacity(
-                  opacity: 0.6,
-                  child: Text(
-                    title,
-                    style: Utilities.fonts.body(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w600,
+        Flexible(
+          flex: 4,
+          child: SizedBox(
+            width: 400.0,
+            child: InkWell(
+              onTap: widget.editMode ? onTapTitleDescription : null,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (title.isNotEmpty)
+                    Opacity(
+                      opacity: 0.8,
+                      child: Text(
+                        title,
+                        style: Utilities.fonts.title(
+                          fontSize: 42.0,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              if (description.isNotEmpty)
-                Opacity(
-                  opacity: 0.4,
-                  child: Text(
-                    description,
-                    style: Utilities.fonts.body(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w600,
+                  if (description.isNotEmpty)
+                    Opacity(
+                      opacity: 0.5,
+                      child: Text(
+                        description,
+                        style: Utilities.fonts.body(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-            ],
+                ],
+              ),
+            ),
           ),
         ),
-        SizedBox(
-          width: 200.0,
-          child: Divider(
-            color: Theme.of(context).secondaryHeaderColor,
-            thickness: 4.0,
-          ),
-        ),
+        Spacer(flex: 2),
+        seeMoreButton(),
       ],
     );
   }
@@ -688,6 +699,21 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
       EnumSectionAction.setSyncDataMode,
       widget.index,
       widget.section,
+    );
+  }
+
+  Widget seeMoreButton() {
+    return DarkTextButton(
+      onPressed: () {
+        widget.onNavigateFromSection?.call(
+          EnumNavigationSection.illustrations,
+        );
+      },
+      backgroundColor: Colors.black12,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [Text("see_more".tr()), Icon(UniconsLine.arrow_right)],
+      ),
     );
   }
 }
