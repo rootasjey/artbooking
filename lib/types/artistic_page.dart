@@ -16,7 +16,7 @@ class ArtisticPage {
     this.hasAppBar = false,
     this.isActive = false,
     this.isDraft = false,
-    this.name = '',
+    this.name = "",
     this.type = EnumPageType.profile,
     this.sections = const [],
   });
@@ -65,27 +65,27 @@ class ArtisticPage {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'created_at': createdAt.millisecondsSinceEpoch,
-      'has_app_bar': hasAppBar,
-      'is_active': isActive,
-      'is_draft': isDraft,
-      'name': name,
-      'type': convertTypeToString(),
-      'updated_at': updatedAt.millisecondsSinceEpoch,
-      'sections': sections.map((x) => x.toMap()).toList(),
+      "id": id,
+      "created_at": createdAt.millisecondsSinceEpoch,
+      "has_app_bar": hasAppBar,
+      "is_active": isActive,
+      "is_draft": isDraft,
+      "name": name,
+      "type": convertTypeToString(),
+      "updated_at": updatedAt.millisecondsSinceEpoch,
+      "sections": sections.map((x) => x.toMap()).toList(),
       "userId": userId,
     };
   }
 
   factory ArtisticPage.empty() {
     return ArtisticPage(
-      id: '',
+      id: "",
       createdAt: DateTime.now(),
       hasAppBar: false,
       isActive: false,
       isDraft: true,
-      name: '',
+      name: "",
       type: EnumPageType.profile,
       updatedAt: DateTime.now(),
       sections: [],
@@ -95,22 +95,22 @@ class ArtisticPage {
 
   factory ArtisticPage.fromMap(Map<String, dynamic> map) {
     return ArtisticPage(
-      id: map['id'] ?? '',
-      createdAt: Utilities.date.fromFirestore(map['created_at']),
+      id: map["id"] ?? "",
+      createdAt: Utilities.date.fromFirestore(map["created_at"]),
       hasAppBar: map["has_app_bar"] ?? false,
-      isActive: map['is_active'] ?? false,
-      isDraft: map['is_draft'] ?? false,
-      name: map['name'] ?? '',
-      type: fromStringToType(map['type']),
-      updatedAt: Utilities.date.fromFirestore(map['updated_at']),
+      isActive: map["is_active"] ?? false,
+      isDraft: map["is_draft"] ?? false,
+      name: map["name"] ?? "",
       sections: List<Section>.from(
-        map['sections']?.map((x) => Section.fromMap(x)),
+        map["sections"]?.map((x) => Section.fromMap(x)),
       ),
+      type: fromStringToType(map["type"]),
+      updatedAt: Utilities.date.fromFirestore(map["updated_at"]),
       userId: map["user_id"],
     );
   }
 
-  static EnumPageType fromStringToType(typeString) {
+  static EnumPageType fromStringToType(String? typeString) {
     if (typeString == null) {
       return EnumPageType.profile;
     }
@@ -118,6 +118,8 @@ class ArtisticPage {
     switch (typeString) {
       case "profile":
         return EnumPageType.profile;
+      case "home":
+        return EnumPageType.home;
       default:
         return EnumPageType.profile;
     }
