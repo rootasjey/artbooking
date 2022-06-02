@@ -16,6 +16,7 @@ import 'package:artbooking/screens/atelier/profile/sections/spacing_section.dart
 import 'package:artbooking/screens/atelier/profile/sections/title_description_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/user_illustration_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/user_section.dart';
+import 'package:artbooking/types/enums/enum_navigation_section.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/section.dart';
@@ -49,6 +50,8 @@ class SectionChooser {
       required EnumSelectType selectType,
     })?
         onShowBookDialog,
+    void Function(EnumNavigationSection enumNavigationSection)?
+        onNavigateFromSection,
   }) {
     if (section.id == SectionIds.user) {
       return UserSection(
@@ -222,6 +225,7 @@ class SectionChooser {
         popupMenuEntries: popupMenuEntries,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
         isHover: isHover,
+        onNavigateFromSection: onNavigateFromSection,
       );
     }
 

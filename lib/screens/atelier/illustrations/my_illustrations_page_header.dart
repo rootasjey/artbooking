@@ -1,4 +1,6 @@
+import 'package:artbooking/components/buttons/circle_button.dart';
 import 'package:artbooking/components/texts/page_title.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_actions.dart';
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_group_actions.dart';
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_title.dart';
@@ -6,6 +8,7 @@ import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:unicons/unicons.dart';
 
 class MyIllustrationsPageHeader extends StatelessWidget {
   const MyIllustrationsPageHeader({
@@ -23,10 +26,12 @@ class MyIllustrationsPageHeader extends StatelessWidget {
     this.onUpdateLayout,
     this.onAddGroupToBook,
     this.onChangeGroupVisibility,
+    this.showBackButton = false,
   }) : super(key: key);
 
   final bool multiSelectActive;
   final bool limitThreeInRow;
+  final bool showBackButton;
 
   final EnumVisibilityTab selectedTab;
 
@@ -80,6 +85,18 @@ class MyIllustrationsPageHeader extends StatelessWidget {
       padding: padding,
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
+          if (showBackButton)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: CircleButton(
+                  tooltip: "back".tr(),
+                  onTap: () => Utilities.navigation.back(context),
+                  icon: Icon(UniconsLine.arrow_left, color: Colors.black),
+                ),
+              ),
+            ),
           PageTitle(
             renderSliver: false,
             title: MyIllustrationsPageTitle(

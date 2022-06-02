@@ -17,6 +17,8 @@ import 'package:artbooking/screens/atelier/profile/profile_page_body.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_empty.dart';
 import 'package:artbooking/types/artistic_page.dart';
 import 'package:artbooking/types/book/scale_factor.dart';
+import 'package:artbooking/types/enums/enum_navigation_section.dart';
+import 'package:artbooking/types/enums/enum_page_type.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_section_size.dart';
@@ -175,6 +177,7 @@ class _ModularPageState extends ConsumerState<ModularPage> {
       onShowBookDialog: onShowBookDialog,
       onDropSection: onDropSection,
       onDropSectionInBetween: onDropSectionInBetween,
+      onNavigateFromSection: onNavigateFromSection,
     );
   }
 
@@ -284,6 +287,35 @@ class _ModularPageState extends ConsumerState<ModularPage> {
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
+  void onNavigateFromSection(EnumNavigationSection enumNavigationSection) {
+    if (_modularPage.type == EnumPageType.profile) {
+      final String userId = _modularPage.userId;
+
+      if (_modularPage.userId.isEmpty) {
+        const String message = "Cannot navigate to user's illustrations page "
+            "because userId is empty.";
+
+        Utilities.logger.e(message);
+        context.showErrorBar(
+          content: Text(message),
+        );
+      }
+
+      Beamer.of(context).beamToNamed(
+        "/users/$userId/illustrations",
+        routeState: {
+          "userId": userId,
+        },
+      );
+      return;
+    }
+
+    if (_modularPage.type == EnumPageType.home) {
+      Beamer.of(context).beamToNamed("/illustrations");
+      return;
     }
   }
 
@@ -532,6 +564,23 @@ class _ModularPageState extends ConsumerState<ModularPage> {
         );
       },
     );
+  }
+
+  void onToggleEditMode() {
+    final UserFirestore? user = ref.read(AppState.userProvider).firestoreUser;
+    final bool canManagePages = user?.rights.canManagePages ?? false;
+
+    if (!canManagePages) {
+      return;
+    }
+
+    setState(() {
+      _editMode = !_editMode;
+    });
+  }
+
+  void onToggleFabToTop(bool show) {
+    setState(() => _showFabToTop = show);
   }
 
   void showRenameSectionDialog(Section section, int index) {
@@ -1015,22 +1064,5 @@ class _ModularPageState extends ConsumerState<ModularPage> {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     }
-  }
-
-  void onToggleEditMode() {
-    final UserFirestore? user = ref.read(AppState.userProvider).firestoreUser;
-    final bool canManagePages = user?.rights.canManagePages ?? false;
-
-    if (!canManagePages) {
-      return;
-    }
-
-    setState(() {
-      _editMode = !_editMode;
-    });
-  }
-
-  void onToggleFabToTop(bool show) {
-    setState(() => _showFabToTop = show);
   }
 }

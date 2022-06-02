@@ -4,6 +4,7 @@ import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/section_chooser.dart';
 import 'package:artbooking/types/drag_data.dart';
+import 'package:artbooking/types/enums/enum_navigation_section.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/section.dart';
@@ -29,6 +30,7 @@ class SectionWrapper extends StatefulWidget {
     this.onUpdateSectionItems,
     this.onShowBookDialog,
     this.onShowIllustrationDialog,
+    this.onNavigateFromSection,
   }) : super(key: key);
 
   final int index;
@@ -50,17 +52,23 @@ class SectionWrapper extends StatefulWidget {
   final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
   final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
   final void Function(Section, int, List<String>)? onUpdateSectionItems;
+
   final void Function({
     required int index,
     required Section section,
     required EnumSelectType selectType,
   })? onShowBookDialog;
+
   final void Function({
     required int index,
     int maxPick,
     required Section section,
     required EnumSelectType selectType,
   })? onShowIllustrationDialog;
+
+  final void Function(
+    EnumNavigationSection enumNavigationSection,
+  )? onNavigateFromSection;
 
   @override
   State<SectionWrapper> createState() => _SectionWrapperState();
@@ -122,6 +130,7 @@ class _SectionWrapperState extends State<SectionWrapper> {
       onPopupMenuItemSelected: widget.onPopupMenuItemSelected,
       onUpdateSectionItems: widget.onUpdateSectionItems,
       isHover: _isHover,
+      onNavigateFromSection: widget.onNavigateFromSection,
     );
 
     if (!widget.editMode) {

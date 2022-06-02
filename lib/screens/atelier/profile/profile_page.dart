@@ -14,6 +14,8 @@ import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_body.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_empty.dart';
 import 'package:artbooking/types/artistic_page.dart';
+import 'package:artbooking/types/enums/enum_navigation_section.dart';
+import 'package:artbooking/types/enums/enum_page_type.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_section_size.dart';
@@ -164,6 +166,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       onUpdateSectionItems: tryUpdateSectionItems,
       onShowBookDialog: onShowBookDialog,
       onDropSection: onDropSection,
+      onNavigateFromSection: onNavigateFromSection,
     );
   }
 
@@ -200,6 +203,75 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     }, onError: (error) {
       Utilities.logger.e(error);
     });
+  }
+
+  void onDropSection(int dropTargetIndex, List<int> dragIndexes) async {
+    final int firstDragIndex = dragIndexes.first;
+    if (dropTargetIndex == firstDragIndex) {
+      return;
+    }
+
+    final sections = _profilePage.sections;
+
+    if (dropTargetIndex < 0 ||
+        firstDragIndex < 0 ||
+        dropTargetIndex >= sections.length ||
+        firstDragIndex > sections.length) {
+      return;
+    }
+
+    final dropTargetSection = sections.elementAt(dropTargetIndex);
+    final dragSection = sections.elementAt(firstDragIndex);
+
+    setState(() {
+      _profilePage.sections[firstDragIndex] = dropTargetSection;
+      _profilePage.sections[dropTargetIndex] = dragSection;
+    });
+
+    try {
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(getUserId())
+          .collection("user_pages")
+          .doc(_profilePage.id)
+          .update({
+        "sections": _profilePage.sections.map((x) => x.toMap()).toList(),
+      });
+
+      setState(() {});
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
+  void onNavigateFromSection(EnumNavigationSection enumNavigationSection) {
+    if (_profilePage.type == EnumPageType.profile) {
+      final String userId = _profilePage.userId;
+
+      if (_profilePage.userId.isEmpty) {
+        const String message = "Cannot navigate to user's illustrations page "
+            "because userId is empty.";
+
+        Utilities.logger.e(message);
+        context.showErrorBar(
+          content: Text(message),
+        );
+      }
+
+      Beamer.of(context).beamToNamed(
+        "/users/$userId/illustrations",
+        routeState: {
+          "userId": userId,
+        },
+      );
+      return;
+    }
+
+    if (_profilePage.type == EnumPageType.home) {
+      Beamer.of(context).beamToNamed("/illustrations");
+      return;
+    }
   }
 
   void onPopupMenuItemSelected(
@@ -398,6 +470,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         );
       },
     );
+  }
+
+  void onToggleFabToTop(bool show) {
+    setState(() => _showFabToTop = show);
   }
 
   /// Show a dialog to confirm a single section deletion.
@@ -953,49 +1029,5 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     }
-  }
-
-  void onDropSection(int dropTargetIndex, List<int> dragIndexes) async {
-    final int firstDragIndex = dragIndexes.first;
-    if (dropTargetIndex == firstDragIndex) {
-      return;
-    }
-
-    final sections = _profilePage.sections;
-
-    if (dropTargetIndex < 0 ||
-        firstDragIndex < 0 ||
-        dropTargetIndex >= sections.length ||
-        firstDragIndex > sections.length) {
-      return;
-    }
-
-    final dropTargetSection = sections.elementAt(dropTargetIndex);
-    final dragSection = sections.elementAt(firstDragIndex);
-
-    setState(() {
-      _profilePage.sections[firstDragIndex] = dropTargetSection;
-      _profilePage.sections[dropTargetIndex] = dragSection;
-    });
-
-    try {
-      await FirebaseFirestore.instance
-          .collection("users")
-          .doc(getUserId())
-          .collection("user_pages")
-          .doc(_profilePage.id)
-          .update({
-        "sections": _profilePage.sections.map((x) => x.toMap()).toList(),
-      });
-
-      setState(() {});
-    } catch (error) {
-      Utilities.logger.e(error);
-      context.showErrorBar(content: Text(error.toString()));
-    }
-  }
-
-  void onToggleFabToTop(bool show) {
-    setState(() => _showFabToTop = show);
   }
 }

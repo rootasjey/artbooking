@@ -33,6 +33,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
 class MyIllustrationsPage extends ConsumerStatefulWidget {
+  MyIllustrationsPage({this.userId = ""});
+
+  final String userId;
+
   @override
   _MyIllustrationsPageState createState() => _MyIllustrationsPageState();
 }
@@ -125,19 +129,20 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
               slivers: <Widget>[
                 ApplicationBar(),
                 MyIllustrationsPageHeader(
-                  multiSelectedItems: _multiSelectedItems,
+                  limitThreeInRow: _layoutThreeInRow,
                   multiSelectActive: _forceMultiSelect,
-                  onUploadIllustration: uploadIllustration,
+                  multiSelectedItems: _multiSelectedItems,
+                  onAddGroupToBook: showAddGroupToBook,
+                  onChangeGroupVisibility: showGroupVisibilityDialog,
+                  onChangedTab: onChangedTab,
                   onClearSelection: onClearSelection,
+                  onConfirmDeleteGroup: confirmDeleteGroup,
                   onSelectAll: onSelectAll,
                   onTriggerMultiSelect: onTriggerMultiSelect,
-                  onConfirmDeleteGroup: confirmDeleteGroup,
-                  selectedTab: _selectedTab,
-                  onChangedTab: onChangedTab,
-                  limitThreeInRow: _layoutThreeInRow,
                   onUpdateLayout: onUpdateLayout,
-                  onChangeGroupVisibility: showGroupVisibilityDialog,
-                  onAddGroupToBook: showAddGroupToBook,
+                  onUploadIllustration: uploadIllustration,
+                  selectedTab: _selectedTab,
+                  showBackButton: widget.userId.isNotEmpty,
                 ),
                 MyIllustrationsPageBody(
                   forceMultiSelect: _forceMultiSelect,
@@ -309,57 +314,6 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     }
   }
 
-  /// Return query to fetch illustrations according to the selected tab.
-  /// It's either active illustrations or archvied ones.
-  QueryMap getFetchQuery() {
-    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
-
-    if (_selectedTab == EnumVisibilityTab.active) {
-      return FirebaseFirestore.instance
-          .collection("illustrations")
-          .where("user_id", isEqualTo: userId)
-          .where("visibility", whereIn: ["public", "private"])
-          .orderBy("user_custom_index", descending: true)
-          .limit(_limit);
-    }
-
-    return FirebaseFirestore.instance
-        .collection("illustrations")
-        .where("user_id", isEqualTo: userId)
-        .where("visibility", isEqualTo: "archived")
-        .orderBy("user_custom_index", descending: true)
-        .limit(_limit);
-  }
-
-  /// Return query to fetch more illustrations according to the selected tab.
-  /// It's either active illustrations or archvied ones.
-  QueryMap? getFetchMoreQuery() {
-    final lastDocument = _lastDocument;
-    if (lastDocument == null) {
-      return null;
-    }
-
-    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
-
-    if (_selectedTab == EnumVisibilityTab.active) {
-      return FirebaseFirestore.instance
-          .collection("illustrations")
-          .where("user_id", isEqualTo: userId)
-          .where("visibility", whereIn: ["public", "private"])
-          .orderBy("user_custom_index", descending: true)
-          .limit(_limit)
-          .startAfterDocument(lastDocument);
-    }
-
-    return FirebaseFirestore.instance
-        .collection("illustrations")
-        .where("user_id", isEqualTo: userId)
-        .where("visibility", isEqualTo: "archived")
-        .orderBy("user_custom_index", descending: true)
-        .limit(_limit)
-        .startAfterDocument(lastDocument);
-  }
-
   /// Fetch illustrations and layout (limit 3 cards in a row?).
   void fetchData() {
     Future.wait([
@@ -409,7 +363,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   Future<void> fetchLayout() async {
     try {
-      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+      final String userId = getUserId();
+
       final snapshot = await FirebaseFirestore.instance
           .collection("users")
           .doc(userId)
@@ -424,26 +379,6 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
       setState(() {
         _layoutThreeInRow = data[_layoutKey] ?? false;
-      });
-    } catch (error) {
-      Utilities.logger.e(error);
-    }
-  }
-
-  void onUpdateLayout() async {
-    try {
-      setState(() {
-        _layoutThreeInRow = !_layoutThreeInRow;
-      });
-
-      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
-      await FirebaseFirestore.instance
-          .collection("users")
-          .doc(userId)
-          .collection("user_settings")
-          .doc("layout")
-          .update({
-        _layoutKey: _layoutThreeInRow,
       });
     } catch (error) {
       Utilities.logger.e(error);
@@ -493,6 +428,67 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     } finally {
       _loadingMore = false;
     }
+  }
+
+  /// Return query to fetch illustrations according to the selected tab.
+  /// It's either active illustrations or archvied ones.
+  QueryMap getFetchQuery() {
+    final String userId = getUserId();
+
+    if (_selectedTab == EnumVisibilityTab.active) {
+      return FirebaseFirestore.instance
+          .collection("illustrations")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", whereIn: ["public", "private"])
+          .orderBy("user_custom_index", descending: true)
+          .limit(_limit);
+    }
+
+    return FirebaseFirestore.instance
+        .collection("illustrations")
+        .where("user_id", isEqualTo: userId)
+        .where("visibility", isEqualTo: "archived")
+        .orderBy("user_custom_index", descending: true)
+        .limit(_limit);
+  }
+
+  /// Return query to fetch more illustrations according to the selected tab.
+  /// It's either active illustrations or archvied ones.
+  QueryMap? getFetchMoreQuery() {
+    final lastDocument = _lastDocument;
+    if (lastDocument == null) {
+      return null;
+    }
+
+    final String userId = getUserId();
+
+    if (_selectedTab == EnumVisibilityTab.active) {
+      return FirebaseFirestore.instance
+          .collection("illustrations")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", whereIn: ["public", "private"])
+          .orderBy("user_custom_index", descending: true)
+          .limit(_limit)
+          .startAfterDocument(lastDocument);
+    }
+
+    return FirebaseFirestore.instance
+        .collection("illustrations")
+        .where("user_id", isEqualTo: userId)
+        .where("visibility", isEqualTo: "archived")
+        .orderBy("user_custom_index", descending: true)
+        .limit(_limit)
+        .startAfterDocument(lastDocument);
+  }
+
+  /// Return either the user's id page parameter
+  /// or the current authenticated user's id.
+  String getUserId() {
+    if (widget.userId.isNotEmpty) {
+      return widget.userId;
+    }
+
+    return ref.read(AppState.userProvider).firestoreUser?.id ?? "";
   }
 
   void loadPreferences() {
@@ -788,6 +784,26 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     setState(() {
       _forceMultiSelect = !_forceMultiSelect;
     });
+  }
+
+  void onUpdateLayout() async {
+    try {
+      setState(() {
+        _layoutThreeInRow = !_layoutThreeInRow;
+      });
+
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_settings")
+          .doc("layout")
+          .update({
+        _layoutKey: _layoutThreeInRow,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+    }
   }
 
   /// Fire when a new document has been updated in Firestore.

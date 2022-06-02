@@ -8,6 +8,7 @@ import 'package:artbooking/screens/atelier/profile/line_drop_zone.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_fab.dart';
 import 'package:artbooking/screens/atelier/profile/section_wrapper.dart';
 import 'package:artbooking/types/artistic_page.dart';
+import 'package:artbooking/types/enums/enum_navigation_section.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/section.dart';
@@ -37,6 +38,7 @@ class ProfilePageBody extends StatelessWidget {
     this.showBackButton = false,
     this.onToggleEditMode,
     this.onDropSectionInBetween,
+    this.onNavigateFromSection,
   }) : super(key: key);
 
   final bool isOwner;
@@ -94,6 +96,10 @@ class ProfilePageBody extends StatelessWidget {
 
   final ScrollController scrollController;
 
+  final void Function(
+    EnumNavigationSection enumNavigationSection,
+  )? onNavigateFromSection;
+
   @override
   Widget build(BuildContext context) {
     final List<Widget> slivers = [
@@ -141,6 +147,7 @@ class ProfilePageBody extends StatelessWidget {
           onUpdateSectionItems: onUpdateSectionItems,
           onShowBookDialog: onShowBookDialog,
           onShowIllustrationDialog: onShowIllustrationDialog,
+          onNavigateFromSection: onNavigateFromSection,
         ),
       );
 

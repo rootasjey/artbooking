@@ -1,4 +1,5 @@
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page.dart';
 import 'package:artbooking/screens/atelier/profile/modular_page.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page.dart';
 import 'package:artbooking/screens/book/book_page.dart';
@@ -32,6 +33,8 @@ class HomeLocation extends BeamLocation<BeamState> {
   static const String profileIllustrationRoute =
       "$profileRoute/i/:illustrationId";
 
+  static const String userIllustrationsRoute = "$profileRoute/illustrations";
+
   static const String postRoute = "/posts/:postId";
 
   @override
@@ -47,6 +50,7 @@ class HomeLocation extends BeamLocation<BeamState> {
         profileIllustrationRoute,
         directIllustrationRoute,
         postRoute,
+        userIllustrationsRoute,
       ];
 
   @override
@@ -85,7 +89,18 @@ class HomeLocation extends BeamLocation<BeamState> {
           title: Utilities.ui.getPageTitle("book".tr()),
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathPatternSegments.contains("illustrations"))
+      if (state.pathPatternSegments.contains(":userId") &&
+          state.pathPatternSegments.contains("illustrations"))
+        BeamPage(
+          child: MyIllustrationsPage(
+            userId: state.pathParameters["userId"] ?? "",
+          ),
+          key: ValueKey(userIllustrationsRoute),
+          title: Utilities.ui.getPageTitle("illustrations".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
+      if (state.pathPatternSegments.contains("illustrations") &&
+          !state.pathPatternSegments.contains(":userId"))
         BeamPage(
           child: IllustrationsPage(),
           key: ValueKey(illustrationsRoute),
@@ -95,7 +110,7 @@ class HomeLocation extends BeamLocation<BeamState> {
       if (state.pathPatternSegments.contains(":illustrationId"))
         BeamPage(
           child: IllustrationPage(
-            illustrationId: state.pathParameters["illustrationId"]!,
+            illustrationId: state.pathParameters["illustrationId"] ?? "",
             heroTag: Utilities.navigation.getHeroTag(state.routeState),
           ),
           key: ValueKey(illustrationRoute),
