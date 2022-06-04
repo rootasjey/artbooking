@@ -1189,6 +1189,7 @@
   "urls_ext": "Liens externes",
   "urls_ext_description": "Ajouter les liens externes en rapport à votre projet. Le lien devrait être directement lié à votre travail, par exemple une vidéo illustrant votre app, ou le site officiel.",
   "user": "Utilisateur",
+  "user_illustrations_page": "Parcourez les illustrations publiques de {}.",
   "user_not_connected": "Vous n'êtes pas connecté(e).",
   "user_updating": "Mise à jour de vos données...",
   "username": "Nom d'utilisateur",
