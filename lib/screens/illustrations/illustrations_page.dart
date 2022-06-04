@@ -3,6 +3,7 @@ import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/texts/page_title.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/illustrations/illustrations_page_body.dart';
 import 'package:artbooking/screens/illustrations/illustrations_page_fab.dart';
@@ -10,9 +11,11 @@ import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
+import 'package:artbooking/types/firestore/query_snap_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/popup_entry_illustration.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
@@ -141,7 +144,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
           .limit(_limit);
 
       listenIllustrationEvents(query);
-      final snapshot = await query.get();
+      final QuerySnapMap snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
         setState(() {
@@ -152,8 +155,8 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
         return;
       }
 
-      for (QueryDocSnapMap document in snapshot.docs) {
-        final data = document.data();
+      for (final QueryDocSnapMap document in snapshot.docs) {
+        final Json data = document.data();
         data["id"] = document.id;
         data["liked"] = await fetchLike(document.id);
 
@@ -214,7 +217,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
           .startAfterDocument(_lastDocument!);
 
       listenIllustrationEvents(query);
-      final snapshot = await query.get();
+      final QuerySnapMap snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
         setState(() {
@@ -225,8 +228,8 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
         return;
       }
 
-      for (QueryDocSnapMap document in snapshot.docs) {
-        final data = document.data();
+      for (final QueryDocSnapMap document in snapshot.docs) {
+        final Json data = document.data();
         data["id"] = document.id;
         data["liked"] = await fetchLike(document.id);
 
@@ -286,7 +289,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
         .skip(1)
         .listen(
       (snapshot) {
-        for (DocumentChangeMap documentChange in snapshot.docChanges) {
+        for (final DocumentChangeMap documentChange in snapshot.docChanges) {
           switch (documentChange.type) {
             case DocumentChangeType.added:
               onAddStreamingLike(documentChange);
@@ -310,7 +313,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
   /// Fire when a new document has been created in Firestore.
   /// Add the corresponding document in the UI.
   void onAddStreamingIllustration(DocumentChangeMap documentChange) {
-    final data = documentChange.doc.data();
+    final Json? data = documentChange.doc.data();
 
     if (data == null) {
       return;
@@ -430,7 +433,10 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
   void onTapIllustration(Illustration illustration) {
     NavigationStateHelper.illustration = illustration;
     Beamer.of(context).beamToNamed(
-      "illustrations/${illustration.id}",
+      HomeLocation.illustrationRoute.replaceFirst(
+        ":illustrationId",
+        illustration.id,
+      ),
       data: {
         "illustrationId": illustration.id,
       },

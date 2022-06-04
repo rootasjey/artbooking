@@ -9,12 +9,14 @@ class MyIllustrationsPageActions extends StatelessWidget {
     Key? key,
     required this.multiSelectActive,
     required this.show,
+    required this.limitThreeInRow,
     this.onUploadIllustration,
     this.onTriggerMultiSelect,
-    required this.limitThreeInRow,
     this.onUpdateLayout,
+    this.isOwner = false,
   }) : super(key: key);
 
+  final bool isOwner;
   final bool multiSelectActive;
   final bool show;
   final bool limitThreeInRow;
@@ -26,7 +28,7 @@ class MyIllustrationsPageActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!show) {
+    if (!show || !isOwner) {
       return Container();
     }
 

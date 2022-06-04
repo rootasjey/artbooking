@@ -4,6 +4,7 @@ import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_e
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/illustration/popup_entry_illustration.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -23,15 +24,24 @@ class MyIllustrationsPageBody extends StatelessWidget {
     this.onTapIllustration,
     this.uploadIllustration,
     this.onDragUpdateIllustration,
+    this.likePopupMenuEntries = const [],
+    this.unlikePopupMenuEntries = const [],
+    this.onDoubleTap,
+    this.isOwner = false,
+    this.authenticated = false,
   }) : super(key: key);
 
+  final bool authenticated;
+  final bool isOwner;
   final bool loading;
   final bool forceMultiSelect;
   final bool limitThreeInRow;
 
   final EnumVisibilityTab selectedTab;
 
+  final void Function(Illustration illustration, int index)? onDoubleTap;
   final void Function(Illustration)? onTapIllustration;
+
   final void Function(
     EnumIllustrationItemAction,
     int,
@@ -47,6 +57,9 @@ class MyIllustrationsPageBody extends StatelessWidget {
 
   final List<Illustration> illustrations;
   final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries;
+
+  final List<PopupEntryIllustration> likePopupMenuEntries;
+  final List<PopupEntryIllustration> unlikePopupMenuEntries;
 
   final Map<String?, Illustration> multiSelectedItems;
 
@@ -82,9 +95,21 @@ class MyIllustrationsPageBody extends StatelessWidget {
       sliver: SliverGrid(
         gridDelegate: getGridDelegate(),
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final illustration = illustrations.elementAt(index);
-            final selected = multiSelectedItems.containsKey(illustration.id);
+          (BuildContext context, int index) {
+            final Illustration illustration = illustrations.elementAt(index);
+            final bool selected = multiSelectedItems.containsKey(
+              illustration.id,
+            );
+
+            final void Function()? _onDoubleTap = onDoubleTap != null
+                ? () => onDoubleTap?.call(illustration, index)
+                : null;
+
+            final _popupMenuEntries = isOwner
+                ? popupMenuEntries
+                : illustration.liked
+                    ? unlikePopupMenuEntries
+                    : likePopupMenuEntries;
 
             return IllustrationCard(
               index: index,
@@ -93,10 +118,12 @@ class MyIllustrationsPageBody extends StatelessWidget {
               selected: selected,
               canDrag: true,
               selectionMode: selectionMode,
+              onDoubleTap: authenticated ? _onDoubleTap : null,
               onDragUpdate: onDragUpdateIllustration,
+              onTapLike: authenticated ? _onDoubleTap : null,
               onTap: () => onTapIllustration?.call(illustration),
               onPopupMenuItemSelected: onPopupMenuItemSelected,
-              popupMenuEntries: popupMenuEntries,
+              popupMenuEntries: authenticated ? _popupMenuEntries : [],
               onDrop: onDropIllustration,
             );
           },

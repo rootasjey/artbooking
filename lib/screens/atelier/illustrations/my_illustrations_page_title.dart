@@ -6,17 +6,81 @@ import 'package:unicons/unicons.dart';
 
 /// My illustrations page custom title with a popup menu button.
 class MyIllustrationsPageTitle extends StatelessWidget {
-  const MyIllustrationsPageTitle({
-    Key? key,
-    required this.selectedTab,
-    this.onChangedTab,
-  }) : super(key: key);
+  const MyIllustrationsPageTitle(
+      {Key? key,
+      required this.selectedTab,
+      this.onChangedTab,
+      this.isOwner = false,
+      this.username = "",
+      this.onGoToUserProfile})
+      : super(key: key);
 
+  final bool isOwner;
   final EnumVisibilityTab selectedTab;
+  final String username;
   final void Function(EnumVisibilityTab)? onChangedTab;
+  final void Function()? onGoToUserProfile;
 
   @override
   Widget build(BuildContext context) {
+    if (isOwner) {
+      return pageTitleWithOwner(context);
+    }
+
+    return Wrap(
+      children: [
+        InkWell(
+          onTap: onGoToUserProfile,
+          child: Opacity(
+            opacity: 0.8,
+            child: Stack(
+              children: [
+                Positioned(
+                  bottom: 8.0,
+                  left: 0.0,
+                  right: 0.0,
+                  child: Container(
+                    height: 8.0,
+                    color: Theme.of(context).primaryColor.withOpacity(0.4),
+                  ),
+                ),
+                Text(
+                  username,
+                  style: Utilities.fonts.body(
+                    fontSize: 30.0,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Opacity(
+          opacity: 0.3,
+          child: Text(
+            " > ",
+            style: Utilities.fonts.body(
+              color: Theme.of(context).secondaryHeaderColor,
+              fontSize: 30.0,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+        Opacity(
+          opacity: 0.8,
+          child: Text(
+            "illustrations".tr(),
+            style: Utilities.fonts.body(
+              fontSize: 30.0,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget pageTitleWithOwner(BuildContext context) {
     return Wrap(
       children: [
         Opacity(
@@ -122,7 +186,6 @@ class MyIllustrationsPageTitle extends StatelessWidget {
               ],
             ),
           ),
-          // Divider(),
         ],
       ),
     );

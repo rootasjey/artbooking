@@ -27,13 +27,19 @@ class MyIllustrationsPageHeader extends StatelessWidget {
     this.onAddGroupToBook,
     this.onChangeGroupVisibility,
     this.showBackButton = false,
+    this.isOwner = false,
+    this.username = "",
+    this.onGoToUserProfile,
   }) : super(key: key);
 
+  final bool isOwner;
   final bool multiSelectActive;
   final bool limitThreeInRow;
   final bool showBackButton;
 
   final EnumVisibilityTab selectedTab;
+
+  final String username;
 
   /// Add a group of illustrations to a book.
   final void Function()? onAddGroupToBook;
@@ -65,6 +71,8 @@ class MyIllustrationsPageHeader extends StatelessWidget {
   /// Selected items.
   final Map<String?, Illustration> multiSelectedItems;
 
+  final void Function()? onGoToUserProfile;
+
   @override
   Widget build(BuildContext context) {
     EdgeInsets padding = const EdgeInsets.only(
@@ -79,6 +87,12 @@ class MyIllustrationsPageHeader extends StatelessWidget {
         left: 120.0,
         bottom: 24.0,
       );
+    }
+
+    String subtitleValue = "illustrations_my_subtitle_extended".tr();
+
+    if (!isOwner) {
+      subtitleValue = "user_illustrations_page".tr(args: [username]);
     }
 
     return SliverPadding(
@@ -100,13 +114,17 @@ class MyIllustrationsPageHeader extends StatelessWidget {
           PageTitle(
             renderSliver: false,
             title: MyIllustrationsPageTitle(
+              isOwner: isOwner,
               selectedTab: selectedTab,
               onChangedTab: onChangedTab,
+              username: username,
+              onGoToUserProfile: onGoToUserProfile,
             ),
-            subtitleValue: "illustrations_my_subtitle_extended".tr(),
+            subtitleValue: subtitleValue,
             padding: const EdgeInsets.only(bottom: 4.0),
           ),
           MyIllustrationsPageActions(
+            isOwner: isOwner,
             multiSelectActive: multiSelectActive,
             show: multiSelectedItems.isEmpty,
             onTriggerMultiSelect: onTriggerMultiSelect,

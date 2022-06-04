@@ -5,17 +5,34 @@ class MyIllustrationsPageFab extends StatelessWidget {
   const MyIllustrationsPageFab({
     Key? key,
     required this.show,
-    this.uploadIllustration,
     required this.scrollController,
+    this.uploadIllustration,
+    this.isOwner = false,
   }) : super(key: key);
 
   final bool show;
+  final bool isOwner;
   final void Function()? uploadIllustration;
   final ScrollController scrollController;
 
   @override
   Widget build(BuildContext context) {
-    if (!show) {
+    if (show) {
+      return FloatingActionButton(
+        onPressed: () {
+          scrollController.animateTo(
+            0.0,
+            duration: const Duration(seconds: 1),
+            curve: Curves.easeOut,
+          );
+        },
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Colors.white,
+        child: Icon(UniconsLine.arrow_up),
+      );
+    }
+
+    if (isOwner) {
       return FloatingActionButton(
         onPressed: uploadIllustration,
         backgroundColor: Theme.of(context).primaryColor,
@@ -24,17 +41,6 @@ class MyIllustrationsPageFab extends StatelessWidget {
       );
     }
 
-    return FloatingActionButton(
-      onPressed: () {
-        scrollController.animateTo(
-          0.0,
-          duration: Duration(seconds: 1),
-          curve: Curves.easeOut,
-        );
-      },
-      backgroundColor: Theme.of(context).primaryColor,
-      foregroundColor: Colors.white,
-      child: Icon(UniconsLine.arrow_up),
-    );
+    return Container();
   }
 }

@@ -8,6 +8,7 @@ import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_body.dart';
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_fab.dart';
@@ -22,6 +23,7 @@ import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/illustration/popup_entry_illustration.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -90,7 +92,30 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   ScrollController _scrollController = ScrollController();
   QuerySnapshotStreamSubscription? _illustrationSubscription;
 
+  /// This illustration page owner's name.
+  /// Used when the current authenticated user is different
+  /// from the owner of this illustrations page. We can then dispay the artist.
+  String _username = "";
+
   var _selectedTab = EnumVisibilityTab.active;
+
+  /// Items when opening the popup.
+  final List<PopupEntryIllustration> _likePopupMenuEntries = [
+    PopupMenuItemIcon(
+      value: EnumIllustrationItemAction.like,
+      icon: Icon(UniconsLine.heart),
+      textLabel: "like".tr(),
+    ),
+  ];
+
+  /// Items when opening the popup.
+  final List<PopupEntryIllustration> _unlikePopupMenuEntries = [
+    PopupMenuItemIcon(
+      value: EnumIllustrationItemAction.unlike,
+      icon: Icon(UniconsLine.heart_break),
+      textLabel: "unlike".tr(),
+    ),
+  ];
 
   @override
   initState() {
@@ -111,12 +136,24 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final String authUserId =
+        ref.watch(AppState.userProvider).firestoreUser?.id ?? "";
+
+    final bool isOwner = (widget.userId == authUserId) ||
+        (widget.userId.isEmpty && authUserId.isNotEmpty);
+
+    final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries =
+        isOwner ? _popupMenuEntries : [];
+
+    final bool authenticated = authUserId.isNotEmpty;
+
     return HeroControllerScope(
       controller: HeroController(),
       child: Scaffold(
         floatingActionButton: MyIllustrationsPageFab(
           show: _showFab,
           scrollController: _scrollController,
+          isOwner: isOwner,
         ),
         body: ImprovedScrolling(
           scrollController: _scrollController,
@@ -129,6 +166,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
               slivers: <Widget>[
                 ApplicationBar(),
                 MyIllustrationsPageHeader(
+                  isOwner: isOwner,
                   limitThreeInRow: _layoutThreeInRow,
                   multiSelectActive: _forceMultiSelect,
                   multiSelectedItems: _multiSelectedItems,
@@ -137,26 +175,33 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                   onChangedTab: onChangedTab,
                   onClearSelection: onClearSelection,
                   onConfirmDeleteGroup: confirmDeleteGroup,
+                  onGoToUserProfile: onGoToUserProfile,
                   onSelectAll: onSelectAll,
                   onTriggerMultiSelect: onTriggerMultiSelect,
                   onUpdateLayout: onUpdateLayout,
                   onUploadIllustration: uploadIllustration,
                   selectedTab: _selectedTab,
                   showBackButton: widget.userId.isNotEmpty,
+                  username: _username,
                 ),
                 MyIllustrationsPageBody(
+                  authenticated: authenticated,
                   forceMultiSelect: _forceMultiSelect,
                   illustrations: _illustrations,
+                  isOwner: isOwner,
                   loading: _loading,
                   multiSelectedItems: _multiSelectedItems,
+                  onDoubleTap: onDoubleTapIllustrationItem,
                   onDragUpdateIllustration: onDragUpdateIllustration,
                   onDropIllustration: onDropIllustration,
                   onGoToActiveTab: onGoToActiveTab,
                   onPopupMenuItemSelected: onPopupMenuItemSelected,
                   onTapIllustration: onTapIllustration,
-                  popupMenuEntries: _popupMenuEntries,
+                  popupMenuEntries: popupMenuEntries,
                   selectedTab: _selectedTab,
                   limitThreeInRow: _layoutThreeInRow,
+                  likePopupMenuEntries: _likePopupMenuEntries,
+                  unlikePopupMenuEntries: _unlikePopupMenuEntries,
                   uploadIllustration: uploadIllustration,
                 ),
                 SliverPadding(padding: const EdgeInsets.only(bottom: 300.0)),
@@ -317,6 +362,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   /// Fetch illustrations and layout (limit 3 cards in a row?).
   void fetchData() {
     Future.wait([
+      fetchUser(),
       fetchLayout(),
       fetchIllustrations(),
     ]);
@@ -344,9 +390,10 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         return;
       }
 
-      for (QueryDocSnapMap document in snapshot.docs) {
+      for (final QueryDocSnapMap document in snapshot.docs) {
         final data = document.data();
         data["id"] = document.id;
+        data["liked"] = await fetchLike(document.id);
         _illustrations.add(Illustration.fromMap(data));
       }
 
@@ -382,6 +429,31 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       });
     } catch (error) {
       Utilities.logger.e(error);
+    }
+  }
+
+  Future<bool> fetchLike(String illustrationId) async {
+    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+    if (userId == null || userId.isEmpty) {
+      return false;
+    }
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(illustrationId)
+          .get();
+
+      if (snapshot.exists) {
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      Utilities.logger.e(error);
+      return false;
     }
   }
 
@@ -430,10 +502,50 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     }
   }
 
+  /// Fetch user's data. This illustrations page owner.
+  /// (Launched if the the page is not owned by the current user)
+  Future<void> fetchUser() async {
+    if (widget.userId.isEmpty) {
+      return;
+    }
+
+    if (getIsOwner()) {
+      return;
+    }
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(widget.userId)
+          .collection("user_public_fields")
+          .doc("base")
+          .get();
+
+      final Json? map = snapshot.data();
+      if (!snapshot.exists || map == null) {
+        return;
+      }
+
+      _username = map["name"];
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
   /// Return query to fetch illustrations according to the selected tab.
   /// It's either active illustrations or archvied ones.
   QueryMap getFetchQuery() {
     final String userId = getUserId();
+
+    if (!getIsOwner()) {
+      return FirebaseFirestore.instance
+          .collection("illustrations")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", isEqualTo: "public")
+          .orderBy("user_custom_index", descending: true)
+          .limit(_limit);
+    }
 
     if (_selectedTab == EnumVisibilityTab.active) {
       return FirebaseFirestore.instance
@@ -462,6 +574,16 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
     final String userId = getUserId();
 
+    if (!getIsOwner()) {
+      return FirebaseFirestore.instance
+          .collection("illustrations")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", isEqualTo: "public")
+          .orderBy("user_custom_index", descending: true)
+          .limit(_limit)
+          .startAfterDocument(lastDocument);
+    }
+
     if (_selectedTab == EnumVisibilityTab.active) {
       return FirebaseFirestore.instance
           .collection("illustrations")
@@ -489,6 +611,18 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     }
 
     return ref.read(AppState.userProvider).firestoreUser?.id ?? "";
+  }
+
+  /// Return true if the current authenticated user is the owner
+  /// of this illustrations page.
+  bool getIsOwner() {
+    final authUserId = ref.read(AppState.userProvider).firestoreUser?.id ?? "";
+
+    if (widget.userId.isEmpty && authUserId.isNotEmpty) {
+      return true;
+    }
+
+    return authUserId == widget.userId;
   }
 
   void loadPreferences() {
@@ -539,11 +673,28 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   void navigateToIllustrationPage(Illustration illustration) {
     NavigationStateHelper.illustration = illustration;
-    Beamer.of(context).beamToNamed(
-      AtelierLocationContent.illustrationRoute.replaceFirst(
+
+    String route = HomeLocation.userIllustrationRoute
+        .replaceFirst(":userId", getUserId())
+        .replaceFirst(":illustrationId", illustration.id);
+
+    final String? location = Beamer.of(context)
+        .beamingHistory
+        .last
+        .history
+        .last
+        .routeInformation
+        .location;
+
+    if (location != null && location.contains("atelier")) {
+      route = AtelierLocationContent.illustrationRoute.replaceFirst(
         ":illustrationId",
         illustration.id,
-      ),
+      );
+    }
+
+    Beamer.of(context).beamToNamed(
+      route,
       data: {
         "illustrationId": illustration.id,
       },
@@ -580,6 +731,10 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       _multiSelectedItems.clear();
       _forceMultiSelect = _multiSelectedItems.length > 0;
     });
+  }
+
+  void onDoubleTapIllustrationItem(Illustration illustration, int index) {
+    onLike(illustration, index);
   }
 
   void onDragUpdateIllustration(DragUpdateDetails details) async {
@@ -673,6 +828,23 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     onChangedTab(EnumVisibilityTab.active);
   }
 
+  void onGoToUserProfile() {
+    Beamer.of(context).beamToNamed(
+      HomeLocation.profileRoute.replaceFirst(":userId", widget.userId),
+      routeState: {
+        "userId": widget.userId,
+      },
+    );
+  }
+
+  void onLike(Illustration illustration, int index) {
+    if (illustration.liked) {
+      return tryUnLike(illustration, index);
+    }
+
+    return tryLike(illustration, index);
+  }
+
   void onLongPressIllustration(key, illustration, selected) {
     if (selected) {
       setState(() {
@@ -693,13 +865,9 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   bool onScrollNotification(ScrollNotification notification) {
     // FAB visibility
     if (notification.metrics.pixels < 50 && _showFab) {
-      setState(() {
-        _showFab = false;
-      });
+      setState(() => _showFab = false);
     } else if (notification.metrics.pixels > 50 && !_showFab) {
-      setState(() {
-        _showFab = true;
-      });
+      setState(() => _showFab = true);
     }
 
     if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
@@ -948,6 +1116,71 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         ),
       ),
     );
+  }
+
+  void tryLike(Illustration illustration, int index) async {
+    setState(() {
+      _illustrations.replaceRange(
+        index,
+        index + 1,
+        [illustration.copyWith(liked: true)],
+      );
+    });
+
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(illustration.id)
+          .set({
+        "type": "illustration",
+        "target_id": illustration.id,
+        "user_id": userId,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+      setState(() {
+        _illustrations.replaceRange(
+          index,
+          index + 1,
+          [illustration.copyWith(liked: false)],
+        );
+      });
+    }
+  }
+
+  void tryUnLike(Illustration illustration, int index) async {
+    setState(() {
+      _illustrations.replaceRange(
+        index,
+        index + 1,
+        [illustration.copyWith(liked: false)],
+      );
+    });
+
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(illustration.id)
+          .delete();
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+      setState(() {
+        _illustrations.replaceRange(
+          index,
+          index + 1,
+          [illustration.copyWith(liked: true)],
+        );
+      });
+    }
   }
 
   void uploadIllustration() {
