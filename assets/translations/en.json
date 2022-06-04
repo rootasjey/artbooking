@@ -434,9 +434,14 @@
   "email_not_valid": "The value entered is not a valid email address",
   "email_empty_no_valid": "The email field is empty. Please enter a valid email address.",
   "email_password_reset_link": "A password reset link has been sent to your mail box",
+  "email_password_reset_link_subtitle": {
+    "1": "Go to ",
+    "2": "inbox. Look inside your spam folder if you don't see it.\n",
+    "3": " → Click to re-send the email "
+  },
   "email_response_soon": "You will receive an email response shortly",
   "email_send_me": "Send me an email",
-  "email_sending": "Sending email...",
+  "email_sending": "Sending email",
   "email_update": "Update email",
   "email_update_description": "Your email can only be associated with one account.",
   "email_update_error": "Error while updating your email. Please try again later.",
@@ -840,6 +845,7 @@
   "password_forgot_reset_process": "We will send a reset link to your mail box.",
   "password_incorrect": "The password is incorrect or the user does not exists.",
   "password_new": "New password",
+  "password_reset_send_link": "Send reset link",
   "password_tips": "Tips",
   "password_tips_1": "Choose at least a 6-characters password length",
   "password_tips_2": "Choose a pass-phrase",
