@@ -34,7 +34,7 @@ class DarkElevatedButton extends StatelessWidget {
   }
 
   static Widget large({
-    Function()? onPressed,
+    void Function()? onPressed,
     required Widget child,
     EdgeInsets margin = EdgeInsets.zero,
   }) {

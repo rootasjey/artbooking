@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 
 class LoadingView extends StatelessWidget {
   LoadingView({
+    required this.title,
     this.size = 100.0,
     this.style = const TextStyle(
       fontSize: 20.0,
     ),
-    required this.title,
     this.sliver = true,
   });
 

@@ -1,6 +1,7 @@
 import 'package:artbooking/components/animations/fade_in_x.dart';
 import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
@@ -27,6 +28,7 @@ class ConnectionPageHeader extends StatelessWidget {
               right: 20.0,
             ),
             child: IconButton(
+              tooltip: "back".tr(),
               onPressed: () => Utilities.navigation.back(context),
               icon: Icon(UniconsLine.arrow_left),
             ),
