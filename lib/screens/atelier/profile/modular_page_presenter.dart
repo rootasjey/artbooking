@@ -13,6 +13,7 @@ import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_body.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_empty.dart';
 import 'package:artbooking/types/modular_page.dart';
@@ -305,7 +306,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
       }
 
       Beamer.of(context).beamToNamed(
-        "/users/$userId/illustrations",
+        HomeLocation.userIllustrationsRoute.replaceFirst(":userId", userId),
         routeState: {
           "userId": userId,
         },

@@ -43,7 +43,7 @@ class PageTitle extends StatelessWidget {
       titleWidget = Opacity(
         opacity: 0.8,
         child: Text(
-          titleValue ?? '',
+          titleValue ?? "",
           style: Utilities.fonts.body(
             fontSize: 30.0,
             fontWeight: FontWeight.w800,

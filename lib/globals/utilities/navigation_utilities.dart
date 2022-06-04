@@ -58,7 +58,7 @@ class NavigationUtilities {
     Illustration illustration,
     String userId,
   ) {
-    final location = Beamer.of(context)
+    final String? location = Beamer.of(context)
         .beamingHistory
         .last
         .history
