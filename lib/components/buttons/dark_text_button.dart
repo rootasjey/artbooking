@@ -34,11 +34,13 @@ class DarkTextButton extends StatelessWidget {
   static Widget large({
     void Function()? onPressed,
     required Widget child,
+    Color? backgroundColor,
   }) {
     return TextButton(
       style: TextButton.styleFrom(
         primary: Colors.black87,
         minimumSize: Size(200.0, 0.0),
+        backgroundColor: backgroundColor,
         textStyle: Utilities.fonts.body(
           fontWeight: FontWeight.w500,
         ),
