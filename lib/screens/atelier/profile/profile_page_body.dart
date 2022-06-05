@@ -2,7 +2,6 @@ import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/buttons/circle_button.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants.dart';
-import 'package:artbooking/globals/constants/section_ids.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/line_drop_zone.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_fab.dart';
@@ -111,11 +110,7 @@ class ProfilePageBody extends StatelessWidget {
     int index = 0;
 
     for (var section in artisticPage.sections) {
-      if (section.id == SectionIds.appBar) {
-        continue;
-      }
-
-      if (editMode) {
+      if (editMode && isOwner) {
         Color color = Colors.transparent;
         if (index < artisticPage.sections.length) {
           color = Color(
@@ -135,19 +130,19 @@ class ProfilePageBody extends StatelessWidget {
 
       slivers.add(
         SectionWrapper(
-          section: section,
+          editMode: editMode && isOwner,
           index: index,
-          scrollController: scrollController,
-          editMode: editMode,
-          sectionCount: artisticPage.sections.length - 1,
-          userId: userId,
           onDropSection: onDropSection,
-          popupMenuEntries: popupMenuEntries,
+          onNavigateFromSection: onNavigateFromSection,
           onPopupMenuItemSelected: onPopupMenuItemSelected,
-          onUpdateSectionItems: onUpdateSectionItems,
           onShowBookDialog: onShowBookDialog,
           onShowIllustrationDialog: onShowIllustrationDialog,
-          onNavigateFromSection: onNavigateFromSection,
+          onUpdateSectionItems: onUpdateSectionItems,
+          popupMenuEntries: popupMenuEntries,
+          scrollController: scrollController,
+          section: section,
+          sectionCount: artisticPage.sections.length - 1,
+          userId: userId,
         ),
       );
 

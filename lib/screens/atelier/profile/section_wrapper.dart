@@ -35,10 +35,12 @@ class SectionWrapper extends StatefulWidget {
 
   final int index;
 
+  final bool editMode;
+
   /// Section's count.
   /// Useful to quickly find which is the last section in the list.
   final int sectionCount;
-  final bool editMode;
+
   final Section section;
   final ScrollController scrollController;
   final String userId;

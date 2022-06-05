@@ -66,7 +66,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
 
   bool _showFabToTop = false;
 
-  /// Modular page.
+  /// Modular page data.
   var _modularPage = ModularPage.empty();
 
   /// Listens to book's updates.
