@@ -149,6 +149,15 @@ class ProfilePageBody extends StatelessWidget {
       index++;
     }
 
+    // Add bottom padding.
+    slivers.add(
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 400.0),
+        ),
+      ),
+    );
+
     return Scaffold(
       floatingActionButton: ProfilePageFAB(
         editMode: editMode,
