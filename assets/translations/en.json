@@ -71,6 +71,20 @@
   "app_annual_fee": "For your website. Then 45€/year *",
   "app_annual_fee_reasons": "We'll charge you the domain name, the maintenance and additional data cost.",
   "app_annual_fee_why": "Why I have to pay a 45€ annual fee?",
+  "app_features": {
+    "atelier": {
+      "title": "Your virtual atelier",
+      "description": "Use the platform to save your digital illustrations, paintings, collages. With books, you can regroup artworks by theme, mood, or the way you want."
+    },
+    "community": {
+      "title": "A vibrant community",
+      "description": "Share your illustrations with the world, get useful feedback, exchange tips. Participate in challenges, contests, and events, alone or together (events are coming soon)."
+    },
+    "target_audience": {
+      "title": "For enthusiastic artists",
+      "description": "Whether you're a hobbyist or a professionnal, this is a safe place to express yourself. We ask everyone to be respectful when they communicate, and to be empathetic."
+    }
+  },
   "app_screenshot_credits": "App screenshots credits",
   "app_type_question": "What type of app do you want?",
   "approve": "Approve",
@@ -1042,7 +1056,8 @@
     "i9OIQ45t6yPVPyewH2V9": "A component showing featured artists linking to their profile page.",
     "Qn3xnQFhflIunbULCdu4": "A section, often at the bottom of the page, presenting main application links, about page, and some boring legal stuff.",
     "dv9CuYRappSfnh5FiLfQ": "Last published posts on various topics (app updates, challenges, artist's work).",
-    "OfmMRxHRgBHRsRiC9Ask": "A grid of illustrations with variable sized items."
+    "OfmMRxHRgBHRsRiC9Ask": "A grid of illustrations with variable sized items.",
+    "sEpudKFaNtOnDd5GUl8F": "A row of 3 cards explaining some of the app features."
   },
   "section_edit_existing": "Update this existing section.",
   "section_name": {
@@ -1062,7 +1077,8 @@
     "i9OIQ45t6yPVPyewH2V9": "Featured Artists",
     "Qn3xnQFhflIunbULCdu4": "Footer",
     "dv9CuYRappSfnh5FiLfQ": "News",
-    "OfmMRxHRgBHRsRiC9Ask": "Mozaïc"
+    "OfmMRxHRgBHRsRiC9Ask": "Mozaïc",
+    "sEpudKFaNtOnDd5GUl8F": "Row Features"
   },
   "section_rename": "Rename section",
   "section_rename_description": "Give a new description to this section.",

@@ -71,6 +71,20 @@
   "app_annual_fee": "Pour votre site web. Puis 45€/an *",
   "app_annual_fee_reasons": "Nous vous factureronsle nom de domaine, la maintenance, la sécurité et les frais d'utilisation de données.",
   "app_annual_fee_why": "Pourquoi dois-je payer des frais annuels de 45€ ?",
+  "app_features": {
+    "atelier": {
+      "title": "Votre atelier virtuel",
+      "description": "Utilisez la plateforme pour stocker vos illustrations au même endroit. À l'aide des books, regroupez vos chefs-d'œuvres par thème, date, ou comme vous le souhaitez."
+    },
+    "community": {
+      "title": "Une communauté active",
+      "description": "Partagez vos illustrations avec le reste du monde, obtenez des retours utiles, échangez des conseils. Participez à des challenges, concours, et évènements, seul•e ou à plusieurs (les évèneemnts sont en cours de préparation)."
+    },
+    "target_audience": {
+      "title": "Pour les artists enthousiates",
+      "description": "Que vous soyez un artiste du dimanche ou un professionnel, nous faisons en sorte que cet endroit soit accueillant pour votre expression artistique. Nous demandons à chacun d'être respectueux dans les échanges avec les membres, et d'être empathique."
+    }
+  },
   "app_screenshot_credits": "Crédits des captures d'écrans",
   "app_type_question": "Quel type d'application voulez-vous ?",
   "approve": "Approuver",
@@ -1041,7 +1055,8 @@
     "i9OIQ45t6yPVPyewH2V9": "Une liste arbitraire d'artistes spécifiquement sélectioné.e.s. Cliquer sur les avatarss renvoie sur la page de profile de l'artist..",
     "Qn3xnQFhflIunbULCdu4": "Une section, généralement placée en bas de page, présentant les liens principaux de l'application, les pages d'informations, et des mentions légales ennuyantes.",
     "dv9CuYRappSfnh5FiLfQ": "Les derniers articles publiés sur divers sujets (mise à jour de l'application, challenges, le travail d'un artist).",
-    "OfmMRxHRgBHRsRiC9Ask": "Une grille d'illustrations contenant des éléments de tailles variables."
+    "OfmMRxHRgBHRsRiC9Ask": "Une grille d'illustrations contenant des éléments de tailles variables.",
+    "sEpudKFaNtOnDd5GUl8F": "Une ligne de 3 cartes expliquant certaines fonctionnalités de l'app."
   },
   "section_edit_existing": "Mettre à jour une section existante.",
   "section_name": {
@@ -1061,7 +1076,8 @@
     "i9OIQ45t6yPVPyewH2V9": "Featured Artists",
     "Qn3xnQFhflIunbULCdu4": "Footer",
     "dv9CuYRappSfnh5FiLfQ": "News",
-    "OfmMRxHRgBHRsRiC9Ask": "Mozaïc"
+    "OfmMRxHRgBHRsRiC9Ask": "Mozaïc",
+    "sEpudKFaNtOnDd5GUl8F": "Lignes de fonctionnalités"
   },
   "section_rename": "Renommer cette section",
   "section_rename_description": "Éditer la description.",
