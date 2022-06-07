@@ -17,6 +17,7 @@ class ModularPage {
     this.hasAppBar = false,
     this.isActive = false,
     this.isDraft = false,
+    this.language = "en",
     this.name = "",
     this.type = EnumPageType.profile,
     this.sections = const [],
@@ -34,6 +35,8 @@ class ModularPage {
   final DateTime updatedAt;
   final List<Section> sections;
 
+  final String language;
+
   /// User’s page id if this page is of “profile” type.
   /// Otherwise, admin who created it.
   final String userId;
@@ -44,6 +47,7 @@ class ModularPage {
     bool? hasAppBar,
     bool? isActive,
     bool? isDraft,
+    String? language,
     String? name,
     EnumPageType? type,
     DateTime? updatedAt,
@@ -56,6 +60,7 @@ class ModularPage {
       hasAppBar: hasAppBar ?? this.hasAppBar,
       isActive: isActive ?? this.isActive,
       isDraft: isDraft ?? this.isDraft,
+      language: language ?? this.language,
       name: name ?? this.name,
       type: type ?? this.type,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -71,6 +76,7 @@ class ModularPage {
       "has_app_bar": hasAppBar,
       "is_active": isActive,
       "is_draft": isDraft,
+      "language": language,
       "name": name,
       "type": convertTypeToString(),
       "updated_at": updatedAt.millisecondsSinceEpoch,
@@ -86,6 +92,7 @@ class ModularPage {
       hasAppBar: false,
       isActive: false,
       isDraft: true,
+      language: "",
       name: "",
       type: EnumPageType.profile,
       updatedAt: DateTime.now(),
@@ -101,6 +108,7 @@ class ModularPage {
       hasAppBar: map["has_app_bar"] ?? false,
       isActive: map["is_active"] ?? false,
       isDraft: map["is_draft"] ?? false,
+      language: map["language"] ?? "en",
       name: map["name"] ?? "",
       sections: List<Section>.from(
         map["sections"]?.map((x) => Section.fromMap(x)),
@@ -143,8 +151,9 @@ class ModularPage {
   @override
   String toString() {
     return "Page(id: $id, createdAt: $createdAt, hasAppBar: $hasAppBar,"
-        " isActive: $isActive, isDraft: $isDraft, name: $name, type: $type, "
-        "updatedAt: $updatedAt, sections: $sections, userId: $userId)";
+        " isActive: $isActive, isDraft: $isDraft, language: $language,"
+        " name: $name, type: $type, updatedAt: $updatedAt, sections: $sections, "
+        "userId: $userId)";
   }
 
   @override
@@ -157,6 +166,7 @@ class ModularPage {
         other.hasAppBar == hasAppBar &&
         other.isActive == isActive &&
         other.isDraft == isDraft &&
+        other.language == language &&
         other.name == name &&
         other.type == type &&
         other.updatedAt == updatedAt &&
@@ -171,6 +181,7 @@ class ModularPage {
         hasAppBar.hashCode ^
         isActive.hashCode ^
         isDraft.hashCode ^
+        language.hashCode ^
         name.hashCode ^
         type.hashCode ^
         updatedAt.hashCode ^
