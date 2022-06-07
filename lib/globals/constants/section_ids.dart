@@ -19,4 +19,5 @@ class SectionIds {
   static const String footer = "Qn3xnQFhflIunbULCdu4";
   static const String news = "dv9CuYRappSfnh5FiLfQ";
   static const String mozaic = "OfmMRxHRgBHRsRiC9Ask";
+  static const String rowFeatures = "sEpudKFaNtOnDd5GUl8F";
 }

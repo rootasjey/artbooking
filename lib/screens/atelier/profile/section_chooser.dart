@@ -12,6 +12,7 @@ import 'package:artbooking/screens/atelier/profile/sections/illustration_window_
 import 'package:artbooking/screens/atelier/profile/sections/mozaic_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/news_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/poster_section.dart';
+import 'package:artbooking/screens/atelier/profile/sections/row_features_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/spacing_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/title_description_section.dart';
 import 'package:artbooking/screens/atelier/profile/sections/user_illustration_section.dart';
@@ -282,6 +283,19 @@ class SectionChooser {
         popupMenuEntries: popupMenuEntries,
         onPopupMenuItemSelected: onPopupMenuItemSelected,
         onUpdateSectionItems: onUpdateSectionItems,
+        isHover: isHover,
+      );
+    }
+
+    if (section.id == SectionIds.rowFeatures) {
+      return RowFeaturesSection(
+        index: index,
+        section: section,
+        editMode: editMode,
+        usingAsDropTarget: usingAsDropTarget,
+        isLast: index == count,
+        popupMenuEntries: popupMenuEntries,
+        onPopupMenuItemSelected: onPopupMenuItemSelected,
         isHover: isHover,
       );
     }
