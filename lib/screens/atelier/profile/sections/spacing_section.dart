@@ -1,6 +1,7 @@
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/screens/atelier/profile/popup_menu_button_section.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
+import 'package:artbooking/types/popup_item_section.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class SpacingSection extends StatelessWidget {
   /// Section's position in the layout (e.g. 0 is the first).
   final int index;
 
-  final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
+  final List<PopupMenuItemSection> popupMenuEntries;
 
   final Section section;
 
@@ -73,31 +74,35 @@ class SpacingSection extends StatelessWidget {
     );
   }
 
-  List<PopupMenuItemIcon<EnumSectionAction>> getPopupMenuEntries() {
-    var _popupMenuEntries = popupMenuEntries.sublist(0);
+  List<PopupMenuItemSection> getPopupMenuEntries() {
+    final List<PopupMenuItemSection> localPopupMenuEntries =
+        popupMenuEntries.sublist(0);
 
     if (index == 0) {
-      _popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);
+      localPopupMenuEntries
+          .removeWhere((x) => x.value == EnumSectionAction.moveUp);
     }
 
     if (isLast) {
-      _popupMenuEntries.removeWhere(
+      localPopupMenuEntries.removeWhere(
         (x) => x.value == EnumSectionAction.moveDown,
       );
     }
 
-    _popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.rename);
-    _popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.settings);
+    localPopupMenuEntries
+      ..removeWhere((x) => x.value == EnumSectionAction.rename)
+      ..removeWhere((x) => x.value == EnumSectionAction.settings);
 
-    _popupMenuEntries.add(
+    localPopupMenuEntries.add(
       PopupMenuItemIcon(
         icon: Icon(UniconsLine.paint_tool),
         textLabel: "edit_background_color".tr(),
         value: EnumSectionAction.editBackgroundColor,
+        delay: Duration(milliseconds: localPopupMenuEntries.length * 25),
       ),
     );
 
-    return _popupMenuEntries;
+    return localPopupMenuEntries;
   }
 
   Widget rightPopupMenuButton(BuildContext context) {

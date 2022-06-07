@@ -1,5 +1,6 @@
 import 'package:artbooking/components/cards/book_card.dart';
 import 'package:artbooking/components/cards/shimmer_card.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/popup_menu_button_section.dart';
@@ -9,6 +10,7 @@ import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
+import 'package:artbooking/types/popup_item_section.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -213,8 +215,9 @@ class _BookGridSectionState extends State<BookGridSection> {
     return children;
   }
 
-  List<PopupMenuItemIcon<EnumSectionAction>> getPopupMenuEntries() {
-    final popupMenuEntries = widget.popupMenuEntries.sublist(0);
+  List<PopupMenuItemSection> getPopupMenuEntries() {
+    final List<PopupMenuItemSection> popupMenuEntries =
+        widget.popupMenuEntries.sublist(0);
 
     if (widget.index == 0) {
       popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);
@@ -229,9 +232,10 @@ class _BookGridSectionState extends State<BookGridSection> {
     if (_currentMode == EnumSectionDataMode.chosen) {
       popupMenuEntries.add(
         PopupMenuItemIcon(
-          icon: Icon(UniconsLine.plus),
+          icon: PopupMenuIcon(UniconsLine.plus),
           textLabel: "books_select".tr(),
           value: EnumSectionAction.selectBooks,
+          delay: Duration(milliseconds: popupMenuEntries.length * 25),
         ),
       );
     }

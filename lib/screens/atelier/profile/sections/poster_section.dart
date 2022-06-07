@@ -1,5 +1,6 @@
 import 'package:artbooking/components/buttons/section_illustration_buttons.dart';
 import 'package:artbooking/components/cards/illustration_card.dart';
+// ignore: unused_import
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/popup_menu_button_section.dart';
@@ -7,6 +8,7 @@ import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/json_types.dart';
+import 'package:artbooking/types/popup_item_section.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flash/flash.dart';
@@ -35,7 +37,7 @@ class PosterSection extends StatefulWidget {
 
   final bool usingAsDropTarget;
 
-  final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
+  final List<PopupMenuItemSection> popupMenuEntries;
 
   /// Section's position in the layout (e.g. 0 is the first).
   final int index;
@@ -121,8 +123,9 @@ class _PosterSectionState extends State<PosterSection> {
     );
   }
 
-  List<PopupMenuItemIcon<EnumSectionAction>> getPopupMenuEntries() {
-    final popupMenuEntries = widget.popupMenuEntries.sublist(0);
+  List<PopupMenuItemSection> getPopupMenuEntries() {
+    final List<PopupMenuItemSection> popupMenuEntries =
+        widget.popupMenuEntries.sublist(0);
 
     if (widget.index == 0) {
       popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);

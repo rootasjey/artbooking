@@ -2,6 +2,7 @@ import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/popup_menu_button_section.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
+import 'package:artbooking/types/popup_item_section.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -123,47 +124,55 @@ class H4Section extends StatelessWidget {
     );
   }
 
-  List<PopupMenuItemIcon<EnumSectionAction>> getPopupMenuEntries() {
-    var _popupMenuEntries = popupMenuEntries.sublist(0);
+  List<PopupMenuItemSection> getPopupMenuEntries() {
+    final List<PopupMenuItemSection> localPopupMenuEntries =
+        popupMenuEntries.sublist(0);
 
     if (index == 0) {
-      _popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);
+      localPopupMenuEntries
+          .removeWhere((x) => x.value == EnumSectionAction.moveUp);
     }
 
     if (isLast) {
-      _popupMenuEntries.removeWhere(
+      localPopupMenuEntries.removeWhere(
         (x) => x.value == EnumSectionAction.moveDown,
       );
     }
 
-    _popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.rename);
-    _popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.settings);
+    localPopupMenuEntries
+      ..removeWhere((x) => x.value == EnumSectionAction.rename)
+      ..removeWhere((x) => x.value == EnumSectionAction.settings);
 
-    _popupMenuEntries.add(
+    final int millisecondsDelay = localPopupMenuEntries.length * 25;
+
+    localPopupMenuEntries.add(
       PopupMenuItemIcon(
         icon: Icon(UniconsLine.paint_tool),
         textLabel: "edit_background_color".tr(),
         value: EnumSectionAction.editBackgroundColor,
+        delay: Duration(milliseconds: millisecondsDelay * 1),
       ),
     );
 
-    _popupMenuEntries.add(
+    localPopupMenuEntries.add(
       PopupMenuItemIcon(
         icon: Icon(UniconsLine.edit_alt),
         textLabel: "title_edit".tr(),
         value: EnumSectionAction.renameTitle,
+        delay: Duration(milliseconds: millisecondsDelay * 2),
       ),
     );
 
-    _popupMenuEntries.add(
+    localPopupMenuEntries.add(
       PopupMenuItemIcon(
         icon: Icon(UniconsLine.font),
         textLabel: "text_color_edit".tr(),
         value: EnumSectionAction.editTextColor,
+        delay: Duration(milliseconds: millisecondsDelay * 3),
       ),
     );
 
-    return _popupMenuEntries;
+    return localPopupMenuEntries;
   }
 
   Widget rightPopupMenuButton(BuildContext context) {

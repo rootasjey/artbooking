@@ -7,6 +7,7 @@ import 'package:artbooking/components/dialogs/select_books_dialog.dart';
 import 'package:artbooking/components/dialogs/select_illustrations_dialog.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/loading_view.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -22,6 +23,7 @@ import 'package:artbooking/types/enums/enum_section_size.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/named_color.dart';
+import 'package:artbooking/types/popup_item_section.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -63,29 +65,29 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   QuerySnapshotStreamSubscription? _profilePageSubscription;
 
   /// Section's popup menu entries.
-  final _popupMenuEntries = <PopupMenuItemIcon<EnumSectionAction>>[
+  final List<PopupMenuItemSection> _popupMenuEntries = [
     PopupMenuItemIcon(
-      icon: Icon(UniconsLine.edit_alt),
+      icon: PopupMenuIcon(UniconsLine.edit_alt),
       textLabel: "rename".tr(),
       value: EnumSectionAction.rename,
     ),
     PopupMenuItemIcon(
-      icon: Icon(UniconsLine.arrow_up),
+      icon: PopupMenuIcon(UniconsLine.arrow_up),
       textLabel: "move_up".tr(),
       value: EnumSectionAction.moveUp,
     ),
     PopupMenuItemIcon(
-      icon: Icon(UniconsLine.arrow_down),
+      icon: PopupMenuIcon(UniconsLine.arrow_down),
       textLabel: "move_down".tr(),
       value: EnumSectionAction.moveDown,
     ),
     PopupMenuItemIcon(
-      icon: Icon(UniconsLine.trash),
+      icon: PopupMenuIcon(UniconsLine.trash),
       textLabel: "delete".tr(),
       value: EnumSectionAction.delete,
     ),
     PopupMenuItemIcon(
-      icon: Icon(UniconsLine.setting),
+      icon: PopupMenuIcon(UniconsLine.setting),
       textLabel: "settings".tr(),
       value: EnumSectionAction.settings,
     ),

@@ -1,5 +1,6 @@
 import 'package:artbooking/components/buttons/section_illustration_buttons.dart';
 import 'package:artbooking/components/cards/illustration_card.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -9,6 +10,7 @@ import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/json_types.dart';
+import 'package:artbooking/types/popup_item_section.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
@@ -203,8 +205,9 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
     );
   }
 
-  List<PopupMenuItemIcon<EnumSectionAction>> getPopupMenuEntries() {
-    final popupMenuEntries = widget.popupMenuEntries.sublist(0);
+  List<PopupMenuItemSection> getPopupMenuEntries() {
+    final List<PopupMenuItemSection> popupMenuEntries =
+        widget.popupMenuEntries.sublist(0);
 
     if (widget.index == 0) {
       popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);
@@ -218,9 +221,10 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
 
     popupMenuEntries.add(
       PopupMenuItemIcon(
-        icon: Icon(UniconsLine.border_out),
+        icon: PopupMenuIcon(UniconsLine.border_out),
         textLabel: "border_color_edit".tr(),
         value: EnumSectionAction.editBorderColor,
+        delay: Duration(milliseconds: popupMenuEntries.length * 25),
       ),
     );
 

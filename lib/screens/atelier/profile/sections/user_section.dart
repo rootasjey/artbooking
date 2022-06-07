@@ -5,6 +5,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/components/user_social_links_component.dart';
 import 'package:artbooking/screens/atelier/profile/popup_menu_button_section.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
+import 'package:artbooking/types/popup_item_section.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -40,7 +41,7 @@ class UserSection extends StatefulWidget {
   /// Section's position in the layout (e.g. 0 is the first).
   final int index;
 
-  final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
+  final List<PopupMenuItemSection> popupMenuEntries;
 
   final Section section;
   final String userId;
@@ -115,8 +116,9 @@ class _UserSectionState extends State<UserSection> {
     );
   }
 
-  List<PopupMenuItemIcon<EnumSectionAction>> getPopupMenuEntries() {
-    var popupMenuEntries = widget.popupMenuEntries.sublist(0);
+  List<PopupMenuItemSection> getPopupMenuEntries() {
+    final List<PopupMenuItemSection> popupMenuEntries =
+        widget.popupMenuEntries.sublist(0);
 
     if (widget.index == 0) {
       popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);
@@ -128,14 +130,16 @@ class _UserSectionState extends State<UserSection> {
       );
     }
 
-    popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.rename);
-    popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.settings);
+    popupMenuEntries
+      ..removeWhere((x) => x.value == EnumSectionAction.rename)
+      ..removeWhere((x) => x.value == EnumSectionAction.settings);
 
     popupMenuEntries.add(
       PopupMenuItemIcon(
         icon: Icon(UniconsLine.paint_tool),
         textLabel: "edit_background_color".tr(),
         value: EnumSectionAction.editBackgroundColor,
+        delay: Duration(milliseconds: popupMenuEntries.length * 25),
       ),
     );
 

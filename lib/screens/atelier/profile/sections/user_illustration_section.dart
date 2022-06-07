@@ -1,7 +1,6 @@
 import 'package:artbooking/components/avatar/better_avatar.dart';
 import 'package:artbooking/components/buttons/section_illustration_buttons.dart';
 import 'package:artbooking/components/cards/illustration_card.dart';
-import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/user_social_links_component.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
@@ -11,6 +10,7 @@ import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/json_types.dart';
+import 'package:artbooking/types/popup_item_section.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
@@ -46,7 +46,7 @@ class UserIllustrationSection extends StatefulWidget {
   final bool usingAsDropTarget;
 
   final String userId;
-  final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
+  final List<PopupMenuItemSection> popupMenuEntries;
 
   final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
   final void Function({
@@ -128,8 +128,9 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
     );
   }
 
-  List<PopupMenuItemIcon<EnumSectionAction>> getPopupMenuEntries() {
-    var popupMenuEntries = widget.popupMenuEntries.sublist(0);
+  List<PopupMenuItemSection> getPopupMenuEntries() {
+    final List<PopupMenuItemSection> popupMenuEntries =
+        widget.popupMenuEntries.sublist(0);
 
     if (widget.index == 0) {
       popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);

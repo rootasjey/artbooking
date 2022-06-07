@@ -1,5 +1,6 @@
 import 'package:artbooking/components/avatar/better_avatar.dart';
 import 'package:artbooking/components/cards/shimmer_card.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/home_location.dart';
@@ -10,6 +11,7 @@ import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/popup_item_section.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:avatar_stack/avatar_stack.dart';
@@ -247,8 +249,9 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
     }
   }
 
-  List<PopupMenuItemIcon<EnumSectionAction>> getPopupMenuEntries() {
-    final popupMenuEntries = widget.popupMenuEntries.sublist(0);
+  List<PopupMenuItemSection> getPopupMenuEntries() {
+    final List<PopupMenuItemSection> popupMenuEntries =
+        widget.popupMenuEntries.sublist(0);
 
     if (widget.index == 0) {
       popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);
@@ -263,9 +266,10 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
     if (_currentMode == EnumSectionDataMode.chosen) {
       popupMenuEntries.add(
         PopupMenuItemIcon(
-          icon: Icon(UniconsLine.plus),
+          icon: PopupMenuIcon(UniconsLine.plus),
           textLabel: "artists_select".tr(),
           value: EnumSectionAction.selectArtists,
+          delay: Duration(milliseconds: popupMenuEntries.length * 25),
         ),
       );
     }

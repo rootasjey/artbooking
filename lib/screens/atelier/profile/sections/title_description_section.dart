@@ -2,6 +2,7 @@ import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/popup_menu_button_section.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
+import 'package:artbooking/types/popup_item_section.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -32,7 +33,7 @@ class TitleDescriptionSection extends StatelessWidget {
   /// Section's position in the layout (e.g. 0 is the first).
   final int index;
 
-  final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
+  final List<PopupMenuItemSection> popupMenuEntries;
 
   final Section section;
 
@@ -178,12 +179,14 @@ class TitleDescriptionSection extends StatelessWidget {
     );
   }
 
-  List<PopupMenuItemIcon<EnumSectionAction>> getPopupMenuEntries() {
-    var localPopupMenuEntries = popupMenuEntries.sublist(0);
+  List<PopupMenuItemSection> getPopupMenuEntries() {
+    final List<PopupMenuItemSection> localPopupMenuEntries =
+        popupMenuEntries.sublist(0);
 
     if (index == 0) {
-      localPopupMenuEntries
-          .removeWhere((x) => x.value == EnumSectionAction.moveUp);
+      localPopupMenuEntries.removeWhere(
+        (x) => x.value == EnumSectionAction.moveUp,
+      );
     }
 
     if (isLast) {
@@ -193,15 +196,17 @@ class TitleDescriptionSection extends StatelessWidget {
     }
 
     localPopupMenuEntries
-        .removeWhere((x) => x.value == EnumSectionAction.rename);
-    localPopupMenuEntries
-        .removeWhere((x) => x.value == EnumSectionAction.settings);
+      ..removeWhere((x) => x.value == EnumSectionAction.rename)
+      ..removeWhere((x) => x.value == EnumSectionAction.settings);
+
+    final int millisecondsDelay = localPopupMenuEntries.length * 25;
 
     localPopupMenuEntries.add(
       PopupMenuItemIcon(
         icon: Icon(UniconsLine.paint_tool),
         textLabel: "edit_background_color".tr(),
         value: EnumSectionAction.editBackgroundColor,
+        delay: Duration(milliseconds: millisecondsDelay * 1),
       ),
     );
 
@@ -210,6 +215,7 @@ class TitleDescriptionSection extends StatelessWidget {
         icon: Icon(UniconsLine.edit_alt),
         textLabel: "title_edit".tr(),
         value: EnumSectionAction.renameTitle,
+        delay: Duration(milliseconds: millisecondsDelay * 2),
       ),
     );
 
@@ -218,6 +224,7 @@ class TitleDescriptionSection extends StatelessWidget {
         icon: Icon(UniconsLine.font),
         textLabel: "text_color_edit".tr(),
         value: EnumSectionAction.editTextColor,
+        delay: Duration(milliseconds: millisecondsDelay * 3),
       ),
     );
 
@@ -226,6 +233,7 @@ class TitleDescriptionSection extends StatelessWidget {
         icon: Icon(UniconsLine.border_out),
         textLabel: "border_color_edit".tr(),
         value: EnumSectionAction.editBorderColor,
+        delay: Duration(milliseconds: millisecondsDelay * 4),
       ),
     );
 

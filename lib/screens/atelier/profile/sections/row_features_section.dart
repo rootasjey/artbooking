@@ -1,10 +1,12 @@
 import 'package:artbooking/components/cards/vertical_card.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/screens/atelier/profile/popup_menu_button_section.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
+import 'package:artbooking/types/popup_item_section.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:beamer/beamer.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -36,7 +38,7 @@ class RowFeaturesSection extends StatelessWidget {
   /// Section's position in the layout (e.g. 0 is the first).
   final int index;
 
-  final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
+  final List<PopupMenuItemSection> popupMenuEntries;
 
   final Section section;
 
@@ -228,12 +230,14 @@ class RowFeaturesSection extends StatelessWidget {
     );
   }
 
-  List<PopupMenuItemIcon<EnumSectionAction>> getPopupMenuEntries() {
-    var localPopupMenuEntries = popupMenuEntries.sublist(0);
+  List<PopupMenuItemSection> getPopupMenuEntries() {
+    final List<PopupMenuItemSection> localPopupMenuEntries =
+        popupMenuEntries.sublist(0);
 
     if (index == 0) {
-      localPopupMenuEntries
-          .removeWhere((x) => x.value == EnumSectionAction.moveUp);
+      localPopupMenuEntries.removeWhere(
+        (x) => x.value == EnumSectionAction.moveUp,
+      );
     }
 
     if (isLast) {
@@ -242,40 +246,36 @@ class RowFeaturesSection extends StatelessWidget {
       );
     }
 
-    localPopupMenuEntries
-        .removeWhere((x) => x.value == EnumSectionAction.rename);
-    localPopupMenuEntries
-        .removeWhere((x) => x.value == EnumSectionAction.settings);
+    localPopupMenuEntries.removeWhere(
+      (x) => x.value == EnumSectionAction.settings,
+    );
+
+    final int millisecondsDelay = localPopupMenuEntries.length * 25;
 
     localPopupMenuEntries.add(
       PopupMenuItemIcon(
-        icon: Icon(UniconsLine.paint_tool),
+        icon: PopupMenuIcon(UniconsLine.paint_tool),
         textLabel: "edit_background_color".tr(),
         value: EnumSectionAction.editBackgroundColor,
+        delay: Duration(milliseconds: millisecondsDelay * 1),
       ),
     );
 
     localPopupMenuEntries.add(
       PopupMenuItemIcon(
-        icon: Icon(UniconsLine.edit_alt),
-        textLabel: "title_edit".tr(),
-        value: EnumSectionAction.renameTitle,
-      ),
-    );
-
-    localPopupMenuEntries.add(
-      PopupMenuItemIcon(
-        icon: Icon(UniconsLine.font),
+        icon: PopupMenuIcon(UniconsLine.font),
         textLabel: "text_color_edit".tr(),
         value: EnumSectionAction.editTextColor,
+        delay: Duration(milliseconds: millisecondsDelay * 2),
       ),
     );
 
     localPopupMenuEntries.add(
       PopupMenuItemIcon(
-        icon: Icon(UniconsLine.border_out),
+        icon: PopupMenuIcon(UniconsLine.border_out),
         textLabel: "border_color_edit".tr(),
         value: EnumSectionAction.editBorderColor,
+        delay: Duration(milliseconds: millisecondsDelay * 3),
       ),
     );
 

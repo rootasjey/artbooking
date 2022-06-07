@@ -21,6 +21,7 @@ import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snap_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/json_types.dart';
+import 'package:artbooking/types/popup_item_section.dart';
 import 'package:artbooking/types/post.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:beamer/beamer.dart';
@@ -56,7 +57,7 @@ class NewsSection extends StatefulWidget {
 
   final bool usingAsDropTarget;
   final int index;
-  final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
+  final List<PopupMenuItemSection> popupMenuEntries;
 
   final void Function(
     EnumSectionAction action,
@@ -265,8 +266,9 @@ class _NewsSectionState extends State<NewsSection> {
     return children;
   }
 
-  List<PopupMenuItemIcon<EnumSectionAction>> getPopupMenuEntries() {
-    final popupMenuEntries = widget.popupMenuEntries.sublist(0);
+  List<PopupMenuItemSection> getPopupMenuEntries() {
+    final List<PopupMenuItemSection> popupMenuEntries =
+        widget.popupMenuEntries.sublist(0);
 
     if (widget.index == 0) {
       popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);
@@ -284,6 +286,7 @@ class _NewsSectionState extends State<NewsSection> {
           icon: Icon(UniconsLine.plus),
           textLabel: "illustrations_select".tr(),
           value: EnumSectionAction.selectIllustrations,
+          delay: Duration(milliseconds: popupMenuEntries.length * 25),
         ),
       );
     }

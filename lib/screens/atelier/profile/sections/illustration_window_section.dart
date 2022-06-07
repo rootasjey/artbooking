@@ -13,6 +13,7 @@ import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/popup_item_section.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -325,8 +326,9 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
     return children;
   }
 
-  List<PopupMenuItemIcon<EnumSectionAction>> getPopupMenuEntries() {
-    final popupMenuEntries = widget.popupMenuEntries.sublist(0);
+  List<PopupMenuItemSection> getPopupMenuEntries() {
+    final List<PopupMenuItemSection> popupMenuEntries =
+        widget.popupMenuEntries.sublist(0);
 
     if (widget.index == 0) {
       popupMenuEntries.removeWhere((x) => x.value == EnumSectionAction.moveUp);
@@ -344,6 +346,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
           icon: Icon(UniconsLine.plus),
           textLabel: "illustrations_select".tr(),
           value: EnumSectionAction.selectIllustrations,
+          delay: Duration(milliseconds: popupMenuEntries.length * 25),
         ),
       );
     }
