@@ -27,6 +27,9 @@ class PopupMenuButtonSection extends StatelessWidget {
       child: Opacity(
         opacity: show ? 1.0 : 0.0,
         child: PopupMenuButton(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(6.0),
+          ),
           child: CircleButton.withNoEvent(
             radius: 16.0,
             icon: Icon(
