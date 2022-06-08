@@ -738,7 +738,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   }
 
   void onDragUpdateIllustration(DragUpdateDetails details) async {
-    final position = details.globalPosition;
+    final Offset position = details.globalPosition;
 
     if (position.dy < _edgeDistance) {
       if (_scrollController.offset <= 0) {
@@ -754,7 +754,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       return;
     }
 
-    final windowHeight = MediaQuery.of(context).size.height;
+    final double windowHeight = MediaQuery.of(context).size.height;
     if (windowHeight - _edgeDistance < position.dy) {
       if (_scrollController.position.atEdge && _scrollController.offset != 0) {
         return;

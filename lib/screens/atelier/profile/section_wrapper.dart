@@ -22,7 +22,6 @@ class SectionWrapper extends StatefulWidget {
     required this.index,
     required this.section,
     required this.sectionCount,
-    required this.scrollController,
     required this.userId,
     this.onDropSection,
     this.onPopupMenuItemSelected,
@@ -31,18 +30,27 @@ class SectionWrapper extends StatefulWidget {
     this.onShowBookDialog,
     this.onShowIllustrationDialog,
     this.onNavigateFromSection,
+    this.onDraggableSectionCanceled,
+    this.onDragSectionCompleted,
+    this.onDragSectionEnd,
+    this.onDragSectionStarted,
   }) : super(key: key);
 
+  /// Section's index.
   final int index;
 
+  /// Show edit controls if this is true. Hide controls otherwise.
   final bool editMode;
 
   /// Section's count.
   /// Useful to quickly find which is the last section in the list.
   final int sectionCount;
 
+  /// Section's data.
+
   final Section section;
-  final ScrollController scrollController;
+
+  /// Current authenticated user's id.
   final String userId;
 
   /// Callback when drag and dropping items on this book card.
@@ -51,16 +59,24 @@ class SectionWrapper extends StatefulWidget {
     List<int> dragIndexes,
   )? onDropSection;
 
+  /// List of popup menu item for this section.
   final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
+
+  /// Callback fired when a popup menu item has been tapped.
+  /// A different action will be performed according to the target item.
   final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
+
+  /// Callback fired when section's items has been updated.
   final void Function(Section, int, List<String>)? onUpdateSectionItems;
 
+  /// Callback to show book selection.
   final void Function({
     required int index,
     required Section section,
     required EnumSelectType selectType,
   })? onShowBookDialog;
 
+  /// Callback to show illustration selection.
   final void Function({
     required int index,
     int maxPick,
@@ -68,9 +84,22 @@ class SectionWrapper extends StatefulWidget {
     required EnumSelectType selectType,
   })? onShowIllustrationDialog;
 
+  /// Callback fired when we navigate from a section.
   final void Function(
     EnumNavigationSection enumNavigationSection,
   )? onNavigateFromSection;
+
+  /// Callback to handle the cancel of a dragged item.
+  final void Function(Velocity, Offset)? onDraggableSectionCanceled;
+
+  /// Callback to handle the completion of a dragged item.
+  final void Function()? onDragSectionCompleted;
+
+  /// Callback to handle the end of a dragged item.
+  final void Function(DraggableDetails)? onDragSectionEnd;
+
+  /// Callback to handle the start of a dragged ite
+  final void Function()? onDragSectionStarted;
 
   @override
   State<SectionWrapper> createState() => _SectionWrapperState();
@@ -164,13 +193,12 @@ class _SectionWrapperState extends State<SectionWrapper> {
                   groupName: "profile-page",
                   type: Section,
                 ),
-                onDragUpdate: (details) => onDragUpdateSection(
-                  context: context,
-                  details: details,
-                  scrollController: widget.scrollController,
-                ),
+                onDragCompleted: widget.onDragSectionCompleted,
+                onDragEnd: widget.onDragSectionEnd,
+                onDraggableCanceled: widget.onDraggableSectionCanceled,
+                onDragStarted: widget.onDragSectionStarted,
                 feedback: Card(
-                  elevation: 2.0,
+                  elevation: 8.0,
                   color: Constants.colors.clairPink,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -207,46 +235,5 @@ class _SectionWrapperState extends State<SectionWrapper> {
         ],
       ),
     );
-  }
-
-  void onDragUpdateSection({
-    required BuildContext context,
-    required DragUpdateDetails details,
-    required ScrollController scrollController,
-  }) async {
-    /// Amount of offset to jump when dragging an element to the edge.
-    final double jumpOffset = 200.0;
-
-    /// Distance to the edge where the scroll viewer starts to jump.
-    final double edgeDistance = 50.0;
-
-    final position = details.globalPosition;
-
-    if (position.dy < edgeDistance) {
-      if (scrollController.offset <= 0) {
-        return;
-      }
-
-      await scrollController.animateTo(
-        scrollController.offset - jumpOffset,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeIn,
-      );
-
-      return;
-    }
-
-    final windowHeight = MediaQuery.of(context).size.height;
-    if (windowHeight - edgeDistance < position.dy) {
-      if (scrollController.position.atEdge && scrollController.offset != 0) {
-        return;
-      }
-
-      await scrollController.animateTo(
-        scrollController.offset + jumpOffset,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeIn,
-      );
-    }
   }
 }

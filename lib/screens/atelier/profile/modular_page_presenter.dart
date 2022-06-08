@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/dialogs/add_section_dialog.dart';
 import 'package:artbooking/components/dialogs/colors_selector.dart';
@@ -68,6 +70,13 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
 
   bool _showFabToTop = false;
 
+  /// If true, a section is being dragged from its original position.
+  bool _isDraggingSection = false;
+
+  /// Run a periodic timer to continuously scroll in a direction
+  /// (without necessarly moving the cursor).
+  Timer? _scrollTimer;
+
   /// Modular page data.
   var _modularPage = ModularPage.empty();
 
@@ -107,6 +116,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     ),
   ];
 
+  /// Scroll controller to move inside the page.
   final _scrollController = ScrollController();
 
   @override
@@ -118,6 +128,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
   @override
   void dispose() {
     _modularPageSubscription?.cancel();
+    _scrollTimer?.cancel();
     super.dispose();
   }
 
@@ -185,6 +196,11 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
       onDropSection: onDropSection,
       onDropSectionInBetween: onDropSectionInBetween,
       onNavigateFromSection: onNavigateFromSection,
+      onDragSectionCompleted: onDragSectionCompleted,
+      onDragSectionEnd: onDragSectionEnd,
+      onDraggableSectionCanceled: onDraggableSectionCanceled,
+      onDragSectionStarted: onDragSectionStarted,
+      onPointerMove: onPointerMove,
     );
   }
 
@@ -1071,5 +1087,70 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     }
+  }
+
+  void onDragSectionCompleted() {
+    _isDraggingSection = false;
+  }
+
+  void onDragSectionEnd(DraggableDetails draggableDetails) {
+    _isDraggingSection = false;
+  }
+
+  void onDraggableSectionCanceled(Velocity velocity, Offset offset) {
+    _isDraggingSection = false;
+  }
+
+  void onDragSectionStarted() {
+    _isDraggingSection = true;
+  }
+
+  void onPointerMove(PointerMoveEvent pointerMoveEvent) {
+    if (!_isDraggingSection) {
+      _scrollTimer?.cancel();
+      return;
+    }
+
+    final int duration = 50;
+    final double jumpOffset = 42.0;
+    final double dy = pointerMoveEvent.position.dy;
+
+    final double scrollTreshold = 100.0;
+
+    if (dy < scrollTreshold && _scrollController.offset > 0) {
+      _scrollTimer?.cancel();
+      _scrollTimer = Timer.periodic(
+        Duration(milliseconds: duration),
+        (timer) {
+          _scrollController.animateTo(
+            _scrollController.offset - jumpOffset,
+            duration: Duration(milliseconds: duration),
+            curve: Curves.easeIn,
+          );
+        },
+      );
+
+      return;
+    }
+
+    final double windowHeight = MediaQuery.of(context).size.height;
+
+    if (dy >= windowHeight - scrollTreshold &&
+        !_scrollController.position.atEdge) {
+      _scrollTimer?.cancel();
+      _scrollTimer = Timer.periodic(
+        Duration(milliseconds: duration),
+        (timer) {
+          _scrollController.animateTo(
+            _scrollController.offset + jumpOffset,
+            duration: Duration(milliseconds: duration),
+            curve: Curves.easeIn,
+          );
+        },
+      );
+      return;
+    }
+
+    _scrollTimer?.cancel();
   }
 }

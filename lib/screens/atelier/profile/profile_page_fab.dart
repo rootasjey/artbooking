@@ -13,10 +13,19 @@ class ProfilePageFAB extends StatelessWidget {
     required this.showFabToTop,
   }) : super(key: key);
 
+  /// True if the current authenticated user- if any - is the owner of this page.
   final bool isOwner;
+
+  /// True if the page can be edited.
   final bool editMode;
+
+  /// If true, a Floating Action Button to scroll to top will be displayed.
   final bool showFabToTop;
+
+  /// Scroll controller to move in the page.
   final ScrollController scrollController;
+
+  /// Callback event fired when we want to activate/deactivate edit mode.
   final void Function()? onToggleEditMode;
 
   @override
