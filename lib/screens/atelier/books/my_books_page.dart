@@ -5,6 +5,7 @@ import 'package:artbooking/components/buttons/visibility_button.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
@@ -60,17 +61,17 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
   final _popupMenuEntries = <PopupMenuEntry<EnumBookItemAction>>[
     PopupMenuItemIcon(
-      icon: Icon(UniconsLine.edit_alt),
+      icon: PopupMenuIcon(UniconsLine.edit_alt),
       textLabel: "rename".tr(),
       value: EnumBookItemAction.rename,
     ),
     PopupMenuItemIcon(
-      icon: Icon(UniconsLine.trash),
+      icon: PopupMenuIcon(UniconsLine.trash),
       textLabel: "delete".tr(),
       value: EnumBookItemAction.delete,
     ),
     PopupMenuItemIcon(
-      icon: Icon(UniconsLine.eye),
+      icon: PopupMenuIcon(UniconsLine.eye),
       textLabel: "visibility_change".tr(),
       value: EnumBookItemAction.updateVisibility,
     ),

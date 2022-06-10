@@ -540,6 +540,9 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
           UniconsLine.ellipsis_h,
         ),
       ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(6.0),
+      ),
       onSelected: (EnumBookItemAction action) {
         widget.onPopupMenuItemSelected?.call(
           action,
