@@ -70,10 +70,10 @@ class MyBooksPageBody extends StatelessWidget {
       padding: const EdgeInsets.all(40.0),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          mainAxisExtent: 410.0,
-          maxCrossAxisExtent: 340.0,
-          mainAxisSpacing: 20.0,
-          crossAxisSpacing: 20.0,
+          mainAxisExtent: 380.0,
+          maxCrossAxisExtent: 380.0,
+          mainAxisSpacing: 0.0,
+          crossAxisSpacing: 0.0,
         ),
         delegate: SliverChildBuilderDelegate(
           (context, index) {

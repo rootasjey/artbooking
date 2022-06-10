@@ -30,8 +30,8 @@ class BookCard extends StatefulWidget {
     this.popupMenuEntries = const [],
     this.selected = false,
     this.selectionMode = false,
-    this.width = 360.0,
-    this.height = 402.0,
+    this.width = 400.0,
+    this.height = 342.0,
     this.onDrop,
     this.onDragUpdate,
     this.canDrag = false,
@@ -81,7 +81,10 @@ class BookCard extends StatefulWidget {
   /// Usually used to re-order items.
   final bool canDrag;
 
+  /// Book card width.
   final double width;
+
+  /// Book card height.
   final double height;
 
   /// Callback when drag and dropping items on this book card.
@@ -104,7 +107,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   late Animation<double> _scaleAnimation;
   late AnimationController _scaleController;
 
-  double _initElevation = 4.0;
+  double _initElevation = 6.0;
   double _elevation = 4.0;
 
   bool _showLikeAnimation = false;
@@ -200,7 +203,8 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
       children: [
         Stack(
           children: [
-            backCard(),
+            backCardAfter(),
+            backCardBefore(),
             frontCard(
               usingAsDropTarget: usingAsDropTarget,
             ),
@@ -268,7 +272,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   Widget draggingCard() {
     return Stack(
       children: [
-        backCard(),
+        backCardBefore(),
         frontCard(),
       ],
     );
@@ -334,11 +338,31 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     );
   }
 
-  Widget backCard() {
+  Widget backCardAfter() {
     return Positioned(
       top: 0.0,
       right: 0.0,
-      width: widget.width - 160.0,
+      width: widget.width - 100.0,
+      child: SizedBox(
+        width: widget.width - 80.0,
+        height: widget.height - _captionHeight,
+        child: Card(
+          elevation: _elevation / 3.0,
+          color: Constants.colors.clairPink,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(_cardRadius),
+          ),
+          clipBehavior: Clip.hardEdge,
+        ),
+      ),
+    );
+  }
+
+  Widget backCardBefore() {
+    return Positioned(
+      top: 0.0,
+      right: 12.0,
+      width: widget.width - 100.0,
       child: SizedBox(
         width: widget.width - 80.0,
         height: widget.height - _captionHeight,
@@ -391,13 +415,14 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   Widget frontCard({bool usingAsDropTarget = false}) {
     final Color primaryColor = Theme.of(context).primaryColor;
     final onDoubleTapOrNull = widget.onDoubleTap != null ? onDoubleTap : null;
+    final double width = widget.width - 80.0;
 
     return Opacity(
       opacity: widget.book.available ? 1.0 : 0.9,
       child: Container(
-        width: widget.width - 60.0,
+        width: width,
         height: widget.height - _captionHeight,
-        padding: const EdgeInsets.only(right: 12.0),
+        padding: const EdgeInsets.only(right: 24.0),
         child: ScaleTransition(
           scale: _scaleAnimation,
           child: Card(
@@ -415,7 +440,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
                 ExtendedImage.network(
                   widget.book.getCoverLink(),
                   fit: BoxFit.cover,
-                  width: widget.width - 60.0,
+                  width: width,
                   height: widget.height - _captionHeight,
                   clearMemoryCacheWhenDispose: true,
                   loadStateChanged: (state) {
@@ -565,7 +590,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
 
   void onHover(isHover) {
     if (isHover) {
-      _elevation = 8.0;
+      _elevation = _initElevation * 1.5;
       _scaleController.forward();
     } else {
       _elevation = _initElevation;
