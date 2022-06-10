@@ -557,6 +557,9 @@ class _IllustrationCardState extends State<IllustrationCard>
             );
           },
         ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(6.0),
+        ),
         onSelected: (EnumIllustrationItemAction action) {
           widget.onPopupMenuItemSelected?.call(
             action,

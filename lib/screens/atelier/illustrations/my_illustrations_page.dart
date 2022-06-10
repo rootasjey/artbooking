@@ -4,6 +4,7 @@ import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/buttons/visibility_button.dart';
 import 'package:artbooking/components/custom_scroll_behavior.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
@@ -68,17 +69,17 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   final _popupMenuEntries = <PopupMenuEntry<EnumIllustrationItemAction>>[
     PopupMenuItemIcon(
-      icon: Icon(UniconsLine.book_medical),
+      icon: PopupMenuIcon(UniconsLine.book_medical),
       textLabel: "add_to_book".tr(),
       value: EnumIllustrationItemAction.addToBook,
     ),
     PopupMenuItemIcon(
-      icon: Icon(UniconsLine.trash),
+      icon: PopupMenuIcon(UniconsLine.trash),
       textLabel: "delete".tr(),
       value: EnumIllustrationItemAction.delete,
     ),
     PopupMenuItemIcon(
-      icon: Icon(UniconsLine.eye),
+      icon: PopupMenuIcon(UniconsLine.eye),
       textLabel: "visibility_change".tr(),
       value: EnumIllustrationItemAction.updateVisibility,
     ),
