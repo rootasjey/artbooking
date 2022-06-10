@@ -116,7 +116,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
               heroTag: illustration.id,
               illustration: illustration,
               selected: selected,
-              canDrag: true,
+              canDrag: isOwner,
               selectionMode: selectionMode,
               onDoubleTap: authenticated ? _onDoubleTap : null,
               onDragUpdate: onDragUpdateIllustration,
