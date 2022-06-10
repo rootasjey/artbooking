@@ -421,22 +421,29 @@ class _IllustrationCardState extends State<IllustrationCard>
 
     final color = widget.illustration.liked
         ? Theme.of(context).secondaryHeaderColor
-        : Colors.black26;
+        : Colors.black;
 
     return Align(
-      alignment: Alignment.topRight,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(24.0),
-        onHover: (isHover) {
-          _keepHeartIconVisibile = isHover;
-        },
-        onTap: widget.onTapLike,
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Icon(
-            iconData,
-            color: color,
-            size: 16.0,
+      alignment: Alignment.topLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(24.0),
+          onHover: (isHover) {
+            _keepHeartIconVisibile = isHover;
+          },
+          onTap: widget.onTapLike,
+          child: Container(
+            padding: const EdgeInsets.all(6.0),
+            decoration: BoxDecoration(
+              color: Constants.colors.clairPink,
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            child: Icon(
+              iconData,
+              color: color,
+              size: 16.0,
+            ),
           ),
         ),
       ),
@@ -544,18 +551,26 @@ class _IllustrationCardState extends State<IllustrationCard>
     final Widget child = Opacity(
       opacity: _showPopupMenu ? 1.0 : 0.0,
       child: PopupMenuButton<EnumIllustrationItemAction>(
-        icon: MirrorAnimation<Color?>(
-          tween: Theme.of(context)
-              .primaryColor
-              .tweenTo(Theme.of(context).secondaryHeaderColor),
-          duration: Duration(seconds: 2),
-          curve: Curves.decelerate,
-          builder: (context, child, value) {
-            return Icon(
-              UniconsLine.ellipsis_h,
-              color: value,
-            );
-          },
+        child: CircleAvatar(
+          radius: 15.0,
+          backgroundColor: Constants.colors.clairPink,
+          child: MirrorAnimation<Color?>(
+            tween: Theme.of(context)
+                .primaryColor
+                .tweenTo(Theme.of(context).secondaryHeaderColor),
+            duration: Duration(seconds: 2),
+            curve: Curves.decelerate,
+            builder: (context, child, value) {
+              return Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Icon(
+                  UniconsLine.ellipsis_h,
+                  color: value,
+                  size: 20,
+                ),
+              );
+            },
+          ),
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(6.0),
