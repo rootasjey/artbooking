@@ -1105,6 +1105,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     _isDraggingSection = true;
   }
 
+  /// Callback fired when a pointer is down and moves.
   void onPointerMove(PointerMoveEvent pointerMoveEvent) {
     if (!_isDraggingSection) {
       _scrollTimer?.cancel();
@@ -1121,12 +1122,16 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
       _scrollTimer?.cancel();
       _scrollTimer = Timer.periodic(
         Duration(milliseconds: duration),
-        (timer) {
+        (Timer timer) {
           _scrollController.animateTo(
             _scrollController.offset - jumpOffset,
             duration: Duration(milliseconds: duration),
             curve: Curves.easeIn,
           );
+
+          if (_scrollController.position.outOfRange) {
+            _scrollTimer?.cancel();
+          }
         },
       );
 
@@ -1140,12 +1145,16 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
       _scrollTimer?.cancel();
       _scrollTimer = Timer.periodic(
         Duration(milliseconds: duration),
-        (timer) {
+        (Timer timer) {
           _scrollController.animateTo(
             _scrollController.offset + jumpOffset,
             duration: Duration(milliseconds: duration),
             curve: Curves.easeIn,
           );
+
+          if (_scrollController.position.outOfRange) {
+            _scrollTimer?.cancel();
+          }
         },
       );
       return;
