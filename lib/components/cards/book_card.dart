@@ -37,6 +37,10 @@ class BookCard extends StatefulWidget {
     this.canDrag = false,
     this.useAsPlaceholder = false,
     this.dragGroupName = "",
+    this.onDragCompleted,
+    this.onDragEnd,
+    this.onDragStarted,
+    this.onDraggableCanceled,
   }) : super(key: key);
 
   /// If true, this card will be used as a place holder.
@@ -47,6 +51,21 @@ class BookCard extends StatefulWidget {
 
   /// Index position in a list, if available.
   final int index;
+
+  /// Callback when book card dragging is completed.
+  final void Function()? onDragCompleted;
+
+  /// Callback when book card dragging has ended.
+  final void Function(DraggableDetails)? onDragEnd;
+
+  /// Callback when book card dragging has been canceled.
+  final void Function(Velocity, Offset)? onDraggableCanceled;
+
+  /// Callback when book card dragging has started.
+  final void Function()? onDragStarted;
+
+  /// Callback when book is being dragged.
+  final void Function(DragUpdateDetails details)? onDragUpdate;
 
   /// Trigger when the user long press this card.
   final Function(bool)? onLongPress;
@@ -62,9 +81,6 @@ class BookCard extends StatefulWidget {
 
   /// Trigger when heart icon tap.
   final void Function()? onTapLike;
-
-  /// Callback when book is being dragged.
-  final void Function(DragUpdateDetails details)? onDragUpdate;
 
   /// Popup menu item entries.
   final List<PopupMenuEntry<EnumBookItemAction>> popupMenuEntries;
@@ -183,17 +199,21 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   /// Card wrapper to enable dragging.
   Widget draggableCard({bool usingAsDropTarget = false}) {
     return LongPressDraggable<DragData>(
+      child: fullstackCard(
+        usingAsDropTarget: usingAsDropTarget,
+      ),
+      childWhenDragging: childWhenDragging(),
       data: DragData(
         index: widget.index,
         groupName: widget.dragGroupName,
         type: BookCard,
       ),
       feedback: draggingCard(),
-      childWhenDragging: childWhenDragging(),
+      onDragCompleted: widget.onDragCompleted,
+      onDragEnd: widget.onDragEnd,
+      onDragStarted: widget.onDragStarted,
+      onDraggableCanceled: widget.onDraggableCanceled,
       onDragUpdate: widget.onDragUpdate,
-      child: fullstackCard(
-        usingAsDropTarget: usingAsDropTarget,
-      ),
     );
   }
 

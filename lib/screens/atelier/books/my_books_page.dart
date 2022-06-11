@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/components/custom_scroll_behavior.dart';
 import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
@@ -40,21 +42,16 @@ class MyBooksPage extends ConsumerStatefulWidget {
 }
 
 class _MyBooksPageState extends ConsumerState<MyBooksPage> {
-  bool _loading = false;
-  bool _hasNext = true;
-  bool _showFab = false;
-  bool _loadingMore = false;
-  bool _forceMultiSelect = false;
   bool _creating = false;
+  bool _forceMultiSelect = false;
+  bool _hasNext = true;
+  bool _isDraggingSection = false;
+  bool _loading = false;
+  bool _loadingMore = false;
+  bool _showFab = false;
 
   /// Last fetched book document.
   DocumentSnapshot? _lastDocument;
-
-  /// /// Amount of offset to jump when dragging an element to the edge.
-  final double _jumpOffset = 200.0;
-
-  /// Distance to the edge where the scroll viewer starts to jump.
-  final double _edgeDistance = 200.0;
 
   final _books = <Book>[];
   final _focusNode = FocusNode();
@@ -87,6 +84,9 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
   EnumVisibilityTab _selectedTab = EnumVisibilityTab.active;
 
+  /// Monitors periodically scroll when dragging book card on edges.
+  Timer? _scrollTimer;
+
   @override
   initState() {
     super.initState();
@@ -98,6 +98,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   void dispose() {
     _bookSubscription?.cancel();
     _focusNode.dispose();
+    _scrollTimer?.cancel();
     super.dispose();
   }
 
@@ -109,62 +110,67 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         show: _showFab,
         onShowCreateBookDialog: showCreateBookDialog,
       ),
-      body: Stack(
-        children: [
-          ImprovedScrolling(
-            scrollController: _scrollController,
-            enableKeyboardScrolling: true,
-            onScroll: onScroll,
-            child: ScrollConfiguration(
-              behavior: CustomScrollBehavior(),
-              child: CustomScrollView(
-                controller: _scrollController,
-                slivers: <Widget>[
-                  ApplicationBar(),
-                  MyBooksPageHeader(
-                    selectedTab: _selectedTab,
-                    onChangedTab: onChangedTab,
-                    multiSelectActive: _forceMultiSelect,
-                    multiSelectedItems: _multiSelectedItems,
-                    onSelectAll: onSelectAll,
-                    onClearSelection: clearSelection,
-                    onTriggerMultiSelect: triggerMultiSelect,
-                    onShowCreateBookDialog: showCreateBookDialog,
-                    onAddToBook: showAddGroupToBookDialog,
-                    onChangeGroupVisibility: showGroupVisibilityDialog,
-                    onConfirmDeleteGroup: onConfirmDeleteGroup,
-                  ),
-                  MyBooksPageBody(
-                    books: _books,
-                    loading: _loading,
-                    onDropBook: onDropBook,
-                    onShowCreateBookDialog: showCreateBookDialog,
-                    popupMenuEntries: _popupMenuEntries,
-                    onDragUpdateBook: onDragUpdateBook,
-                    onLongPressBook: onLongPressBook,
-                    forceMultiSelect: _forceMultiSelect,
-                    multiSelectedItems: _multiSelectedItems,
-                    onPopupMenuItemSelected: onPopupMenuItemSelected,
-                    onTapBook: onTapBook,
-                    onGoToActiveBooks: onGoToActiveBooks,
-                    selectedTab: _selectedTab,
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.only(bottom: 100.0),
-                  ),
-                ],
+      body: Listener(
+        onPointerMove: onPointerMove,
+        child: Stack(
+          children: [
+            ImprovedScrolling(
+              scrollController: _scrollController,
+              enableKeyboardScrolling: true,
+              onScroll: onScroll,
+              child: ScrollConfiguration(
+                behavior: CustomScrollBehavior(),
+                child: CustomScrollView(
+                  controller: _scrollController,
+                  slivers: <Widget>[
+                    ApplicationBar(),
+                    MyBooksPageHeader(
+                      selectedTab: _selectedTab,
+                      onChangedTab: onChangedTab,
+                      multiSelectActive: _forceMultiSelect,
+                      multiSelectedItems: _multiSelectedItems,
+                      onSelectAll: onSelectAll,
+                      onClearSelection: clearSelection,
+                      onTriggerMultiSelect: triggerMultiSelect,
+                      onShowCreateBookDialog: showCreateBookDialog,
+                      onAddToBook: showAddGroupToBookDialog,
+                      onChangeGroupVisibility: showGroupVisibilityDialog,
+                      onConfirmDeleteGroup: onConfirmDeleteGroup,
+                    ),
+                    MyBooksPageBody(
+                      books: _books,
+                      loading: _loading,
+                      onDropBook: onDropBook,
+                      onShowCreateBookDialog: showCreateBookDialog,
+                      popupMenuEntries: _popupMenuEntries,
+                      onLongPressBook: onLongPressBook,
+                      forceMultiSelect: _forceMultiSelect,
+                      multiSelectedItems: _multiSelectedItems,
+                      onPopupMenuItemSelected: onPopupMenuItemSelected,
+                      onTapBook: onTapBook,
+                      onGoToActiveBooks: onGoToActiveBooks,
+                      selectedTab: _selectedTab,
+                      onDragBookCompleted: onDragBookCompleted,
+                      onDragBookEnd: onDragBookEnd,
+                      onDragBookStarted: onDragBookStarted,
+                    ),
+                    SliverPadding(
+                      padding: const EdgeInsets.only(bottom: 100.0),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          Positioned(
-            top: 100.0,
-            right: 24.0,
-            child: PopupProgressIndicator(
-              show: _creating,
-              message: "book_creating".tr() + "...",
+            Positioned(
+              top: 100.0,
+              right: 24.0,
+              child: PopupProgressIndicator(
+                show: _creating,
+                message: "book_creating".tr() + "...",
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -476,34 +482,20 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     Utilities.storage.saveBooksTab(selectedTab);
   }
 
-  void onDragUpdateBook(DragUpdateDetails details) {
-    final position = details.globalPosition;
+  void onDragBookCompleted() {
+    _isDraggingSection = false;
+  }
 
-    if (position.dy < _edgeDistance) {
-      if (_scrollController.offset <= 0) {
-        return;
-      }
+  void onDragBookEnd(DraggableDetails p1) {
+    _isDraggingSection = false;
+  }
 
-      _scrollController.animateTo(
-        _scrollController.offset - _jumpOffset,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeIn,
-      );
-      return;
-    }
+  void onDragBookStarted() {
+    _isDraggingSection = true;
+  }
 
-    final windowHeight = MediaQuery.of(context).size.height;
-    if (windowHeight - _edgeDistance < position.dy) {
-      if (_scrollController.position.atEdge && _scrollController.offset != 0) {
-        return;
-      }
-
-      _scrollController.animateTo(
-        _scrollController.offset + _jumpOffset,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeIn,
-      );
-    }
+  void onDraggableBookCanceled(Velocity velocity, Offset offset) {
+    _isDraggingSection = false;
   }
 
   void onDropBook(int dropIndex, List<int> dragIndexes) async {
@@ -576,6 +568,98 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     });
   }
 
+  /// Callback fired when a pointer is down and moves.
+  void onPointerMove(PointerMoveEvent pointerMoveEvent) {
+    if (!_isDraggingSection) {
+      _scrollTimer?.cancel();
+      return;
+    }
+
+    final int duration = 50;
+
+    /// Amount of offset to jump when dragging an element to the edge.
+    final double jumpOffset = 42.0;
+    final double dy = pointerMoveEvent.position.dy;
+
+    /// Distance to the edge where the scroll viewer starts to jump.
+    final double scrollTreshold = 100.0;
+
+    if (dy < scrollTreshold && _scrollController.offset > 0) {
+      _scrollTimer?.cancel();
+      _scrollTimer = Timer.periodic(
+        Duration(milliseconds: duration),
+        (Timer timer) {
+          _scrollController.animateTo(
+            _scrollController.offset - jumpOffset,
+            duration: Duration(milliseconds: duration),
+            curve: Curves.easeIn,
+          );
+
+          if (_scrollController.position.outOfRange) {
+            _scrollTimer?.cancel();
+          }
+        },
+      );
+
+      return;
+    }
+
+    final double windowHeight = MediaQuery.of(context).size.height;
+    final bool pointerIsAtBottom = dy >= windowHeight - scrollTreshold;
+    final bool scrollIsAtBottomEdge =
+        _scrollController.offset >= _scrollController.position.maxScrollExtent;
+
+    if (pointerIsAtBottom && !scrollIsAtBottomEdge) {
+      _scrollTimer?.cancel();
+      _scrollTimer = Timer.periodic(
+        Duration(milliseconds: duration),
+        (Timer timer) {
+          _scrollController.animateTo(
+            _scrollController.offset + jumpOffset,
+            duration: Duration(milliseconds: duration),
+            curve: Curves.easeIn,
+          );
+
+          if (_scrollController.position.outOfRange) {
+            _scrollTimer?.cancel();
+          }
+        },
+      );
+      return;
+    }
+
+    _scrollTimer?.cancel();
+  }
+
+  void onNavigateToBook(Book book) {
+    NavigationStateHelper.book = book;
+    Beamer.of(context).beamToNamed(
+      AtelierLocationContent.bookRoute.replaceFirst(":bookId", book.id),
+      data: {
+        "bookId": book.id,
+      },
+    );
+  }
+
+  void onPopupMenuItemSelected(
+    EnumBookItemAction action,
+    int index,
+    Book book,
+  ) {
+    switch (action) {
+      case EnumBookItemAction.rename:
+        showRenameBookDialog(book);
+        break;
+      case EnumBookItemAction.delete:
+        confirmDeleteBook(book, index);
+        break;
+      case EnumBookItemAction.updateVisibility:
+        showVisibilityDialog(book, index);
+        break;
+      default:
+    }
+  }
+
   /// When a book has been delete from Firestore.
   /// Delete the corresponding document from the UI.
   void onRemoveStreamingBook(DocumentChangeMap documentChange) {
@@ -612,35 +696,6 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     });
 
     setState(() {});
-  }
-
-  void onNavigateToBook(Book book) {
-    NavigationStateHelper.book = book;
-    Beamer.of(context).beamToNamed(
-      AtelierLocationContent.bookRoute.replaceFirst(":bookId", book.id),
-      data: {
-        "bookId": book.id,
-      },
-    );
-  }
-
-  void onPopupMenuItemSelected(
-    EnumBookItemAction action,
-    int index,
-    Book book,
-  ) {
-    switch (action) {
-      case EnumBookItemAction.rename:
-        showRenameBookDialog(book);
-        break;
-      case EnumBookItemAction.delete:
-        confirmDeleteBook(book, index);
-        break;
-      case EnumBookItemAction.updateVisibility:
-        showVisibilityDialog(book, index);
-        break;
-      default:
-    }
   }
 
   /// When a book card receives onTap event.

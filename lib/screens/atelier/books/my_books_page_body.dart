@@ -23,6 +23,10 @@ class MyBooksPageBody extends StatelessWidget {
     this.onGoToActiveBooks,
     this.onDropBook,
     this.onDragUpdateBook,
+    this.onDragBookCompleted,
+    this.onDragBookEnd,
+    this.onDraggableBookCanceled,
+    this.onDragBookStarted,
   }) : super(key: key);
 
   final bool forceMultiSelect;
@@ -38,6 +42,18 @@ class MyBooksPageBody extends StatelessWidget {
   final void Function(Book, bool)? onLongPressBook;
   final void Function()? onGoToActiveBooks;
   final void Function(DragUpdateDetails details)? onDragUpdateBook;
+
+  /// Callback when book dragging is completed.
+  final void Function()? onDragBookCompleted;
+
+  /// Callback when book dragging has ended.
+  final void Function(DraggableDetails)? onDragBookEnd;
+
+  /// Callback when book dragging has been canceled.
+  final void Function(Velocity, Offset)? onDraggableBookCanceled;
+
+  /// Callback when book dragging has started.
+  final void Function()? onDragBookStarted;
 
   final List<Book> books;
   final List<PopupMenuEntry<EnumBookItemAction>> popupMenuEntries;
@@ -93,6 +109,10 @@ class MyBooksPageBody extends StatelessWidget {
               onTap: () => onTapBook?.call(book),
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               popupMenuEntries: popupMenuEntries,
+              onDragCompleted: onDragBookCompleted,
+              onDragEnd: onDragBookEnd,
+              onDragStarted: onDragBookStarted,
+              onDraggableCanceled: onDraggableBookCanceled,
             );
           },
           childCount: books.length,
