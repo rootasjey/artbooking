@@ -58,11 +58,12 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   /// Last fetched illustration document.
   DocumentSnapshot? _lastDocument;
 
+  /// Max illustrations to fetch per page.
   final int _limit = 20;
 
   final _illustrations = <Illustration>[];
 
-  final _popupMenuEntries = <PopupMenuEntry<EnumIllustrationItemAction>>[
+  final List<PopupEntryIllustration> _popupMenuEntries = [
     PopupMenuItemIcon(
       icon: PopupMenuIcon(UniconsLine.book_medical),
       textLabel: "add_to_book".tr(),
@@ -384,8 +385,6 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
     try {
       final QueryMap query = getFetchQuery();
-
-      listenIllustrationsEvents(query);
       final snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
@@ -408,6 +407,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         _lastDocument = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
       });
+
+      listenIllustrationsEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
@@ -478,7 +479,6 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         return;
       }
 
-      listenIllustrationsEvents(query);
       final snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
@@ -502,6 +502,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         _hasNext = snapshot.docs.length == _limit;
         _loadingMore = false;
       });
+
+      listenIllustrationsEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
@@ -610,6 +612,41 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         .startAfterDocument(lastDocument);
   }
 
+  /// Return the query to listen changes to.
+  QueryMap? getListenQuery() {
+    final lastDocument = _lastDocument;
+    if (lastDocument == null) {
+      return null;
+    }
+
+    final String userId = getUserId();
+
+    if (!getIsOwner()) {
+      return FirebaseFirestore.instance
+          .collection("illustrations")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", isEqualTo: "public")
+          .orderBy("user_custom_index", descending: true)
+          .endAtDocument(lastDocument);
+    }
+
+    if (_selectedTab == EnumVisibilityTab.active) {
+      return FirebaseFirestore.instance
+          .collection("illustrations")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", whereIn: ["public", "private"])
+          .orderBy("user_custom_index", descending: true)
+          .endAtDocument(lastDocument);
+    }
+
+    return FirebaseFirestore.instance
+        .collection("illustrations")
+        .where("user_id", isEqualTo: userId)
+        .where("visibility", isEqualTo: "archived")
+        .orderBy("user_custom_index", descending: true)
+        .endAtDocument(lastDocument);
+  }
+
   /// Return either the user's id page parameter
   /// or the current authenticated user's id.
   String getUserId() {
@@ -637,7 +674,11 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   }
 
   /// Listen to tillustrations'events.
-  void listenIllustrationsEvents(QueryMap query) {
+  void listenIllustrationsEvents(QueryMap? query) {
+    if (query == null) {
+      return;
+    }
+
     _illustrationSubscription?.cancel();
     _illustrationSubscription = query.snapshots().skip(1).listen(
       (snapshot) {
