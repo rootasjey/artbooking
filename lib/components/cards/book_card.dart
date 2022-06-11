@@ -215,6 +215,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     );
   }
 
+  /// Widget which stays at the original place when dragging starts.
   Widget childWhenDragging({
     String textValue = "",
     Function()? onTapPlaceholder,
@@ -272,6 +273,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   Widget draggingCard() {
     return Stack(
       children: [
+        backCardAfter(),
         backCardBefore(),
         frontCard(),
       ],
