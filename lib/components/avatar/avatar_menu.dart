@@ -1,4 +1,5 @@
 import 'package:artbooking/components/avatar/adaptive_user_avatar.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
@@ -68,30 +69,30 @@ class AvatarMenu extends StatelessWidget {
     return [
       if (compact) ...[
         PopupMenuItemIcon(
-          icon: Icon(UniconsLine.search, color: iconColor),
+          icon: PopupMenuIcon(UniconsLine.search, color: iconColor),
           textLabel: "search".tr(),
           value: SearchLocation.route,
         ),
       ],
       if (!pathIsHome)
         PopupMenuItemIcon(
-          icon: Icon(UniconsLine.home, color: iconColor),
+          icon: PopupMenuIcon(UniconsLine.home, color: iconColor),
           textLabel: "home".tr(),
           value: HomeLocation.route,
         ),
       if (!pathIsDashboard)
         PopupMenuItemIcon(
-          icon: Icon(UniconsLine.ruler_combined, color: iconColor),
+          icon: PopupMenuIcon(UniconsLine.ruler_combined, color: iconColor),
           textLabel: "atelier".tr(),
           value: AtelierLocationContent.route,
         ),
       PopupMenuItemIcon(
-        icon: Icon(UniconsLine.setting, color: iconColor),
+        icon: PopupMenuIcon(UniconsLine.setting, color: iconColor),
         textLabel: "settings".tr(),
         value: AtelierLocationContent.settingsRoute,
       ),
       PopupMenuItemIcon(
-        icon: Icon(UniconsLine.sign_left, color: iconColor),
+        icon: PopupMenuIcon(UniconsLine.sign_left, color: iconColor),
         textLabel: "signout".tr(),
         value: "signout",
       ),

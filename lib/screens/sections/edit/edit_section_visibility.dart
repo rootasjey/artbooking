@@ -1,3 +1,4 @@
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums/enum_section_visibility.dart';
@@ -60,12 +61,12 @@ class EditSectionVisibility extends StatelessWidget {
             onSelected: onValueChanged,
             itemBuilder: (context) => <PopupMenuEntry<EnumSectionVisibility>>[
               PopupMenuItemIcon(
-                icon: Icon(UniconsLine.user_arrows),
+                icon: PopupMenuIcon(UniconsLine.user_arrows),
                 value: EnumSectionVisibility.public,
                 textLabel: "visibility_public".tr(),
               ),
               PopupMenuItemIcon(
-                icon: Icon(UniconsLine.lock),
+                icon: PopupMenuIcon(UniconsLine.lock),
                 value: EnumSectionVisibility.staff,
                 textLabel: "visibility_staff".tr(),
               ),

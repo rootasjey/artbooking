@@ -1,3 +1,4 @@
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/drag_data.dart';
@@ -318,7 +319,7 @@ class _BetterAvatarState extends State<BetterAvatar>
 
   Widget popupMenuButton() {
     return PopupMenuButton<EnumArtistItemAction>(
-      icon: Icon(
+      icon: PopupMenuIcon(
         UniconsLine.ellipsis_h,
         color: Theme.of(context).secondaryHeaderColor,
       ),

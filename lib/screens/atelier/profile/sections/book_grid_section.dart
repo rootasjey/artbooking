@@ -163,7 +163,7 @@ class _BookGridSectionState extends State<BookGridSection> {
     final List<PopupMenuEntry<EnumBookItemAction>> popupMenuEntries = canDrag
         ? [
             PopupMenuItemIcon(
-              icon: Icon(UniconsLine.minus),
+              icon: PopupMenuIcon(UniconsLine.minus),
               textLabel: "remove".tr(),
               value: EnumBookItemAction.remove,
             ),

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/loading_view.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -79,7 +80,7 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
   final List<PopupEntryPost> _postPopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumPostItemAction.delete,
-      icon: Icon(UniconsLine.trash),
+      icon: PopupMenuIcon(UniconsLine.trash),
       textLabel: "delete".tr(),
     ),
   ];

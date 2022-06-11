@@ -4,6 +4,7 @@ import 'package:artbooking/components/cards/create_post_card.dart';
 import 'package:artbooking/components/cards/post_card.dart';
 import 'package:artbooking/components/cards/shimmer_card.dart';
 import 'package:artbooking/components/icons/animated_app_icon.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -232,7 +233,7 @@ class _NewsSectionState extends State<NewsSection> {
         widget.editMode
             ? [
                 PopupMenuItemIcon(
-                  icon: Icon(UniconsLine.minus),
+                  icon: PopupMenuIcon(UniconsLine.minus),
                   textLabel: "remove".tr(),
                   value: EnumPostItemAction.remove,
                 ),
@@ -283,7 +284,7 @@ class _NewsSectionState extends State<NewsSection> {
     if (_currentMode == EnumSectionDataMode.chosen) {
       popupMenuEntries.add(
         PopupMenuItemIcon(
-          icon: Icon(UniconsLine.plus),
+          icon: PopupMenuIcon(UniconsLine.plus),
           textLabel: "illustrations_select".tr(),
           value: EnumSectionAction.selectIllustrations,
           delay: Duration(milliseconds: popupMenuEntries.length * 25),

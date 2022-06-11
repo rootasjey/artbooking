@@ -5,6 +5,7 @@ import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
@@ -115,12 +116,12 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   final List<PopupMenuEntry<EnumIllustrationItemAction>> _popupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumIllustrationItemAction.addToBook,
-      icon: Icon(UniconsLine.book_medical),
+      icon: PopupMenuIcon(UniconsLine.book_medical),
       textLabel: "add_to_book".tr(),
     ),
     PopupMenuItemIcon(
       value: EnumIllustrationItemAction.removeFromBook,
-      icon: Icon(UniconsLine.image_minus),
+      icon: PopupMenuIcon(UniconsLine.image_minus),
       textLabel: "remove".tr(),
     ),
   ];
@@ -814,6 +815,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     }
   }
 
+  /// Toggle a book existence in user's favourites.
   void onLike() {
     if (_liked) {
       return tryUnLike();
@@ -1224,6 +1226,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     showAddToBook(mapEntry.key, mapEntry.value);
   }
 
+  /// Add a book to a user's favourites.
   void tryLike() async {
     try {
       final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
@@ -1244,6 +1247,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     }
   }
 
+  /// Remove a book to a user's favourites.
   void tryUnLike() async {
     try {
       final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;

@@ -1,3 +1,4 @@
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/popup_menu_button_section.dart';
@@ -203,7 +204,7 @@ class TitleDescriptionSection extends StatelessWidget {
 
     localPopupMenuEntries.add(
       PopupMenuItemIcon(
-        icon: Icon(UniconsLine.paint_tool),
+        icon: PopupMenuIcon(UniconsLine.paint_tool),
         textLabel: "edit_background_color".tr(),
         value: EnumSectionAction.editBackgroundColor,
         delay: Duration(milliseconds: millisecondsDelay * 1),
@@ -212,7 +213,7 @@ class TitleDescriptionSection extends StatelessWidget {
 
     localPopupMenuEntries.add(
       PopupMenuItemIcon(
-        icon: Icon(UniconsLine.edit_alt),
+        icon: PopupMenuIcon(UniconsLine.edit_alt),
         textLabel: "title_edit".tr(),
         value: EnumSectionAction.renameTitle,
         delay: Duration(milliseconds: millisecondsDelay * 2),
@@ -221,7 +222,7 @@ class TitleDescriptionSection extends StatelessWidget {
 
     localPopupMenuEntries.add(
       PopupMenuItemIcon(
-        icon: Icon(UniconsLine.font),
+        icon: PopupMenuIcon(UniconsLine.font),
         textLabel: "text_color_edit".tr(),
         value: EnumSectionAction.editTextColor,
         delay: Duration(milliseconds: millisecondsDelay * 3),
@@ -230,7 +231,7 @@ class TitleDescriptionSection extends StatelessWidget {
 
     localPopupMenuEntries.add(
       PopupMenuItemIcon(
-        icon: Icon(UniconsLine.border_out),
+        icon: PopupMenuIcon(UniconsLine.border_out),
         textLabel: "border_color_edit".tr(),
         value: EnumSectionAction.editBorderColor,
         delay: Duration(milliseconds: millisecondsDelay * 4),

@@ -2,6 +2,7 @@ import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/custom_scroll_behavior.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
@@ -71,12 +72,12 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
       _illustrationPopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumIllustrationItemAction.approve,
-      icon: Icon(UniconsLine.check),
+      icon: PopupMenuIcon(UniconsLine.check),
       textLabel: "approve".tr(),
     ),
     PopupMenuItemIcon(
       value: EnumIllustrationItemAction.disapprove,
-      icon: Icon(UniconsLine.times),
+      icon: PopupMenuIcon(UniconsLine.times),
       textLabel: "disapprove".tr(),
     ),
   ];
@@ -85,12 +86,12 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
   final List<PopupMenuEntry<EnumBookItemAction>> _bookPopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumBookItemAction.approve,
-      icon: Icon(UniconsLine.check),
+      icon: PopupMenuIcon(UniconsLine.check),
       textLabel: "approve".tr(),
     ),
     PopupMenuItemIcon(
       value: EnumBookItemAction.disapprove,
-      icon: Icon(UniconsLine.times),
+      icon: PopupMenuIcon(UniconsLine.times),
       textLabel: "disapprove".tr(),
     ),
   ];

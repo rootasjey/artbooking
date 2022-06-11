@@ -1,4 +1,5 @@
 import 'package:artbooking/components/application_bar/application_bar.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -59,7 +60,7 @@ class _LikesPageState extends ConsumerState<LikesPage> {
       _illustrationPopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumIllustrationItemAction.unlike,
-      icon: Icon(UniconsLine.heart_break),
+      icon: PopupMenuIcon(UniconsLine.heart_break),
       textLabel: "unlike".tr(),
     ),
   ];
@@ -68,7 +69,7 @@ class _LikesPageState extends ConsumerState<LikesPage> {
   final List<PopupMenuEntry<EnumBookItemAction>> _bookPopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumBookItemAction.unlike,
-      icon: Icon(UniconsLine.heart_break),
+      icon: PopupMenuIcon(UniconsLine.heart_break),
       textLabel: "unlike".tr(),
     ),
   ];

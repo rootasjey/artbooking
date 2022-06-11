@@ -1,3 +1,4 @@
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/screens/atelier/profile/popup_menu_button_section.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
@@ -95,7 +96,7 @@ class SpacingSection extends StatelessWidget {
 
     localPopupMenuEntries.add(
       PopupMenuItemIcon(
-        icon: Icon(UniconsLine.paint_tool),
+        icon: PopupMenuIcon(UniconsLine.paint_tool),
         textLabel: "edit_background_color".tr(),
         value: EnumSectionAction.editBackgroundColor,
         delay: Duration(milliseconds: localPopupMenuEntries.length * 25),

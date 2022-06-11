@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:artbooking/components/cards/illustration_card.dart';
 import 'package:artbooking/components/cards/shimmer_card.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/popup_menu_button_section.dart';
@@ -193,7 +194,7 @@ class _MozaicSectionState extends State<MozaicSection> {
         canDrag
             ? [
                 PopupMenuItemIcon(
-                  icon: Icon(UniconsLine.minus),
+                  icon: PopupMenuIcon(UniconsLine.minus),
                   textLabel: "remove".tr(),
                   value: EnumIllustrationItemAction.remove,
                 ),
@@ -283,7 +284,7 @@ class _MozaicSectionState extends State<MozaicSection> {
     if (_currentMode == EnumSectionDataMode.chosen) {
       popupMenuEntries.add(
         PopupMenuItemIcon(
-          icon: Icon(UniconsLine.plus),
+          icon: PopupMenuIcon(UniconsLine.plus),
           textLabel: "illustrations_select".tr(),
           value: EnumSectionAction.selectIllustrations,
           delay: Duration(milliseconds: popupMenuEntries.length * 25),

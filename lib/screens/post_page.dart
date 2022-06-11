@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/buttons/lang_popup_menu_button.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/user_avatar_extended.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/loading_view.dart';
@@ -142,7 +143,7 @@ class _PostPageState extends ConsumerState<PostPage> {
               itemBuilder: (_) => [
                 PopupMenuItemIcon(
                   value: EnumPostItemAction.delete,
-                  icon: Icon(UniconsLine.trash_alt),
+                  icon: PopupMenuIcon(UniconsLine.trash_alt),
                   textLabel: "delete".tr(),
                 ),
               ],
@@ -392,13 +393,13 @@ class _PostPageState extends ConsumerState<PostPage> {
       },
       itemBuilder: (_) => [
         PopupMenuItemIcon(
-          icon: Icon(UniconsLine.keyhole_square),
+          icon: PopupMenuIcon(UniconsLine.keyhole_square),
           textLabel: "make_private".tr(),
           value: EnumContentVisibility.private,
           selected: _post.visibility == EnumContentVisibility.private,
         ),
         PopupMenuItemIcon(
-          icon: Icon(UniconsLine.envelope_upload_alt),
+          icon: PopupMenuIcon(UniconsLine.envelope_upload_alt),
           textLabel: "publish".tr(),
           value: EnumContentVisibility.public,
           selected: _post.visibility == EnumContentVisibility.public,

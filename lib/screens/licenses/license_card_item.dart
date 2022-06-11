@@ -1,3 +1,4 @@
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/license/license.dart';
@@ -114,13 +115,13 @@ class LicenseCardItem extends StatelessWidget {
     return [
       if (onDelete != null)
         PopupMenuItemIcon(
-          icon: Icon(UniconsLine.trash),
+          icon: PopupMenuIcon(UniconsLine.trash),
           textLabel: "delete".tr(),
           value: EnumLicenseItemAction.delete,
         ),
       if (onEdit != null)
         PopupMenuItemIcon(
-          icon: Icon(UniconsLine.edit),
+          icon: PopupMenuIcon(UniconsLine.edit),
           textLabel: "edit".tr(),
           value: EnumLicenseItemAction.edit,
         ),

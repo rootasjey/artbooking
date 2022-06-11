@@ -180,7 +180,7 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
     final List<PopupMenuEntry<EnumArtistItemAction>> popupMenuEntries = canDrag
         ? [
             PopupMenuItemIcon(
-              icon: Icon(UniconsLine.minus),
+              icon: PopupMenuIcon(UniconsLine.minus),
               textLabel: "remove".tr(),
               value: EnumArtistItemAction.remove,
             ),
