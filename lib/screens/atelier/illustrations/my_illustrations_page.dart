@@ -99,7 +99,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   final List<PopupEntryIllustration> _likePopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumIllustrationItemAction.like,
-      icon: Icon(UniconsLine.heart),
+      icon: PopupMenuIcon(UniconsLine.heart),
       textLabel: "like".tr(),
     ),
   ];
@@ -108,7 +108,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   final List<PopupEntryIllustration> _unlikePopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumIllustrationItemAction.unlike,
-      icon: Icon(UniconsLine.heart_break),
+      icon: PopupMenuIcon(UniconsLine.heart_break),
       textLabel: "unlike".tr(),
     ),
   ];
