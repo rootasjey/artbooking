@@ -26,7 +26,7 @@ class BookCard extends StatefulWidget {
     this.onPopupMenuItemSelected,
     this.onTap,
     this.onDoubleTap,
-    this.onTapLike,
+    this.onLike,
     this.popupMenuEntries = const [],
     this.selected = false,
     this.selectionMode = false,
@@ -43,68 +43,66 @@ class BookCard extends StatefulWidget {
     this.onDraggableCanceled,
   }) : super(key: key);
 
-  /// If true, this card will be used as a place holder.
-  final bool useAsPlaceholder;
-
   /// Book's data for this card.
   final Book book;
 
-  /// Index position in a list, if available.
-  final int index;
+  /// If true, the card can be dragged. Usually used to re-order items.
+  final bool canDrag;
 
-  /// Callback when book card dragging is completed.
-  final void Function()? onDragCompleted;
-
-  /// Callback when book card dragging has ended.
-  final void Function(DraggableDetails)? onDragEnd;
-
-  /// Callback when book card dragging has been canceled.
-  final void Function(Velocity, Offset)? onDraggableCanceled;
-
-  /// Callback when book card dragging has started.
-  final void Function()? onDragStarted;
-
-  /// Callback when book is being dragged.
-  final void Function(DragUpdateDetails details)? onDragUpdate;
-
-  /// Trigger when the user long press this card.
-  final Function(bool)? onLongPress;
-
-  /// Callback function when popup menu item entries are tapped.
-  final void Function(EnumBookItemAction, int, Book)? onPopupMenuItemSelected;
-
-  /// Trigger when the user taps on this card.
-  final void Function()? onTap;
-
-  /// Trigger when the user double taps on this card.
-  final void Function()? onDoubleTap;
-
-  /// Trigger when heart icon tap.
-  final void Function()? onTapLike;
-
-  /// Popup menu item entries.
-  final List<PopupMenuEntry<EnumBookItemAction>> popupMenuEntries;
-
-  /// If true, this card is in selection mode
-  /// alongside all other cards in the list/grid, if any.
+  /// A visual indicator is built around this card, if true.
   final bool selected;
 
   /// If true, this card is in selection mode
   /// alongside all other cards in the list/grid, if any.
   final bool selectionMode;
 
-  /// If true, the card can be dragged.
-  /// Usually used to re-order items.
-  final bool canDrag;
+  /// If true, this card will be used as a place holder.
+  final bool useAsPlaceholder;
 
-  /// Book card width.
+  /// Book card's width.
   final double width;
 
-  /// Book card height.
+  /// Book card's height.
   final double height;
 
-  /// Callback when drag and dropping items on this book card.
+  /// Callback fired on double tap.
+  final void Function()? onDoubleTap;
+
+  /// Callback fired on drag completed.
+  final void Function()? onDragCompleted;
+
+  /// Callback fired on drag end .
+  final void Function(DraggableDetails)? onDragEnd;
+
+  /// Callback fired on drag canceled.
+  final void Function(Velocity, Offset)? onDraggableCanceled;
+
+  /// Callback fired on drag started.
+  final void Function()? onDragStarted;
+
+  /// Callback fired on drag update.
+  final void Function(DragUpdateDetails details)? onDragUpdate;
+
+  /// Callback fired when drag and dropping items on this card.
   final void Function(int dropTargetIndex, List<int> dragIndexes)? onDrop;
+
+  /// Callback fired on long press.
+  final Function(bool)? onLongPress;
+
+  /// Callback fired when one of the popup menu item entries is selected.
+  final void Function(EnumBookItemAction, int, Book)? onPopupMenuItemSelected;
+
+  /// Callback fired on tap.
+  final void Function()? onTap;
+
+  /// Callback fired on tap heart icon.
+  final void Function(Book book)? onLike;
+
+  /// Index position in a list, if available.
+  final int index;
+
+  /// Menu item list displayed after tapping on the corresponding popup button.
+  final List<PopupMenuEntry<EnumBookItemAction>> popupMenuEntries;
 
   /// An arbitrary name given to this item's drag group
   ///  (e.g. "home-books"). Thus to avoid dragging items between sections.
@@ -127,7 +125,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   double _elevation = 4.0;
 
   bool _showLikeAnimation = false;
-  bool _keepHeartIconVisibile = false;
+  bool _showPopupMenu = false;
 
   final double _captionHeight = 42.0;
   final double _cardRadius = 8.0;
@@ -300,42 +298,6 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     );
   }
 
-  Widget likeOverlay() {
-    if (widget.onTapLike == null) {
-      return Container();
-    }
-
-    if (_elevation != 8.0 && !_keepHeartIconVisibile) {
-      return Container();
-    }
-
-    final IconData iconData =
-        widget.book.liked ? FontAwesomeIcons.solidHeart : UniconsLine.heart;
-
-    final color = widget.book.liked
-        ? Theme.of(context).secondaryHeaderColor
-        : Colors.black26;
-
-    return Align(
-      alignment: Alignment.topRight,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(24.0),
-        onHover: (isHover) {
-          _keepHeartIconVisibile = isHover;
-        },
-        onTap: widget.onTapLike,
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Icon(
-            iconData,
-            color: color,
-            size: 16.0,
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget likeAnimationOverlay() {
     if (!_showLikeAnimation) {
       return Container();
@@ -408,8 +370,9 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
       child: Container(
         width: widget.width - 50.0,
         padding: const EdgeInsets.only(
-          left: 16.0,
+          left: 20.0,
           right: 16.0,
+          top: 8.0,
         ),
         child: Row(
           children: [
@@ -427,7 +390,6 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
                 ),
               ),
             ),
-            popupMenuButton(),
           ],
         ),
       ),
@@ -475,10 +437,12 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
                             onTap: widget.onTap,
                             onDoubleTap: onDoubleTapOrNull,
                             // onLongPress: onLongPress,
-                            onHover: onHover,
+                            onHover: onHoverFrontCard,
                             child: Stack(
                               children: [
                                 multiSelectIndicator(),
+                                likeIcon(),
+                                popupMenuButton(),
                               ],
                             ),
                           ),
@@ -507,9 +471,50 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
                     }
                   },
                 ),
-                likeOverlay(),
                 likeAnimationOverlay(),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Like icon to toggle favourite.
+  Widget likeIcon() {
+    if (widget.onLike == null) {
+      return Container();
+    }
+
+    if (!_showPopupMenu) {
+      return Container();
+    }
+
+    final IconData iconData =
+        widget.book.liked ? FontAwesomeIcons.solidHeart : UniconsLine.heart;
+
+    final color = widget.book.liked
+        ? Theme.of(context).secondaryHeaderColor
+        : Colors.black;
+
+    return Positioned(
+      top: 10.0,
+      left: 10.0,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(24.0),
+          onTap: () => widget.onLike?.call(widget.book),
+          child: Container(
+            padding: const EdgeInsets.all(6.0),
+            decoration: BoxDecoration(
+              color: Constants.colors.clairPink,
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            child: Icon(
+              iconData,
+              color: color,
+              size: 16.0,
             ),
           ),
         ),
@@ -580,24 +585,33 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
       return Container();
     }
 
-    return PopupMenuButton(
-      icon: Opacity(
-        opacity: 0.8,
-        child: Icon(
-          UniconsLine.ellipsis_h,
+    return Positioned(
+      top: 10.0,
+      right: 10.0,
+      child: Opacity(
+        opacity: _showPopupMenu ? 1.0 : 0.0,
+        child: PopupMenuButton(
+          child: CircleAvatar(
+            radius: 15.0,
+            backgroundColor: Constants.colors.clairPink,
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Icon(UniconsLine.ellipsis_h, size: 20),
+            ),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(6.0),
+          ),
+          onSelected: (EnumBookItemAction action) {
+            widget.onPopupMenuItemSelected?.call(
+              action,
+              widget.index,
+              widget.book,
+            );
+          },
+          itemBuilder: (_) => widget.popupMenuEntries,
         ),
       ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(6.0),
-      ),
-      onSelected: (EnumBookItemAction action) {
-        widget.onPopupMenuItemSelected?.call(
-          action,
-          widget.index,
-          widget.book,
-        );
-      },
-      itemBuilder: (_) => widget.popupMenuEntries,
     );
   }
 
@@ -610,16 +624,23 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     });
   }
 
-  void onHover(isHover) {
+  /// Callback fired when the hover state of the front card of the book changes.
+  void onHoverFrontCard(isHover) {
     if (isHover) {
-      _elevation = _initElevation * 1.5;
-      _scaleController.forward();
-    } else {
-      _elevation = _initElevation;
-      _scaleController.reverse();
+      setState(() {
+        _elevation = _initElevation * 1.5;
+        _showPopupMenu = true;
+        _scaleController.forward();
+      });
+
+      return;
     }
 
-    setState(() {});
+    setState(() {
+      _elevation = _initElevation;
+      _scaleController.reverse();
+      _showPopupMenu = false;
+    });
   }
 
   void onLongPress() {

@@ -153,6 +153,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                       onDragBookCompleted: onDragBookCompleted,
                       onDragBookEnd: onDragBookEnd,
                       onDragBookStarted: onDragBookStarted,
+                      onLike: onLike,
                     ),
                     SliverPadding(
                       padding: const EdgeInsets.only(bottom: 100.0),
@@ -354,7 +355,8 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
       for (QueryDocSnapMap document in snapshot.docs) {
         final data = document.data();
-        data['id'] = document.id;
+        data["id"] = document.id;
+        data["liked"] = await fetchLike(document.id);
         _books.add(Book.fromMap(data));
       }
 
@@ -366,6 +368,31 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       Utilities.logger.e(error);
     } finally {
       setState(() => _loading = false);
+    }
+  }
+
+  Future<bool> fetchLike(String bookId) async {
+    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+    if (userId == null || userId.isEmpty) {
+      return false;
+    }
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(bookId)
+          .get();
+
+      if (snapshot.exists) {
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      Utilities.logger.e(error);
+      return false;
     }
   }
 
@@ -552,6 +579,15 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
   void onGoToActiveBooks() {
     onChangedTab(EnumVisibilityTab.active);
+  }
+
+  /// Toggle a book existence in user's favourites.
+  void onLike(Book book) {
+    if (book.liked) {
+      return tryUnLike(book);
+    }
+
+    return tryLike(book);
   }
 
   void onLongPressBook(Book book, bool selected) {
@@ -943,6 +979,44 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     setState(() {
       _forceMultiSelect = !_forceMultiSelect;
     });
+  }
+
+  /// Add a book to a user's favourites.
+  void tryLike(Book book) async {
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(book.id)
+          .set({
+        "type": "book",
+        "target_id": book.id,
+        "user_id": userId,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
+  /// Remove a book to a user's favourites.
+  void tryUnLike(Book book) async {
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(book.id)
+          .delete();
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
   }
 
   void updateGroupVisibility(EnumContentVisibility visibility) {

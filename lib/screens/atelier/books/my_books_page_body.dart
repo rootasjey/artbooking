@@ -27,6 +27,7 @@ class MyBooksPageBody extends StatelessWidget {
     this.onDragBookEnd,
     this.onDraggableBookCanceled,
     this.onDragBookStarted,
+    this.onLike,
   }) : super(key: key);
 
   final bool forceMultiSelect;
@@ -54,6 +55,9 @@ class MyBooksPageBody extends StatelessWidget {
 
   /// Callback when book dragging has started.
   final void Function()? onDragBookStarted;
+
+  /// Callback fired on toggle book existence in an user's favourites.
+  final void Function(Book book)? onLike;
 
   final List<Book> books;
   final List<PopupMenuEntry<EnumBookItemAction>> popupMenuEntries;
@@ -97,22 +101,23 @@ class MyBooksPageBody extends StatelessWidget {
             final selected = multiSelectedItems.containsKey(book.id);
 
             return BookCard(
-              key: ValueKey(book.id),
+              book: book,
+              canDrag: true,
               heroTag: book.id,
               index: index,
-              book: book,
-              selected: selected,
-              selectionMode: selectionMode,
-              canDrag: true,
+              key: ValueKey(book.id),
               onDragUpdate: onDragUpdateBook,
-              onDrop: onDropBook,
-              onTap: () => onTapBook?.call(book),
-              onPopupMenuItemSelected: onPopupMenuItemSelected,
-              popupMenuEntries: popupMenuEntries,
               onDragCompleted: onDragBookCompleted,
               onDragEnd: onDragBookEnd,
               onDragStarted: onDragBookStarted,
               onDraggableCanceled: onDraggableBookCanceled,
+              onDrop: onDropBook,
+              onLike: onLike,
+              onPopupMenuItemSelected: onPopupMenuItemSelected,
+              onTap: () => onTapBook?.call(book),
+              popupMenuEntries: popupMenuEntries,
+              selected: selected,
+              selectionMode: selectionMode,
             );
           },
           childCount: books.length,

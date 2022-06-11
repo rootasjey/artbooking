@@ -14,6 +14,7 @@ class BooksPageBody extends StatelessWidget {
     this.onLongPressBook,
     this.onTap,
     this.onDoubleTap,
+    this.onLike,
     this.onPopupMenuItemSelected,
     this.likePopupMenuEntries = const [],
     this.unlikePopupMenuEntries = const [],
@@ -24,6 +25,9 @@ class BooksPageBody extends StatelessWidget {
   final void Function(bool)? onLongPressBook;
   final void Function(Book)? onTap;
   final void Function(Book, int)? onDoubleTap;
+
+  /// Callback fired on toggle book existence in an user's favourites.
+  final void Function(Book book)? onLike;
   final void Function(EnumBookItemAction, int, Book)? onPopupMenuItemSelected;
 
   /// Entries if this book is NOT already liked.
@@ -73,7 +77,7 @@ class BooksPageBody extends StatelessWidget {
               heroTag: book.id,
               onTap: () => onTap?.call(book),
               onDoubleTap: onDoubleTapOrNull,
-              onTapLike: onDoubleTapOrNull,
+              onLike: onLike,
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               popupMenuEntries: popupMenuEntries,
               onLongPress: onLongPressBook,

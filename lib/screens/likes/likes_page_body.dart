@@ -106,7 +106,7 @@ class LikesPageBody extends StatelessWidget {
                 height: 332.0,
                 onTap: () => onTapBook?.call(book),
                 onDoubleTap: () => onUnlikeBook?.call(book, index),
-                onTapLike: () => onUnlikeBook?.call(book, index),
+                onLike: (_) => onUnlikeBook?.call(book, index),
                 onPopupMenuItemSelected: onPopupMenuBookSelected,
                 popupMenuEntries: bookPopupMenuEntries,
               );
