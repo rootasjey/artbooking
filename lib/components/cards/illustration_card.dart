@@ -153,10 +153,11 @@ class _IllustrationCardState extends State<IllustrationCard>
   late Animation<double> _scaleAnimation;
   late AnimationController _scaleController;
 
-  bool _showPopupMenu = false;
-
+  /// Start a heart animation when true.
   bool _showLikeAnimation = false;
-  bool _keepHeartIconVisibile = false;
+
+  /// Show the popup menu button if true.
+  bool _showPopupMenu = false;
 
   double _startElevation = 3.0;
   double _endElevation = 6.0;
@@ -430,7 +431,7 @@ class _IllustrationCardState extends State<IllustrationCard>
       return Container();
     }
 
-    if (!_showPopupMenu && !_keepHeartIconVisibile) {
+    if (!_showPopupMenu) {
       return Container();
     }
 
@@ -448,9 +449,6 @@ class _IllustrationCardState extends State<IllustrationCard>
         padding: const EdgeInsets.only(left: 8.0, top: 8.0),
         child: InkWell(
           borderRadius: BorderRadius.circular(24.0),
-          onHover: (isHover) {
-            _keepHeartIconVisibile = isHover;
-          },
           onTap: widget.onTapLike,
           child: Container(
             padding: const EdgeInsets.all(6.0),
