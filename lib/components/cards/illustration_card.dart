@@ -49,14 +49,11 @@ class IllustrationCard extends StatefulWidget {
     this.onDraggableCanceled,
   }) : super(key: key);
 
-  /// Index position in a list, if available.
-  final int index;
+  /// If true, the card can be dragged. Usually used to re-order items.
+  final bool canDrag;
 
-  /// If true, this card will be used as a placeholder.
-  final bool useAsPlaceholder;
-
-  /// If true, a "plus" icon will be used as the placeholder child.
-  final bool useIconPlaceholder;
+  /// If true, the card can be resized.
+  final bool canResize;
 
   /// If true, the card will be marked with a check circle.
   final bool selected;
@@ -65,29 +62,52 @@ class IllustrationCard extends StatefulWidget {
   /// alongside all other cards in the list/grid, if any.
   final bool selectionMode;
 
-  /// If true, the card can be dragged.
-  /// Usually used to re-order items.
-  final bool canDrag;
+  /// If true, this card will be used as a placeholder.
+  final bool useAsPlaceholder;
 
-  /// If true, the card can be resized.
-  final bool canResize;
-
-  /// Illustration's data for this card.
-  final Illustration illustration;
-
-  /// Trigger when the user long press this card.
-  final void Function(String, Illustration, bool)? onLongPress;
+  /// If true, a "plus" icon will be used as the placeholder child.
+  final bool useIconPlaceholder;
 
   /// Card's size (width = height).
   final double size;
 
+  /// Illustration's data for this card.
+  final Illustration illustration;
+
+  /// Index position in a list, if available.
+  final int index;
+
   /// Card's padding.
   final EdgeInsets padding;
 
-  /// Trigger when the user double taps on this card.
+  /// Callback fired on double tap.
   final void Function()? onDoubleTap;
 
-  /// Trigger when this illustration card' resize ends.
+  /// Callback fired on drag completed.
+  final void Function()? onDragCompleted;
+
+  /// Callback fired on drag end.
+  final void Function(DraggableDetails)? onDragEnd;
+
+  /// Callback fired on drag canceled.
+  final void Function(Velocity, Offset)? onDraggableCanceled;
+
+  /// Callback fired on drag started.
+  final void Function()? onDragStarted;
+
+  /// Callback fired on drag update.
+  final void Function(DragUpdateDetails details)? onDragUpdate;
+
+  /// Callback fired on drop.
+  final void Function(int dropTargetIndex, List<int> dragIndexes)? onDrop;
+
+  /// Callback fired on long press.
+  final void Function(String, Illustration, bool)? onLongPress;
+
+  /// Callback fired when this card wants to grow up.
+  final void Function(int index)? onGrowUp;
+
+  /// Callback fired on resize end.
   final void Function(
     Size endSize,
     Size originalSize,
@@ -95,38 +115,13 @@ class IllustrationCard extends StatefulWidget {
     int index,
   )? onResizeEnd;
 
-  /// Function callback to handle illustration card grows up.
-  /// This fires after onTap on a button.
-  final void Function(int index)? onGrowUp;
-
-  /// Trigger when the user taps on this card.
+  /// Callback fired on tap.
   final void Function()? onTap;
 
-  /// Trigger when heart icon tap.
+  /// Callback fired on tap heart icon.
   final void Function()? onTapLike;
 
-  /// Callback when illustration dragging is completed.
-  final void Function()? onDragCompleted;
-
-  /// Callback when illustration dragging has ended.
-  final void Function(DraggableDetails)? onDragEnd;
-
-  /// Callback when illustration dragging has been canceled.
-  final void Function(Velocity, Offset)? onDraggableCanceled;
-
-  /// Callback when illustration dragging has started.
-  final void Function()? onDragStarted;
-
-  /// Callback when illustration is being dragged.
-  final void Function(DragUpdateDetails details)? onDragUpdate;
-
-  /// Callback when drag and dropping items on this illustration card.
-  final void Function(int dropTargetIndex, List<int> dragIndexes)? onDrop;
-
-  /// Popup menu item entries.
-  final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries;
-
-  /// Callback function when popup menu item entries are tapped.
+  /// Callback fired when one of the popup menu item entries is selected.
   final void Function(
     EnumIllustrationItemAction action,
     int index,
@@ -134,17 +129,20 @@ class IllustrationCard extends StatefulWidget {
     String illustrationKey,
   )? onPopupMenuItemSelected;
 
+  /// Menu item list displayed after tapping on the corresponding popup button.
+  final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries;
+
   /// An arbitrary name given to this item's drag group
   ///  (e.g. "home-illustrations"). Thus to avoid dragging items between sections.
   final String dragGroupName;
-
-  /// Custom app generated key to perform operations quicker.
-  final String illustrationKey;
 
   /// An unique tag to identify a single component for animation.
   /// This tag must be unique on the page and among a list.
   /// If you're not sure what to put, just use the illustration's id.
   final String heroTag;
+
+  /// Custom app generated key to perform operations quicker.
+  final String illustrationKey;
 
   @override
   _IllustrationCardState createState() => _IllustrationCardState();
@@ -285,7 +283,7 @@ class _IllustrationCardState extends State<IllustrationCard>
                   child: Stack(
                     children: [
                       multiSelectIndicator(),
-                      likeOverlay(),
+                      likeIcon(),
                       likeAnimationOverlay(),
                       borderOverlay(),
                       popupMenuButton(),
@@ -426,12 +424,13 @@ class _IllustrationCardState extends State<IllustrationCard>
     );
   }
 
-  Widget likeOverlay() {
+  /// Like icon to toggle favourite.
+  Widget likeIcon() {
     if (widget.onTapLike == null) {
       return Container();
     }
 
-    if (_elevation != _endElevation && !_keepHeartIconVisibile) {
+    if (!_showPopupMenu && !_keepHeartIconVisibile) {
       return Container();
     }
 
@@ -568,57 +567,47 @@ class _IllustrationCardState extends State<IllustrationCard>
       return Container();
     }
 
-    final Widget child = Opacity(
-      opacity: _showPopupMenu ? 1.0 : 0.0,
-      child: PopupMenuButton<EnumIllustrationItemAction>(
-        child: CircleAvatar(
-          radius: 15.0,
-          backgroundColor: Constants.colors.clairPink,
-          child: MirrorAnimation<Color?>(
-            tween: Theme.of(context)
-                .primaryColor
-                .tweenTo(Theme.of(context).secondaryHeaderColor),
-            duration: Duration(seconds: 2),
-            curve: Curves.decelerate,
-            builder: (context, child, value) {
-              return Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Icon(
-                  UniconsLine.ellipsis_h,
-                  color: value,
-                  size: 20,
-                ),
-              );
-            },
-          ),
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(6.0),
-        ),
-        onSelected: (EnumIllustrationItemAction action) {
-          widget.onPopupMenuItemSelected?.call(
-            action,
-            widget.index,
-            widget.illustration,
-            widget.illustrationKey,
-          );
-        },
-        itemBuilder: (_) => widget.popupMenuEntries,
-      ),
-    );
-
-    if (widget.canDrag) {
-      return Positioned(
-        top: 10.0,
-        right: 10.0,
-        child: child,
-      );
-    }
-
     return Positioned(
-      bottom: 10.0,
+      top: 10.0,
       right: 10.0,
-      child: child,
+      child: Opacity(
+        opacity: _showPopupMenu ? 1.0 : 0.0,
+        child: PopupMenuButton<EnumIllustrationItemAction>(
+          child: CircleAvatar(
+            radius: 15.0,
+            backgroundColor: Constants.colors.clairPink,
+            child: MirrorAnimation<Color?>(
+              tween: Theme.of(context)
+                  .primaryColor
+                  .tweenTo(Theme.of(context).secondaryHeaderColor),
+              duration: Duration(seconds: 2),
+              curve: Curves.decelerate,
+              builder: (context, child, value) {
+                return Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Icon(
+                    UniconsLine.ellipsis_h,
+                    color: value,
+                    size: 20,
+                  ),
+                );
+              },
+            ),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(6.0),
+          ),
+          onSelected: (EnumIllustrationItemAction action) {
+            widget.onPopupMenuItemSelected?.call(
+              action,
+              widget.index,
+              widget.illustration,
+              widget.illustrationKey,
+            );
+          },
+          itemBuilder: (_) => widget.popupMenuEntries,
+        ),
+      ),
     );
   }
 

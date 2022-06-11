@@ -66,7 +66,7 @@ class Book {
 
   /// True if the current authenticated user liked this book.
   /// This property does NOT exist as a Book's field in Firestore.
-  /// I must be fetched from Book's subcollection `book_likes`.
+  /// It must be fetched from Book's subcollection `book_likes`.
   final bool liked;
 
   /// This book's name.

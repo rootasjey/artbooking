@@ -57,7 +57,6 @@ class _SignupPageState extends ConsumerState<SignupPage> {
             fontWeight: FontWeight.w700,
           ),
         ),
-        // icon: Icon(UniconsLine.question),
       ),
       body: CustomScrollView(
         slivers: [
