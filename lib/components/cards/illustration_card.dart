@@ -43,6 +43,10 @@ class IllustrationCard extends StatefulWidget {
     this.useIconPlaceholder = false,
     this.dragGroupName = "",
     this.padding = EdgeInsets.zero,
+    this.onDragCompleted,
+    this.onDragEnd,
+    this.onDragStarted,
+    this.onDraggableCanceled,
   }) : super(key: key);
 
   /// Index position in a list, if available.
@@ -101,6 +105,24 @@ class IllustrationCard extends StatefulWidget {
   /// Trigger when heart icon tap.
   final void Function()? onTapLike;
 
+  /// Callback when illustration dragging is completed.
+  final void Function()? onDragCompleted;
+
+  /// Callback when illustration dragging has ended.
+  final void Function(DraggableDetails)? onDragEnd;
+
+  /// Callback when illustration dragging has been canceled.
+  final void Function(Velocity, Offset)? onDraggableCanceled;
+
+  /// Callback when illustration dragging has started.
+  final void Function()? onDragStarted;
+
+  /// Callback when illustration is being dragged.
+  final void Function(DragUpdateDetails details)? onDragUpdate;
+
+  /// Callback when drag and dropping items on this illustration card.
+  final void Function(int dropTargetIndex, List<int> dragIndexes)? onDrop;
+
   /// Popup menu item entries.
   final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries;
 
@@ -123,12 +145,6 @@ class IllustrationCard extends StatefulWidget {
   /// This tag must be unique on the page and among a list.
   /// If you're not sure what to put, just use the illustration's id.
   final String heroTag;
-
-  /// Callback when drag and dropping items on this illustration card.
-  final void Function(int dropTargetIndex, List<int> dragIndexes)? onDrop;
-
-  /// Callback when illustration is being dragged.
-  final void Function(DragUpdateDetails details)? onDragUpdate;
 
   @override
   _IllustrationCardState createState() => _IllustrationCardState();
@@ -303,15 +319,19 @@ class _IllustrationCardState extends State<IllustrationCard>
 
     if (widget.canDrag) {
       cardChild = LongPressDraggable<DragData>(
+        child: cardChild,
+        childWhenDragging: childWhenDragging(),
         data: DragData(
           index: widget.index,
           groupName: widget.dragGroupName,
           type: IllustrationCard,
         ),
         feedback: draggingCard(),
-        childWhenDragging: childWhenDragging(),
         onDragUpdate: widget.onDragUpdate,
-        child: cardChild,
+        onDragCompleted: widget.onDragCompleted,
+        onDragEnd: widget.onDragEnd,
+        onDragStarted: widget.onDragStarted,
+        onDraggableCanceled: widget.onDraggableCanceled,
       );
     }
 

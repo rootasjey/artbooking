@@ -47,6 +47,7 @@ class MyIllustrationsPage extends ConsumerStatefulWidget {
 class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   bool _forceMultiSelect = false;
   bool _hasNext = true;
+  bool _isDraggingSection = false;
   bool _loading = false;
   bool _loadingMore = false;
   bool _showFab = false;
@@ -56,12 +57,6 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   /// Last fetched illustration document.
   DocumentSnapshot? _lastDocument;
-
-  /// /// Amount of offset to jump when dragging an element to the edge.
-  final double _jumpOffset = 200.0;
-
-  /// Distance to the edge where the scroll viewer starts to jump.
-  final double _edgeDistance = 200.0;
 
   final int _limit = 20;
 
@@ -118,6 +113,9 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     ),
   ];
 
+  /// Monitors periodically scroll when dragging illustration card on edges.
+  Timer? _scrollTimer;
+
   @override
   initState() {
     super.initState();
@@ -132,6 +130,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     _popupFocusNode.dispose();
     _multiSelectedItems.clear();
     _illustrations.clear();
+    _scrollTimer?.cancel();
     super.dispose();
   }
 
@@ -156,57 +155,64 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
           scrollController: _scrollController,
           isOwner: isOwner,
         ),
-        body: ImprovedScrolling(
-          scrollController: _scrollController,
-          enableKeyboardScrolling: true,
-          onScroll: onScroll,
-          child: ScrollConfiguration(
-            behavior: CustomScrollBehavior(),
-            child: CustomScrollView(
-              controller: _scrollController,
-              slivers: <Widget>[
-                ApplicationBar(),
-                MyIllustrationsPageHeader(
-                  isOwner: isOwner,
-                  limitThreeInRow: _layoutThreeInRow,
-                  multiSelectActive: _forceMultiSelect,
-                  multiSelectedItems: _multiSelectedItems,
-                  onAddGroupToBook: showAddGroupToBook,
-                  onChangeGroupVisibility: showGroupVisibilityDialog,
-                  onChangedTab: onChangedTab,
-                  onClearSelection: onClearSelection,
-                  onConfirmDeleteGroup: confirmDeleteGroup,
-                  onGoToUserProfile: onGoToUserProfile,
-                  onSelectAll: onSelectAll,
-                  onTriggerMultiSelect: onTriggerMultiSelect,
-                  onUpdateLayout: onUpdateLayout,
-                  onUploadIllustration: uploadIllustration,
-                  selectedTab: _selectedTab,
-                  showBackButton: widget.userId.isNotEmpty,
-                  username: _username,
-                ),
-                MyIllustrationsPageBody(
-                  authenticated: authenticated,
-                  forceMultiSelect: _forceMultiSelect,
-                  illustrations: _illustrations,
-                  isOwner: isOwner,
-                  loading: _loading,
-                  multiSelectedItems: _multiSelectedItems,
-                  onDoubleTap: onDoubleTapIllustrationItem,
-                  onDragUpdateIllustration: onDragUpdateIllustration,
-                  onDropIllustration: onDropIllustration,
-                  onGoToActiveTab: onGoToActiveTab,
-                  onPopupMenuItemSelected: onPopupMenuItemSelected,
-                  onTapIllustration: onTapIllustration,
-                  popupMenuEntries: popupMenuEntries,
-                  selectedTab: _selectedTab,
-                  limitThreeInRow: _layoutThreeInRow,
-                  likePopupMenuEntries: _likePopupMenuEntries,
-                  unlikePopupMenuEntries: _unlikePopupMenuEntries,
-                  uploadIllustration: uploadIllustration,
-                ),
-                SliverPadding(padding: const EdgeInsets.only(bottom: 300.0)),
-              ],
+        body: Listener(
+          onPointerMove: onPointerMove,
+          child: ImprovedScrolling(
+            scrollController: _scrollController,
+            enableKeyboardScrolling: true,
+            onScroll: onScroll,
+            child: ScrollConfiguration(
+              behavior: CustomScrollBehavior(),
+              child: CustomScrollView(
+                controller: _scrollController,
+                slivers: <Widget>[
+                  ApplicationBar(),
+                  MyIllustrationsPageHeader(
+                    isOwner: isOwner,
+                    limitThreeInRow: _layoutThreeInRow,
+                    multiSelectActive: _forceMultiSelect,
+                    multiSelectedItems: _multiSelectedItems,
+                    onAddGroupToBook: showAddGroupToBook,
+                    onChangeGroupVisibility: showGroupVisibilityDialog,
+                    onChangedTab: onChangedTab,
+                    onClearSelection: onClearSelection,
+                    onConfirmDeleteGroup: confirmDeleteGroup,
+                    onGoToUserProfile: onGoToUserProfile,
+                    onSelectAll: onSelectAll,
+                    onTriggerMultiSelect: onTriggerMultiSelect,
+                    onUpdateLayout: onUpdateLayout,
+                    onUploadIllustration: uploadIllustration,
+                    selectedTab: _selectedTab,
+                    showBackButton: widget.userId.isNotEmpty,
+                    username: _username,
+                  ),
+                  MyIllustrationsPageBody(
+                    authenticated: authenticated,
+                    forceMultiSelect: _forceMultiSelect,
+                    illustrations: _illustrations,
+                    isOwner: isOwner,
+                    loading: _loading,
+                    multiSelectedItems: _multiSelectedItems,
+                    onDoubleTap: onDoubleTapIllustrationItem,
+                    onDropIllustration: onDropIllustration,
+                    onGoToActiveTab: onGoToActiveTab,
+                    onPopupMenuItemSelected: onPopupMenuItemSelected,
+                    onTapIllustration: onTapIllustration,
+                    popupMenuEntries: popupMenuEntries,
+                    selectedTab: _selectedTab,
+                    limitThreeInRow: _layoutThreeInRow,
+                    likePopupMenuEntries: _likePopupMenuEntries,
+                    unlikePopupMenuEntries: _unlikePopupMenuEntries,
+                    uploadIllustration: uploadIllustration,
+                    onDragIllustrationCompleted: onDragIllustrationCompleted,
+                    onDragIllustrationEnd: onDragIllustrationEnd,
+                    onDragIllustrationStarted: onDragIllustrationStarted,
+                    onDraggableIllustrationCanceled:
+                        onDraggableIllustrationCanceled,
+                  ),
+                  SliverPadding(padding: const EdgeInsets.only(bottom: 300.0)),
+                ],
+              ),
             ),
           ),
         ),
@@ -738,35 +744,20 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     onLike(illustration, index);
   }
 
-  void onDragUpdateIllustration(DragUpdateDetails details) async {
-    final Offset position = details.globalPosition;
+  void onDragIllustrationCompleted() {
+    _isDraggingSection = false;
+  }
 
-    if (position.dy < _edgeDistance) {
-      if (_scrollController.offset <= 0) {
-        return;
-      }
+  void onDragIllustrationEnd(DraggableDetails p1) {
+    _isDraggingSection = false;
+  }
 
-      await _scrollController.animateTo(
-        _scrollController.offset - _jumpOffset,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeIn,
-      );
+  void onDragIllustrationStarted() {
+    _isDraggingSection = true;
+  }
 
-      return;
-    }
-
-    final double windowHeight = MediaQuery.of(context).size.height;
-    if (windowHeight - _edgeDistance < position.dy) {
-      if (_scrollController.position.atEdge && _scrollController.offset != 0) {
-        return;
-      }
-
-      await _scrollController.animateTo(
-        _scrollController.offset + _jumpOffset,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeIn,
-      );
-    }
+  void onDraggableIllustrationCanceled(Velocity velocity, Offset offset) {
+    _isDraggingSection = false;
   }
 
   void onDropIllustration(int dropIndex, List<int> dragIndexes) async {
@@ -889,6 +880,69 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     }
 
     multiSelectIllustration(illustration);
+  }
+
+  /// Callback fired when a pointer is down and moves.
+  void onPointerMove(PointerMoveEvent pointerMoveEvent) {
+    if (!_isDraggingSection) {
+      _scrollTimer?.cancel();
+      return;
+    }
+
+    final int duration = 50;
+
+    /// Amount of offset to jump when dragging an element to the edge.
+    final double jumpOffset = 42.0;
+    final double dy = pointerMoveEvent.position.dy;
+
+    /// Distance to the edge where the scroll viewer starts to jump.
+    final double scrollTreshold = 100.0;
+
+    if (dy < scrollTreshold && _scrollController.offset > 0) {
+      _scrollTimer?.cancel();
+      _scrollTimer = Timer.periodic(
+        Duration(milliseconds: duration),
+        (Timer timer) {
+          _scrollController.animateTo(
+            _scrollController.offset - jumpOffset,
+            duration: Duration(milliseconds: duration),
+            curve: Curves.easeIn,
+          );
+
+          if (_scrollController.position.outOfRange) {
+            _scrollTimer?.cancel();
+          }
+        },
+      );
+
+      return;
+    }
+
+    final double windowHeight = MediaQuery.of(context).size.height;
+    final bool pointerIsAtBottom = dy >= windowHeight - scrollTreshold;
+    final bool scrollIsAtBottomEdge =
+        _scrollController.offset >= _scrollController.position.maxScrollExtent;
+
+    if (pointerIsAtBottom && !scrollIsAtBottomEdge) {
+      _scrollTimer?.cancel();
+      _scrollTimer = Timer.periodic(
+        Duration(milliseconds: duration),
+        (Timer timer) {
+          _scrollController.animateTo(
+            _scrollController.offset + jumpOffset,
+            duration: Duration(milliseconds: duration),
+            curve: Curves.easeIn,
+          );
+
+          if (_scrollController.position.outOfRange) {
+            _scrollTimer?.cancel();
+          }
+        },
+      );
+      return;
+    }
+
+    _scrollTimer?.cancel();
   }
 
   void onPopupMenuItemSelected(

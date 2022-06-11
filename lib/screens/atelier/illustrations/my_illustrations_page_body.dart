@@ -23,12 +23,16 @@ class MyIllustrationsPageBody extends StatelessWidget {
     this.onPopupMenuItemSelected,
     this.onTapIllustration,
     this.uploadIllustration,
-    this.onDragUpdateIllustration,
+    this.onDragIllustrationUpdate,
     this.likePopupMenuEntries = const [],
     this.unlikePopupMenuEntries = const [],
     this.onDoubleTap,
     this.isOwner = false,
     this.authenticated = false,
+    this.onDragIllustrationCompleted,
+    this.onDragIllustrationEnd,
+    this.onDragIllustrationStarted,
+    this.onDraggableIllustrationCanceled,
   }) : super(key: key);
 
   final bool authenticated;
@@ -52,8 +56,23 @@ class MyIllustrationsPageBody extends StatelessWidget {
   final void Function()? onGoToActiveTab;
   final void Function()? uploadIllustration;
 
+  /// Callback when illustration dragging is completed.
+  final void Function()? onDragIllustrationCompleted;
+
+  /// Callback when illustration dragging has ended.
+  final void Function(DraggableDetails)? onDragIllustrationEnd;
+
+  /// Callback when illustration dragging has been canceled.
+  final void Function(Velocity, Offset)? onDraggableIllustrationCanceled;
+
+  /// Callback when illustration dragging has started.
+  final void Function()? onDragIllustrationStarted;
+
   /// Callback when dragging an illustration around.
-  final void Function(DragUpdateDetails details)? onDragUpdateIllustration;
+  final void Function(DragUpdateDetails details)? onDragIllustrationUpdate;
+
+  /// Callback when drag and dropping item on this illustration card.
+  final void Function(int, List<int>)? onDropIllustration;
 
   final List<Illustration> illustrations;
   final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries;
@@ -62,9 +81,6 @@ class MyIllustrationsPageBody extends StatelessWidget {
   final List<PopupEntryIllustration> unlikePopupMenuEntries;
 
   final Map<String?, Illustration> multiSelectedItems;
-
-  /// Callback when drag and dropping item on this illustration card.
-  final void Function(int, List<int>)? onDropIllustration;
 
   @override
   Widget build(BuildContext context) {
@@ -112,19 +128,23 @@ class MyIllustrationsPageBody extends StatelessWidget {
                     : likePopupMenuEntries;
 
             return IllustrationCard(
-              index: index,
+              canDrag: isOwner,
               heroTag: illustration.id,
               illustration: illustration,
-              selected: selected,
-              canDrag: isOwner,
-              selectionMode: selectionMode,
+              index: index,
               onDoubleTap: authenticated ? _onDoubleTap : null,
-              onDragUpdate: onDragUpdateIllustration,
+              onDragCompleted: onDragIllustrationCompleted,
+              onDragEnd: onDragIllustrationEnd,
+              onDraggableCanceled: onDraggableIllustrationCanceled,
+              onDragStarted: onDragIllustrationStarted,
+              onDragUpdate: onDragIllustrationUpdate,
+              onDrop: onDropIllustration,
               onTapLike: authenticated ? _onDoubleTap : null,
               onTap: () => onTapIllustration?.call(illustration),
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               popupMenuEntries: authenticated ? _popupMenuEntries : [],
-              onDrop: onDropIllustration,
+              selected: selected,
+              selectionMode: selectionMode,
             );
           },
           childCount: illustrations.length,
