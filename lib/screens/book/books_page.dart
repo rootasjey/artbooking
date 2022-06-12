@@ -49,7 +49,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
   QuerySnapshotStreamSubscription? _likeSubscription;
 
   /// Items when opening the popup.
-  final List<PopupMenuEntry<EnumBookItemAction>> _likePopupMenuEntries = [
+  final List<PopupEntryBook> _likePopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumBookItemAction.like,
       icon: PopupMenuIcon(UniconsLine.heart),
@@ -58,7 +58,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
   ];
 
   /// Items when opening the popup.
-  final List<PopupMenuEntry<EnumBookItemAction>> _unlikePopupMenuEntries = [
+  final List<PopupEntryBook> _unlikePopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumBookItemAction.unlike,
       icon: PopupMenuIcon(UniconsLine.heart_break),

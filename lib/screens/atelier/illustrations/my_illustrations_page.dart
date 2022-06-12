@@ -143,7 +143,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     final bool isOwner = (widget.userId == authUserId) ||
         (widget.userId.isEmpty && authUserId.isNotEmpty);
 
-    final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries =
+    final List<PopupEntryIllustration> popupMenuEntries =
         isOwner ? _popupMenuEntries : [];
 
     final bool authenticated = authUserId.isNotEmpty;

@@ -121,7 +121,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
                 ? () => onDoubleTap?.call(illustration, index)
                 : null;
 
-            final _popupMenuEntries = isOwner
+            final illustrationPopupMenuEntries = isOwner
                 ? popupMenuEntries
                 : illustration.liked
                     ? unlikePopupMenuEntries
@@ -142,7 +142,8 @@ class MyIllustrationsPageBody extends StatelessWidget {
               onTapLike: authenticated ? _onDoubleTap : null,
               onTap: () => onTapIllustration?.call(illustration),
               onPopupMenuItemSelected: onPopupMenuItemSelected,
-              popupMenuEntries: authenticated ? _popupMenuEntries : [],
+              popupMenuEntries:
+                  authenticated ? illustrationPopupMenuEntries : [],
               selected: selected,
               selectionMode: selectionMode,
             );
