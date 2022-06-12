@@ -17,35 +17,49 @@ class MyIllustrationsPageBody extends StatelessWidget {
     required this.forceMultiSelect,
     required this.popupMenuEntries,
     required this.selectedTab,
+    this.authenticated = false,
+    this.isOwner = false,
+    this.likePopupMenuEntries = const [],
     this.limitThreeInRow = false,
+    this.onDoubleTap,
+    this.onDragIllustrationCompleted,
+    this.onDragIllustrationEnd,
+    this.onDragIllustrationStarted,
+    this.onDragIllustrationUpdate,
+    this.onDraggableIllustrationCanceled,
     this.onDropIllustration,
     this.onGoToActiveTab,
     this.onPopupMenuItemSelected,
     this.onTapIllustration,
     this.uploadIllustration,
-    this.onDragIllustrationUpdate,
-    this.likePopupMenuEntries = const [],
     this.unlikePopupMenuEntries = const [],
-    this.onDoubleTap,
-    this.isOwner = false,
-    this.authenticated = false,
-    this.onDragIllustrationCompleted,
-    this.onDragIllustrationEnd,
-    this.onDragIllustrationStarted,
-    this.onDraggableIllustrationCanceled,
   }) : super(key: key);
 
+  /// If true, the current user is authenticated.
   final bool authenticated;
-  final bool isOwner;
-  final bool loading;
+
+  /// If true, the UI is in multi-select mode.
   final bool forceMultiSelect;
+
+  /// True if the current authenticated user is the owner of these books.
+  final bool isOwner;
+
+  /// If true, this composant is currently loading.
+  final bool loading;
+
+  /// If true, the layout will be limited to 3 illustration in a single row.
   final bool limitThreeInRow;
 
+  /// Selected illustrations tab.
   final EnumVisibilityTab selectedTab;
 
+  /// Callback fired when an illustration card receives a double tap event.
   final void Function(Illustration illustration, int index)? onDoubleTap;
+
+  /// Callback fired when an illustration card receives a tap event.
   final void Function(Illustration)? onTapIllustration;
 
+  /// Callback fired after selecting a popup menu item.
   final void Function(
     EnumIllustrationItemAction,
     int,
@@ -53,7 +67,10 @@ class MyIllustrationsPageBody extends StatelessWidget {
     String,
   )? onPopupMenuItemSelected;
 
+  /// Will navigate to active illustrations tab.
   final void Function()? onGoToActiveTab;
+
+  /// Callback fired to start an illustration upload.
   final void Function()? uploadIllustration;
 
   /// Callback when illustration dragging is completed.
@@ -74,12 +91,21 @@ class MyIllustrationsPageBody extends StatelessWidget {
   /// Callback when drag and dropping item on this illustration card.
   final void Function(int, List<int>)? onDropIllustration;
 
+  /// Illustration list.
   final List<Illustration> illustrations;
+
+  /// Owner popup menu entries.
   final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries;
 
+  /// Available items for authenticated user
+  /// and the illustration target is not liked yet.
   final List<PopupEntryIllustration> likePopupMenuEntries;
+
+  /// Available items for authenticated user
+  /// and the illustration target is already liked.
   final List<PopupEntryIllustration> unlikePopupMenuEntries;
 
+  /// Group of illustration selected.
   final Map<String?, Illustration> multiSelectedItems;
 
   @override
@@ -121,11 +147,12 @@ class MyIllustrationsPageBody extends StatelessWidget {
                 ? () => onDoubleTap?.call(illustration, index)
                 : null;
 
-            final illustrationPopupMenuEntries = isOwner
-                ? popupMenuEntries
-                : illustration.liked
-                    ? unlikePopupMenuEntries
-                    : likePopupMenuEntries;
+            final List<PopupEntryIllustration> illustrationPopupMenuEntries =
+                isOwner
+                    ? popupMenuEntries
+                    : illustration.liked
+                        ? unlikePopupMenuEntries
+                        : likePopupMenuEntries;
 
             return IllustrationCard(
               canDrag: isOwner,

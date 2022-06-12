@@ -42,6 +42,8 @@ import 'package:unicons/unicons.dart';
 class MyBooksPage extends ConsumerStatefulWidget {
   MyBooksPage({this.userId = ""});
 
+  /// User's books page, if provided.
+  /// If [userId] is empty, the app will use the current authenticated user's id.
   final String userId;
 
   @override

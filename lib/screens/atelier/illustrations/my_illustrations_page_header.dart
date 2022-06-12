@@ -32,47 +32,59 @@ class MyIllustrationsPageHeader extends StatelessWidget {
     this.onGoToUserProfile,
   }) : super(key: key);
 
+  /// If true, show owner actions (e.g. create).
+  /// Otherwise, hide actions and show username if provided.
   final bool isOwner;
+
+  /// Show actions group if true (perform bulk action on multiple books).
   final bool multiSelectActive;
+
+  /// If true, set additinal padding on header
+  /// to match 3 illustration a row layout.
   final bool limitThreeInRow;
+
+  /// Display back button if true.
   final bool showBackButton;
 
+  /// Selected active page tab.
   final EnumVisibilityTab selectedTab;
 
-  final String username;
-
-  /// Add a group of illustrations to a book.
+  /// Callback fired to add a group of illustrations to a book.
   final void Function()? onAddGroupToBook;
 
-  /// Trigger on tab change.
+  /// Callback fired when changing page tab.
   final void Function(EnumVisibilityTab)? onChangedTab;
 
-  /// Update visibility of a group of illustrations.
+  /// Callback fired on an illustration group visibility change.
   final void Function()? onChangeGroupVisibility;
 
-  /// Cancel multiple section.
+  /// Callback to cancel group section.
   final void Function()? onClearSelection;
 
-  /// Show a popup to confirm illustrations group deletion.
+  /// Callback showing a popup to confirm illustrations group deletion.
   final void Function()? onConfirmDeleteGroup;
 
-  /// Select all displayed illustrations.
+  /// Callback fired to select all displayed illustrations.
   final void Function()? onSelectAll;
 
-  /// Toggle multi-select
+  /// Callback fired to toggle multi-select.
   final void Function()? onTriggerMultiSelect;
 
-  /// Limit illustrations to 3-in-a-row.
+  /// Callback to toggle the 3-in-a-row limit.
   final void Function()? onUpdateLayout;
 
-  /// Create a new illustration.
+  /// Callback fired to upload a new illustration.
   final void Function()? onUploadIllustration;
 
-  /// Selected items.
+  /// Group of illustrations selected.
   final Map<String?, Illustration> multiSelectedItems;
 
+  /// Callback fired to navigate to user's profile (when they're not the owner).
   final void Function()? onGoToUserProfile;
 
+  /// The user's illustrations owner.
+  /// Used if the current authenticated user is not the owner.
+  final String username;
   @override
   Widget build(BuildContext context) {
     EdgeInsets padding = const EdgeInsets.only(

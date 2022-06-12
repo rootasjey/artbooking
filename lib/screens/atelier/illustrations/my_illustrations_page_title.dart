@@ -6,25 +6,39 @@ import 'package:unicons/unicons.dart';
 
 /// My illustrations page custom title with a popup menu button.
 class MyIllustrationsPageTitle extends StatelessWidget {
-  const MyIllustrationsPageTitle(
-      {Key? key,
-      required this.selectedTab,
-      this.onChangedTab,
-      this.isOwner = false,
-      this.username = "",
-      this.onGoToUserProfile})
-      : super(key: key);
+  const MyIllustrationsPageTitle({
+    Key? key,
+    required this.selectedTab,
+    this.isOwner = false,
+    this.onChangedTab,
+    this.onGoToUserProfile,
+    this.username = "",
+  }) : super(key: key);
 
+  /// Show an additional dropdown button to select tab if true.
   final bool isOwner;
+
+  /// Current selected tab.
+  /// Used only if the current authenticated user is the owner.
   final EnumVisibilityTab selectedTab;
-  final String username;
+
+  /// Callback fired on changed tab.
+  /// Can be called only if the current authenticated user is the owner.
   final void Function(EnumVisibilityTab)? onChangedTab;
+
+  /// Callback to navigate to user profile.
+  /// Called only if the current authenticated user is NOT the owner.
+  /// Otherwise, the current authenticated user's name is not displayed.
   final void Function()? onGoToUserProfile;
+
+  /// Current authenticated user's name.
+  /// Displayed only if the current authenticated user is NOT the owner..
+  final String username;
 
   @override
   Widget build(BuildContext context) {
     if (isOwner) {
-      return pageTitleWithOwner(context);
+      return pageTitleWithTab(context);
     }
 
     return Wrap(
@@ -80,7 +94,7 @@ class MyIllustrationsPageTitle extends StatelessWidget {
     );
   }
 
-  Widget pageTitleWithOwner(BuildContext context) {
+  Widget pageTitleWithTab(BuildContext context) {
     return Wrap(
       children: [
         Opacity(

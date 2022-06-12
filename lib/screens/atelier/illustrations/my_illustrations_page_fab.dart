@@ -10,9 +10,16 @@ class MyIllustrationsPageFab extends StatelessWidget {
     this.isOwner = false,
   }) : super(key: key);
 
-  final bool show;
+  /// Show create book FAB if true.
   final bool isOwner;
+
+  /// Show the scroll to top FAB if true.
+  final bool show;
+
+  /// Callback to upload an illustration.
   final void Function()? uploadIllustration;
+
+  /// Page scroll controller to scroll to top.
   final ScrollController scrollController;
 
   @override

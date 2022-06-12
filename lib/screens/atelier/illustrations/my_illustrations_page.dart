@@ -38,6 +38,8 @@ import 'package:unicons/unicons.dart';
 class MyIllustrationsPage extends ConsumerStatefulWidget {
   MyIllustrationsPage({this.userId = ""});
 
+  /// User's illustrations page, if provided.
+  /// If [userId] is empty, the app will use the current authenticated user's id.
   final String userId;
 
   @override
@@ -45,15 +47,28 @@ class MyIllustrationsPage extends ConsumerStatefulWidget {
 }
 
 class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
+  /// If true, multiple illustrations can be select for group actions.
   bool _forceMultiSelect = false;
+
+  /// If true, there are more books to fetch.
   bool _hasNext = true;
-  bool _isDraggingSection = false;
-  bool _loading = false;
-  bool _loadingMore = false;
-  bool _showFab = false;
+
+  /// If true, an illustration is being dragged and we can auto-scroll on edges.
+  bool _isDraggingIllustration = false;
 
   /// If true, illustration cards will be limited to 3 in a single row.
   bool _layoutThreeInRow = false;
+
+  /// Loading the current page if true.
+  bool _loading = false;
+
+  /// Loading the next page if true.
+  bool _loadingMore = false;
+
+  /// Show the page floating action button if true.
+  bool _showFab = false;
+
+  var _selectedTab = EnumVisibilityTab.active;
 
   /// Last fetched illustration document.
   DocumentSnapshot? _lastDocument;
@@ -61,8 +76,20 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   /// Max illustrations to fetch per page.
   final int _limit = 20;
 
-  final _illustrations = <Illustration>[];
+  final _popupFocusNode = FocusNode();
 
+  final List<Illustration> _illustrations = [];
+
+  /// Available items for authenticated user and the illustration is not liked yet.
+  final List<PopupEntryIllustration> _likePopupMenuEntries = [
+    PopupMenuItemIcon(
+      value: EnumIllustrationItemAction.like,
+      icon: PopupMenuIcon(UniconsLine.heart),
+      textLabel: "like".tr(),
+    ),
+  ];
+
+  /// Items when the current authenticated user own these illustrations.
   final List<PopupEntryIllustration> _popupMenuEntries = [
     PopupMenuItemIcon(
       icon: PopupMenuIcon(UniconsLine.book_medical),
@@ -81,31 +108,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     ),
   ];
 
-  final _popupFocusNode = FocusNode();
-
-  final String _layoutKey = "illustrations_three_in_a_row";
-
-  Map<String, Illustration> _multiSelectedItems = Map();
-  ScrollController _scrollController = ScrollController();
-  QuerySnapshotStreamSubscription? _illustrationSubscription;
-
-  /// This illustration page owner's name.
-  /// Used when the current authenticated user is different
-  /// from the owner of this illustrations page. We can then dispay the artist.
-  String _username = "";
-
-  var _selectedTab = EnumVisibilityTab.active;
-
-  /// Items when opening the popup.
-  final List<PopupEntryIllustration> _likePopupMenuEntries = [
-    PopupMenuItemIcon(
-      value: EnumIllustrationItemAction.like,
-      icon: PopupMenuIcon(UniconsLine.heart),
-      textLabel: "like".tr(),
-    ),
-  ];
-
-  /// Items when opening the popup.
+  /// Available items for authenticated user
+  /// and the illustration is already liked.
   final List<PopupEntryIllustration> _unlikePopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumIllustrationItemAction.unlike,
@@ -113,6 +117,20 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       textLabel: "unlike".tr(),
     ),
   ];
+
+  /// Group of selected illustrations.
+  final Map<String, Illustration> _multiSelectedItems = Map();
+  final String _layoutKey = "illustrations_three_in_a_row";
+
+  QuerySnapshotStreamSubscription? _illustrationSubscription;
+
+  /// Page scroll controller.
+  final _scrollController = ScrollController();
+
+  /// This illustration page owner's name.
+  /// Used when the current authenticated user is different
+  /// from the owner of this illustrations page. We can then dispay the artist.
+  String _username = "";
 
   /// Monitors periodically scroll when dragging illustration card on edges.
   Timer? _scrollTimer;
@@ -192,24 +210,24 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                     forceMultiSelect: _forceMultiSelect,
                     illustrations: _illustrations,
                     isOwner: isOwner,
+                    likePopupMenuEntries: _likePopupMenuEntries,
+                    limitThreeInRow: _layoutThreeInRow,
                     loading: _loading,
                     multiSelectedItems: _multiSelectedItems,
                     onDoubleTap: onDoubleTapIllustrationItem,
+                    onDragIllustrationCompleted: onDragIllustrationCompleted,
+                    onDragIllustrationEnd: onDragIllustrationEnd,
+                    onDragIllustrationStarted: onDragIllustrationStarted,
+                    onDraggableIllustrationCanceled:
+                        onDraggableIllustrationCanceled,
                     onDropIllustration: onDropIllustration,
                     onGoToActiveTab: onGoToActiveTab,
                     onPopupMenuItemSelected: onPopupMenuItemSelected,
                     onTapIllustration: onTapIllustration,
                     popupMenuEntries: popupMenuEntries,
                     selectedTab: _selectedTab,
-                    limitThreeInRow: _layoutThreeInRow,
-                    likePopupMenuEntries: _likePopupMenuEntries,
                     unlikePopupMenuEntries: _unlikePopupMenuEntries,
                     uploadIllustration: uploadIllustration,
-                    onDragIllustrationCompleted: onDragIllustrationCompleted,
-                    onDragIllustrationEnd: onDragIllustrationEnd,
-                    onDragIllustrationStarted: onDragIllustrationStarted,
-                    onDraggableIllustrationCanceled:
-                        onDraggableIllustrationCanceled,
                   ),
                   SliverPadding(padding: const EdgeInsets.only(bottom: 300.0)),
                 ],
@@ -786,19 +804,19 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   }
 
   void onDragIllustrationCompleted() {
-    _isDraggingSection = false;
+    _isDraggingIllustration = false;
   }
 
   void onDragIllustrationEnd(DraggableDetails p1) {
-    _isDraggingSection = false;
+    _isDraggingIllustration = false;
   }
 
   void onDragIllustrationStarted() {
-    _isDraggingSection = true;
+    _isDraggingIllustration = true;
   }
 
   void onDraggableIllustrationCanceled(Velocity velocity, Offset offset) {
-    _isDraggingSection = false;
+    _isDraggingIllustration = false;
   }
 
   void onDropIllustration(int dropIndex, List<int> dragIndexes) async {
@@ -925,7 +943,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   /// Callback fired when a pointer is down and moves.
   void onPointerMove(PointerMoveEvent pointerMoveEvent) {
-    if (!_isDraggingSection) {
+    if (!_isDraggingIllustration) {
       _scrollTimer?.cancel();
       return;
     }
