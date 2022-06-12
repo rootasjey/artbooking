@@ -96,6 +96,7 @@ class SectionChooser {
         popupMenuEntries: popupMenuEntries,
         onUpdateSectionItems: onUpdateSectionItems,
         onShowBookDialog: onShowBookDialog,
+        onNavigateFromSection: onNavigateFromSection,
         isHover: isHover,
       );
     }
