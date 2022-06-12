@@ -314,6 +314,48 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
   }
 
   void onNavigateFromSection(EnumNavigationSection enumNavigationSection) {
+    switch (enumNavigationSection) {
+      case EnumNavigationSection.books:
+        onNavigateToBooksPage();
+        break;
+      case EnumNavigationSection.illustrations:
+        onNavigateToIllustrationsPage();
+        break;
+      default:
+    }
+  }
+
+  void onNavigateToBooksPage() {
+    if (_modularPage.type == EnumPageType.profile) {
+      final String userId = _modularPage.userId;
+
+      if (_modularPage.userId.isEmpty) {
+        const String message = "Cannot navigate to user's illustrations page "
+            "because userId is empty.";
+
+        Utilities.logger.e(message);
+        context.showErrorBar(
+          content: Text(message),
+        );
+      }
+
+      Beamer.of(context).beamToNamed(
+        HomeLocation.userBooksRoute.replaceFirst(":userId", userId),
+        routeState: {
+          "userId": userId,
+        },
+      );
+
+      return;
+    }
+
+    if (_modularPage.type == EnumPageType.home) {
+      Beamer.of(context).beamToNamed("/books");
+      return;
+    }
+  }
+
+  void onNavigateToIllustrationsPage() {
     if (_modularPage.type == EnumPageType.profile) {
       final String userId = _modularPage.userId;
 

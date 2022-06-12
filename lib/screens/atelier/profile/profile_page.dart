@@ -12,6 +12,7 @@ import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_body.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_empty.dart';
 import 'package:artbooking/types/modular_page.dart';
@@ -248,6 +249,18 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   void onNavigateFromSection(EnumNavigationSection enumNavigationSection) {
+    switch (enumNavigationSection) {
+      case EnumNavigationSection.books:
+        onNavigateToBooksPage();
+        break;
+      case EnumNavigationSection.illustrations:
+        onNavigateToIllustrationsPage();
+        break;
+      default:
+    }
+  }
+
+  void onNavigateToBooksPage() {
     if (_profilePage.type == EnumPageType.profile) {
       final String userId = _profilePage.userId;
 
@@ -262,7 +275,37 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       }
 
       Beamer.of(context).beamToNamed(
-        "/users/$userId/illustrations",
+        HomeLocation.userBooksRoute.replaceFirst(":userId", userId),
+        routeState: {
+          "userId": userId,
+        },
+      );
+
+      return;
+    }
+
+    if (_profilePage.type == EnumPageType.home) {
+      Beamer.of(context).beamToNamed("/books");
+      return;
+    }
+  }
+
+  void onNavigateToIllustrationsPage() {
+    if (_profilePage.type == EnumPageType.profile) {
+      final String userId = _profilePage.userId;
+
+      if (_profilePage.userId.isEmpty) {
+        const String message = "Cannot navigate to user's illustrations page "
+            "because userId is empty.";
+
+        Utilities.logger.e(message);
+        context.showErrorBar(
+          content: Text(message),
+        );
+      }
+
+      Beamer.of(context).beamToNamed(
+        HomeLocation.userIllustrationsRoute.replaceFirst(":userId", userId),
         routeState: {
           "userId": userId,
         },
