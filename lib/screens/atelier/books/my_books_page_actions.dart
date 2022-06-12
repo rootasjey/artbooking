@@ -11,16 +11,27 @@ class MyBooksPageActions extends StatelessWidget {
     required this.show,
     this.onShowCreateBookDialog,
     this.onTriggerMultiSelect,
+    this.isOwner = false,
   }) : super(key: key);
 
+  /// Show create book FAB if true.
+  final bool isOwner;
+
+  /// If true, the UI is in multi-select mode.
   final bool multiSelectActive;
+
+  /// Show the scroll to top FAB if true.
   final bool show;
+
+  /// Callback displaying create book dialog.
   final void Function()? onShowCreateBookDialog;
+
+  /// Callback to turn multi-select ON.
   final void Function()? onTriggerMultiSelect;
 
   @override
   Widget build(BuildContext context) {
-    if (!show) {
+    if (!show || !isOwner) {
       return Container();
     }
 
@@ -31,7 +42,7 @@ class MyBooksPageActions extends StatelessWidget {
         TextRectangleButton(
           onPressed: onShowCreateBookDialog,
           icon: Icon(UniconsLine.plus),
-          label: Text('create'.tr()),
+          label: Text("create".tr()),
           primary: Colors.black38,
         ),
         SquareButton(

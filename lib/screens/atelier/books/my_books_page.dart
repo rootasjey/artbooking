@@ -14,11 +14,13 @@ import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/atelier/books/my_books_page_body.dart';
 import 'package:artbooking/screens/atelier/books/my_books_page_fab.dart';
 import 'package:artbooking/screens/atelier/books/my_books_page_header.dart';
 import 'package:artbooking/types/book/book.dart';
+import 'package:artbooking/types/book/popup_entry_book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/enums/enum_visibility_tab.dart';
@@ -27,6 +29,7 @@ import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/cloud_functions/book_response.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,26 +40,59 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
 class MyBooksPage extends ConsumerStatefulWidget {
+  MyBooksPage({this.userId = ""});
+
+  final String userId;
+
   @override
   _MyBooksPageState createState() => _MyBooksPageState();
 }
 
 class _MyBooksPageState extends ConsumerState<MyBooksPage> {
+  /// Creating a new book if true.
   bool _creating = false;
+
+  /// If true, multiple books can be select for group actions.
   bool _forceMultiSelect = false;
+
+  /// If true, there are more books to fetch.
   bool _hasNext = true;
-  bool _isDraggingSection = false;
+
+  /// If true, a book is being dragged and we can auto-scroll on edges.
+  bool _isDraggingBook = false;
+
+  /// Loading the current page if true.
   bool _loading = false;
+
+  /// Loading the next page if true.
   bool _loadingMore = false;
+
+  /// Show the page floating action button if true.
   bool _showFab = false;
 
   /// Last fetched book document.
   DocumentSnapshot? _lastDocument;
 
-  final _books = <Book>[];
-  final _focusNode = FocusNode();
+  /// Page active tab.
+  var _selectedTab = EnumVisibilityTab.active;
 
-  final _popupMenuEntries = <PopupMenuEntry<EnumBookItemAction>>[
+  /// Book list.
+  final List<Book> _books = [];
+
+  /// Maximum books fetched in a page.
+  int _limit = 20;
+
+  /// Available items for authenticated user and the book is not liked yet.
+  final List<PopupEntryBook> _likePopupMenuEntries = [
+    PopupMenuItemIcon(
+      value: EnumBookItemAction.like,
+      icon: PopupMenuIcon(UniconsLine.heart),
+      textLabel: "like".tr(),
+    ),
+  ];
+
+  /// Items when the current authenticated user own these books.
+  final List<PopupEntryBook> _ownerPopupMenuEntries = [
     PopupMenuItemIcon(
       icon: PopupMenuIcon(UniconsLine.edit_alt),
       textLabel: "rename".tr(),
@@ -74,15 +110,28 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     ),
   ];
 
-  int _limit = 20;
+  /// Available items for authenticated user and the book is already liked.
+  final List<PopupEntryBook> _unlikePopupMenuEntries = [
+    PopupMenuItemIcon(
+      value: EnumBookItemAction.unlike,
+      icon: PopupMenuIcon(UniconsLine.heart_break),
+      textLabel: "unlike".tr(),
+    ),
+  ];
 
-  Map<String?, Book> _multiSelectedItems = Map();
+  /// Group of selected books.
+  final Map<String?, Book> _multiSelectedItems = Map();
 
-  ScrollController _scrollController = ScrollController();
-
+  /// Subscribe to book collection updates.
   QuerySnapshotStreamSubscription? _bookSubscription;
 
-  EnumVisibilityTab _selectedTab = EnumVisibilityTab.active;
+  /// Page scroll controller.
+  final _scrollController = ScrollController();
+
+  /// This books page owner's name.
+  /// Used when the current authenticated user is different
+  /// from the owner of this illustrations page. We can then dispay the artist.
+  String _username = "";
 
   /// Monitors periodically scroll when dragging book card on edges.
   Timer? _scrollTimer;
@@ -91,23 +140,34 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   initState() {
     super.initState();
     loadPreferences();
-    fetchBooks();
+    fetchData();
   }
 
   @override
   void dispose() {
     _bookSubscription?.cancel();
-    _focusNode.dispose();
     _scrollTimer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final String authUserId =
+        ref.watch(AppState.userProvider).firestoreUser?.id ?? "";
+
+    final bool isOwner = (widget.userId == authUserId) ||
+        (widget.userId.isEmpty && authUserId.isNotEmpty);
+
+    final List<PopupEntryBook> popupMenuEntries =
+        isOwner ? _ownerPopupMenuEntries : [];
+
+    final bool authenticated = authUserId.isNotEmpty;
+
     return Scaffold(
       floatingActionButton: MyBooksPageFab(
         scrollController: _scrollController,
         show: _showFab,
+        isOwner: isOwner,
         onShowCreateBookDialog: showCreateBookDialog,
       ),
       body: Listener(
@@ -125,35 +185,42 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                   slivers: <Widget>[
                     ApplicationBar(),
                     MyBooksPageHeader(
-                      selectedTab: _selectedTab,
-                      onChangedTab: onChangedTab,
+                      isOwner: isOwner,
                       multiSelectActive: _forceMultiSelect,
                       multiSelectedItems: _multiSelectedItems,
-                      onSelectAll: onSelectAll,
-                      onClearSelection: clearSelection,
-                      onTriggerMultiSelect: triggerMultiSelect,
-                      onShowCreateBookDialog: showCreateBookDialog,
                       onAddToBook: showAddGroupToBookDialog,
+                      onChangedTab: onChangedTab,
                       onChangeGroupVisibility: showGroupVisibilityDialog,
+                      onClearSelection: clearSelection,
                       onConfirmDeleteGroup: onConfirmDeleteGroup,
+                      onGoToUserProfile: onGoToUserProfile,
+                      onSelectAll: onSelectAll,
+                      onShowCreateBookDialog: showCreateBookDialog,
+                      onTriggerMultiSelect: triggerMultiSelect,
+                      selectedTab: _selectedTab,
+                      username: _username,
                     ),
                     MyBooksPageBody(
+                      authenticated: authenticated,
                       books: _books,
-                      loading: _loading,
-                      onDropBook: onDropBook,
-                      onShowCreateBookDialog: showCreateBookDialog,
-                      popupMenuEntries: _popupMenuEntries,
-                      onLongPressBook: onLongPressBook,
                       forceMultiSelect: _forceMultiSelect,
+                      isOwner: isOwner,
+                      loading: _loading,
+                      onLongPressBook: onLongPressBook,
                       multiSelectedItems: _multiSelectedItems,
-                      onPopupMenuItemSelected: onPopupMenuItemSelected,
-                      onTapBook: onTapBook,
-                      onGoToActiveBooks: onGoToActiveBooks,
-                      selectedTab: _selectedTab,
                       onDragBookCompleted: onDragBookCompleted,
                       onDragBookEnd: onDragBookEnd,
                       onDragBookStarted: onDragBookStarted,
+                      onDropBook: onDropBook,
+                      onGoToActiveBooks: onGoToActiveBooks,
                       onLike: onLike,
+                      onPopupMenuItemSelected: onPopupMenuItemSelected,
+                      onShowCreateBookDialog: showCreateBookDialog,
+                      onTapBook: onTapBook,
+                      popupMenuEntries: popupMenuEntries,
+                      selectedTab: _selectedTab,
+                      likePopupMenuEntries: _likePopupMenuEntries,
+                      unlikePopupMenuEntries: _unlikePopupMenuEntries,
                     ),
                     SliverPadding(
                       padding: const EdgeInsets.only(bottom: 100.0),
@@ -181,18 +248,6 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       _multiSelectedItems.clear();
       _forceMultiSelect = _multiSelectedItems.length > 0;
     });
-  }
-
-  /// Show a dialog to confirm multiple books deletion.
-  void onConfirmDeleteGroup() async {
-    if (_multiSelectedItems.isEmpty) {
-      context.showErrorBar(content: Text("multi_select_no_item".tr()));
-      return;
-    }
-
-    final Book book = _multiSelectedItems.values.first;
-    final int index = _books.indexWhere((x) => x.id == book.id);
-    confirmDeleteBook(book, index);
   }
 
   /// Show a dialog to confirm a single book deletion.
@@ -286,52 +341,38 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     }
   }
 
-  QueryMap getFetchQuery() {
-    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
-
-    if (_selectedTab == EnumVisibilityTab.active) {
-      return FirebaseFirestore.instance
-          .collection("books")
-          .where("user_id", isEqualTo: userId)
-          .where("visibility", whereIn: ["public", "private"])
-          .orderBy("user_custom_index", descending: true)
-          .limit(_limit);
+  /// Fetch user's data. This illustrations page owner.
+  /// (Launched if the the page is not owned by the current user)
+  Future<void> fetchUser() async {
+    if (widget.userId.isEmpty) {
+      return;
     }
-    return FirebaseFirestore.instance
-        .collection("books")
-        .where("user_id", isEqualTo: userId)
-        .where("visibility", isEqualTo: "archived")
-        .orderBy("user_custom_index", descending: true)
-        .limit(_limit);
+
+    if (getIsOwner()) {
+      return;
+    }
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(widget.userId)
+          .collection("user_public_fields")
+          .doc("base")
+          .get();
+
+      final Json? map = snapshot.data();
+      if (!snapshot.exists || map == null) {
+        return;
+      }
+
+      _username = map["name"];
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
   }
 
-  QueryMap? getFetchMoreQuery() {
-    final lastDocument = _lastDocument;
-    if (lastDocument == null) {
-      return null;
-    }
-
-    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
-
-    if (_selectedTab == EnumVisibilityTab.active) {
-      return FirebaseFirestore.instance
-          .collection("books")
-          .where("user_id", isEqualTo: userId)
-          .where("visibility", whereIn: ["public", "private"])
-          .orderBy("user_custom_index", descending: true)
-          .limit(_limit)
-          .startAfterDocument(lastDocument);
-    }
-    return FirebaseFirestore.instance
-        .collection("books")
-        .where("user_id", isEqualTo: userId)
-        .where("visibility", isEqualTo: "archived")
-        .orderBy("user_custom_index", descending: true)
-        .limit(_limit)
-        .startAfterDocument(lastDocument);
-  }
-
-  void fetchBooks() async {
+  Future<void> fetchBooks() async {
     setState(() {
       _loading = true;
       _hasNext = true;
@@ -438,6 +479,129 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     }
   }
 
+  QueryMap getFetchQuery() {
+    final String userId = getUserId();
+
+    if (!getIsOwner()) {
+      return FirebaseFirestore.instance
+          .collection("books")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", isEqualTo: "public")
+          .orderBy("user_custom_index", descending: true)
+          .limit(_limit);
+    }
+
+    if (_selectedTab == EnumVisibilityTab.active) {
+      return FirebaseFirestore.instance
+          .collection("books")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", whereIn: ["public", "private"])
+          .orderBy("user_custom_index", descending: true)
+          .limit(_limit);
+    }
+
+    return FirebaseFirestore.instance
+        .collection("books")
+        .where("user_id", isEqualTo: userId)
+        .where("visibility", isEqualTo: "archived")
+        .orderBy("user_custom_index", descending: true)
+        .limit(_limit);
+  }
+
+  QueryMap? getFetchMoreQuery() {
+    final lastDocument = _lastDocument;
+    if (lastDocument == null) {
+      return null;
+    }
+
+    final String userId = getUserId();
+
+    if (!getIsOwner()) {
+      return FirebaseFirestore.instance
+          .collection("books")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", isEqualTo: "public")
+          .orderBy("user_custom_index", descending: true)
+          .limit(_limit)
+          .startAfterDocument(lastDocument);
+    }
+
+    if (_selectedTab == EnumVisibilityTab.active) {
+      return FirebaseFirestore.instance
+          .collection("books")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", whereIn: ["public", "private"])
+          .orderBy("user_custom_index", descending: true)
+          .limit(_limit)
+          .startAfterDocument(lastDocument);
+    }
+
+    return FirebaseFirestore.instance
+        .collection("books")
+        .where("user_id", isEqualTo: userId)
+        .where("visibility", isEqualTo: "archived")
+        .orderBy("user_custom_index", descending: true)
+        .limit(_limit)
+        .startAfterDocument(lastDocument);
+  }
+
+  /// Return true if the current authenticated user is the owner
+  /// of this illustrations page.
+  bool getIsOwner() {
+    final authUserId = ref.read(AppState.userProvider).firestoreUser?.id ?? "";
+
+    if (widget.userId.isEmpty && authUserId.isNotEmpty) {
+      return true;
+    }
+
+    return authUserId == widget.userId;
+  }
+
+  /// Return the query to listen changes to.
+  QueryMap? getListenQuery() {
+    final lastDocument = _lastDocument;
+    if (lastDocument == null) {
+      return null;
+    }
+
+    final String userId = getUserId();
+
+    if (!getIsOwner()) {
+      return FirebaseFirestore.instance
+          .collection("illustrations")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", isEqualTo: "public")
+          .orderBy("user_custom_index", descending: true)
+          .endAtDocument(lastDocument);
+    }
+
+    if (_selectedTab == EnumVisibilityTab.active) {
+      return FirebaseFirestore.instance
+          .collection("illustrations")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", whereIn: ["public", "private"])
+          .orderBy("user_custom_index", descending: true)
+          .endAtDocument(lastDocument);
+    }
+
+    return FirebaseFirestore.instance
+        .collection("illustrations")
+        .where("user_id", isEqualTo: userId)
+        .where("visibility", isEqualTo: "archived")
+        .orderBy("user_custom_index", descending: true)
+        .endAtDocument(lastDocument);
+  }
+
+  /// Return either the user's id page parameter
+  /// or the current authenticated user's id.
+  String getUserId() {
+    if (widget.userId.isNotEmpty) {
+      return widget.userId;
+    }
+
+    return ref.read(AppState.userProvider).firestoreUser?.id ?? "";
+  }
+
   /// Listen to the last Firestore query of this page.
   void listenBooksEvents(QueryMap query) {
     _bookSubscription?.cancel();
@@ -509,20 +673,32 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     Utilities.storage.saveBooksTab(selectedTab);
   }
 
+  /// Show a dialog to confirm multiple books deletion.
+  void onConfirmDeleteGroup() async {
+    if (_multiSelectedItems.isEmpty) {
+      context.showErrorBar(content: Text("multi_select_no_item".tr()));
+      return;
+    }
+
+    final Book book = _multiSelectedItems.values.first;
+    final int index = _books.indexWhere((x) => x.id == book.id);
+    confirmDeleteBook(book, index);
+  }
+
   void onDragBookCompleted() {
-    _isDraggingSection = false;
+    _isDraggingBook = false;
   }
 
   void onDragBookEnd(DraggableDetails p1) {
-    _isDraggingSection = false;
+    _isDraggingBook = false;
   }
 
   void onDragBookStarted() {
-    _isDraggingSection = true;
+    _isDraggingBook = true;
   }
 
   void onDraggableBookCanceled(Velocity velocity, Offset offset) {
-    _isDraggingSection = false;
+    _isDraggingBook = false;
   }
 
   void onDropBook(int dropIndex, List<int> dragIndexes) async {
@@ -581,6 +757,15 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     onChangedTab(EnumVisibilityTab.active);
   }
 
+  void onGoToUserProfile() {
+    Beamer.of(context).beamToNamed(
+      HomeLocation.profileRoute.replaceFirst(":userId", widget.userId),
+      routeState: {
+        "userId": widget.userId,
+      },
+    );
+  }
+
   /// Toggle a book existence in user's favourites.
   void onLike(Book book) {
     if (book.liked) {
@@ -606,7 +791,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
   /// Callback fired when a pointer is down and moves.
   void onPointerMove(PointerMoveEvent pointerMoveEvent) {
-    if (!_isDraggingSection) {
+    if (!_isDraggingBook) {
       _scrollTimer?.cancel();
       return;
     }
@@ -667,10 +852,30 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     _scrollTimer?.cancel();
   }
 
-  void onNavigateToBook(Book book) {
+  void navigateToBookPage(Book book) {
     NavigationStateHelper.book = book;
+
+    String route = HomeLocation.userBookRoute
+        .replaceFirst(":userId", getUserId())
+        .replaceFirst(":bookId", book.id);
+
+    final String? location = Beamer.of(context)
+        .beamingHistory
+        .last
+        .history
+        .last
+        .routeInformation
+        .location;
+
+    if (location != null && location.contains("atelier")) {
+      route = AtelierLocationContent.bookRoute.replaceFirst(
+        ":bookId",
+        book.id,
+      );
+    }
+
     Beamer.of(context).beamToNamed(
-      AtelierLocationContent.bookRoute.replaceFirst(":bookId", book.id),
+      route,
       data: {
         "bookId": book.id,
       },
@@ -737,7 +942,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   /// When a book card receives onTap event.
   void onTapBook(Book book) {
     if (_multiSelectedItems.isEmpty && !_forceMultiSelect) {
-      onNavigateToBook(book);
+      navigateToBookPage(book);
       return;
     }
 
@@ -1072,5 +1277,12 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         });
       }
     }
+  }
+
+  void fetchData() {
+    Future.wait([
+      fetchUser(),
+      fetchBooks(),
+    ]);
   }
 }
