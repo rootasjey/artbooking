@@ -78,7 +78,7 @@ class _FooterState extends ConsumerState<Footer> {
             ],
           ),
           FooterCompanyWatermark(
-            padding: const EdgeInsets.only(top: 24.0),
+            padding: const EdgeInsets.only(top: 12.0),
           ),
         ],
       ),

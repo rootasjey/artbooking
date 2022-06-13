@@ -2,6 +2,7 @@ import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/buttons/circle_button.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants.dart';
+import 'package:artbooking/globals/constants/section_ids.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/line_drop_zone.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_fab.dart';
@@ -195,14 +196,15 @@ class ProfilePageBody extends StatelessWidget {
       index++;
     }
 
-    // Add bottom padding.
-    slivers.add(
-      SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 400.0),
+    if (artisticPage.sections.last.id != SectionIds.footer) {
+      slivers.add(
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 400.0),
+          ),
         ),
-      ),
-    );
+      );
+    }
 
     return Scaffold(
       floatingActionButton: ProfilePageFAB(
