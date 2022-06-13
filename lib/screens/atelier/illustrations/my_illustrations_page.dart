@@ -19,9 +19,11 @@ import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums/enum_visibility_tab.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
+import 'package:artbooking/types/firestore/query_snap_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/popup_entry_illustration.dart';
@@ -122,6 +124,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   final Map<String, Illustration> _multiSelectedItems = Map();
   final String _layoutKey = "illustrations_three_in_a_row";
 
+  /// Subscribe to illustration collection updates.
   QuerySnapshotStreamSubscription? _illustrationSubscription;
 
   /// Page scroll controller.
@@ -403,7 +406,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
     try {
       final QueryMap query = getFetchQuery();
-      final snapshot = await query.get();
+      final QuerySnapMap snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
         setState(() {
@@ -415,7 +418,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       }
 
       for (final QueryDocSnapMap document in snapshot.docs) {
-        final data = document.data();
+        final Json data = document.data();
         data["id"] = document.id;
         data["liked"] = await fetchLike(document.id);
         _illustrations.add(Illustration.fromMap(data));
@@ -438,7 +441,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     try {
       final String userId = getUserId();
 
-      final snapshot = await FirebaseFirestore.instance
+      final DocumentSnapshotMap snapshot = await FirebaseFirestore.instance
           .collection("users")
           .doc(userId)
           .collection("user_settings")
@@ -465,7 +468,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     }
 
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final DocumentSnapshotMap snapshot = await FirebaseFirestore.instance
           .collection("users")
           .doc(userId)
           .collection("user_likes")
@@ -497,7 +500,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         return;
       }
 
-      final snapshot = await query.get();
+      final QuerySnapMap snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
         setState(() {
@@ -509,8 +512,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       }
 
       for (QueryDocSnapMap document in snapshot.docs) {
-        final data = document.data();
-        data['id'] = document.id;
+        final Json data = document.data();
+        data["id"] = document.id;
 
         _illustrations.add(Illustration.fromMap(data));
       }
@@ -541,7 +544,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     }
 
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final DocumentSnapshotMap snapshot = await FirebaseFirestore.instance
           .collection("users")
           .doc(widget.userId)
           .collection("user_public_fields")
@@ -632,7 +635,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   /// Return the query to listen changes to.
   QueryMap? getListenQuery() {
-    final lastDocument = _lastDocument;
+    final DocumentSnapshot? lastDocument = _lastDocument;
     if (lastDocument == null) {
       return null;
     }
