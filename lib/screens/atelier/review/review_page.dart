@@ -10,13 +10,19 @@ import 'package:artbooking/screens/atelier/review/review_page_body.dart';
 import 'package:artbooking/screens/atelier/review/review_page_header.dart';
 import 'package:artbooking/screens/likes/likes_page_fab.dart';
 import 'package:artbooking/types/book/book.dart';
+import 'package:artbooking/types/book/popup_entry_book.dart';
+import 'package:artbooking/types/cloud_functions/illustration_response.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/types/enums/enum_tab_data_type.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
+import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
+import 'package:artbooking/types/firestore/query_snap_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/illustration/popup_entry_illustration.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,53 +43,41 @@ class ReviewPage extends ConsumerStatefulWidget {
 }
 
 class _LikesPageState extends ConsumerState<ReviewPage> {
-  /// True if there're more data to fetch.
+  /// Order results from most recent or oldest.
+  bool _descending = true;
+
+  /// If true, there are more items (illustrations or books) to fetch.
   bool _hasNext = true;
 
-  /// True if loading more style from Firestore.
-  bool _loadingMore = false;
-
-  bool _descending = true;
-  bool _loading = false;
-  bool _showFab = false;
+  /// Hide items who has been explicitly disapproved if true.
   bool _hideDisapproved = false;
 
+  /// Loading the current page if true.
+  bool _loading = false;
+
+  /// Loading the next page if true.
+  bool _loadingMore = false;
+
+  /// Show the page floating action button if true.
+  bool _showFab = false;
+
   /// Last fetched document snapshot. Used for pagination.
-  DocumentSnapshot<Object>? _lastDocumentSnapshot;
-
-  /// Illusttrations to review.
-  final List<Illustration> _illustrations = [];
-
-  /// Books  to review.
-  final List<Book> _books = [];
-
-  /// Maximum licenses to fetch in one request.
-  int _limit = 20;
-
-  /// Collection subscription on books or illustrations
-  /// according the current selected tab.
-  QuerySnapshotStreamSubscription? _dataSubscription;
+  DocumentSnapshot<Object>? _lastDocument;
 
   /// Selected tab showing data (books or illustrations).
   var _selectedTab = EnumTabDataType.illustrations;
 
-  /// Items when opening the popup.
-  final List<PopupMenuEntry<EnumIllustrationItemAction>>
-      _illustrationPopupMenuEntries = [
-    PopupMenuItemIcon(
-      value: EnumIllustrationItemAction.approve,
-      icon: PopupMenuIcon(UniconsLine.check),
-      textLabel: "approve".tr(),
-    ),
-    PopupMenuItemIcon(
-      value: EnumIllustrationItemAction.disapprove,
-      icon: PopupMenuIcon(UniconsLine.times),
-      textLabel: "disapprove".tr(),
-    ),
-  ];
+  /// Maximum items (illustrations or books) to fetch per page.
+  final int _limit = 20;
 
-  /// Items when opening the popup.
-  final List<PopupMenuEntry<EnumBookItemAction>> _bookPopupMenuEntries = [
+  /// List of books to review.
+  final List<Book> _books = [];
+
+  /// List of llusttrations to review.
+  final List<Illustration> _illustrations = [];
+
+  /// Menu items for books.
+  final List<PopupEntryBook> _bookPopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumBookItemAction.approve,
       icon: PopupMenuIcon(UniconsLine.check),
@@ -96,6 +90,25 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
     ),
   ];
 
+  /// Menu items for illustrations.
+  final List<PopupEntryIllustration> _illustrationPopupMenuEntries = [
+    PopupMenuItemIcon(
+      value: EnumIllustrationItemAction.approve,
+      icon: PopupMenuIcon(UniconsLine.check),
+      textLabel: "approve".tr(),
+    ),
+    PopupMenuItemIcon(
+      value: EnumIllustrationItemAction.disapprove,
+      icon: PopupMenuIcon(UniconsLine.times),
+      textLabel: "disapprove".tr(),
+    ),
+  ];
+
+  /// Collection subscription on books or illustrations
+  /// according the current selected tab.
+  QuerySnapshotStreamSubscription? _dataSubscription;
+
+  /// Page scroll controller.
   final _scrollController = ScrollController();
 
   @override
@@ -158,10 +171,8 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
 
   /// Fetch books or illustrations on Firestore.
   void fetch() async {
-    _dataSubscription?.cancel();
-
     setState(() {
-      _lastDocumentSnapshot = null;
+      _lastDocument = null;
       _loading = true;
     });
 
@@ -172,6 +183,106 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
     return fetchIllustrations();
   }
 
+  void fetchBooks() async {
+    _books.clear();
+    _hasNext = true;
+
+    try {
+      QueryMap query = FirebaseFirestore.instance
+          .collection("books")
+          .where("visibility", isEqualTo: "public")
+          .where("staff_review.approved", isEqualTo: false)
+          .orderBy("created_at", descending: _descending)
+          .limit(_limit);
+
+      if (_hideDisapproved) {
+        query = query.where("staff_review.user_id", isEqualTo: "");
+      }
+
+      final QuerySnapMap snapshot = await query.get();
+      if (snapshot.docs.isEmpty) {
+        _hasNext = false;
+        return;
+      }
+
+      for (final QueryDocSnapMap document in snapshot.docs) {
+        final DocumentSnapshotMap bookSnapshot = await FirebaseFirestore
+            .instance
+            .collection("books")
+            .doc(document.id)
+            .get();
+
+        final Json? bookData = bookSnapshot.data();
+
+        if (bookData != null) {
+          bookData["id"] = bookSnapshot.id;
+          _books.add(Book.fromMap(bookData));
+        }
+      }
+
+      _lastDocument = snapshot.docs.last;
+      _hasNext = snapshot.size == _limit;
+
+      listenDataEvents(getListenQuery());
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() {
+        _loading = false;
+      });
+    }
+  }
+
+  void fetchIllustrations() async {
+    _illustrations.clear();
+    _hasNext = true;
+
+    try {
+      QueryMap query = FirebaseFirestore.instance
+          .collection("illustrations")
+          .where("visibility", isEqualTo: "public")
+          .where("staff_review.approved", isEqualTo: false)
+          .orderBy("created_at", descending: _descending)
+          .limit(_limit);
+
+      if (_hideDisapproved) {
+        query = query.where("staff_review.user_id", isEqualTo: "");
+      }
+
+      final QuerySnapMap snapshot = await query.get();
+      if (snapshot.docs.isEmpty) {
+        _hasNext = false;
+        return;
+      }
+
+      for (final QueryDocSnapMap document in snapshot.docs) {
+        final DocumentSnapshotMap illustrationSnapshot = await FirebaseFirestore
+            .instance
+            .collection("illustrations")
+            .doc(document.id)
+            .get();
+
+        final Json? illustrationData = illustrationSnapshot.data();
+
+        if (illustrationData != null) {
+          illustrationData["id"] = illustrationSnapshot.id;
+          _illustrations.add(Illustration.fromMap(illustrationData));
+        }
+      }
+
+      _lastDocument = snapshot.docs.last;
+      _hasNext = snapshot.size == _limit;
+
+      listenDataEvents(getListenQuery());
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _loading = false);
+    }
+  }
+
   void fetchMore() {
     if (_selectedTab == EnumTabDataType.books) {
       return fetchMoreBooks();
@@ -180,55 +291,64 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
     return fetchMoreIllustrations();
   }
 
-  void fetchIllustrations() async {
-    _illustrations.clear();
-    _hasNext = true;
+  void fetchMoreBooks() async {
+    final DocumentSnapshot? lastDocumentSnapshot = _lastDocument;
+    if (lastDocumentSnapshot == null) {
+      return;
+    }
+
+    _loadingMore = true;
 
     try {
-      Query<Map<String, dynamic>> query = FirebaseFirestore.instance
-          .collection("illustrations")
+      QueryMap query = FirebaseFirestore.instance
+          .collection("books")
           .where("visibility", isEqualTo: "public")
           .where("staff_review.approved", isEqualTo: false)
           .orderBy("created_at", descending: _descending)
+          .startAfterDocument(lastDocumentSnapshot)
           .limit(_limit);
 
       if (_hideDisapproved) {
         query = query.where("staff_review.user_id", isEqualTo: "");
       }
 
-      final snapshot = await query.get();
+      final QuerySnapMap snapshot = await query.get();
       if (snapshot.docs.isEmpty) {
         _hasNext = false;
         return;
       }
 
-      for (var document in snapshot.docs) {
-        final illustrationSnapshot = await FirebaseFirestore.instance
-            .collection("illustrations")
+      for (final QueryDocSnapMap document in snapshot.docs) {
+        final DocumentSnapshotMap bookSnapshot = await FirebaseFirestore
+            .instance
+            .collection("books")
             .doc(document.id)
             .get();
 
-        final illustrationData = illustrationSnapshot.data();
-        if (illustrationData != null) {
-          illustrationData["id"] = illustrationSnapshot.id;
-          _illustrations.add(Illustration.fromMap(illustrationData));
+        final Json? bookData = bookSnapshot.data();
+
+        if (bookData != null) {
+          bookData["id"] = bookSnapshot.id;
+          _books.add(Book.fromMap(bookData));
         }
       }
 
-      _lastDocumentSnapshot = snapshot.docs.last;
+      _lastDocument = snapshot.docs.last;
       _hasNext = snapshot.size == _limit;
+
+      listenDataEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     } finally {
       setState(() {
-        _loading = false;
+        _loadingMore = false;
       });
     }
   }
 
   void fetchMoreIllustrations() async {
-    final lastDocumentSnapshot = _lastDocumentSnapshot;
+    final DocumentSnapshot? lastDocumentSnapshot = _lastDocument;
     if (lastDocumentSnapshot == null) {
       return;
     }
@@ -248,27 +368,31 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
         query = query.where("staff_review.user_id", isEqualTo: "");
       }
 
-      final snapshot = await query.get();
+      final QuerySnapMap snapshot = await query.get();
       if (snapshot.docs.isEmpty) {
         _hasNext = false;
         return;
       }
 
-      for (var document in snapshot.docs) {
-        final illustrationSnapshot = await FirebaseFirestore.instance
+      for (final QueryDocSnapMap document in snapshot.docs) {
+        final DocumentSnapshotMap illustrationSnapshot = await FirebaseFirestore
+            .instance
             .collection("illustrations")
             .doc(document.id)
             .get();
 
-        final illustrationData = illustrationSnapshot.data();
+        final Json? illustrationData = illustrationSnapshot.data();
+
         if (illustrationData != null) {
           illustrationData["id"] = illustrationSnapshot.id;
           _illustrations.add(Illustration.fromMap(illustrationData));
         }
       }
 
-      _lastDocumentSnapshot = snapshot.docs.last;
+      _lastDocument = snapshot.docs.last;
       _hasNext = snapshot.size == _limit;
+
+      listenDataEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
@@ -279,103 +403,40 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
     }
   }
 
-  void fetchBooks() async {
-    _books.clear();
-    _hasNext = true;
+  /// Return the query to listen changes to.
+  QueryMap? getListenQuery() {
+    final DocumentSnapshot? lastDocument = _lastDocument;
+    if (lastDocument == null) {
+      return null;
+    }
 
-    try {
-      Query<Map<String, dynamic>> query = FirebaseFirestore.instance
+    if (_selectedTab == EnumTabDataType.books) {
+      QueryMap query = FirebaseFirestore.instance
           .collection("books")
           .where("visibility", isEqualTo: "public")
           .where("staff_review.approved", isEqualTo: false)
           .orderBy("created_at", descending: _descending)
-          .limit(_limit);
+          .endAtDocument(lastDocument);
 
       if (_hideDisapproved) {
         query = query.where("staff_review.user_id", isEqualTo: "");
       }
 
-      final snapshot = await query.get();
-      if (snapshot.docs.isEmpty) {
-        _hasNext = false;
-        return;
-      }
-
-      for (var document in snapshot.docs) {
-        final bookSnapshot = await FirebaseFirestore.instance
-            .collection("books")
-            .doc(document.id)
-            .get();
-
-        final bookData = bookSnapshot.data();
-        if (bookData != null) {
-          bookData["id"] = bookSnapshot.id;
-          _books.add(Book.fromMap(bookData));
-        }
-      }
-
-      _lastDocumentSnapshot = snapshot.docs.last;
-      _hasNext = snapshot.size == _limit;
-    } catch (error) {
-      Utilities.logger.e(error);
-      context.showErrorBar(content: Text(error.toString()));
-    } finally {
-      setState(() {
-        _loading = false;
-      });
-    }
-  }
-
-  void fetchMoreBooks() async {
-    final lastDocumentSnapshot = _lastDocumentSnapshot;
-    if (lastDocumentSnapshot == null) {
-      return;
+      return query;
     }
 
-    _loadingMore = true;
+    QueryMap query = FirebaseFirestore.instance
+        .collection("illustrations")
+        .where("visibility", isEqualTo: "public")
+        .where("staff_review.approved", isEqualTo: false)
+        .orderBy("created_at", descending: _descending)
+        .endAtDocument(lastDocument);
 
-    try {
-      Query<Map<String, dynamic>> query = FirebaseFirestore.instance
-          .collection("books")
-          .where("visibility", isEqualTo: "public")
-          .where("staff_review.approved", isEqualTo: false)
-          .orderBy("created_at", descending: _descending)
-          .startAfterDocument(lastDocumentSnapshot)
-          .limit(_limit);
-
-      if (_hideDisapproved) {
-        query = query.where("staff_review.user_id", isEqualTo: "");
-      }
-
-      final snapshot = await query.get();
-      if (snapshot.docs.isEmpty) {
-        _hasNext = false;
-        return;
-      }
-
-      for (var document in snapshot.docs) {
-        final bookSnapshot = await FirebaseFirestore.instance
-            .collection("books")
-            .doc(document.id)
-            .get();
-
-        final bookData = bookSnapshot.data();
-        if (bookData != null) {
-          bookData["id"] = bookSnapshot.id;
-          _books.add(Book.fromMap(bookData));
-        }
-      }
-
-      _lastDocumentSnapshot = snapshot.docs.last;
-      _hasNext = snapshot.size == _limit;
-    } catch (error) {
-      Utilities.logger.e(error);
-      context.showErrorBar(content: Text(error.toString()));
-    } finally {
-      setState(() {
-        _loadingMore = false;
-      });
+    if (_hideDisapproved) {
+      query = query.where("staff_review.user_id", isEqualTo: "");
     }
+
+    return query;
   }
 
   void loadPreferences() {
@@ -384,16 +445,18 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
   }
 
   void onChangedTab(EnumTabDataType reviewTabDataType) {
-    setState(() {
-      _selectedTab = reviewTabDataType;
-    });
-
+    setState(() => _selectedTab = reviewTabDataType);
     fetch();
+
     Utilities.storage.saveReviewTab(reviewTabDataType);
   }
 
   /// Listen to the last Firestore query of this page.
-  void listenDataEvents(QueryMap query) {
+  void listenDataEvents(QueryMap? query) {
+    if (query == null) {
+      return;
+    }
+
     _dataSubscription?.cancel();
     _dataSubscription = query.snapshots().skip(1).listen(
       (snapshot) {
@@ -418,7 +481,7 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
   /// Fire when a new document has been created in Firestore.
   /// Add the corresponding document in the UI.
   void onAddStreamingItem(DocumentChangeMap documentChange) {
-    final data = documentChange.doc.data();
+    final Json? data = documentChange.doc.data();
     if (data == null) {
       return;
     }
@@ -438,6 +501,7 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
 
     setState(() {
       data["id"] = documentChange.doc.id;
+
       final illustration = Illustration.fromMap(data);
       _illustrations.insert(0, illustration);
     });
@@ -525,9 +589,7 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
   }
 
   void onApproveBook(Book book, int index) async {
-    setState(() {
-      _books.removeAt(index);
-    });
+    setState(() => _books.removeAt(index));
 
     final response = await BooksActions.approve(
       bookId: book.id,
@@ -544,11 +606,8 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
   }
 
   void onDisapproveBook(Book book, int index) async {
-    Utilities.logger.i(book.id);
     if (_hideDisapproved) {
-      setState(() {
-        _books.removeAt(index);
-      });
+      setState(() => _books.removeAt(index));
     }
 
     final response = await BooksActions.approve(
@@ -561,18 +620,14 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
     }
 
     if (_hideDisapproved) {
-      setState(() {
-        _books.insert(index, book);
-      });
+      setState(() => _books.insert(index, book));
     }
   }
 
   void onApproveIllustration(Illustration illustration, int index) async {
-    setState(() {
-      _illustrations.removeAt(index);
-    });
+    setState(() => _illustrations.removeAt(index));
 
-    final response = await IllustrationsActions.approve(
+    final IllustrationResponse response = await IllustrationsActions.approve(
       illustrationId: illustration.id,
       approved: true,
     );
@@ -581,19 +636,15 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
       return;
     }
 
-    setState(() {
-      _illustrations.insert(index, illustration);
-    });
+    setState(() => _illustrations.insert(index, illustration));
   }
 
   void onDisapproveIllustration(Illustration illustration, int index) async {
     if (_hideDisapproved) {
-      setState(() {
-        _illustrations.removeAt(index);
-      });
+      setState(() => _illustrations.removeAt(index));
     }
 
-    final response = await IllustrationsActions.approve(
+    final IllustrationResponse response = await IllustrationsActions.approve(
       illustrationId: illustration.id,
       approved: false,
     );
@@ -603,9 +654,7 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
     }
 
     if (_hideDisapproved) {
-      setState(() {
-        _illustrations.insert(index, illustration);
-      });
+      setState(() => _illustrations.insert(index, illustration));
     }
   }
 
@@ -629,11 +678,9 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
   }
 
   void onUpdateShowHidden() {
-    setState(() {
-      _hideDisapproved = !_hideDisapproved;
-    });
+    setState(() => _hideDisapproved = !_hideDisapproved);
+    fetch();
 
     Utilities.storage.saveReviewHideDisapproved(_hideDisapproved);
-    fetch();
   }
 }
