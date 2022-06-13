@@ -24,9 +24,11 @@ import 'package:artbooking/types/book/popup_entry_book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/enums/enum_visibility_tab.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
+import 'package:artbooking/types/firestore/query_snap_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/cloud_functions/book_response.dart';
 import 'package:artbooking/types/json_types.dart';
@@ -355,7 +357,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     }
 
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final DocumentSnapshotMap snapshot = await FirebaseFirestore.instance
           .collection("users")
           .doc(widget.userId)
           .collection("user_public_fields")
@@ -382,10 +384,8 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     });
 
     try {
-      final query = getFetchQuery();
-
-      listenBooksEvents(query);
-      final snapshot = await query.get();
+      final QueryMap query = getFetchQuery();
+      final QuerySnapMap snapshot = await query.get();
 
       if (snapshot.docs.isEmpty) {
         setState(() {
@@ -396,8 +396,8 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         return;
       }
 
-      for (QueryDocSnapMap document in snapshot.docs) {
-        final data = document.data();
+      for (final QueryDocSnapMap document in snapshot.docs) {
+        final Json data = document.data();
         data["id"] = document.id;
         data["liked"] = await fetchLike(document.id);
         _books.add(Book.fromMap(data));
@@ -407,6 +407,8 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         _lastDocument = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
       });
+
+      listenBooksEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
@@ -421,7 +423,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     }
 
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final DocumentSnapshotMap snapshot = await FirebaseFirestore.instance
           .collection("users")
           .doc(userId)
           .collection("user_likes")
@@ -452,7 +454,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         return;
       }
 
-      final snapshot = await query.get();
+      final QuerySnapMap snapshot = await query.get();
       if (snapshot.docs.isEmpty) {
         setState(() {
           _hasNext = false;
@@ -463,8 +465,8 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       }
 
       for (QueryDocSnapMap document in snapshot.docs) {
-        final data = document.data();
-        data['id'] = document.id;
+        final Json data = document.data();
+        data["id"] = document.id;
 
         _books.add(Book.fromMap(data));
       }
@@ -474,6 +476,8 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         _lastDocument = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
       });
+
+      listenBooksEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
@@ -570,7 +574,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
     if (!getIsOwner()) {
       return FirebaseFirestore.instance
-          .collection("illustrations")
+          .collection("books")
           .where("user_id", isEqualTo: userId)
           .where("visibility", isEqualTo: "public")
           .orderBy("user_custom_index", descending: true)
@@ -579,7 +583,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
     if (_selectedTab == EnumVisibilityTab.active) {
       return FirebaseFirestore.instance
-          .collection("illustrations")
+          .collection("books")
           .where("user_id", isEqualTo: userId)
           .where("visibility", whereIn: ["public", "private"])
           .orderBy("user_custom_index", descending: true)
@@ -587,7 +591,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     }
 
     return FirebaseFirestore.instance
-        .collection("illustrations")
+        .collection("books")
         .where("user_id", isEqualTo: userId)
         .where("visibility", isEqualTo: "archived")
         .orderBy("user_custom_index", descending: true)
@@ -605,7 +609,11 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   }
 
   /// Listen to the last Firestore query of this page.
-  void listenBooksEvents(QueryMap query) {
+  void listenBooksEvents(QueryMap? query) {
+    if (query == null) {
+      return;
+    }
+
     _bookSubscription?.cancel();
     _bookSubscription = query.snapshots().skip(1).listen(
       (snapshot) {
