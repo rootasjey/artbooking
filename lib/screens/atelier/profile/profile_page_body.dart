@@ -21,7 +21,7 @@ class ProfilePageBody extends StatelessWidget {
   const ProfilePageBody({
     Key? key,
     required this.userId,
-    required this.artisticPage,
+    required this.modularPage,
     required this.scrollController,
     this.onPopupMenuItemSelected,
     this.popupMenuEntries = const [],
@@ -63,7 +63,7 @@ class ProfilePageBody extends StatelessWidget {
   final String userId;
 
   /// Modular page fetched and composed of modular sections.
-  final ModularPage artisticPage;
+  final ModularPage modularPage;
 
   /// Callback fired when a popup menu item is tapped.
   final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
@@ -148,17 +148,17 @@ class ProfilePageBody extends StatelessWidget {
     final List<Widget> slivers = [
       // Sliver issue: https://github.com/flutter/flutter/issues/55170
       SliverToBoxAdapter(),
-      if (artisticPage.hasAppBar) ApplicationBar(),
+      if (modularPage.hasAppBar) ApplicationBar(),
     ];
 
     int index = 0;
 
-    for (var section in artisticPage.sections) {
+    for (var section in modularPage.sections) {
       if (editMode && isOwner) {
         Color color = Colors.transparent;
-        if (index < artisticPage.sections.length) {
+        if (index < modularPage.sections.length) {
           color = Color(
-            artisticPage.sections.elementAt(index).backgroundColor,
+            modularPage.sections.elementAt(index).backgroundColor,
           );
         }
 
@@ -184,7 +184,7 @@ class ProfilePageBody extends StatelessWidget {
           onUpdateSectionItems: onUpdateSectionItems,
           popupMenuEntries: popupMenuEntries,
           section: section,
-          sectionCount: artisticPage.sections.length - 1,
+          sectionCount: modularPage.sections.length - 1,
           userId: userId,
           onDragSectionStarted: onDragSectionStarted,
           onDragSectionCompleted: onDragSectionCompleted,
@@ -196,7 +196,7 @@ class ProfilePageBody extends StatelessWidget {
       index++;
     }
 
-    if (artisticPage.sections.last.id != SectionIds.footer) {
+    if (modularPage.sections.last.id != SectionIds.footer) {
       slivers.add(
         SliverToBoxAdapter(
           child: Padding(

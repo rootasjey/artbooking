@@ -160,7 +160,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       scrollController: _scrollController,
       showFabToTop: _showFabToTop,
       onToggleFabToTop: onToggleFabToTop,
-      artisticPage: _profilePage,
+      modularPage: _profilePage,
       onAddSection: tryAddSection,
       popupMenuEntries: _popupMenuEntries,
       onPopupMenuItemSelected: onPopupMenuItemSelected,

@@ -183,7 +183,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
       showFabToTop: _showFabToTop,
       onToggleFabToTop: onToggleFabToTop,
       isOwner: canManagePages,
-      artisticPage: _modularPage,
+      modularPage: _modularPage,
       onAddSection: tryAddSection,
       editMode: _editMode,
       onToggleEditMode: onToggleEditMode,
