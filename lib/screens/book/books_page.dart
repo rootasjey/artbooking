@@ -10,10 +10,13 @@ import 'package:artbooking/screens/book/books_page_fab.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/book/popup_entry_book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
+import 'package:artbooking/types/firestore/query_snap_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -30,16 +33,28 @@ class BooksPage extends ConsumerStatefulWidget {
 }
 
 class _BooksPageState extends ConsumerState<BooksPage> {
-  bool _loading = false;
-  bool _hasNext = false;
+  /// Start from the most recent.
   bool _descending = true;
-  bool _isLoadingMore = true;
+
+  /// If true, there are more books to fetch.
+  bool _hasNext = false;
+
+  /// Loading the current page if true.
+  bool _loading = false;
+
+  /// Loading the next page if true.
+  bool _loadingMore = true;
+
+  /// Show the page floating action button if true.
   bool _showFab = false;
 
+  /// Last fetched book document.
   DocumentSnapshot? _lastDocument;
 
+  /// Maximum books fetched in a page.
   final int _limit = 50;
 
+  /// Book list.
   final List<Book> _books = [];
 
   /// Listens to book's updates.
@@ -48,7 +63,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
   /// Listens to user like's updates.
   QuerySnapshotStreamSubscription? _likeSubscription;
 
-  /// Items when opening the popup.
+  /// Available items for authenticated user and book is not liked yet.
   final List<PopupEntryBook> _likePopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumBookItemAction.like,
@@ -57,7 +72,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     ),
   ];
 
-  /// Items when opening the popup.
+  /// Available items for authenticated user and book is already liked.
   final List<PopupEntryBook> _unlikePopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumBookItemAction.unlike,
@@ -66,6 +81,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     ),
   ];
 
+  /// Page scroll controller.
   final _scrollController = ScrollController();
 
   @override
@@ -138,7 +154,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     }
 
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final DocumentSnapshotMap snapshot = await FirebaseFirestore.instance
           .collection("users")
           .doc(userId)
           .collection("user_likes")
@@ -164,15 +180,13 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     });
 
     try {
-      final query = FirebaseFirestore.instance
+      final QuerySnapMap snapshot = await FirebaseFirestore.instance
           .collection("books")
           .where("visibility", isEqualTo: "public")
           .where("staff_review.approved", isEqualTo: true)
           .orderBy("updated_at", descending: _descending)
-          .limit(_limit);
-
-      listenBookEvents(query);
-      final snapshot = await query.get();
+          .limit(_limit)
+          .get();
 
       if (snapshot.docs.isEmpty) {
         setState(() {
@@ -183,8 +197,8 @@ class _BooksPageState extends ConsumerState<BooksPage> {
         return;
       }
 
-      for (QueryDocSnapMap document in snapshot.docs) {
-        final data = document.data();
+      for (final QueryDocSnapMap document in snapshot.docs) {
+        final Json data = document.data();
         data["id"] = document.id;
         data["liked"] = await fetchLike(document.id);
 
@@ -195,6 +209,8 @@ class _BooksPageState extends ConsumerState<BooksPage> {
         _lastDocument = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
       });
+
+      listenBookEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
@@ -206,14 +222,14 @@ class _BooksPageState extends ConsumerState<BooksPage> {
   void fetchMoreBooks() async {
     final lastDocument = _lastDocument;
 
-    if (!_hasNext || lastDocument == null || _isLoadingMore) {
+    if (!_hasNext || lastDocument == null || _loadingMore) {
       return;
     }
 
-    _isLoadingMore = true;
+    _loadingMore = true;
 
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final QuerySnapMap snapshot = await FirebaseFirestore.instance
           .collection("books")
           .where("visibility", isEqualTo: "public")
           .where("staff_review.approved", isEqualTo: true)
@@ -225,14 +241,14 @@ class _BooksPageState extends ConsumerState<BooksPage> {
       if (snapshot.docs.isEmpty) {
         setState(() {
           _hasNext = false;
-          _isLoadingMore = false;
+          _loadingMore = false;
         });
 
         return;
       }
 
-      for (QueryDocSnapMap document in snapshot.docs) {
-        final data = document.data();
+      for (final QueryDocSnapMap document in snapshot.docs) {
+        final Json data = document.data();
         data["id"] = document.id;
         data["liked"] = await fetchLike(document.id);
 
@@ -240,10 +256,12 @@ class _BooksPageState extends ConsumerState<BooksPage> {
       }
 
       setState(() {
-        _isLoadingMore = false;
+        _loadingMore = false;
         _lastDocument = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
       });
+
+      listenBookEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
@@ -251,8 +269,28 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     }
   }
 
+  /// Return the query to listen changes to.
+  QueryMap? getListenQuery() {
+    final DocumentSnapshot? lastDocument = _lastDocument;
+    if (lastDocument == null) {
+      return null;
+    }
+
+    return FirebaseFirestore.instance
+        .collection("books")
+        .where("visibility", isEqualTo: "public")
+        .where("staff_review.approved", isEqualTo: true)
+        .orderBy("updated_at", descending: _descending)
+        .endAtDocument(lastDocument);
+  }
+
   /// Listen to Firestore book events.
-  void listenBookEvents(QueryMap query) {
+  void listenBookEvents(QueryMap? query) {
+    if (query == null) {
+      return;
+    }
+
+    _bookSubscription?.cancel();
     _bookSubscription = query.snapshots().skip(1).listen(
       (snapshot) {
         for (DocumentChangeMap documentChange in snapshot.docChanges) {
@@ -395,7 +433,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
       return false;
     }
 
-    if (_hasNext && !_isLoadingMore) {
+    if (_hasNext && !_loadingMore) {
       fetchMoreBooks();
     }
 
