@@ -9,6 +9,7 @@ import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/illustrations/illustrations_page_body.dart';
 import 'package:artbooking/screens/illustrations/illustrations_page_fab.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
@@ -31,25 +32,31 @@ class IllustrationsPage extends ConsumerStatefulWidget {
 }
 
 class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
+  /// Start from the most recent.
   bool _descending = true;
+
+  /// If true, there are more books to fetch.
   bool _hasNext = true;
-  bool _loadingMore = false;
+
+  /// Loading the current page if true.
   bool _loading = false;
+
+  /// Loading the next page if true.
+  bool _loadingMore = false;
+
+  /// Show the page floating action button if true.
   bool _showFab = false;
 
+  /// Last fetched illustration document.
   DocumentSnapshot? _lastDocument;
 
+  /// Maximum books fetched in a page.
   final int _limit = 30;
+
+  /// Illustration list.
   final List<Illustration> _illustrations = [];
-  final _scrollController = ScrollController();
 
-  /// Listens to illustration's updates.
-  QuerySnapshotStreamSubscription? _illustrationSubscription;
-
-  /// Listens to user like's updates.
-  QuerySnapshotStreamSubscription? _likeSubscription;
-
-  /// Items when opening the popup.
+  /// Available items for authenticated user and illustration is not liked yet.
   final List<PopupEntryIllustration> _likePopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumIllustrationItemAction.like,
@@ -58,7 +65,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
     ),
   ];
 
-  /// Items when opening the popup.
+  /// Available items for authenticated user and illustration is already liked.
   final List<PopupEntryIllustration> _unlikePopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumIllustrationItemAction.unlike,
@@ -66,6 +73,15 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
       textLabel: "unlike".tr(),
     ),
   ];
+
+  /// Listens to illustration's updates.
+  QuerySnapshotStreamSubscription? _illustrationSubscription;
+
+  /// Listens to user like's updates.
+  QuerySnapshotStreamSubscription? _likeSubscription;
+
+  /// Page scroll controller.
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -137,15 +153,13 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
     });
 
     try {
-      final QueryMap query = FirebaseFirestore.instance
+      final QuerySnapMap snapshot = await FirebaseFirestore.instance
           .collection("illustrations")
           .where("visibility", isEqualTo: "public")
           .where("staff_review.approved", isEqualTo: true)
           .orderBy("created_at", descending: _descending)
-          .limit(_limit);
-
-      listenIllustrationEvents(query);
-      final QuerySnapMap snapshot = await query.get();
+          .limit(_limit)
+          .get();
 
       if (snapshot.docs.isEmpty) {
         setState(() {
@@ -168,6 +182,8 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
         _lastDocument = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
       });
+
+      listenIllustrationEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
@@ -182,7 +198,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
     }
 
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final DocumentSnapshotMap snapshot = await FirebaseFirestore.instance
           .collection("users")
           .doc(userId)
           .collection("user_likes")
@@ -202,23 +218,22 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
 
   /// Fetch more illustrations data from Firestore.
   void fetchMoreIllustrations() async {
-    if (!_hasNext || _lastDocument == null) {
+    final lastDocument = _lastDocument;
+    if (!_hasNext || lastDocument == null) {
       return;
     }
 
     _loadingMore = true;
 
     try {
-      final QueryMap query = await FirebaseFirestore.instance
+      final QuerySnapMap snapshot = await FirebaseFirestore.instance
           .collection("illustrations")
           .where("visibility", isEqualTo: "public")
           .where("staff_review.approved", isEqualTo: true)
           .orderBy("created_at", descending: _descending)
           .limit(_limit)
-          .startAfterDocument(_lastDocument!);
-
-      listenIllustrationEvents(query);
-      final QuerySnapMap snapshot = await query.get();
+          .startAfterDocument(lastDocument)
+          .get();
 
       if (snapshot.docs.isEmpty) {
         setState(() {
@@ -242,6 +257,8 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
         _hasNext = snapshot.docs.length == _limit;
         _loadingMore = false;
       });
+
+      listenIllustrationEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
@@ -249,8 +266,27 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
     }
   }
 
+  /// Return the query to listen changes to.
+  QueryMap? getListenQuery() {
+    final DocumentSnapshot? lastDocument = _lastDocument;
+    if (lastDocument == null) {
+      return null;
+    }
+
+    return FirebaseFirestore.instance
+        .collection("illustrations")
+        .where("visibility", isEqualTo: "public")
+        .where("staff_review.approved", isEqualTo: true)
+        .orderBy("created_at", descending: _descending)
+        .endAtDocument(lastDocument);
+  }
+
   /// Listen to Firestore illustration events
-  void listenIllustrationEvents(QueryMap query) {
+  void listenIllustrationEvents(QueryMap? query) {
+    if (query == null) {
+      return;
+    }
+
     _illustrationSubscription?.cancel();
     _illustrationSubscription = query.snapshots().skip(1).listen(
       (snapshot) {
