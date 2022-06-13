@@ -8,13 +8,19 @@ import 'package:artbooking/screens/likes/likes_page_body.dart';
 import 'package:artbooking/screens/likes/likes_page_fab.dart';
 import 'package:artbooking/screens/likes/likes_page_header.dart';
 import 'package:artbooking/types/book/book.dart';
+import 'package:artbooking/types/book/popup_entry_book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/types/enums/enum_like_type.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
+import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
+import 'package:artbooking/types/firestore/query_snap_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/illustration/popup_entry_illustration.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
@@ -31,42 +37,35 @@ class LikesPage extends ConsumerStatefulWidget {
 }
 
 class _LikesPageState extends ConsumerState<LikesPage> {
-  /// True if there're more data to fetch.
+  /// Order results from most recent or oldest.
+  bool _descending = true;
+
+  /// If true, there are more liked items to fetch.
   bool _hasNext = true;
 
-  /// True if loading more style from Firestore.
-  bool _isLoadingMore = false;
+  /// Loading the next page if true.
+  bool _loadingMore = false;
 
-  bool _descending = true;
+  /// Loading the current page if true.
   bool _loading = false;
+
+  /// Show the page floating action button if true.
   bool _showFab = false;
 
   /// Last fetched document snapshot. Used for pagination.
-  DocumentSnapshot<Object>? _lastDocumentSnapshot;
-
-  final List<Illustration> _likedIllustrations = [];
-  final List<Book> _likedBooks = [];
-
-  /// Maximum licenses to fetch in one request.
-  int _limit = 20;
-
-  QuerySnapshotStreamSubscription? _likeSubscription;
+  DocumentSnapshot<Object>? _lastDocument;
 
   /// Selected tab to show license (staff or user).
   var _selectedTab = EnumLikeType.illustration;
 
-  /// Items when opening the popup.
-  final List<PopupMenuEntry<EnumIllustrationItemAction>>
-      _illustrationPopupMenuEntries = [
-    PopupMenuItemIcon(
-      value: EnumIllustrationItemAction.unlike,
-      icon: PopupMenuIcon(UniconsLine.heart_break),
-      textLabel: "unlike".tr(),
-    ),
-  ];
+  /// List of liked illustrations.
+  final List<Illustration> _likedIllustrations = [];
 
-  /// Items when opening the popup.
-  final List<PopupMenuEntry<EnumBookItemAction>> _bookPopupMenuEntries = [
+  /// List of liked books.
+  final List<Book> _likedBooks = [];
+
+  /// Menu items for books.
+  final List<PopupEntryBook> _bookPopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumBookItemAction.unlike,
       icon: PopupMenuIcon(UniconsLine.heart_break),
@@ -74,6 +73,22 @@ class _LikesPageState extends ConsumerState<LikesPage> {
     ),
   ];
 
+  /// Menu items for illustrations.
+  final List<PopupEntryIllustration> _illustrationPopupMenuEntries = [
+    PopupMenuItemIcon(
+      value: EnumIllustrationItemAction.unlike,
+      icon: PopupMenuIcon(UniconsLine.heart_break),
+      textLabel: "unlike".tr(),
+    ),
+  ];
+
+  /// Maximum likes to fetch in one request.
+  final int _limit = 20;
+
+  /// Subscribe to illustration collection updates.
+  QuerySnapshotStreamSubscription? _likeSubscription;
+
+  /// Page scroll controller.
   final _scrollController = ScrollController();
 
   @override
@@ -126,10 +141,8 @@ class _LikesPageState extends ConsumerState<LikesPage> {
 
   /// Fetch liked books or illustrations on Firestore.
   void fetchLikes() async {
-    _likeSubscription?.cancel();
-
     setState(() {
-      _lastDocumentSnapshot = null;
+      _lastDocument = null;
       _loading = true;
     });
 
@@ -138,112 +151,6 @@ class _LikesPageState extends ConsumerState<LikesPage> {
     }
 
     return fetchLikedIllustrations();
-  }
-
-  void fetchMoreLikes() {
-    if (_selectedTab == EnumLikeType.book) {
-      return fetchMoreLikedBooks();
-    }
-
-    return fetchMoreLikedIllustrations();
-  }
-
-  void fetchLikedIllustrations() async {
-    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
-    if (userId == null) {
-      return;
-    }
-
-    _likedIllustrations.clear();
-
-    try {
-      final query = FirebaseFirestore.instance
-          .collection("users")
-          .doc(userId)
-          .collection("user_likes")
-          .where("type", isEqualTo: "illustration")
-          .orderBy("created_at", descending: _descending)
-          .limit(_limit);
-
-      final snapshot = await query.get();
-      if (snapshot.docs.isEmpty) {
-        return;
-      }
-
-      for (var document in snapshot.docs) {
-        final illustrationSnapshot = await FirebaseFirestore.instance
-            .collection("illustrations")
-            .doc(document.id)
-            .get();
-
-        final illustrationData = illustrationSnapshot.data();
-        if (illustrationData != null) {
-          illustrationData['id'] = illustrationSnapshot.id;
-          illustrationData['liked'] = true;
-          _likedIllustrations.add(Illustration.fromMap(illustrationData));
-        }
-      }
-
-      _lastDocumentSnapshot = snapshot.docs.last;
-    } catch (error) {
-      Utilities.logger.e(error);
-      context.showErrorBar(content: Text(error.toString()));
-    } finally {
-      setState(() {
-        _loading = false;
-      });
-    }
-  }
-
-  void fetchMoreLikedIllustrations() async {
-    final lastDocumentSnapshot = _lastDocumentSnapshot;
-    if (lastDocumentSnapshot == null) {
-      return;
-    }
-
-    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
-    if (userId == null) {
-      return;
-    }
-
-    try {
-      final query = FirebaseFirestore.instance
-          .collection("users")
-          .doc(userId)
-          .collection("user_likes")
-          .where("type", isEqualTo: "illustration")
-          .orderBy("created_at", descending: _descending)
-          .startAfterDocument(lastDocumentSnapshot)
-          .limit(_limit);
-
-      final snapshot = await query.get();
-      if (snapshot.docs.isEmpty) {
-        return;
-      }
-
-      for (var document in snapshot.docs) {
-        final illustrationSnapshot = await FirebaseFirestore.instance
-            .collection("illustrations")
-            .doc(document.id)
-            .get();
-
-        final illustrationData = illustrationSnapshot.data();
-        if (illustrationData != null) {
-          illustrationData['id'] = illustrationSnapshot.id;
-          illustrationData['liked'] = true;
-          _likedIllustrations.add(Illustration.fromMap(illustrationData));
-        }
-      }
-
-      _lastDocumentSnapshot = snapshot.docs.last;
-    } catch (error) {
-      Utilities.logger.e(error);
-      context.showErrorBar(content: Text(error.toString()));
-    } finally {
-      setState(() {
-        _loading = false;
-      });
-    }
   }
 
   void fetchLikedBooks() async {
@@ -255,46 +162,104 @@ class _LikesPageState extends ConsumerState<LikesPage> {
     _likedBooks.clear();
 
     try {
-      final query = FirebaseFirestore.instance
+      final QuerySnapMap snapshot = await FirebaseFirestore.instance
           .collection("users")
           .doc(userId)
           .collection("user_likes")
           .where("type", isEqualTo: "book")
           .orderBy("created_at", descending: _descending)
-          .limit(_limit);
+          .limit(_limit)
+          .get();
 
-      final snapshot = await query.get();
       if (snapshot.docs.isEmpty) {
         return;
       }
 
-      for (var document in snapshot.docs) {
-        final bookSnapshot = await FirebaseFirestore.instance
+      for (final QueryDocSnapMap document in snapshot.docs) {
+        final DocumentSnapshotMap bookSnapshot = await FirebaseFirestore
+            .instance
             .collection("books")
             .doc(document.id)
             .get();
 
-        final bookData = bookSnapshot.data();
+        final Json? bookData = bookSnapshot.data();
+
         if (bookData != null) {
-          bookData['id'] = bookSnapshot.id;
-          bookData['liked'] = true;
+          bookData["id"] = bookSnapshot.id;
+          bookData["liked"] = true;
+
           _likedBooks.add(Book.fromMap(bookData));
         }
       }
 
-      _lastDocumentSnapshot = snapshot.docs.last;
+      _lastDocument = snapshot.docs.last;
+      listenLikeEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     } finally {
-      setState(() {
-        _loading = false;
-      });
+      setState(() => _loading = false);
     }
   }
 
+  void fetchLikedIllustrations() async {
+    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+    if (userId == null) {
+      return;
+    }
+
+    _likedIllustrations.clear();
+
+    try {
+      final QuerySnapMap snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .where("type", isEqualTo: "illustration")
+          .orderBy("created_at", descending: _descending)
+          .limit(_limit)
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        return;
+      }
+
+      for (final QueryDocSnapMap document in snapshot.docs) {
+        final DocumentSnapshotMap illustrationSnapshot = await FirebaseFirestore
+            .instance
+            .collection("illustrations")
+            .doc(document.id)
+            .get();
+
+        final Json? illustrationData = illustrationSnapshot.data();
+
+        if (illustrationData != null) {
+          illustrationData["id"] = illustrationSnapshot.id;
+          illustrationData["liked"] = true;
+          _likedIllustrations.add(Illustration.fromMap(illustrationData));
+        }
+      }
+
+      _lastDocument = snapshot.docs.last;
+      listenLikeEvents(getListenQuery());
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _loading = false);
+    }
+  }
+
+  void fetchMoreLikes() {
+    if (_selectedTab == EnumLikeType.book) {
+      return fetchMoreLikedBooks();
+    }
+
+    return fetchMoreLikedIllustrations();
+  }
+
   void fetchMoreLikedBooks() async {
-    final lastDocumentSnapshot = _lastDocumentSnapshot;
+    final DocumentSnapshot? lastDocumentSnapshot = _lastDocument;
     if (lastDocumentSnapshot == null) {
       return;
     }
@@ -305,83 +270,133 @@ class _LikesPageState extends ConsumerState<LikesPage> {
     }
 
     try {
-      final query = FirebaseFirestore.instance
+      final QuerySnapMap snapshot = await FirebaseFirestore.instance
           .collection("users")
           .doc(userId)
           .collection("user_likes")
           .where("type", isEqualTo: "book")
           .orderBy("created_at", descending: _descending)
           .startAfterDocument(lastDocumentSnapshot)
-          .limit(_limit);
+          .limit(_limit)
+          .get();
 
-      final snapshot = await query.get();
       if (snapshot.docs.isEmpty) {
         return;
       }
 
-      for (var document in snapshot.docs) {
-        final bookSnapshot = await FirebaseFirestore.instance
+      for (final QueryDocSnapMap document in snapshot.docs) {
+        final DocumentSnapshotMap bookSnapshot = await FirebaseFirestore
+            .instance
             .collection("books")
             .doc(document.id)
             .get();
 
-        final bookData = bookSnapshot.data();
+        final Json? bookData = bookSnapshot.data();
+
         if (bookData != null) {
-          bookData['id'] = bookSnapshot.id;
-          bookData['liked'] = true;
+          bookData["id"] = bookSnapshot.id;
+          bookData["liked"] = true;
+
           _likedBooks.add(Book.fromMap(bookData));
         }
       }
 
-      _lastDocumentSnapshot = snapshot.docs.last;
+      _lastDocument = snapshot.docs.last;
+      listenLikeEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     } finally {
-      setState(() {
-        _loading = false;
-      });
+      setState(() => _loading = false);
     }
   }
 
-  void loadPreferences() {
-    _selectedTab = Utilities.storage.getLikesTab();
+  void fetchMoreLikedIllustrations() async {
+    final DocumentSnapshot? lastDocumentSnapshot = _lastDocument;
+    if (lastDocumentSnapshot == null) {
+      return;
+    }
+
+    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+    if (userId == null) {
+      return;
+    }
+
+    try {
+      final QuerySnapMap snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .where("type", isEqualTo: "illustration")
+          .orderBy("created_at", descending: _descending)
+          .startAfterDocument(lastDocumentSnapshot)
+          .limit(_limit)
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        return;
+      }
+
+      for (final QueryDocSnapMap document in snapshot.docs) {
+        final DocumentSnapshotMap illustrationSnapshot = await FirebaseFirestore
+            .instance
+            .collection("illustrations")
+            .doc(document.id)
+            .get();
+
+        final Json? illustrationData = illustrationSnapshot.data();
+
+        if (illustrationData != null) {
+          illustrationData["id"] = illustrationSnapshot.id;
+          illustrationData["liked"] = true;
+          _likedIllustrations.add(Illustration.fromMap(illustrationData));
+        }
+      }
+
+      _lastDocument = snapshot.docs.last;
+      listenLikeEvents(getListenQuery());
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _loading = false);
+    }
   }
 
-  void onChangedTab(EnumLikeType likeType) {
-    setState(() {
-      _selectedTab = likeType;
-    });
-
-    fetchLikes();
-    Utilities.storage.saveLikesTab(likeType);
-  }
-
-  /// On scroll notification
-  bool onNotification(ScrollNotification notification) {
-    if (notification.metrics.pixels < 50 && _showFab) {
-      setState(() {
-        _showFab = false;
-      });
-    } else if (notification.metrics.pixels > 50 && !_showFab) {
-      setState(() {
-        _showFab = true;
-      });
+  /// Return the query to listen changes to.
+  QueryMap? getListenQuery() {
+    final DocumentSnapshot? lastDocument = _lastDocument;
+    if (lastDocument == null) {
+      return null;
     }
 
-    if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
-      return false;
+    final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+    if (_selectedTab == EnumLikeType.book) {
+      return FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .where("type", isEqualTo: "book")
+          .orderBy("created_at", descending: _descending)
+          .endAtDocument(lastDocument);
     }
 
-    if (_hasNext && !_isLoadingMore && _lastDocumentSnapshot != null) {
-      fetchMoreLikes();
-    }
-
-    return false;
+    return FirebaseFirestore.instance
+        .collection("users")
+        .doc(userId)
+        .collection("user_likes")
+        .where("type", isEqualTo: "illustration")
+        .orderBy("created_at", descending: _descending)
+        .endAtDocument(lastDocument);
   }
 
   /// Listen to the last Firestore query of this page.
-  void listenLikeEvents(QueryMap query) {
+  void listenLikeEvents(QueryMap? query) {
+    if (query == null) {
+      return;
+    }
+
     _likeSubscription?.cancel();
     _likeSubscription = query.snapshots().skip(1).listen(
       (snapshot) {
@@ -401,6 +416,19 @@ class _LikesPageState extends ConsumerState<LikesPage> {
         Utilities.logger.e(error);
       },
     );
+  }
+
+  void loadPreferences() {
+    _selectedTab = Utilities.storage.getLikesTab();
+  }
+
+  void onChangedTab(EnumLikeType likeType) {
+    setState(() {
+      _selectedTab = likeType;
+    });
+
+    fetchLikes();
+    Utilities.storage.saveLikesTab(likeType);
   }
 
   /// Fire when a new document has been created in Firestore.
@@ -463,6 +491,25 @@ class _LikesPageState extends ConsumerState<LikesPage> {
     } catch (error) {
       Utilities.logger.e(error);
     }
+  }
+
+  /// On scroll notification
+  bool onNotification(ScrollNotification notification) {
+    if (notification.metrics.pixels < 50 && _showFab) {
+      setState(() => _showFab = false);
+    } else if (notification.metrics.pixels > 50 && !_showFab) {
+      setState(() => _showFab = true);
+    }
+
+    if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
+      return false;
+    }
+
+    if (_hasNext && !_loadingMore && _lastDocument != null) {
+      fetchMoreLikes();
+    }
+
+    return false;
   }
 
   void onPopupMenuBookSelected(
