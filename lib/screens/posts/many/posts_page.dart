@@ -17,6 +17,7 @@ import 'package:artbooking/types/enums/enum_post_item_action.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
+import 'package:artbooking/types/firestore/query_snap_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/popup_entry_post.dart';
@@ -38,45 +39,34 @@ class PostsPage extends ConsumerStatefulWidget {
 }
 
 class _LicensesPageState extends ConsumerState<PostsPage> {
-  /// True if there're more data to fetch.
-  bool _hasNext = true;
-
-  /// True if loading more style from Firestore.
-  bool _loadingMore = false;
-
-  /// Posts displayed order.
-  bool _descending = true;
-
-  /// True if the data is loading.
-  bool _loading = false;
-
   /// True if currently creating a new post.
   bool _creating = false;
 
+  /// Posts displayed order If true, start with the most recent.
+  bool _descending = true;
+
+  /// True if there're more data to fetch.
+  bool _hasNext = true;
+
+  /// Loading the next page if true.
+  bool _loadingMore = false;
+
+  /// Loading the current page if true.
+  bool _loading = false;
+
   /// Last fetched document snapshot. Used for pagination.
-  DocumentSnapshot<Object>? _lastDocumentSnapshot;
-
-  /// Staff's available licenses.
-  final List<Post> _posts = [];
-
-  /// Search results.
-  // final List<IllustrationLicense> _suggestionsLicenses = [];
-
-  /// Search controller.
-  final _searchTextController = TextEditingController();
-
-  /// Maximum licenses to fetch in one request.
-  int _limit = 20;
-
-  QuerySnapshotStreamSubscription? _postSubscription;
-
-  /// Delay search after typing input.
-  Timer? _searchTimer;
+  DocumentSnapshot<Object>? _lastDocument;
 
   /// Selected tab to show (published or drafts).
   var _selectedTab = EnumContentVisibility.public;
 
-  /// Items when opening the popup.
+  /// Maximum posts to fetch in one request.
+  int _limit = 20;
+
+  /// Post list.
+  final List<Post> _posts = [];
+
+  /// Menu items on post.
   final List<PopupEntryPost> _postPopupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumPostItemAction.delete,
@@ -84,6 +74,17 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
       textLabel: "delete".tr(),
     ),
   ];
+
+  /// Search results.
+  // final List<IllustrationLicense> _suggestionsLicenses = [];
+
+  QuerySnapshotStreamSubscription? _postSubscription;
+
+  /// Delay search after typing input.
+  Timer? _searchTimer;
+
+  /// Search controller.
+  final _searchTextController = TextEditingController();
 
   @override
   initState() {
@@ -172,23 +173,19 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
 
   /// Fetch published posts on Firestore.
   void fetchPublishedPosts() async {
-    _postSubscription?.cancel();
-
     setState(() {
-      _lastDocumentSnapshot = null;
+      _lastDocument = null;
       _posts.clear();
       _loading = true;
     });
 
     try {
-      final query = await FirebaseFirestore.instance
+      final QuerySnapMap snapshot = await FirebaseFirestore.instance
           .collection("posts")
           .where("visibility", isEqualTo: "public")
           .orderBy("published_at", descending: true)
-          .limit(_limit);
-
-      listenPostEvents(query);
-      final snapshot = await query.get();
+          .limit(_limit)
+          .get();
 
       if (snapshot.size == 0) {
         setState(() {
@@ -200,15 +197,17 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
       }
 
       for (final QueryDocSnapMap doc in snapshot.docs) {
-        final data = doc.data();
+        final Json data = doc.data();
         data["id"] = doc.id;
 
-        final post = Post.fromMap(data);
+        final Post post = Post.fromMap(data);
         _posts.add(post);
       }
 
       _hasNext = _limit == snapshot.size;
-      _lastDocumentSnapshot = snapshot.docs.last;
+      _lastDocument = snapshot.docs.last;
+
+      listenPostEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
@@ -219,7 +218,7 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
 
   /// Fetch more published posts on Firestore.
   void fetchMorePublishedPosts() async {
-    final lastDocumentSnapshot = _lastDocumentSnapshot;
+    final DocumentSnapshot? lastDocumentSnapshot = _lastDocument;
     if (_loadingMore || !_hasNext || lastDocumentSnapshot == null) {
       return;
     }
@@ -227,7 +226,7 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
     setState(() => _loadingMore = true);
 
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final QuerySnapMap snapshot = await FirebaseFirestore.instance
           .collection("posts")
           .where("visibility", isEqualTo: "public")
           .orderBy("published_at", descending: true)
@@ -238,22 +237,24 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
         setState(() {
           _hasNext = false;
           _loadingMore = false;
-          _lastDocumentSnapshot = null;
+          _lastDocument = null;
         });
 
         return;
       }
 
       for (final QueryDocSnapMap doc in snapshot.docs) {
-        final data = doc.data();
+        final Json data = doc.data();
         data["id"] = doc.id;
 
-        final post = Post.fromMap(data);
+        final Post post = Post.fromMap(data);
         _posts.add(post);
       }
 
       _hasNext = _limit == snapshot.size;
-      _lastDocumentSnapshot = snapshot.docs.last;
+      _lastDocument = snapshot.docs.last;
+
+      listenPostEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
@@ -264,23 +265,19 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
 
   /// Fetch drafts posts on Firestore.
   void fetchDrafts() async {
-    _postSubscription?.cancel();
-
     setState(() {
-      _lastDocumentSnapshot = null;
+      _lastDocument = null;
       _posts.clear();
       _loading = true;
     });
 
     try {
-      final query = await FirebaseFirestore.instance
+      final QuerySnapMap snapshot = await FirebaseFirestore.instance
           .collection("posts")
           .where("visibility", isEqualTo: "private")
           .orderBy("created_at", descending: _descending)
-          .limit(_limit);
-
-      listenPostEvents(query);
-      final snapshot = await query.get();
+          .limit(_limit)
+          .get();
 
       if (snapshot.size == 0) {
         setState(() {
@@ -292,15 +289,17 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
       }
 
       for (final QueryDocSnapMap doc in snapshot.docs) {
-        final data = doc.data();
+        final Json data = doc.data();
         data["id"] = doc.id;
 
-        final post = Post.fromMap(data);
+        final Post post = Post.fromMap(data);
         _posts.add(post);
       }
 
       _hasNext = _limit == snapshot.size;
-      _lastDocumentSnapshot = snapshot.docs.last;
+      _lastDocument = snapshot.docs.last;
+
+      listenPostEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
@@ -311,7 +310,7 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
 
   /// Fetch more drafts posts on Firestore.
   void fetchMoreDrafts() async {
-    final lastDocumentSnapshot = _lastDocumentSnapshot;
+    final DocumentSnapshot? lastDocumentSnapshot = _lastDocument;
     if (_loadingMore || !_hasNext || lastDocumentSnapshot == null) {
       return;
     }
@@ -319,7 +318,7 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
     setState(() => _loadingMore = true);
 
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final QuerySnapMap snapshot = await FirebaseFirestore.instance
           .collection("posts")
           .where("visibility", isEqualTo: "private")
           .orderBy("created_at", descending: _descending)
@@ -330,28 +329,54 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
         setState(() {
           _hasNext = false;
           _loadingMore = false;
-          _lastDocumentSnapshot = null;
+          _lastDocument = null;
         });
 
         return;
       }
 
       for (final QueryDocSnapMap doc in snapshot.docs) {
-        final data = doc.data();
+        final Json data = doc.data();
         data["id"] = doc.id;
 
-        final post = Post.fromMap(data);
+        final Post post = Post.fromMap(data);
         _posts.add(post);
       }
 
       _hasNext = _limit == snapshot.size;
-      _lastDocumentSnapshot = snapshot.docs.last;
+      _lastDocument = snapshot.docs.last;
+
+      listenPostEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     } finally {
       setState(() => _loadingMore = false);
     }
+  }
+
+  /// Return the query to listen changes to.
+  QueryMap? getListenQuery() {
+    final DocumentSnapshot? lastDocument = _lastDocument;
+    if (lastDocument == null) {
+      return null;
+    }
+
+    if (_selectedTab == EnumContentVisibility.public) {
+      return FirebaseFirestore.instance
+          .collection("posts")
+          .where("visibility", isEqualTo: "public")
+          .orderBy("published_at", descending: true)
+          .limit(_limit)
+          .endAtDocument(lastDocument);
+    }
+
+    return FirebaseFirestore.instance
+        .collection("posts")
+        .where("visibility", isEqualTo: "private")
+        .orderBy("created_at", descending: _descending)
+        .limit(_limit)
+        .endAtDocument(lastDocument);
   }
 
   void loadPreferences() {
@@ -382,7 +407,7 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
       return false;
     }
 
-    if (_hasNext && !_loadingMore && _lastDocumentSnapshot != null) {
+    if (_hasNext && !_loadingMore && _lastDocument != null) {
       fetchMorePublishedPosts();
     }
 
@@ -400,7 +425,11 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
   }
 
   /// Listen to the last Firestore query of this page.
-  void listenPostEvents(QueryMap query) {
+  void listenPostEvents(QueryMap? query) {
+    if (query == null) {
+      return;
+    }
+
     _postSubscription?.cancel();
     _postSubscription = query.snapshots().skip(1).listen(
       (snapshot) {
