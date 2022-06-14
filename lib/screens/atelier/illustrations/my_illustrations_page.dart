@@ -8,6 +8,7 @@ import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
@@ -29,8 +30,10 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/popup_entry_illustration.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:beamer/beamer.dart';
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
@@ -52,8 +55,14 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   /// If true, multiple illustrations can be select for group actions.
   bool _forceMultiSelect = false;
 
+  /// Disable file drop when navigating to a new page.
+  bool _enableFileDrop = true;
+
   /// If true, there are more books to fetch.
   bool _hasNext = true;
+
+  /// If true, a file is being dragged on the app window.
+  bool _isDraggingFile = false;
 
   /// If true, an illustration is being dragged and we can auto-scroll on edges.
   bool _isDraggingIllustration = false;
@@ -80,6 +89,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   final _popupFocusNode = FocusNode();
 
+  final List<String> _allowedExt = ["jpg", "jpeg", "png", "webp", "tiff"];
   final List<Illustration> _illustrations = [];
 
   /// Available items for authenticated user and the illustration is not liked yet.
@@ -137,12 +147,20 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   /// Monitors periodically scroll when dragging illustration card on edges.
   Timer? _scrollTimer;
+  BeamerDelegate? _beamer;
 
   @override
   initState() {
     super.initState();
     loadPreferences();
     fetchData();
+
+    // NOTE: Beamer state isn't ready on 1st frame.
+    // So we use [addPostFrameCallback] to access the state in the next frame.
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      _beamer = Beamer.of(context);
+      Beamer.of(context).addListener(onRouteUpdate);
+    });
   }
 
   @override
@@ -153,6 +171,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     _multiSelectedItems.clear();
     _illustrations.clear();
     _scrollTimer?.cancel();
+    _beamer?.removeListener(onRouteUpdate);
     super.dispose();
   }
 
@@ -178,61 +197,132 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
           isOwner: isOwner,
         ),
         body: Listener(
+          // for auto-scoll on dragging on edges.
           onPointerMove: onPointerMove,
-          child: ImprovedScrolling(
-            scrollController: _scrollController,
-            enableKeyboardScrolling: true,
-            onScroll: onScroll,
-            child: ScrollConfiguration(
-              behavior: CustomScrollBehavior(),
-              child: CustomScrollView(
-                controller: _scrollController,
-                slivers: <Widget>[
-                  ApplicationBar(),
-                  MyIllustrationsPageHeader(
-                    isOwner: isOwner,
-                    limitThreeInRow: _layoutThreeInRow,
-                    multiSelectActive: _forceMultiSelect,
-                    multiSelectedItems: _multiSelectedItems,
-                    onAddGroupToBook: showAddGroupToBook,
-                    onChangeGroupVisibility: showGroupVisibilityDialog,
-                    onChangedTab: onChangedTab,
-                    onClearSelection: onClearSelection,
-                    onConfirmDeleteGroup: confirmDeleteGroup,
-                    onGoToUserProfile: onGoToUserProfile,
-                    onSelectAll: onSelectAll,
-                    onTriggerMultiSelect: onTriggerMultiSelect,
-                    onUpdateLayout: onUpdateLayout,
-                    onUploadIllustration: uploadIllustration,
-                    selectedTab: _selectedTab,
-                    showBackButton: widget.userId.isNotEmpty,
-                    username: _username,
+          child: DropTarget(
+            // for file drop -> upload illustration.
+            enable: _enableFileDrop,
+            onDragEntered: onDragFileEntered,
+            onDragDone: onDragFileDone,
+            onDragExited: onDragFileExited,
+            child: Stack(
+              children: [
+                Container(
+                  decoration: _isDraggingFile
+                      ? BoxDecoration(
+                          border: Border.all(
+                            color: Constants.colors.tertiary,
+                            width: 4.0,
+                          ),
+                          borderRadius: BorderRadius.circular(4.0),
+                        )
+                      : null,
+                  child: ImprovedScrolling(
+                    scrollController: _scrollController,
+                    enableKeyboardScrolling: true,
+                    onScroll: onScroll,
+                    child: ScrollConfiguration(
+                      behavior: CustomScrollBehavior(),
+                      child: CustomScrollView(
+                        controller: _scrollController,
+                        slivers: <Widget>[
+                          ApplicationBar(),
+                          MyIllustrationsPageHeader(
+                            isOwner: isOwner,
+                            limitThreeInRow: _layoutThreeInRow,
+                            multiSelectActive: _forceMultiSelect,
+                            multiSelectedItems: _multiSelectedItems,
+                            onAddGroupToBook: showAddGroupToBook,
+                            onChangeGroupVisibility: showGroupVisibilityDialog,
+                            onChangedTab: onChangedTab,
+                            onClearSelection: onClearSelection,
+                            onConfirmDeleteGroup: confirmDeleteGroup,
+                            onGoToUserProfile: onGoToUserProfile,
+                            onSelectAll: onSelectAll,
+                            onTriggerMultiSelect: onTriggerMultiSelect,
+                            onUpdateLayout: onUpdateLayout,
+                            onUploadIllustration: uploadIllustration,
+                            selectedTab: _selectedTab,
+                            showBackButton: widget.userId.isNotEmpty,
+                            username: _username,
+                          ),
+                          MyIllustrationsPageBody(
+                            authenticated: authenticated,
+                            forceMultiSelect: _forceMultiSelect,
+                            illustrations: _illustrations,
+                            isOwner: isOwner,
+                            likePopupMenuEntries: _likePopupMenuEntries,
+                            limitThreeInRow: _layoutThreeInRow,
+                            loading: _loading,
+                            multiSelectedItems: _multiSelectedItems,
+                            onDoubleTap: onDoubleTapIllustrationItem,
+                            onDragIllustrationCompleted:
+                                onDragIllustrationCompleted,
+                            onDragIllustrationEnd: onDragIllustrationEnd,
+                            onDragIllustrationStarted:
+                                onDragIllustrationStarted,
+                            onDraggableIllustrationCanceled:
+                                onDraggableIllustrationCanceled,
+                            onDropIllustration: onDropIllustration,
+                            onGoToActiveTab: onGoToActiveTab,
+                            onPopupMenuItemSelected: onPopupMenuItemSelected,
+                            onTapIllustration: onTapIllustration,
+                            popupMenuEntries: popupMenuEntries,
+                            selectedTab: _selectedTab,
+                            unlikePopupMenuEntries: _unlikePopupMenuEntries,
+                            uploadIllustration: uploadIllustration,
+                          ),
+                          SliverPadding(
+                            padding: const EdgeInsets.only(bottom: 300.0),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  MyIllustrationsPageBody(
-                    authenticated: authenticated,
-                    forceMultiSelect: _forceMultiSelect,
-                    illustrations: _illustrations,
-                    isOwner: isOwner,
-                    likePopupMenuEntries: _likePopupMenuEntries,
-                    limitThreeInRow: _layoutThreeInRow,
-                    loading: _loading,
-                    multiSelectedItems: _multiSelectedItems,
-                    onDoubleTap: onDoubleTapIllustrationItem,
-                    onDragIllustrationCompleted: onDragIllustrationCompleted,
-                    onDragIllustrationEnd: onDragIllustrationEnd,
-                    onDragIllustrationStarted: onDragIllustrationStarted,
-                    onDraggableIllustrationCanceled:
-                        onDraggableIllustrationCanceled,
-                    onDropIllustration: onDropIllustration,
-                    onGoToActiveTab: onGoToActiveTab,
-                    onPopupMenuItemSelected: onPopupMenuItemSelected,
-                    onTapIllustration: onTapIllustration,
-                    popupMenuEntries: popupMenuEntries,
-                    selectedTab: _selectedTab,
-                    unlikePopupMenuEntries: _unlikePopupMenuEntries,
-                    uploadIllustration: uploadIllustration,
+                ),
+                dropHint(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget dropHint() {
+    if (!_isDraggingFile) {
+      return Container();
+    }
+
+    return Positioned(
+      bottom: 24.0,
+      left: 0.0,
+      right: 0.0,
+      child: Align(
+        alignment: Alignment.center,
+        child: SizedBox(
+          width: 500.0,
+          child: Card(
+            elevation: 6.0,
+            color: Constants.colors.tertiary,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      "Drop the file here to upload a new illustration",
+                      style: Utilities.fonts.body(
+                        color: Colors.black,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
-                  SliverPadding(padding: const EdgeInsets.only(bottom: 300.0)),
+                  Icon(
+                    UniconsLine.tear,
+                    color: Colors.black,
+                  ),
                 ],
               ),
             ),
@@ -806,6 +896,62 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     onLike(illustration, index);
   }
 
+  /// Callback event fired when files are dropped on this page.
+  /// Try to upload them as image and create correspondig illustrations.
+  void onDragFileDone(DropDoneDetails dropDoneDetails) async {
+    final List<FilePickerCross> files = [];
+
+    for (final file in dropDoneDetails.files) {
+      final int length = await file.length();
+
+      if (length > 25000000) {
+        context.showErrorBar(
+          content: Text(
+            "illustration_upload_size_limit".tr(
+              args: [file.name, length.toString(), "25"],
+            ),
+          ),
+        );
+        continue;
+      }
+
+      final int dotIndex = file.path.lastIndexOf(".");
+      final String extension = file.path.substring(dotIndex + 1);
+
+      if (!_allowedExt.contains(extension)) {
+        context.showErrorBar(
+          content: Text(
+            "illustration_upload_invalid_extension".tr(
+              args: [file.name, _allowedExt.join(", ")],
+            ),
+          ),
+        );
+        continue;
+      }
+
+      final FilePickerCross filePickerCross = FilePickerCross(
+        await file.readAsBytes(),
+        path: file.path,
+        type: FileTypeCross.image,
+        fileExtension: extension,
+      );
+
+      files.add(filePickerCross);
+    }
+
+    ref.read(AppState.uploadTaskListProvider.notifier).handleDropFiles(files);
+  }
+
+  /// Callback event fired when a pointer enters this page with files.
+  void onDragFileEntered(DropEventDetails dropEventDetails) {
+    setState(() => _isDraggingFile = true);
+  }
+
+  /// Callback event fired when a pointer exits this page with files.
+  void onDragFileExited(DropEventDetails dropEventDetails) {
+    setState(() => _isDraggingFile = false);
+  }
+
   void onDragIllustrationCompleted() {
     _isDraggingIllustration = false;
   }
@@ -1036,6 +1182,20 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         (illustration) => illustration.id == documentChange.doc.id,
       );
     });
+  }
+
+  /// Callback fired when route changes.
+  void onRouteUpdate() {
+    final String? stringLocation = Beamer.of(context)
+        .beamingHistory
+        .last
+        .history
+        .last
+        .routeInformation
+        .location;
+
+    _enableFileDrop =
+        stringLocation == AtelierLocationContent.illustrationsRoute;
   }
 
   /// Callback when the page scrolls up and down.

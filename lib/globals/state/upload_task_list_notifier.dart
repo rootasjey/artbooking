@@ -117,6 +117,22 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     return passedFiles;
   }
 
+  /// Receive a list of files and try to upload images and create illustrations.
+  Future<List<FilePickerCross>> handleDropFiles(
+    List<FilePickerCross> files,
+  ) async {
+    final List<FilePickerCross> filteredFiles = files
+        .where(_checkSize)
+        .where((FilePickerCross file) => file.path != null)
+        .toList();
+
+    for (FilePickerCross file in filteredFiles) {
+      _uploadIllustration(file);
+    }
+
+    return filteredFiles;
+  }
+
   /// Select an image file to upload to your illustrations collection,
   /// and add this illustration to the specified book (with its id).
   Future<List<FilePickerCross>> pickImageAndAddToBook({
@@ -261,7 +277,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
             "extension": extension,
             "firestore_id": illustrationId,
             "file_type": "illustration",
-            "userId": userId,
+            "user_id": userId,
             "visibility": "public",
           },
           contentType: mimeFromExtension(
