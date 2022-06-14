@@ -201,7 +201,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
           onPointerMove: onPointerMove,
           child: DropTarget(
             // for file drop -> upload illustration.
-            enable: _enableFileDrop,
+            enable: _enableFileDrop && isOwner,
             onDragEntered: onDragFileEntered,
             onDragDone: onDragFileDone,
             onDragExited: onDragFileExited,
