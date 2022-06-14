@@ -625,7 +625,9 @@
     "many": "{} uploaded.",
     "other": "{} uploaded."
   },
+  "illustration_upload_invalid_extension": "File {} does not seem to be an image or it does not have a valid extension. Valid extention should be among the following: {}.",
   "illustration_upload_error": "Sorry, there was an issue while uploading your illustration. Please try again later.",
+  "illustration_upload_size_limit": "File {} size is {} and exceeds {}MB limit.",
   "illustration_uploading_files": {
     "zero": "Uploading no file.",
     "one": "Uploading {} file...",
