@@ -15,8 +15,13 @@ class UploadWindowBody extends ConsumerWidget {
     this.onToggleExpanded,
   }) : super(key: key);
 
+  /// The panel has its maximum size if true. Otherwise the window is minized.
   final bool expanded;
+
+  /// List of upload tasks.
   final List<CustomUploadTask> uploadTaskList;
+
+  /// Callback event to expand or minimize upload panel.
   final void Function()? onToggleExpanded;
 
   @override
@@ -37,7 +42,7 @@ class UploadWindowBody extends ConsumerWidget {
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: uploadTaskList.map((customUploadTask) {
+            children: uploadTaskList.map((CustomUploadTask customUploadTask) {
               return UploadPanelItemCard(
                 customUploadTask: customUploadTask,
                 onTap: () {
@@ -48,9 +53,21 @@ class UploadWindowBody extends ConsumerWidget {
                     return;
                   }
 
-                  if (customUploadTask.task?.snapshot.state ==
-                      TaskState.success) {
+                  final TaskState? uploadTaskState =
+                      customUploadTask.task?.snapshot.state;
+
+                  if (uploadTaskState == TaskState.success) {
                     onToggleExpanded?.call();
+
+                    final int totalBytes =
+                        customUploadTask.task?.snapshot.totalBytes ?? 0;
+
+                    ref
+                        .read(AppState.uploadBytesTransferredProvider.notifier)
+                        .remove(totalBytes);
+                    ref
+                        .read(AppState.uploadTaskListProvider.notifier)
+                        .removeDone(customUploadTask);
 
                     final String route =
                         AtelierLocationContent.illustrationRoute.replaceFirst(
