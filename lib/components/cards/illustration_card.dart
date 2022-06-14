@@ -245,7 +245,6 @@ class _IllustrationCardState extends State<IllustrationCard>
 
   Widget imageCard({bool usingAsDropTarget = false}) {
     final String imageUrl = widget.illustration.getThumbnail();
-    final Color defaultColor = Colors.transparent;
     final Color primaryColor = Theme.of(context).primaryColor;
 
     BorderSide borderSide = BorderSide.none;
@@ -255,7 +254,7 @@ class _IllustrationCardState extends State<IllustrationCard>
     }
 
     Widget cardChild = Card(
-      color: widget.selected ? primaryColor : defaultColor,
+      color: Theme.of(context).backgroundColor,
       elevation: _elevation,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
@@ -276,6 +275,8 @@ class _IllustrationCardState extends State<IllustrationCard>
               return Ink.image(
                 image: state.imageProvider,
                 fit: BoxFit.cover,
+                width: widget.size,
+                height: widget.size,
                 child: InkWell(
                   onTap: widget.onTap,
                   // onLongPress: onLongPressImage,
@@ -516,14 +517,15 @@ class _IllustrationCardState extends State<IllustrationCard>
 
     if (!widget.selected) {
       return Positioned(
-        top: 10.0,
-        right: 10.0,
+        bottom: 10.0,
+        left: 10.0,
         child: Material(
-          elevation: 1.0,
-          color: Colors.red.shade100,
+          elevation: 2.0,
+          color: Colors.indigo,
           clipBehavior: Clip.hardEdge,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(6.0),
+            side: BorderSide(color: Colors.white, width: 2.0),
           ),
           child: Icon(
             UniconsLine.square_full,
@@ -534,18 +536,23 @@ class _IllustrationCardState extends State<IllustrationCard>
     }
 
     return Positioned(
-      top: 10.0,
-      right: 10.0,
+      bottom: 10.0,
+      left: 10.0,
       child: Material(
-        elevation: 2.0,
-        color: Colors.pink.shade100,
+        elevation: 4.0,
+        color: Colors.indigo.shade700,
         clipBehavior: Clip.hardEdge,
         shape: RoundedRectangleBorder(
-          side: BorderSide.none,
+          side: BorderSide(color: Colors.white, width: 2.0),
+          borderRadius: BorderRadius.circular(24.0),
         ),
-        child: Icon(
-          UniconsLine.check_square,
-          color: Theme.of(context).secondaryHeaderColor,
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Icon(
+            UniconsLine.check,
+            size: 18.0,
+            color: Colors.white,
+          ),
         ),
       ),
     );
