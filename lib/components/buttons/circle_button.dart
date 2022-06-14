@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 /// An alternative to IconButton.
 class CircleButton extends StatelessWidget {
   CircleButton({
-    this.onTap,
     required this.icon,
+    this.onTap,
     this.radius = 20.0,
     this.elevation = 0.0,
     this.backgroundColor = Colors.black12,
     this.tooltip,
     this.showBorder = false,
+    this.margin = EdgeInsets.zero,
   });
 
   /// Tap callback.
@@ -27,6 +28,7 @@ class CircleButton extends StatelessWidget {
   final Color backgroundColor;
 
   final double elevation;
+  final EdgeInsets margin;
 
   // final BorderSide borderSide;
   final bool showBorder;
@@ -51,16 +53,19 @@ class CircleButton extends StatelessWidget {
       );
     }
 
-    return Material(
-      shape: CircleBorder(
-        side: showBorder
-            ? BorderSide(color: Colors.white38, width: 2.0)
-            : BorderSide.none,
+    return Padding(
+      padding: margin,
+      child: Material(
+        shape: CircleBorder(
+          side: showBorder
+              ? BorderSide(color: Colors.white38, width: 2.0)
+              : BorderSide.none,
+        ),
+        clipBehavior: Clip.antiAlias,
+        color: Colors.transparent,
+        elevation: elevation,
+        child: child,
       ),
-      clipBehavior: Clip.antiAlias,
-      color: Colors.transparent,
-      elevation: elevation,
-      child: child,
     );
   }
 

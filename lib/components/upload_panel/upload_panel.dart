@@ -17,18 +17,32 @@ class UploadWindow extends ConsumerStatefulWidget {
 }
 
 class _UploadWindowState extends ConsumerState<UploadWindow> {
+  /// Grow the upload panel to a maxium size if true.
+  /// Otherwise minimize the window.
   bool _expanded = false;
 
+  /// Upload's panel current width.
   double _width = 260.0;
+
+  /// Upload's panel current height.
   double _height = 100.0;
 
+  /// Upload's panel initial width.
+
   double _initialWidth = 260.0;
+
+  /// Upload's panel initial height.
   double _initialHeight = 100.0;
 
+  /// Upload's panel maximum possible width.
+
   double _maxWidth = 360.0;
+
+  /// Upload's panel maximum possible height.
   double _maxHeight = 300.0;
 
-  ScrollController _scrollController = ScrollController();
+  /// Page scroll controller
+  ScrollController _pageScrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +75,7 @@ class _UploadWindowState extends ConsumerState<UploadWindow> {
         child: InkWell(
           onTap: onToggleExpanded,
           child: SingleChildScrollView(
-            controller: _scrollController,
+            controller: _pageScrollController,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

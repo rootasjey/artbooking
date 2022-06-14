@@ -20,9 +20,16 @@ class UploadPanelItemCard extends ConsumerStatefulWidget {
     this.onTap,
   }) : super(key: key);
 
+  /// Upload task to follow upload progression.
   final CustomUploadTask customUploadTask;
+
+  /// Callback event fired if the upload is canceled.
   final void Function()? onCancel;
+
+  /// Callback event fired if the upload has completed.
   final void Function()? onDone;
+
+  /// Callback event fired on item tap.
   final void Function()? onTap;
 
   @override
@@ -30,12 +37,19 @@ class UploadPanelItemCard extends ConsumerStatefulWidget {
 }
 
 class _UploadItemCardState extends ConsumerState<UploadPanelItemCard> {
+  /// This items card's elevation.
   double _elevation = 0.0;
+
+  /// True if there's a pointer hover this item card.
   bool _isHover = false;
 
+  /// Data transferred in bytes.
   int _bytesTransferred = 0;
+
+  /// Total file's size in bytes.
   int _totalBytes = 0;
 
+  /// Used to follow upload progression.
   StreamSubscription<TaskSnapshot>? _taskListener;
 
   @override

@@ -9,14 +9,16 @@ class UploadPanelCancelButton extends ConsumerWidget {
   const UploadPanelCancelButton({
     Key? key,
     required this.pendingTaskCount,
+    this.margin = const EdgeInsets.only(left: 8.0),
   }) : super(key: key);
 
   final int pendingTaskCount;
+  final EdgeInsets margin;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4.0),
+      padding: margin,
       child: CircleButton(
         onTap: () {
           ref.read(AppState.uploadTaskListProvider.notifier).cancelAll();

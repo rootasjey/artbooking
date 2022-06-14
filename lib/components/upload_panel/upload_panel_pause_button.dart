@@ -9,9 +9,11 @@ class UploadPanelPauseButton extends ConsumerWidget {
   const UploadPanelPauseButton({
     Key? key,
     required this.hide,
+    this.margin: const EdgeInsets.only(),
   }) : super(key: key);
 
   final bool hide;
+  final EdgeInsets margin;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

@@ -11,8 +11,13 @@ class UploadPanelHeaderButtons extends StatelessWidget {
     required this.pendingTaskCount,
   }) : super(key: key);
 
+  /// Current active tasks
   final int runningTaskCount;
+
+  /// Current paused tasks
   final int pausedTaskCount;
+
+  /// Current pending tasks
   final int pendingTaskCount;
 
   @override
