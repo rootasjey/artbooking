@@ -554,14 +554,13 @@ export const onStorageUpload = functions
     const customMetadata = objectMeta.metadata;
     if (!customMetadata) { return; }
 
-    const { firestoreId, visibility, target } = customMetadata;
-    const fileType = customMetadata.file_type;
+    const { file_type, firestore_id, visibility, target } = customMetadata;
 
-    if (fileType === "profile_picture" && target === "profile_picture") {
+    if (file_type === "profile_picture" && target === "profile_picture") {
       return await setUserProfilePicture(objectMeta);
     }
     
-    if (fileType !== "illustration") {
+    if (file_type !== "illustration") {
       return;
     }
 
@@ -571,7 +570,7 @@ export const onStorageUpload = functions
     
     const endIndex: number = filepath.indexOf('/illustrations')
     const userId = filepath.substring(6, endIndex)
-    if (!firestoreId || !userId) { return; }
+    if (!firestore_id || !userId) { return; }
 
     // Exit if thumbnail or not an image file.
     const contentType = objectMeta.contentType || '';
@@ -584,7 +583,7 @@ export const onStorageUpload = functions
     // Check if same user as firestore illustration
     const illustrationSnapshot = await firestore
       .collection(ILLUSTRATIONS_COLLECTION_NAME)
-      .doc(firestoreId)
+      .doc(firestore_id)
       .get();
 
     const illustrationData = illustrationSnapshot.data()
