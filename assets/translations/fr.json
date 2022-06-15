@@ -626,6 +626,8 @@
     "other": "{} envoyées."
   },
   "illustration_upload_error": "Désolés, nous avons rencontré une erreur durant le transfert de votre illustration. Veuillez réessayer plus tard.",
+  "illustration_upload_file": "Lâcher le fichier ici pour charger une nouvelle illustration",
+  "illustration_upload_file_to_book": "Lâcher le fichier ici pour charger une nouvelle illustration et l'ajouter à ce book",
   "illustration_upload_invalid_extension": "Le fichier {} ne semble pas être une image ou n'a pas d'extention valide. Les extentions autorisées sont parmi les suivantes: {}.",
   "illustration_upload_size_limit": "Le fichier {} pèse {} et dépasse la limite des {}MB.",
   "illustration_uploading_files": {
