@@ -6,6 +6,15 @@ class Constants {
   static const String appVersion = '0.46.0';
   static const int appBuildNumber = 2;
 
+  /// Allowed image file extension for illustrations.
+  static const List<String> allowedImageExt = [
+    "jpg",
+    "jpeg",
+    "png",
+    "webp",
+    "tiff",
+  ];
+
   static final colors = ColorsConstants();
   static const links = const LinksContants();
   static const storageKeys = const StorageKeys();
