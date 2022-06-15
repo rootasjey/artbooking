@@ -12,11 +12,13 @@ import {
   allowedLicenseTypes,
   ART_MOVEMENTS_COLLECTION_NAME,
   BASE_DOCUMENT_NAME,
+  BOOKS_COLLECTION_NAME,
   checkVisibilityValue,
   cloudRegions,
   ILLUSTRATIONS_COLLECTION_NAME,
   ILLUSTRATION_STATISTICS_COLLECTION_NAME,
   STORAGES_DOCUMENT_NAME,
+  TASKS_COLLECTION_NAME,
   USERS_COLLECTION_NAME,
   USER_STATISTICS_COLLECTION_NAME
 } from './utils';
@@ -576,7 +578,6 @@ export const onStorageUpload = functions
     const contentType = objectMeta.contentType || '';
 
     if (filename.includes('thumb@') || !contentType.includes('image')) {
-      console.info(`Exiting function => existing image or non-file image: ${filepath}`);
       return false;
     }
 
@@ -643,6 +644,7 @@ export const onStorageUpload = functions
         },
         extension,
         links: {
+          illustration_id: illustrationSnapshot.id,
           original: firebaseDownloadUrl,
           storage: storageUrl,
           thumbnails,
@@ -651,6 +653,8 @@ export const onStorageUpload = functions
         updated_at: adminApp.firestore.Timestamp.now(),
         version,
       });
+
+    await checkBookCoverTasks(illustrationSnapshot.id);
 
     // Skip update used storage if we're updating the image file
     // (crop, rotate, flip).
@@ -1098,11 +1102,107 @@ export const updateVisibility = functions
 // Helper functions
 // ----------------
 
+/** Check if the thumbnail generation has an associated book cover task. */
+async function checkBookCoverTasks(illustrationId: string) {
+  const taskSnapshot = await firestore
+    .collection(TASKS_COLLECTION_NAME)
+    .where("name", "==", "illustration_thumbnail_generation_book_cover")
+    .where("target.illustration_id", "==", illustrationId)
+    .get();
+
+  for await (const taskDoc of taskSnapshot.docs) {
+    const taskData = taskDoc.data();
+    const bookSnapshot = await firestore
+      .collection(BOOKS_COLLECTION_NAME)
+      .doc(taskData.target.book_id)
+      .get();
+
+    const bookData = bookSnapshot.data();
+    if (!taskDoc.exists || !taskData || !bookSnapshot.exists || !bookData) {
+      console.log(
+        `⚠️ Warning: Found a task with an unexisting book'id ` + 
+        `(${taskData.target.book_id}). Deleting this task`
+      );
+      
+      await taskDoc.ref.delete();
+      continue;
+    }
+
+    const illustrationSnapshot = await firestore
+    .collection(ILLUSTRATIONS_COLLECTION_NAME)
+    .doc(illustrationId)
+    .get();
+
+    const illustrationData = illustrationSnapshot.data();
+    if (!illustrationSnapshot.exists || !illustrationData) {
+      console.log(
+        `⚠️ Warning: Found a task with an unexisting illustration'id ` + 
+        `(${taskData.target.illustration_id}). Deleting this task`
+      );
+      
+      await taskDoc.ref.delete();
+      return;
+    }
+
+    await bookSnapshot.ref.update({
+      cover: {
+        links: illustrationData.links,
+        mode: bookData.cover?.mode,
+        updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      },
+      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+    });
+
+    await taskDoc.ref.delete();
+  }
+}
+
+function checkIllustrationLicenseFormat(data: any) {
+  if (typeof data !== 'object') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      `The license data you provided is not an object. You provided a ${typeof data}. ` +
+      `You must specify an object, and it should have a [type] property which is a string, ` + 
+      `and an [id] property referencing an existing license in database.`,
+    )
+  }
+  
+  if (typeof data.id !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      `The license data you provided has the property [license.id] = ${data.id} - ` +
+      `which is not an string. ` +
+      `The property [id] must be a string ` + 
+      `and references an existing license in database.`,
+    )
+  }
+
+  if (typeof data.type !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      `The license data you provided has the property [license.type] = ${data.type} - ` +
+      `which is not an string. ` +
+      `The property [type] must be a string ` + 
+      `among these values: ${allowedLicenseTypes.join(", ")}`,
+    )
+  }
+
+  if (allowedLicenseTypes.includes(data.type)) {
+    return;
+  }
+
+  throw new functions.https.HttpsError(
+    'invalid-argument',
+    `The value provided for [type] parameter is not valid. ` +
+    `Allowed values are: ${allowedLicenseTypes.join(", ")}`,
+  );
+}
+
 /**
  * Check properties presence.
  * @param data Object containing updated properties.
  */
-function checkUpdatePresentationParams(data: UpdateIllusPresentationParams) {
+ function checkUpdatePresentationParams(data: UpdateIllusPresentationParams) {
   if (!data) {
     throw new functions.https.HttpsError(
       'invalid-argument', 
@@ -1149,47 +1249,6 @@ function checkUpdatePresentationParams(data: UpdateIllusPresentationParams) {
        `parameter which is the illustration's lore.`,
       );
   }
-}
-
-function checkIllustrationLicenseFormat(data: any) {
-  if (typeof data !== 'object') {
-    throw new functions.https.HttpsError(
-      'invalid-argument',
-      `The license data you provided is not an object. You provided a ${typeof data}. ` +
-      `You must specify an object, and it should have a [type] property which is a string, ` + 
-      `and an [id] property referencing an existing license in database.`,
-    )
-  }
-  
-  if (typeof data.id !== 'string') {
-    throw new functions.https.HttpsError(
-      'invalid-argument',
-      `The license data you provided has the property [license.id] = ${data.id} - ` +
-      `which is not an string. ` +
-      `The property [id] must be a string ` + 
-      `and references an existing license in database.`,
-    )
-  }
-
-  if (typeof data.type !== 'string') {
-    throw new functions.https.HttpsError(
-      'invalid-argument',
-      `The license data you provided has the property [license.type] = ${data.type} - ` +
-      `which is not an string. ` +
-      `The property [type] must be a string ` + 
-      `among these values: ${allowedLicenseTypes.join(", ")}`,
-    )
-  }
-
-  if (allowedLicenseTypes.includes(data.type)) {
-    return;
-  }
-
-  throw new functions.https.HttpsError(
-    'invalid-argument',
-    `The value provided for [type] parameter is not valid. ` +
-    `Allowed values are: ${allowedLicenseTypes.join(", ")}`,
-  );
 }
 
 /**

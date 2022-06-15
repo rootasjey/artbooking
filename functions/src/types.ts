@@ -84,6 +84,12 @@ enum EnumLicenseType {
   user = 'user',
 }
 
+interface AddTaskParams {
+  book_id: string;
+  bookCoverLinks: MasterpieceLinks;
+  illustration_id: string;
+}
+
 interface ApproveBookParams {
   /** Target book to update. */
   book_id: string;
@@ -320,6 +326,7 @@ interface License {
 }
 
 interface MasterpieceLinks {
+  illustration_id: string,
   original: string,
   share: { 
     read: string, 

@@ -9,6 +9,7 @@ import {
   checkVisibilityValue, 
   cloudRegions, 
   ILLUSTRATIONS_COLLECTION_NAME,
+  TASKS_COLLECTION_NAME,
   USERS_COLLECTION_NAME,
   USER_STATISTICS_COLLECTION_NAME
 } from './utils';
@@ -17,7 +18,7 @@ const firebaseTools = require('firebase-tools');
 const firestore = adminApp.firestore();
 
 /**
- * Add illustrations to a list of existing books.
+ * Add a list of illustrations to an existing book.
  */
 export const addIllustrations = functions
   .region(cloudRegions.eu)
@@ -78,10 +79,16 @@ export const addIllustrations = functions
     const bookIllustrations: BookIllustration[] = bookData.illustrations;
     let newBookIllustrations = bookIllustrations.concat(newIllustrations);
     
-    let bookCoverLinks = bookData.cover?.links
+    let bookCoverLinks: MasterpieceLinks = bookData.cover?.links
     if (bookData.cover?.mode === BookCoverMode.lastIllustrationAdded) {
       bookCoverLinks = await getBookCoverLinks(newBookIllustrations);
     }
+
+    await maybeAddTask({
+      bookCoverLinks, 
+      book_id: bookSnapshot.id, 
+      illustration_id: bookCoverLinks.illustration_id,
+    });
     
     if (newBookIllustrations.length > 100) {
       newBookIllustrations = newBookIllustrations.slice(0, 100);
@@ -90,8 +97,10 @@ export const addIllustrations = functions
 
     await bookSnapshot.ref.update({
       count: newBookIllustrations.length,
-      cover: { 
-        links: bookCoverLinks,
+      cover: {
+        links: bookCoverLinks.thumbnails.m.length > 0 
+          ? bookCoverLinks 
+          : bookData.cover?.links,
         mode: bookData.cover?.mode ?? BookCoverMode.lastIllustrationAdded,
         updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
       },
@@ -752,6 +761,7 @@ export const setCover = functions
 
     const illustrationLinks = illustrationData.links;
     const coverLinks: MasterpieceLinks = {
+      illustration_id: illustrationSnapshot.id,
       original: illustrationLinks.original,
       share: { read: "", write: "" },
       storage: illustrationLinks.storage,
@@ -1045,6 +1055,7 @@ async function getBookCoverLinks(
   bookIllustrations: BookIllustration[],
 ): Promise<MasterpieceLinks> {
   const defaultLinks: MasterpieceLinks = {
+    illustration_id: "",
     original: "https://firebasestorage.googleapis.com/v0/b/artbooking-54d22.appspot.com/o/static%2Fimages%2Fbooks%2Fdefault%2Fbook_cover_original.png?alt=media&token=81d7ff5f-c92f-4159-9716-25066bcc39b1",
     share: { read: "", write: "" },
     storage: "/static/images/books/default",
@@ -1077,6 +1088,8 @@ async function getBookCoverLinks(
     return defaultLinks;
   }
 
+  // NOTE: Can be removed later (after data wipe out).
+  illustrationData.links.illustration_id = lastAddedIllustration.id;
   return illustrationData.links;
 }
 
@@ -1096,5 +1109,33 @@ async function getNextBookIndex(userId: string) {
   let userBookCreated: number = userBookStatsData.created ?? 0
   userBookCreated = typeof userBookCreated === 'number' ? userBookCreated + 1 : 1
   return userBookCreated
+}
+
+/**
+ * Add a new task to set book's cover 
+ * when illustration's thumbnails have finished generated.
+ * @param data Data to create the suitable task (bookCoverLinks, book's id, illustration's id).
+ * @returns Nothing.
+ */
+async function maybeAddTask(data: AddTaskParams) {
+  const { bookCoverLinks, book_id, illustration_id } = data;
+
+  // If the following test is true, thumbnails has been generated.
+  if (bookCoverLinks.thumbnails.m.length > 0) {
+    return;
+  }
+
+  await firestore
+    .collection(TASKS_COLLECTION_NAME)
+    .add({
+      created_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      description: "A task to asynchronously update a book's cover with an illustration thumbnail.",
+      name: "illustration_thumbnail_generation_book_cover",
+      target: {
+        book_id,
+        illustration_id,
+      },
+      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+    });
 }
 
