@@ -12,6 +12,7 @@ import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
@@ -33,8 +34,10 @@ import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.da
 import 'package:artbooking/types/cloud_functions/book_response.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:beamer/beamer.dart';
+import 'package:desktop_drop/src/drop_target.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
@@ -215,6 +218,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                       onDragBookCompleted: onDragBookCompleted,
                       onDragBookEnd: onDragBookEnd,
                       onDragBookStarted: onDragBookStarted,
+                      onDragFileDone: onDragFileDone,
                       onDropBook: onDropBook,
                       onGoToActiveBooks: onGoToActiveBooks,
                       onLike: onLike,
@@ -709,6 +713,52 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
   void onDraggableBookCanceled(Velocity velocity, Offset offset) {
     _isDraggingBook = false;
+  }
+
+  void onDragFileDone(Book book, DropDoneDetails dropDoneDetails) async {
+    final List<FilePickerCross> files = [];
+
+    for (final file in dropDoneDetails.files) {
+      final int length = await file.length();
+
+      if (length > 25000000) {
+        context.showErrorBar(
+          content: Text(
+            "illustration_upload_size_limit".tr(
+              args: [file.name, length.toString(), "25"],
+            ),
+          ),
+        );
+        continue;
+      }
+
+      final int dotIndex = file.path.lastIndexOf(".");
+      final String extension = file.path.substring(dotIndex + 1);
+
+      if (!Constants.allowedImageExt.contains(extension)) {
+        context.showErrorBar(
+          content: Text(
+            "illustration_upload_invalid_extension".tr(
+              args: [file.name, Constants.allowedImageExt.join(", ")],
+            ),
+          ),
+        );
+        continue;
+      }
+
+      final FilePickerCross filePickerCross = FilePickerCross(
+        await file.readAsBytes(),
+        path: file.path,
+        type: FileTypeCross.image,
+        fileExtension: extension,
+      );
+
+      files.add(filePickerCross);
+    }
+
+    ref
+        .read(AppState.uploadTaskListProvider.notifier)
+        .handleDropFilesToBook(files: files, bookId: book.id);
   }
 
   void onDropBook(int dropIndex, List<int> dragIndexes) async {

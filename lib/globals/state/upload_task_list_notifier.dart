@@ -133,6 +133,26 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     return filteredFiles;
   }
 
+  /// Receive a list of files and try to upload images and create illustrations.
+  Future<List<FilePickerCross>> handleDropFilesToBook({
+    required List<FilePickerCross> files,
+    required String bookId,
+  }) async {
+    final List<FilePickerCross> filteredFiles = files
+        .where(_checkSize)
+        .where((FilePickerCross file) => file.path != null)
+        .toList();
+
+    for (FilePickerCross file in filteredFiles) {
+      _uploadIllustrationToBook(
+        file: file,
+        bookId: bookId,
+      );
+    }
+
+    return filteredFiles;
+  }
+
   /// Select an image file to upload to your illustrations collection,
   /// and add this illustration to the specified book (with its id).
   Future<List<FilePickerCross>> pickImageAndAddToBook({
@@ -170,8 +190,8 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     required FilePickerCross file,
     required String bookId,
   }) async {
-    final customUploadTask = await _uploadIllustration(file);
-    final String illustrationId = customUploadTask.illustrationId ?? '';
+    final CustomUploadTask customUploadTask = await _uploadIllustration(file);
+    final String illustrationId = customUploadTask.illustrationId ?? "";
 
     if (illustrationId.isEmpty) {
       Utilities.logger.e(

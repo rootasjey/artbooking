@@ -5,6 +5,7 @@ import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/book/popup_entry_book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/enums/enum_visibility_tab.dart';
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -20,6 +21,7 @@ class MyBooksPageBody extends StatelessWidget {
     this.authenticated = false,
     this.isOwner = false,
     this.likePopupMenuEntries = const [],
+    this.onDragFileDone,
     this.onDoubleTap,
     this.onDragBookCompleted,
     this.onDragBookEnd,
@@ -50,6 +52,11 @@ class MyBooksPageBody extends StatelessWidget {
 
   /// Selected books tab.
   final EnumVisibilityTab selectedTab;
+
+  final void Function(
+    Book book,
+    DropDoneDetails dropDoneDetails,
+  )? onDragFileDone;
 
   /// Callback when drag and dropping item on this book card.
   final void Function(int, List<int>)? onDropBook;
@@ -159,6 +166,8 @@ class MyBooksPageBody extends StatelessWidget {
               heroTag: book.id,
               index: index,
               key: ValueKey(book.id),
+              canDropFile: isOwner,
+              onDragFileDone: onDragFileDone,
               onDoubleTap: authenticated ? _onDoubleTap : null,
               onDragUpdate: onDragBookUpdate,
               onDragCompleted: onDragBookCompleted,

@@ -5,6 +5,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/drag_data.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
@@ -22,6 +23,7 @@ class BookCard extends StatefulWidget {
     required this.book,
     required this.heroTag,
     required this.index,
+    this.canDropFile = false,
     this.onLongPress,
     this.onPopupMenuItemSelected,
     this.onTap,
@@ -39,6 +41,7 @@ class BookCard extends StatefulWidget {
     this.dragGroupName = "",
     this.onDragCompleted,
     this.onDragEnd,
+    this.onDragFileDone,
     this.onDragStarted,
     this.onDraggableCanceled,
   }) : super(key: key);
@@ -48,6 +51,10 @@ class BookCard extends StatefulWidget {
 
   /// If true, the card can be dragged. Usually used to re-order items.
   final bool canDrag;
+
+  /// If true, this book card can receive file drop to create illustration,
+  /// and then adding this illustration in this book.
+  final bool canDropFile;
 
   /// A visual indicator is built around this card, if true.
   final bool selected;
@@ -76,6 +83,11 @@ class BookCard extends StatefulWidget {
 
   /// Callback fired on drag canceled.
   final void Function(Velocity, Offset)? onDraggableCanceled;
+
+  final void Function(
+    Book book,
+    DropDoneDetails dropDoneDetails,
+  )? onDragFileDone;
 
   /// Callback fired on drag started.
   final void Function()? onDragStarted;
@@ -121,14 +133,23 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   late Animation<double> _scaleAnimation;
   late AnimationController _scaleController;
 
-  double _initElevation = 6.0;
-  double _elevation = 4.0;
+  bool _isFileHover = false;
 
+  /// Briefly show like animation if true.
   bool _showLikeAnimation = false;
+
+  /// Display popup menu if true.
   bool _showPopupMenu = false;
 
+  /// Book's name height.
   final double _captionHeight = 42.0;
   final double _cardRadius = 8.0;
+
+  /// Initial elevation.
+  double _initElevation = 6.0;
+
+  /// Current elevation.
+  double _elevation = 4.0;
 
   @override
   void initState() {
@@ -159,14 +180,14 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
         child: SizedBox(
           width: widget.width,
           height: widget.height,
-          child: widget.canDrag ? dropTarget() : fullstackCard(),
+          child: widget.canDrag ? dragTarget() : fullstackCard(),
         ),
       ),
     );
   }
 
   /// Card wrapper to enable using book card as drop target.
-  Widget dropTarget() {
+  Widget dragTarget() {
     return DragTarget<DragData>(
       builder: (BuildContext context, candidateItems, rejectedItems) {
         return draggableCard(
@@ -197,8 +218,14 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   /// Card wrapper to enable dragging.
   Widget draggableCard({bool usingAsDropTarget = false}) {
     return LongPressDraggable<DragData>(
-      child: fullstackCard(
-        usingAsDropTarget: usingAsDropTarget,
+      child: DropTarget(
+        enable: widget.canDropFile,
+        onDragDone: onDragFileDone,
+        onDragEntered: (_) => setState(() => _isFileHover = true),
+        onDragExited: (_) => setState(() => _isFileHover = false),
+        child: fullstackCard(
+          usingAsDropTarget: usingAsDropTarget,
+        ),
       ),
       childWhenDragging: childWhenDragging(),
       data: DragData(
@@ -396,8 +423,45 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     );
   }
 
-  Widget frontCard({bool usingAsDropTarget = false}) {
-    final Color primaryColor = Theme.of(context).primaryColor;
+  Widget dropHint() {
+    if (!_isFileHover) {
+      return Container();
+    }
+
+    return Positioned(
+      bottom: 12.0,
+      left: 0.0,
+      right: 0.0,
+      child: Align(
+        alignment: Alignment.center,
+        child: SizedBox(
+          width: widget.width / 1.5,
+          child: Card(
+            elevation: 12.0,
+            color: Constants.colors.tertiary,
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Text(
+                "illustration_upload_file_to_book".tr(),
+                style: Utilities.fonts.body(
+                  color: Colors.black,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget frontCard({
+    bool usingAsDropTarget = false,
+  }) {
+    final Color borderColor = _isFileHover
+        ? Constants.colors.tertiary
+        : Theme.of(context).primaryColor;
     final onDoubleTapOrNull = widget.onDoubleTap != null ? onDoubleTap : null;
     final double width = widget.width - 80.0;
 
@@ -410,12 +474,12 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
         child: ScaleTransition(
           scale: _scaleAnimation,
           child: Card(
-            color: widget.selected ? primaryColor : Colors.transparent,
+            color: widget.selected ? borderColor : Colors.transparent,
             elevation: _elevation,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(_cardRadius),
-              side: usingAsDropTarget
-                  ? BorderSide(color: primaryColor, width: 4.0)
+              side: usingAsDropTarget || _isFileHover
+                  ? BorderSide(color: borderColor, width: 4.0)
                   : BorderSide.none,
             ),
             clipBehavior: Clip.antiAlias,
@@ -472,6 +536,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
                   },
                 ),
                 likeAnimationOverlay(),
+                dropHint(),
               ],
             ),
           ),
@@ -622,6 +687,14 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     Future.delayed(Duration(seconds: 1), () {
       setState(() => _showLikeAnimation = false);
     });
+  }
+
+  void onDragFileDone(DropDoneDetails details) {
+    if (widget.onDragFileDone == null) {
+      return;
+    }
+
+    widget.onDragFileDone?.call(widget.book, details);
   }
 
   /// Callback fired when the hover state of the front card of the book changes.
