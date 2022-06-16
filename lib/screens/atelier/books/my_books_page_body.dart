@@ -38,6 +38,7 @@ class MyBooksPageBody extends StatelessWidget {
     this.unlikePopupMenuEntries = const [],
     this.onDragFileEntered,
     this.onDragFileExited,
+    this.onTapBookCaption,
   }) : super(key: key);
 
   /// If true, the current user is authenticated.
@@ -105,6 +106,8 @@ class MyBooksPageBody extends StatelessWidget {
 
   /// Callback fired on toggle book existence in an user's favourites.
   final void Function(Book book)? onLike;
+
+  final void Function(Book book)? onTapBookCaption;
 
   /// Book list.
   final List<Book> books;
@@ -187,6 +190,7 @@ class MyBooksPageBody extends StatelessWidget {
               onDrop: onDropBook,
               onLike: authenticated ? onLike : null,
               onPopupMenuItemSelected: onPopupMenuItemSelected,
+              onTapCaption: onTapBookCaption,
               onTap: () => onTapBook?.call(book),
               popupMenuEntries: authenticated ? bookPopupMenuEntries : [],
               selected: selected,

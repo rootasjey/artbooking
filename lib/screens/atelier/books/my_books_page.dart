@@ -282,6 +282,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                           onPopupMenuItemSelected: onPopupMenuItemSelected,
                           onShowCreateBookDialog: showCreateBookDialog,
                           onTapBook: onTapBook,
+                          onTapBookCaption: onTapBookCaption,
                           popupMenuEntries: popupMenuEntries,
                           selectedTab: _selectedTab,
                           likePopupMenuEntries: _likePopupMenuEntries,
@@ -1276,8 +1277,8 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   /// Rename one book.
   void renameBook(Book book, String name, String description) async {
     try {
-      final prevName = book.name;
-      final prevDescription = book.description;
+      final String prevName = book.name;
+      final String prevDescription = book.description;
 
       setState(() {
         book = book.copyWith(
@@ -1286,7 +1287,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         );
       });
 
-      final response = await BooksActions.renameOne(
+      final BookResponse response = await BooksActions.renameOne(
         name: name,
         description: description,
         bookId: book.id,
@@ -1582,5 +1583,9 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         });
       }
     }
+  }
+
+  void onTapBookCaption(Book book) {
+    showRenameBookDialog(book);
   }
 }
