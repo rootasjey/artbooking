@@ -44,6 +44,8 @@ class BookCard extends StatefulWidget {
     this.onDragFileDone,
     this.onDragStarted,
     this.onDraggableCanceled,
+    this.onDragFileEntered,
+    this.onDragFileExited,
   }) : super(key: key);
 
   /// Book's data for this card.
@@ -109,6 +111,12 @@ class BookCard extends StatefulWidget {
 
   /// Callback fired on tap heart icon.
   final void Function(Book book)? onLike;
+
+  /// Callback event fired when files started to being dragged over this book.
+  final void Function(DropEventDetails details)? onDragFileEntered;
+
+  /// Callback event fired when files exited to being dragged over this book.
+  final void Function(DropEventDetails details)? onDragFileExited;
 
   /// Index position in a list, if available.
   final int index;
@@ -221,8 +229,8 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
       child: DropTarget(
         enable: widget.canDropFile,
         onDragDone: onDragFileDone,
-        onDragEntered: (_) => setState(() => _isFileHover = true),
-        onDragExited: (_) => setState(() => _isFileHover = false),
+        onDragEntered: onDragFileEntered,
+        onDragExited: onDragFileExited,
         child: fullstackCard(
           usingAsDropTarget: usingAsDropTarget,
         ),
@@ -720,5 +728,15 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     if (widget.onLongPress != null) {
       widget.onLongPress?.call(widget.selected);
     }
+  }
+
+  void onDragFileEntered(DropEventDetails details) {
+    setState(() => _isFileHover = true);
+    widget.onDragFileEntered?.call(details);
+  }
+
+  void onDragFileExited(DropEventDetails details) {
+    setState(() => _isFileHover = false);
+    widget.onDragFileExited?.call(details);
   }
 }
