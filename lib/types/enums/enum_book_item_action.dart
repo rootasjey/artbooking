@@ -31,4 +31,7 @@ enum EnumBookItemAction {
 
   /// Update this book's visibility.
   updateVisibility,
+
+  /// Upload new illustrations and add them to the target book.
+  uploadIllustrations,
 }

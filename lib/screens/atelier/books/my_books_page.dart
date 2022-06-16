@@ -137,6 +137,11 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       textLabel: "visibility_change".tr(),
       value: EnumBookItemAction.updateVisibility,
     ),
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.upload),
+      textLabel: "illustration_upload".tr(),
+      value: EnumBookItemAction.uploadIllustrations,
+    ),
   ];
 
   /// Available items for authenticated user and the book is already liked.
@@ -1167,6 +1172,11 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         break;
       case EnumBookItemAction.updateVisibility:
         showVisibilityDialog(book, index);
+        break;
+      case EnumBookItemAction.uploadIllustrations:
+        ref
+            .read(AppState.uploadTaskListProvider.notifier)
+            .pickImageAndAddToBook(bookId: book.id);
         break;
       default:
     }
