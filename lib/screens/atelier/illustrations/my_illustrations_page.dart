@@ -52,6 +52,10 @@ class MyIllustrationsPage extends ConsumerStatefulWidget {
 }
 
 class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
+  /// Listen to route to deaactivate file drop on this page
+  /// (see `DropTarget.enable` property for more information).
+  BeamerDelegate? _beamer;
+
   /// If true, multiple illustrations can be select for group actions.
   bool _forceMultiSelect = false;
 
@@ -89,7 +93,6 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   final _popupFocusNode = FocusNode();
 
-  final List<String> _allowedExt = ["jpg", "jpeg", "png", "webp", "tiff"];
   final List<Illustration> _illustrations = [];
 
   /// Available items for authenticated user and the illustration is not liked yet.
@@ -147,7 +150,6 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   /// Monitors periodically scroll when dragging illustration card on edges.
   Timer? _scrollTimer;
-  BeamerDelegate? _beamer;
 
   @override
   initState() {
@@ -202,21 +204,21 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
           child: DropTarget(
             // for file drop -> upload illustration.
             enable: _enableFileDrop && isOwner,
-            onDragEntered: onDragFileEntered,
             onDragDone: onDragFileDone,
+            onDragEntered: onDragFileEntered,
             onDragExited: onDragFileExited,
             child: Stack(
               children: [
                 Container(
-                  decoration: _isDraggingFile
-                      ? BoxDecoration(
-                          border: Border.all(
-                            color: Constants.colors.tertiary,
-                            width: 4.0,
-                          ),
-                          borderRadius: BorderRadius.circular(4.0),
-                        )
-                      : null,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Constants.colors.tertiary,
+                      width: 4.0,
+                      style: _isDraggingFile
+                          ? BorderStyle.solid
+                          : BorderStyle.none,
+                    ),
+                  ),
                   child: ImprovedScrolling(
                     scrollController: _scrollController,
                     enableKeyboardScrolling: true,
@@ -311,7 +313,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                 children: [
                   Expanded(
                     child: Text(
-                      "Drop the file here to upload a new illustration",
+                      "illustration_upload_file".tr(),
                       style: Utilities.fonts.body(
                         color: Colors.black,
                         fontSize: 16.0,
@@ -918,11 +920,11 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       final int dotIndex = file.path.lastIndexOf(".");
       final String extension = file.path.substring(dotIndex + 1);
 
-      if (!_allowedExt.contains(extension)) {
+      if (!Constants.allowedImageExt.contains(extension)) {
         context.showErrorBar(
           content: Text(
             "illustration_upload_invalid_extension".tr(
-              args: [file.name, _allowedExt.join(", ")],
+              args: [file.name, Constants.allowedImageExt.join(", ")],
             ),
           ),
         );
