@@ -56,8 +56,15 @@ class MyBooksPage extends ConsumerStatefulWidget {
 }
 
 class _MyBooksPageState extends ConsumerState<MyBooksPage> {
+  /// Listen to route to deaactivate file drop on this page
+  /// (see `DropTarget.enable` property for more information).
+  BeamerDelegate? _beamer;
+
   /// Creating a new book if true.
   bool _creating = false;
+
+  /// Disable file drop when navigating to a new page.
+  bool _enableFileDrop = true;
 
   /// If true, multiple books can be select for group actions.
   bool _forceMultiSelect = false;
@@ -67,6 +74,12 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
   /// If true, a book is being dragged and we can auto-scroll on edges.
   bool _isDraggingBook = false;
+
+  /// True if files are being dragged over this page.
+  bool _isDraggingFile = false;
+
+  /// True if files is being dragged over a book on this page.
+  bool _isDraggingFileOverBook = false;
 
   /// Loading the current page if true.
   bool _loading = false;
@@ -148,12 +161,20 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     super.initState();
     loadPreferences();
     fetchData();
+
+    // NOTE: Beamer state isn't ready on 1st frame.
+    // So we use [addPostFrameCallback] to access the state in the next frame.
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      _beamer = Beamer.of(context);
+      Beamer.of(context).addListener(onRouteUpdate);
+    });
   }
 
   @override
   void dispose() {
     _bookSubscription?.cancel();
     _scrollTimer?.cancel();
+    _beamer?.removeListener(onRouteUpdate);
     super.dispose();
   }
 
@@ -170,6 +191,9 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
     final bool authenticated = authUserId.isNotEmpty;
 
+    final bool showPageDropDecoration =
+        _isDraggingFile && !_isDraggingFileOverBook;
+
     return Scaffold(
       floatingActionButton: MyBooksPageFab(
         scrollController: _scrollController,
@@ -179,73 +203,137 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       ),
       body: Listener(
         onPointerMove: onPointerMove,
-        child: Stack(
-          children: [
-            ImprovedScrolling(
-              scrollController: _scrollController,
-              enableKeyboardScrolling: true,
-              onScroll: onScroll,
-              child: ScrollConfiguration(
-                behavior: CustomScrollBehavior(),
-                child: CustomScrollView(
-                  controller: _scrollController,
-                  slivers: <Widget>[
-                    ApplicationBar(),
-                    MyBooksPageHeader(
-                      isOwner: isOwner,
-                      multiSelectActive: _forceMultiSelect,
-                      multiSelectedItems: _multiSelectedItems,
-                      onAddToBook: showAddGroupToBookDialog,
-                      onChangedTab: onChangedTab,
-                      onChangeGroupVisibility: showGroupVisibilityDialog,
-                      onClearSelection: clearSelection,
-                      onConfirmDeleteGroup: onConfirmDeleteGroup,
-                      onGoToUserProfile: onGoToUserProfile,
-                      onSelectAll: onSelectAll,
-                      onShowCreateBookDialog: showCreateBookDialog,
-                      onTriggerMultiSelect: triggerMultiSelect,
-                      selectedTab: _selectedTab,
-                      username: _username,
+        child: DropTarget(
+          enable: _enableFileDrop && isOwner,
+          onDragDone: onDragFileDone,
+          onDragEntered: onDragFileEntered,
+          onDragExited: onDragFileExited,
+          child: Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Constants.colors.tertiary,
+                    width: 4.0,
+                    style: showPageDropDecoration
+                        ? BorderStyle.solid
+                        : BorderStyle.none,
+                  ),
+                  borderRadius: BorderRadius.circular(4.0),
+                ),
+                child: ImprovedScrolling(
+                  scrollController: _scrollController,
+                  enableKeyboardScrolling: true,
+                  onScroll: onScroll,
+                  child: ScrollConfiguration(
+                    behavior: CustomScrollBehavior(),
+                    child: CustomScrollView(
+                      controller: _scrollController,
+                      slivers: <Widget>[
+                        ApplicationBar(),
+                        MyBooksPageHeader(
+                          isOwner: isOwner,
+                          multiSelectActive: _forceMultiSelect,
+                          multiSelectedItems: _multiSelectedItems,
+                          onAddToBook: showAddGroupToBookDialog,
+                          onChangedTab: onChangedTab,
+                          onChangeGroupVisibility: showGroupVisibilityDialog,
+                          onClearSelection: clearSelection,
+                          onConfirmDeleteGroup: onConfirmDeleteGroup,
+                          onGoToUserProfile: onGoToUserProfile,
+                          onSelectAll: onSelectAll,
+                          onShowCreateBookDialog: showCreateBookDialog,
+                          onTriggerMultiSelect: triggerMultiSelect,
+                          selectedTab: _selectedTab,
+                          username: _username,
+                        ),
+                        MyBooksPageBody(
+                          authenticated: authenticated,
+                          books: _books,
+                          forceMultiSelect: _forceMultiSelect,
+                          isOwner: isOwner,
+                          loading: _loading,
+                          onLongPressBook: onLongPressBook,
+                          multiSelectedItems: _multiSelectedItems,
+                          onDragBookCompleted: onDragBookCompleted,
+                          onDragBookEnd: onDragBookEnd,
+                          onDragBookStarted: onDragBookStarted,
+                          onDragFileDone: onDragFileOnBookDone,
+                          onDragFileEntered: onDragFileOnBookEntered,
+                          onDragFileExited: onDragFileOnBookExited,
+                          onDropBook: onDropBook,
+                          onGoToActiveBooks: onGoToActiveBooks,
+                          onLike: onLike,
+                          onPopupMenuItemSelected: onPopupMenuItemSelected,
+                          onShowCreateBookDialog: showCreateBookDialog,
+                          onTapBook: onTapBook,
+                          popupMenuEntries: popupMenuEntries,
+                          selectedTab: _selectedTab,
+                          likePopupMenuEntries: _likePopupMenuEntries,
+                          unlikePopupMenuEntries: _unlikePopupMenuEntries,
+                        ),
+                        SliverPadding(
+                          padding: const EdgeInsets.only(bottom: 100.0),
+                        ),
+                      ],
                     ),
-                    MyBooksPageBody(
-                      authenticated: authenticated,
-                      books: _books,
-                      forceMultiSelect: _forceMultiSelect,
-                      isOwner: isOwner,
-                      loading: _loading,
-                      onLongPressBook: onLongPressBook,
-                      multiSelectedItems: _multiSelectedItems,
-                      onDragBookCompleted: onDragBookCompleted,
-                      onDragBookEnd: onDragBookEnd,
-                      onDragBookStarted: onDragBookStarted,
-                      onDragFileDone: onDragFileDone,
-                      onDropBook: onDropBook,
-                      onGoToActiveBooks: onGoToActiveBooks,
-                      onLike: onLike,
-                      onPopupMenuItemSelected: onPopupMenuItemSelected,
-                      onShowCreateBookDialog: showCreateBookDialog,
-                      onTapBook: onTapBook,
-                      popupMenuEntries: popupMenuEntries,
-                      selectedTab: _selectedTab,
-                      likePopupMenuEntries: _likePopupMenuEntries,
-                      unlikePopupMenuEntries: _unlikePopupMenuEntries,
-                    ),
-                    SliverPadding(
-                      padding: const EdgeInsets.only(bottom: 100.0),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-            Positioned(
-              top: 100.0,
-              right: 24.0,
-              child: PopupProgressIndicator(
-                show: _creating,
-                message: "book_creating".tr() + "...",
+              Positioned(
+                top: 100.0,
+                right: 24.0,
+                child: PopupProgressIndicator(
+                  show: _creating,
+                  message: "book_creating".tr() + "...",
+                ),
+              ),
+              dropHint(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget dropHint() {
+    if (!_isDraggingFile || _isDraggingFileOverBook) {
+      return Container();
+    }
+
+    return Positioned(
+      bottom: 24.0,
+      left: 0.0,
+      right: 0.0,
+      child: Align(
+        alignment: Alignment.center,
+        child: SizedBox(
+          width: 500.0,
+          child: Card(
+            elevation: 6.0,
+            color: Constants.colors.tertiary,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      "illustration_upload_file_to_new_book".tr(),
+                      style: Utilities.fonts.body(
+                        color: Colors.black,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    UniconsLine.tear,
+                    color: Colors.black,
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -282,7 +370,8 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     );
   }
 
-  void createBook(String name, String description) async {
+  /// Create a new book and return the created book's id.
+  Future<String> createBook(String name, String description) async {
     setState(() => _creating = true);
 
     final BookResponse response = await BooksActions.createOne(
@@ -297,12 +386,14 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         content: Text("book_creation_error".tr()),
       );
 
-      return;
+      return "";
     }
 
     context.showSuccessBar(
       content: Text("book_creation_success".tr()),
     );
+
+    return response.book.id;
   }
 
   void deleteBook(Book book, int index) async {
@@ -349,35 +440,11 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     }
   }
 
-  /// Fetch user's data. This illustrations page owner.
-  /// (Launched if the the page is not owned by the current user)
-  Future<void> fetchUser() async {
-    if (widget.userId.isEmpty) {
-      return;
-    }
-
-    if (getIsOwner()) {
-      return;
-    }
-
-    try {
-      final DocumentSnapshotMap snapshot = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(widget.userId)
-          .collection("user_public_fields")
-          .doc("base")
-          .get();
-
-      final Json? map = snapshot.data();
-      if (!snapshot.exists || map == null) {
-        return;
-      }
-
-      _username = map["name"];
-    } catch (error) {
-      Utilities.logger.e(error);
-      context.showErrorBar(content: Text(error.toString()));
-    }
+  void fetchData() {
+    Future.wait([
+      fetchUser(),
+      fetchBooks(),
+    ]);
   }
 
   Future<void> fetchBooks() async {
@@ -486,6 +553,37 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       Utilities.logger.e(error);
     } finally {
       setState(() => _loading = false);
+    }
+  }
+
+  /// Fetch user's data. This illustrations page owner.
+  /// (Launched if the the page is not owned by the current user)
+  Future<void> fetchUser() async {
+    if (widget.userId.isEmpty) {
+      return;
+    }
+
+    if (getIsOwner()) {
+      return;
+    }
+
+    try {
+      final DocumentSnapshotMap snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(widget.userId)
+          .collection("user_public_fields")
+          .doc("base")
+          .get();
+
+      final Json? map = snapshot.data();
+      if (!snapshot.exists || map == null) {
+        return;
+      }
+
+      _username = map["name"];
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
     }
   }
 
@@ -662,6 +760,36 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     });
   }
 
+  void navigateToBookPage(Book book) {
+    NavigationStateHelper.book = book;
+
+    String route = HomeLocation.userBookRoute
+        .replaceFirst(":userId", getUserId())
+        .replaceFirst(":bookId", book.id);
+
+    final String? location = Beamer.of(context)
+        .beamingHistory
+        .last
+        .history
+        .last
+        .routeInformation
+        .location;
+
+    if (location != null && location.contains("atelier")) {
+      route = AtelierLocationContent.bookRoute.replaceFirst(
+        ":bookId",
+        book.id,
+      );
+    }
+
+    Beamer.of(context).beamToNamed(
+      route,
+      data: {
+        "bookId": book.id,
+      },
+    );
+  }
+
   /// Fire when a new book is created in collection.
   /// Add the corresponding document in the UI.
   void onAddStreamingBook(DocumentChangeMap documentChange) {
@@ -715,7 +843,68 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     _isDraggingBook = false;
   }
 
-  void onDragFileDone(Book book, DropDoneDetails dropDoneDetails) async {
+  /// Callback event fired when files are dropped on this page.
+  /// Ask to create a book and, upload the illustration,
+  /// and then add this illuqtration to the created book.
+  void onDragFileDone(DropDoneDetails dropDoneDetails) async {
+    if (_isDraggingFileOverBook) {
+      return;
+    }
+
+    final List<FilePickerCross> files = [];
+
+    for (final file in dropDoneDetails.files) {
+      final int length = await file.length();
+
+      if (length > 25000000) {
+        context.showErrorBar(
+          content: Text(
+            "illustration_upload_size_limit".tr(
+              args: [file.name, length.toString(), "25"],
+            ),
+          ),
+        );
+        continue;
+      }
+
+      final int dotIndex = file.path.lastIndexOf(".");
+      final String extension = file.path.substring(dotIndex + 1);
+
+      if (!Constants.allowedImageExt.contains(extension)) {
+        context.showErrorBar(
+          content: Text(
+            "illustration_upload_invalid_extension".tr(
+              args: [file.name, Constants.allowedImageExt.join(", ")],
+            ),
+          ),
+        );
+        continue;
+      }
+
+      final FilePickerCross filePickerCross = FilePickerCross(
+        await file.readAsBytes(),
+        path: file.path,
+        type: FileTypeCross.image,
+        fileExtension: extension,
+      );
+
+      files.add(filePickerCross);
+    }
+
+    showCreateBookDialog(files: files);
+  }
+
+  /// Callback event fired when a pointer enters this page with files.
+  void onDragFileEntered(DropEventDetails dropEventDetails) {
+    setState(() => _isDraggingFile = true);
+  }
+
+  /// Callback event fired when a pointer exits this page with files.
+  void onDragFileExited(DropEventDetails dropEventDetails) {
+    setState(() => _isDraggingFile = false);
+  }
+
+  void onDragFileOnBookDone(Book book, DropDoneDetails dropDoneDetails) async {
     final List<FilePickerCross> files = [];
 
     for (final file in dropDoneDetails.files) {
@@ -761,8 +950,20 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         .handleDropFilesToBook(files: files, bookId: book.id);
   }
 
+  void onDragFileOnBookEntered(DropEventDetails details) {
+    Future.delayed(Duration(milliseconds: 12), () {
+      setState(() {
+        _isDraggingFileOverBook = true;
+      });
+    });
+  }
+
+  void onDragFileOnBookExited(DropEventDetails details) {
+    setState(() => _isDraggingFileOverBook = false);
+  }
+
   void onDropBook(int dropIndex, List<int> dragIndexes) async {
-    final firstDragIndex = dragIndexes.first;
+    final int firstDragIndex = dragIndexes.first;
     if (dropIndex == firstDragIndex) {
       return;
     }
@@ -912,36 +1113,6 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     _scrollTimer?.cancel();
   }
 
-  void navigateToBookPage(Book book) {
-    NavigationStateHelper.book = book;
-
-    String route = HomeLocation.userBookRoute
-        .replaceFirst(":userId", getUserId())
-        .replaceFirst(":bookId", book.id);
-
-    final String? location = Beamer.of(context)
-        .beamingHistory
-        .last
-        .history
-        .last
-        .routeInformation
-        .location;
-
-    if (location != null && location.contains("atelier")) {
-      route = AtelierLocationContent.bookRoute.replaceFirst(
-        ":bookId",
-        book.id,
-      );
-    }
-
-    Beamer.of(context).beamToNamed(
-      route,
-      data: {
-        "bookId": book.id,
-      },
-    );
-  }
-
   void onPopupMenuItemSelected(
     EnumBookItemAction action,
     int index,
@@ -967,6 +1138,20 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     setState(() {
       _books.removeWhere((book) => book.id == documentChange.doc.id);
     });
+  }
+
+  /// Callback fired when route changes.
+  void onRouteUpdate() {
+    final String? stringLocation = Beamer.of(context)
+        .beamingHistory
+        .last
+        .history
+        .last
+        .routeInformation
+        .location;
+
+    _enableFileDrop =
+        stringLocation == AtelierLocationContent.illustrationsRoute;
   }
 
   /// Callback when the page scrolls up and down.
@@ -1110,7 +1295,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     showVisibilityDialog(book, index);
   }
 
-  void showCreateBookDialog() {
+  void showCreateBookDialog({List<FilePickerCross> files = const []}) {
     final _nameController = TextEditingController();
     final _descriptionController = TextEditingController();
 
@@ -1122,12 +1307,23 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         nameController: _nameController,
         descriptionController: _descriptionController,
         onCancel: Beamer.of(context).popRoute,
-        onSubmitted: (value) {
-          createBook(
+        onSubmitted: (_) async {
+          Beamer.of(context).popRoute();
+          final String createdBookId = await createBook(
             _nameController.text,
             _descriptionController.text,
           );
-          Beamer.of(context).popRoute();
+
+          if (createdBookId.isEmpty) {
+            return;
+          }
+
+          ref
+              .read(AppState.uploadTaskListProvider.notifier)
+              .handleDropFilesToBook(
+                files: files,
+                bookId: createdBookId,
+              );
         },
       ),
     );
@@ -1337,12 +1533,5 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         });
       }
     }
-  }
-
-  void fetchData() {
-    Future.wait([
-      fetchUser(),
-      fetchBooks(),
-    ]);
   }
 }

@@ -36,6 +36,8 @@ class MyBooksPageBody extends StatelessWidget {
     this.onShowCreateBookDialog,
     this.onTapBook,
     this.unlikePopupMenuEntries = const [],
+    this.onDragFileEntered,
+    this.onDragFileExited,
   }) : super(key: key);
 
   /// If true, the current user is authenticated.
@@ -57,6 +59,12 @@ class MyBooksPageBody extends StatelessWidget {
     Book book,
     DropDoneDetails dropDoneDetails,
   )? onDragFileDone;
+
+  /// Callback event fired when files started to being dragged over this book.
+  final void Function(DropEventDetails details)? onDragFileEntered;
+
+  /// Callback event fired when files exited to being dragged over this book.
+  final void Function(DropEventDetails details)? onDragFileExited;
 
   /// Callback when drag and dropping item on this book card.
   final void Function(int, List<int>)? onDropBook;
@@ -168,6 +176,8 @@ class MyBooksPageBody extends StatelessWidget {
               key: ValueKey(book.id),
               canDropFile: isOwner,
               onDragFileDone: onDragFileDone,
+              onDragFileEntered: onDragFileEntered,
+              onDragFileExited: onDragFileExited,
               onDoubleTap: authenticated ? _onDoubleTap : null,
               onDragUpdate: onDragBookUpdate,
               onDragCompleted: onDragBookCompleted,
