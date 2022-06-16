@@ -60,6 +60,11 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   /// (see `DropTarget.enable` property for more information).
   BeamerDelegate? _beamer;
 
+  /// When true, avoid starting auto scroll periodic timer multiple times
+  /// (fix auto-scroll issue when dropping files on window's edges).
+  /// (PS: this variable is set to true on dragging file).
+  bool _activateAutoScrollOnce = false;
+
   /// Creating a new book if true.
   bool _creating = false;
 
@@ -71,6 +76,10 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
   /// If true, there are more books to fetch.
   bool _hasNext = true;
+
+  /// True if the page scroller is currently moving up or down.
+  /// Avoid starting auto scroll periodic timer multiple times.
+  bool _isAutoScrolling = false;
 
   /// If true, a book is being dragged and we can auto-scroll on edges.
   bool _isDraggingBook = false;
@@ -208,6 +217,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
           onDragDone: onDragFileDone,
           onDragEntered: onDragFileEntered,
           onDragExited: onDragFileExited,
+          onDragUpdated: onDragFileUpdated,
           child: Stack(
             children: [
               Container(
@@ -294,6 +304,79 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         ),
       ),
     );
+  }
+
+  void autoScrollOnEdges({
+    /// Current pointer y position.
+    required double dy,
+
+    /// Distance to the edge where the scroll viewer starts to jump.
+    double scrollTreshold = 100.0,
+  }) {
+    final int duration = 50;
+
+    /// Amount of offset to jump when dragging an element to the edge.
+    final double jumpOffset = 42.0;
+
+    if (dy < scrollTreshold && _scrollController.offset > 0) {
+      if (_activateAutoScrollOnce && _isAutoScrolling) {
+        return;
+      }
+
+      _scrollTimer?.cancel();
+      _scrollTimer = Timer.periodic(
+        Duration(milliseconds: duration),
+        (Timer timer) {
+          _scrollController.animateTo(
+            _scrollController.offset - jumpOffset,
+            duration: Duration(milliseconds: duration),
+            curve: Curves.easeIn,
+          );
+
+          if (_scrollController.position.outOfRange) {
+            _scrollTimer?.cancel();
+            _isAutoScrolling = false;
+          }
+        },
+      );
+
+      _isAutoScrolling = true;
+      return;
+    }
+
+    final double windowHeight = MediaQuery.of(context).size.height;
+    final bool pointerIsAtBottom = dy >= windowHeight - scrollTreshold;
+    final bool scrollIsAtBottomEdge =
+        _scrollController.offset >= _scrollController.position.maxScrollExtent;
+
+    if (pointerIsAtBottom && !scrollIsAtBottomEdge) {
+      if (_activateAutoScrollOnce && _isAutoScrolling) {
+        return;
+      }
+
+      _scrollTimer?.cancel();
+      _scrollTimer = Timer.periodic(
+        Duration(milliseconds: duration),
+        (Timer timer) {
+          _scrollController.animateTo(
+            _scrollController.offset + jumpOffset,
+            duration: Duration(milliseconds: duration),
+            curve: Curves.easeIn,
+          );
+
+          if (_scrollController.position.outOfRange) {
+            _scrollTimer?.cancel();
+            _isAutoScrolling = false;
+          }
+        },
+      );
+
+      _isAutoScrolling = true;
+      return;
+    }
+
+    _scrollTimer?.cancel();
+    _isAutoScrolling = false;
   }
 
   Widget dropHint() {
@@ -962,6 +1045,14 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     setState(() => _isDraggingFileOverBook = false);
   }
 
+  /// Called when dragging files over the window.
+  void onDragFileUpdated(DropEventDetails details) {
+    _activateAutoScrollOnce = true;
+    autoScrollOnEdges(
+      dy: details.globalPosition.dy,
+    );
+  }
+
   void onDropBook(int dropIndex, List<int> dragIndexes) async {
     final int firstDragIndex = dragIndexes.first;
     if (dropIndex == firstDragIndex) {
@@ -1057,60 +1148,9 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       return;
     }
 
-    final int duration = 50;
-
-    /// Amount of offset to jump when dragging an element to the edge.
-    final double jumpOffset = 42.0;
-    final double dy = pointerMoveEvent.position.dy;
-
-    /// Distance to the edge where the scroll viewer starts to jump.
-    final double scrollTreshold = 100.0;
-
-    if (dy < scrollTreshold && _scrollController.offset > 0) {
-      _scrollTimer?.cancel();
-      _scrollTimer = Timer.periodic(
-        Duration(milliseconds: duration),
-        (Timer timer) {
-          _scrollController.animateTo(
-            _scrollController.offset - jumpOffset,
-            duration: Duration(milliseconds: duration),
-            curve: Curves.easeIn,
-          );
-
-          if (_scrollController.position.outOfRange) {
-            _scrollTimer?.cancel();
-          }
-        },
-      );
-
-      return;
-    }
-
-    final double windowHeight = MediaQuery.of(context).size.height;
-    final bool pointerIsAtBottom = dy >= windowHeight - scrollTreshold;
-    final bool scrollIsAtBottomEdge =
-        _scrollController.offset >= _scrollController.position.maxScrollExtent;
-
-    if (pointerIsAtBottom && !scrollIsAtBottomEdge) {
-      _scrollTimer?.cancel();
-      _scrollTimer = Timer.periodic(
-        Duration(milliseconds: duration),
-        (Timer timer) {
-          _scrollController.animateTo(
-            _scrollController.offset + jumpOffset,
-            duration: Duration(milliseconds: duration),
-            curve: Curves.easeIn,
-          );
-
-          if (_scrollController.position.outOfRange) {
-            _scrollTimer?.cancel();
-          }
-        },
-      );
-      return;
-    }
-
-    _scrollTimer?.cancel();
+    autoScrollOnEdges(
+      dy: pointerMoveEvent.position.dy,
+    );
   }
 
   void onPopupMenuItemSelected(
