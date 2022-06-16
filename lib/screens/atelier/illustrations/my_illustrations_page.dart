@@ -56,14 +56,23 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   /// (see `DropTarget.enable` property for more information).
   BeamerDelegate? _beamer;
 
-  /// If true, multiple illustrations can be select for group actions.
-  bool _forceMultiSelect = false;
+  /// When true, avoid starting auto scroll periodic timer multiple times
+  /// (fix auto-scroll issue when dropping files on window's edges).
+  /// (PS: this variable is set to true on dragging file).
+  bool _activateAutoScrollOnce = false;
 
   /// Disable file drop when navigating to a new page.
   bool _enableFileDrop = true;
 
+  /// If true, multiple illustrations can be select for group actions.
+  bool _forceMultiSelect = false;
+
   /// If true, there are more books to fetch.
   bool _hasNext = true;
+
+  /// True if the page scroller is currently moving up or down.
+  /// Avoid starting auto scroll periodic timer multiple times.
+  bool _isAutoScrolling = false;
 
   /// If true, a file is being dragged on the app window.
   bool _isDraggingFile = false;
@@ -207,6 +216,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
             onDragDone: onDragFileDone,
             onDragEntered: onDragFileEntered,
             onDragExited: onDragFileExited,
+            onDragUpdated: onDragFileUpdated,
             child: Stack(
               children: [
                 Container(
@@ -332,6 +342,79 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         ),
       ),
     );
+  }
+
+  void autoScrollOnEdges({
+    /// Current pointer y position.
+    required double dy,
+
+    /// Distance to the edge where the scroll viewer starts to jump.
+    double scrollTreshold = 100.0,
+  }) {
+    final int duration = 50;
+
+    /// Amount of offset to jump when dragging an element to the edge.
+    final double jumpOffset = 42.0;
+
+    if (dy < scrollTreshold && _scrollController.offset > 0) {
+      if (_activateAutoScrollOnce && _isAutoScrolling) {
+        return;
+      }
+
+      _scrollTimer?.cancel();
+      _scrollTimer = Timer.periodic(
+        Duration(milliseconds: duration),
+        (Timer timer) {
+          _scrollController.animateTo(
+            _scrollController.offset - jumpOffset,
+            duration: Duration(milliseconds: duration),
+            curve: Curves.easeIn,
+          );
+
+          if (_scrollController.position.outOfRange) {
+            _scrollTimer?.cancel();
+            _isAutoScrolling = false;
+          }
+        },
+      );
+
+      _isAutoScrolling = true;
+      return;
+    }
+
+    final double windowHeight = MediaQuery.of(context).size.height;
+    final bool pointerIsAtBottom = dy >= windowHeight - scrollTreshold;
+    final bool scrollIsAtBottomEdge =
+        _scrollController.offset >= _scrollController.position.maxScrollExtent;
+
+    if (pointerIsAtBottom && !scrollIsAtBottomEdge) {
+      if (_activateAutoScrollOnce && _isAutoScrolling) {
+        return;
+      }
+
+      _scrollTimer?.cancel();
+      _scrollTimer = Timer.periodic(
+        Duration(milliseconds: duration),
+        (Timer timer) {
+          _scrollController.animateTo(
+            _scrollController.offset + jumpOffset,
+            duration: Duration(milliseconds: duration),
+            curve: Curves.easeIn,
+          );
+
+          if (_scrollController.position.outOfRange) {
+            _scrollTimer?.cancel();
+            _isAutoScrolling = false;
+          }
+        },
+      );
+
+      _isAutoScrolling = true;
+      return;
+    }
+
+    _scrollTimer?.cancel();
+    _isAutoScrolling = false;
   }
 
   /// Show a dialog to confirm multiple illustrations deletion.
@@ -901,6 +984,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   /// Callback event fired when files are dropped on this page.
   /// Try to upload them as image and create correspondig illustrations.
   void onDragFileDone(DropDoneDetails dropDoneDetails) async {
+    _scrollTimer?.cancel();
     final List<FilePickerCross> files = [];
 
     for (final file in dropDoneDetails.files) {
@@ -951,7 +1035,20 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   /// Callback event fired when a pointer exits this page with files.
   void onDragFileExited(DropEventDetails dropEventDetails) {
-    setState(() => _isDraggingFile = false);
+    _scrollTimer?.cancel();
+
+    setState(() {
+      _isDraggingFile = false;
+      _activateAutoScrollOnce = false;
+    });
+  }
+
+  /// Called when dragging files over the window.
+  void onDragFileUpdated(DropEventDetails details) {
+    _activateAutoScrollOnce = true;
+    autoScrollOnEdges(
+      dy: details.globalPosition.dy,
+    );
   }
 
   void onDragIllustrationCompleted() {
@@ -1099,60 +1196,9 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       return;
     }
 
-    final int duration = 50;
-
-    /// Amount of offset to jump when dragging an element to the edge.
-    final double jumpOffset = 42.0;
-    final double dy = pointerMoveEvent.position.dy;
-
-    /// Distance to the edge where the scroll viewer starts to jump.
-    final double scrollTreshold = 100.0;
-
-    if (dy < scrollTreshold && _scrollController.offset > 0) {
-      _scrollTimer?.cancel();
-      _scrollTimer = Timer.periodic(
-        Duration(milliseconds: duration),
-        (Timer timer) {
-          _scrollController.animateTo(
-            _scrollController.offset - jumpOffset,
-            duration: Duration(milliseconds: duration),
-            curve: Curves.easeIn,
-          );
-
-          if (_scrollController.position.outOfRange) {
-            _scrollTimer?.cancel();
-          }
-        },
-      );
-
-      return;
-    }
-
-    final double windowHeight = MediaQuery.of(context).size.height;
-    final bool pointerIsAtBottom = dy >= windowHeight - scrollTreshold;
-    final bool scrollIsAtBottomEdge =
-        _scrollController.offset >= _scrollController.position.maxScrollExtent;
-
-    if (pointerIsAtBottom && !scrollIsAtBottomEdge) {
-      _scrollTimer?.cancel();
-      _scrollTimer = Timer.periodic(
-        Duration(milliseconds: duration),
-        (Timer timer) {
-          _scrollController.animateTo(
-            _scrollController.offset + jumpOffset,
-            duration: Duration(milliseconds: duration),
-            curve: Curves.easeIn,
-          );
-
-          if (_scrollController.position.outOfRange) {
-            _scrollTimer?.cancel();
-          }
-        },
-      );
-      return;
-    }
-
-    _scrollTimer?.cancel();
+    autoScrollOnEdges(
+      dy: pointerMoveEvent.position.dy,
+    );
   }
 
   void onPopupMenuItemSelected(
