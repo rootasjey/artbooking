@@ -1,6 +1,7 @@
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/types/cloud_functions/illustrations_response.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/src/public_ext.dart';
@@ -143,13 +144,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
         .where((FilePickerCross file) => file.path != null)
         .toList();
 
-    for (FilePickerCross file in filteredFiles) {
-      _uploadIllustrationToBook(
-        file: file,
-        bookId: bookId,
-      );
-    }
-
+    await _uploadIllustrationToBook(bookId: bookId, files: filteredFiles);
     return filteredFiles;
   }
 
@@ -173,12 +168,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     final List<FilePickerCross> passedFiles =
         pickerResult.where(_checkSize).toList();
 
-    for (FilePickerCross passedFile in passedFiles) {
-      _uploadIllustrationToBook(
-        file: passedFile,
-        bookId: bookId,
-      );
-    }
+    await _uploadIllustrationToBook(bookId: bookId, files: passedFiles);
 
     return passedFiles;
   }
@@ -186,31 +176,35 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
   /// Upload a file creating a Firestore document and adding a new file to
   /// Firebase Cloud Storage. Then add this new created illustration to
   /// an existing book.
-  Future _uploadIllustrationToBook({
-    required FilePickerCross file,
+  Future<void> _uploadIllustrationToBook({
+    required List<FilePickerCross> files,
     required String bookId,
   }) async {
-    final CustomUploadTask customUploadTask = await _uploadIllustration(file);
-    final String illustrationId = customUploadTask.illustrationId ?? "";
+    final List<Future<CustomUploadTask>> futureUploads = [];
 
-    if (illustrationId.isEmpty) {
-      Utilities.logger.e(
-        "A custom task upload cannot have an empty [illustrationId] "
-        "at this step.",
-      );
-
-      return;
+    for (FilePickerCross passedFile in files) {
+      futureUploads.add(_uploadIllustration(passedFile));
     }
 
-    final response = await BooksActions.addIllustrations(
+    final List<CustomUploadTask> tasks = await Future.wait(futureUploads);
+    final List<String> illustrationIds = [];
+
+    for (final CustomUploadTask customUploadTask in tasks) {
+      final String illustrationId = customUploadTask.illustrationId ?? "";
+
+      if (illustrationId.isNotEmpty) {
+        illustrationIds.add(illustrationId);
+      }
+    }
+
+    final IllustrationsResponse response = await BooksActions.addIllustrations(
       bookId: bookId,
-      illustrationIds: [illustrationId],
+      illustrationIds: illustrationIds,
     );
 
     if (response.hasErrors) {
       Utilities.logger.e(
-        "There was an error while adding "
-        "the illustration $illustrationId.",
+        "There was an error while adding illustrations $illustrationIds.",
       );
     }
   }
