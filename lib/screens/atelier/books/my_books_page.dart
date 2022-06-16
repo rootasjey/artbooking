@@ -1150,8 +1150,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         .routeInformation
         .location;
 
-    _enableFileDrop =
-        stringLocation == AtelierLocationContent.illustrationsRoute;
+    _enableFileDrop = stringLocation == AtelierLocationContent.booksRoute;
   }
 
   /// Callback when the page scrolls up and down.
