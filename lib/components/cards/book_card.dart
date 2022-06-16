@@ -46,6 +46,7 @@ class BookCard extends StatefulWidget {
     this.onDraggableCanceled,
     this.onDragFileEntered,
     this.onDragFileExited,
+    this.onTapCaption,
   }) : super(key: key);
 
   /// Book's data for this card.
@@ -108,6 +109,8 @@ class BookCard extends StatefulWidget {
 
   /// Callback fired on tap.
   final void Function()? onTap;
+
+  final void Function(Book book)? onTapCaption;
 
   /// Callback fired on tap heart icon.
   final void Function(Book book)? onLike;
@@ -398,8 +401,6 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   }
 
   Widget caption() {
-    final illustration = widget.book;
-
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -409,23 +410,22 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
           right: 16.0,
           top: 8.0,
         ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Opacity(
-                opacity: 0.8,
-                child: Text(
-                  illustration.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Utilities.fonts.body(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
+        child: InkWell(
+          onTap: widget.onTapCaption != null
+              ? () => widget.onTapCaption?.call(widget.book)
+              : null,
+          child: Opacity(
+            opacity: 0.8,
+            child: Text(
+              widget.book.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Utilities.fonts.body(
+                fontSize: 14.0,
+                fontWeight: FontWeight.w800,
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
