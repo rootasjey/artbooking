@@ -27,7 +27,7 @@ class UploadPanelHeaderSubtitle extends ConsumerWidget {
       return SizedBox(
         width: 200.0,
         child: LinearProgressIndicator(
-          minHeight: 2.0,
+          minHeight: 4.0,
         ),
       );
     }
