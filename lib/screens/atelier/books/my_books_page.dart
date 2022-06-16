@@ -1277,14 +1277,19 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   /// Rename one book.
   void renameBook(Book book, String name, String description) async {
     try {
-      final String prevName = book.name;
-      final String prevDescription = book.description;
+      final int bookIndex = _books.indexWhere((x) => x.id == book.id);
 
       setState(() {
-        book = book.copyWith(
+        final Book renamedBook = book.copyWith(
           name: name,
           description: description,
         );
+
+        if (bookIndex < 0) {
+          return;
+        }
+
+        _books.replaceRange(bookIndex, bookIndex + 1, [renamedBook]);
       });
 
       final BookResponse response = await BooksActions.renameOne(
@@ -1298,10 +1303,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       }
 
       setState(() {
-        book = book.copyWith(
-          name: prevName,
-          description: prevDescription,
-        );
+        _books.replaceRange(bookIndex, bookIndex + 1, [book]);
       });
 
       context.showErrorBar(
