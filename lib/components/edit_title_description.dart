@@ -1,4 +1,4 @@
-import 'package:artbooking/globals/constants.dart';
+import 'package:artbooking/components/texts/outlined_text_field.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
@@ -16,11 +16,22 @@ class EditTitleDescription extends StatefulWidget {
     this.titleHintText = "",
   }) : super(key: key);
 
+  /// Initial section's name.
   final String initialName;
+
+  /// Initial section's description.
   final String initialDescription;
+
+  /// Will be shown as a default value inside the title input.
   final String titleHintText;
+
+  /// Will be shown as a default value inside the description input.
   final String descriptionHintText;
+
+  /// Callback event fired when this section's description is udpated.
   final void Function(String)? onDescriptionChanged;
+
+  /// Callback event fired when this section's title is udpated.
   final void Function(String)? onTitleChanged;
 
   @override
@@ -28,7 +39,6 @@ class EditTitleDescription extends StatefulWidget {
 }
 
 class _EditTitleDescriptionState extends State<EditTitleDescription> {
-  final _clairPink = Constants.colors.clairPink;
   final _nameTextController = TextEditingController();
   final _descriptionTextController = TextEditingController();
 
@@ -64,37 +74,18 @@ class _EditTitleDescriptionState extends State<EditTitleDescription> {
                   child: Text(
                     "title".tr(),
                     style: Utilities.fonts.body(
-                      fontWeight: FontWeight.w600,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ),
               ),
-              Container(
-                width: Utilities.size.isMobileSize(context) ? 300.0 : 600.0,
-                child: TextField(
-                  autofocus: true,
+              SizedBox(
+                width: 300.0,
+                child: OutlinedTextField(
                   controller: _nameTextController,
-                  keyboardType: TextInputType.multiline,
-                  textInputAction: TextInputAction.next,
-                  textCapitalization: TextCapitalization.sentences,
-                  style: Utilities.fonts.body(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.w700,
-                  ),
                   onChanged: widget.onTitleChanged,
-                  decoration: InputDecoration(
-                    hintText: widget.titleHintText,
-                    filled: true,
-                    isDense: true,
-                    fillColor: _clairPink,
-                    focusColor: _clairPink,
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        width: 2.0,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                  ),
+                  hintText: widget.titleHintText,
                 ),
               ),
             ],
@@ -115,30 +106,19 @@ class _EditTitleDescriptionState extends State<EditTitleDescription> {
                     child: Text(
                       "description".tr(),
                       style: Utilities.fonts.body(
-                        fontWeight: FontWeight.w600,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ),
                 ),
                 SizedBox(
-                  width: Utilities.size.isMobileSize(context) ? 300.0 : 600.0,
-                  child: TextField(
-                    maxLines: null,
+                  width: 300.0,
+                  child: OutlinedTextField(
+                    hintText: widget.descriptionHintText,
                     controller: _descriptionTextController,
                     onChanged: widget.onDescriptionChanged,
-                    decoration: InputDecoration(
-                      hintText: widget.descriptionHintText,
-                      filled: true,
-                      isDense: true,
-                      fillColor: _clairPink,
-                      focusColor: _clairPink,
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 2.0,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                    ),
+                    maxLines: null,
                   ),
                 ),
               ],
