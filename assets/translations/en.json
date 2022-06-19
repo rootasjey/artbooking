@@ -647,11 +647,11 @@
     "other": "Change illustrations visibility"
   },
   "illustration_visibility_choose": {
-    "zero": "Tap on the following button to choose who can see your illustration.",
-    "one": "Tap on the following button to choose who can see your illustration.",
-    "two": "Tap on the following button to choose who can see these illustrations.",
-    "many": "Tap on the following button to choose who can see these illustrations.",
-    "other": "Tap on the following button to choose who can see these illustrations."
+    "zero": "Choose who can see your illustration.",
+    "one": "Choose who can see your illustration.",
+    "two": "Choose who can see these illustrations.",
+    "many": "Choose who can see these illustrations.",
+    "other": "Choose who can see these illustrations."
   },
   "illustration_visibility_description": "Define who can view, edit or share your illustration.",
   "illustration_visibility_update_fail": "Sorry, we couldn't update your illustration visibility",
@@ -1040,6 +1040,7 @@
   "section_configure": "Configure this section",
   "section_configure_subtitle": "You can select a background color, or data fetch mode.",
   "section_create": "Create a new section.",
+  "section_create_abbreviation": "Create section",
   "section_data_fetch_modes": "Data fetch modes",
   "section_data_mode_choose": "Choose how this section will fetch its data.",
   "section_data_types": "Data types",
@@ -1065,6 +1066,7 @@
     "OfmMRxHRgBHRsRiC9Ask": "A grid of illustrations with variable sized items.",
     "sEpudKFaNtOnDd5GUl8F": "A row of 3 cards explaining some of the app features."
   },
+  "section_edit": "Edit section",
   "section_edit_existing": "Update this existing section.",
   "section_name": {
     "C9Z51SG4JeJ5VFUHOagF": "3x2 Book Grid",
@@ -1089,6 +1091,7 @@
   "section_rename": "Rename section",
   "section_rename_description": "Give a new description to this section.",
   "section_title_edit_description": "Set a new value for this section content.",
+  "section_update": "Update section",
   "sections": "Sections",
   "sections_description": "View and manage (create, update, delete) all profile page sections.",
   "sections_loading": "Loading sections",

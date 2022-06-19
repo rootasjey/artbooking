@@ -647,11 +647,11 @@
     "other": "Changer la visibilité des illustrations"
   },
   "illustration_visibility_choose": {
-    "zero": "Appuyez sur le bouton ci-dessous pour choisir qui peut voir votre illustration.",
-    "one": "Appuyez sur le bouton ci-dessous pour choisir qui peut voir votre illustration.",
-    "two": "Appuyez sur le bouton ci-dessous pour choisir qui peut voir vos illustrations.",
-    "many": "Appuyez sur le bouton ci-dessous pour choisir qui peut voir vos illustrations.",
-    "other": "Appuyez sur le bouton ci-dessous pour choisir qui peut voir vos illustrations."
+    "zero": "Choisir qui peut voir votre illustration.",
+    "one": "Choisir qui peut voir votre illustration.",
+    "two": "Choisir qui peut voir vos illustrations.",
+    "many": "Choisir qui peut voir vos illustrations.",
+    "other": "Choisir qui peut voir vos illustrations."
   },
   "illustration_visibility_description": "Définissez qui peut voir, modifier ou partager votre illustration.",
   "illustration_visibility_update_fail": "Nous n'avons pas pu mettre à jour la visibilité de votre illustration.",
@@ -1039,6 +1039,7 @@
   "section_configure": "Configurer cette section",
   "section_configure_subtitle": "Vous pouvez sélectionner une nouvelle couleur de fond, ou la méthode de récupération de données.",
   "section_create": "Créer une nouvelle section.",
+  "section_create_abbreviation": "Créer une section",
   "section_data_fetch_modes": "Modes de récupération de données",
   "section_data_mode_choose": "Choisissez comment cette section récupérera ses données.",
   "section_data_types": "Types de données",
@@ -1064,6 +1065,7 @@
     "OfmMRxHRgBHRsRiC9Ask": "Une grille d'illustrations contenant des éléments de tailles variables.",
     "sEpudKFaNtOnDd5GUl8F": "Une ligne de 3 cartes expliquant certaines fonctionnalités de l'app."
   },
+  "section_edit": "Modifier la section",
   "section_edit_existing": "Mettre à jour une section existante.",
   "section_name": {
     "C9Z51SG4JeJ5VFUHOagF": "Grille 3x2 de books",
@@ -1088,6 +1090,7 @@
   "section_rename": "Renommer cette section",
   "section_rename_description": "Éditer la description.",
   "section_title_edit_description": "Définissez une nouvelle valeur pour le contenu de cette section.",
+  "section_update": "Mettre à jour la section",
   "sections": "Sections",
   "sections_description": "Visualisez et gérer (créez, mettez à jour, supprimez) toutes les sections des pages de profile.",
   "sections_loading": "Chargement des sections",
