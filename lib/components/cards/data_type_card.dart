@@ -1,5 +1,6 @@
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/types/enums/enum_data_ui_shape.dart';
 import 'package:artbooking/types/enums/enum_section_data_type.dart';
 import 'package:artbooking/types/tile_data.dart';
 import 'package:flutter/material.dart';
@@ -10,11 +11,20 @@ class DataTypeCard extends StatelessWidget {
     this.selected = false,
     required this.data,
     this.onTap,
+    this.shape = EnumDataUIShape.chip,
   }) : super(key: key);
 
+  /// This widget is highlighted if true.
   final bool selected;
+
+  /// Main data.
   final TileData<EnumSectionDataType> data;
+
+  /// Callback fired when this widget is tapped.
   final void Function(EnumSectionDataType type, bool selected)? onTap;
+
+  /// The visual aspect of this widget.
+  final EnumDataUIShape shape;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +33,23 @@ class DataTypeCard extends StatelessWidget {
       opacity = selected ? 1.0 : 0.6;
     }
 
+    if (shape == EnumDataUIShape.card) {
+      return cardWiget(
+        context,
+        opacity: opacity,
+      );
+    }
+
+    return chipWidget(
+      context,
+      opacity: opacity,
+    );
+  }
+
+  Widget cardWiget(
+    BuildContext context, {
+    double opacity = 1.0,
+  }) {
     return Opacity(
       opacity: opacity,
       child: Container(
@@ -82,6 +109,36 @@ class DataTypeCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget chipWidget(
+    BuildContext context, {
+    double opacity = 1.0,
+  }) {
+    return ChoiceChip(
+      tooltip: data.description,
+      avatar: Icon(
+        data.iconData,
+        size: 16.0,
+        color: Colors.black38,
+      ),
+      label: Text(
+        data.name,
+        style: Utilities.fonts.body(),
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12.0,
+        vertical: 8.0,
+      ),
+      selected: selected,
+      selectedColor: Colors.amber,
+      onSelected: (active) {
+        onTap?.call(
+          data.type,
+          !selected,
+        );
+      },
     );
   }
 }
