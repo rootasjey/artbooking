@@ -3,7 +3,6 @@ import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
-import 'package:artbooking/screens/sections/edit/edit_section_page.dart';
 import 'package:artbooking/screens/sections/many/sections_page_body.dart';
 import 'package:artbooking/screens/sections/many/sections_page_header.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
@@ -18,7 +17,6 @@ import 'package:easy_localization/src/public_ext.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:unicons/unicons.dart';
 
 class SectionsPage extends ConsumerStatefulWidget {
@@ -64,9 +62,11 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: openNewSectionDialog,
-        child: Icon(UniconsLine.plus),
+        icon: Icon(UniconsLine.plus),
+        label: Text("section_create_abbreviation".tr()),
+        extendedTextStyle: Utilities.fonts.body(fontWeight: FontWeight.w600),
         backgroundColor: Theme.of(context).secondaryHeaderColor,
       ),
       body: CustomScrollView(
@@ -235,11 +235,12 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
   }
 
   void onEditSection(Section targetSection, int targetIndex) {
-    showCupertinoModalBottomSheet(
-      context: context,
-      builder: (context) => EditSectionPage(
-        section: targetSection,
-      ),
+    NavigationStateHelper.section = targetSection;
+    Beamer.of(context).beamToNamed(
+      AtelierLocationContent.addSectionRoute,
+      routeState: {
+        "sectionId": targetSection.id,
+      },
     );
   }
 
@@ -294,12 +295,12 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
   }
 
   void openNewLicenseDialog() async {
-    await showCupertinoModalBottomSheet(
-      context: context,
-      builder: (context) => EditSectionPage(
-        section: Section.empty(),
-      ),
-    );
+    // await showCupertinoModalBottomSheet(
+    //   context: context,
+    //   builder: (context) => EditSectionPage(
+    //     section: Section.empty(),
+    //   ),
+    // );
   }
 
   void showDeleteConfirmDialog(License license, int index) {
@@ -372,11 +373,18 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
   }
 
   void openNewSectionDialog() {
-    showCupertinoModalBottomSheet(
-      context: context,
-      builder: (context) => EditSectionPage(
-        section: Section.empty(),
-      ),
+    Beamer.of(context).beamToNamed(
+      AtelierLocationContent.addSectionRoute,
+      routeState: {
+        "sectionId": "",
+      },
     );
+
+    // showCupertinoModalBottomSheet(
+    //   context: context,
+    //   builder: (context) => EditSectionPage(
+    //     section: Section.empty(),
+    //   ),
+    // );
   }
 }

@@ -7,6 +7,7 @@ import 'package:artbooking/screens/atelier/review/review_page.dart';
 import 'package:artbooking/screens/likes/likes_page.dart';
 import 'package:artbooking/screens/post_page.dart';
 import 'package:artbooking/screens/posts/many/posts_page.dart';
+import 'package:artbooking/screens/sections/edit/edit_section_page.dart';
 import 'package:artbooking/screens/sections/many/sections_page.dart';
 import 'package:artbooking/screens/sections/one/section_page.dart';
 import 'package:artbooking/screens/settings/delete_account/delete_account_page.dart';
@@ -126,10 +127,16 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
   /// Settings route value for this location.
   static const String settingsRoute = "$route/settings";
 
-  /// Sections (profile page) route.
+  /// (admin) Sections route.
   static const String sectionsRoute = "$route/sections";
 
-  /// Section (profile page) route.
+  /// (admin) Add a new section route.
+  static const String addSectionRoute = "$route/add/section/";
+
+  /// (admin) Edit an existing section route.
+  static const String editSectionRoute = "$route/edit/section/:sectionId";
+
+  /// Single section route.
   static const String sectionRoute = "$sectionsRoute/:sectionId";
 
   /// Delete account route value for this location.
@@ -169,6 +176,8 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
         reviewRoute,
         postsRoute,
         postRoute,
+        addSectionRoute,
+        editSectionRoute,
       ];
 
   @override
@@ -190,7 +199,7 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
       if (state.pathPatternSegments.contains("profile"))
         BeamPage(
           child: ProfilePage(
-            userId: state.pathParameters["userId"] ?? '',
+            userId: state.pathParameters["userId"] ?? "",
           ),
           key: ValueKey("$profileRoute"),
           title: Utilities.ui.getPageTitle("profile".tr()),
@@ -206,7 +215,7 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
       if (state.pathPatternSegments.contains(":bookId"))
         BeamPage(
           child: BookPage(
-            bookId: state.pathParameters["bookId"]!,
+            bookId: state.pathParameters["bookId"] ?? "",
             heroTag: Utilities.navigation.getHeroTag(state.routeState),
           ),
           key: ValueKey("$booksRoute/one"),
@@ -305,6 +314,24 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
           title: Utilities.ui.getPageTitle("section".tr()),
           type: BeamPageType.fadeTransition,
         ),
+      if (isAddSection(state))
+        BeamPage(
+          child: EditSectionPage(
+            sectionId: "",
+          ),
+          key: ValueKey("$addSectionRoute"),
+          title: Utilities.ui.getPageTitle("sections".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
+      if (isEditSection(state))
+        BeamPage(
+          child: EditSectionPage(
+            sectionId: state.pathParameters["sectionId"] ?? "",
+          ),
+          key: ValueKey("$addSectionRoute"),
+          title: Utilities.ui.getPageTitle("sections".tr()),
+          type: BeamPageType.fadeTransition,
+        ),
       if (state.pathPatternSegments.contains("review"))
         BeamPage(
           child: ReviewPage(),
@@ -339,6 +366,17 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
     }
 
     return EnumLicenseType.user;
+  }
+
+  bool isAddSection(BeamState state) {
+    return state.pathPatternSegments.contains("section") &&
+        state.pathPatternSegments.contains("add");
+  }
+
+  bool isEditSection(BeamState state) {
+    return state.pathPatternSegments.contains("section") &&
+        state.pathPatternSegments.contains("edit") &&
+        state.pathPatternSegments.contains(":sectionId");
   }
 
   /// True if the path match the delete account page.

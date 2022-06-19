@@ -1,12 +1,15 @@
 import 'package:artbooking/components/dialogs/header_separator_dialog.dart';
 import 'package:artbooking/components/edit_item_sheet_header.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/sections/edit/edit_section_page_body.dart';
 import 'package:artbooking/types/enums/enum_header_separator_tab.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_section_data_type.dart';
 import 'package:artbooking/types/enums/enum_section_visibility.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/header_separator.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/named_color.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:beamer/beamer.dart';
@@ -19,10 +22,10 @@ import 'package:unicons/unicons.dart';
 class EditSectionPage extends StatefulWidget {
   const EditSectionPage({
     Key? key,
-    required this.section,
+    required this.sectionId,
   }) : super(key: key);
 
-  final Section section;
+  final String sectionId;
 
   @override
   State<EditSectionPage> createState() => _EditSectionPageState();
@@ -37,7 +40,13 @@ class _EditSectionPageState extends State<EditSectionPage> {
   @override
   void initState() {
     super.initState();
-    _section = widget.section.copyWith();
+    final navSection = NavigationStateHelper.section;
+
+    if (navSection != null && navSection.id == widget.sectionId) {
+      _section = navSection;
+    } else {
+      fetchSection();
+    }
   }
 
   @override
@@ -49,10 +58,16 @@ class _EditSectionPageState extends State<EditSectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: tryCreateOrUpdateSection,
-        child: Icon(UniconsLine.check),
-        backgroundColor: Theme.of(context).secondaryHeaderColor,
+        icon: Icon(_section.id.isEmpty ? UniconsLine.plus : UniconsLine.check),
+        label: Text(
+          _section.id.isEmpty ? "create".tr() : "update".tr(),
+          style: Utilities.fonts.body(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -69,7 +84,7 @@ class _EditSectionPageState extends State<EditSectionPage> {
                 section: _section,
                 loading: _loading,
                 saving: _saving,
-                isNew: widget.section.id.isEmpty,
+                isNew: _section.id.isEmpty,
                 onValidate: tryCreateOrUpdateSection,
                 onBackgroundColorChanged: onBackgroundColorChanged,
                 onTextColorChanged: onTextColorChanged,
@@ -85,6 +100,32 @@ class _EditSectionPageState extends State<EditSectionPage> {
         ),
       ),
     );
+  }
+
+  void fetchSection() async {
+    if (widget.sectionId.isEmpty) {
+      return;
+    }
+
+    setState(() => _loading = true);
+    try {
+      final DocumentSnapshotMap snapshot = await FirebaseFirestore.instance
+          .collection("sections")
+          .doc(widget.sectionId)
+          .get();
+
+      final Json? map = snapshot.data();
+      if (!snapshot.exists || map == null) {
+        return;
+      }
+
+      _section = Section.fromMap(map);
+    } catch (error) {
+      Utilities.logger.i(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _loading = false);
+    }
   }
 
   void onShowHeaderSeparatorDialog(EnumHeaderSeparatorTab initialTab) {

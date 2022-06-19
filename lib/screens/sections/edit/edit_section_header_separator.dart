@@ -9,49 +9,69 @@ import 'package:flutter/material.dart';
 class EditSectionHeaderSeparator extends StatelessWidget {
   const EditSectionHeaderSeparator({
     Key? key,
-    this.padding = EdgeInsets.zero,
+    this.margin = EdgeInsets.zero,
     required this.headerSeparator,
     this.onShowHeaderSeparatorDialog,
+    this.editMode = false,
   }) : super(key: key);
 
-  final EdgeInsets padding;
+  /// Values will be editable if true.
+  final bool editMode;
+
+  /// External padding (blank space around this widget).
+  final EdgeInsets margin;
+
+  /// Selected section's header separator.
   final HeaderSeparator headerSeparator;
+
+  /// Callback event fired when this section's header separator is updated.
   final void Function(
     EnumHeaderSeparatorTab initialTab,
   )? onShowHeaderSeparatorDialog;
 
   @override
   Widget build(BuildContext context) {
+    final void Function()? onTapShapeCard = editMode
+        ? () => onShowHeaderSeparatorDialog?.call(
+              EnumHeaderSeparatorTab.shape,
+            )
+        : null;
+
+    final void Function()? onTapColorCard = editMode
+        ? () => onShowHeaderSeparatorDialog?.call(
+              EnumHeaderSeparatorTab.color,
+            )
+        : null;
+
     return Padding(
-      padding: padding,
+      padding: margin,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 4.0),
+            padding: const EdgeInsets.only(left: 4.0, bottom: 12.0),
             child: Opacity(
               opacity: 0.6,
               child: Text(
-                "header_separator".tr(),
-                style: Utilities.fonts.body(
-                  fontWeight: FontWeight.w700,
+                "header_separator".tr().toUpperCase(),
+                style: Utilities.fonts.body3(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
           ),
           Wrap(
+            spacing: 12.0,
+            runSpacing: 12.0,
             children: [
               SeparatorShapeCard(
                 separatorType: headerSeparator.shape,
-                onTap: () => onShowHeaderSeparatorDialog?.call(
-                  EnumHeaderSeparatorTab.shape,
-                ),
+                onTap: onTapShapeCard,
               ),
               SeparatorColorCard(
                 color: Color(headerSeparator.color),
-                onTap: () => onShowHeaderSeparatorDialog?.call(
-                  EnumHeaderSeparatorTab.color,
-                ),
+                onTap: onTapColorCard,
               ),
             ],
           ),
