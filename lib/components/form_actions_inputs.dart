@@ -27,11 +27,9 @@ class FormActionInputs extends StatelessWidget {
     Key? key,
     this.onCancel,
     this.onValidate,
-    this.cancelTextString = 'Clear input',
-    this.saveTextString = 'Save',
-    this.padding = const EdgeInsets.only(
-      top: 20.0,
-    ),
+    this.cancelTextString = "Clear input",
+    this.saveTextString = "Save",
+    this.padding = const EdgeInsets.only(top: 20.0),
     this.adaptivePadding = true,
   }) : super(key: key);
 
@@ -40,21 +38,21 @@ class FormActionInputs extends StatelessWidget {
     double left = 40.0;
     double spacing = 24.0;
 
-    EdgeInsets _padding = padding;
-    final isMobileSize = Utilities.size.isMobileSize(context);
+    EdgeInsets localPadding = padding;
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
 
     if (adaptivePadding && isMobileSize) {
       spacing = 12.0;
       left = 0.0;
 
-      _padding = EdgeInsets.only(
+      localPadding = EdgeInsets.only(
         top: 20.0,
         left: left,
       );
     }
 
     return Padding(
-      padding: _padding,
+      padding: localPadding,
       child: Wrap(
         alignment: WrapAlignment.end,
         spacing: spacing,

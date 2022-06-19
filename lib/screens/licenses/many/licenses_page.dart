@@ -448,14 +448,18 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   }
 
   void onTapLicense(License license) {
-    final route = AtelierLocationContent.licenseRoute
+    final String route = AtelierLocationContent.licenseRoute
         .replaceFirst(':licenseId', license.id);
 
-    Beamer.of(context).beamToNamed(route, data: {
-      'licenseId': license.id,
-    }, routeState: {
-      'type': license.typeToString(),
-    });
+    Beamer.of(context).beamToNamed(
+      route,
+      data: {
+        "licenseId": license.id,
+      },
+      routeState: {
+        "type": license.typeToString(),
+      },
+    );
   }
 
   /// Fire when a new document has been updated in Firestore.
