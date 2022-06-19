@@ -1,21 +1,27 @@
 import 'package:artbooking/components/buttons/circle_button.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
 class SheetHeader extends StatelessWidget {
-  final String title;
-  final String? subtitle;
-  final String? tooltip;
-  final Widget? bottom;
-
   SheetHeader({
     required this.title,
     this.subtitle,
     this.tooltip,
     this.bottom,
   });
+
+  /// Ttile's value.
+  final String title;
+
+  /// Subtile's value.
+  final String? subtitle;
+
+  /// Tooltip's message if anny.
+  final String? tooltip;
+
+  /// Widget to show below subtitle if any.
+  final Widget? bottom;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +31,7 @@ class SheetHeader extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(right: 16.0),
           child: CircleButton(
-            onTap: Beamer.of(context).popRoute,
+            onTap: () => Utilities.navigation.back(context),
             tooltip: tooltip,
             icon: Icon(
               UniconsLine.times,
