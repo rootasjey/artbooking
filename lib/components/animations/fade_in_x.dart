@@ -10,7 +10,7 @@ class FadeInX extends StatelessWidget {
     this.child,
     this.delay = const Duration(seconds: 0),
     this.endX = 0.0,
-    this.duration = const Duration(milliseconds: 300),
+    this.duration = const Duration(milliseconds: 150),
   });
 
   final double beginX;
