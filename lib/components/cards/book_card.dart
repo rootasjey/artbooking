@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/book/book.dart';
+import 'package:artbooking/types/book/popup_entry_book.dart';
 import 'package:artbooking/types/drag_data.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:desktop_drop/desktop_drop.dart';
@@ -125,7 +126,7 @@ class BookCard extends StatefulWidget {
   final int index;
 
   /// Menu item list displayed after tapping on the corresponding popup button.
-  final List<PopupMenuEntry<EnumBookItemAction>> popupMenuEntries;
+  final List<PopupEntryBook> popupMenuEntries;
 
   /// An arbitrary name given to this item's drag group
   ///  (e.g. "home-books"). Thus to avoid dragging items between sections.
@@ -150,6 +151,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   bool _showLikeAnimation = false;
 
   /// Display popup menu if true.
+  /// Because we only show popup menu on hover.
   bool _showPopupMenu = false;
 
   /// Book's name height.
