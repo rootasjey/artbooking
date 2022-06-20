@@ -2,7 +2,7 @@ import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums/enum_section_visibility.dart';
-import 'package:artbooking/types/popup_entry_section.dart';
+import 'package:artbooking/types/popup_entry_section_visibility.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -76,7 +76,7 @@ class EditSectionVisibility extends StatelessWidget {
               ),
             ),
             onSelected: onValueChanged,
-            itemBuilder: (context) => <PopupEntrySection>[
+            itemBuilder: (context) => <PopupEntrySectionVisibility>[
               PopupMenuItemIcon(
                 icon: PopupMenuIcon(UniconsLine.user_arrows),
                 value: EnumSectionVisibility.public,
