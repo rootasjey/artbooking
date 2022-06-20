@@ -1,0 +1,4 @@
+enum EnumSectionItemAction {
+  delete,
+  edit,
+}
