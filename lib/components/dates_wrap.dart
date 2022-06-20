@@ -1,3 +1,4 @@
+import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -54,37 +55,45 @@ class DatesWrap extends StatelessWidget {
         spacing: 12.0,
         runSpacing: 12.0,
         children: [
-          Chip(
-            avatar: CircleAvatar(
-              child: Icon(UniconsLine.jackhammer, size: 16.0),
-              backgroundColor: Colors.white38,
-              foregroundColor: Colors.black54,
-            ),
-            label: Opacity(
-              opacity: 0.8,
-              child: Text(
-                createdAtString,
-                style: Utilities.fonts.body(
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-          ),
-          if (updatedAtString.isNotEmpty)
-            Chip(
+          FadeInY(
+            beginY: 12.0,
+            delay: Duration(milliseconds: 25),
+            child: Chip(
               avatar: CircleAvatar(
-                child: Icon(UniconsLine.refresh, size: 16.0),
+                child: Icon(UniconsLine.jackhammer, size: 16.0),
                 backgroundColor: Colors.white38,
                 foregroundColor: Colors.black54,
               ),
               label: Opacity(
                 opacity: 0.8,
                 child: Text(
-                  updatedAtString,
+                  createdAtString,
                   style: Utilities.fonts.body(
                     fontSize: 14.0,
                     fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (updatedAtString.isNotEmpty)
+            FadeInY(
+              beginY: 12.0,
+              delay: Duration(milliseconds: 50),
+              child: Chip(
+                avatar: CircleAvatar(
+                  child: Icon(UniconsLine.refresh, size: 16.0),
+                  backgroundColor: Colors.white38,
+                  foregroundColor: Colors.black54,
+                ),
+                label: Opacity(
+                  opacity: 0.8,
+                  child: Text(
+                    updatedAtString,
+                    style: Utilities.fonts.body(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
               ),

@@ -1,3 +1,4 @@
+import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/cards/data_type_card.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums/enum_data_ui_shape.dart';
@@ -41,18 +42,22 @@ class EditSectionDataTypes extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 4.0,
-              bottom: 12.0,
-            ),
-            child: Opacity(
-              opacity: 0.6,
-              child: Text(
-                "section_data_types".tr().toUpperCase(),
-                style: Utilities.fonts.body3(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.w600,
+          FadeInY(
+            beginY: 12.0,
+            delay: Duration(milliseconds: 200),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: 4.0,
+                bottom: 12.0,
+              ),
+              child: Opacity(
+                opacity: 0.6,
+                child: Text(
+                  "section_data_types".tr().toUpperCase(),
+                  style: Utilities.fonts.body3(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
@@ -85,9 +90,13 @@ class EditSectionDataTypes extends StatelessWidget {
       );
     }).map(
       (TileData<EnumSectionDataType> data) {
-        return DataTypeCard(
-          data: data,
-          shape: EnumDataUIShape.chip,
+        return FadeInY(
+          beginY: 12.0,
+          delay: Duration(milliseconds: 225),
+          child: DataTypeCard(
+            data: data,
+            shape: EnumDataUIShape.chip,
+          ),
         );
       },
     ).toList();

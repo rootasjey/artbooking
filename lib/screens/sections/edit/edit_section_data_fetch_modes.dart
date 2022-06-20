@@ -1,3 +1,4 @@
+import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/cards/data_fetch_mode_card.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums/enum_data_ui_shape.dart';
@@ -34,19 +35,23 @@ class EditSectionDataFetchModes extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 8.0,
-              top: 16.0,
-              bottom: 16.0,
-            ),
-            child: Opacity(
-              opacity: 0.6,
-              child: Text(
-                "section_data_fetch_modes".tr().toUpperCase(),
-                style: Utilities.fonts.body3(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.w600,
+          FadeInY(
+            beginY: 12.0,
+            delay: Duration(milliseconds: 150),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: 8.0,
+                top: 16.0,
+                bottom: 16.0,
+              ),
+              child: Opacity(
+                opacity: 0.6,
+                child: Text(
+                  "section_data_fetch_modes".tr().toUpperCase(),
+                  style: Utilities.fonts.body3(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
@@ -79,10 +84,14 @@ class EditSectionDataFetchModes extends StatelessWidget {
       );
     }).map(
       (TileData<EnumSectionDataMode> data) {
-        return DataFetchModeCard(
-          data: data,
-          shape: EnumDataUIShape.chip,
-          onTap: editMode ? onValueChanged : null,
+        return FadeInY(
+          beginY: 12.0,
+          delay: Duration(milliseconds: 175),
+          child: DataFetchModeCard(
+            data: data,
+            shape: EnumDataUIShape.chip,
+            onTap: editMode ? onValueChanged : null,
+          ),
         );
       },
     ).toList();

@@ -1,3 +1,4 @@
+import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/sections/edit/color_card_picker.dart';
 import 'package:artbooking/types/enums/enum_data_ui_shape.dart';
@@ -51,23 +52,31 @@ class EditSectionColors extends StatelessWidget {
             spacing: 6.0,
             runSpacing: 6.0,
             children: [
-              ColorCardPicker(
-                shape: EnumDataUIShape.chip,
-                name: "background_color_default".tr(),
-                dialogTextTitle: "background_color_update".tr(),
-                dialogTextSubtitle: "section_background_color_choose".tr(),
-                selectedColor: section.backgroundColor,
-                onValueChanged: onBackgroundColorChanged,
-                margin: const EdgeInsets.only(left: 6.0),
+              FadeInY(
+                beginY: 12.0,
+                delay: Duration(milliseconds: 100),
+                child: ColorCardPicker(
+                  shape: EnumDataUIShape.chip,
+                  name: "background_color_default".tr(),
+                  dialogTextTitle: "background_color_update".tr(),
+                  dialogTextSubtitle: "section_background_color_choose".tr(),
+                  selectedColor: section.backgroundColor,
+                  onValueChanged: onBackgroundColorChanged,
+                  margin: const EdgeInsets.only(left: 6.0),
+                ),
               ),
-              ColorCardPicker(
-                shape: EnumDataUIShape.chip,
-                dialogTextTitle: "text_color_update".tr(),
-                dialogTextSubtitle: "text_color_choose".tr(),
-                name: "text_color_default".tr(),
-                selectedColor: section.textColor,
-                onValueChanged: onTextColorChanged,
-                margin: const EdgeInsets.only(left: 6.0),
+              FadeInY(
+                beginY: 12.0,
+                delay: Duration(milliseconds: 125),
+                child: ColorCardPicker(
+                  shape: EnumDataUIShape.chip,
+                  dialogTextTitle: "text_color_update".tr(),
+                  dialogTextSubtitle: "text_color_choose".tr(),
+                  name: "text_color_default".tr(),
+                  selectedColor: section.textColor,
+                  onValueChanged: onTextColorChanged,
+                  margin: const EdgeInsets.only(left: 6.0),
+                ),
               ),
             ],
           ),

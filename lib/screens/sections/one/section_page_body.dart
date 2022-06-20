@@ -1,3 +1,4 @@
+import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/dates_wrap.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -82,7 +83,11 @@ class SectionPageBody extends StatelessWidget {
                         updatedAt: section.updatedAt,
                         margin: const EdgeInsets.only(bottom: 24.0),
                       ),
-                      Divider(height: 54.0),
+                      FadeInY(
+                        beginY: 12.0,
+                        delay: Duration(milliseconds: 75),
+                        child: Divider(height: 54.0),
+                      ),
                       EditSectionColors(
                         section: section,
                         margin: const EdgeInsets.only(top: 24.0),

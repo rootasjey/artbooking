@@ -1,3 +1,4 @@
+import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/cards/separator_color_card.dart';
 import 'package:artbooking/components/cards/separator_shape_card.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -48,15 +49,19 @@ class EditSectionHeaderSeparator extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 4.0, bottom: 12.0),
-            child: Opacity(
-              opacity: 0.6,
-              child: Text(
-                "header_separator".tr().toUpperCase(),
-                style: Utilities.fonts.body3(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.w600,
+          FadeInY(
+            beginY: 12.0,
+            delay: Duration(milliseconds: 250),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 4.0, bottom: 12.0),
+              child: Opacity(
+                opacity: 0.6,
+                child: Text(
+                  "header_separator".tr().toUpperCase(),
+                  style: Utilities.fonts.body3(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
@@ -65,13 +70,21 @@ class EditSectionHeaderSeparator extends StatelessWidget {
             spacing: 12.0,
             runSpacing: 12.0,
             children: [
-              SeparatorShapeCard(
-                separatorType: headerSeparator.shape,
-                onTap: onTapShapeCard,
+              FadeInY(
+                beginY: 12.0,
+                delay: Duration(milliseconds: 275),
+                child: SeparatorShapeCard(
+                  separatorType: headerSeparator.shape,
+                  onTap: onTapShapeCard,
+                ),
               ),
-              SeparatorColorCard(
-                color: Color(headerSeparator.color),
-                onTap: onTapColorCard,
+              FadeInY(
+                beginY: 12.0,
+                delay: Duration(milliseconds: 300),
+                child: SeparatorColorCard(
+                  color: Color(headerSeparator.color),
+                  onTap: onTapColorCard,
+                ),
               ),
             ],
           ),
