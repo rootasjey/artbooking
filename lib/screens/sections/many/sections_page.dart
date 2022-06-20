@@ -1,15 +1,18 @@
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/sections/many/sections_page_body.dart';
 import 'package:artbooking/screens/sections/many/sections_page_header.dart';
+import 'package:artbooking/types/enums/enum_section_item_action.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
-import 'package:artbooking/types/license/license.dart';
+import 'package:artbooking/types/popup_entry_section.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,14 +30,18 @@ class SectionsPage extends ConsumerStatefulWidget {
 }
 
 class _LicensesPageState extends ConsumerState<SectionsPage> {
+  /// Collection order.
+  /// Oftent starts as the newest to oldest.
+  bool _descending = true;
+
   /// True if there're more data to fetch.
   bool _hasNext = true;
 
+  /// Fetching data if true.
+  bool _loading = false;
+
   /// True if loading more style from Firestore.
   bool _loadingMore = false;
-
-  bool _descending = true;
-  bool _loading = false;
 
   /// Last fetched document snapshot. Used for pagination.
   DocumentSnapshot<Object>? _lastDocumentSnapshot;
@@ -42,9 +49,24 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
   /// Staff's available licenses.
   final List<Section> _sections = [];
 
+  /// Available items for authenticated user and book is not liked yet.
+  final List<PopupEntrySection> _popupMenuEntries = [
+    PopupMenuItemIcon(
+      value: EnumSectionItemAction.edit,
+      icon: PopupMenuIcon(UniconsLine.pen),
+      textLabel: "edit".tr(),
+    ),
+    PopupMenuItemIcon(
+      value: EnumSectionItemAction.delete,
+      icon: PopupMenuIcon(UniconsLine.trash),
+      textLabel: "delete".tr(),
+    ),
+  ];
+
   /// Maximum licenses to fetch in one request.
   int _limit = 20;
 
+  /// Subscribe to Firestore collection.
   QuerySnapshotStreamSubscription? _sectionSubscription;
 
   @override
@@ -63,7 +85,7 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: openNewSectionDialog,
+        onPressed: navigateToAddSection,
         icon: Icon(UniconsLine.plus),
         label: Text("section_create_abbreviation".tr()),
         extendedTextStyle: Utilities.fonts.body(fontWeight: FontWeight.w600),
@@ -79,7 +101,9 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
             onTapSection: onTapSection,
             onDeleteSection: onDeleteSection,
             onEditSection: onEditSection,
-            onCreateSection: openNewLicenseDialog,
+            onCreateSection: navigateToAddSection,
+            popupMenuEntries: _popupMenuEntries,
+            onPopupMenuItemSelected: onPopupMenuItemSelected,
           )
         ],
       ),
@@ -214,6 +238,26 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
     );
   }
 
+  void navigateToAddSection() {
+    Beamer.of(context).beamToNamed(
+      AtelierLocationContent.addSectionRoute,
+      routeState: {
+        "sectionId": "",
+      },
+    );
+  }
+
+  void navigateToEditSectionPage(Section section) {
+    NavigationStateHelper.section = section;
+
+    final String route = AtelierLocationContent.editSectionRoute
+        .replaceFirst(':sectionId', section.id);
+
+    Beamer.of(context).beamToNamed(route, data: {
+      "sectionId": section.id,
+    });
+  }
+
   /// Fire when a new document has been created in Firestore.
   /// Add the corresponding document in the UI.
   void onAddStreamingLicense(DocumentChangeMap documentChange) {
@@ -244,6 +288,23 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
     );
   }
 
+  void onPopupMenuItemSelected(
+    EnumSectionItemAction action,
+    Section section,
+    int index,
+  ) {
+    switch (action) {
+      case EnumSectionItemAction.edit:
+        navigateToEditSectionPage(section);
+        break;
+      case EnumSectionItemAction.delete:
+        showDeleteConfirmDialog(section, index);
+        break;
+      default:
+        break;
+    }
+  }
+
   /// Fire when a new document has been delete from Firestore.
   /// Delete the corresponding document from the UI.
   void onRemoveStreamingLicense(DocumentChangeMap documentChange) {
@@ -256,7 +317,8 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
 
   void onTapSection(Section section, int index) {
     NavigationStateHelper.section = section;
-    final route = AtelierLocationContent.sectionRoute
+
+    final String route = AtelierLocationContent.sectionRoute
         .replaceFirst(':sectionId', section.id);
 
     Beamer.of(context).beamToNamed(route, data: {
@@ -294,16 +356,7 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
     }
   }
 
-  void openNewLicenseDialog() async {
-    // await showCupertinoModalBottomSheet(
-    //   context: context,
-    //   builder: (context) => EditSectionPage(
-    //     section: Section.empty(),
-    //   ),
-    // );
-  }
-
-  void showDeleteConfirmDialog(License license, int index) {
+  void showDeleteConfirmDialog(Section section, int index) {
     showDialog(
       context: context,
       builder: (context) {
@@ -316,7 +369,7 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
             child: Opacity(
               opacity: 0.8,
               child: Text(
-                "license_delete".tr().toUpperCase(),
+                "section_delete".tr().toUpperCase(),
                 style: Utilities.fonts.body(
                   fontWeight: FontWeight.w700,
                 ),
@@ -331,14 +384,14 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: Text.rich(
                   TextSpan(
-                    text: "license_delete_are_you_sure".tr(),
+                    text: "section_delete_description".tr(),
                     style: Utilities.fonts.body(
                       fontSize: 24.0,
                       fontWeight: FontWeight.w500,
                     ),
                     children: [
                       TextSpan(
-                        text: license.name,
+                        text: " ${section.name}",
                         style: Utilities.fonts.body(
                           fontSize: 24.0,
                           fontWeight: FontWeight.w500,
@@ -354,7 +407,7 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
           ),
           textButtonValidation: "delete".tr(),
           onValidate: () {
-            tryDeleteSection(license, index);
+            tryDeleteSection(section, index);
             Beamer.of(context).popRoute();
           },
           onCancel: Beamer.of(context).popRoute,
@@ -363,28 +416,18 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
     );
   }
 
-  void tryDeleteSection(License license, int index) async {
+  void tryDeleteSection(Section section, int index) async {
     setState(() => _sections.removeAt(index));
 
-    try {} catch (error) {
+    try {
+      await FirebaseFirestore.instance
+          .collection("sections")
+          .doc(section.id)
+          .delete();
+    } catch (error) {
+      setState(() => _sections.insert(index, section));
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     }
-  }
-
-  void openNewSectionDialog() {
-    Beamer.of(context).beamToNamed(
-      AtelierLocationContent.addSectionRoute,
-      routeState: {
-        "sectionId": "",
-      },
-    );
-
-    // showCupertinoModalBottomSheet(
-    //   context: context,
-    //   builder: (context) => EditSectionPage(
-    //     section: Section.empty(),
-    //   ),
-    // );
   }
 }

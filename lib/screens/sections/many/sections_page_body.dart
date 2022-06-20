@@ -2,6 +2,8 @@ import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/sections/many/section_card_item.dart';
+import 'package:artbooking/types/enums/enum_section_item_action.dart';
+import 'package:artbooking/types/popup_entry_section.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
@@ -16,14 +18,37 @@ class SectionsPageBody extends StatelessWidget {
     this.onEditSection,
     this.onTapSection,
     this.onCreateSection,
+    this.popupMenuEntries = const [],
+    this.onPopupMenuItemSelected,
   }) : super(key: key);
 
+  /// Data list.
   final List<Section> sections;
+
+  /// Currently fetching data if true.
   final bool loading;
+
+  /// Callback event fired when we want to delete a section.
   final Function(Section, int)? onDeleteSection;
+
+  /// Callback event fired when we want to edit a section.
   final Function(Section, int)? onEditSection;
+
+  /// Callback event fired when we want to create a section.
   final Function()? onCreateSection;
+
+  /// Callback event fired when we tap on a section.
   final Function(Section, int)? onTapSection;
+
+  /// Menu item list displayed after tapping on the corresponding popup button.
+  final List<PopupEntrySection> popupMenuEntries;
+
+  /// Callback fired when one of the popup menu item entries is selected.
+  final void Function(
+    EnumSectionItemAction action,
+    Section section,
+    int index,
+  )? onPopupMenuItemSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +116,7 @@ class SectionsPageBody extends StatelessWidget {
         ),
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            final section = sections.elementAt(index);
+            final Section section = sections.elementAt(index);
 
             return SectionCardItem(
               key: ValueKey(section.id),
@@ -100,6 +125,8 @@ class SectionsPageBody extends StatelessWidget {
               onTap: onTapSection,
               onDelete: onDeleteSection,
               onEdit: onEditSection,
+              popupMenuEntries: popupMenuEntries,
+              onPopupMenuItemSelected: onPopupMenuItemSelected,
             );
           },
           childCount: sections.length,
