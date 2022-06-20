@@ -243,6 +243,7 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
       AtelierLocationContent.addSectionRoute,
       routeState: {
         "sectionId": "",
+        "skip_route:SectionPage": false,
       },
     );
   }

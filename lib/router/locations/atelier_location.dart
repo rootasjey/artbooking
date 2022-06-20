@@ -135,7 +135,6 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
   static const String addSectionRoute = "$sectionsRoute/add";
 
   /// (admin) Edit an existing section route.
-  // static const String editSectionRoute = "$route/edit/section/:sectionId";
   static const String editSectionRoute = "$sectionsRoute/:sectionId/edit";
 
   /// Single section route.
@@ -163,6 +162,7 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
         activityRoute,
         profileRoute,
         sectionsRoute,
+        addSectionRoute,
         sectionRoute,
         settingsRoute,
         deleteAccountRoute,
@@ -178,7 +178,6 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
         reviewRoute,
         postsRoute,
         postRoute,
-        addSectionRoute,
         editSectionRoute,
       ];
 
@@ -330,7 +329,7 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
           child: EditSectionPage(
             sectionId: state.pathParameters["sectionId"] ?? "",
           ),
-          key: ValueKey("$addSectionRoute"),
+          key: ValueKey("$editSectionRoute"),
           title: Utilities.ui.getPageTitle("sections".tr()),
           type: BeamPageType.fadeTransition,
         ),
