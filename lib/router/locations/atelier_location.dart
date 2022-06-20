@@ -24,6 +24,7 @@ import 'package:artbooking/screens/settings/update_password/update_password_page
 import 'package:artbooking/screens/settings/update_username/update_username_page.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/types/enums/enum_license_type.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
@@ -131,10 +132,11 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
   static const String sectionsRoute = "$route/sections";
 
   /// (admin) Add a new section route.
-  static const String addSectionRoute = "$route/add/section/";
+  static const String addSectionRoute = "$sectionsRoute/add";
 
   /// (admin) Edit an existing section route.
-  static const String editSectionRoute = "$route/edit/section/:sectionId";
+  // static const String editSectionRoute = "$route/edit/section/:sectionId";
+  static const String editSectionRoute = "$sectionsRoute/:sectionId/edit";
 
   /// Single section route.
   static const String sectionRoute = "$sectionsRoute/:sectionId";
@@ -305,7 +307,7 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
           title: Utilities.ui.getPageTitle("sections".tr()),
           type: BeamPageType.fadeTransition,
         ),
-      if (state.pathPatternSegments.contains(":sectionId"))
+      if (isSectionPage(state))
         BeamPage(
           child: SectionPage(
             sectionId: state.pathParameters["sectionId"] ?? "",
@@ -369,12 +371,12 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
   }
 
   bool isAddSection(BeamState state) {
-    return state.pathPatternSegments.contains("section") &&
+    return state.pathPatternSegments.contains("sections") &&
         state.pathPatternSegments.contains("add");
   }
 
   bool isEditSection(BeamState state) {
-    return state.pathPatternSegments.contains("section") &&
+    return state.pathPatternSegments.contains("sections") &&
         state.pathPatternSegments.contains("edit") &&
         state.pathPatternSegments.contains(":sectionId");
   }
@@ -401,5 +403,14 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
   bool isUpdateUsername(List<String> pathBlueprintSegments) {
     return pathBlueprintSegments.contains("update") &&
         pathBlueprintSegments.contains("username");
+  }
+
+  bool isSectionPage(BeamState state) {
+    if (state.routeState == null) {
+      return state.pathPatternSegments.contains(":sectionId");
+    }
+
+    final Json? routeState = state.routeState as Json?;
+    return routeState?["skip_route:SectionPage"] ?? true;
   }
 }

@@ -57,6 +57,16 @@ class _EditSectionPageState extends State<EditSectionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isSectionIdEmpty = _section.id.isEmpty;
+    final String sectionName = _section.name;
+
+    final String headerTitleValue = isSectionIdEmpty
+        ? "create".tr() + " $sectionName"
+        : "edit".tr() + " $sectionName";
+
+    final String headerSubtitle =
+        isSectionIdEmpty ? "section_create".tr() : "section_edit_existing".tr();
+
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         onPressed: tryCreateOrUpdateSection,
@@ -75,10 +85,9 @@ class _EditSectionPageState extends State<EditSectionPage> {
           child: Column(
             children: [
               EditItemSheetHeader(
-                itemId: _section.id,
-                itemName: _section.name,
-                subtitleCreate: "section_create".tr(),
-                subtitleEdit: "section_edit_existing".tr(),
+                heroTitleTag: _section.id,
+                titleValue: headerTitleValue,
+                subtitleValue: headerSubtitle,
               ),
               EditSectionPageBody(
                 section: _section,

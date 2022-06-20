@@ -9,19 +9,23 @@ class SheetHeader extends StatelessWidget {
     this.subtitle,
     this.tooltip,
     this.bottom,
+    this.heroTitleTag = "",
   });
 
-  /// Ttile's value.
-  final String title;
+  /// Widget to show below subtitle if any.
+  final Widget? bottom;
+
+  /// If provided, will try to make a hero transition with the title.
+  final String heroTitleTag;
 
   /// Subtile's value.
   final String? subtitle;
 
+  /// Ttile's value.
+  final String title;
+
   /// Tooltip's message if anny.
   final String? tooltip;
-
-  /// Widget to show below subtitle if any.
-  final Widget? bottom;
 
   @override
   Widget build(BuildContext context) {
@@ -44,13 +48,16 @@ class SheetHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Opacity(
-                opacity: 0.4,
-                child: Text(
-                  title,
-                  style: Utilities.fonts.body(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.w600,
+              Hero(
+                tag: heroTitleTag,
+                child: Opacity(
+                  opacity: 0.4,
+                  child: Text(
+                    title,
+                    style: Utilities.fonts.body(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),

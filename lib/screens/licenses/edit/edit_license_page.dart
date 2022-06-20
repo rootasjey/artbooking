@@ -54,6 +54,16 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isLicenseIdEmpty = _license.id.isEmpty;
+    final String licenseName = _license.name;
+
+    final String headerTitleValue = isLicenseIdEmpty
+        ? "create".tr() + " $licenseName"
+        : "edit".tr() + " $licenseName";
+
+    final String headerSubtitle =
+        isLicenseIdEmpty ? "license_create".tr() : "license_edit_existing".tr();
+
     return Scaffold(
       body: Stack(
         children: [
@@ -63,10 +73,13 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
               child: Column(
                 children: [
                   EditItemSheetHeader(
-                    itemId: _license.id,
-                    itemName: _license.name,
-                    subtitleCreate: "license_create".tr(),
-                    subtitleEdit: "license_edit_existing".tr(),
+                    heroTitleTag: _license.id,
+                    titleValue: headerTitleValue,
+                    subtitleValue: headerSubtitle,
+                    // itemId: _license.id,
+                    // itemName: _license.name,
+                    // subtitleCreate: "license_create".tr(),
+                    // subtitleEdit: "license_edit_existing".tr(),
                   ),
                   EditLicensePageBody(
                     license: _license,

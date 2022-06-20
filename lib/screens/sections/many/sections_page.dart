@@ -255,6 +255,8 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
 
     Beamer.of(context).beamToNamed(route, data: {
       "sectionId": section.id,
+    }, routeState: {
+      "skip_route:SectionPage": false,
     });
   }
 

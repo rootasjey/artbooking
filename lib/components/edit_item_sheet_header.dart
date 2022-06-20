@@ -5,30 +5,27 @@ import 'package:flutter/material.dart';
 class EditItemSheetHeader extends StatelessWidget {
   const EditItemSheetHeader({
     Key? key,
-    required this.itemId,
-    required this.itemName,
-    this.subtitleCreate = "",
-    this.subtitleEdit = "",
+    required this.titleValue,
+    this.heroTitleTag = "",
+    this.subtitleValue = "",
   }) : super(key: key);
 
-  final String itemId;
-  final String itemName;
-  final String subtitleCreate;
-  final String subtitleEdit;
+  /// If provided, will try to make a hero transition with the title.
+  final String heroTitleTag;
+
+  /// Title's string.
+  final String titleValue;
+
+  /// Subtitle's string.
+  final String subtitleValue;
 
   @override
   Widget build(BuildContext context) {
-    final String headerTitleValue = itemId.isEmpty
-        ? "create".tr() + " $itemName"
-        : "edit".tr() + " $itemName";
-
-    final String headerSubtitle =
-        itemId.isEmpty ? subtitleCreate : subtitleEdit;
-
     return SheetHeader(
-      title: headerTitleValue,
+      heroTitleTag: heroTitleTag,
+      subtitle: subtitleValue,
+      title: titleValue,
       tooltip: "close".tr(),
-      subtitle: headerSubtitle,
     );
   }
 }
