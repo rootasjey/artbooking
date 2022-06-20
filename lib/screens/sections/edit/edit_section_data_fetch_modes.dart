@@ -108,11 +108,15 @@ class EditSectionDataFetchModes extends StatelessWidget {
       );
     }).map(
       (TileData<EnumSectionDataMode> data) {
-        return DataFetchModeCard(
-          data: data,
-          shape: EnumDataUIShape.chip,
-          selected: dataModes.contains(data.type),
-          onTap: editMode ? onValueChanged : null,
+        return FadeInY(
+          beginY: 12.0,
+          delay: Duration(milliseconds: 175),
+          child: DataFetchModeCard(
+            data: data,
+            shape: EnumDataUIShape.chip,
+            selected: dataModes.contains(data.type),
+            onTap: editMode ? onValueChanged : null,
+          ),
         );
       },
     ).toList();

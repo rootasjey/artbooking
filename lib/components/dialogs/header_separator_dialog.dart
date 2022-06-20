@@ -118,6 +118,7 @@ class _HeaderSeparatorDialogState extends State<HeaderSeparatorDialog> {
             ),
             child: Wrap(
               spacing: 12.0,
+              runSpacing: 12.0,
               children: [
                 DarkOutlinedButton(
                   selected: _selectedTab == EnumHeaderSeparatorTab.color,
@@ -181,6 +182,8 @@ class _HeaderSeparatorDialogState extends State<HeaderSeparatorDialog> {
               ),
             ),
             Wrap(
+              spacing: 12.0,
+              runSpacing: 12.0,
               children: [
                 TileData<EnumSeparatorShape>(
                   name: "",
@@ -203,9 +206,10 @@ class _HeaderSeparatorDialogState extends State<HeaderSeparatorDialog> {
               ].map((data) {
                 index++;
                 return FadeInY(
-                    beginY: 12.0,
-                    delay: Duration(milliseconds: 50 * index),
-                    child: shapeTile(data));
+                  beginY: 12.0,
+                  delay: Duration(milliseconds: 50 * index),
+                  child: shapeTile(data),
+                );
               }).toList(),
             ),
           ]),
@@ -217,19 +221,16 @@ class _HeaderSeparatorDialogState extends State<HeaderSeparatorDialog> {
   Widget shapeTile(TileData<EnumSeparatorShape> data) {
     final bool selected = _headerSeparator.shape == data.type;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: SeparatorShapeCard(
-        selected: selected,
-        separatorType: data.type,
-        onTap: () {
-          setState(() {
-            _headerSeparator = _headerSeparator.copyWith(
-              separatorType: data.type,
-            );
-          });
-        },
-      ),
+    return SeparatorShapeCard(
+      selected: selected,
+      separatorType: data.type,
+      onTap: () {
+        setState(() {
+          _headerSeparator = _headerSeparator.copyWith(
+            separatorType: data.type,
+          );
+        });
+      },
     );
   }
 

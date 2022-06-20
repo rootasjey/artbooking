@@ -35,15 +35,19 @@ class EditSectionColors extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 4.0, bottom: 12.0),
-            child: Opacity(
-              opacity: 0.6,
-              child: Text(
-                "colors".tr().toUpperCase(),
-                style: Utilities.fonts.body3(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.w600,
+          FadeInY(
+            beginY: 12.0,
+            delay: Duration(milliseconds: 75),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 4.0, bottom: 12.0),
+              child: Opacity(
+                opacity: 0.6,
+                child: Text(
+                  "colors".tr().toUpperCase(),
+                  style: Utilities.fonts.body3(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),

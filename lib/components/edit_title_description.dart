@@ -1,3 +1,4 @@
+import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/texts/outlined_text_field.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:easy_localization/src/public_ext.dart';
@@ -67,25 +68,33 @@ class _EditTitleDescriptionState extends State<EditTitleDescription> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Opacity(
-                opacity: 0.6,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Text(
-                    "title".tr(),
-                    style: Utilities.fonts.body(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w800,
+              FadeInY(
+                beginY: 12.0,
+                delay: Duration(milliseconds: 4),
+                child: Opacity(
+                  opacity: 0.6,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      "title".tr(),
+                      style: Utilities.fonts.body(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
                 ),
               ),
-              SizedBox(
-                width: 300.0,
-                child: OutlinedTextField(
-                  controller: _nameTextController,
-                  onChanged: widget.onTitleChanged,
-                  hintText: widget.titleHintText,
+              FadeInY(
+                beginY: 12.0,
+                delay: Duration(milliseconds: 50),
+                child: SizedBox(
+                  width: 300.0,
+                  child: OutlinedTextField(
+                    controller: _nameTextController,
+                    onChanged: widget.onTitleChanged,
+                    hintText: widget.titleHintText,
+                  ),
                 ),
               ),
             ],
@@ -99,26 +108,34 @@ class _EditTitleDescriptionState extends State<EditTitleDescription> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Opacity(
-                  opacity: 0.6,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Text(
-                      "description".tr(),
-                      style: Utilities.fonts.body(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w800,
+                FadeInY(
+                  beginY: 12.0,
+                  delay: Duration(milliseconds: 100),
+                  child: Opacity(
+                    opacity: 0.6,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Text(
+                        "description".tr(),
+                        style: Utilities.fonts.body(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: 300.0,
-                  child: OutlinedTextField(
-                    hintText: widget.descriptionHintText,
-                    controller: _descriptionTextController,
-                    onChanged: widget.onDescriptionChanged,
-                    maxLines: null,
+                FadeInY(
+                  beginY: 12.0,
+                  delay: Duration(milliseconds: 125),
+                  child: SizedBox(
+                    width: 300.0,
+                    child: OutlinedTextField(
+                      hintText: widget.descriptionHintText,
+                      controller: _descriptionTextController,
+                      onChanged: widget.onDescriptionChanged,
+                      maxLines: null,
+                    ),
                   ),
                 ),
               ],

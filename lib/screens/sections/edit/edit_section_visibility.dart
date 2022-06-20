@@ -1,3 +1,4 @@
+import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -34,43 +35,47 @@ class EditSectionVisibility extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Opacity(
-              opacity: 0.6,
-              child: Text(
-                "visibility".tr().toUpperCase(),
-                // style: Utilities.fonts.body(
-                //   fontSize: 18.0,
-                //   fontWeight: FontWeight.w700,
-                // ),
-                style: Utilities.fonts.body3(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.w600,
+          FadeInY(
+            beginY: 12.0,
+            delay: Duration(milliseconds: 100),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Opacity(
+                opacity: 0.6,
+                child: Text(
+                  "visibility".tr().toUpperCase(),
+                  style: Utilities.fonts.body3(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
           ),
           PopupMenuButton(
             tooltip: "illustration_visibility_choose".plural(1),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  width: 2.0,
-                  color: color.withOpacity(0.3),
+            child: FadeInY(
+              beginY: 12.0,
+              delay: Duration(milliseconds: 115),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    width: 2.0,
+                    color: color.withOpacity(0.3),
+                  ),
+                  borderRadius: BorderRadius.circular(4.0),
                 ),
-                borderRadius: BorderRadius.circular(4.0),
-              ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 38.0,
-                vertical: 8.0,
-              ),
-              child: Opacity(
-                opacity: 0.6,
-                child: Text(
-                  "visibility_${visibility.name}".tr().toUpperCase(),
-                  style: Utilities.fonts.body(
-                    fontWeight: FontWeight.w700,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 38.0,
+                  vertical: 8.0,
+                ),
+                child: Opacity(
+                  opacity: 0.6,
+                  child: Text(
+                    "visibility_${visibility.name}".tr().toUpperCase(),
+                    style: Utilities.fonts.body(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
