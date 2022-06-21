@@ -31,7 +31,7 @@ class DatesWrap extends StatelessWidget {
     final Duration createdAtDiff = DateTime.now().difference(createdAt);
 
     if (createdAtDiff.inDays > 15) {
-      createdAtString = Jiffy(createdAt).yMMMd;
+      createdAtString = Jiffy(createdAt).yMMMMEEEEd;
     } else {
       createdAtString = "date_created_ago".tr(
         args: [Jiffy(createdAt).fromNow()],
@@ -42,7 +42,7 @@ class DatesWrap extends StatelessWidget {
       final Duration updatedAtDiff = DateTime.now().difference(updatedAt);
 
       if (updatedAtDiff.inDays > 15) {
-        updatedAtString = Jiffy(createdAt).yMMMd;
+        updatedAtString = Jiffy(updatedAt).yMMMEdjm;
       } else {
         updatedAtString = "date_updated_ago"
             .tr(args: [Jiffy(updatedAt).fromNow()]).toLowerCase();
