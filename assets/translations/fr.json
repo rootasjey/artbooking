@@ -742,6 +742,7 @@
   "license_delete_failed": "Nous sommes désolé, nous n'avons pas réussi à supprimer cette licence. Veuillez réessayer ultérieurement.",
   "license_deleting": "Suppression de la licence",
   "license_description_sample": "Cette licence autorise les autres à distrubuer, remixer, adapter, et même construire par-dessus votre œuvre...",
+  "license_edit": "Modifier la license",
   "license_edit_existing": "Mettre à jour une licence existante.",
   "license_find": "Trouver une licence",
   "license_label_text": "attribution, sharealike, ...",
@@ -758,6 +759,7 @@
   "license_hide_panel": "Masquer le panneau de licence",
   "license_update_fail": "Nous sommes désolés, nous n'avons pas pu mettre à jour votre licence. Veuillez réessayer plus tard.",
   "license_updating": "Mise à jour de la licence",
+  "license_usage": "Usage",
   "license_usage_information": "Informations d'utilisation",
   "license_usages": {
     "adapt": "Remixer, transformer, et construire par-dessus l'œuvre quel que soit la raison, même à but commercial.",

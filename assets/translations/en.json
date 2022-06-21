@@ -742,6 +742,7 @@
   "license_delete_failed": "Sorry, we couldn't delete this license. Please try again later.",
   "license_deleting": "Deleting this license",
   "license_description_sample": "This license lets others distribute, remix, adapt, and build upon your work, ...",
+  "license_edit": "Edit license",
   "license_edit_existing": "Update this existing license.",
   "license_find": "Find a license",
   "license_hide_panel": "Hide license panel",
@@ -758,6 +759,7 @@
   "license_title_dot": "License's title...",
   "license_update_fail": "Sorry, we couldn't update your license. Please try again later.",
   "license_updating": "Updating license",
+  "license_usage": "Usage",
   "license_usage_information": "Usage information",
   "license_usages": {
     "adapt": "Remix, transform, and build upon the material for any purpose, even commercially.",
