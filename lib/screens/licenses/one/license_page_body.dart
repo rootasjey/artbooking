@@ -1,52 +1,73 @@
-import 'package:artbooking/components/buttons/text_rectangle_button.dart';
+import 'package:artbooking/components/animations/fade_in_y.dart';
+import 'package:artbooking/components/dates_wrap.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/screens/licenses/one/license_page_dates.dart';
 import 'package:artbooking/screens/licenses/one/license_page_links.dart';
 import 'package:artbooking/screens/licenses/one/license_page_usage.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
-import 'package:unicons/unicons.dart';
 
 class LicensePageBody extends StatelessWidget {
   const LicensePageBody({
     Key? key,
     required this.license,
-    required this.isLoading,
-    this.isDeleting = false,
+    required this.loading,
+    this.deleting = false,
     this.onEditLicense,
     this.onDeleteLicense,
     required this.canManageLicense,
   }) : super(key: key);
 
-  final License license;
-  final bool isLoading;
-  final bool isDeleting;
+  /// Fetching data on the license.
+  final bool loading;
+
+  /// Currently deleting the displayed license if true.
+  final bool deleting;
+
+  /// If true, the current authenticated user has the right to
+  /// create/update/delete staff licenses.
   final bool canManageLicense;
+
+  /// Actual license.
+  final License license;
+
+  /// Callback fired when we want to edit a license.
   final Function()? onEditLicense;
+
+  /// Callback fired when we want to delete a license.
   final Function()? onDeleteLicense;
 
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
       padding: const EdgeInsets.only(
-        top: 60.0,
+        top: 12.0,
         left: 60.0,
         right: 60.0,
         bottom: 260.0,
       ),
-      sliver: isLoading || isDeleting ? loadingView() : idleView(),
+      sliver: loading || deleting ? loadingView() : idleView(),
     );
   }
 
   Widget idleView() {
-    final bool isPending = isLoading || isDeleting;
-
     return SliverList(
-      delegate: SliverChildListDelegate.fixed(
-        [
-          Opacity(
+      delegate: SliverChildListDelegate.fixed([
+        Hero(
+          tag: license.name,
+          child: Text(
+            license.name,
+            style: Utilities.fonts.body3(
+              fontSize: 24.0,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        FadeInY(
+          beginY: 12.0,
+          delay: Duration(milliseconds: 4),
+          child: Opacity(
             opacity: 0.4,
             child: Text(
               "version_number".tr(args: [license.version]),
@@ -56,71 +77,43 @@ class LicensePageBody extends StatelessWidget {
               ),
             ),
           ),
-          Hero(
-            tag: license.name,
-            child: Text(
-              license.name,
-              style: Utilities.fonts.body(
-                fontSize: 32.0,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          Opacity(
+        ),
+        FadeInY(
+          beginY: 12.0,
+          delay: Duration(milliseconds: 25),
+          child: Opacity(
             opacity: 0.6,
             child: Text(
               license.description,
               style: Utilities.fonts.body(
-                fontSize: 18.0,
+                fontSize: 16.0,
                 fontWeight: FontWeight.w400,
               ),
             ),
           ),
-          LicensePageDates(
-            createdAt: license.createdAt,
-            updatedAt: license.updatedAt,
+        ),
+        DatesWrap(
+          createdAt: license.createdAt,
+          updatedAt: license.updatedAt,
+          margin: const EdgeInsets.only(top: 12.0),
+        ),
+        LicensePageUsage(
+          usage: license.usage,
+          margin: const EdgeInsets.only(top: 42.0),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 42.0),
+          child: LicensePageLinks(
+            links: license.links,
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 42.0),
-            child: LicensePageUsage(
-              usage: license.usage,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 42.0),
-            child: LicensePageLinks(
-              links: license.links,
-            ),
-          ),
-          if (canManageLicense)
-            Padding(
-              padding: const EdgeInsets.only(top: 24.0),
-              child: Wrap(
-                spacing: 20.0,
-                children: [
-                  TextRectangleButton(
-                    onPressed: isPending ? null : onEditLicense,
-                    icon: Icon(UniconsLine.edit),
-                    label: Text('edit'.tr()),
-                    primary: Colors.black38,
-                  ),
-                  TextRectangleButton(
-                    onPressed: isPending ? null : onDeleteLicense,
-                    icon: Icon(UniconsLine.trash),
-                    label: Text('delete'.tr()),
-                    primary: Colors.black38,
-                  ),
-                ],
-              ),
-            ),
-        ],
-      ),
+        ),
+      ]),
     );
   }
 
   Widget loadingView() {
     final String pendingAction =
-        isDeleting ? "license_deleting".tr() : "license_loading".tr();
+        deleting ? "license_deleting".tr() : "license_loading".tr();
 
     return LoadingView(
       sliver: true,

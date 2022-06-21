@@ -37,11 +37,16 @@ class LicensePage extends ConsumerStatefulWidget {
 }
 
 class _LicensePageState extends ConsumerState<LicensePage> {
-  bool _isDeleting = false;
-  bool _isLoading = false;
+  /// Currently deleting the displayed license if true.
+  bool _deleting = false;
 
+  /// Fetching data on the license.
+  bool _loading = false;
+
+  /// Listen to updates about the license.
   DocSnapshotStreamSubscription? _licenseSubscription;
 
+  /// Actual license.
   var _license = License.empty();
 
   @override
@@ -69,8 +74,8 @@ class _LicensePageState extends ConsumerState<LicensePage> {
           ApplicationBar(),
           LicensePageHeader(),
           LicensePageBody(
-            isLoading: _isLoading,
-            isDeleting: _isDeleting,
+            loading: _loading,
+            deleting: _deleting,
             license: _license,
             onEditLicense: onEditLicense,
             onDeleteLicense: onDeleteLicense,
@@ -86,10 +91,35 @@ class _LicensePageState extends ConsumerState<LicensePage> {
       return Container();
     }
 
-    return FloatingActionButton(
-      onPressed: onEditLicense,
-      child: Icon(UniconsLine.edit),
-      backgroundColor: Theme.of(context).secondaryHeaderColor,
+    final bool isPending = _loading || _deleting;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        FloatingActionButton.extended(
+          onPressed: isPending ? null : onEditLicense,
+          icon: Icon(UniconsLine.pen, size: 24.0),
+          label: Text("license_edit".tr()),
+          extendedTextStyle: Utilities.fonts.body(
+            fontSize: 18.0,
+            fontWeight: FontWeight.w600,
+          ),
+          backgroundColor: Theme.of(context).secondaryHeaderColor,
+          extendedPadding: EdgeInsets.symmetric(
+            horizontal: 20.0,
+            vertical: 20.0,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: FloatingActionButton(
+            heroTag: null,
+            onPressed: isPending ? null : onDeleteLicense,
+            child: Icon(UniconsLine.trash),
+            backgroundColor: Theme.of(context).secondaryHeaderColor,
+          ),
+        ),
+      ],
     );
   }
 
@@ -110,7 +140,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
   }
 
   void fetchLicense() async {
-    setState(() => _isLoading = true);
+    setState(() => _loading = true);
 
     try {
       final query = getLicenseQuery();
@@ -129,7 +159,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
-      setState(() => _isLoading = false);
+      setState(() => _loading = false);
     }
   }
 
@@ -228,7 +258,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
   }
 
   void tryDeleteLicense(License license) async {
-    setState(() => _isDeleting = true);
+    setState(() => _deleting = true);
 
     try {
       final response = await Utilities.cloud.fun('licenses-deleteOne').call({
@@ -246,7 +276,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     } finally {
-      setState(() => _isDeleting = false);
+      setState(() => _deleting = false);
     }
   }
 }
