@@ -405,11 +405,14 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
   }
 
   bool isSectionPage(BeamState state) {
+    final bool containsSectionId =
+        state.pathPatternSegments.contains(":sectionId");
+
     if (state.routeState == null) {
-      return state.pathPatternSegments.contains(":sectionId");
+      return containsSectionId;
     }
 
     final Json? routeState = state.routeState as Json?;
-    return routeState?["skip_route:SectionPage"] ?? true;
+    return routeState?["skip_route:SectionPage"] ?? containsSectionId;
   }
 }
