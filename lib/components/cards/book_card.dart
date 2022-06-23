@@ -142,7 +142,11 @@ class BookCard extends StatefulWidget {
 }
 
 class _BookCardState extends State<BookCard> with AnimationMixin {
+  /// Carde scale animation.
   late Animation<double> _scaleAnimation;
+
+  /// Carde scale animation controller.
+  /// Animation can be started, paused, stopped, reversed etc. with this.
   late AnimationController _scaleController;
 
   bool _isFileHover = false;
@@ -156,6 +160,8 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
 
   /// Book's name height.
   final double _captionHeight = 42.0;
+
+  /// Card's border radius.
   final double _cardRadius = 8.0;
 
   /// Initial elevation.

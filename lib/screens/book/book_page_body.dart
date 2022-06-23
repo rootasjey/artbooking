@@ -111,14 +111,14 @@ class BookPageBody extends StatelessWidget {
           (context, index) {
             final bookIllustration = bookIllustrations.elementAt(index);
             final key = Utilities.generateIllustrationKey(bookIllustration);
-            final illustration = illustrationMap[key];
+            final Illustration? illustration = illustrationMap[key];
             final bool selected = multiSelectedItems.containsKey(key);
 
             if (illustration == null) {
               return Container();
             }
 
-            final onTap = () => onTapIllustrationCard?.call(
+            final void Function() onTap = () => onTapIllustrationCard?.call(
                   key,
                   illustration,
                 );
