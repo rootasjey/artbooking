@@ -2,6 +2,7 @@ import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/cloud_functions/illustrations_response.dart';
+import 'package:artbooking/types/cloud_functions/upload_cover_response.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/src/public_ext.dart';
@@ -173,6 +174,125 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     return passedFiles;
   }
 
+  /// Select an image file to upload as this book's cover,
+  Future<UploadCoverResponse> pickImageAndSetAsBookCover({
+    required String bookId,
+  }) async {
+    try {
+      FilePickerCross pickerResult = await FilePickerCross.importFromStorage(
+        type: FileTypeCross.image,
+      );
+
+      if (!_checkSize(pickerResult)) {
+        return UploadCoverResponse(
+          errorMessage: "book_set_cover_error_size_limit".tr(),
+          file: pickerResult,
+          success: false,
+        );
+      }
+
+      final HttpsCallableResult response =
+          await Utilities.cloud.fun("books-setCover").call({
+        "book_id": bookId,
+        "cover_type": "uploaded_cover",
+      });
+
+      if (!response.data["success"]) {
+        return UploadCoverResponse(
+          errorMessage: "book_set_cover_error_network".tr(),
+          file: pickerResult,
+          success: false,
+        );
+      }
+
+      await _uploadBookCover(
+        bookId: bookId,
+        file: pickerResult,
+      );
+
+      return UploadCoverResponse(
+        errorMessage: "",
+        file: pickerResult,
+        success: true,
+      );
+    } on Exception catch (error) {
+      final String errorMessage = "${'book_set_cover_error'.tr()}. "
+          "Error: ${error.toString()}";
+
+      return UploadCoverResponse(
+        errorMessage: errorMessage,
+        success: false,
+      );
+    }
+  }
+
+  /// Upload a file to Firebase Storage to use as a book's cover.
+  Future<CustomUploadTask> _uploadBookCover({
+    required String bookId,
+    required FilePickerCross file,
+  }) async {
+    final String fileName =
+        file.fileName ?? "${"unknown".tr()}-${DateTime.now()}";
+
+    final customUploadTask = CustomUploadTask(
+      name: fileName,
+    );
+
+    add(customUploadTask);
+
+    final String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+
+    if (userId.isEmpty) {
+      return customUploadTask;
+    }
+
+    final lastIndexDot = fileName.lastIndexOf(".") + 1;
+    final String extension = fileName.substring(lastIndexDot);
+
+    final String cloudStorageFilePath =
+        "users/$userId/books/$bookId/cover/original.$extension";
+
+    final storage = FirebaseStorage.instance;
+    final UploadTask uploadTask = storage.ref(cloudStorageFilePath).putData(
+        file.toUint8List(),
+        SettableMetadata(
+          customMetadata: {
+            "book_id": bookId,
+            "extension": extension,
+            "file_type": "book_cover",
+            "user_id": userId,
+            "target": "book",
+            "visibility": "public",
+          },
+          contentType: mimeFromExtension(
+            extension,
+          ),
+        ));
+
+    customUploadTask.task = uploadTask;
+
+    final List<CustomUploadTask> filteredState =
+        state.where((CustomUploadTask x) {
+      return x.illustrationId != customUploadTask.illustrationId;
+    }).toList();
+
+    state = [
+      ...filteredState,
+      customUploadTask,
+    ];
+
+    try {
+      await uploadTask;
+    } on FirebaseException catch (error) {
+      Utilities.logger.e(error);
+    } catch (error) {
+      Utilities.logger.e(error);
+    } finally {
+      state = [...state];
+      return customUploadTask;
+    }
+  }
+
   /// Upload a file creating a Firestore document and adding a new file to
   /// Firebase Cloud Storage. Then add this new created illustration to
   /// an existing book.
@@ -209,6 +329,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     }
   }
 
+  /// Return true if the size is below 25Mo. Return false otherwise.
   bool _checkSize(FilePickerCross file) {
     if (file.length > 25 * 1024 * 1024) {
       return false;

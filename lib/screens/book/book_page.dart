@@ -9,6 +9,7 @@ import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
+import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
@@ -17,6 +18,9 @@ import 'package:artbooking/screens/book/book_page_fab.dart';
 import 'package:artbooking/screens/book/book_page_header.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/book/book_illustration.dart';
+import 'package:artbooking/types/book/popup_entry_book.dart';
+import 'package:artbooking/types/cloud_functions/upload_cover_response.dart';
+import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/globals/app_state.dart';
@@ -24,9 +28,11 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/firestore/document_map.dart';
 import 'package:artbooking/types/firestore/doc_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/illustration/popup_entry_illustration.dart';
 import 'package:artbooking/types/illustration_map.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
@@ -77,6 +83,17 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   /// True if the current authenticated user has liked this book.
   bool _liked = false;
 
+  /// Currently changing book's cover if true.
+  /// It may be fast or takes more time if there's file upload + thumbnails
+  /// generation.
+  bool _updatingCover = false;
+
+  /// Listens to book's updates.
+  DocSnapshotStreamSubscription? _bookSubscription;
+
+  /// Listent to changes for this book's like status.
+  DocSnapshotStreamSubscription? _likeSubscription;
+
   /// /// Amount of offset to jump when dragging an element to the edge.
   final double _jumpOffset = 200.0;
 
@@ -106,14 +123,14 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   /// The last illustration to fetch in the array.
   int _endIndex = 0;
 
+  /// Listens to illustrations' updates.
+  final Map<String, DocSnapshotStreamSubscription> _illustrationSubs = {};
+
   /// Currently selected illustrations.
   IllustrationMap _multiSelectedItems = Map();
 
-  /// Handles page's scroll.
-  ScrollController _scrollController = ScrollController();
-
   /// Items when opening the popup.
-  final List<PopupMenuEntry<EnumIllustrationItemAction>> _popupMenuEntries = [
+  final List<PopupEntryIllustration> _popupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumIllustrationItemAction.addToBook,
       icon: PopupMenuIcon(UniconsLine.book_medical),
@@ -124,19 +141,31 @@ class _MyBookPageState extends ConsumerState<BookPage> {
       icon: PopupMenuIcon(UniconsLine.image_minus),
       textLabel: "remove".tr(),
     ),
+    PopupMenuItemIcon(
+      value: EnumIllustrationItemAction.setAsCover,
+      icon: PopupMenuIcon(UniconsLine.image_check),
+      textLabel: "set_as_cover".tr(),
+    ),
   ];
 
-  /// Listens to book's updates.
-  DocSnapshotStreamSubscription? _bookSubscription;
+  final List<PopupEntryBook> _coverPopupMenuEntries = [
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.history),
+      textLabel: "book_reset_cover".tr(),
+      value: EnumBookItemAction.resetCover,
+    ),
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.upload),
+      textLabel: "book_upload_cover".tr(),
+      value: EnumBookItemAction.uploadCover,
+    ),
+  ];
 
-  /// Listens to illustrations' updates.
-  final Map<String, DocSnapshotStreamSubscription> _illustrationSubs = {};
+  /// Handles page's scroll.
+  ScrollController _pageScrollController = ScrollController();
 
   /// String separator to generate unique key for illustrations.
   final String _keySeparator = '--';
-
-  /// Listent to changes for this book's like status.
-  DocSnapshotStreamSubscription? _likeSubscription;
 
   @override
   initState() {
@@ -169,57 +198,71 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     return Scaffold(
       floatingActionButton: BookPageFab(
         show: _showFab,
-        scrollController: _scrollController,
+        scrollController: _pageScrollController,
       ),
-      body: NotificationListener<ScrollNotification>(
-        onNotification: onScrollNotification,
-        child: CustomScrollView(
-          controller: _scrollController,
-          slivers: <Widget>[
-            ApplicationBar(
-              minimal: true,
+      body: Stack(
+        children: [
+          NotificationListener<ScrollNotification>(
+            onNotification: onScrollNotification,
+            child: CustomScrollView(
+              controller: _pageScrollController,
+              slivers: <Widget>[
+                ApplicationBar(
+                  minimal: true,
+                ),
+                BookPageHeader(
+                  book: _book,
+                  forceMultiSelect: _forceMultiSelect,
+                  liked: _liked,
+                  heroTag: widget.heroTag,
+                  authenticated: authenticated,
+                  coverPopupMenuEntries: _coverPopupMenuEntries,
+                  multiSelectedItems: _multiSelectedItems,
+                  onLike: onLike,
+                  onAddToBook: showAddGroupToBook,
+                  onClearMultiSelect: onClearMultiSelect,
+                  onConfirmDeleteBook: onConfirmDeleteBook,
+                  onConfirmRemoveGroup: onConfirmRemoveGroup,
+                  onCoverPopupMenuItemSelected: onCoverPopupMenuItemSelected,
+                  onMultiSelectAll: onMultiSelectAll,
+                  onToggleMultiSelect: onToggleMultiSelect,
+                  onShowDatesDialog: onShowDatesDialog,
+                  onShowRenameBookDialog: onShowRenameBookDialog,
+                  onUploadToThisBook: onUploadToThisBook,
+                  onUpdateVisibility: onUpdateVisibility,
+                  isOwner: isOwner,
+                ),
+                BookPageBody(
+                  loading: _loading,
+                  hasError: _hasError,
+                  forceMultiSelect: _forceMultiSelect,
+                  illustrationMap: _illustrationMap,
+                  bookIllustrations: _book.illustrations,
+                  multiSelectedItems: _multiSelectedItems,
+                  popupMenuEntries: _popupMenuEntries,
+                  onBrowseIllustrations: onBrowseIllustrations,
+                  onDragUpdateBook: onDragUpdateBook,
+                  onPopupMenuItemSelected: onPopupMenuItemSelected,
+                  onTapIllustrationCard: onTapIllustrationCard,
+                  onUploadToThisBook: onUploadToThisBook,
+                  onDropIllustration: onDropIllustration,
+                  isOwner: isOwner,
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.only(bottom: 100.0),
+                ),
+              ],
             ),
-            BookPageHeader(
-              book: _book,
-              forceMultiSelect: _forceMultiSelect,
-              liked: _liked,
-              heroTag: widget.heroTag,
-              authenticated: authenticated,
-              multiSelectedItems: _multiSelectedItems,
-              onLike: onLike,
-              onAddToBook: showAddGroupToBook,
-              onClearMultiSelect: onClearMultiSelect,
-              onConfirmDeleteBook: onConfirmDeleteBook,
-              onConfirmRemoveGroup: onConfirmRemoveGroup,
-              onMultiSelectAll: onMultiSelectAll,
-              onToggleMultiSelect: onToggleMultiSelect,
-              onShowDatesDialog: onShowDatesDialog,
-              onShowRenameBookDialog: onShowRenameBookDialog,
-              onUploadToThisBook: onUploadToThisBook,
-              onUpdateVisibility: onUpdateVisibility,
-              isOwner: isOwner,
+          ),
+          Positioned(
+            top: 100.0,
+            right: 24.0,
+            child: PopupProgressIndicator(
+              show: _updatingCover,
+              message: "book_updating_cover".tr() + "...",
             ),
-            BookPageBody(
-              loading: _loading,
-              hasError: _hasError,
-              forceMultiSelect: _forceMultiSelect,
-              illustrationMap: _illustrationMap,
-              bookIllustrations: _book.illustrations,
-              multiSelectedItems: _multiSelectedItems,
-              popupMenuEntries: _popupMenuEntries,
-              onBrowseIllustrations: onBrowseIllustrations,
-              onDragUpdateBook: onDragUpdateBook,
-              onPopupMenuItemSelected: onPopupMenuItemSelected,
-              onTapIllustrationCard: onTapIllustrationCard,
-              onUploadToThisBook: onUploadToThisBook,
-              onDropIllustration: onDropIllustration,
-              isOwner: isOwner,
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.only(bottom: 100.0),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -737,6 +780,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     );
   }
 
+  /// Show a popup to confirm illustrations group deletion.
   void onConfirmRemoveGroup() {
     if (_multiSelectedItems.isEmpty) {
       context.showErrorBar(content: Text("multi_select_no_item".tr()));
@@ -748,16 +792,30 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     confirmRemoveIllustrationGroup(illustration, key);
   }
 
+  /// Callback when a cover popup menu item is selected.
+  void onCoverPopupMenuItemSelected(
+      EnumBookItemAction action, int index, Book book) {
+    switch (action) {
+      case EnumBookItemAction.resetCover:
+        tryResetCover(book);
+        break;
+      case EnumBookItemAction.uploadCover:
+        tryUploadCover(book);
+        break;
+      default:
+    }
+  }
+
   void onDragUpdateBook(DragUpdateDetails details) async {
     final position = details.globalPosition;
 
     if (position.dy < _edgeDistance) {
-      if (_scrollController.offset <= 0) {
+      if (_pageScrollController.offset <= 0) {
         return;
       }
 
-      await _scrollController.animateTo(
-        _scrollController.offset - _jumpOffset,
+      await _pageScrollController.animateTo(
+        _pageScrollController.offset - _jumpOffset,
         duration: Duration(milliseconds: 300),
         curve: Curves.easeIn,
       );
@@ -767,12 +825,13 @@ class _MyBookPageState extends ConsumerState<BookPage> {
 
     final windowHeight = MediaQuery.of(context).size.height;
     if (windowHeight - _edgeDistance < position.dy) {
-      if (_scrollController.position.atEdge && _scrollController.offset != 0) {
+      if (_pageScrollController.position.atEdge &&
+          _pageScrollController.offset != 0) {
         return;
       }
 
-      await _scrollController.animateTo(
-        _scrollController.offset + _jumpOffset,
+      await _pageScrollController.animateTo(
+        _pageScrollController.offset + _jumpOffset,
         duration: Duration(milliseconds: 300),
         curve: Curves.easeIn,
       );
@@ -876,6 +935,9 @@ class _MyBookPageState extends ConsumerState<BookPage> {
         }
 
         confirmRemoveIllustrationGroup(illustration, illustrationKey);
+        break;
+      case EnumIllustrationItemAction.setAsCover:
+        trySetIllustrationAsCover(illustration);
         break;
       default:
     }
@@ -1309,5 +1371,81 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     final user = ref.read(AppState.userProvider.notifier);
     await user.signOut();
     Beamer.of(context, root: true).beamToNamed(HomeLocation.route);
+  }
+
+  /// Set the passed illustration as the book's cover.
+  /// This will also update the cover mode to `chosen_illustration`.
+  void trySetIllustrationAsCover(Illustration illustration) async {
+    setState(() => _updatingCover = true);
+
+    try {
+      final HttpsCallableResult response =
+          await Utilities.cloud.fun("books-setCover").call({
+        "book_id": _book.id,
+        "illustration_id": illustration.id,
+        "cover_type": "chosen_illustration",
+      });
+
+      if (response.data["success"]) {
+        return;
+      }
+
+      context.showErrorBar(content: Text("book_set_cover_error".tr()));
+    } catch (error) {
+      Utilities.logger.i(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _updatingCover = false);
+    }
+  }
+
+  /// Set back the book's cover mode as `last_illustration`.
+  /// Delete any uploaded cover if any.
+  void tryResetCover(Book book) async {
+    setState(() => _updatingCover = true);
+
+    try {
+      final HttpsCallableResult response =
+          await Utilities.cloud.fun("books-setCover").call({
+        "book_id": _book.id,
+        "cover_type": "last_illustration_added",
+      });
+
+      if (response.data["success"]) {
+        return;
+      }
+
+      context.showErrorBar(content: Text("book_set_cover_error".tr()));
+    } catch (error) {
+      Utilities.logger.i(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _updatingCover = false);
+    }
+  }
+
+  /// Pick a file, set book cover mode as `uploaded_cover`,
+  /// and upload the file to Firebase Storage.
+  /// Cloud functions will take the process from there, and changes will be
+  /// automatically updated back into the app.
+  void tryUploadCover(Book book) async {
+    setState(() => _updatingCover = true);
+
+    try {
+      final UploadCoverResponse operationResult = await ref
+          .read(AppState.uploadTaskListProvider.notifier)
+          .pickImageAndSetAsBookCover(bookId: book.id);
+
+      if (operationResult.success) {
+        return;
+      }
+
+      context.showErrorBar(content: Text(operationResult.errorMessage));
+    } catch (error) {
+      Utilities.logger.i(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _updatingCover = false);
+    }
   }
 }

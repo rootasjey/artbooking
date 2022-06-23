@@ -1,10 +1,12 @@
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/book/book_page_actions.dart';
 import 'package:artbooking/screens/book/book_page_group_actions.dart';
+import 'package:artbooking/screens/book/book_square_cover.dart';
 import 'package:artbooking/types/book/book.dart';
+import 'package:artbooking/types/book/popup_entry_book.dart';
+import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/illustration_map.dart';
-import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -32,28 +34,65 @@ class BookPageHeader extends StatelessWidget {
     this.onUpdateVisibility,
     this.authenticated = false,
     this.heroTag = "",
+    this.coverPopupMenuEntries = const [],
+    this.onCoverPopupMenuItemSelected,
   }) : super(key: key);
 
+  /// Main page data.
   final Book book;
+
+  /// True if the book is liked by the current authenticated user.
   final bool liked;
+
+  /// True if the current authenticated user is the owner.
   final bool isOwner;
+
+  /// True if the current user is authenticated.
   final bool authenticated;
+
+  /// If true, illustrations in this book can be selected in group.
   final bool forceMultiSelect;
 
   /// Currently selected illustrations.
   final IllustrationMap multiSelectedItems;
 
+  /// Callback fired when an illustration is added to a book.
   final void Function()? onAddToBook;
+
+  /// Callback fired when multiple selection is cleared.
   final void Function()? onClearMultiSelect;
+
+  /// Callback fired when (illustrations) selection group is removed/deleted.
   final void Function()? onConfirmRemoveGroup;
+
+  /// Callback showing a popup to confirm book deletion.
   final void Function()? onConfirmDeleteBook;
+
+  /// Callback fired when the book is liked.
   final void Function()? onLike;
+
+  /// Callback fired when all illustrations inside the book are selected.
   final void Function()? onMultiSelectAll;
+
+  /// Callback fired when one of the popup menu item entries is selected.
+  final void Function(EnumBookItemAction, int, Book)?
+      onCoverPopupMenuItemSelected;
+
+  /// Callback fired when we switch on/off multiselect.
   final void Function()? onToggleMultiSelect;
+
+  /// Callback fired when we want to show book's creation & last updated dates.
   final void Function()? onShowDatesDialog;
+
+  /// Callback showing an input dialog to rename this book.
   final void Function()? onShowRenameBookDialog;
+
+  /// Callback fired when a file is uploaded and added to this book.
   final void Function()? onUploadToThisBook;
+
+  /// Callback fired when the book's visibility is updated.
   final void Function(EnumContentVisibility)? onUpdateVisibility;
+  final List<PopupEntryBook> coverPopupMenuEntries;
 
   /// Custom hero tag (if `book.id` default tag is not unique).
   final String heroTag;
@@ -72,25 +111,12 @@ class BookPageHeader extends StatelessWidget {
         delegate: SliverChildListDelegate.fixed([
           Row(
             children: [
-              Hero(
-                tag: bookHeroTag,
-                child: SizedBox(
-                  height: 260.0,
-                  width: 200.0,
-                  child: Card(
-                    elevation: 4.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: Ink.image(
-                      image: NetworkImage(book.getCoverLink()),
-                      height: 260.0,
-                      width: 200.0,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
+              BookSquareCover(
+                book: book,
+                bookHeroTag: bookHeroTag,
+                index: 0,
+                onPopupMenuItemSelected: onCoverPopupMenuItemSelected,
+                popupMenuEntries: coverPopupMenuEntries,
               ),
               rightRow(context),
             ],
@@ -185,7 +211,7 @@ class BookPageHeader extends StatelessWidget {
             opacity: 0.6,
             child: IconButton(
               tooltip: "back".tr(),
-              onPressed: Beamer.of(context).beamBack,
+              onPressed: () => Utilities.navigation.back(context),
               icon: Icon(UniconsLine.arrow_left),
             ),
           ),
