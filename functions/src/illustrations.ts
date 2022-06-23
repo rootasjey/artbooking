@@ -12,6 +12,7 @@ import {
   allowedLicenseTypes,
   ART_MOVEMENTS_COLLECTION_NAME,
   BASE_DOCUMENT_NAME,
+  BookCoverMode,
   BOOKS_COLLECTION_NAME,
   checkVisibilityValue,
   cloudRegions,
@@ -561,6 +562,10 @@ export const onStorageUpload = functions
     if (file_type === "profile_picture" && target === "profile_picture") {
       return await setUserProfilePicture(objectMeta);
     }
+
+    if (file_type === "book_cover" && target === "book") {
+      return setBookCover(objectMeta);
+    }
     
     if (file_type !== "illustration") {
       return;
@@ -570,14 +575,14 @@ export const onStorageUpload = functions
     const filename = filepath.split('/').pop() || '';
     const storageUrl = filepath;
     
-    const endIndex: number = filepath.indexOf('/illustrations')
+    const endIndex: number = filepath.indexOf("/illustrations")
     const userId = filepath.substring(6, endIndex)
     if (!firestore_id || !userId) { return; }
 
     // Exit if thumbnail or not an image file.
     const contentType = objectMeta.contentType || '';
 
-    if (filename.includes('thumb@') || !contentType.includes('image')) {
+    if (filename.includes("thumb@") || !contentType.includes("image")) {
       return false;
     }
 
@@ -590,7 +595,7 @@ export const onStorageUpload = functions
     const illustrationData = illustrationSnapshot.data()
     if (!illustrationSnapshot.exists || !illustrationData || illustrationData.user_id !== userId) {
       throw new functions.https.HttpsError(
-        'permission-denied',
+        "permission-denied",
         `It seems that the user ${userId} is trying to access a forbidden document.`,
       )
     }
@@ -600,17 +605,17 @@ export const onStorageUpload = functions
       .file(storageUrl);
 
     if (!await imageFile.exists()) {
-      console.error('file does not exist')
+      console.error("file does not exist")
       return;
     }
 
     // -> Start to process the image file.
-    if (visibility === 'public') {
+    if (visibility === "public") {
       await imageFile.makePublic();
     }
 
     const extension = objectMeta.metadata?.extension ||
-      filename.substring(filename.lastIndexOf('.'));
+      filename.substring(filename.lastIndexOf("."));
 
     // Generate thumbnails
     // -------------------
@@ -632,7 +637,7 @@ export const onStorageUpload = functions
     );
 
     let version: number = illustrationData.version ?? 0;
-    if (typeof version !== 'number') { version = 0 }
+    if (typeof version !== "number") { version = 0 }
     version += 1;
 
     // Save new properties to Firestore.
@@ -677,7 +682,7 @@ export const onStorageUpload = functions
     }
 
     let used: number = statisticsData.illustrations.used ?? 0
-    if (typeof used !== 'number') { used = 0 }
+    if (typeof used !== "number") { used = 0 }
     used += parseFloat(objectMeta.size)
 
     return await statsSnapshot.ref.update({
@@ -1603,4 +1608,85 @@ async function getDimensionsFromStorage(
   await fs.remove(workingDir);
 
   return dimensions;
+}
+
+async function setBookCover(objectMeta: functions.storage.ObjectMetadata) {
+  const customMetadata = objectMeta.metadata;
+  if (!customMetadata) { return; }
+
+  const { book_id, visibility } = customMetadata;
+
+  const filepath = objectMeta.name || "";
+  const filename = filepath.split("/").pop() || "";
+  const storageUrl = filepath;
+  
+  const endIndex: number = filepath.indexOf("/books")
+  const userId = filepath.substring(6, endIndex)
+  
+  if (!userId || !book_id) { return; }
+
+  // Exit if thumbnail or not an image file.
+  const contentType = objectMeta.contentType || "";
+  if (filename.includes("thumb@") || !contentType.includes("image")) {
+    return;
+  }
+  
+  const bookSnap = await firestore
+    .collection("books")
+    .doc(book_id)
+    .get();
+
+  if (!bookSnap.exists) {
+    return;
+  }
+
+  const imageFile = adminApp.storage()
+    .bucket()
+    .file(storageUrl);
+
+  if (!await imageFile.exists()) {
+    console.error("file does not exist")
+    return;
+  }
+
+  // -> Start to process the image file.
+  if (visibility === "public") {
+    await imageFile.makePublic();
+  }
+
+  const extension = objectMeta.metadata?.extension ||
+    filename.substring(filename.lastIndexOf("."));
+
+  // Generate thumbnails
+  // -------------------
+  const { thumbnails } = await generateImageThumbs({
+    extension,
+    filename,
+    filepath,
+    objectMeta,
+    visibility,
+  });
+
+  const downloadToken = objectMeta.metadata?.firebaseStorageDownloadTokens ?? "";
+  const firebaseDownloadUrl = createPersistentDownloadUrl(
+    objectMeta.bucket,
+    filepath, 
+    downloadToken,
+  );
+
+  await bookSnap.ref
+    .update({
+      cover: {
+        mode: BookCoverMode.uploadedCover,
+        links: {
+          illustration_id: "",
+          original: firebaseDownloadUrl,
+          share: { read: "", write: "" },
+          storage: storageUrl,
+          thumbnails,
+        },
+        updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      },
+      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+    })
 }

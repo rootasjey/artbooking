@@ -38,8 +38,13 @@ export const cloudRegions = {
 };
 
 export enum BookCoverMode {
+  /** Booc uses the last uploaded illustration as cover. */
   lastIllustrationAdded = "last_illustration_added",
+
+  /** User manually sets an illustration (inside this book) as cover. */
   chosenIllustration = "chosen_illustration",
+  
+  /** User upload a specific image to use as book's cover. */
   uploadedCover = "uploaded_cover",
 }
 

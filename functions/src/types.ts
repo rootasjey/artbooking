@@ -1,3 +1,15 @@
+///
+/// Enums
+///
+enum BookCoverType {
+  /** Booc uses the last uploaded illustration as cover. */
+  lastIllustrationAdded = "last_illustration_added",
+  /** User manually sets an illustration (inside this book) as cover. */
+  chosenIllustration = "chosen_illustration",
+  /** User upload a specific image to use as book's cover. */
+  uploadedCover = "uploaded_cover",
+}
+
 enum BookLayout {
   /**
    * Display illustrations on a grid with a size adapted 
@@ -84,6 +96,9 @@ enum EnumLicenseType {
   user = 'user',
 }
 
+///
+/// Interfaces
+///
 interface AddTaskParams {
   book_id: string;
   bookCoverLinks: MasterpieceLinks;
@@ -102,6 +117,24 @@ interface ApproveIllustrationParams {
   illustration_id: string;
   /** Approved status. */
   approved: boolean;
+}
+
+interface BookIllustration {
+  /** Date when this illustration was added to this book. */
+  created_at: FirebaseFirestore.FieldValue;
+
+  /** This illustration's id. */
+  id: string;
+
+  /**
+   * Virtual scale factor defines illustrations size inside a book 
+   * when the [layout] (or [mobileLayout]) is {customGrid}, 
+   * {customVerticalList} or {customHorizontalList}.
+   */
+  scale_factor: {
+    height: number;
+    width: number;
+  };
 }
 
 interface CheckPropertiesParams {
@@ -353,22 +386,15 @@ interface SetUserAuthorParams {
   illustration_id: string;
 }
 
-interface BookIllustration {
-  /** Date when this illustration was added to this book. */
-  created_at: FirebaseFirestore.FieldValue;
+interface RenameBookPropertiesParams {
+  /** This book's id. */
+  book_id: string;
 
-  /** This illustration's id. */
-  id: string;
+  /** This book's description. */
+  description: string;
 
-  /**
-   * Virtual scale factor defines illustrations size inside a book 
-   * when the [layout] (or [mobileLayout]) is {customGrid}, 
-   * {customVerticalList} or {customHorizontalList}.
-   */
-  scale_factor: {
-    height: number;
-    width: number;
-  };
+  /** This book's name. */
+  name: string;
 }
 
 interface ReorderBookIllustrationsParams {
@@ -380,6 +406,12 @@ interface ReorderBookIllustrationsParams {
 
   /** Indexes of illustrations being dragged.  */
   drag_indexes: number[];
+}
+
+interface SetCoverParams {
+  book_id: string
+  illustration_id: string
+  cover_type: BookCoverType
 }
 
 interface ThumbnailLinks {
@@ -398,17 +430,6 @@ interface UpdateBookIllustrationsParams {
 
   /** illustrations' ids. */
   illustration_ids: string[];
-}
-
-interface RenameBookPropertiesParams {
-  /** This book's id. */
-  book_id: string;
-
-  /** This book's description. */
-  description: string;
-
-  /** This book's name. */
-  name: string;
 }
 
 interface UpdateBookPropertiesParams {

@@ -320,6 +320,8 @@ export const deleteOne = functions
       )
     }
 
+    await maybeCleanUploadedCover(book_id, userAuth.uid);
+
     await firebaseTools.firestore
       .delete(bookSnap.ref.path, {
         project: process.env.GCLOUD_PROJECT,
@@ -406,6 +408,8 @@ export const deleteMany = functions
             recursive: true,
             yes: true,
           });
+
+        await maybeCleanUploadedCover(book_id, userAuth.uid);
 
         itemsProcessed.push({
           book: { id: book_id },
@@ -699,9 +703,17 @@ export const renameOne = functions
 export const setCover = functions
   .region(cloudRegions.eu)
   .https
-  .onCall(async (params: any, context) => {
+  .onCall(async (params: SetCoverParams, context) => {
     const userAuth = context.auth;
-    const { book_id, illustration_id } = params;
+    const { book_id, illustration_id, cover_type } = params;
+
+    if (cover_type === "last_illustration_added") {
+      return setLastIllustrationCover(params, context);
+    }
+
+    if (cover_type === "uploaded_cover") {
+      return setUploadedCover(params, context);
+    }
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
@@ -746,6 +758,19 @@ export const setCover = functions
       )
     }
 
+    // Inside book check.
+    const illustrationInside: boolean = bookData.illustrations.some(
+      (x: BookIllustration) => x.id === illustration_id
+    )
+
+    if (!illustrationInside) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        `The provided illustration's id does not belongs to the target book. ` +
+        `Only illustrations from inside the book can be set as cover.`
+      );
+    }
+
     const illustrationSnapshot = await firestore
       .collection(ILLUSTRATIONS_COLLECTION_NAME)
       .doc(illustration_id)
@@ -767,6 +792,12 @@ export const setCover = functions
       storage: illustrationLinks.storage,
       thumbnails: illustrationLinks.thumbnails,
     }
+ 
+    await checkTaskToSetCover({
+      bookCoverLinks: illustrationLinks,
+      book_id: bookSnapshot.id, 
+      illustration_id: illustrationSnapshot.id,
+    });
 
     await bookSnapshot.ref.update({
       cover: {
@@ -777,6 +808,8 @@ export const setCover = functions
       },
       updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
     });
+
+    await maybeCleanUploadedCover(book_id, userAuth.uid);
 
     return {
       book: { id: book_id },
@@ -1137,5 +1170,203 @@ async function maybeAddTask(data: AddTaskParams) {
       },
       updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
     });
+}
+
+/**
+ * Delete uploaded cover files if any.
+ * @param book_id Book's id to delete.
+ * @param user_id Book's owner.
+ */
+ async function maybeCleanUploadedCover(book_id: string, user_id: string) {
+  const storagePath = `users/${user_id}/books/${book_id}/cover`;
+
+   // Delete files from Cloud Storage
+   const dir = await adminApp.storage()
+    .bucket()
+    .getFiles({
+      directory: storagePath,
+    });
+
+  const files = dir[0];
+  for await (const file of files) {
+    await file.delete();
+  }
+}
+
+async function checkTaskToSetCover(data: AddTaskParams) {
+  const { bookCoverLinks, book_id, illustration_id } = data;
+
+  let existingTasks = 0;
+
+  const taskSnapshot = await firestore
+    .collection(TASKS_COLLECTION_NAME)
+    .where("name", "==", "illustration_thumbnail_generation_book_cover")
+    .where("target.book_id", "==", book_id)
+    .get();
+
+  for await (const doc of taskSnapshot.docs) {
+    if (doc.id === illustration_id) {
+      existingTasks++;
+      continue;
+    }
+
+    await doc.ref.delete();
+  }
+  
+  // If the following test is true, thumbnails has been generated.
+  if (bookCoverLinks.thumbnails.m.length > 0 || existingTasks > 0) {
+    return;
+  }
+
+  await firestore
+    .collection(TASKS_COLLECTION_NAME)
+    .add({
+      created_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      description: "A task to asynchronously update a book's cover with an illustration thumbnail.",
+      name: "illustration_thumbnail_generation_book_cover",
+      target: {
+        book_id,
+        illustration_id,
+      },
+      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+    });
+}
+
+/**
+ * Set book's cover mode as "last dded illustration" and apply the new cover.
+ * @param params User's passed data (book's id).
+ * @param context Function's context containing auth stuff for example.
+ * @returns A promise.
+ */
+ async function setLastIllustrationCover(
+  params: SetCoverParams, 
+  context: functions.https.CallableContext,
+) {
+  const userAuth = context.auth;
+  const { book_id } = params;
+
+  if (!userAuth) {
+    throw new functions.https.HttpsError(
+      'unauthenticated',
+      `The function must be called from an authenticated user.`,
+    );
+  }
+
+  if (typeof book_id !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      `The function must be called with a valid [bookId] (string) parameter ` +
+        `which is the book to update.`,
+    );
+  }
+
+  const bookSnapshot = await firestore
+  .collection(BOOKS_COLLECTION_NAME)
+  .doc(book_id)
+  .get();
+
+  const bookData = bookSnapshot.data()
+  if (!bookSnapshot.exists || !bookData) {
+    throw new functions.https.HttpsError(
+      'not-found',
+      `The book [${book_id}] doesn't exist.`,
+    )
+  }
+
+  if (bookData.user_id !== userAuth.uid) {
+    throw new functions.https.HttpsError(
+      'permission-denied',
+      `You don't have permission to update this book ${bookSnapshot.id}.`,
+    )
+  }
+
+  const bookCoverLinks = await getBookCoverLinks(bookData.illustrations);
+
+  // In rare cases, the last book illustration may not have generated its thumbnails.
+  // This function checks thumbnail url and add a task if it's empty.
+  await maybeAddTask({
+    bookCoverLinks, 
+    book_id: bookSnapshot.id, 
+    illustration_id: bookCoverLinks.illustration_id,
+  });
+  
+  await bookSnapshot.ref.update({
+    cover: {
+      links: bookCoverLinks,
+      mode: BookCoverMode.lastIllustrationAdded,
+      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+    },
+    updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+  });
+
+  await maybeCleanUploadedCover(book_id, userAuth.uid);
+
+  return {
+    book: { id: book_id },
+    success: true,
+  };
+}
+
+/**
+ * Set book's cover mode as "uploaded cover".
+ * @param params User's passed data (book's id).
+ * @param context Function's context containing auth stuff for example.
+ * @returns A promise.
+ */
+async function setUploadedCover(
+  params: SetCoverParams, 
+  context: functions.https.CallableContext,
+) {  
+  const userAuth = context.auth;
+  const { book_id } = params;
+
+  if (!userAuth) {
+    throw new functions.https.HttpsError(
+      'unauthenticated',
+      `The function must be called from an authenticated user.`,
+    );
+  }
+
+  if (typeof book_id !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      `The function must be called with a valid [bookId] (string) parameter ` +
+        `which is the book to update.`,
+    );
+  }
+
+  const bookSnapshot = await firestore
+  .collection(BOOKS_COLLECTION_NAME)
+  .doc(book_id)
+  .get();
+
+  const bookData = bookSnapshot.data()
+  if (!bookSnapshot.exists || !bookData) {
+    throw new functions.https.HttpsError(
+      'not-found',
+      `The book [${book_id}] doesn't exist.`,
+    )
+  }
+
+  if (bookData.user_id !== userAuth.uid) {
+    throw new functions.https.HttpsError(
+      'permission-denied',
+      `You don't have permission to update this book ${bookSnapshot.id}.`,
+    )
+  }
+
+  await bookSnapshot.ref.update({
+    cover: {
+      links: bookData.cover.links,
+      mode: BookCoverMode.uploadedCover,
+      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+    },
+    updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+  });
+
+  return {
+    book: { id: book_id },
+    success: true,
+  };
 }
 
