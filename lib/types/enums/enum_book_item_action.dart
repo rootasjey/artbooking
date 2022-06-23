@@ -20,6 +20,9 @@ enum EnumBookItemAction {
   /// Rename book's title.
   rename,
 
+  /// Reset cover by switching back to `last_illustratin` mode.
+  resetCover,
+
   /// Unlike a book.
   unlike,
 
@@ -31,6 +34,9 @@ enum EnumBookItemAction {
 
   /// Update this book's visibility.
   updateVisibility,
+
+  /// Upload a new image as cover.
+  uploadCover,
 
   /// Upload new illustrations and add them to the target book.
   uploadIllustrations,

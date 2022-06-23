@@ -23,6 +23,9 @@ enum EnumIllustrationItemAction {
   /// Remove this illustration from a book.
   removeFromBook,
 
+  /// Use this illustration as a book's cover.
+  setAsCover,
+
   /// Unlike an illustration..
   unlike,
 
