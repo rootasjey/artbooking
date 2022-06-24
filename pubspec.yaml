@@ -73,7 +73,7 @@ dependencies:
   super_editor: 0.2.0
   timelines: 0.1.0
   unicons: 2.0.2
-  url_launcher: 6.0.18
+  url_launcher: 6.1.4
   url_strategy: 0.2.0
   verbal_expressions: 1.0.0
   waterfall_flow: 3.0.2
