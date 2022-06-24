@@ -4,6 +4,7 @@ import 'package:artbooking/types/enums/enum_data_ui_shape.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/tile_data.dart';
 import 'package:flutter/material.dart';
+import 'package:just_the_tooltip/just_the_tooltip.dart';
 
 class DataFetchModeCard extends StatelessWidget {
   const DataFetchModeCard({
@@ -134,29 +135,52 @@ class DataFetchModeCard extends StatelessWidget {
       );
     }
 
-    return ChoiceChip(
-      tooltip: data.description,
-      avatar: Icon(
-        data.iconData,
-        size: 16.0,
-        color: Colors.black38,
+    return JustTheTooltip(
+      tailBaseWidth: 20.0,
+      tailLength: 12.0,
+      backgroundColor: Constants.colors.tertiary,
+      content: Container(
+        constraints: BoxConstraints(maxWidth: 500.0),
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: selected ? Constants.colors.tertiary : Colors.white,
+          borderRadius: BorderRadius.circular(4.0),
+          border: Border.all(
+            color: Constants.colors.tertiary,
+            width: 2.0,
+          ),
+        ),
+        child: Text(
+          data.description,
+          style: Utilities.fonts.body(
+            fontSize: 14.0,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
-      label: Text(
-        data.name,
-        style: Utilities.fonts.body(),
+      child: ChoiceChip(
+        avatar: Icon(
+          data.iconData,
+          size: 16.0,
+          color: Colors.black38,
+        ),
+        label: Text(
+          data.name,
+          style: Utilities.fonts.body(),
+        ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 12.0,
+          vertical: 8.0,
+        ),
+        selected: selected,
+        selectedColor: Constants.colors.tertiary,
+        onSelected: (active) {
+          onTap?.call(
+            data.type,
+            !selected,
+          );
+        },
       ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12.0,
-        vertical: 8.0,
-      ),
-      selected: selected,
-      selectedColor: Colors.amber,
-      onSelected: (active) {
-        onTap?.call(
-          data.type,
-          !selected,
-        );
-      },
     );
   }
 }
