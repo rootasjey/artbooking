@@ -146,12 +146,13 @@ class Illustration {
   }
 
   String getHDThumbnail() {
-    final small = links.thumbnails.m;
+    final String small = links.thumbnails.m;
+
     if (small.isNotEmpty) {
       return small;
     }
 
-    final large = links.thumbnails.l;
+    final String large = links.thumbnails.l;
     if (large.isNotEmpty) {
       return large;
     }
@@ -160,27 +161,27 @@ class Illustration {
   }
 
   String getThumbnail() {
-    final extraSmall = links.thumbnails.xs;
+    final String extraSmall = links.thumbnails.xs;
     if (extraSmall.isNotEmpty) {
       return extraSmall;
     }
 
-    final small = links.thumbnails.s;
+    final String small = links.thumbnails.s;
     if (small.isNotEmpty) {
       return small;
     }
 
-    final medium = links.thumbnails.m;
+    final String medium = links.thumbnails.m;
     if (medium.isNotEmpty) {
       return medium;
     }
 
-    final large = links.thumbnails.l;
+    final String large = links.thumbnails.l;
     if (large.isNotEmpty) {
       return large;
     }
 
-    final extraLarge = links.thumbnails.xxl;
+    final String extraLarge = links.thumbnails.xxl;
     if (extraLarge.isNotEmpty) {
       return extraLarge;
     }

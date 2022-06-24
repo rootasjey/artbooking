@@ -117,9 +117,9 @@ class _ContactPageState extends State<ContactPage> {
   Widget emailBlock() {
     return cardLink(
       onTap: () async {
-        const url =
-            'mailto:feedback@fig.style?subject=[fig.style%20Web]%20Feedback';
-        await launch(url);
+        const String url =
+            "mailto:feedback@fig.style?subject=[fig.style%20Web]%20Feedback";
+        await launchUrl(Uri.parse(url));
       },
       icon: Padding(
         padding: const EdgeInsets.only(right: 16.0),
@@ -130,8 +130,8 @@ class _ContactPageState extends State<ContactPage> {
         ),
       ),
       color: Color(0xFF45D09E),
-      textTitle: 'Email',
-      subTitle: 'We would love to hear from you',
+      textTitle: "Email",
+      subTitle: "We would love to hear from you",
       socialAccount: 'feedback@fig.style',
     );
   }
@@ -139,8 +139,8 @@ class _ContactPageState extends State<ContactPage> {
   Widget twitterBlock() {
     return cardLink(
       onTap: () async {
-        const url = 'https://twitter.com/intent/tweet?via=fig_style';
-        await launch(url);
+        const String url = "https://twitter.com/intent/tweet?via=artbookingapp";
+        await launchUrl(Uri.parse(url));
       },
       icon: Padding(
         padding: const EdgeInsets.only(right: 16.0),

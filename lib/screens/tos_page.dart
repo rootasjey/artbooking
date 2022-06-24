@@ -180,7 +180,7 @@ class _TosPageState extends State<TosPage> {
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
-                  launch("https://getterms.io/");
+                  launchUrl(Uri.parse("https://getterms.io/"));
                 },
             ),
           ),

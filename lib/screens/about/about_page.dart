@@ -264,38 +264,40 @@ class _AboutPageState extends State<AboutPage> {
             ),
           ),
           AboutPageCreditItem(
-            textValue: 'icons_by'.tr(args: [' Unicons']),
-            onTap: () => launch('https://iconscout.com/unicons'),
+            textValue: "icons_by".tr(args: [" Unicons"]),
+            onTap: () => launchUrl(Uri.parse('https://iconscout.com/unicons')),
             iconData: UniconsLine.palette,
             hoverColor: Theme.of(context).primaryColor,
             baseColor: baseColor,
           ),
           AboutPageCreditItem(
-            textValue: 'illustration_by_from'.tr(
-              args: ['Natasha Remarchuk', 'Icons8'],
+            textValue: "illustration_by_from".tr(
+              args: ["Natasha Remarchuk", "Icons8"],
             ),
-            onTap: () => launch('https://icons8.com/'),
+            onTap: () => launchUrl(Uri.parse('https://icons8.com/')),
             iconData: UniconsLine.image,
             hoverColor: Colors.pink,
             baseColor: baseColor,
           ),
           AboutPageCreditItem(
-            textValue: 'app_screenshot_credits'.tr(args: ['AppMockUp']),
-            onTap: () => launch('https://app-mockup.com/'),
+            textValue: "app_screenshot_credits".tr(args: ["AppMockUp"]),
+            onTap: () => launchUrl(Uri.parse('https://app-mockup.com/')),
             iconData: UniconsLine.mobile_android,
             hoverColor: Theme.of(context).secondaryHeaderColor,
             baseColor: baseColor,
           ),
           AboutPageCreditItem(
             textValue: "Lottie animations from DIEGO VILLALPANDO CRUZ",
-            onTap: () => launch("https://lottiefiles.com/xu85gcdnbv"),
+            onTap: () =>
+                launchUrl(Uri.parse("https://lottiefiles.com/xu85gcdnbv")),
             iconData: UniconsLine.star,
             hoverColor: Theme.of(context).secondaryHeaderColor,
             baseColor: baseColor,
           ),
           AboutPageCreditItem(
             textValue: "Lottie animations from Yogesh Pal",
-            onTap: () => launch("https://lottiefiles.com/99680-3-dots-loading"),
+            onTap: () => launchUrl(
+                Uri.parse("https://lottiefiles.com/99680-3-dots-loading")),
             iconData: UniconsLine.star,
             hoverColor: Theme.of(context).secondaryHeaderColor,
             baseColor: baseColor,
@@ -328,7 +330,6 @@ class _AboutPageState extends State<AboutPage> {
             child: ListTile(
               title: Text('changelog'.tr()),
               trailing: Icon(Icons.arrow_forward),
-              // onTap: () => context.router.push(ChangelogPageRoute()),
               onTap: () => context.beamBack(),
             ),
           ),
@@ -341,9 +342,9 @@ class _AboutPageState extends State<AboutPage> {
           ),
           Card(
             child: ListTile(
-              title: Text('GitHub'),
+              title: Text("GitHub"),
               trailing: Icon(Icons.open_in_new),
-              onTap: () => launch(Constants.links.githubLink),
+              onTap: () => launchUrl(Uri.parse(Constants.links.githubLink)),
             ),
           ),
         ],
@@ -365,7 +366,7 @@ class _AboutPageState extends State<AboutPage> {
             child: Opacity(
               opacity: titleOpacity,
               child: Text(
-                'the_concept'.tr().toUpperCase(),
+                "the_concept".tr().toUpperCase(),
                 style: titleStyle,
               ),
             ),
@@ -375,7 +376,7 @@ class _AboutPageState extends State<AboutPage> {
             child: Padding(
               padding: const EdgeInsets.only(top: 25.0),
               child: Text(
-                'the_concept_content'.tr(),
+                "the_concept_content".tr(),
                 style: paragraphStyle,
               ),
             ),
@@ -396,7 +397,7 @@ class _AboutPageState extends State<AboutPage> {
             child: Padding(
               padding: const EdgeInsets.only(top: 120.0),
               child: Text(
-                'the_author'.tr().toUpperCase(),
+                "the_author".tr().toUpperCase(),
                 style: titleStyle,
               ),
             ),

@@ -445,7 +445,7 @@ class UserSocialLinksComponent extends StatelessWidget {
         return;
       }
 
-      launch(initialValue);
+      launchUrl(Uri.parse(initialValue));
       return;
     }
 
@@ -454,7 +454,7 @@ class UserSocialLinksComponent extends StatelessWidget {
 
     final String hintText = initialValue.isNotEmpty
         ? initialValue
-        : 'https://myawesomelink.art/...';
+        : "https://myawesomelink.art/...";
 
     showDialog(
       context: context,

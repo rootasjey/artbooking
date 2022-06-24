@@ -194,7 +194,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
       },
       value: notificationsON,
       title: Text(
-        'Daily quote',
+        "Daily quote",
         style: TextStyle(
           fontWeight: FontWeight.w700,
         ),
@@ -290,7 +290,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
             padding: const EdgeInsets.all(8.0),
             child: icon,
           ),
-          onTap: () => launch(url),
+          onTap: () => launchUrl(Uri.parse(url)),
         ),
       ),
     );
@@ -316,8 +316,8 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
       ),
       image: Center(
         child: Image.asset(
-          'assets/images/illus_signin.png',
-          semanticLabel: 'Account illustration',
+          "assets/images/illus_signin.png",
+          semanticLabel: "Account illustration",
           width: illusSize,
           height: illusSize,
         ),

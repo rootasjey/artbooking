@@ -38,7 +38,8 @@ class FooterAboutUs extends StatelessWidget {
       ),
       FooterLinkData(
         label: "GitHub",
-        onPressed: () => launch('https://github.com/rootasjey/rootasjey.dev'),
+        onPressed: () =>
+            launchUrl(Uri.parse("https://github.com/rootasjey/rootasjey.dev")),
       ),
     ];
   }

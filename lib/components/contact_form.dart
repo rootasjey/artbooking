@@ -279,7 +279,7 @@ class _ContactFormState extends State<ContactForm> {
         child: Opacity(
           opacity: 0.8,
           child: InkWell(
-            onTap: () => launch("mailto:$email"),
+            onTap: () => launchUrl(Uri.parse("mailto:$email")),
             child: Text.rich(
               TextSpan(
                 text: "Or send us an email at ",
@@ -451,11 +451,11 @@ class _ContactFormState extends State<ContactForm> {
     }
 
     if (_email.isEmpty) {
-      return _errorMessages['emptyEmail'];
+      return _errorMessages["emptyEmail"];
     }
 
     if (!UsersActions.checkEmailFormat(_email)) {
-      return _errorMessages['invalidEmail'];
+      return _errorMessages["invalidEmail"];
     }
 
     return null;
@@ -467,11 +467,11 @@ class _ContactFormState extends State<ContactForm> {
     }
 
     if (_messageTitle.isEmpty) {
-      return _errorMessages['emptyTitle'];
+      return _errorMessages["emptyTitle"];
     }
 
     if (_messageTitle.length < 3) {
-      return _errorMessages['tooShortTitle'];
+      return _errorMessages["tooShortTitle"];
     }
 
     return null;
@@ -487,11 +487,11 @@ class _ContactFormState extends State<ContactForm> {
     }
 
     if (_messageBody.isEmpty) {
-      return _errorMessages['emptyBody'];
+      return _errorMessages["emptyBody"];
     }
 
     if (_messageBody.length < 3) {
-      return _errorMessages['tooShortBody'];
+      return _errorMessages["tooShortBody"];
     }
 
     return null;
@@ -507,13 +507,13 @@ class _ContactFormState extends State<ContactForm> {
 
     try {
       await FirebaseFirestore.instance.collection('messages').add({
-        'created_at': Timestamp.now(),
-        'email': _email,
-        'type': _subject,
-        'body': _messageBody,
-        'title': _messageTitle,
-        'isRead': false,
-        'is_anwswered': false,
+        "created_at": Timestamp.now(),
+        "email": _email,
+        "type": _subject,
+        "body": _messageBody,
+        "title": _messageTitle,
+        "isRead": false,
+        "is_anwswered": false,
       });
 
       setState(() {

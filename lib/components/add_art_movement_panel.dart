@@ -7,6 +7,9 @@ import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/art_movement/art_movement.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
+import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
+import 'package:artbooking/types/firestore/query_snap_map.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -259,7 +262,8 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
           height: 260.0,
           fit: BoxFit.cover,
           child: InkWell(
-            onTap: () => launch(_selectedArtMovementPreview.links.image),
+            onTap: () =>
+                launchUrl(Uri.parse(_selectedArtMovementPreview.links.image)),
           ),
         ),
       );
@@ -316,8 +320,8 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
               ),
             ),
             TextButton(
-              onPressed: () =>
-                  launch(_selectedArtMovementPreview.links.wikipedia),
+              onPressed: () => launchUrl(
+                  Uri.parse(_selectedArtMovementPreview.links.wikipedia)),
               child: Text(_selectedArtMovementPreview.links.wikipedia),
               style: TextButton.styleFrom(
                 primary: Colors.black54,
@@ -517,7 +521,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
     _availableArtMovements.clear();
 
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final QuerySnapMap snapshot = await FirebaseFirestore.instance
           .collection('art_movements')
           .limit(_limit)
           .orderBy('name', descending: true)
@@ -531,11 +535,11 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
         return;
       }
 
-      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
-        final map = doc.data();
-        map['id'] = doc.id;
+      for (final QueryDocSnapMap doc in snapshot.docs) {
+        final Json map = doc.data();
+        map["id"] = doc.id;
 
-        final artMovement = ArtMovement.fromMap(map);
+        final ArtMovement artMovement = ArtMovement.fromMap(map);
         _availableArtMovements.add(artMovement);
       }
 
@@ -552,10 +556,10 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
     _isLoadingMore = true;
 
     try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('art_movements')
+      final QuerySnapMap snapshot = await FirebaseFirestore.instance
+          .collection("art_movements")
           .limit(_limit)
-          .orderBy('name', descending: true)
+          .orderBy("name", descending: true)
           .startAfterDocument(_lastDocumentSnapshot!)
           .get();
 
@@ -568,11 +572,11 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
         return;
       }
 
-      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
-        final map = doc.data();
-        map['id'] = doc.id;
+      for (final QueryDocSnapMap doc in snapshot.docs) {
+        final Json map = doc.data();
+        map["id"] = doc.id;
 
-        final artMovement = ArtMovement.fromMap(map);
+        final ArtMovement artMovement = ArtMovement.fromMap(map);
         _availableArtMovements.add(artMovement);
       }
 
@@ -615,10 +619,10 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
 
       setState(() {
         for (final AlgoliaObjectSnapshot hit in snapshot.hits) {
-          final data = hit.data;
-          data['id'] = hit.objectID;
+          final Json data = hit.data;
+          data["id"] = hit.objectID;
 
-          final artMovement = ArtMovement.fromMap(data);
+          final ArtMovement artMovement = ArtMovement.fromMap(data);
           _suggestionsList.add(artMovement);
         }
       });

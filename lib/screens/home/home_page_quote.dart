@@ -83,7 +83,7 @@ class _HomePageQuoteState extends State<HomePageQuote> {
       padding: const EdgeInsets.only(top: 60.0),
       child: OutlinedButton(
         onPressed: () {
-          launch("https://fig.style");
+          launchUrl(Uri.parse("https://fig.style"));
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),

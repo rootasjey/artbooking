@@ -82,7 +82,7 @@ class SelectLicensePanelMoreInfo extends StatelessWidget {
         children: [
           if (license.links.wikipedia.isNotEmpty)
             OutlinedButton(
-              onPressed: () => launch(license.links.wikipedia),
+              onPressed: () => launchUrl(Uri.parse(license.links.wikipedia)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text("wikipedia"),
@@ -93,7 +93,7 @@ class SelectLicensePanelMoreInfo extends StatelessWidget {
             ),
           if (license.links.website.isNotEmpty)
             OutlinedButton(
-              onPressed: () => launch(license.links.website),
+              onPressed: () => launchUrl(Uri.parse(license.links.website)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text("website"),

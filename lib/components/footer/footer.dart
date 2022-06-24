@@ -64,15 +64,17 @@ class _FooterState extends ConsumerState<Footer> {
             spacing: 24.0,
             children: [
               socialIcon(
-                onTap: () => launch("https://twitter/artbooking"),
+                onTap: () => launchUrl(Uri.parse("https://twitter/artbooking")),
                 iconData: UniconsLine.twitter,
               ),
               socialIcon(
-                onTap: () => launch("https://facebook/artbooking"),
+                onTap: () =>
+                    launchUrl(Uri.parse("https://facebook/artbooking")),
                 iconData: UniconsLine.facebook_f,
               ),
               socialIcon(
-                onTap: () => launch("https://instagram/artbooking"),
+                onTap: () =>
+                    launchUrl(Uri.parse("https://instagram/artbooking")),
                 iconData: UniconsLine.instagram,
               ),
             ],

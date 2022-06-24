@@ -247,8 +247,8 @@ class _ChangelogPageState extends State<ChangelogPage> {
         child: Opacity(
           opacity: 0.6,
           child: InkWell(
-            onTap: () =>
-                launch("https://github.com/rootasjey/fig.style/releases"),
+            onTap: () => launchUrl(
+                Uri.parse("https://github.com/rootasjey/fig.style/releases")),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Wrap(

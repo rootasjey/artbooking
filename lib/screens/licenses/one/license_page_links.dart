@@ -42,7 +42,7 @@ class LicensePageLinks extends StatelessWidget {
           children: [
             if (links.website.isNotEmpty)
               SquareLink(
-                onTap: () => launch(links.website),
+                onTap: () => launchUrl(Uri.parse(links.website)),
                 icon: Icon(
                   UniconsLine.globe,
                   size: 42.0,
@@ -57,7 +57,7 @@ class LicensePageLinks extends StatelessWidget {
               ),
             if (links.wikipedia.isNotEmpty)
               SquareLink(
-                onTap: () => launch(links.wikipedia),
+                onTap: () => launchUrl(Uri.parse(links.wikipedia)),
                 icon: Icon(
                   FontAwesomeIcons.wikipediaW,
                   size: 36.0,

@@ -299,7 +299,7 @@ class _SearchPageState extends State<SearchPage> {
         child: Column(
           children: <Widget>[
             Text(
-              '${_illustrationsSuggestions.length} results in total',
+              "${_illustrationsSuggestions.length} results in total",
               style: TextStyle(
                 fontSize: 25.0,
               ),
@@ -376,8 +376,9 @@ class _SearchPageState extends State<SearchPage> {
     final url = '${Constants.links.baseIllustrationLink}${illustration.id}';
     final hashtags = '&hashtags=artbooking';
 
-    await launch(
-      '${Constants.links.baseTwitterShareLink}$sharingText$hashtags&url=$url',
+    await launchUrl(
+      Uri.parse(
+          "${Constants.links.baseTwitterShareLink}$sharingText$hashtags&url=$url"),
     );
   }
 
