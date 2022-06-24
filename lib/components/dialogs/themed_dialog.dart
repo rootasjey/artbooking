@@ -154,10 +154,7 @@ class ThemedDialog extends StatelessWidget {
             child: body,
           ),
           if (showDivider) Divider(),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: footerButtons(),
-          ),
+          _footerWidget,
         ],
       ),
     );
