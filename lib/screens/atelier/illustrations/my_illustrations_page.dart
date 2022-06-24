@@ -4,6 +4,7 @@ import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/buttons/visibility_button.dart';
 import 'package:artbooking/components/custom_scroll_behavior.dart';
+import 'package:artbooking/components/dialogs/share_dialog.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
@@ -19,6 +20,7 @@ import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/types/enums/enum_share_content_type.dart';
 import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
@@ -129,6 +131,11 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       icon: PopupMenuIcon(UniconsLine.eye),
       textLabel: "visibility_change".tr(),
       value: EnumIllustrationItemAction.updateVisibility,
+    ),
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.share),
+      textLabel: "share".tr(),
+      value: EnumIllustrationItemAction.share,
     ),
   ];
 
@@ -853,10 +860,19 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     return ref.read(AppState.userProvider).firestoreUser?.id ?? "";
   }
 
+  String getUsername() {
+    if (getIsOwner()) {
+      return ref.read(AppState.userProvider).firestoreUser?.name ?? "";
+    }
+
+    return _username;
+  }
+
   /// Return true if the current authenticated user is the owner
   /// of this illustrations page.
   bool getIsOwner() {
-    final authUserId = ref.read(AppState.userProvider).firestoreUser?.id ?? "";
+    final String authUserId =
+        ref.read(AppState.userProvider).firestoreUser?.id ?? "";
 
     if (widget.userId.isEmpty && authUserId.isNotEmpty) {
       return true;
@@ -1217,6 +1233,9 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       case EnumIllustrationItemAction.updateVisibility:
         showVisibilityDialog(illustration, index);
         break;
+      case EnumIllustrationItemAction.share:
+        showShareDialog(illustration, index);
+        break;
       default:
         break;
     }
@@ -1360,7 +1379,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   }
 
   void showVisibilityDialog(Illustration illustration, int index) {
-    final width = 310.0;
+    final double width = 310.0;
 
     showDialog(
       context: context,
@@ -1565,5 +1584,18 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         });
       }
     }
+  }
+
+  void showShareDialog(Illustration illustration, int index) {
+    showDialog(
+      context: context,
+      builder: (context) => ShareDialog(
+        itemId: illustration.id,
+        imageProvider: NetworkImage(illustration.getThumbnail()),
+        name: illustration.name,
+        shareContentType: EnumShareContentType.illustration,
+        username: getUsername(),
+      ),
+    );
   }
 }
