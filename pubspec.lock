@@ -707,6 +707,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.1"
+  just_the_tooltip:
+    dependency: "direct main"
+    description:
+      name: just_the_tooltip
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.11+2"
   linkify:
     dependency: transitive
     description:
