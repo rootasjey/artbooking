@@ -1,4 +1,5 @@
 import 'package:artbooking/components/application_bar/application_bar.dart';
+import 'package:artbooking/components/dialogs/share_dialog.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/texts/page_title.dart';
@@ -9,6 +10,7 @@ import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/illustrations/illustrations_page_body.dart';
 import 'package:artbooking/screens/illustrations/illustrations_page_fab.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
+import 'package:artbooking/types/enums/enum_share_content_type.dart';
 import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
@@ -63,6 +65,11 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
       icon: PopupMenuIcon(UniconsLine.heart),
       textLabel: "like".tr(),
     ),
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.share),
+      textLabel: "share".tr(),
+      value: EnumIllustrationItemAction.share,
+    ),
   ];
 
   /// Available items for authenticated user and illustration is already liked.
@@ -71,6 +78,11 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
       value: EnumIllustrationItemAction.unlike,
       icon: PopupMenuIcon(UniconsLine.heart_break),
       textLabel: "unlike".tr(),
+    ),
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.share),
+      textLabel: "share".tr(),
+      value: EnumIllustrationItemAction.share,
     ),
   ];
 
@@ -431,6 +443,9 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
       case EnumIllustrationItemAction.unlike:
         onLike(illustration, index);
         break;
+      case EnumIllustrationItemAction.share:
+        showShareDialog(illustration, index);
+        break;
       default:
     }
   }
@@ -509,6 +524,23 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
 
       Utilities.logger.e(error);
     }
+  }
+
+  void showShareDialog(Illustration illustration, int index) {
+    showDialog(
+      context: context,
+      builder: (context) => ShareDialog(
+        extension: illustration.extension,
+        itemId: illustration.id,
+        imageProvider: NetworkImage(illustration.getThumbnail()),
+        name: illustration.name,
+        imageUrl: illustration.getThumbnail(),
+        shareContentType: EnumShareContentType.illustration,
+        userId: illustration.userId,
+        username: "", // getUsername(),
+        visibility: illustration.visibility,
+      ),
+    );
   }
 
   void tryLike(Illustration illustration, int index) async {
