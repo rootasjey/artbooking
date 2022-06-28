@@ -1123,7 +1123,7 @@
   "settings_subtitle": "You can change your preferences here.",
   "shape": "Shape",
   "share": "Share",
-  "share_illustration_tweet_text": "I 💜 illustration \"{}\" by {}",
+  "share_illustration_tweet_text": "I 💜 illustration \"{}\" by {} //",
   "share_on_twitter": "Share on Twitter",
   "share_visibility_issue": {
     "book": {

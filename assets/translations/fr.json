@@ -1122,7 +1122,7 @@
   "settings_subtitle": "Vous pouvez modifier vos préférences ici.",
   "shape": "Forme",
   "share": "Partager",
-  "share_illustration_tweet_text": "J' 💜 l'illustration \"{}\" de {}",
+  "share_illustration_tweet_text": "J' 💜 l'illustration \"{}\" de {} //",
   "share_on_twitter": "Partager sur Twitter",
   "share_visibility_issue": {
     "book": {
