@@ -1,7 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:animations/animations.dart';
+import 'package:artbooking/components/buttons/visibility_button.dart';
 import 'package:artbooking/components/custom_scroll_behavior.dart';
+import 'package:artbooking/components/dialogs/share_dialog.dart';
+import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
@@ -13,12 +16,15 @@ import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/illustrations/illustration_page_fab.dart';
+import 'package:artbooking/types/enums/enum_content_visibility.dart';
+import 'package:artbooking/types/enums/enum_share_content_type.dart';
 import 'package:artbooking/types/firestore/doc_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -263,6 +269,21 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     );
   }
 
+  void onChangedVisibility(
+    BuildContext context, {
+    required Illustration illustration,
+    required int index,
+    required EnumContentVisibility visibility,
+  }) {
+    final Future<EnumContentVisibility?>? futureResult = tryUpdateVisibility(
+      illustration,
+      visibility,
+      index,
+    );
+
+    Navigator.pop(context, futureResult);
+  }
+
   void onShowEditMetadataPanel() async {
     await showCupertinoModalBottomSheet(
       context: context,
@@ -392,7 +413,23 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     }
   }
 
-  void onShare() async {}
+  void onShare() async {
+    showDialog(
+      context: context,
+      builder: (context) => ShareDialog(
+        extension: _illustration.extension,
+        itemId: _illustration.id,
+        imageProvider: NetworkImage(_illustration.getThumbnail()),
+        name: _illustration.name,
+        imageUrl: _illustration.getThumbnail(),
+        shareContentType: EnumShareContentType.illustration,
+        userId: _illustration.userId,
+        username: "",
+        visibility: _illustration.visibility,
+        onShowVisibilityDialog: () => showVisibilityDialog(_illustration, 0),
+      ),
+    );
+  }
 
   void goToEditIllustrationMetada() async {
     await Beamer.of(context).popRoute();
@@ -432,5 +469,86 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     }
 
     return HomeLocation.profileRoute.replaceFirst(":userId", userFirestore.id);
+  }
+
+  Future<EnumContentVisibility?>? showVisibilityDialog(
+    Illustration illustration,
+    int index,
+  ) async {
+    final double width = 310.0;
+
+    return await showDialog<Future<EnumContentVisibility?>?>(
+      context: context,
+      builder: (context) => ThemedDialog(
+        showDivider: true,
+        titleValue: "illustration_visibility_change".plural(0),
+        textButtonValidation: "close".tr(),
+        onValidate: Beamer.of(context).popRoute,
+        onCancel: Beamer.of(context).popRoute,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(left: 16.0),
+                  width: width,
+                  child: Opacity(
+                    opacity: 0.6,
+                    child: Text(
+                      "illustration_visibility_choose".plural(0),
+                      style: Utilities.fonts.body(
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ),
+                ),
+                VisibilityButton(
+                  maxWidth: width,
+                  visibility: illustration.visibility,
+                  onChangedVisibility: (EnumContentVisibility visibility) =>
+                      onChangedVisibility(
+                    context,
+                    visibility: visibility,
+                    illustration: illustration,
+                    index: index,
+                  ),
+                  padding: const EdgeInsets.only(
+                    left: 16.0,
+                    top: 12.0,
+                    bottom: 32.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<EnumContentVisibility?> tryUpdateVisibility(
+    Illustration illustration,
+    EnumContentVisibility visibility,
+    int index,
+  ) async {
+    try {
+      final HttpsCallableResult response =
+          await Utilities.cloud.fun("illustrations-updateVisibility").call({
+        "illustration_id": illustration.id,
+        "visibility": visibility.name,
+      });
+
+      if (response.data["success"] as bool) {
+        return visibility;
+      }
+
+      throw Error();
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+      return null;
+    }
   }
 }
