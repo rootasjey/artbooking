@@ -997,6 +997,29 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     Utilities.storage.saveIllustrationsTab(selectedTab);
   }
 
+  void onChangedVisibility(
+    BuildContext context, {
+    required Illustration illustration,
+    required int index,
+    required EnumContentVisibility visibility,
+  }) {
+    Future<EnumContentVisibility?>? futureResult;
+
+    if (_multiSelectedItems.isEmpty) {
+      futureResult = tryUpdateVisibility(illustration, visibility, index);
+    } else {
+      _multiSelectedItems.putIfAbsent(
+        illustration.id,
+        () => illustration,
+      );
+
+      tryUpdateGroupVisibility(visibility);
+    }
+
+    onClearSelection();
+    Navigator.pop(context, futureResult);
+  }
+
   void onClearSelection() {
     setState(() {
       _multiSelectedItems.clear();
@@ -1464,24 +1487,13 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                   maxWidth: width,
                   group: _multiSelectedItems.isNotEmpty,
                   visibility: illustration.visibility,
-                  onChangedVisibility: (EnumContentVisibility visibility) {
-                    Future<EnumContentVisibility?>? futureResult;
-
-                    if (_multiSelectedItems.isEmpty) {
-                      futureResult =
-                          tryUpdateVisibility(illustration, visibility, index);
-                    } else {
-                      _multiSelectedItems.putIfAbsent(
-                        illustration.id,
-                        () => illustration,
-                      );
-
-                      tryUpdateGroupVisibility(visibility);
-                    }
-
-                    onClearSelection();
-                    Navigator.pop(context, futureResult);
-                  },
+                  onChangedVisibility: (EnumContentVisibility visibility) =>
+                      onChangedVisibility(
+                    context,
+                    visibility: visibility,
+                    illustration: illustration,
+                    index: index,
+                  ),
                   padding: const EdgeInsets.only(
                     left: 16.0,
                     top: 12.0,
@@ -1597,7 +1609,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     setState(() {});
 
     try {
-      final HttpsCallableResult<dynamic> response =
+      final HttpsCallableResult response =
           await Utilities.cloud.fun("illustrations-updateVisibility").call({
         "illustration_id": illustration.id,
         "visibility": visibility.name,
