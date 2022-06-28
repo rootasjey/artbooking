@@ -1,4 +1,5 @@
 import 'package:artbooking/components/application_bar/application_bar.dart';
+import 'package:artbooking/components/dialogs/share_dialog.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/texts/page_title.dart';
@@ -10,6 +11,7 @@ import 'package:artbooking/screens/book/books_page_fab.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/book/popup_entry_book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
+import 'package:artbooking/types/enums/enum_share_content_type.dart';
 import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
@@ -70,6 +72,11 @@ class _BooksPageState extends ConsumerState<BooksPage> {
       icon: PopupMenuIcon(UniconsLine.heart),
       textLabel: "like".tr(),
     ),
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.share),
+      textLabel: "share".tr(),
+      value: EnumBookItemAction.share,
+    ),
   ];
 
   /// Available items for authenticated user and book is already liked.
@@ -78,6 +85,11 @@ class _BooksPageState extends ConsumerState<BooksPage> {
       value: EnumBookItemAction.unlike,
       icon: PopupMenuIcon(UniconsLine.heart_break),
       textLabel: "unlike".tr(),
+    ),
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.share),
+      textLabel: "share".tr(),
+      value: EnumBookItemAction.share,
     ),
   ];
 
@@ -450,6 +462,9 @@ class _BooksPageState extends ConsumerState<BooksPage> {
       case EnumBookItemAction.unlike:
         onLike(book, index);
         break;
+      case EnumBookItemAction.share:
+        showShareDialog(book, index);
+        break;
       default:
     }
   }
@@ -482,6 +497,23 @@ class _BooksPageState extends ConsumerState<BooksPage> {
         [book.copyWith(liked: false)],
       );
     });
+  }
+
+  void showShareDialog(Book book, int index) {
+    showDialog(
+      context: context,
+      builder: (context) => ShareDialog(
+        extension: "",
+        itemId: book.id,
+        imageProvider: NetworkImage(book.getCoverLink()),
+        name: book.name,
+        imageUrl: book.getCoverLink(),
+        shareContentType: EnumShareContentType.book,
+        userId: book.userId,
+        username: "",
+        visibility: book.visibility,
+      ),
+    );
   }
 
   /// Fire when a new document has been updated in Firestore.
