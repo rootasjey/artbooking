@@ -347,7 +347,7 @@ class _ShareDialogState extends State<ShareDialog> {
     final String base = "https://twitter.com/intent/tweet";
     final String hashtags = "artbooking,art,illustrations,books";
     final String text = "share_illustration_tweet_text".tr(
-      args: [widget.name, widget.username],
+      args: [widget.name, _username],
     );
     final String url = "https://artbooking.fr/${type}/${widget.itemId}";
     final String via = "artbookingapp";
