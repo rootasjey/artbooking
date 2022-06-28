@@ -32,6 +32,7 @@ import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/popup_entry_illustration.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:beamer/beamer.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -113,6 +114,11 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       icon: PopupMenuIcon(UniconsLine.heart),
       textLabel: "like".tr(),
     ),
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.share),
+      textLabel: "share".tr(),
+      value: EnumIllustrationItemAction.share,
+    ),
   ];
 
   /// Items when the current authenticated user own these illustrations.
@@ -146,6 +152,11 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       value: EnumIllustrationItemAction.unlike,
       icon: PopupMenuIcon(UniconsLine.heart_break),
       textLabel: "unlike".tr(),
+    ),
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.share),
+      textLabel: "share".tr(),
+      value: EnumIllustrationItemAction.share,
     ),
   ];
 
@@ -1378,10 +1389,30 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     showVisibilityDialog(illustration, index);
   }
 
-  void showVisibilityDialog(Illustration illustration, int index) {
+  void showShareDialog(Illustration illustration, int index) {
+    showDialog(
+      context: context,
+      builder: (context) => ShareDialog(
+        extension: illustration.extension,
+        itemId: illustration.id,
+        imageProvider: NetworkImage(illustration.getThumbnail()),
+        name: illustration.name,
+        imageUrl: illustration.getThumbnail(),
+        shareContentType: EnumShareContentType.illustration,
+        username: getUsername(),
+        visibility: illustration.visibility,
+        onShowVisibilityDialog: () => showVisibilityDialog(illustration, index),
+      ),
+    );
+  }
+
+  Future<EnumContentVisibility?>? showVisibilityDialog(
+    Illustration illustration,
+    int index,
+  ) async {
     final double width = 310.0;
 
-    showDialog(
+    return await showDialog<Future<EnumContentVisibility?>?>(
       context: context,
       builder: (context) => ThemedDialog(
         showDivider: true,
@@ -1433,20 +1464,23 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                   maxWidth: width,
                   group: _multiSelectedItems.isNotEmpty,
                   visibility: illustration.visibility,
-                  onChangedVisibility: (visibility) {
+                  onChangedVisibility: (EnumContentVisibility visibility) {
+                    Future<EnumContentVisibility?>? futureResult;
+
                     if (_multiSelectedItems.isEmpty) {
-                      updateVisibility(illustration, visibility, index);
+                      futureResult =
+                          tryUpdateVisibility(illustration, visibility, index);
                     } else {
                       _multiSelectedItems.putIfAbsent(
                         illustration.id,
                         () => illustration,
                       );
 
-                      updateGroupVisibility(visibility);
+                      tryUpdateGroupVisibility(visibility);
                     }
 
-                    Beamer.of(context).popRoute();
                     onClearSelection();
+                    Navigator.pop(context, futureResult);
                   },
                   padding: const EdgeInsets.only(
                     left: 16.0,
@@ -1531,17 +1565,17 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     ref.read(AppState.uploadTaskListProvider.notifier).pickImage();
   }
 
-  void updateGroupVisibility(EnumContentVisibility visibility) {
+  void tryUpdateGroupVisibility(EnumContentVisibility visibility) {
     for (var illustration in _multiSelectedItems.values) {
       final int index = _illustrations.indexWhere(
         (x) => x.id == illustration.id,
       );
 
-      updateVisibility(illustration, visibility, index);
+      tryUpdateVisibility(illustration, visibility, index);
     }
   }
 
-  void updateVisibility(
+  Future<EnumContentVisibility?> tryUpdateVisibility(
     Illustration illustration,
     EnumContentVisibility visibility,
     int index,
@@ -1563,14 +1597,14 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     setState(() {});
 
     try {
-      final response =
+      final HttpsCallableResult<dynamic> response =
           await Utilities.cloud.fun("illustrations-updateVisibility").call({
         "illustration_id": illustration.id,
         "visibility": visibility.name,
       });
 
-      if (response.data['success'] as bool) {
-        return;
+      if (response.data["success"] as bool) {
+        return visibility;
       }
 
       throw Error();
@@ -1583,19 +1617,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
           _illustrations.insert(index, illustration);
         });
       }
-    }
-  }
 
-  void showShareDialog(Illustration illustration, int index) {
-    showDialog(
-      context: context,
-      builder: (context) => ShareDialog(
-        itemId: illustration.id,
-        imageProvider: NetworkImage(illustration.getThumbnail()),
-        name: illustration.name,
-        shareContentType: EnumShareContentType.illustration,
-        username: getUsername(),
-      ),
-    );
+      return null;
+    }
   }
 }
