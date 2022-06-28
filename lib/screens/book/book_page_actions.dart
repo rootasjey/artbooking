@@ -18,17 +18,34 @@ class BookPageActions extends StatelessWidget {
     this.onUploadToThisBook,
     this.visible = true,
     this.onUpdateVisibility,
+    this.onShareBook,
   }) : super(key: key);
 
+  /// Will activate multi-select if true.
   final bool forceMultiSelect;
+
+  /// If true, this widget is visible.
   final bool visible;
 
+  /// This book's visibility.
   final EnumContentVisibility visibility;
 
+  /// Callback event when multi-select state is toggled on/off.
   final void Function()? onToggleMultiSelect;
+
+  /// Callback event showing a popup to confirm book deletion.
   final void Function()? onConfirmDeleteBook;
+
+  /// Callback event showing a popup to confirm book deletion.
+  final void Function()? onShareBook;
+
+  /// Callback event showing a popup to rename this book.
   final void Function()? onShowRenameBookDialog;
+
+  /// Callback event to upload new illustrations to this book.
   final void Function()? onUploadToThisBook;
+
+  /// Callback event to update this book's visibility.
   final void Function(EnumContentVisibility)? onUpdateVisibility;
 
   /// Currently selected illustrations.
@@ -58,6 +75,11 @@ class BookPageActions extends StatelessWidget {
           message: "book_rename".tr(),
           onTap: onShowRenameBookDialog,
           child: Icon(UniconsLine.edit_alt),
+        ),
+        SquareButton(
+          onTap: onShareBook,
+          child: Icon(UniconsLine.share),
+          message: "share".tr(),
         ),
         SquareButton(
           onTap: onToggleMultiSelect,

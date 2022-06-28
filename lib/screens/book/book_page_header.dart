@@ -27,6 +27,7 @@ class BookPageHeader extends StatelessWidget {
     this.onConfirmRemoveGroup,
     this.onConfirmDeleteBook,
     this.onMultiSelectAll,
+    this.onShareBook,
     this.onToggleMultiSelect,
     this.onShowRenameBookDialog,
     this.onUploadToThisBook,
@@ -75,8 +76,11 @@ class BookPageHeader extends StatelessWidget {
   final void Function()? onMultiSelectAll;
 
   /// Callback fired when one of the popup menu item entries is selected.
-  final void Function(EnumBookItemAction, int, Book)?
-      onCoverPopupMenuItemSelected;
+  final void Function(
+    EnumBookItemAction,
+    int,
+    Book,
+  )? onCoverPopupMenuItemSelected;
 
   /// Callback fired when we switch on/off multiselect.
   final void Function()? onToggleMultiSelect;
@@ -92,6 +96,9 @@ class BookPageHeader extends StatelessWidget {
 
   /// Callback fired when the book's visibility is updated.
   final void Function(EnumContentVisibility)? onUpdateVisibility;
+
+  final void Function()? onShareBook;
+
   final List<PopupEntryBook> coverPopupMenuEntries;
 
   /// Custom hero tag (if `book.id` default tag is not unique).
@@ -135,11 +142,12 @@ class BookPageHeader extends StatelessWidget {
                     multiSelectedItems: multiSelectedItems,
                     onConfirmDeleteBook: onConfirmDeleteBook,
                     onToggleMultiSelect: onToggleMultiSelect,
+                    onShareBook: onShareBook,
                     onShowRenameBookDialog: onShowRenameBookDialog,
                     onUploadToThisBook: onUploadToThisBook,
+                    onUpdateVisibility: onUpdateVisibility,
                     visible: multiSelectedItems.isEmpty,
                     visibility: book.visibility,
-                    onUpdateVisibility: onUpdateVisibility,
                   ),
                   BookPageGroupActions(
                     onAddToBook: onAddToBook,

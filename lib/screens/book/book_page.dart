@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
+import 'package:artbooking/components/buttons/visibility_button.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
+import 'package:artbooking/components/dialogs/share_dialog.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
@@ -25,6 +27,7 @@ import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/types/enums/enum_share_content_type.dart';
 import 'package:artbooking/types/firestore/document_map.dart';
 import 'package:artbooking/types/firestore/doc_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
@@ -225,6 +228,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
                   onConfirmRemoveGroup: onConfirmRemoveGroup,
                   onCoverPopupMenuItemSelected: onCoverPopupMenuItemSelected,
                   onMultiSelectAll: onMultiSelectAll,
+                  onShareBook: onShareBook,
                   onToggleMultiSelect: onToggleMultiSelect,
                   onShowDatesDialog: onShowDatesDialog,
                   onShowRenameBookDialog: onShowRenameBookDialog,
@@ -723,6 +727,21 @@ class _MyBookPageState extends ConsumerState<BookPage> {
 
   void onBrowseIllustrations() {
     context.beamToNamed(AtelierLocationContent.illustrationsRoute);
+  }
+
+  void onChangedVisibility(
+    BuildContext context, {
+    required Book book,
+    required int index,
+    required EnumContentVisibility visibility,
+  }) {
+    final Future<EnumContentVisibility?>? futureResult = tryUpdateVisibility(
+      book,
+      visibility,
+      index,
+    );
+
+    Navigator.pop(context, futureResult);
   }
 
   void onClearMultiSelect() {
@@ -1446,6 +1465,109 @@ class _MyBookPageState extends ConsumerState<BookPage> {
       context.showErrorBar(content: Text(error.toString()));
     } finally {
       setState(() => _updatingCover = false);
+    }
+  }
+
+  void onShareBook() {
+    showDialog(
+      context: context,
+      builder: (context) => ShareDialog(
+        extension: "",
+        itemId: _book.id,
+        imageProvider: NetworkImage(_book.getCoverLink()),
+        name: _book.name,
+        imageUrl: _book.getCoverLink(),
+        shareContentType: EnumShareContentType.book,
+        userId: _book.userId,
+        username: "",
+        visibility: _book.visibility,
+        onShowVisibilityDialog: () => showVisibilityDialog(_book, 0),
+      ),
+    );
+  }
+
+  Future<EnumContentVisibility?>? showVisibilityDialog(
+    Book book,
+    int index,
+  ) async {
+    final double width = 310.0;
+
+    return await showDialog<Future<EnumContentVisibility?>?>(
+      context: context,
+      builder: (context) => ThemedDialog(
+        showDivider: true,
+        titleValue: "book_visibility_change".plural(
+          _multiSelectedItems.length,
+        ),
+        textButtonValidation: "close".tr(),
+        onValidate: Beamer.of(context).popRoute,
+        onCancel: Beamer.of(context).popRoute,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(left: 16.0),
+                  width: width,
+                  child: Opacity(
+                    opacity: 0.6,
+                    child: Text(
+                      "book_visibility_choose".plural(
+                        _multiSelectedItems.length,
+                      ),
+                      style: Utilities.fonts.body(
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ),
+                ),
+                VisibilityButton(
+                  maxWidth: width,
+                  visibility: book.visibility,
+                  onChangedVisibility: (EnumContentVisibility visibility) =>
+                      onChangedVisibility(
+                    context,
+                    visibility: visibility,
+                    book: book,
+                    index: index,
+                  ),
+                  padding: const EdgeInsets.only(
+                    left: 16.0,
+                    top: 12.0,
+                    bottom: 32.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<EnumContentVisibility?> tryUpdateVisibility(
+    Book book,
+    EnumContentVisibility visibility,
+    int index,
+  ) async {
+    try {
+      final HttpsCallableResult response =
+          await Utilities.cloud.fun("books-updateVisibility").call({
+        "book_id": book.id,
+        "visibility": visibility.name,
+      });
+
+      if (response.data["success"] as bool) {
+        return visibility;
+      }
+
+      throw Error();
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+      return null;
     }
   }
 }
