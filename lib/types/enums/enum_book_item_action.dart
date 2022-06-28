@@ -23,6 +23,9 @@ enum EnumBookItemAction {
   /// Reset cover by switching back to `last_illustratin` mode.
   resetCover,
 
+  /// Share this book.
+  share,
+
   /// Unlike a book.
   unlike,
 

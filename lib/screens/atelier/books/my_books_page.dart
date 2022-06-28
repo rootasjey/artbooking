@@ -7,6 +7,7 @@ import 'package:artbooking/components/buttons/visibility_button.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
+import 'package:artbooking/components/dialogs/share_dialog.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
@@ -24,6 +25,7 @@ import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/book/popup_entry_book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
+import 'package:artbooking/types/enums/enum_share_content_type.dart';
 import 'package:artbooking/types/enums/enum_visibility_tab.dart';
 import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
@@ -34,6 +36,7 @@ import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.da
 import 'package:artbooking/types/cloud_functions/book_response.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:beamer/beamer.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:desktop_drop/src/drop_target.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -118,10 +121,20 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       icon: PopupMenuIcon(UniconsLine.heart),
       textLabel: "like".tr(),
     ),
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.share),
+      textLabel: "share".tr(),
+      value: EnumBookItemAction.share,
+    ),
   ];
 
   /// Items when the current authenticated user own these books.
   final List<PopupEntryBook> _ownerPopupMenuEntries = [
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.share),
+      textLabel: "share".tr(),
+      value: EnumBookItemAction.share,
+    ),
     PopupMenuItemIcon(
       icon: PopupMenuIcon(UniconsLine.edit_alt),
       textLabel: "rename".tr(),
@@ -150,6 +163,11 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       value: EnumBookItemAction.unlike,
       icon: PopupMenuIcon(UniconsLine.heart_break),
       textLabel: "unlike".tr(),
+    ),
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.share),
+      textLabel: "share".tr(),
+      value: EnumBookItemAction.share,
     ),
   ];
 
@@ -799,6 +817,14 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     return ref.read(AppState.userProvider).firestoreUser?.id ?? "";
   }
 
+  String getUsername() {
+    if (getIsOwner()) {
+      return ref.read(AppState.userProvider).firestoreUser?.name ?? "";
+    }
+
+    return _username;
+  }
+
   /// Listen to the last Firestore query of this page.
   void listenBooksEvents(QueryMap? query) {
     if (query == null) {
@@ -902,6 +928,25 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
     fetchBooks();
     Utilities.storage.saveBooksTab(selectedTab);
+  }
+
+  void onChangedVisibility(
+    BuildContext context, {
+    required Book book,
+    required int index,
+    required EnumContentVisibility visibility,
+  }) {
+    Future<EnumContentVisibility?>? futureResult;
+
+    if (_multiSelectedItems.isEmpty) {
+      futureResult = tryUpdateVisibility(book, visibility, index);
+    } else {
+      _multiSelectedItems.putIfAbsent(book.id, () => book);
+      tryUpdateGroupVisibility(visibility);
+    }
+
+    clearSelection();
+    Navigator.pop(context, futureResult);
   }
 
   /// Show a dialog to confirm multiple books deletion.
@@ -1179,6 +1224,9 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
             .read(AppState.uploadTaskListProvider.notifier)
             .pickImageAndAddToBook(bookId: book.id);
         break;
+      case EnumBookItemAction.share:
+        showShareDialog(book, index);
+        break;
       default:
     }
   }
@@ -1242,6 +1290,10 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     }
 
     multiSelectBook(book);
+  }
+
+  void onTapBookCaption(Book book) {
+    showRenameBookDialog(book);
   }
 
   /// Fire when a new document has been updated in Firestore.
@@ -1409,10 +1461,30 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     );
   }
 
-  void showVisibilityDialog(Book book, int index) {
-    final width = 310.0;
-
+  void showShareDialog(Book book, int index) {
     showDialog(
+      context: context,
+      builder: (context) => ShareDialog(
+        extension: "",
+        itemId: book.id,
+        imageProvider: NetworkImage(book.getCoverLink()),
+        name: book.name,
+        imageUrl: book.getCoverLink(),
+        shareContentType: EnumShareContentType.book,
+        username: getUsername(),
+        visibility: book.visibility,
+        onShowVisibilityDialog: () => showVisibilityDialog(book, index),
+      ),
+    );
+  }
+
+  Future<EnumContentVisibility?>? showVisibilityDialog(
+    Book book,
+    int index,
+  ) async {
+    final double width = 310.0;
+
+    return await showDialog<Future<EnumContentVisibility?>?>(
       context: context,
       builder: (context) => ThemedDialog(
         showDivider: true,
@@ -1463,17 +1535,13 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                 VisibilityButton(
                   maxWidth: width,
                   visibility: book.visibility,
-                  onChangedVisibility: (visibility) {
-                    if (_multiSelectedItems.isEmpty) {
-                      updateVisibility(book, visibility, index);
-                    } else {
-                      _multiSelectedItems.putIfAbsent(book.id, () => book);
-                      updateGroupVisibility(visibility);
-                    }
-
-                    Beamer.of(context).popRoute();
-                    clearSelection();
-                  },
+                  onChangedVisibility: (EnumContentVisibility visibility) =>
+                      onChangedVisibility(
+                    context,
+                    visibility: visibility,
+                    book: book,
+                    index: index,
+                  ),
                   padding: const EdgeInsets.only(
                     left: 16.0,
                     top: 12.0,
@@ -1532,17 +1600,17 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     }
   }
 
-  void updateGroupVisibility(EnumContentVisibility visibility) {
+  void tryUpdateGroupVisibility(EnumContentVisibility visibility) {
     for (Book book in _multiSelectedItems.values) {
       final int index = _books.indexWhere(
         (x) => x.id == book.id,
       );
 
-      updateVisibility(book, visibility, index);
+      tryUpdateVisibility(book, visibility, index);
     }
   }
 
-  void updateVisibility(
+  Future<EnumContentVisibility?> tryUpdateVisibility(
     Book book,
     EnumContentVisibility visibility,
     int index,
@@ -1564,14 +1632,14 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     setState(() {});
 
     try {
-      final response =
+      final HttpsCallableResult response =
           await Utilities.cloud.fun("books-updateVisibility").call({
         "book_id": book.id,
         "visibility": visibility.name,
       });
 
-      if (response.data['success'] as bool) {
-        return;
+      if (response.data["success"] as bool) {
+        return visibility;
       }
 
       throw Error();
@@ -1584,10 +1652,8 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
           _books.insert(index, book);
         });
       }
-    }
-  }
 
-  void onTapBookCaption(Book book) {
-    showRenameBookDialog(book);
+      return null;
+    }
   }
 }

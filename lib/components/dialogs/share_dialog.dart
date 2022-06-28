@@ -235,7 +235,9 @@ class _ShareDialogState extends State<ShareDialog> {
             child: ActionChip(
               elevation: 2.0,
               avatar: Icon(UniconsLine.eye, size: 16.0),
-              label: Text("illustration_edit_visibility".tr()),
+              label: Text(
+                "${widget.shareContentType.name}_edit_visibility".tr(),
+              ),
               labelStyle: Utilities.fonts.body(
                 fontSize: 16.0,
                 fontWeight: FontWeight.w500,
@@ -346,7 +348,7 @@ class _ShareDialogState extends State<ShareDialog> {
 
     final String base = "https://twitter.com/intent/tweet";
     final String hashtags = "artbooking,art,illustrations,books";
-    final String text = "share_illustration_tweet_text".tr(
+    final String text = "share_${widget.shareContentType.name}_tweet_text".tr(
       args: [widget.name, _username],
     );
     final String url = "https://artbooking.fr/${type}/${widget.itemId}";
