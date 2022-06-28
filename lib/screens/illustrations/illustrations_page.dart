@@ -537,7 +537,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
         imageUrl: illustration.getThumbnail(),
         shareContentType: EnumShareContentType.illustration,
         userId: illustration.userId,
-        username: "", // getUsername(),
+        username: "",
         visibility: illustration.visibility,
       ),
     );

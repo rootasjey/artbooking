@@ -233,6 +233,38 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     }
   }
 
+  String getUserRoute(UserFirestore userFirestore) {
+    final location = Beamer.of(context)
+        .beamingHistory
+        .last
+        .history
+        .last
+        .routeInformation
+        .location;
+
+    if (location == null) {
+      return HomeLocation.profileRoute
+          .replaceFirst(":userId", userFirestore.id);
+    }
+
+    if (location.contains("atelier")) {
+      return AtelierLocationContent.profileRoute
+          .replaceFirst(":userId", userFirestore.id);
+    }
+
+    return HomeLocation.profileRoute.replaceFirst(":userId", userFirestore.id);
+  }
+
+  void goToEditIllustrationMetada() async {
+    await Beamer.of(context).popRoute();
+    onShowEditMetadataPanel();
+  }
+
+  void goToEditImagePage() async {
+    await Beamer.of(context).popRoute();
+    onGoToEditImagePage();
+  }
+
   /// Listen to Firestore document changes.
   void listenToIllustrationChanges(
       DocumentReference<Map<String, dynamic>> query) {
@@ -284,14 +316,6 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     Navigator.pop(context, futureResult);
   }
 
-  void onShowEditMetadataPanel() async {
-    await showCupertinoModalBottomSheet(
-      context: context,
-      builder: (context) => EditIllustrationPage(
-          illustration: _illustration, goToEditImagePage: goToEditImagePage),
-    );
-  }
-
   void onGoToEditImagePage() {
     Navigator.of(context).push(
       PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) {
@@ -326,42 +350,6 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     }
 
     return tryLike();
-  }
-
-  void tryLike() async {
-    try {
-      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
-
-      await FirebaseFirestore.instance
-          .collection("users")
-          .doc(userId)
-          .collection("user_likes")
-          .doc(_illustration.id)
-          .set({
-        "type": "illustration",
-        "target_id": _illustration.id,
-        "user_id": userId,
-      });
-    } catch (error) {
-      Utilities.logger.e(error);
-      context.showErrorBar(content: Text(error.toString()));
-    }
-  }
-
-  void tryUnLike() async {
-    try {
-      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
-
-      await FirebaseFirestore.instance
-          .collection("users")
-          .doc(userId)
-          .collection("user_likes")
-          .doc(_illustration.id)
-          .delete();
-    } catch (error) {
-      Utilities.logger.e(error);
-      context.showErrorBar(content: Text(error.toString()));
-    }
   }
 
   void onSaveEditedIllustration(Uint8List? editedImageData) async {
@@ -431,14 +419,12 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     );
   }
 
-  void goToEditIllustrationMetada() async {
-    await Beamer.of(context).popRoute();
-    onShowEditMetadataPanel();
-  }
-
-  void goToEditImagePage() async {
-    await Beamer.of(context).popRoute();
-    onGoToEditImagePage();
+  void onShowEditMetadataPanel() async {
+    await showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => EditIllustrationPage(
+          illustration: _illustration, goToEditImagePage: goToEditImagePage),
+    );
   }
 
   void onTapUser(UserFirestore userFirestore) {
@@ -447,28 +433,6 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
       route,
       data: {"userId": userFirestore.id},
     );
-  }
-
-  String getUserRoute(UserFirestore userFirestore) {
-    final location = Beamer.of(context)
-        .beamingHistory
-        .last
-        .history
-        .last
-        .routeInformation
-        .location;
-
-    if (location == null) {
-      return HomeLocation.profileRoute
-          .replaceFirst(":userId", userFirestore.id);
-    }
-
-    if (location.contains("atelier")) {
-      return AtelierLocationContent.profileRoute
-          .replaceFirst(":userId", userFirestore.id);
-    }
-
-    return HomeLocation.profileRoute.replaceFirst(":userId", userFirestore.id);
   }
 
   Future<EnumContentVisibility?>? showVisibilityDialog(
@@ -526,6 +490,42 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
         ),
       ),
     );
+  }
+
+  void tryLike() async {
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(_illustration.id)
+          .set({
+        "type": "illustration",
+        "target_id": _illustration.id,
+        "user_id": userId,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
+  void tryUnLike() async {
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(_illustration.id)
+          .delete();
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
   }
 
   Future<EnumContentVisibility?> tryUpdateVisibility(
