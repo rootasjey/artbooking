@@ -212,6 +212,7 @@
     "many": "La suppression de ces books n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de ceux-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible.",
     "other": "La suppression de ces books n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de ceux-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible."
   },
+  "book_edit_visibility": "Modifier la visibilité du book",
   "book_illustrations_remove": {
     "zero": "Rien retirer",
     "one": "Retirer 1 illustration",
@@ -609,6 +610,7 @@
   },
   "illustration_description_dot": "Description de l'illustration...",
   "illustration_description_sample": "C'est une fleur sur un balcon...",
+  "illustration_edit_visibility": "Modifier la visibility de l'illustration",
   "illustration_license_description": "Définissez comment les règles d'utilisation de votre travail.",
   "illustration_metadata": "Méta-données de l'illustration",
   "illustration_metadata_description": "Modifiez le titre de l'ilustration, son résumé, sa description, ses topics & plus",
@@ -1122,6 +1124,16 @@
   "share": "Partager",
   "share_illustration_tweet_text": "J' 💜 l'illustration \"{}\" de {}",
   "share_on_twitter": "Partager sur Twitter",
+  "share_visibility_issue": {
+    "book": {
+      "archived": "Les books archivés ne sont visibles que par vous",
+      "private": "Les books privés ne sont visibles que par vous"
+    },
+    "illustration": {
+      "archived": "Les illustrations archivés ne sont visibles que par vous",
+      "private": "Les illustrations archivés ne sont visibles que par vous"
+    }
+  },
   "short_bio": "Je suis un entrepreneur et développeur freelance.",
   "showcase": "Exposition",
   "signin": "Se connecter",

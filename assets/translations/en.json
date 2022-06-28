@@ -214,6 +214,7 @@
     "many": "Deleting these books won't delete illustrations inside it. Illustrations live on their own. This action is irrevsible.",
     "other": "Deleting these books won't delete illustrations inside it. Illustrations live on their own. This action is irrevsible."
   },
+  "book_edit_visibility": "Edit book's visiblity",
   "book_illustrations_remove": {
     "zero": "Don't remove",
     "one": "Remove 1 illustration",
@@ -609,6 +610,7 @@
   },
   "illustration_description_dot": "Illustration's description...",
   "illustration_description_sample": "It's a flower on a balcony...",
+  "illustration_edit_visibility": "Edit illustration's visiblity",
   "illustration_license_description": "Define how other can and cannot use your work.",
   "illustration_metadata": "Illustration's metadata",
   "illustration_metadata_description": "Set Illustration title, summary, description, topics & more",
@@ -1123,6 +1125,16 @@
   "share": "Share",
   "share_illustration_tweet_text": "I 💜 illustration \"{}\" by {}",
   "share_on_twitter": "Share on Twitter",
+  "share_visibility_issue": {
+    "book": {
+      "archived": "Archived books are only visible to you",
+      "private": "Private books are only visible to you"
+    },
+    "illustration": {
+      "archived": "Archived illustrations are only visible to you",
+      "private": "Private illustrations are only visible to you"
+    }
+  },
   "short_bio": "I'm a french entrepreneur and freelance developer.",
   "showcase": "Showcase",
   "signin": "Sign in",
