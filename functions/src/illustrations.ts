@@ -376,14 +376,14 @@ export const deleteOne = functions
 
     if (!userAuth) {
       throw new functions.https.HttpsError(
-        'unauthenticated', 
+        "unauthenticated", 
         `The function must be called from an authenticated user.`,
       );
     }
 
-    if (typeof illustration_id !== 'string') {
+    if (typeof illustration_id !== "string") {
       throw new functions.https.HttpsError(
-        'invalid-argument', 
+        "invalid-argument", 
         `The function must be called with a valid [illustration_id] argument (string) ` +
          ` which is the illustration's id to delete.`,
         );
@@ -397,14 +397,14 @@ export const deleteOne = functions
     const illustrationData = illustrationSnap.data();
     if (!illustrationSnap.exists || !illustrationData) {
       throw new functions.https.HttpsError(
-        'not-found',
+        "not-found",
         `The illustration id [${illustration_id}] doesn't exist.`,
       );
     }
 
     if (illustrationData.user_id !== userAuth.uid) {
       throw new functions.https.HttpsError(
-        'permission-denied',
+        "permission-denied",
         `You don't have the permission to edit this illustration.`,
       );
     }
@@ -539,6 +539,72 @@ export const deleteMany = functions
       successCount,
       hasErrors: successCount === illustration_ids.length,
     };
+  });
+
+/** 
+ * Return a signed URL to download an illustration. 
+ * It expires after 5 min. 
+ **/
+export const getSignedUrl = functions
+  .region(cloudRegions.eu)
+  .https
+  .onCall(async (params: DeleteIllustrationParams, context) => {
+    const { illustration_id } = params;
+    const userAuth = context.auth;
+    
+    if (typeof illustration_id !== "string") {
+      throw new functions.https.HttpsError(
+        "invalid-argument", 
+        `The function must be called with a valid [illustration_id] argument (string) ` +
+        ` which is the illustration's id to delete.`,
+        );
+      }
+    
+    const illustrationSnap = await firestore
+    .collection(ILLUSTRATIONS_COLLECTION_NAME)
+    .doc(illustration_id)
+    .get();
+    
+    const illustrationData = illustrationSnap.data();
+    if (!illustrationSnap.exists || !illustrationData) {
+      throw new functions.https.HttpsError(
+        "not-found",
+        `The illustration id [${illustration_id}] doesn't exist.`,
+        );
+      }
+    
+    if (illustrationData.visibility !== "public") {
+      console.log("illustration not public");
+      if (!userAuth) {
+        throw new functions.https.HttpsError(
+          "unauthenticated", 
+          `The function must be called from an authenticated user.`,
+          );
+        }
+      
+      if (illustrationData.user_id !== userAuth.uid) {
+        throw new functions.https.HttpsError(
+          "permission-denied",
+          `You don't have the permission to edit this illustration.`,
+          );
+        }
+    }
+  
+    const storagePath: string = illustrationData.links.storage
+    const bucket = adminApp.storage().bucket();
+    
+    const [url] = await bucket
+    .file(storagePath)
+    .getSignedUrl({
+      version: "v4",
+      action: "read",
+      expires: Date.now() + 1000 * 60 * 5, // 5 minutes
+    });
+  
+    return {
+      success: true,
+      url,
+    }
   });
 
 /**
