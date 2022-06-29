@@ -30,6 +30,8 @@ import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 const firestore = adminApp.firestore();
 const gcs = new Storage();
 
+const ILLUSTRATION_DOC_PATH = "illustrations/{illustration_id}"
+
 interface GenerateImageThumbsParams {
   extension: string;
   filename: string;
@@ -758,6 +760,47 @@ export const onStorageUpload = functions
       },
     })
   });
+
+/** 
+ * Event handler on illustration doc updates.
+ * Check if visibility has been updated to a more restricted value 
+ * (e.g. from another value than `public`).
+ * If so, force `firebaseStorageDownloadTokens` regeneration for security issue.
+ * 
+ * (cf.: https://www.sentinelstand.com/article/guide-to-firebase-storage-download-urls-tokens)
+ * 
+ * (cf.: https://github.com/googleapis/nodejs-storage/issues/697#issuecomment-610603232)
+ **/
+export const onVisibilityUpdate = functions
+.region(cloudRegions.eu)
+.firestore
+.document(ILLUSTRATION_DOC_PATH)
+.onUpdate(async (snapshot) => {
+  const beforeData = snapshot.before.data();
+  const afterData = snapshot.after.data();
+
+  if (beforeData.visibility === afterData.visibility) {
+    return;
+  }
+
+  if (afterData.visibility === "public") {
+    return;
+  }
+
+  // Force Firebase/GCP to regenerate download token.
+  const storagePath: string = afterData.links.storage
+  const bucket = adminApp.storage().bucket();
+  
+  await bucket
+  .file(storagePath)
+  .setMetadata({
+    metadata: {
+      // Delete the download token. 
+      // A new one will be generated when attempting to download the illustration.
+      firebaseStorageDownloadTokens: null,
+    },
+  });
+});
 
 /**
  * Unset illustration's license.
