@@ -340,6 +340,13 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Icon(
+                      UniconsLine.tear,
+                      color: Colors.black,
+                    ),
+                  ),
                   Expanded(
                     child: Text(
                       "illustration_upload_file".tr(),
@@ -349,10 +356,6 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ),
-                  Icon(
-                    UniconsLine.tear,
-                    color: Colors.black,
                   ),
                 ],
               ),
@@ -1035,6 +1038,10 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   /// Callback event fired when files are dropped on this page.
   /// Try to upload them as image and create correspondig illustrations.
   void onDragFileDone(DropDoneDetails dropDoneDetails) async {
+    if (!_enableFileDrop) {
+      return;
+    }
+
     _scrollTimer?.cancel();
     final List<FilePickerCross> files = [];
 
@@ -1081,11 +1088,18 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   /// Callback event fired when a pointer enters this page with files.
   void onDragFileEntered(DropEventDetails dropEventDetails) {
+    if (!_enableFileDrop) {
+      return;
+    }
     setState(() => _isDraggingFile = true);
   }
 
   /// Callback event fired when a pointer exits this page with files.
   void onDragFileExited(DropEventDetails dropEventDetails) {
+    if (!_enableFileDrop) {
+      return;
+    }
+
     _scrollTimer?.cancel();
 
     setState(() {
