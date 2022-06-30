@@ -6,20 +6,36 @@ import 'package:unicons/unicons.dart';
 class PopupProgressIndicator extends StatelessWidget {
   const PopupProgressIndicator({
     Key? key,
-    this.show = true,
     required this.message,
+    this.show = true,
     this.onClose,
+    this.icon,
   }) : super(key: key);
 
+  /// This widget is displayed if true.
   final bool show;
+
+  /// Callback when this widget is dismissed.
   final void Function()? onClose;
+
+  /// Text to show inside this widget
   final String message;
+
+  /// Icon prefix inside this widget.
+  final Widget? icon;
 
   @override
   Widget build(BuildContext context) {
     if (!show) {
       return Container();
     }
+
+    final Widget prefix = icon != null
+        ? icon!
+        : Icon(
+            UniconsLine.circle,
+            color: Constants.colors.secondary,
+          );
 
     return SizedBox(
       width: 240.0,
@@ -37,10 +53,7 @@ class PopupProgressIndicator extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    UniconsLine.circle,
-                    color: Constants.colors.secondary,
-                  ),
+                  prefix,
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8.0),
@@ -50,7 +63,7 @@ class PopupProgressIndicator extends StatelessWidget {
                           message,
                           style: Utilities.fonts.body(
                             fontSize: 14.0,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
