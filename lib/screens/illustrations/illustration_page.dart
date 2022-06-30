@@ -28,6 +28,7 @@ import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:file_picker_cross/file_picker_cross.dart';
@@ -59,8 +60,18 @@ class IllustrationPage extends ConsumerStatefulWidget {
 }
 
 class _IllustrationPageState extends ConsumerState<IllustrationPage> {
+  /// Listen to route to deaactivate file drop on this page
+  /// (see `DropTarget.enable` property for more information).
+  BeamerDelegate? _beamer;
+
   /// True if the illustration is being downloaded.
   bool _downloading = false;
+
+  /// Disable file drop when navigating to a new page.
+  bool _enableFileDrop = true;
+
+  /// If true, a file is being dragged on the app window.
+  bool _isDraggingFile = false;
 
   /// True if data is loading.
   bool _loading = false;
@@ -86,6 +97,14 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
   @override
   void initState() {
     super.initState();
+
+    // NOTE: Beamer state isn't ready on 1st frame.
+    // So we use [addPostFrameCallback] to access the state in the next frame.
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      _beamer = Beamer.of(context);
+      Beamer.of(context).addListener(onRouteUpdate);
+    });
+
     final Illustration? illustrationFromNav =
         NavigationStateHelper.illustration;
 
@@ -110,6 +129,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     _illustrationSubscription?.cancel();
     _likeSubscription?.cancel();
     _pageScrollController.dispose();
+    _beamer?.removeListener(onRouteUpdate);
     super.dispose();
   }
 
@@ -129,35 +149,99 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
           onDownload: tryDownload,
           onCreateNewVersion: onCreateNewVersion,
         ),
-        body: Stack(
-          children: [
-            ImprovedScrolling(
-              scrollController: _pageScrollController,
-              child: ScrollConfiguration(
-                behavior: CustomScrollBehavior(),
-                child: CustomScrollView(
-                  controller: _pageScrollController,
-                  slivers: [
-                    ApplicationBar(),
-                    IllustrationPageBody(
-                      isOwner: isOwner,
-                      isLoading: _loading,
-                      heroTag: widget.heroTag,
-                      updatingImage: _updatingImage,
-                      illustration: _illustration,
-                      onShowEditMetadataPanel: onShowEditMetadataPanel,
-                      onGoToEditImagePage: onGoToEditImagePage,
-                      onLike: authenticated ? onLike : null,
-                      onShare: onShare,
-                      liked: _liked,
-                      onTapUser: onTapUser,
+        body: DropTarget(
+          // for file drop -> upload illustration.
+          enable: _enableFileDrop && isOwner,
+          onDragDone: onDragFileDone,
+          onDragEntered: onDragFileEntered,
+          onDragExited: onDragFileExited,
+          child: Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Constants.colors.tertiary,
+                    width: 4.0,
+                    style:
+                        _isDraggingFile ? BorderStyle.solid : BorderStyle.none,
+                  ),
+                ),
+                child: ImprovedScrolling(
+                  scrollController: _pageScrollController,
+                  child: ScrollConfiguration(
+                    behavior: CustomScrollBehavior(),
+                    child: CustomScrollView(
+                      controller: _pageScrollController,
+                      slivers: [
+                        ApplicationBar(),
+                        IllustrationPageBody(
+                          isOwner: isOwner,
+                          isLoading: _loading,
+                          heroTag: widget.heroTag,
+                          updatingImage: _updatingImage,
+                          illustration: _illustration,
+                          onShowEditMetadataPanel: onShowEditMetadataPanel,
+                          onGoToEditImagePage: onGoToEditImagePage,
+                          onLike: authenticated ? onLike : null,
+                          onShare: onShare,
+                          liked: _liked,
+                          onTapUser: onTapUser,
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
+              popupProgressIndicator(),
+              dropHint(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget dropHint() {
+    if (!_isDraggingFile) {
+      return Container();
+    }
+
+    return Positioned(
+      bottom: 24.0,
+      left: 0.0,
+      right: 0.0,
+      child: Align(
+        alignment: Alignment.center,
+        child: SizedBox(
+          width: 500.0,
+          child: Card(
+            elevation: 6.0,
+            color: Constants.colors.tertiary,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Icon(
+                      UniconsLine.tear,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      "illustration_upload_file_to_existing".tr(),
+                      style: Utilities.fonts.body(
+                        color: Colors.black,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            popupProgressIndicator(),
-          ],
+          ),
         ),
       ),
     );
@@ -352,7 +436,77 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
   void onCreateNewVersion() async {
     ref
         .read(AppState.uploadTaskListProvider.notifier)
-        .pickImageAndCreateNewIllustrationVersion(_illustration);
+        .pickImageForNewVersion(_illustration);
+  }
+
+  /// Callback event fired when files are dropped on this page.
+  /// Try to upload them as image and create correspondig illustrations.
+  void onDragFileDone(DropDoneDetails dropDoneDetails) async {
+    if (!_enableFileDrop) {
+      return;
+    }
+
+    if (dropDoneDetails.files.isEmpty) {
+      return;
+    }
+
+    final firstFile = dropDoneDetails.files.first;
+    final int length = await firstFile.length();
+
+    if (length > 25000000) {
+      context.showErrorBar(
+        content: Text(
+          "illustration_upload_size_limit".tr(
+            args: [firstFile.name, length.toString(), "25"],
+          ),
+        ),
+      );
+      return;
+    }
+
+    final int dotIndex = firstFile.path.lastIndexOf(".");
+    final String extension = firstFile.path.substring(dotIndex + 1);
+
+    if (!Constants.allowedImageExt.contains(extension)) {
+      context.showErrorBar(
+        content: Text(
+          "illustration_upload_invalid_extension".tr(
+            args: [firstFile.name, Constants.allowedImageExt.join(", ")],
+          ),
+        ),
+      );
+      return;
+    }
+
+    final FilePickerCross filePickerCross = FilePickerCross(
+      await firstFile.readAsBytes(),
+      path: firstFile.path,
+      type: FileTypeCross.image,
+      fileExtension: extension,
+    );
+
+    ref.read(AppState.uploadTaskListProvider.notifier).handleDropForNewVersion(
+          filePickerCross,
+          _illustration,
+        );
+  }
+
+  /// Callback event fired when a pointer enters this page with files.
+  void onDragFileEntered(DropEventDetails dropEventDetails) {
+    if (!_enableFileDrop) {
+      return;
+    }
+    setState(() => _isDraggingFile = true);
+  }
+
+  /// Callback event fired when a pointer exits this page with files.
+  void onDragFileExited(DropEventDetails dropEventDetails) {
+    if (!_enableFileDrop) {
+      return;
+    }
+    setState(() {
+      _isDraggingFile = false;
+    });
   }
 
   void onGoToEditImagePage() {
@@ -389,6 +543,20 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     }
 
     return tryLike();
+  }
+
+  /// Callback fired when route changes.
+  void onRouteUpdate() {
+    final String? stringLocation = Beamer.of(context)
+        .beamingHistory
+        .last
+        .history
+        .last
+        .routeInformation
+        .location;
+
+    _enableFileDrop =
+        stringLocation == AtelierLocationContent.illustrationRoute;
   }
 
   void onSaveEditedIllustration(Uint8List? editedImageData) async {

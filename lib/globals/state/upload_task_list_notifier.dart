@@ -120,9 +120,23 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     return passedFiles;
   }
 
+  /// Receive a single file
+  /// and try to upload it as the new illustration's version.
+  Future<FilePickerCross?> handleDropForNewVersion(
+    FilePickerCross file,
+    Illustration illustration,
+  ) async {
+    if (file.path == null || !_checkSize(file)) {
+      return null;
+    }
+
+    _createNewIllustrationVersion(file, illustration);
+    return file;
+  }
+
   /// A "select file/folder" window will appear. User will have to choose a file.
-  /// This file will be then read, and uploaded to firebase storage;
-  Future<FilePickerCross?> pickImageAndCreateNewIllustrationVersion(
+  /// This file will be used as the new version for the existing illustration;
+  Future<FilePickerCross?> pickImageForNewVersion(
     Illustration illustration,
   ) async {
     FilePickerCross? pickerResult;
@@ -376,7 +390,6 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     return await _startStorageUpload(
       file: file,
       fileName: illustration.name,
-      fileExtension: illustration.extension,
       illustrationId: illustration.id,
       customUploadTask: customUploadTask,
     );
@@ -435,16 +448,19 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     required String fileName,
     required String illustrationId,
     required CustomUploadTask customUploadTask,
-    String? fileExtension,
   }) async {
-    final String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final String userId = FirebaseAuth.instance.currentUser?.uid ?? "";
 
     if (userId.isEmpty) {
       return customUploadTask;
     }
 
-    final int lastIndexDot = fileName.lastIndexOf(".") + 1;
-    final String extension = fileExtension ?? fileName.substring(lastIndexDot);
+    String extension = file.fileExtension;
+
+    if (extension.isEmpty) {
+      final int lastIndexDot = fileName.lastIndexOf(".") + 1;
+      extension = fileName.substring(lastIndexDot);
+    }
 
     final String cloudStorageFilePath =
         "users/$userId/illustrations/$illustrationId/original.$extension";
