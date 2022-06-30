@@ -618,6 +618,7 @@
   "illustration_metadata": "Méta-données de l'illustration",
   "illustration_metadata_description": "Modifiez le titre de l'ilustration, son résumé, sa description, ses topics & plus",
   "illustration_name_metadata": "Méta-données de {}",
+  "illustration_not_found_with_id": "L'illustration dont l'id est {} n'existe pas.",
   "illustration_permutation_description": "Déposez cette illustration sur une autre pour les permutter.",
   "illustration_remove": "Retirer cette illustration",
   "illustration_story_dot": "Histoire derrière cette illustration...",

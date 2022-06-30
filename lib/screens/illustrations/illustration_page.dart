@@ -7,6 +7,7 @@ import 'package:artbooking/components/dialogs/share_dialog.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/screens/edit_image/edit_image_page.dart';
@@ -19,6 +20,8 @@ import 'package:artbooking/screens/illustrations/illustration_page_fab.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/enums/enum_share_content_type.dart';
 import 'package:artbooking/types/firestore/doc_snapshot_stream_subscription.dart';
+import 'package:artbooking/types/firestore/document_map.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
@@ -27,6 +30,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +38,8 @@ import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:unicons/unicons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class IllustrationPage extends ConsumerStatefulWidget {
   const IllustrationPage({
@@ -53,20 +59,29 @@ class IllustrationPage extends ConsumerStatefulWidget {
 }
 
 class _IllustrationPageState extends ConsumerState<IllustrationPage> {
+  /// True if the illustration is being downloaded.
+  bool _downloading = false;
+
   /// True if data is loading.
-  bool _isLoading = false;
+  bool _loading = false;
+
+  /// True if the illustration is being updated.
   bool _updatingImage = false;
+
+  /// True if the illustration is liked by the current authenticated user.
   bool _liked = false;
 
+  /// Illustration of this page.
   var _illustration = Illustration.empty();
 
   /// Listen to changes for this illustration.
   DocSnapshotStreamSubscription? _illustrationSubscription;
 
-  /// Listent to changes for this illustration's like status.
+  /// Listen to changes for this illustration's like status.
   DocSnapshotStreamSubscription? _likeSubscription;
 
-  final _scrollController = ScrollController();
+  /// Page scroll controller.
+  final _pageScrollController = ScrollController();
 
   @override
   void initState() {
@@ -79,7 +94,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
       _illustration = illustrationFromNav;
 
       final query = FirebaseFirestore.instance
-          .collection('illustrations')
+          .collection("illustrations")
           .doc(_illustration.id);
 
       listenToIllustrationChanges(query);
@@ -94,7 +109,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
   void dispose() {
     _illustrationSubscription?.cancel();
     _likeSubscription?.cancel();
-    _scrollController.dispose();
+    _pageScrollController.dispose();
     super.dispose();
   }
 
@@ -109,22 +124,24 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
       controller: HeroController(),
       child: Scaffold(
         floatingActionButton: IllustrationPageFab(
-          isVisible: isOwner,
-          onShowEditMetadataPanel: onShowEditMetadataPanel,
+          show: true,
+          isOwner: isOwner,
+          onDownload: tryDownload,
+          onCreateNewVersion: onCreateNewVersion,
         ),
         body: Stack(
           children: [
             ImprovedScrolling(
-              scrollController: _scrollController,
+              scrollController: _pageScrollController,
               child: ScrollConfiguration(
                 behavior: CustomScrollBehavior(),
                 child: CustomScrollView(
-                  controller: _scrollController,
+                  controller: _pageScrollController,
                   slivers: [
                     ApplicationBar(),
                     IllustrationPageBody(
                       isOwner: isOwner,
-                      isLoading: _isLoading,
+                      isLoading: _loading,
                       heroTag: widget.heroTag,
                       updatingImage: _updatingImage,
                       illustration: _illustration,
@@ -139,21 +156,38 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
                 ),
               ),
             ),
-            Positioned(
-              top: 100.0,
-              right: 24.0,
-              child: PopupProgressIndicator(
-                show: _updatingImage,
-                message: "image_updating".tr() + "...",
-                onClose: () {
-                  setState(() {
-                    _updatingImage = false;
-                  });
-                },
-              ),
-            ),
+            popupProgressIndicator(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget popupProgressIndicator() {
+    String message = "";
+
+    if (_downloading) {
+      message = "downloading".tr();
+    } else if (_updatingImage) {
+      message = "image_updating".tr();
+    }
+
+    return Positioned(
+      top: 100.0,
+      right: 24.0,
+      child: PopupProgressIndicator(
+        icon: Icon(
+          _downloading ? UniconsLine.download_alt : UniconsLine.upload_alt,
+          color: Constants.colors.secondary,
+        ),
+        show: _updatingImage || _downloading,
+        message: message + "...",
+        onClose: () {
+          setState(() {
+            _updatingImage = false;
+            _downloading = false;
+          });
+        },
       ),
     );
   }
@@ -164,24 +198,23 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     }
 
     setState(() {
-      _isLoading = !silent;
+      _loading = !silent;
     });
 
     try {
-      final query = FirebaseFirestore.instance
+      final DocumentMap query = FirebaseFirestore.instance
           .collection("illustrations")
           .doc(widget.illustrationId);
 
       listenToIllustrationChanges(query);
 
-      final snapshot = await query.get();
-      final data = snapshot.data();
+      final DocumentSnapshotMap snapshot = await query.get();
+      final Json? data = snapshot.data();
 
       if (!snapshot.exists || data == null) {
         context.showErrorBar(
           content: Text(
-            "The illustration with the id ${widget.illustrationId} "
-            "doesn't exist.",
+            "illustration_not_found_with_id".tr(args: [_illustration.id]),
           ),
         );
 
@@ -192,7 +225,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
 
       setState(() {
         _illustration = Illustration.fromMap(data);
-        _isLoading = false;
+        _loading = false;
       });
 
       fetchLike();
@@ -203,7 +236,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
         return;
       }
       setState(() {
-        _isLoading = false;
+        _loading = false;
       });
     }
   }
@@ -314,6 +347,12 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     );
 
     Navigator.pop(context, futureResult);
+  }
+
+  void onCreateNewVersion() async {
+    ref
+        .read(AppState.uploadTaskListProvider.notifier)
+        .pickImageAndCreateNewIllustrationVersion(_illustration);
   }
 
   void onGoToEditImagePage() {
@@ -490,6 +529,70 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
         ),
       ),
     );
+  }
+
+  bool hasImageExtension(String name) {
+    return Constants.allowedImageExt.any((String ext) => name.endsWith(ext));
+  }
+
+  String createLocalFilePath() {
+    if (hasImageExtension(_illustration.name)) {
+      return _illustration.name;
+    }
+
+    return "${_illustration.name}.${_illustration.extension}";
+  }
+
+  void tryDownload() async {
+    setState(() => _downloading = true);
+
+    try {
+      final Reference storageRef = FirebaseStorage.instance.ref();
+      final Reference fileRef = storageRef.child(_illustration.links.storage);
+
+      // if file's size > 10mb, use a web browser.
+      if (_illustration.size > 10000000) {
+        final HttpsCallableResult response = await Utilities.cloud
+            .illustrations("getSignedUrl")
+            .call({"illustration_id": _illustration.id});
+
+        if (!response.data["success"]) {
+          throw ErrorDescription("download_file_error".tr());
+        }
+
+        final String downloadUrl = response.data["url"];
+
+        final Uri url = Uri.parse(downloadUrl);
+        await launchUrl(url);
+        return;
+      }
+
+      // Load the file in memory
+      // ----------
+      final Uint8List? fileData = await fileRef.getData();
+      if (fileData == null) {
+        context.showErrorBar(
+          content: Text("download_file_error".tr()),
+        );
+
+        return;
+      }
+
+      final fileCross = FilePickerCross(
+        fileData,
+        fileExtension: _illustration.extension,
+        type: FileTypeCross.image,
+      );
+
+      fileCross.exportToStorage(
+        fileName: _illustration.name,
+      );
+    } catch (error) {
+      Utilities.logger.i(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _downloading = false);
+    }
   }
 
   void tryLike() async {

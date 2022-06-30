@@ -618,6 +618,7 @@
   "illustration_metadata": "Illustration's metadata",
   "illustration_metadata_description": "Set Illustration title, summary, description, topics & more",
   "illustration_name_metadata": "{}'s metadata",
+  "illustration_not_found_with_id": "The illustration with the id {} doesn't exist.",
   "illustration_permutation_description": "Drop this illustration on another one to permute them.",
   "illustration_remove": "Remove this illustration",
   "illustration_story_dot": "Illustration'story...",

@@ -4,6 +4,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/cloud_functions/illustrations_response.dart';
 import 'package:artbooking/types/cloud_functions/upload_cover_response.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
+import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:file_picker_cross/file_picker_cross.dart';
@@ -117,6 +118,29 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     }
 
     return passedFiles;
+  }
+
+  /// A "select file/folder" window will appear. User will have to choose a file.
+  /// This file will be then read, and uploaded to firebase storage;
+  Future<FilePickerCross?> pickImageAndCreateNewIllustrationVersion(
+    Illustration illustration,
+  ) async {
+    FilePickerCross? pickerResult;
+
+    try {
+      pickerResult = await FilePickerCross.importFromStorage(
+        type: FileTypeCross.image,
+      );
+    } on Exception catch (_) {}
+
+    if (pickerResult == null ||
+        pickerResult.path == null ||
+        !_checkSize(pickerResult)) {
+      return null;
+    }
+
+    _createNewIllustrationVersion(pickerResult, illustration);
+    return pickerResult;
   }
 
   /// Receive a list of files and try to upload images and create illustrations.
@@ -338,6 +362,26 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     return true;
   }
 
+  Future<CustomUploadTask> _createNewIllustrationVersion(
+    FilePickerCross file,
+    Illustration illustration,
+  ) async {
+    final customUploadTask = CustomUploadTask(
+      illustrationId: illustration.id,
+      name: illustration.name,
+    );
+
+    add(customUploadTask);
+
+    return await _startStorageUpload(
+      file: file,
+      fileName: illustration.name,
+      fileExtension: illustration.extension,
+      illustrationId: illustration.id,
+      customUploadTask: customUploadTask,
+    );
+  }
+
   Future<CustomUploadTask> _uploadIllustration(FilePickerCross file) async {
     final String fileName =
         file.fileName ?? "${"unknown".tr()}-${DateTime.now()}";
@@ -391,6 +435,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     required String fileName,
     required String illustrationId,
     required CustomUploadTask customUploadTask,
+    String? fileExtension,
   }) async {
     final String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
 
@@ -398,13 +443,13 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
       return customUploadTask;
     }
 
-    final lastIndexDot = fileName.lastIndexOf(".") + 1;
-    final String extension = fileName.substring(lastIndexDot);
+    final int lastIndexDot = fileName.lastIndexOf(".") + 1;
+    final String extension = fileExtension ?? fileName.substring(lastIndexDot);
 
     final String cloudStorageFilePath =
         "users/$userId/illustrations/$illustrationId/original.$extension";
 
-    final storage = FirebaseStorage.instance;
+    final FirebaseStorage storage = FirebaseStorage.instance;
     final UploadTask uploadTask = storage.ref(cloudStorageFilePath).putData(
         file.toUint8List(),
         SettableMetadata(
@@ -421,6 +466,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
         ));
 
     customUploadTask.task = uploadTask;
+
     final List<CustomUploadTask> filteredState = state.where((customTask) {
       return customTask.illustrationId != customUploadTask.illustrationId;
     }).toList();
