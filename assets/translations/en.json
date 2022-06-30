@@ -643,6 +643,7 @@
   "illustration_upload_error": "Sorry, there was an issue while uploading your illustration. Please try again later.",
   "illustration_upload_file": "Drop the file here to upload a new illustration",
   "illustration_upload_file_to_book": "Drop the file here to upload a new illustration to this book",
+  "illustration_upload_file_to_existing": "Drop the file here to upload a new version of this illustration",
   "illustration_upload_file_to_new_book": "Drop the file here to create a new book and upload the illustration in it",
   "illustration_upload_invalid_extension": "File {} does not seem to be an image or it does not have a valid extension. Valid extention should be among the following: {}.",
   "illustration_upload_size_limit": "File {} size is {} and exceeds {}MB limit.",
