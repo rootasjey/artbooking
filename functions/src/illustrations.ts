@@ -708,7 +708,11 @@ export const onStorageUpload = functions
     if (typeof version !== "number") { version = 0 }
     version += 1;
 
-    // Save new properties to Firestore.
+    let previousSize: number = 0;
+    if (version > 1) {
+      previousSize = parseFloat(illustrationData.size);
+    }
+
     await illustrationSnapshot.ref
       .update({
         dimensions: {
@@ -728,12 +732,6 @@ export const onStorageUpload = functions
       });
 
     await checkBookCoverTasks(illustrationSnapshot.id);
-
-    // Skip update used storage if we're updating the image file
-    // (crop, rotate, flip).
-    if (version > 1) {
-      return true;
-    }
     
     // Update user's storage.
     // ----------------------
@@ -752,6 +750,10 @@ export const onStorageUpload = functions
     let used: number = statisticsData.illustrations.used ?? 0
     if (typeof used !== "number") { used = 0 }
     used += parseFloat(objectMeta.size)
+
+    if (version > 1) {
+      used -= previousSize;
+    }
 
     return await statsSnapshot.ref.update({
       illustrations: {
