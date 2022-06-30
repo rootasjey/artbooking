@@ -36,7 +36,7 @@ class IllustrationPageFab extends StatelessWidget {
       children: [
         FloatingActionButton.extended(
           onPressed: onDownload,
-          backgroundColor: Theme.of(context).primaryColor,
+          backgroundColor: Colors.black,
           foregroundColor: Colors.white,
           icon: Padding(
             padding: const EdgeInsets.only(left: 8.0),
@@ -57,7 +57,7 @@ class IllustrationPageFab extends StatelessWidget {
             padding: const EdgeInsets.only(left: 8.0),
             child: FloatingActionButton(
               heroTag: null,
-              backgroundColor: Colors.amber.shade700,
+              backgroundColor: Colors.black,
               onPressed: onCreateNewVersion,
               child: Icon(UniconsLine.upload_alt),
             ),
