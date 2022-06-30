@@ -168,7 +168,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   QuerySnapshotStreamSubscription? _illustrationSubscription;
 
   /// Page scroll controller.
-  final _scrollController = ScrollController();
+  final _pageScrollController = ScrollController();
 
   /// This illustration page owner's name.
   /// Used when the current authenticated user is different
@@ -195,7 +195,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   @override
   void dispose() {
     _illustrationSubscription?.cancel();
-    _scrollController.dispose();
+    _pageScrollController.dispose();
     _popupFocusNode.dispose();
     _multiSelectedItems.clear();
     _illustrations.clear();
@@ -222,8 +222,9 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       child: Scaffold(
         floatingActionButton: MyIllustrationsPageFab(
           show: _showFab,
-          scrollController: _scrollController,
+          scrollController: _pageScrollController,
           isOwner: isOwner,
+          uploadIllustration: uploadIllustration,
         ),
         body: Listener(
           // for auto-scoll on dragging on edges.
@@ -248,13 +249,13 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                     ),
                   ),
                   child: ImprovedScrolling(
-                    scrollController: _scrollController,
+                    scrollController: _pageScrollController,
                     enableKeyboardScrolling: true,
                     onScroll: onScroll,
                     child: ScrollConfiguration(
                       behavior: CustomScrollBehavior(),
                       child: CustomScrollView(
-                        controller: _scrollController,
+                        controller: _pageScrollController,
                         slivers: <Widget>[
                           ApplicationBar(),
                           MyIllustrationsPageHeader(
@@ -374,7 +375,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     /// Amount of offset to jump when dragging an element to the edge.
     final double jumpOffset = 42.0;
 
-    if (dy < scrollTreshold && _scrollController.offset > 0) {
+    if (dy < scrollTreshold && _pageScrollController.offset > 0) {
       if (_activateAutoScrollOnce && _isAutoScrolling) {
         return;
       }
@@ -383,13 +384,13 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       _scrollTimer = Timer.periodic(
         Duration(milliseconds: duration),
         (Timer timer) {
-          _scrollController.animateTo(
-            _scrollController.offset - jumpOffset,
+          _pageScrollController.animateTo(
+            _pageScrollController.offset - jumpOffset,
             duration: Duration(milliseconds: duration),
             curve: Curves.easeIn,
           );
 
-          if (_scrollController.position.outOfRange) {
+          if (_pageScrollController.position.outOfRange) {
             _scrollTimer?.cancel();
             _isAutoScrolling = false;
           }
@@ -402,8 +403,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
     final double windowHeight = MediaQuery.of(context).size.height;
     final bool pointerIsAtBottom = dy >= windowHeight - scrollTreshold;
-    final bool scrollIsAtBottomEdge =
-        _scrollController.offset >= _scrollController.position.maxScrollExtent;
+    final bool scrollIsAtBottomEdge = _pageScrollController.offset >=
+        _pageScrollController.position.maxScrollExtent;
 
     if (pointerIsAtBottom && !scrollIsAtBottomEdge) {
       if (_activateAutoScrollOnce && _isAutoScrolling) {
@@ -414,13 +415,13 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       _scrollTimer = Timer.periodic(
         Duration(milliseconds: duration),
         (Timer timer) {
-          _scrollController.animateTo(
-            _scrollController.offset + jumpOffset,
+          _pageScrollController.animateTo(
+            _pageScrollController.offset + jumpOffset,
             duration: Duration(milliseconds: duration),
             curve: Curves.easeIn,
           );
 
-          if (_scrollController.position.outOfRange) {
+          if (_pageScrollController.position.outOfRange) {
             _scrollTimer?.cancel();
             _isAutoScrolling = false;
           }
@@ -1310,7 +1311,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       setState(() => _showFab = true);
     }
 
-    if (_scrollController.position.atEdge &&
+    if (_pageScrollController.position.atEdge &&
         scrollOffset > 50 &&
         _hasNext &&
         !_loadingMore) {
