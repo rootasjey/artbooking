@@ -48,6 +48,8 @@ class RowFeaturesSection extends StatelessWidget {
     final EdgeInsets outerPadding =
         usingAsDropTarget ? const EdgeInsets.all(4.0) : EdgeInsets.zero;
 
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     final BoxDecoration boxDecoration = usingAsDropTarget
         ? BoxDecoration(
             borderRadius: BorderRadius.circular(4.0),
@@ -61,61 +63,22 @@ class RowFeaturesSection extends StatelessWidget {
             color: Color(section.backgroundColor),
           );
 
-    final double height = 420.0;
-
     return Padding(
       padding: outerPadding,
       child: Stack(
         children: [
           Container(
             decoration: boxDecoration,
-            padding: const EdgeInsets.only(bottom: 60.0, left: 80.0),
+            padding: EdgeInsets.only(
+              bottom: 60.0,
+              left: isMobileSize ? 16.0 : 80.0,
+              right: 16.0,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                titleWidget(context),
-                SizedBox(
-                  height: height + 100.0,
-                  child: ListView(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(vertical: 32.0),
-                    children: [
-                      VerticalCard(
-                        icon: Icon(
-                          UniconsLine.ruler_combined,
-                          size: 32.0,
-                          color: Constants.colors.tertiary,
-                        ),
-                        title: "app_features.atelier.title".tr(),
-                        description: "app_features.atelier.description".tr(),
-                        onTap: () => Beamer.of(context).beamToNamed(
-                          AtelierLocationContent.activityRoute,
-                        ),
-                      ),
-                      VerticalCard(
-                        icon: Icon(
-                          UniconsLine.users_alt,
-                          size: 32.0,
-                          color: Constants.colors.primary,
-                        ),
-                        title: "app_features.community.title".tr(),
-                        description: "app_features.community.description".tr(),
-                        margin: const EdgeInsets.symmetric(horizontal: 32.0),
-                      ),
-                      VerticalCard(
-                        icon: Icon(
-                          UniconsLine.heart,
-                          size: 32.0,
-                          color: Constants.colors.secondary,
-                        ),
-                        title: "app_features.target_audience.title".tr(),
-                        description:
-                            "app_features.target_audience.description".tr(),
-                      ),
-                    ],
-                  ),
-                ),
+                titleWidget(context, isMobileSize),
+                bodyWidget(context, isMobileSize),
               ],
             ),
           ),
@@ -125,7 +88,143 @@ class RowFeaturesSection extends StatelessWidget {
     );
   }
 
-  Widget titleWidget(BuildContext context) {
+  Widget bodyWidget(BuildContext context, bool isMobileSize) {
+    if (isMobileSize) {
+      return verticalBody(context, isMobileSize);
+    }
+
+    return horizontalBody(context, isMobileSize);
+  }
+
+  Widget horizontalFeatureCard({
+    required String titleValue,
+    required String subtitleValue,
+    required IconData iconData,
+    void Function()? onTap,
+  }) {
+    return Card(
+      elevation: 0.0,
+      color: Colors.white60,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(18.0),
+          child: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 12.0),
+                child: Opacity(
+                  opacity: 0.6,
+                  child: Icon(iconData, size: 24.0),
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Opacity(
+                      opacity: 0.8,
+                      child: Text(
+                        titleValue,
+                        style: Utilities.fonts.body(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    Opacity(
+                      opacity: 0.6,
+                      child: Text(
+                        subtitleValue,
+                        style: Utilities.fonts.body(
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.w300,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget horizontalBody(BuildContext context, bool isMobileSize) {
+    return SizedBox(
+      height: 520.0,
+      child: ListView(
+        shrinkWrap: true,
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(vertical: 32.0),
+        children: [
+          VerticalCard(
+            icon: Icon(
+              UniconsLine.ruler_combined,
+              size: 32.0,
+              color: Constants.colors.tertiary,
+            ),
+            title: "app_features.atelier.title".tr(),
+            description: "app_features.atelier.description".tr(),
+            onTap: () => Beamer.of(context).beamToNamed(
+              AtelierLocationContent.activityRoute,
+            ),
+          ),
+          VerticalCard(
+            icon: Icon(
+              UniconsLine.users_alt,
+              size: 32.0,
+              color: Constants.colors.primary,
+            ),
+            title: "app_features.community.title".tr(),
+            description: "app_features.community.description".tr(),
+            margin: const EdgeInsets.symmetric(horizontal: 32.0),
+          ),
+          VerticalCard(
+            icon: Icon(
+              UniconsLine.heart,
+              size: 32.0,
+              color: Constants.colors.secondary,
+            ),
+            title: "app_features.target_audience.title".tr(),
+            description: "app_features.target_audience.description".tr(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget verticalBody(BuildContext context, bool isMobileSize) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: Column(
+        children: [
+          horizontalFeatureCard(
+            iconData: UniconsLine.ruler_combined,
+            onTap: () => Beamer.of(context).beamToNamed(
+              AtelierLocationContent.activityRoute,
+            ),
+            titleValue: "app_features.atelier.title".tr(),
+            subtitleValue: "app_features.atelier.description".tr(),
+          ),
+          horizontalFeatureCard(
+            iconData: UniconsLine.users_alt,
+            titleValue: "app_features.community.title".tr(),
+            subtitleValue: "app_features.community.description".tr(),
+          ),
+          horizontalFeatureCard(
+            iconData: UniconsLine.heart,
+            titleValue: "app_features.target_audience.title".tr(),
+            subtitleValue: "app_features.target_audience.description".tr(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget titleWidget(BuildContext context, bool isMobileSize) {
     if (section.name.isEmpty && section.description.isEmpty) {
       return Center(
         child: Opacity(
@@ -187,7 +286,7 @@ class RowFeaturesSection extends StatelessWidget {
               section.description,
               overflow: TextOverflow.clip,
               style: Utilities.fonts.body(
-                fontSize: 54.0,
+                fontSize: isMobileSize ? 24.0 : 54.0,
                 fontWeight: FontWeight.w200,
                 color: Color(section.textColor),
               ),
