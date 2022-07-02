@@ -41,7 +41,7 @@ class App extends StatelessWidget {
       initial: savedThemeMode ?? AdaptiveThemeMode.light,
       builder: (theme, darkTheme) {
         return MaterialApp.router(
-          title: 'ArtBooking',
+          title: "ArtBooking",
           theme: theme,
           darkTheme: darkTheme,
           debugShowCheckedModeBanner: false,

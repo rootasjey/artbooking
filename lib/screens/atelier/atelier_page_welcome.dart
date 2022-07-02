@@ -7,6 +7,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/types/user/user.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -19,8 +20,8 @@ class AtelierPageWelcome extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userState = ref.watch(AppState.userProvider);
-    final userFirestore = userState.firestoreUser;
+    final User userState = ref.watch(AppState.userProvider);
+    final UserFirestore? userFirestore = userState.firestoreUser;
 
     String name = "Anonymous";
 

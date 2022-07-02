@@ -17,8 +17,8 @@ import 'package:window_manager/window_manager.dart';
 
 void main() async {
   LicenseRegistry.addLicense(() async* {
-    final license = await rootBundle.loadString('google_fonts/OFL.txt');
-    yield LicenseEntryWithLineBreaks(['google_fonts'], license);
+    final license = await rootBundle.loadString("google_fonts/OFL.txt");
+    yield LicenseEntryWithLineBreaks(["google_fonts"], license);
   });
 
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,11 +29,11 @@ void main() async {
 
   await Utilities.storage.initialize();
   await EasyLocalization.ensureInitialized();
-  await GlobalConfiguration().loadFromAsset('app_settings');
+  await GlobalConfiguration().loadFromAsset("app_settings");
 
   Utilities.search.init(
-    applicationId: GlobalConfiguration().getValue('algolia_app_id'),
-    searchApiKey: GlobalConfiguration().getValue('algolia_search_api_key'),
+    applicationId: GlobalConfiguration().getValue("algolia_app_id"),
+    searchApiKey: GlobalConfiguration().getValue("algolia_search_api_key"),
   );
 
   // Try re-authenticate w/ blocking call.
@@ -70,9 +70,9 @@ void main() async {
   return runApp(
     ProviderScope(
       child: EasyLocalization(
-        path: 'assets/translations',
-        supportedLocales: [Locale('en'), Locale('fr')],
-        fallbackLocale: Locale('en'),
+        path: "assets/translations",
+        supportedLocales: [Locale("en"), Locale("fr")],
+        fallbackLocale: Locale("en"),
         child: App(
           savedThemeMode: savedThemeMode,
         ),

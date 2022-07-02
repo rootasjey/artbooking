@@ -44,12 +44,13 @@ class AtelierLocation extends BeamLocation<BeamState> {
         BeamGuard(
           pathPatterns: [route, routeWildCard],
           check: (context, location) {
-            final providerContainer = ProviderScope.containerOf(
+            final ProviderContainer providerContainer =
+                ProviderScope.containerOf(
               context,
               listen: false,
             );
 
-            final isAuthenticated = providerContainer
+            final bool isAuthenticated = providerContainer
                 .read(AppState.userProvider.notifier)
                 .isAuthenticated;
 

@@ -19,6 +19,8 @@ import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_body.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_empty.dart';
+import 'package:artbooking/types/firestore/document_map.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/modular_page.dart';
 import 'package:artbooking/types/book/scale_factor.dart';
 import 'package:artbooking/types/enums/enum_navigation_section.dart';
@@ -891,12 +893,11 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     });
 
     try {
-      final query =
+      final DocumentMap query =
           FirebaseFirestore.instance.collection("pages").doc(widget.pageId);
 
       listenModularPage(query);
-
-      final snapshot = await query.get();
+      final DocumentSnapshotMap snapshot = await query.get();
 
       if (!snapshot.exists) {
         _isEmpty = true;
@@ -915,9 +916,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
       context.showErrorBar(content: Text(error.toString()));
       _hasErrors = true;
     } finally {
-      setState(() {
-        _loading = false;
-      });
+      setState(() => _loading = false);
     }
   }
 
