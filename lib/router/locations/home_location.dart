@@ -5,6 +5,7 @@ import 'package:artbooking/screens/atelier/profile/modular_page_presenter.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page.dart';
 import 'package:artbooking/screens/book/book_page.dart';
 import 'package:artbooking/screens/book/books_page.dart';
+import 'package:artbooking/screens/home_mobile_page.dart';
 import 'package:artbooking/screens/illustrations/illustration_page.dart';
 import 'package:artbooking/screens/illustrations/illustrations_page.dart';
 import 'package:artbooking/screens/post_page.dart';
@@ -64,13 +65,22 @@ class HomeLocation extends BeamLocation<BeamState> {
 
   @override
   List<BeamPage> buildPages(BuildContext context, BeamState state) {
+    final BeamPage homeBeamPage = Utilities.size.isMobileSize(context)
+        ? BeamPage(
+            child: HomeMobilePage(),
+            key: ValueKey("/discover"),
+            title: Utilities.ui.getPageTitle("home".tr()),
+            type: BeamPageType.fadeTransition,
+          )
+        : BeamPage(
+            child: ModularPagePresenter(pageId: "home"),
+            key: ValueKey(route),
+            title: Utilities.ui.getPageTitle("home".tr()),
+            type: BeamPageType.fadeTransition,
+          );
+
     return [
-      BeamPage(
-        child: ModularPagePresenter(pageId: "home"),
-        key: ValueKey(route),
-        title: Utilities.ui.getPageTitle("home".tr()),
-        type: BeamPageType.fadeTransition,
-      ),
+      homeBeamPage,
       if (state.pathPatternSegments.contains("users") &&
           state.pathPatternSegments.contains(":userId"))
         BeamPage(
