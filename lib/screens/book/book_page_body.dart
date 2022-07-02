@@ -124,6 +124,7 @@ class BookPageBody extends StatelessWidget {
                 );
 
             return IllustrationCard(
+              borderRadius: BorderRadius.circular(16.0),
               index: index,
               heroTag: key,
               illustration: illustration,

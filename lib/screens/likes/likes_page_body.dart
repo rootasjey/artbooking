@@ -135,6 +135,7 @@ class LikesPageBody extends StatelessWidget {
             final illustration = illustrations.elementAt(index);
 
             return IllustrationCard(
+              borderRadius: BorderRadius.circular(16.0),
               index: index,
               size: 250.0,
               heroTag: illustration.id,

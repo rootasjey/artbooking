@@ -98,6 +98,7 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
             ),
             padding: const EdgeInsets.all(16.0),
             child: IllustrationCard(
+              borderRadius: BorderRadius.circular(16.0),
               useAsPlaceholder: true,
               heroTag: DateTime.now().toString(),
               illustration: Illustration.empty(),

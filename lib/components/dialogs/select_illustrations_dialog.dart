@@ -210,6 +210,7 @@ class _SelectIllustrationsDialogState extends State<SelectIllustrationsDialog> {
                       );
 
                       return IllustrationCard(
+                        borderRadius: BorderRadius.circular(16.0),
                         heroTag: "",
                         illustration: illustration,
                         index: index,

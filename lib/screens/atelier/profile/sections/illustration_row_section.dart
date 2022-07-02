@@ -184,6 +184,7 @@ class _IllustrationRowSectionState extends State<IllustrationRowSection> {
       final heroTag = "${widget.section.id}-${index}-${illustration.id}";
 
       return IllustrationCard(
+        borderRadius: BorderRadius.circular(16.0),
         canDrag: canDrag,
         onDrop: onDrop,
         dragGroupName: "${widget.section.id}-${widget.index}",
@@ -202,6 +203,7 @@ class _IllustrationRowSectionState extends State<IllustrationRowSection> {
         children.isEmpty) {
       children.add(
         IllustrationCard(
+          borderRadius: BorderRadius.circular(16.0),
           useAsPlaceholder: true,
           heroTag: "empty_${DateTime.now()}",
           illustration: Illustration.empty(),

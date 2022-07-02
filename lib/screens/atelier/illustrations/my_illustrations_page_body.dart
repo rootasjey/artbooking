@@ -155,6 +155,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
                         : likePopupMenuEntries;
 
             return IllustrationCard(
+              borderRadius: BorderRadius.circular(16.0),
               canDrag: isOwner,
               heroTag: illustration.id,
               illustration: illustration,

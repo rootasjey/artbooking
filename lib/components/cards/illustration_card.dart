@@ -47,6 +47,7 @@ class IllustrationCard extends StatefulWidget {
     this.onDragEnd,
     this.onDragStarted,
     this.onDraggableCanceled,
+    this.borderRadius = BorderRadius.zero,
   }) : super(key: key);
 
   /// If true, the card can be dragged. Usually used to re-order items.
@@ -67,6 +68,8 @@ class IllustrationCard extends StatefulWidget {
 
   /// If true, a "plus" icon will be used as the placeholder child.
   final bool useIconPlaceholder;
+
+  final BorderRadiusGeometry borderRadius;
 
   /// Card's size (width = height).
   final double size;
@@ -257,7 +260,7 @@ class _IllustrationCardState extends State<IllustrationCard>
       color: Theme.of(context).backgroundColor,
       elevation: _elevation,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: widget.borderRadius,
         side: borderSide,
       ),
       clipBehavior: Clip.antiAlias,

@@ -144,6 +144,7 @@ class _SearchPageState extends State<SearchPage> {
     return Column(
       children: _illustrationsSuggestions.mapIndexed((index, illustration) {
         return IllustrationCard(
+          borderRadius: BorderRadius.circular(16.0),
           index: index,
           heroTag: illustration.id,
           illustration: illustration,

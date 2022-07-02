@@ -86,6 +86,7 @@ class _PosterSectionState extends State<PosterSection> {
             height: size.height,
             padding: const EdgeInsets.all(16.0),
             child: IllustrationCard(
+              borderRadius: BorderRadius.circular(16.0),
               useAsPlaceholder: true,
               heroTag: DateTime.now().toString(),
               illustration: Illustration.empty(),

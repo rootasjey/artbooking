@@ -180,6 +180,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
     if (_illustrations.isEmpty) {
       return wrapInResponsiveCard(
         child: IllustrationCard(
+          borderRadius: BorderRadius.circular(16.0),
           useAsPlaceholder: true,
           useIconPlaceholder: true,
           heroTag: "empty_${DateTime.now()}",
@@ -213,6 +214,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
 
     return wrapInResponsiveCard(
       child: IllustrationCard(
+        borderRadius: BorderRadius.circular(16.0),
         heroTag: heroTag,
         illustration: firstIllustration,
         index: index,
@@ -280,6 +282,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
       final heroTag = "${widget.section.id}-${index}-${illustration.id}";
 
       return IllustrationCard(
+        borderRadius: BorderRadius.circular(16.0),
         canDrag: canDrag,
         onDrop: onDrop,
         dragGroupName: "${widget.section.id}-${widget.index}",
@@ -310,6 +313,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
     for (var i = 0; i < placeholderMaxCount; i++) {
       children.add(
         IllustrationCard(
+          borderRadius: BorderRadius.circular(16.0),
           useAsPlaceholder: true,
           useIconPlaceholder: true,
           heroTag: "empty_${DateTime.now()}",

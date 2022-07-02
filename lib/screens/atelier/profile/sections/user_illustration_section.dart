@@ -150,6 +150,7 @@ class _UserIllustrationSectionState extends State<UserIllustrationSection> {
     if (_illustration.id.isEmpty) {
       return Expanded(
         child: IllustrationCard(
+          borderRadius: BorderRadius.circular(16.0),
           useAsPlaceholder: true,
           heroTag: DateTime.now().toString(),
           illustration: Illustration.empty(),
