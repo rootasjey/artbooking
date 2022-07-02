@@ -118,6 +118,8 @@ class _MozaicSectionState extends State<MozaicSection> {
       return loadingWidget();
     }
 
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     final EdgeInsets outerPadding =
         widget.usingAsDropTarget ? const EdgeInsets.all(4.0) : EdgeInsets.zero;
 
@@ -134,23 +136,27 @@ class _MozaicSectionState extends State<MozaicSection> {
             color: Color(widget.section.backgroundColor),
           );
 
+    final EdgeInsets padding = isMobileSize
+        ? const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0)
+        : const EdgeInsets.symmetric(
+            horizontal: 48.0,
+            vertical: 32.0,
+          );
+
     return Padding(
       padding: outerPadding,
       child: Stack(
         children: [
           Container(
             decoration: boxDecoration,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 48.0,
-              vertical: 32.0,
-            ),
+            padding: padding,
             child: Column(
               children: [
-                titleSectionWidget(),
+                titleSectionWidget(isMobileSize),
                 maybeHelperText(),
                 Padding(
                   padding: const EdgeInsets.only(top: 34.0),
-                  child: mozaicBody(),
+                  child: mozaicBody(isMobileSize),
                 ),
               ],
             ),
@@ -161,29 +167,16 @@ class _MozaicSectionState extends State<MozaicSection> {
     );
   }
 
-  Widget mozaicBody() {
+  Widget mozaicBody(bool isMobileSize) {
     return StaggeredGrid.count(
-      crossAxisCount: 6,
+      crossAxisCount: isMobileSize ? 4 : 6,
       mainAxisSpacing: 24.0,
       crossAxisSpacing: 24.0,
-      children: getChildren(),
+      children: getChildrenInMozaic(isMobileSize),
     );
   }
 
-  Widget wrapInResponsiveCard({required Widget child}) {
-    return Flexible(
-      flex: 5,
-      child: FractionallySizedBox(
-        widthFactor: 0.6,
-        child: AspectRatio(
-          aspectRatio: 1.0,
-          child: child,
-        ),
-      ),
-    );
-  }
-
-  List<Widget> getChildren() {
+  List<Widget> getChildrenInMozaic(bool isMobileSize) {
     int index = 0;
     final double size = 200.0;
 
@@ -207,27 +200,34 @@ class _MozaicSectionState extends State<MozaicSection> {
       final ScaleFactor scaleFactor =
           widget.section.complexItems[index].scaleFactor;
 
-      final heroTag = "${widget.section.id}-${index}-${illustration.id}";
+      final String heroTag = "${widget.section.id}-${index}-${illustration.id}";
 
-      children.add(StaggeredGridTile.count(
-        crossAxisCellCount: scaleFactor.width,
-        mainAxisCellCount: scaleFactor.height,
-        child: IllustrationCard(
-          canResize: canResize,
-          canDrag: canDrag,
-          onDrop: onDrop,
-          onResizeEnd: onResizeEnd,
-          onGrowUp: onGrowUp,
-          dragGroupName: "${widget.section.id}-${widget.index}",
-          heroTag: heroTag,
-          illustration: illustration,
-          index: index,
-          size: size,
-          onTap: () => navigateToIllustrationPage(illustration, heroTag),
-          popupMenuEntries: popupMenuEntries,
-          onPopupMenuItemSelected: onIllustrationItemSelected,
+      final int crossAxisCellCount = isMobileSize ? 2 : scaleFactor.width;
+      final int mainAxisCellCount =
+          isMobileSize ? max(2, scaleFactor.height) : scaleFactor.height;
+
+      children.add(
+        StaggeredGridTile.count(
+          crossAxisCellCount: crossAxisCellCount,
+          mainAxisCellCount: mainAxisCellCount,
+          child: IllustrationCard(
+            borderRadius: BorderRadius.circular(16.0),
+            canResize: canResize,
+            canDrag: canDrag,
+            onDrop: onDrop,
+            onResizeEnd: onResizeEnd,
+            onGrowUp: onGrowUp,
+            dragGroupName: "${widget.section.id}-${widget.index}",
+            heroTag: heroTag,
+            illustration: illustration,
+            index: index,
+            size: size,
+            onTap: () => navigateToIllustrationPage(illustration, heroTag),
+            popupMenuEntries: popupMenuEntries,
+            onPopupMenuItemSelected: onIllustrationItemSelected,
+          ),
         ),
-      ));
+      );
 
       index++;
     }
@@ -249,6 +249,7 @@ class _MozaicSectionState extends State<MozaicSection> {
         crossAxisCellCount: 1,
         mainAxisCellCount: 1,
         child: IllustrationCard(
+          borderRadius: BorderRadius.circular(16.0),
           useAsPlaceholder: true,
           useIconPlaceholder: true,
           heroTag: "empty_${DateTime.now()}",
@@ -360,9 +361,9 @@ class _MozaicSectionState extends State<MozaicSection> {
     );
   }
 
-  Widget titleSectionWidget() {
-    final title = widget.section.name;
-    final description = widget.section.description;
+  Widget titleSectionWidget(bool isMobileSize) {
+    final String title = widget.section.name;
+    final String description = widget.section.description;
 
     if (title.isEmpty && description.isEmpty) {
       return Container();
@@ -383,7 +384,7 @@ class _MozaicSectionState extends State<MozaicSection> {
                   child: Text(
                     title,
                     style: Utilities.fonts.title(
-                      fontSize: 42.0,
+                      fontSize: isMobileSize ? 26.0 : 42.0,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -394,7 +395,7 @@ class _MozaicSectionState extends State<MozaicSection> {
                   child: Text(
                     description,
                     style: Utilities.fonts.body3(
-                      fontSize: 16.0,
+                      fontSize: isMobileSize ? 14.0 : 16.0,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
