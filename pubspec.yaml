@@ -65,6 +65,7 @@ dependencies:
   mime_type: 1.0.0
   modal_bottom_sheet: 2.0.0
   photo_view: 0.13.0
+  salomon_bottom_bar: 3.3.1
   share: 2.0.4
   shimmer_animation: 2.1.0+1
   simple_animations: 4.0.1
