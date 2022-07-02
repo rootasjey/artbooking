@@ -1,12 +1,12 @@
 import 'package:artbooking/components/icons/app_icon.dart';
 import 'package:artbooking/components/application_bar/middle_section/application_bar_middle_desktop.dart';
-import 'package:artbooking/components/application_bar/middle_section/application_bar_middle_mobile.dart';
 import 'package:artbooking/components/application_bar/user_section/application_bar_auth_user.dart';
 import 'package:artbooking/components/application_bar/user_section/application_bar_guest_user.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/state/user_notifier.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/types/user/user.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,7 +26,7 @@ class ApplicationBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bool compact = Utilities.size.isMobileSize(context);
 
-    final userProvider = ref.watch(AppState.userProvider);
+    final User userProvider = ref.watch(AppState.userProvider);
     final UserNotifier userNotifier = ref.read(AppState.userProvider.notifier);
 
     final String? avatarUrl = userProvider.firestoreUser?.getProfilePicture();
@@ -42,7 +42,7 @@ class ApplicationBar extends ConsumerWidget {
         automaticallyImplyLeading: false,
         title: Padding(
           padding: EdgeInsets.only(
-            left: compact ? 0.0 : 80.0,
+            left: compact ? 12.0 : 48.0,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -57,7 +57,7 @@ class ApplicationBar extends ConsumerWidget {
                 minimal: minimal,
                 isAuthenticated: userNotifier.isAuthenticated,
                 initials: initials,
-                avatarUrl: avatarUrl ?? '',
+                avatarUrl: avatarUrl ?? "",
               ),
             ],
           ),
@@ -68,7 +68,7 @@ class ApplicationBar extends ConsumerWidget {
 
   Widget mainSection(bool compact) {
     if (compact) {
-      return ApplicationBarMiddleMobile();
+      return Container();
     }
 
     return ApplicationBarMiddleDesktop();
@@ -80,15 +80,20 @@ class ApplicationBar extends ConsumerWidget {
     bool minimal = false,
     bool isAuthenticated = false,
     required WidgetRef ref,
-    String initials = '',
-    String avatarUrl = '',
+    String initials = "",
+    String avatarUrl = "",
   }) {
     if (isAuthenticated) {
+      final EdgeInsets margin = compact
+          ? const EdgeInsets.only(top: 5.0, right: 0.0)
+          : const EdgeInsets.only(top: 5.0, right: 30.0);
+
       return ApplicationBarAuthUser(
         compact: compact,
         avatarInitials: initials,
         avatarURL: avatarUrl,
         showSearch: minimal,
+        margin: margin,
         onSignOut: () => onSignOut(context, ref),
       );
     }
@@ -97,7 +102,7 @@ class ApplicationBar extends ConsumerWidget {
   }
 
   void onSignOut(BuildContext context, WidgetRef ref) async {
-    final user = ref.read(AppState.userProvider.notifier);
+    final UserNotifier user = ref.read(AppState.userProvider.notifier);
     await user.signOut();
     Beamer.of(context, root: true).beamToNamed(HomeLocation.route);
   }

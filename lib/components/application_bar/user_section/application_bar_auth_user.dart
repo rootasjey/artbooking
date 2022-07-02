@@ -10,13 +10,21 @@ class ApplicationBarAuthUser extends StatelessWidget {
     required this.onSignOut,
     this.compact = false,
     this.trailing = const [],
-    this.avatarInitials = '',
-    this.avatarURL = '',
+    this.avatarInitials = "",
+    this.avatarURL = "",
     this.showSearch = false,
+    this.margin = const EdgeInsets.only(top: 5.0, right: 30.0),
   }) : super(key: key);
 
+  /// If true, will show search icon button.
   final bool showSearch;
+
+  /// Will hide some elements if true.
   final bool compact;
+
+  final EdgeInsets margin;
+
+  /// List of widgets to display at the end of the row.
   final List<Widget> trailing;
 
   /// If set, this will take priority over [avatarInitials] property.
@@ -25,12 +33,13 @@ class ApplicationBarAuthUser extends StatelessWidget {
   /// Show initials letters if [avatarURL] is empty.
   final String avatarInitials;
 
+  /// Callback fired to disconnect the current authenticated user.
   final VoidCallback onSignOut;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 5.0, right: 10.0),
+      padding: margin,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -45,7 +54,6 @@ class ApplicationBarAuthUser extends StatelessWidget {
             avatarURL: avatarURL,
             padding: const EdgeInsets.only(
               left: 12.0,
-              right: 20.0,
             ),
           ),
         ],
