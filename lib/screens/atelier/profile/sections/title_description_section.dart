@@ -39,6 +39,7 @@ class TitleDescriptionSection extends StatelessWidget {
   final Section section;
 
   final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
+
   @override
   Widget build(BuildContext context) {
     final EdgeInsets outerPadding =
@@ -57,6 +58,8 @@ class TitleDescriptionSection extends StatelessWidget {
             color: Color(section.backgroundColor),
           );
 
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Padding(
       padding: outerPadding,
       child: Stack(
@@ -69,7 +72,7 @@ class TitleDescriptionSection extends StatelessWidget {
                 Flexible(
                   child: InkWell(
                     onTap: editMode ? onTapTitle : null,
-                    child: titleChild(context),
+                    child: titleWidget(context, isMobileSize),
                   ),
                 ),
               ],
@@ -81,7 +84,7 @@ class TitleDescriptionSection extends StatelessWidget {
     );
   }
 
-  Widget titleChild(BuildContext context) {
+  Widget titleWidget(BuildContext context, bool isMobileSize) {
     if (section.name.isEmpty && section.description.isEmpty) {
       return Center(
         child: Opacity(
@@ -135,13 +138,15 @@ class TitleDescriptionSection extends StatelessWidget {
           ),
         ),
         Container(
-          padding: EdgeInsets.zero,
-          width: width / 1.5,
+          padding: isMobileSize
+              ? const EdgeInsets.symmetric(horizontal: 8.0)
+              : EdgeInsets.zero,
+          width: isMobileSize ? width : width / 1.5,
           child: Text(
             section.description,
             overflow: TextOverflow.clip,
             style: Utilities.fonts.body(
-              fontSize: 64.0,
+              fontSize: isMobileSize ? 42.0 : 64.0,
               fontWeight: FontWeight.w200,
               color: Color(section.textColor),
             ),
