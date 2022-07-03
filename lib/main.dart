@@ -59,7 +59,6 @@ void main() async {
 
   windowManager.waitUntilReadyToShow(
     WindowOptions(
-      size: Size(1200, 1000),
       titleBarStyle: TitleBarStyle.hidden,
     ),
     () async {
