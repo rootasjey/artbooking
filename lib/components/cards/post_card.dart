@@ -62,12 +62,14 @@ class _PostCardState extends State<PostCard> {
   @override
   void initState() {
     super.initState();
-    _borderColor = widget.borderColor;
+    _borderColor = widget.borderColor == Colors.transparent
+        ? widget.borderColor
+        : widget.borderColor.withOpacity(0.6);
   }
 
   @override
   Widget build(BuildContext context) {
-    final post = widget.post;
+    final Post post = widget.post;
 
     return SizedBox(
       width: widget.width,
@@ -87,11 +89,15 @@ class _PostCardState extends State<PostCard> {
           onHover: (isHover) {
             setState(() {
               _elevation = isHover ? 4.0 : 2.0;
-              _borderColor = isHover
-                  ? widget.borderColor
-                  : widget.borderColor.withOpacity(0.6);
+
               _borderWidth = isHover ? 3.0 : 2.0;
               _textBgColor = isHover ? Colors.amber : Colors.transparent;
+
+              if (widget.borderColor != Colors.transparent) {
+                _borderColor = isHover
+                    ? widget.borderColor
+                    : widget.borderColor.withOpacity(0.6);
+              }
             });
           },
           child: Stack(
