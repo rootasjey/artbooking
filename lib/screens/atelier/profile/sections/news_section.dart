@@ -1,5 +1,3 @@
-// ignore: unused_import
-import 'package:artbooking/components/buttons/dark_text_button.dart';
 import 'package:artbooking/components/cards/create_post_card.dart';
 import 'package:artbooking/components/cards/post_card.dart';
 import 'package:artbooking/components/cards/shimmer_card.dart';
@@ -150,48 +148,72 @@ class _NewsSectionState extends State<NewsSection> {
             color: Color(widget.section.backgroundColor),
           );
 
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Padding(
       padding: outerPadding,
       child: Stack(
         children: [
           Container(
             decoration: boxDecoration,
-            padding: const EdgeInsets.only(
-              left: 64.0,
+            padding: EdgeInsets.only(
+              left: isMobileSize ? 0.0 : 64.0,
               right: 12.0,
               top: 24.0,
               bottom: 24.0,
             ),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 300.0,
-                  child: titleSectionWidget(),
-                ),
-                Container(
-                  padding: const EdgeInsets.only(right: 24.0, top: 32.0),
-                  height: 320.0,
-                  child: VerticalDivider(
-                    color: Constants.colors.tertiary,
-                    thickness: 4.0,
-                  ),
-                ),
-                Container(
-                  height: 336.0,
-                  padding: const EdgeInsets.only(top: 34.0),
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    itemExtent: 240.0,
-                    children: getChildren(),
-                  ),
-                ),
-              ],
-            ),
+            child: bodyWidget(isMobileSize),
           ),
           rightPopupMenuButton(),
         ],
       ),
+    );
+  }
+
+  Widget bodyWidget(bool isMobileSize) {
+    if (isMobileSize) {
+      return Column(
+        children: [
+          titleWidget(isMobileSize),
+          Container(
+            height: 336.0,
+            padding: const EdgeInsets.only(top: 34.0),
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              shrinkWrap: true,
+              itemExtent: 240.0,
+              children: getChildren(),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Row(
+      children: [
+        SizedBox(
+          width: 300.0,
+          child: titleWidget(isMobileSize),
+        ),
+        Container(
+          padding: const EdgeInsets.only(right: 24.0, top: 32.0),
+          height: 320.0,
+          child: VerticalDivider(
+            color: Constants.colors.tertiary,
+            thickness: 4.0,
+          ),
+        ),
+        Container(
+          height: 336.0,
+          padding: const EdgeInsets.only(top: 34.0),
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            shrinkWrap: true,
+            itemExtent: 240.0,
+            children: getChildren(),
+          ),
+        ),
+      ],
     );
   }
 
@@ -258,6 +280,7 @@ class _NewsSectionState extends State<NewsSection> {
           index: index,
           heroTag: heroTag,
           onTap: goToPostPage,
+          borderColor: Colors.transparent,
           popupMenuEntries: popupMenuEntries,
           onPopupMenuItemSelected: onPostItemSelected,
         ),
@@ -330,47 +353,46 @@ class _NewsSectionState extends State<NewsSection> {
     );
   }
 
-  Widget titleSectionWidget() {
-    final title = widget.section.name;
-    final description = widget.section.description;
+  Widget titleWidget(bool isMobileSize) {
+    final String title = widget.section.name;
+    final String description = widget.section.description;
 
     if (title.isEmpty && description.isEmpty) {
       return Container();
     }
 
-    return Column(
-      children: [
-        InkWell(
-          onTap: onTapTitleDescription,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (title.isNotEmpty)
-                Opacity(
-                  opacity: 0.9,
-                  child: Text(
-                    title,
-                    style: Utilities.fonts.body2(
-                      fontSize: 78.0,
-                      fontWeight: FontWeight.w800,
-                    ),
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0),
+      child: InkWell(
+        onTap: widget.editMode ? onTapTitleDescription : null,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (title.isNotEmpty)
+              Opacity(
+                opacity: 0.9,
+                child: Text(
+                  title,
+                  style: Utilities.fonts.body2(
+                    fontSize: isMobileSize ? 42.0 : 78.0,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
-              if (description.isNotEmpty)
-                Opacity(
-                  opacity: 0.4,
-                  child: Text(
-                    description,
-                    style: Utilities.fonts.body2(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w600,
-                    ),
+              ),
+            if (description.isNotEmpty)
+              Opacity(
+                opacity: 0.4,
+                child: Text(
+                  description,
+                  style: Utilities.fonts.body2(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
