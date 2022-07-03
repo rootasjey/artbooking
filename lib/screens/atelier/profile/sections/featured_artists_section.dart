@@ -130,6 +130,8 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
             color: Color(widget.section.backgroundColor),
           );
 
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Padding(
       padding: outerPadding,
       child: Stack(
@@ -143,7 +145,7 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
             child: Center(
               child: Column(
                 children: [
-                  titleSectionWidget(),
+                  titleWidget(isMobileSize),
                   maybeHelperText(),
                   SizedBox(
                     height: 200.0,
@@ -331,9 +333,9 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
     );
   }
 
-  Widget titleSectionWidget() {
-    final title = widget.section.name;
-    final description = widget.section.description;
+  Widget titleWidget(bool isMobileSize) {
+    final String title = widget.section.name;
+    final String description = widget.section.description;
 
     if (title.isEmpty && description.isEmpty) {
       return Container();
@@ -351,7 +353,7 @@ class _FeaturedArtistsSectionState extends State<FeaturedArtistsSection> {
                 child: Text(
                   title,
                   style: Utilities.fonts.title2(
-                    fontSize: 62.0,
+                    fontSize: isMobileSize ? 36.0 : 62.0,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
