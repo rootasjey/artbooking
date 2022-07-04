@@ -8,7 +8,7 @@ class ApplicationBarAuthUser extends StatelessWidget {
   const ApplicationBarAuthUser({
     Key? key,
     required this.onSignOut,
-    this.compact = false,
+    this.isMobileSize = false,
     this.trailing = const [],
     this.avatarInitials = "",
     this.avatarURL = "",
@@ -20,7 +20,7 @@ class ApplicationBarAuthUser extends StatelessWidget {
   final bool showSearch;
 
   /// Will hide some elements if true.
-  final bool compact;
+  final bool isMobileSize;
 
   final EdgeInsets margin;
 
@@ -45,10 +45,10 @@ class ApplicationBarAuthUser extends StatelessWidget {
         children: [
           if (showSearch) ApplicationBarSearchButton(),
           ApplicationBarUploadButton(),
-          if (!compact) ApplicationBarLangButton(),
+          if (!isMobileSize) ApplicationBarLangButton(),
           ...trailing,
           AvatarMenu(
-            compact: compact,
+            isMobileSize: isMobileSize,
             onSignOut: onSignOut,
             avatarInitials: avatarInitials,
             avatarURL: avatarURL,

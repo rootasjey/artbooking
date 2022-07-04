@@ -15,8 +15,12 @@ class ApplicationBar extends ConsumerWidget {
   ApplicationBar({
     this.padding = const EdgeInsets.only(top: 30.0),
     this.minimal = false,
+    this.showSearch = true,
   });
 
+  /// If true, will show a search button.
+  /// Otherwise, the search button will be hidden.
+  final bool showSearch;
   final EdgeInsets padding;
 
   /// If true, will only display right section with search, language, & avatar.
@@ -24,7 +28,7 @@ class ApplicationBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool compact = Utilities.size.isMobileSize(context);
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
 
     final User userProvider = ref.watch(AppState.userProvider);
     final UserNotifier userNotifier = ref.read(AppState.userProvider.notifier);
@@ -42,18 +46,19 @@ class ApplicationBar extends ConsumerWidget {
         automaticallyImplyLeading: false,
         title: Padding(
           padding: EdgeInsets.only(
-            left: compact ? 12.0 : 48.0,
+            top: 12.0,
+            left: isMobileSize ? 12.0 : 48.0,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               AppIcon(size: 32.0),
-              if (!minimal) mainSection(compact),
+              if (!minimal) mainSection(isMobileSize),
               userSection(
                 context,
                 ref: ref,
-                compact: compact,
+                isMobileSize: isMobileSize,
                 minimal: minimal,
                 isAuthenticated: userNotifier.isAuthenticated,
                 initials: initials,
@@ -76,23 +81,23 @@ class ApplicationBar extends ConsumerWidget {
 
   Widget userSection(
     BuildContext context, {
-    bool compact = false,
     bool minimal = false,
     bool isAuthenticated = false,
     required WidgetRef ref,
     String initials = "",
     String avatarUrl = "",
+    bool isMobileSize = false,
   }) {
     if (isAuthenticated) {
-      final EdgeInsets margin = compact
+      final EdgeInsets margin = isMobileSize
           ? const EdgeInsets.only(top: 5.0, right: 0.0)
           : const EdgeInsets.only(top: 5.0, right: 30.0);
 
       return ApplicationBarAuthUser(
-        compact: compact,
+        isMobileSize: isMobileSize,
         avatarInitials: initials,
         avatarURL: avatarUrl,
-        showSearch: minimal,
+        showSearch: showSearch,
         margin: margin,
         onSignOut: () => onSignOut(context, ref),
       );
