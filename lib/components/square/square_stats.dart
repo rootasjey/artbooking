@@ -1,5 +1,6 @@
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 /// A card showing a statistic number, title and icon.
@@ -11,10 +12,14 @@ class SquareStats extends StatefulWidget {
     this.onTap,
     required this.textTitle,
     this.borderColor,
+    this.compact = false,
   }) : super(key: key);
 
   /// Card border's color.
   final Color? borderColor;
+
+  /// If true, will reduce the default size of this square widget.
+  final bool compact;
 
   /// This number will be display as the main information.
   final int count;
@@ -47,11 +52,13 @@ class _SquareStatsState extends State<SquareStats> {
 
   @override
   Widget build(BuildContext context) {
+    final double size = widget.compact ? 160.0 : 220.0;
+
     return Opacity(
       opacity: widget.onTap == null ? 0.4 : 1.0,
       child: SizedBox(
-        width: 220.0,
-        height: 220.0,
+        width: size,
+        height: size,
         child: Card(
           color: Constants.colors.clairPink,
           elevation: getElevation(),
@@ -118,13 +125,16 @@ class _SquareStatsState extends State<SquareStats> {
         elevation: 0.0,
         color: Colors.black12,
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 8.0,
-            vertical: 8.0,
+          padding: EdgeInsets.symmetric(
+            horizontal: widget.compact ? 2.0 : 8.0,
+            vertical: widget.compact ? 2.0 : 8.0,
           ),
           child: Text(
-            "Available soon",
+            "available_soon".tr(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: Utilities.fonts.body(
+              fontSize: widget.compact ? 14.0 : 16.0,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -169,9 +179,11 @@ class _SquareStatsState extends State<SquareStats> {
       opacity: 0.7,
       child: Text(
         widget.textTitle,
+        maxLines: widget.compact ? 1 : 3,
+        overflow: TextOverflow.ellipsis,
         style: Utilities.fonts.body(
           color: _textColor,
-          fontSize: 20.0,
+          fontSize: widget.compact ? 14.0 : 20.0,
           fontWeight: FontWeight.w700,
         ),
       ),
