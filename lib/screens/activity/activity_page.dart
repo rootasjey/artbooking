@@ -67,24 +67,30 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
         userState.firestoreUser ?? UserFirestore.empty();
 
     final DateTime? createdAt = userFirestore.createdAt;
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
 
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
-          ApplicationBar(),
-          ActivityPageHeader(),
+          ApplicationBar(
+            hideSearch: isMobileSize,
+          ),
+          ActivityPageHeader(
+            isMobileSize: isMobileSize,
+          ),
           SliverList(
             delegate: SliverChildListDelegate.fixed([
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ActivityPageCategories(
+                    isMobileSize: isMobileSize,
                     dataList: getStatsCategories(),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(
-                      left: 50.0,
-                      right: 50.0,
+                    padding: EdgeInsets.only(
+                      left: isMobileSize ? 12.0 : 50.0,
+                      right: isMobileSize ? 12.0 : 50.0,
                       top: 60.0,
                       bottom: 200.0,
                     ),

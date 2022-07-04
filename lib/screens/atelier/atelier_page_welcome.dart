@@ -37,7 +37,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         slivers: <Widget>[
           ApplicationBar(
             minimal: true,
-            showSearch: !isMobileSize,
+            hideSearch: isMobileSize,
           ),
           header(isMobileSize),
           SliverList(

@@ -10,17 +10,18 @@ import 'package:artbooking/types/user/user.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:unicons/unicons.dart';
 
 class ApplicationBar extends ConsumerWidget {
   ApplicationBar({
     this.padding = const EdgeInsets.only(top: 30.0),
     this.minimal = false,
-    this.showSearch = true,
+    this.hideSearch = false,
   });
 
-  /// If true, will show a search button.
-  /// Otherwise, the search button will be hidden.
-  final bool showSearch;
+  /// If true, will hide a search button.
+  /// Otherwise, the search button will be displayed.
+  final bool hideSearch;
   final EdgeInsets padding;
 
   /// If true, will only display right section with search, language, & avatar.
@@ -47,13 +48,38 @@ class ApplicationBar extends ConsumerWidget {
         title: Padding(
           padding: EdgeInsets.only(
             top: 12.0,
-            left: isMobileSize ? 12.0 : 48.0,
+            left: isMobileSize ? 0.0 : 48.0,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
-              AppIcon(size: 32.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Container(
+                      height: 28.0,
+                      width: 28.0,
+                      decoration: BoxDecoration(
+                        border: Border.all(width: 2.0),
+                        borderRadius: BorderRadius.circular(24.0),
+                      ),
+                      clipBehavior: Clip.hardEdge,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(24.0),
+                        onTap: () => Utilities.navigation.back(context),
+                        child: Icon(
+                          UniconsLine.arrow_left,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                  AppIcon(size: 32.0),
+                ],
+              ),
               if (!minimal) mainSection(isMobileSize),
               userSection(
                 context,
@@ -97,7 +123,7 @@ class ApplicationBar extends ConsumerWidget {
         isMobileSize: isMobileSize,
         avatarInitials: initials,
         avatarURL: avatarUrl,
-        showSearch: showSearch,
+        hideSearch: hideSearch,
         margin: margin,
         onSignOut: () => onSignOut(context, ref),
       );

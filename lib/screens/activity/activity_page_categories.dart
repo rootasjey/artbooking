@@ -7,25 +7,29 @@ class ActivityPageCategories extends StatelessWidget {
   const ActivityPageCategories({
     Key? key,
     this.dataList = const [],
+    this.isMobileSize = false,
   }) : super(key: key);
 
+  /// If true, will adapt this widget for small screen (responsive).
+  final bool isMobileSize;
   final List<SquareStatsData> dataList;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-        left: 50.0,
-        right: 50.0,
+      padding: EdgeInsets.only(
+        left: isMobileSize ? 12.0 : 50.0,
+        right: isMobileSize ? 12.0 : 50.0,
         top: 20.0,
       ),
       child: Wrap(
-        spacing: 16.0,
-        runSpacing: 16.0,
+        spacing: isMobileSize ? 6.0 : 16.0,
+        runSpacing: isMobileSize ? 6.0 : 16.0,
         alignment: WrapAlignment.start,
         children: dataList.map((item) {
           return SquareStats(
             borderColor: item.borderColor,
+            compact: isMobileSize,
             count: item.count,
             textTitle: item.titleValue,
             onTap: item.routePath.isEmpty

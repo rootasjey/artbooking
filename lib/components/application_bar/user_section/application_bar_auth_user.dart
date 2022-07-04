@@ -12,12 +12,12 @@ class ApplicationBarAuthUser extends StatelessWidget {
     this.trailing = const [],
     this.avatarInitials = "",
     this.avatarURL = "",
-    this.showSearch = false,
+    this.hideSearch = false,
     this.margin = const EdgeInsets.only(top: 5.0, right: 30.0),
   }) : super(key: key);
 
   /// If true, will show search icon button.
-  final bool showSearch;
+  final bool hideSearch;
 
   /// Will hide some elements if true.
   final bool isMobileSize;
@@ -43,7 +43,7 @@ class ApplicationBarAuthUser extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          if (showSearch) ApplicationBarSearchButton(),
+          if (!hideSearch) ApplicationBarSearchButton(),
           ApplicationBarUploadButton(),
           if (!isMobileSize) ApplicationBarLangButton(),
           ...trailing,
