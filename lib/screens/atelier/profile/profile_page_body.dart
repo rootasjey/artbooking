@@ -153,7 +153,7 @@ class ProfilePageBody extends StatelessWidget {
 
     int index = 0;
 
-    for (var section in modularPage.sections) {
+    for (final Section section in modularPage.sections) {
       if (editMode && isOwner) {
         Color color = Colors.transparent;
         if (index < modularPage.sections.length) {

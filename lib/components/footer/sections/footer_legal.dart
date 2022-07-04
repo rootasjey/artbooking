@@ -7,11 +7,16 @@ import 'package:artbooking/router/locations/tos_location.dart';
 import 'package:artbooking/types/footer_link_data.dart';
 
 class FooterLegal extends StatelessWidget {
-  const FooterLegal({Key? key}) : super(key: key);
+  const FooterLegal({
+    Key? key,
+    this.useCard = false,
+  }) : super(key: key);
+
+  final bool useCard;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final Widget child = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         FooterColumn(
@@ -28,6 +33,15 @@ class FooterLegal extends StatelessWidget {
         ),
       ],
     );
+
+    if (useCard) {
+      return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: child,
+      );
+    }
+
+    return child;
   }
 
   List<FooterLinkData> getItems(BuildContext context) {

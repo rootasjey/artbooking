@@ -12,15 +12,15 @@ import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Footer extends ConsumerStatefulWidget {
-  final ScrollController? pageScrollController;
-  final bool closeModalOnNav;
-  final bool autoNavToHome;
-
   Footer({
     this.autoNavToHome = true,
     this.pageScrollController,
     this.closeModalOnNav = false,
   });
+
+  final ScrollController? pageScrollController;
+  final bool closeModalOnNav;
+  final bool autoNavToHome;
 
   @override
   _FooterState createState() => _FooterState();
@@ -30,11 +30,11 @@ class _FooterState extends ConsumerState<Footer> {
   @override
   Widget build(BuildContext context) {
     double horizontal = 60.0;
-    WrapAlignment alignment = WrapAlignment.spaceAround;
 
-    if (Utilities.size.isMobileSize(context)) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    if (isMobileSize) {
       horizontal = 12.0;
-      alignment = WrapAlignment.spaceBetween;
     }
 
     return Container(
@@ -46,20 +46,7 @@ class _FooterState extends ConsumerState<Footer> {
       child: Column(
         children: [
           AppIcon(size: 30.0),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 60.0),
-            child: Wrap(
-              runSpacing: 80.0,
-              spacing: 54.0,
-              alignment: alignment,
-              children: <Widget>[
-                FooterLegal(),
-                FooterArtworks(),
-                FooterUser(),
-                FooterAboutUs(),
-              ],
-            ),
-          ),
+          sectionsWidget(isMobileSize),
           Wrap(
             spacing: 24.0,
             children: [
@@ -82,6 +69,51 @@ class _FooterState extends ConsumerState<Footer> {
           FooterCompanyWatermark(
             padding: const EdgeInsets.only(top: 12.0),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget sectionsWidget(bool isMobileSize) {
+    final WrapAlignment alignment =
+        isMobileSize ? WrapAlignment.spaceBetween : WrapAlignment.spaceAround;
+
+    if (isMobileSize) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 60.0),
+        child: Wrap(
+          runSpacing: 12.0,
+          spacing: 12.0,
+          alignment: alignment,
+          crossAxisAlignment: WrapCrossAlignment.start,
+          children: <Widget>[
+            FooterLegal(),
+            FooterArtworks(),
+            FooterUser(),
+            FooterAboutUs(),
+          ]
+              .map(
+                (Widget child) => SizedBox(
+                  width: 180.0,
+                  child: child,
+                ),
+              )
+              .toList(),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 60.0),
+      child: Wrap(
+        runSpacing: 80.0,
+        spacing: 54.0,
+        alignment: alignment,
+        children: <Widget>[
+          FooterLegal(useCard: true),
+          FooterArtworks(),
+          FooterUser(),
+          FooterAboutUs(),
         ],
       ),
     );

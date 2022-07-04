@@ -6,7 +6,6 @@ import 'package:artbooking/screens/atelier/profile/popup_menu_button_section.dar
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/popup_item_section.dart';
 import 'package:artbooking/types/section.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -43,8 +42,15 @@ class FooterSection extends StatelessWidget {
   final Section section;
 
   final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
+
   @override
   Widget build(BuildContext context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    if (isMobileSize) {
+      return Container();
+    }
+
     final EdgeInsets outerPadding =
         usingAsDropTarget ? const EdgeInsets.all(4.0) : EdgeInsets.zero;
 
@@ -60,6 +66,25 @@ class FooterSection extends StatelessWidget {
         : BoxDecoration(
             color: Colors.transparent,
           );
+
+    final Widget footer = Footer();
+
+    // Mobile footer.
+    // The following code is commented
+    // as it's simpler to completely hide the footer.
+    // --------------
+    // if (isMobileSize) {
+    //   return Stack(
+    //     children: [
+    //       Container(
+    //         padding: outerPadding,
+    //         color: Color(section.backgroundColor),
+    //         child: footer,
+    //       ),
+    //       rightPopupMenuButton(context),
+    //     ],
+    //   );
+    // }
 
     return Stack(
       children: [
@@ -84,55 +109,13 @@ class FooterSection extends StatelessWidget {
               Container(
                 decoration: boxDecoration,
                 padding: const EdgeInsets.all(24.0),
-                child: Footer(),
+                child: footer,
               ),
             ],
           ),
         ),
         rightPopupMenuButton(context),
       ],
-    );
-  }
-
-  Widget textChild() {
-    if (section.name.isEmpty) {
-      return Center(
-        child: Opacity(
-          opacity: 0.6,
-          child: DottedBorder(
-            strokeWidth: 3.0,
-            borderType: BorderType.RRect,
-            radius: Radius.circular(4),
-            dashPattern: [8, 4],
-            child: ClipRRect(
-              borderRadius: BorderRadius.all(Radius.circular(4)),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24.0,
-                  vertical: 8.0,
-                ),
-                child: Text(
-                  "text_enter".tr(),
-                  style: Utilities.fonts.body(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    return Text(
-      section.name,
-      textAlign: TextAlign.center,
-      style: Utilities.fonts.body(
-        fontSize: 64.0,
-        fontWeight: FontWeight.w800,
-        color: Color(section.textColor),
-      ),
     );
   }
 
