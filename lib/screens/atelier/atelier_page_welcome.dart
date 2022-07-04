@@ -22,6 +22,7 @@ class AtelierPageWelcome extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final User userState = ref.watch(AppState.userProvider);
     final UserFirestore? userFirestore = userState.firestoreUser;
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
 
     String name = "Anonymous";
 
@@ -34,21 +35,30 @@ class AtelierPageWelcome extends ConsumerWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
-          ApplicationBar(minimal: true),
-          header(),
+          ApplicationBar(
+            minimal: true,
+            showSearch: !isMobileSize,
+          ),
+          header(isMobileSize),
           SliverList(
             delegate: SliverChildListDelegate.fixed([
               Padding(
-                padding: const EdgeInsets.only(left: 54.0),
+                padding: isMobileSize
+                    ? const EdgeInsets.symmetric(horizontal: 12.0)
+                    : const EdgeInsets.only(left: 54.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     greetings(
                       color: Theme.of(context).primaryColor,
                       name: name,
                     ),
                     navigationDescription(),
-                    sectionsList(context, userFirestore),
+                    sectionsList(
+                      context,
+                      userFirestore,
+                      isMobileSize,
+                    ),
                   ],
                 ),
               ),
@@ -59,14 +69,15 @@ class AtelierPageWelcome extends ConsumerWidget {
     );
   }
 
-  Widget header() {
+  Widget header(bool isMobileSize) {
     return SliverPadding(
-      padding: const EdgeInsets.only(
+      padding: EdgeInsets.only(
         top: 60.0,
-        left: 54.0,
-        bottom: 54.0,
+        left: isMobileSize ? 12.0 : 54.0,
+        bottom: isMobileSize ? 24 : 54.0,
       ),
       sliver: PageTitle(
+        isMobileSize: isMobileSize,
         titleValue: "atelier".tr(),
         subtitleValue: "atelier_greetings".tr(),
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,7 +141,11 @@ class AtelierPageWelcome extends ConsumerWidget {
     );
   }
 
-  Widget sectionsList(BuildContext context, UserFirestore? userFirestore) {
+  Widget sectionsList(
+    BuildContext context,
+    UserFirestore? userFirestore,
+    bool isMobileSize,
+  ) {
     int index = 0;
 
     bool canManageSections = false;
@@ -145,6 +160,7 @@ class AtelierPageWelcome extends ConsumerWidget {
 
     final List<Widget> children = [
       AtelierPageCard(
+        noSizeConstraints: true,
         hoverColor: Constants.colors.activity,
         iconData: UniconsLine.chart_pie,
         textTitle: "activity".tr(),
@@ -154,6 +170,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         },
       ),
       AtelierPageCard(
+        noSizeConstraints: true,
         hoverColor: Constants.colors.illustrations,
         iconData: UniconsLine.picture,
         textTitle: "illustrations".tr(),
@@ -163,6 +180,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         },
       ),
       AtelierPageCard(
+        noSizeConstraints: true,
         hoverColor: Constants.colors.books,
         iconData: UniconsLine.book_alt,
         textTitle: "books".tr(),
@@ -172,6 +190,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         },
       ),
       AtelierPageCard(
+        noSizeConstraints: true,
         hoverColor: Constants.colors.settings,
         iconData: UniconsLine.setting,
         textTitle: "settings".tr(),
@@ -181,6 +200,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         },
       ),
       AtelierPageCard(
+        noSizeConstraints: true,
         hoverColor: Constants.colors.profile,
         iconData: UniconsLine.user,
         textTitle: "profile".tr(),
@@ -190,6 +210,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         },
       ),
       AtelierPageCard(
+        noSizeConstraints: true,
         hoverColor: Constants.colors.likes,
         iconData: UniconsLine.heart,
         textTitle: "likes".tr(),
@@ -199,6 +220,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         },
       ),
       AtelierPageCard(
+        noSizeConstraints: true,
         hoverColor: Constants.colors.licenses,
         iconData: UniconsLine.document_info,
         textTitle: "licenses".tr(),
@@ -209,6 +231,7 @@ class AtelierPageWelcome extends ConsumerWidget {
       ),
       if (canManageReviews)
         AtelierPageCard(
+          noSizeConstraints: true,
           hoverColor: Constants.colors.review,
           iconData: UniconsLine.image_check,
           textTitle: "review".tr(),
@@ -219,6 +242,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         ),
       if (canManageSections)
         AtelierPageCard(
+          noSizeConstraints: true,
           hoverColor: Constants.colors.sections,
           iconData: UniconsLine.web_grid,
           textTitle: "sections".tr(),
@@ -229,6 +253,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         ),
       if (canManagePosts)
         AtelierPageCard(
+          noSizeConstraints: true,
           hoverColor: Constants.colors.sections,
           iconData: UniconsLine.file_edit_alt,
           textTitle: "posts".tr(),
@@ -238,6 +263,7 @@ class AtelierPageWelcome extends ConsumerWidget {
           },
         ),
       AtelierPageCard(
+        noSizeConstraints: true,
         hoverColor: Constants.colors.home,
         iconData: UniconsLine.home,
         textTitle: "home".tr(),
@@ -256,14 +282,27 @@ class AtelierPageWelcome extends ConsumerWidget {
       );
     }).toList();
 
+    if (isMobileSize) {
+      return Container(
+        // color: Colors.pink,
+        padding: const EdgeInsets.only(
+          top: 32.0,
+          bottom: 200.0,
+        ),
+        child: Column(
+          children: children,
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.only(
         top: 32.0,
         bottom: 200.0,
       ),
       child: Wrap(
-        spacing: 24.0,
-        runSpacing: 24.0,
+        spacing: isMobileSize ? 4.0 : 24.0,
+        runSpacing: isMobileSize ? 4.0 : 24.0,
         children: children,
       ),
     );

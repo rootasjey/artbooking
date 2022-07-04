@@ -11,13 +11,29 @@ class AtelierPageCard extends StatefulWidget {
     required String this.textSubtitle,
     this.compact = false,
     this.onTap,
+    this.noSizeConstraints = false,
   }) : super(key: key);
 
+  /// If true, this card won't have size constrains
+  /// (height = 116.0 and width = 200 || 300).
+  final bool noSizeConstraints;
+
+  /// If true, the card's width will be 200.0.
   final bool compact;
+
+  /// Icon's data which will be displayed before text.
   final IconData iconData;
+
+  /// Primary card's text.
   final String textTitle;
+
+  /// Secondary card's text.
   final String textSubtitle;
+
+  /// Icon will be of this color on hover.
   final Color hoverColor;
+
+  /// Callback fired when this card is tapped.
   final Function()? onTap;
 
   @override
@@ -25,45 +41,54 @@ class AtelierPageCard extends StatefulWidget {
 }
 
 class _AtelierPageCardState extends State<AtelierPageCard> {
+  /// Card's current elevation.
   double _elevation = 2.0;
+
+  /// Card's current icon color.
   Color? _iconColor;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: widget.compact ? 200.0 : 300.0,
-      height: 116.0,
-      child: Card(
-        elevation: _elevation,
-        color: Constants.colors.clairPink,
-        child: InkWell(
-          onTap: widget.onTap,
-          onHover: (isHover) {
-            if (isHover) {
-              setState(() {
-                _elevation = 4.0;
-                _iconColor = widget.hoverColor;
-              });
-              return;
-            }
-
+    final Widget card = Card(
+      elevation: _elevation,
+      color: Constants.colors.clairPink,
+      child: InkWell(
+        onTap: widget.onTap,
+        onHover: (isHover) {
+          if (isHover) {
             setState(() {
-              _elevation = 2.0;
-              _iconColor = null;
+              _elevation = 4.0;
+              _iconColor = widget.hoverColor;
             });
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                icon(),
-                texts(),
-              ],
-            ),
+            return;
+          }
+
+          setState(() {
+            _elevation = 2.0;
+            _iconColor = null;
+          });
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              icon(),
+              texts(),
+            ],
           ),
         ),
       ),
+    );
+
+    if (widget.noSizeConstraints) {
+      return card;
+    }
+
+    return Container(
+      width: widget.compact ? 200.0 : 300.0,
+      height: 116.0,
+      child: card,
     );
   }
 
