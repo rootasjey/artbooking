@@ -12,7 +12,11 @@ class PageTitle extends StatelessWidget {
     this.crossAxisAlignment = CrossAxisAlignment.start,
     this.padding = EdgeInsets.zero,
     this.renderSliver = true,
+    this.isMobileSize = false,
   }) : super(key: key);
+
+  /// True if this widget must adapt its size to small screen.
+  final bool isMobileSize;
 
   /// If true, render this Widget as a sliver box.
   final bool renderSliver;
@@ -45,6 +49,7 @@ class PageTitle extends StatelessWidget {
         child: Text(
           titleValue ?? "",
           style: Utilities.fonts.body(
+            height: isMobileSize ? 0.0 : null,
             fontSize: 30.0,
             fontWeight: FontWeight.w800,
           ),
@@ -52,7 +57,7 @@ class PageTitle extends StatelessWidget {
       );
     }
 
-    final child = Padding(
+    final Widget child = Padding(
       padding: padding,
       child: Column(
         crossAxisAlignment: crossAxisAlignment,
@@ -76,8 +81,11 @@ class PageTitle extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   titleWidget,
-                  SizedBox(
-                    width: 500.0,
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: isMobileSize ? double.infinity : 500.0,
+                      minWidth: isMobileSize ? 0.0 : 500.0,
+                    ),
                     child: Opacity(
                       opacity: 0.4,
                       child: Text(
