@@ -176,7 +176,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
                         ApplicationBar(),
                         IllustrationPageBody(
                           isOwner: isOwner,
-                          isLoading: _loading,
+                          loading: _loading,
                           heroTag: widget.heroTag,
                           updatingImage: _updatingImage,
                           illustration: _illustration,

@@ -1,4 +1,5 @@
 import 'package:artbooking/components/icons/animated_app_icon.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/illustrations/illustration_page_header.dart';
 import 'package:artbooking/screens/illustrations/illustration_poster.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
@@ -9,7 +10,7 @@ import 'package:flutter/material.dart';
 class IllustrationPageBody extends StatelessWidget {
   const IllustrationPageBody({
     Key? key,
-    required this.isLoading,
+    required this.loading,
     required this.illustration,
     this.isOwner = false,
     this.liked = false,
@@ -22,18 +23,34 @@ class IllustrationPageBody extends StatelessWidget {
     this.onTapUser,
   }) : super(key: key);
 
-  final bool isLoading;
+  /// True if the current authenticated user is the owner of this illustration.
   final bool isOwner;
+
+  /// True if the current authenticated user has liked this illustration.
   final bool liked;
+
+  /// True if this page is laoding.
+  final bool loading;
+
+  /// True if this illustration is being updated (new image upload).
   final bool updatingImage;
+
+  /// Callback fired when illustration is liked.
   final Function()? onLike;
+
+  /// Callback fired when illustration is shared.
   final Function()? onShare;
+
+  /// Callback fired to show edit panel for illustration's metadata.
   final Function()? onShowEditMetadataPanel;
+
+  /// Callback fired to edit image (crop, resize, ...).
   final Function()? onGoToEditImagePage;
 
-  /// Callback when tapping on this illustration's owner.
+  /// Callback fired when tapping on this illustration's owner.
   final void Function(UserFirestore)? onTapUser;
 
+  /// Main data. The view is based on this illustration.
   final Illustration illustration;
 
   /// Custom hero tag (if `illustration.id` default tag is not unique).
@@ -41,7 +58,7 @@ class IllustrationPageBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (loading) {
       return SliverPadding(
         padding: const EdgeInsets.only(top: 80.0),
         sliver: SliverList(
@@ -61,11 +78,16 @@ class IllustrationPageBody extends StatelessWidget {
       );
     }
 
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    final double left = isMobileSize ? 0.0 : 60.0;
+    final double right = isMobileSize ? 0.0 : 60.0;
+
     return SliverPadding(
-      padding: const EdgeInsets.only(
+      padding: EdgeInsets.only(
         top: 60.0,
-        left: 60.0,
-        right: 60.0,
+        left: left,
+        right: right,
         bottom: 120.0,
       ),
       sliver: SliverList(

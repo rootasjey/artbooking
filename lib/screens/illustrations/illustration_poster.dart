@@ -28,13 +28,15 @@ class IllustrationPoster extends StatefulWidget {
     this.heroTag = "",
   }) : super(key: key);
 
+  /// True if the current authenticated user is the owner of this illustration.
+  final bool isOwner;
+
+  /// True if the current authenticated user has liked this illustration.
+  final bool liked;
+
   /// True if the image is being updated
   /// after a transformation (crop, rotate, flip).
   final bool updatingImage;
-
-  final bool liked;
-
-  final bool isOwner;
 
   /// Edit metadata (title, description, license, ...).
   final Function()? onShowEditMetadataPanel;
@@ -83,9 +85,14 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
 
   @override
   Widget build(BuildContext context) {
-    final illustration = widget.illustration;
-    final windowSize = MediaQuery.of(context).size;
-    final double maxHeight = windowSize.height * 60 / 100;
+    final Illustration illustration = widget.illustration;
+    final Size windowSize = MediaQuery.of(context).size;
+    final bool isMobileSize =
+        windowSize.width < Utilities.size.mobileWidthTreshold;
+
+    final double maxHeight =
+        isMobileSize ? windowSize.width - 20.0 : windowSize.height * 60 / 100;
+
     final double maxWidth = illustration.dimensions.getRelativeWidth(
       maxHeight,
     );
@@ -95,10 +102,10 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
       fetchHighResImage();
     }
 
-    final heroTag =
+    final String heroTag =
         widget.heroTag.isNotEmpty ? widget.heroTag : illustration.id;
 
-    final onTapUserOrNull =
+    final void Function()? onTapUserOrNull =
         widget.onTapUser != null ? () => widget.onTapUser?.call(_user) : null;
 
     return Column(
