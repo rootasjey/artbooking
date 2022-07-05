@@ -217,7 +217,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
     final bool authenticated = authUserId.isNotEmpty;
 
-    final isMobileSize = Utilities.size.isMobileSize(context);
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
 
     return HeroControllerScope(
       controller: HeroController(),

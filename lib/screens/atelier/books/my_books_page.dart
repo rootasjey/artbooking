@@ -226,6 +226,8 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     final bool showPageDropDecoration =
         _isDraggingFile && !_isDraggingFileOverBook;
 
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Scaffold(
       floatingActionButton: MyBooksPageFab(
         scrollController: _scrollController,
@@ -265,6 +267,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                       slivers: <Widget>[
                         ApplicationBar(),
                         MyBooksPageHeader(
+                          isMobileSize: isMobileSize,
                           isOwner: isOwner,
                           multiSelectActive: _forceMultiSelect,
                           multiSelectedItems: _multiSelectedItems,
@@ -284,6 +287,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                           authenticated: authenticated,
                           books: _books,
                           forceMultiSelect: _forceMultiSelect,
+                          isMobileSize: isMobileSize,
                           isOwner: isOwner,
                           loading: _loading,
                           onLongPressBook: onLongPressBook,

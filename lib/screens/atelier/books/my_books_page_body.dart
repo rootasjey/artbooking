@@ -39,6 +39,7 @@ class MyBooksPageBody extends StatelessWidget {
     this.onDragFileEntered,
     this.onDragFileExited,
     this.onTapBookCaption,
+    this.isMobileSize = false,
   }) : super(key: key);
 
   /// If true, the current user is authenticated.
@@ -46,6 +47,9 @@ class MyBooksPageBody extends StatelessWidget {
 
   /// If true, the UI is in multi-select mode.
   final bool forceMultiSelect;
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   /// True if the current authenticated user is the owner of these books.
   final bool isOwner;
@@ -145,14 +149,15 @@ class MyBooksPageBody extends StatelessWidget {
       );
     }
 
-    final selectionMode = forceMultiSelect || multiSelectedItems.isNotEmpty;
+    final bool selectionMode =
+        forceMultiSelect || multiSelectedItems.isNotEmpty;
 
     return SliverPadding(
-      padding: const EdgeInsets.all(40.0),
+      padding: isMobileSize ? EdgeInsets.zero : const EdgeInsets.all(40.0),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          mainAxisExtent: 380.0,
-          maxCrossAxisExtent: 380.0,
+          mainAxisExtent: isMobileSize ? 161.0 : 380.0,
+          maxCrossAxisExtent: isMobileSize ? 220.0 : 380.0,
           mainAxisSpacing: 0.0,
           crossAxisSpacing: 0.0,
         ),
@@ -177,6 +182,8 @@ class MyBooksPageBody extends StatelessWidget {
               heroTag: book.id,
               index: index,
               key: ValueKey(book.id),
+              width: isMobileSize ? 220.0 : 400.0,
+              height: isMobileSize ? 161.0 : 342.0,
               canDropFile: isOwner,
               onDragFileDone: onDragFileDone,
               onDragFileEntered: onDragFileEntered,

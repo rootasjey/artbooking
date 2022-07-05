@@ -24,7 +24,11 @@ class MyBooksPageHeader extends StatelessWidget {
     this.onSelectAll,
     this.onTriggerMultiSelect,
     this.username = "",
+    this.isMobileSize = false,
   }) : super(key: key);
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   /// If true, show owner actions (e.g. create).
   /// Otherwise, hide actions and show username if provided.
@@ -79,16 +83,18 @@ class MyBooksPageHeader extends StatelessWidget {
     }
 
     return SliverPadding(
-      padding: const EdgeInsets.only(
-        top: 60.0,
-        left: 64.0,
+      padding: EdgeInsets.only(
+        top: isMobileSize ? 24.0 : 60.0,
+        left: isMobileSize ? 12.0 : 64.0,
         bottom: 24.0,
       ),
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
           PageTitle(
+            isMobileSize: isMobileSize,
             renderSliver: false,
             title: MyBooksPageTitle(
+              isMobileSize: isMobileSize,
               isOwner: isOwner,
               selectedTab: selectedTab,
               onChangedTab: onChangedTab,

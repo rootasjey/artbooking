@@ -45,6 +45,8 @@ class MyIllustrationsPageTitle extends StatelessWidget {
       return pageTitleWithTab(context);
     }
 
+    final double titleFontSize = isMobileSize ? 24.0 : 30.0;
+
     return Wrap(
       children: [
         InkWell(
@@ -65,7 +67,7 @@ class MyIllustrationsPageTitle extends StatelessWidget {
                 Text(
                   username,
                   style: Utilities.fonts.body(
-                    fontSize: 30.0,
+                    fontSize: titleFontSize,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -79,7 +81,7 @@ class MyIllustrationsPageTitle extends StatelessWidget {
             " > ",
             style: Utilities.fonts.body(
               color: Theme.of(context).secondaryHeaderColor,
-              fontSize: 30.0,
+              fontSize: titleFontSize,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -89,7 +91,7 @@ class MyIllustrationsPageTitle extends StatelessWidget {
           child: Text(
             "illustrations".tr(),
             style: Utilities.fonts.body(
-              fontSize: 30.0,
+              fontSize: titleFontSize,
               fontWeight: FontWeight.w800,
             ),
           ),

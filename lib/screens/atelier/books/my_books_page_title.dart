@@ -13,7 +13,11 @@ class MyBooksPageTitle extends StatelessWidget {
     this.onChangedTab,
     this.onGoToUserProfile,
     this.username = "",
+    this.isMobileSize = false,
   }) : super(key: key);
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   /// Show an additional dropdown button to select tab if true.
   final bool isOwner;
@@ -41,6 +45,8 @@ class MyBooksPageTitle extends StatelessWidget {
       return pageTitleWithTab(context);
     }
 
+    final double titleFontSize = isMobileSize ? 24.0 : 30.0;
+
     return Wrap(
       children: [
         InkWell(
@@ -61,7 +67,7 @@ class MyBooksPageTitle extends StatelessWidget {
                 Text(
                   username,
                   style: Utilities.fonts.body(
-                    fontSize: 30.0,
+                    fontSize: titleFontSize,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -75,7 +81,7 @@ class MyBooksPageTitle extends StatelessWidget {
             " > ",
             style: Utilities.fonts.body(
               color: Theme.of(context).secondaryHeaderColor,
-              fontSize: 30.0,
+              fontSize: titleFontSize,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -85,7 +91,7 @@ class MyBooksPageTitle extends StatelessWidget {
           child: Text(
             "books".tr(),
             style: Utilities.fonts.body(
-              fontSize: 30.0,
+              fontSize: titleFontSize,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -138,6 +144,8 @@ class MyBooksPageTitle extends StatelessWidget {
   }
 
   Widget pageTitleWithTab(BuildContext context) {
+    final double titleFontSize = isMobileSize ? 24.0 : 30.0;
+
     return Wrap(
       children: [
         Opacity(
@@ -145,7 +153,7 @@ class MyBooksPageTitle extends StatelessWidget {
           child: Text(
             "books".tr(),
             style: Utilities.fonts.body(
-              fontSize: 30.0,
+              fontSize: titleFontSize,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -156,7 +164,7 @@ class MyBooksPageTitle extends StatelessWidget {
             " •",
             style: Utilities.fonts.body(
               color: Theme.of(context).secondaryHeaderColor,
-              fontSize: 30.0,
+              fontSize: titleFontSize,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -181,7 +189,7 @@ class MyBooksPageTitle extends StatelessWidget {
                   Text(
                     selectedTab.name,
                     style: Utilities.fonts.body(
-                      fontSize: 30.0,
+                      fontSize: titleFontSize,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
