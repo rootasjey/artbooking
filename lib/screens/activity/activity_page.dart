@@ -72,9 +72,7 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
-          ApplicationBar(
-            hideSearch: isMobileSize,
-          ),
+          ApplicationBar(),
           ActivityPageHeader(
             isMobileSize: isMobileSize,
           ),

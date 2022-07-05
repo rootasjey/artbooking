@@ -8,7 +8,13 @@ import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:unicons/unicons.dart';
 
 class HomeMobilePage extends StatefulWidget {
-  const HomeMobilePage({Key? key}) : super(key: key);
+  const HomeMobilePage({
+    Key? key,
+    this.initialTabIndex = 0,
+  }) : super(key: key);
+
+  /// Initial tab index.
+  final int initialTabIndex;
 
   @override
   State<HomeMobilePage> createState() => _HomeMobilePageState();
@@ -16,7 +22,7 @@ class HomeMobilePage extends StatefulWidget {
 
 class _HomeMobilePageState extends State<HomeMobilePage> {
   /// Bottom bar's current index.
-  int _barCurrentIndex = 0;
+  int _tabIndex = 0;
 
   final List<Widget> _bodies = [
     ModularPagePresenter(pageId: "home"),
@@ -25,15 +31,25 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _tabIndex = widget.initialTabIndex;
+
+    if (_tabIndex < 0 || _tabIndex > (_bodies.length - 1)) {
+      _tabIndex = 0;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _bodies[_barCurrentIndex],
+      body: _bodies[_tabIndex],
       bottomNavigationBar: Material(
         elevation: 6,
         child: SalomonBottomBar(
           margin: EdgeInsets.all(24.0),
-          currentIndex: _barCurrentIndex,
-          onTap: (int index) => setState(() => _barCurrentIndex = index),
+          currentIndex: _tabIndex,
+          onTap: (int index) => setState(() => _tabIndex = index),
           items: [
             SalomonBottomBarItem(
               icon: Icon(UniconsLine.estate),

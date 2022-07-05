@@ -67,7 +67,9 @@ class HomeLocation extends BeamLocation<BeamState> {
   List<BeamPage> buildPages(BuildContext context, BeamState state) {
     final BeamPage homeBeamPage = Utilities.size.isMobileSize(context)
         ? BeamPage(
-            child: HomeMobilePage(),
+            child: HomeMobilePage(
+              initialTabIndex: getInitialTabIndex(state.routeState),
+            ),
             key: ValueKey("/discover"),
             title: Utilities.ui.getPageTitle("home".tr()),
             type: BeamPageType.fadeTransition,
@@ -159,5 +161,15 @@ class HomeLocation extends BeamLocation<BeamState> {
           type: BeamPageType.fadeTransition,
         ),
     ];
+  }
+
+  int getInitialTabIndex(Object? routeState) {
+    if (routeState == null) {
+      return 0;
+    }
+
+    final mapState = routeState as Map<String, dynamic>;
+    final int initialTabIndex = mapState["initialTabIndex"] ?? 0;
+    return initialTabIndex;
   }
 }
