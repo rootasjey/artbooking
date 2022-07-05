@@ -1,3 +1,4 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
@@ -10,20 +11,12 @@ class NavigationUtilities {
   const NavigationUtilities();
 
   void back(BuildContext context, {bool isMobile = false}) {
-    final String? location = Beamer.of(context)
-        .beamingHistory
-        .last
-        .history
-        .last
-        .routeInformation
-        .location;
+    if (isMobile) {
+      final bool handled = handleMobileBack(context);
 
-    if (isMobile && location == AtelierLocationContent.activityRoute) {
-      Beamer.of(context, root: true)
-          .beamToNamed(HomeLocation.route, routeState: {
-        "initialTabIndex": 2,
-      });
-      return;
+      if (handled) {
+        return;
+      }
     }
 
     if (Beamer.of(context).canBeamBack) {
@@ -103,6 +96,36 @@ class NavigationUtilities {
     return HomeLocation.profileIllustrationRoute
         .replaceFirst(":userId", userId)
         .replaceFirst(":illustrationId", illustration.id);
+  }
+
+  bool handleMobileBack(BuildContext context) {
+    final String location = Beamer.of(context)
+            .beamingHistory
+            .last
+            .history
+            .last
+            .routeInformation
+            .location ??
+        "";
+
+    final bool containsAtelier = location.contains("atelier");
+    final List<String> locationParts = location.split("/");
+    final bool threeDepths = locationParts.length == 3;
+    if (!threeDepths) {
+      return false;
+    }
+
+    final bool atelierIsSecond = locationParts.elementAt(1) == "atelier";
+
+    if (containsAtelier && threeDepths && atelierIsSecond) {
+      Beamer.of(context, root: true)
+          .beamToNamed(HomeLocation.route, routeState: {
+        "initialTabIndex": 2,
+      });
+      return true;
+    }
+
+    return false;
   }
 
   /// Navigate from a profile page to a book page.
