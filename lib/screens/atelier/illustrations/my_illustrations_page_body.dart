@@ -33,6 +33,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
     this.onTapIllustration,
     this.uploadIllustration,
     this.unlikePopupMenuEntries = const [],
+    this.isMobileSize = false,
   }) : super(key: key);
 
   /// If true, the current user is authenticated.
@@ -40,6 +41,9 @@ class MyIllustrationsPageBody extends StatelessWidget {
 
   /// If true, the UI is in multi-select mode.
   final bool forceMultiSelect;
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   /// True if the current authenticated user is the owner of these books.
   final bool isOwner;
@@ -130,7 +134,8 @@ class MyIllustrationsPageBody extends StatelessWidget {
       );
     }
 
-    final selectionMode = forceMultiSelect || multiSelectedItems.isNotEmpty;
+    final bool selectionMode =
+        forceMultiSelect || multiSelectedItems.isNotEmpty;
 
     return SliverPadding(
       padding: getGridPadding(),
@@ -155,8 +160,9 @@ class MyIllustrationsPageBody extends StatelessWidget {
                         : likePopupMenuEntries;
 
             return IllustrationCard(
-              borderRadius: BorderRadius.circular(16.0),
+              borderRadius: BorderRadius.circular(isMobileSize ? 24.0 : 16.0),
               canDrag: isOwner,
+              elevation: 8.0,
               heroTag: illustration.id,
               illustration: illustration,
               index: index,
@@ -184,16 +190,16 @@ class MyIllustrationsPageBody extends StatelessWidget {
 
   EdgeInsets getGridPadding() {
     if (limitThreeInRow) {
-      return const EdgeInsets.symmetric(
-        horizontal: 120.0,
+      return EdgeInsets.symmetric(
+        horizontal: isMobileSize ? 12.0 : 120.0,
         vertical: 40.0,
       );
     }
 
-    return const EdgeInsets.only(
+    return EdgeInsets.only(
       top: 40.0,
-      left: 40.0,
-      right: 40.0,
+      left: isMobileSize ? 12.0 : 40.0,
+      right: isMobileSize ? 12.0 : 40.0,
       bottom: 100.0,
     );
   }
@@ -202,15 +208,15 @@ class MyIllustrationsPageBody extends StatelessWidget {
     if (limitThreeInRow) {
       return SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
-        mainAxisSpacing: 40.0,
-        crossAxisSpacing: 40.0,
+        mainAxisSpacing: isMobileSize ? 12.0 : 40.0,
+        crossAxisSpacing: isMobileSize ? 12.0 : 40.0,
       );
     }
 
     return SliverGridDelegateWithMaxCrossAxisExtent(
-      maxCrossAxisExtent: 300.0,
-      mainAxisSpacing: 20.0,
-      crossAxisSpacing: 20.0,
+      maxCrossAxisExtent: isMobileSize ? 100.0 : 300.0,
+      mainAxisSpacing: isMobileSize ? 8.0 : 20.0,
+      crossAxisSpacing: isMobileSize ? 8.0 : 20.0,
     );
   }
 }

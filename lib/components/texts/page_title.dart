@@ -5,8 +5,8 @@ import 'package:unicons/unicons.dart';
 class PageTitle extends StatelessWidget {
   const PageTitle({
     Key? key,
-    this.titleValue,
     required this.subtitleValue,
+    this.titleValue,
     this.showBackButton = false,
     this.title,
     this.crossAxisAlignment = CrossAxisAlignment.start,
@@ -77,27 +77,31 @@ class PageTitle extends StatelessWidget {
                     ),
                   ),
                 ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  titleWidget,
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: isMobileSize ? double.infinity : 500.0,
-                      minWidth: isMobileSize ? 0.0 : 500.0,
-                    ),
-                    child: Opacity(
-                      opacity: 0.4,
-                      child: Text(
-                        subtitleValue,
-                        style: Utilities.fonts.body(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w600,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleWidget,
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: isMobileSize ? double.infinity : 500.0,
+                        minWidth: isMobileSize ? 0.0 : 500.0,
+                      ),
+                      child: Opacity(
+                        opacity: 0.4,
+                        child: Text(
+                          subtitleValue,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: Utilities.fonts.body(
+                            fontSize: isMobileSize ? 14.0 : 16.0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

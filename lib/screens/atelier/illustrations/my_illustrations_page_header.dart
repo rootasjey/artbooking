@@ -30,7 +30,11 @@ class MyIllustrationsPageHeader extends StatelessWidget {
     this.isOwner = false,
     this.username = "",
     this.onGoToUserProfile,
+    this.isMobileSize = false,
   }) : super(key: key);
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   /// If true, show owner actions (e.g. create).
   /// Otherwise, hide actions and show username if provided.
@@ -87,16 +91,16 @@ class MyIllustrationsPageHeader extends StatelessWidget {
   final String username;
   @override
   Widget build(BuildContext context) {
-    EdgeInsets padding = const EdgeInsets.only(
-      top: 60.0,
-      left: 50.0,
+    EdgeInsets padding = EdgeInsets.only(
+      top: isMobileSize ? 24.0 : 60.0,
+      left: isMobileSize ? 12.0 : 50.0,
       bottom: 24.0,
     );
 
     if (limitThreeInRow) {
-      padding = const EdgeInsets.only(
-        top: 60.0,
-        left: 120.0,
+      padding = EdgeInsets.only(
+        top: isMobileSize ? 24.0 : 60.0,
+        left: isMobileSize ? 12.0 : 120.0,
         bottom: 24.0,
       );
     }
@@ -124,8 +128,10 @@ class MyIllustrationsPageHeader extends StatelessWidget {
               ),
             ),
           PageTitle(
+            isMobileSize: isMobileSize,
             renderSliver: false,
             title: MyIllustrationsPageTitle(
+              isMobileSize: isMobileSize,
               isOwner: isOwner,
               selectedTab: selectedTab,
               onChangedTab: onChangedTab,

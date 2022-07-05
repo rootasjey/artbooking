@@ -13,7 +13,11 @@ class MyIllustrationsPageTitle extends StatelessWidget {
     this.onChangedTab,
     this.onGoToUserProfile,
     this.username = "",
+    this.isMobileSize = false,
   }) : super(key: key);
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   /// Show an additional dropdown button to select tab if true.
   final bool isOwner;
@@ -95,6 +99,8 @@ class MyIllustrationsPageTitle extends StatelessWidget {
   }
 
   Widget pageTitleWithTab(BuildContext context) {
+    final double titleFontSize = isMobileSize ? 24.0 : 30.0;
+
     return Wrap(
       children: [
         Opacity(
@@ -102,7 +108,7 @@ class MyIllustrationsPageTitle extends StatelessWidget {
           child: Text(
             "illustrations".tr(),
             style: Utilities.fonts.body(
-              fontSize: 30.0,
+              fontSize: titleFontSize,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -113,7 +119,7 @@ class MyIllustrationsPageTitle extends StatelessWidget {
             " •",
             style: Utilities.fonts.body(
               color: Theme.of(context).secondaryHeaderColor,
-              fontSize: 30.0,
+              fontSize: titleFontSize,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -138,7 +144,7 @@ class MyIllustrationsPageTitle extends StatelessWidget {
                   Text(
                     selectedTab.name,
                     style: Utilities.fonts.body(
-                      fontSize: 30.0,
+                      fontSize: titleFontSize,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

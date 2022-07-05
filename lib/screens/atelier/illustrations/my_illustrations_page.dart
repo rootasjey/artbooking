@@ -217,6 +217,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
     final bool authenticated = authUserId.isNotEmpty;
 
+    final isMobileSize = Utilities.size.isMobileSize(context);
+
     return HeroControllerScope(
       controller: HeroController(),
       child: Scaffold(
@@ -259,6 +261,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                         slivers: <Widget>[
                           ApplicationBar(),
                           MyIllustrationsPageHeader(
+                            isMobileSize: isMobileSize,
                             isOwner: isOwner,
                             limitThreeInRow: _layoutThreeInRow,
                             multiSelectActive: _forceMultiSelect,
@@ -281,6 +284,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                             authenticated: authenticated,
                             forceMultiSelect: _forceMultiSelect,
                             illustrations: _illustrations,
+                            isMobileSize: isMobileSize,
                             isOwner: isOwner,
                             likePopupMenuEntries: _likePopupMenuEntries,
                             limitThreeInRow: _layoutThreeInRow,
