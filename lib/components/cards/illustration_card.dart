@@ -48,6 +48,7 @@ class IllustrationCard extends StatefulWidget {
     this.onDragStarted,
     this.onDraggableCanceled,
     this.borderRadius = BorderRadius.zero,
+    this.elevation = 3.0,
   }) : super(key: key);
 
   /// If true, the card can be dragged. Usually used to re-order items.
@@ -70,6 +71,9 @@ class IllustrationCard extends StatefulWidget {
   final bool useIconPlaceholder;
 
   final BorderRadiusGeometry borderRadius;
+
+  /// Card's elevation.
+  final double elevation;
 
   /// Card's size (width = height).
   final double size;
@@ -164,7 +168,7 @@ class _IllustrationCardState extends State<IllustrationCard>
 
   double _startElevation = 3.0;
   double _endElevation = 6.0;
-  double _elevation = 4.0;
+  double _elevation = 3.0;
 
   @override
   void initState() {
@@ -174,7 +178,12 @@ class _IllustrationCardState extends State<IllustrationCard>
     _scaleAnimation =
         0.6.tweenTo(1.0).animatedBy(_scaleController).curve(Curves.elasticOut);
 
-    setState(() => _elevation = _startElevation);
+    setState(() {
+      _startElevation = widget.elevation;
+      _endElevation = widget.elevation + 3.0;
+      _elevation = _startElevation;
+    });
+
     checkProperties();
   }
 
