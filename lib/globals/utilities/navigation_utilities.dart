@@ -9,7 +9,23 @@ import 'package:flutter/widgets.dart';
 class NavigationUtilities {
   const NavigationUtilities();
 
-  void back(BuildContext context) {
+  void back(BuildContext context, {bool isMobile = false}) {
+    final String? location = Beamer.of(context)
+        .beamingHistory
+        .last
+        .history
+        .last
+        .routeInformation
+        .location;
+
+    if (isMobile && location == AtelierLocationContent.activityRoute) {
+      Beamer.of(context, root: true)
+          .beamToNamed(HomeLocation.route, routeState: {
+        "initialTabIndex": 2,
+      });
+      return;
+    }
+
     if (Beamer.of(context).canBeamBack) {
       Beamer.of(context).beamBack();
       return;
@@ -29,7 +45,7 @@ class NavigationUtilities {
   }
 
   String getProfileToBookRoute(BuildContext context, Book book, String userId) {
-    final location = Beamer.of(context)
+    final String? location = Beamer.of(context)
         .beamingHistory
         .last
         .history
