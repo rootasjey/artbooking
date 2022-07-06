@@ -1,6 +1,7 @@
 import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/icons/animated_app_icon.dart';
+import 'package:artbooking/components/texts/outlined_text_field.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/settings/update_email/update_email_page_completed.dart';
@@ -22,18 +23,40 @@ class UpdateEmailPageBody extends StatelessWidget {
     this.onChangedInput,
     this.checking = false,
     required this.errorMessage,
+    this.isMobileSize = false,
   }) : super(key: key);
 
+  /// Email has been successfully updated if true.
   final bool completed;
+
+  /// Checking new email availability if true.
   final bool checking;
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
+
+  /// Currently updating with the new email if true.
   final bool updating;
+
+  /// Current authenticated user's email.
   final String currentEmail;
+
+  /// New email to replace the old one.
   final String newEmail;
+
+  /// Error about the new email.
   final String errorMessage;
+
+  /// Y axis to start entrance animation.
   final double beginY;
 
+  /// Callback to show tips about choosing a good email.
   final void Function(String)? onShowTipsDialog;
+
+  /// Callback fired when new email input has changed.
   final void Function(String)? onChangedInput;
+
+  /// Callback fired to udpate user's email.
   final void Function(String)? onTryUpdateEmail;
 
   @override
@@ -75,14 +98,15 @@ class UpdateEmailPageBody extends StatelessWidget {
     return SliverToBoxAdapter(
       child: Container(
         width: 400.0,
-        padding: const EdgeInsets.all(60.0),
+        padding: EdgeInsets.all(isMobileSize ? 12.0 : 60.0),
         child: Column(
           children: <Widget>[
             FadeInY(
               delay: 0.milliseconds,
               beginY: beginY,
               child: Padding(
-                padding: const EdgeInsets.only(
+                padding: EdgeInsets.only(
+                  top: isMobileSize ? 36.0 : 0.0,
                   bottom: 40.0,
                 ),
                 child: Card(
@@ -135,32 +159,17 @@ class UpdateEmailPageBody extends StatelessWidget {
               beginY: beginY,
               child: Container(
                 width: 390.0,
-                padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                padding: const EdgeInsets.symmetric(horizontal: 6.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    TextFormField(
+                    OutlinedTextField(
                       autofocus: true,
                       controller: _newEmailController,
                       textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        fillColor: Colors.white,
-                        focusColor: Constants.colors.clairPink,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 8.0,
-                        ),
-                        labelText: "email_new".tr(),
-                      ),
+                      label: "email_new".tr(),
                       keyboardType: TextInputType.emailAddress,
                       onChanged: onChangedInput,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "email_empty_forbidden".tr();
-                        }
-
-                        return null;
-                      },
                     ),
                     Opacity(
                       opacity: checking ? 1.0 : 0.0,
@@ -190,35 +199,20 @@ class UpdateEmailPageBody extends StatelessWidget {
               child: Container(
                 width: 390.0,
                 padding: EdgeInsets.only(
-                  top: 20.0,
+                  top: isMobileSize ? 0.0 : 20.0,
                   bottom: 60.0,
-                  left: 30.0,
-                  right: 30.0,
+                  left: 6.0,
+                  right: 6.0,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    TextFormField(
+                    OutlinedTextField(
                       controller: _currentPasswordController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        fillColor: Colors.white,
-                        focusColor: Constants.colors.clairPink,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 8.0,
-                        ),
-                        labelText: "password_current".tr(),
-                      ),
+                      label: "password_current".tr(),
                       obscureText: true,
-                      onFieldSubmitted: (passwordValue) {
+                      onSubmitted: (passwordValue) {
                         onTryUpdateEmail?.call(passwordValue);
-                      },
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "password_empty_forbidden".tr();
-                        }
-
-                        return null;
                       },
                     ),
                   ],

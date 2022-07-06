@@ -20,13 +20,23 @@ class UpdateEmailPage extends ConsumerStatefulWidget {
 }
 
 class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
+  /// Checking if the new email is available if true.
   bool _checkingEmail = false;
+
+  /// Try to update the user's email if true.
   bool _updating = false;
+
+  /// Email has been successfully updated if true.
   bool _completed = false;
 
-  String _newEmail = '';
-  String _errorMessage = '';
+  /// New email wanted.
+  String _newEmail = "";
 
+  /// Error about the new email.
+  String _errorMessage = "";
+
+  /// Schedule availability check of the new email.
+  /// Allow requests debounce.
   Timer? _emailTimer;
 
   @override
@@ -37,18 +47,22 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
     final String email =
-        ref.watch(AppState.userProvider).firestoreUser?.email ?? '';
+        ref.watch(AppState.userProvider).firestoreUser?.email ?? "";
 
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
           ApplicationBar(),
-          UpdateEmailPageHeader(),
+          UpdateEmailPageHeader(
+            isMobileSize: isMobileSize,
+          ),
           UpdateEmailPageBody(
             beginY: 10.0,
             completed: _completed,
             checking: _checkingEmail,
+            isMobileSize: isMobileSize,
             updating: _updating,
             errorMessage: _errorMessage,
             currentEmail: email,
@@ -116,7 +130,7 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
     _emailTimer = null;
 
     _emailTimer = Timer(1.seconds, () async {
-      final isAvailable =
+      final bool isAvailable =
           await (UsersActions.checkEmailAvailability(_newEmail));
 
       if (!isAvailable) {
@@ -130,7 +144,7 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
 
       setState(() {
         _checkingEmail = false;
-        _errorMessage = '';
+        _errorMessage = "";
       });
     });
   }
@@ -193,7 +207,7 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
               );
 
       if (!response.success) {
-        throw ErrorDescription(response.error?.message ?? '');
+        throw ErrorDescription(response.error?.message ?? "");
       }
 
       setState(() {
