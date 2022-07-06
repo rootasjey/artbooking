@@ -1,6 +1,7 @@
 import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/icons/animated_app_icon.dart';
+import 'package:artbooking/components/texts/outlined_text_field.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/settings/update_password/update_password_page_completed.dart';
@@ -17,12 +18,25 @@ class UpdatePasswordPageBody extends StatelessWidget {
     this.beginY = 0.0,
     this.onShowTipsDialog,
     this.onTryUpdatePassword,
+    this.isMobileSize = false,
   }) : super(key: key);
 
+  /// Password has been successfully updated if true.
   final bool completed;
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
+
+  /// Currently updating the current password if true.
   final bool updating;
+
+  /// Y axis to start entrance animation.
   final double beginY;
+
+  /// Callback to show tips about chossing a good password.
   final void Function()? onShowTipsDialog;
+
+  /// Callback fired to update password.
   final void Function(String, String)? onTryUpdatePassword;
 
   @override
@@ -66,7 +80,7 @@ class UpdatePasswordPageBody extends StatelessWidget {
               padding: EdgeInsets.only(
                 left: 25.0,
                 right: 25.0,
-                top: 80.0,
+                top: isMobileSize ? 36.0 : 80.0,
                 bottom: 40.0,
               ),
               width: 378.0,
@@ -100,32 +114,17 @@ class UpdatePasswordPageBody extends StatelessWidget {
             delay: 100.milliseconds,
             beginY: beginY,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               width: 400.0,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  TextFormField(
+                  OutlinedTextField(
                     autofocus: true,
                     controller: _currentPasswordController,
                     textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      fillColor: Colors.white,
-                      focusColor: Constants.colors.clairPink,
-                      labelText: "password_current".tr(),
-                      border: OutlineInputBorder(),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 8.0,
-                      ),
-                    ),
+                    label: "password_current".tr(),
                     obscureText: true,
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return "password_empty_forbidden".tr();
-                      }
-
-                      return null;
-                    },
                   ),
                 ],
               ),
@@ -136,42 +135,23 @@ class UpdatePasswordPageBody extends StatelessWidget {
             beginY: beginY,
             child: Container(
               width: 400.0,
-              padding: const EdgeInsets.only(
+              padding: EdgeInsets.only(
                 top: 20.0,
                 bottom: 60.0,
-                left: 40.0,
-                right: 40.0,
+                left: isMobileSize ? 16.0 : 40.0,
+                right: isMobileSize ? 16.0 : 40.0,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  TextFormField(
+                  OutlinedTextField(
                     controller: _newPasswordController,
-                    decoration: InputDecoration(
-                      fillColor: Colors.white,
-                      focusColor: Constants.colors.clairPink,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 8.0,
-                      ),
-                      labelText: "password_new".tr(),
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 2.0,
-                        ),
-                      ),
-                    ),
+                    label: "password_new".tr(),
                     obscureText: true,
-                    onFieldSubmitted: (value) => onTryUpdatePassword?.call(
+                    onSubmitted: (value) => onTryUpdatePassword?.call(
                       _currentPasswordController.text,
                       _newPasswordController.text,
                     ),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return "password_empty_forbidden".tr();
-                      }
-
-                      return null;
-                    },
                   ),
                 ],
               ),

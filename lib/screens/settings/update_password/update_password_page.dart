@@ -16,22 +16,53 @@ class UpdatePasswordPage extends ConsumerStatefulWidget {
 }
 
 class _UpdatePasswordPageState extends ConsumerState<UpdatePasswordPage> {
+  /// The password has been successfully updated if true.
   bool _completed = false;
+
+  /// The password is currently being updated if true.
   bool _updating = false;
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
           ApplicationBar(),
-          UpdatePasswordPageHeader(),
+          UpdatePasswordPageHeader(
+            isMobileSize: isMobileSize,
+          ),
           UpdatePasswordPageBody(
             beginY: 10.0,
+            isMobileSize: isMobileSize,
             updating: _updating,
             completed: _completed,
             onShowTipsDialog: onShowTipsDialog,
             onTryUpdatePassword: onTryUpdatePassword,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget bulletPoint({required String textValue}) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 15.0),
+      child: Row(
+        children: [
+          Utilities.fonts.coloredDot(),
+          Expanded(
+            child: Opacity(
+              opacity: 0.6,
+              child: Text(
+                textValue,
+                style: Utilities.fonts.body(
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -66,26 +97,29 @@ class _UpdatePasswordPageState extends ConsumerState<UpdatePasswordPage> {
           backgroundColor: Constants.colors.clairPink,
           title: Text(
             "password_tips".tr(),
-            style: Utilities.fonts.body(
-              fontSize: 14.0,
+            style: Utilities.fonts.title3(
+              fontSize: 16.0,
               fontWeight: FontWeight.w600,
             ),
           ),
           children: <Widget>[
             Divider(
               color: Theme.of(context).secondaryHeaderColor,
-              thickness: 1.0,
+              thickness: 2.0,
             ),
             Padding(
-              padding: const EdgeInsets.all(25.0),
+              padding: const EdgeInsets.only(
+                top: 10.0,
+                left: 25.0,
+                right: 25.0,
+                bottom: 25.0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text("password_tips_1".tr()),
-                  Padding(padding: const EdgeInsets.only(top: 15.0)),
-                  Text("password_tips_2".tr()),
-                  Padding(padding: const EdgeInsets.only(top: 15.0)),
-                  Text("password_tips_3".tr()),
+                  bulletPoint(textValue: "password_tips_1".tr()),
+                  bulletPoint(textValue: "password_tips_2".tr()),
+                  bulletPoint(textValue: "password_tips_3".tr()),
                 ],
               ),
             ),
