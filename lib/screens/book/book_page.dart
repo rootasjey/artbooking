@@ -1050,14 +1050,26 @@ class _MyBookPageState extends ConsumerState<BookPage> {
           children: [
             Row(
               children: [
-                Text("• "),
                 Opacity(
-                  opacity: 0.6,
+                  opacity: 0.3,
                   child: Text(
-                    createdAtStr,
+                    "• ",
                     style: Utilities.fonts.body(
+                      color: Theme.of(context).primaryColor,
                       fontSize: 16.0,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Opacity(
+                    opacity: 0.6,
+                    child: Text(
+                      createdAtStr.toLowerCase(),
+                      style: Utilities.fonts.body(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
@@ -1065,14 +1077,26 @@ class _MyBookPageState extends ConsumerState<BookPage> {
             ),
             Row(
               children: [
-                Text("• "),
                 Opacity(
-                  opacity: 0.6,
+                  opacity: 0.3,
                   child: Text(
-                    updatedAtStr,
+                    "• ",
                     style: Utilities.fonts.body(
+                      color: Theme.of(context).secondaryHeaderColor,
                       fontSize: 16.0,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Opacity(
+                    opacity: 0.6,
+                    child: Text(
+                      updatedAtStr.toLowerCase(),
+                      style: Utilities.fonts.body(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),

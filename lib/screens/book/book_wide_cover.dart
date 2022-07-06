@@ -231,6 +231,8 @@ class _BookWideCoverState extends State<BookWideCover> {
                   opacity: 0.8,
                   child: Text(
                     " ${widget.book.name} ",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: Utilities.fonts.body(
                       backgroundColor: Colors.black87,
                       color: Colors.white,
@@ -243,6 +245,8 @@ class _BookWideCoverState extends State<BookWideCover> {
                   opacity: 0.6,
                   child: Text(
                     " ${widget.book.description} ",
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: Utilities.fonts.body(
                       backgroundColor: Colors.black87,
                       color: Colors.white,
