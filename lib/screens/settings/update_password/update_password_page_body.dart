@@ -33,7 +33,7 @@ class UpdatePasswordPageBody extends StatelessWidget {
   /// Y axis to start entrance animation.
   final double beginY;
 
-  /// Callback to show tips about chossing a good password.
+  /// Callback to show tips about choosing a good password.
   final void Function()? onShowTipsDialog;
 
   /// Callback fired to update password.
@@ -78,8 +78,8 @@ class UpdatePasswordPageBody extends StatelessWidget {
             beginY: beginY,
             child: Container(
               padding: EdgeInsets.only(
-                left: 25.0,
-                right: 25.0,
+                left: isMobileSize ? 12.0 : 25.0,
+                right: isMobileSize ? 12.0 : 25.0,
                 top: isMobileSize ? 36.0 : 80.0,
                 bottom: 40.0,
               ),

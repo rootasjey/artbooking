@@ -18,20 +18,28 @@ class SettingsPageDeleteAccount extends ConsumerStatefulWidget {
 }
 
 class DeleteAccountPageState extends ConsumerState<SettingsPageDeleteAccount> {
+  /// Currently deleting the authenticated user's account if true.
   bool _deleting = false;
+
+  /// Last authenticated user's account has been successfully deleted if true;
   bool _completed = false;
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
           ApplicationBar(),
-          DeleteAccountPageHeader(),
+          DeleteAccountPageHeader(
+            isMobileSize: isMobileSize,
+          ),
           DeleteAccountPageBody(
             beginY: 10.0,
             completed: _completed,
             deleting: _deleting,
+            isMobileSize: isMobileSize,
             onShowTipsDialog: onShowTipsDialog,
             onTryDeleteAccount: onTryDeleteAccount,
           ),

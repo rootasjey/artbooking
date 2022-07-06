@@ -1,6 +1,7 @@
 import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/icons/animated_app_icon.dart';
+import 'package:artbooking/components/texts/outlined_text_field.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/settings/delete_account/delete_account_page_completed.dart';
@@ -17,14 +18,25 @@ class DeleteAccountPageBody extends StatelessWidget {
     this.beginY = 0.0,
     this.onShowTipsDialog,
     this.onTryDeleteAccount,
+    this.isMobileSize = false,
   }) : super(key: key);
 
+  /// Last authenticated user's account has been successfully deleted if true;
   final bool completed;
+
+  /// Currently deleting the authenticated user's account if true.
   final bool deleting;
 
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
+
+  /// Y axis to start entrance animation.
   final double beginY;
 
+  /// Callback which show a popup about the consequences of this deletion.
   final void Function()? onShowTipsDialog;
+
+  /// Callback fired to delete the last authenticated user's account.
   final void Function(String)? onTryDeleteAccount;
 
   @override
@@ -36,7 +48,7 @@ class DeleteAccountPageBody extends StatelessWidget {
     if (deleting) {
       return SliverToBoxAdapter(
         child: Container(
-          padding: const EdgeInsets.only(top: 100.0),
+          padding: EdgeInsets.only(top: isMobileSize ? 24.0 : 100.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -60,7 +72,7 @@ class DeleteAccountPageBody extends StatelessWidget {
 
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 40.0),
+        padding: EdgeInsets.symmetric(horizontal: isMobileSize ? 12.0 : 40.0),
         child: Column(
           children: <Widget>[
             FadeInY(
@@ -125,32 +137,20 @@ class DeleteAccountPageBody extends StatelessWidget {
             FadeInY(
               delay: 100.milliseconds,
               beginY: beginY,
-              child: SizedBox(
+              child: Container(
                 width: 340.0,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 4.0,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    TextFormField(
+                    OutlinedTextField(
                       autofocus: true,
                       obscureText: true,
                       controller: _currentPasswordController,
-                      decoration: InputDecoration(
-                        fillColor: Colors.white,
-                        focusColor: Constants.colors.clairPink,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 8.0,
-                        ),
-                        labelText: "password_enter".tr(),
-                        border: OutlineInputBorder(),
-                      ),
-                      onFieldSubmitted: onTryDeleteAccount,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "password_empty_forbidden".tr();
-                        }
-
-                        return null;
-                      },
+                      label: "password_enter".tr(),
+                      onSubmitted: onTryDeleteAccount,
                     ),
                   ],
                 ),
