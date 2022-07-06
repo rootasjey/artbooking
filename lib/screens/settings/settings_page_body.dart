@@ -41,9 +41,11 @@ class SettingsPageBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: 18.0,
-          vertical: isMobileSize ? 24.0 : 100.0,
+        padding: EdgeInsets.only(
+          top: 18.0,
+          left: isMobileSize ? 24.0 : 100.0,
+          right: isMobileSize ? 24.0 : 100.0,
+          bottom: 300.0,
         ),
         child: isMobileSize ? columnChild() : rowChild(),
       ),
