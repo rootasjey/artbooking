@@ -27,6 +27,7 @@ class BookPageBody extends StatelessWidget {
     this.onBrowseIllustrations,
     this.onDropIllustration,
     this.onDragUpdateBook,
+    this.isMobileSize = false,
   }) : super(key: key);
 
   /// Why a map and not just a list?
@@ -38,6 +39,9 @@ class BookPageBody extends StatelessWidget {
   final IllustrationMap illustrationMap;
 
   final List<BookIllustration> bookIllustrations;
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   /// True if the page is currently loading.
   final bool loading;
@@ -100,15 +104,17 @@ class BookPageBody extends StatelessWidget {
     final selectionMode = forceMultiSelect || multiSelectedItems.isNotEmpty;
 
     return SliverPadding(
-      padding: const EdgeInsets.all(40.0),
+      padding: isMobileSize
+          ? const EdgeInsets.all(12.0)
+          : const EdgeInsets.all(40.0),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 300.0,
-          mainAxisSpacing: 20.0,
-          crossAxisSpacing: 20.0,
+          maxCrossAxisExtent: isMobileSize ? 100.0 : 300.0,
+          mainAxisSpacing: isMobileSize ? 12.0 : 20.0,
+          crossAxisSpacing: isMobileSize ? 12.0 : 20.0,
         ),
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
+          (BuildContext context, int index) {
             final bookIllustration = bookIllustrations.elementAt(index);
             final key = Utilities.generateIllustrationKey(bookIllustration);
             final Illustration? illustration = illustrationMap[key];
@@ -124,7 +130,7 @@ class BookPageBody extends StatelessWidget {
                 );
 
             return IllustrationCard(
-              borderRadius: BorderRadius.circular(16.0),
+              borderRadius: BorderRadius.circular(isMobileSize ? 24.0 : 16.0),
               index: index,
               heroTag: key,
               illustration: illustration,

@@ -19,10 +19,14 @@ class BookPageActions extends StatelessWidget {
     this.visible = true,
     this.onUpdateVisibility,
     this.onShareBook,
+    this.isMobileSize = false,
   }) : super(key: key);
 
   /// Will activate multi-select if true.
   final bool forceMultiSelect;
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   /// If true, this widget is visible.
   final bool visible;
@@ -58,6 +62,7 @@ class BookPageActions extends StatelessWidget {
     }
 
     return Wrap(
+      alignment: isMobileSize ? WrapAlignment.center : WrapAlignment.start,
       spacing: 12.0,
       runSpacing: 12.0,
       children: [

@@ -13,7 +13,11 @@ class BookPageGroupActions extends StatelessWidget {
     this.onClearMultiSelect,
     this.onConfirmRemoveGroup,
     this.visible = false,
+    this.isMobileSize = false,
   }) : super(key: key);
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   final bool visible;
 
@@ -31,21 +35,42 @@ class BookPageGroupActions extends StatelessWidget {
       return Container();
     }
 
-    return Wrap(
-      spacing: 12.0,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        Opacity(
-          opacity: 0.6,
-          child: Text(
-            "multi_items_selected".tr(
-              args: [multiSelectedItems.length.toString()],
-            ),
-            style: TextStyle(
-              fontSize: 30.0,
+    final Widget selectedText = Opacity(
+      opacity: 0.6,
+      child: Text(
+        "multi_items_selected".tr(
+          args: [multiSelectedItems.length.toString()],
+        ),
+        style: TextStyle(
+          fontSize: isMobileSize ? 24.0 : 30.0,
+          fontWeight: isMobileSize ? FontWeight.w700 : FontWeight.w500,
+        ),
+      ),
+    );
+
+    if (isMobileSize) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          selectedText,
+          Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: Wrap(
+              spacing: 12.0,
+              runSpacing: 12.0,
+              children: buttonsWidget(),
             ),
           ),
-        ),
+        ],
+      );
+    }
+
+    return Wrap(
+      spacing: 12.0,
+      runSpacing: 12.0,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        selectedText,
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Container(
@@ -54,27 +79,33 @@ class BookPageGroupActions extends StatelessWidget {
             color: Colors.black12,
           ),
         ),
-        SquareButton(
-          child: Icon(UniconsLine.ban),
-          message: "clear_selection".tr(),
-          onTap: onClearMultiSelect,
-        ),
-        SquareButton(
-          child: Icon(UniconsLine.layers),
-          message: "select_all".tr(),
-          onTap: onMultiSelectAll,
-        ),
-        SquareButton(
-          child: Icon(UniconsLine.minus_circle),
-          message: "remove".tr(),
-          onTap: onConfirmRemoveGroup,
-        ),
-        SquareButton(
-          child: Icon(UniconsLine.book_medical),
-          message: "add_to_book".tr(),
-          onTap: onAddToBook,
-        ),
+        ...buttonsWidget(),
       ],
     );
+  }
+
+  List<Widget> buttonsWidget() {
+    return [
+      SquareButton(
+        child: Icon(UniconsLine.ban),
+        message: "clear_selection".tr(),
+        onTap: onClearMultiSelect,
+      ),
+      SquareButton(
+        child: Icon(UniconsLine.layers),
+        message: "select_all".tr(),
+        onTap: onMultiSelectAll,
+      ),
+      SquareButton(
+        child: Icon(UniconsLine.minus_circle),
+        message: "remove".tr(),
+        onTap: onConfirmRemoveGroup,
+      ),
+      SquareButton(
+        child: Icon(UniconsLine.book_medical),
+        message: "add_to_book".tr(),
+        onTap: onAddToBook,
+      ),
+    ];
   }
 }

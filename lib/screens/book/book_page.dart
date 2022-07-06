@@ -197,6 +197,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
     final bool authenticated = userId != null && userId.isNotEmpty;
     final bool isOwner = (_book.userId == userId) && _book.userId.isNotEmpty;
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
 
     return Scaffold(
       floatingActionButton: BookPageFab(
@@ -216,6 +217,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
                 BookPageHeader(
                   book: _book,
                   forceMultiSelect: _forceMultiSelect,
+                  isMobileSize: isMobileSize,
                   liked: _liked,
                   heroTag: widget.heroTag,
                   authenticated: authenticated,
@@ -237,8 +239,9 @@ class _MyBookPageState extends ConsumerState<BookPage> {
                   isOwner: isOwner,
                 ),
                 BookPageBody(
-                  loading: _loading,
                   hasError: _hasError,
+                  isMobileSize: isMobileSize,
+                  loading: _loading,
                   forceMultiSelect: _forceMultiSelect,
                   illustrationMap: _illustrationMap,
                   bookIllustrations: _book.illustrations,
