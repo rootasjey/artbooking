@@ -78,6 +78,27 @@ class FontsUtilities {
     );
   }
 
+  /// Return a colored dot aq a Widget.
+  /// Useful in bullet list or as a separator.
+  Widget coloredDot({
+    Color? color,
+    double opacity = 0.3,
+    double size = 16.0,
+    FontWeight weight = FontWeight.w800,
+  }) {
+    return Opacity(
+      opacity: opacity,
+      child: Text(
+        " • ",
+        style: body(
+          color: color,
+          fontSize: size,
+          fontWeight: weight,
+        ),
+      ),
+    );
+  }
+
   /// Primary title's font style.
   TextStyle title({
     FontWeight fontWeight = FontWeight.w400,
