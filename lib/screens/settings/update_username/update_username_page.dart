@@ -8,6 +8,7 @@ import 'package:artbooking/screens/settings/update_username/update_username_page
 import 'package:artbooking/screens/settings/update_username/update_username_page_header.dart';
 import 'package:artbooking/types/cloud_functions/cloud_functions_response.dart';
 import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flash/src/flash_helper.dart';
@@ -36,7 +37,9 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
 
   @override
   Widget build(BuildContext context) {
-    final firestoureUser = ref.watch(AppState.userProvider).firestoreUser;
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+    final UserFirestore? firestoureUser =
+        ref.watch(AppState.userProvider).firestoreUser;
     if (firestoureUser != null) {
       _username = firestoureUser.name;
     }
@@ -46,10 +49,13 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
         controller: _pageScrollController,
         slivers: <Widget>[
           ApplicationBar(),
-          UpdateUsernamePageHeader(),
+          UpdateUsernamePageHeader(
+            isMobileSize: isMobileSize,
+          ),
           UpdateUsernamePageBody(
             checking: _checkingName,
             completed: _completed,
+            isMobileSize: isMobileSize,
             onChanged: onChangedInput,
             updating: _updating,
             onShowTipsDialog: onShowTipsDialog,

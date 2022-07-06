@@ -32,6 +32,7 @@ class SettingsPageBodyLeft extends StatelessWidget {
     return SizedBox(
       width: 400.0,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 24.0),

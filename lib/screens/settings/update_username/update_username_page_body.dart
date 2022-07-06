@@ -1,5 +1,6 @@
 import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/components/icons/animated_app_icon.dart';
+import 'package:artbooking/components/texts/outlined_text_field.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/settings/update_username/update_username_page_complete.dart';
@@ -20,17 +21,39 @@ class UpdateUsernamePageBody extends StatelessWidget {
     this.completed = false,
     this.updating = false,
     required this.newUsername,
+    this.isMobileSize = false,
   }) : super(key: key);
 
-  final void Function()? onShowTipsDialog;
-  final void Function()? onTryUpdateUsername;
-  final void Function(String)? onChanged;
-  final String username;
-  final String newUsername;
-  final String nameErrorMessage;
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
+
+  /// If true, checking the new usernam availability.
   final bool checking;
+
+  /// If true, the username has successfully been updated.
   final bool completed;
+
+  /// Currently updating the username if true.
   final bool updating;
+
+  /// Callback fired to show tips on username.
+  final void Function()? onShowTipsDialog;
+
+  /// Callback fired to try to update the username.
+  final void Function()? onTryUpdateUsername;
+
+  /// Callback fired when the username value is updated.
+  /// The chnage will trigger username availability.
+  final void Function(String)? onChanged;
+
+  /// Current username value.
+  final String username;
+
+  /// New username value.
+  final String newUsername;
+
+  /// Error message about the new username.
+  final String nameErrorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +65,7 @@ class UpdateUsernamePageBody extends StatelessWidget {
       return SliverToBoxAdapter(
         child: Container(
           width: 400.0,
-          padding: const EdgeInsets.all(90.0),
+          padding: EdgeInsets.all(isMobileSize ? 12.0 : 90.0),
           child: Column(
             children: <Widget>[
               AnimatedAppIcon(),
@@ -69,7 +92,7 @@ class UpdateUsernamePageBody extends StatelessWidget {
 
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.all(90.0),
+        padding: EdgeInsets.all(isMobileSize ? 12.0 : 90.0),
         child: Column(
           children: [
             FadeInY(
@@ -138,18 +161,10 @@ class UpdateUsernamePageBody extends StatelessWidget {
                 ),
                 child: Column(
                   children: <Widget>[
-                    TextFormField(
+                    OutlinedTextField(
                       autofocus: true,
                       controller: _usernameController,
-                      decoration: InputDecoration(
-                        fillColor: Colors.white,
-                        focusColor: Constants.colors.clairPink,
-                        labelText: "username_new".tr(),
-                        border: OutlineInputBorder(),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 8.0,
-                        ),
-                      ),
+                      label: "username_new".tr(),
                       keyboardType: TextInputType.text,
                       onChanged: onChanged,
                     ),

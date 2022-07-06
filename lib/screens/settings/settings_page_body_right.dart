@@ -18,7 +18,11 @@ class SettingsPageBodyRight extends ConsumerWidget {
     this.onGoToUpdateEmail,
     this.onEditLocation,
     this.onEditBio,
+    this.isMobileSize = false,
   }) : super(key: key);
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   final UserFirestore userFirestore;
   final void Function()? onGoToDeleteAccount;
@@ -94,6 +98,14 @@ class SettingsPageBodyRight extends ConsumerWidget {
         child: child,
       );
     }).toList();
+
+    if (isMobileSize) {
+      return Wrap(
+        spacing: 12.0,
+        runSpacing: 12.0,
+        children: children,
+      );
+    }
 
     return Expanded(
       child: Wrap(

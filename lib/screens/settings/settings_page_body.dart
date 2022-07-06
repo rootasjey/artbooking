@@ -18,7 +18,11 @@ class SettingsPageBody extends StatelessWidget {
     this.onEditBio,
     this.onLinkChanged,
     this.profilePictureHeroTag = '',
+    this.isMobileSize = false,
   }) : super(key: key);
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   final UserFirestore userFirestore;
   final void Function()? onEditPicture;
@@ -37,33 +41,62 @@ class SettingsPageBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(
+        padding: EdgeInsets.symmetric(
           horizontal: 18.0,
-          vertical: 100.0,
+          vertical: isMobileSize ? 24.0 : 100.0,
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SettingsPageBodyLeft(
-              profilePictureHeroTag: profilePictureHeroTag,
-              profilePictureUrl: userFirestore.getProfilePicture(),
-              onEditPicture: onEditPicture,
-              onUploadPicture: onUploadPicture,
-              socialLinks: userFirestore.socialLinks,
-              onLinkChanged: onLinkChanged,
-            ),
-            SettingsPageBodyRight(
-              userFirestore: userFirestore,
-              onEditLocation: onEditLocation,
-              onEditBio: onEditBio,
-              onGoToDeleteAccount: onGoToDeleteAccount,
-              onGoToUpdateEmail: onGoToUpdateEmail,
-              onGoToUpdatePasssword: onGoToUpdatePasssword,
-              onGoToUpdateUsername: onGoToUpdateUsername,
-            ),
-          ],
-        ),
+        child: isMobileSize ? columnChild() : rowChild(),
       ),
+    );
+  }
+
+  Widget columnChild() {
+    return Column(
+      children: [
+        SettingsPageBodyLeft(
+          profilePictureHeroTag: profilePictureHeroTag,
+          profilePictureUrl: userFirestore.getProfilePicture(),
+          onEditPicture: onEditPicture,
+          onUploadPicture: onUploadPicture,
+          socialLinks: userFirestore.socialLinks,
+          onLinkChanged: onLinkChanged,
+        ),
+        SettingsPageBodyRight(
+          isMobileSize: isMobileSize,
+          userFirestore: userFirestore,
+          onEditLocation: onEditLocation,
+          onEditBio: onEditBio,
+          onGoToDeleteAccount: onGoToDeleteAccount,
+          onGoToUpdateEmail: onGoToUpdateEmail,
+          onGoToUpdatePasssword: onGoToUpdatePasssword,
+          onGoToUpdateUsername: onGoToUpdateUsername,
+        ),
+      ],
+    );
+  }
+
+  Widget rowChild() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SettingsPageBodyLeft(
+          profilePictureHeroTag: profilePictureHeroTag,
+          profilePictureUrl: userFirestore.getProfilePicture(),
+          onEditPicture: onEditPicture,
+          onUploadPicture: onUploadPicture,
+          socialLinks: userFirestore.socialLinks,
+          onLinkChanged: onLinkChanged,
+        ),
+        SettingsPageBodyRight(
+          userFirestore: userFirestore,
+          onEditLocation: onEditLocation,
+          onEditBio: onEditBio,
+          onGoToDeleteAccount: onGoToDeleteAccount,
+          onGoToUpdateEmail: onGoToUpdateEmail,
+          onGoToUpdatePasssword: onGoToUpdatePasssword,
+          onGoToUpdateUsername: onGoToUpdateUsername,
+        ),
+      ],
     );
   }
 }

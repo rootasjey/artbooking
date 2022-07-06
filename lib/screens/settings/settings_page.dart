@@ -11,6 +11,8 @@ import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/settings/settings_page_body.dart';
 import 'package:artbooking/screens/settings/settings_page_header.dart';
+import 'package:artbooking/types/user/user.dart';
+import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:artbooking/types/user/user_social_links.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -47,14 +49,16 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final userState = ref.watch(AppState.userProvider);
-    final userFirestore = userState.firestoreUser;
+    final User userState = ref.watch(AppState.userProvider);
+    final UserFirestore? userFirestore = userState.firestoreUser;
 
     if (userFirestore == null) {
       return SettingsPageEmpty(
         scrollController: _pageScrollController,
       );
     }
+
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
 
     return Scaffold(
       body: NotificationListener<ScrollNotification>(
@@ -64,8 +68,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               controller: _pageScrollController,
               slivers: <Widget>[
                 ApplicationBar(),
-                SettingsPageHeader(),
+                SettingsPageHeader(
+                  isMobileSize: isMobileSize,
+                ),
                 SettingsPageBody(
+                  isMobileSize: isMobileSize,
                   profilePictureHeroTag: heroTag,
                   userFirestore: userFirestore,
                   onEditLocation: onEditLocation,
