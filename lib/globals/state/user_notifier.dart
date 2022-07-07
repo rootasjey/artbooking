@@ -4,11 +4,12 @@ import 'package:artbooking/types/cloud_functions/cloud_functions_error.dart';
 import 'package:artbooking/types/cloud_functions/cloud_functions_response.dart';
 import 'package:artbooking/types/cloud_functions/create_account_response.dart';
 import 'package:artbooking/types/dialog_return_value.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/user/user.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
@@ -21,13 +22,9 @@ class UserNotifier extends StateNotifier<User> {
 
   Future<CloudFunctionsResponse> deleteAccount(String idToken) async {
     try {
-      final callable = FirebaseFunctions.instanceFor(
-        app: Firebase.app(),
-        region: 'europe-west3',
-      ).httpsCallable('users-deleteAccount');
-
-      final response = await callable.call({
-        'idToken': idToken,
+      final HttpsCallableResult response =
+          await Utilities.cloud.fun("users-deleteAccount").call({
+        "idToken": idToken,
       });
 
       signOut();
@@ -39,8 +36,8 @@ class UserNotifier extends StateNotifier<User> {
       return CloudFunctionsResponse(
         success: false,
         error: CloudFunctionsError(
-          code: exception.details['code'],
-          message: exception.details['message'],
+          code: exception.details["code"],
+          message: exception.details["message"],
         ),
       );
     } catch (error) {
@@ -49,7 +46,7 @@ class UserNotifier extends StateNotifier<User> {
       return CloudFunctionsResponse(
         success: false,
         error: CloudFunctionsError(
-          code: '',
+          code: "",
           message: error.toString(),
         ),
       );
@@ -58,10 +55,10 @@ class UserNotifier extends StateNotifier<User> {
 
   String getInitialsUsername() {
     final UserFirestore? firestoreUser = state.firestoreUser;
-    if (firestoreUser == null) return '';
+    if (firestoreUser == null) return "";
 
     final splittedUsernameArray = firestoreUser.name.split(' ');
-    if (splittedUsernameArray.isEmpty) return '';
+    if (splittedUsernameArray.isEmpty) return "";
 
     String initials = splittedUsernameArray.length > 1
         ? splittedUsernameArray.reduce(
@@ -75,7 +72,7 @@ class UserNotifier extends StateNotifier<User> {
     return initials;
   }
 
-  String getPPUrl({String orElse = ''}) {
+  String getPPUrl({String orElse = ""}) {
     final UserFirestore? firestoreUser = state.firestoreUser;
     if (firestoreUser == null) return orElse;
 
@@ -110,7 +107,7 @@ class UserNotifier extends StateNotifier<User> {
     }
 
     FirebaseFirestore.instance
-        .collection('users')
+        .collection("users")
         .doc(authUser.uid)
         .snapshots()
         .listen(
@@ -138,12 +135,12 @@ class UserNotifier extends StateNotifier<User> {
     Utilities.logger.e(error);
   }
 
-  void _onFirestoreData(DocumentSnapshot<Map<String, dynamic>> docSnap) {
-    final userData = docSnap.data();
+  void _onFirestoreData(DocumentSnapshotMap docSnap) {
+    final Json? userData = docSnap.data();
     if (userData == null) return;
 
-    userData.putIfAbsent('id', () => docSnap.id);
-    final firestoreUser = UserFirestore.fromMap(userData);
+    userData.putIfAbsent("id", () => docSnap.id);
+    final UserFirestore firestoreUser = UserFirestore.fromMap(userData);
 
     state = User(
       authUser: state.authUser,
@@ -164,7 +161,7 @@ class UserNotifier extends StateNotifier<User> {
 
   Future<firebase_auth.User?> signIn({String? email, String? password}) async {
     try {
-      final credentialsMap = Utilities.storage.getCredentials();
+      final Json credentialsMap = Utilities.storage.getCredentials();
 
       email = email ?? credentialsMap['email'];
       password = password ?? credentialsMap['password'];
@@ -231,7 +228,8 @@ class UserNotifier extends StateNotifier<User> {
     required username,
     required password,
   }) async {
-    final createAccountResponse = await UsersActions.createAccount(
+    final CreateAccountResponse createAccountResponse =
+        await UsersActions.createAccount(
       email: email,
       username: username,
       password: password,
@@ -262,16 +260,17 @@ class UserNotifier extends StateNotifier<User> {
       }
 
       final credentials = firebase_auth.EmailAuthProvider.credential(
-        email: authUser.email ?? '',
+        email: authUser.email ?? "",
         password: password,
       );
 
       await authUser.reauthenticateWithCredential(credentials);
-      final idToken = await authUser.getIdToken();
+      final String idToken = await authUser.getIdToken();
 
-      final response = await Utilities.cloud.fun('users-updateEmail').call({
-        'email': authUser.email,
-        'id_token': idToken,
+      final HttpsCallableResult response =
+          await Utilities.cloud.fun("users-updateEmail").call({
+        "email": authUser.email,
+        "id_token": idToken,
       });
 
       await signIn(email: authUser.email);
@@ -281,7 +280,7 @@ class UserNotifier extends StateNotifier<User> {
       return CloudFunctionsResponse(
         success: false,
         error: CloudFunctionsError(
-          code: '',
+          code: "",
           message: error.toString(),
         ),
       );
@@ -327,8 +326,8 @@ class UserNotifier extends StateNotifier<User> {
 
   Future<CloudFunctionsResponse> updateUsername(String newUsername) async {
     try {
-      final response = await Utilities.cloud.fun('users-updateUsername').call({
-        'username': newUsername,
+      final response = await Utilities.cloud.fun("users-updateUsername").call({
+        "username": newUsername,
       });
 
       return CloudFunctionsResponse.fromJSON(response.data);
@@ -336,7 +335,7 @@ class UserNotifier extends StateNotifier<User> {
       return CloudFunctionsResponse(
         success: false,
         error: CloudFunctionsError(
-          code: '',
+          code: "",
           message: error.toString(),
         ),
       );
