@@ -12,25 +12,42 @@ class LicensesPageBody extends StatelessWidget {
   const LicensesPageBody({
     Key? key,
     required this.licenses,
-    required this.isLoading,
+    required this.loading,
     this.onDeleteLicense,
     this.onEditLicense,
     this.onTap,
     this.onCreateLicense,
     required this.selectedTab,
+    this.isMobileSize = false,
   }) : super(key: key);
 
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
+
+  /// List of licenses (main data).
   final List<License> licenses;
-  final bool isLoading;
+
+  /// True if data is currently loading.
+  final bool loading;
+
+  /// Callback to confirm license deletion.
   final Function(License, int)? onDeleteLicense;
+
+  /// Callback to navigate to license edit page.
   final Function(License, int)? onEditLicense;
+
+  /// Callback to go to the license create page.
   final Function()? onCreateLicense;
+
+  /// Callback fired after license tap.
   final Function(License)? onTap;
+
+  /// Currently selected tab (staff or user).
   final EnumLicenseType selectedTab;
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (loading) {
       return LoadingView(
         sliver: true,
         title: Text(
@@ -45,8 +62,8 @@ class LicensesPageBody extends StatelessWidget {
 
     if (licenses.isEmpty) {
       return SliverPadding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 80.0,
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobileSize ? 12.0 : 80.0,
           vertical: 69.0,
         ),
         sliver: SliverList(
@@ -93,15 +110,15 @@ class LicensesPageBody extends StatelessWidget {
     }
 
     return SliverPadding(
-      padding: const EdgeInsets.only(
-        left: 34.0,
-        right: 30.0,
+      padding: EdgeInsets.only(
+        left: isMobileSize ? 0.0 : 34.0,
+        right: isMobileSize ? 0.0 : 30.0,
         bottom: 300.0,
       ),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            final license = licenses.elementAt(index);
+            final License license = licenses.elementAt(index);
 
             return LicenseCardItem(
               key: ValueKey(license.id),

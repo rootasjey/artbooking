@@ -88,6 +88,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
     final User user = ref.watch(AppState.userProvider);
     final bool canManageStaffLicense =
         user.firestoreUser?.rights.canManageLicenses ?? false;
@@ -99,17 +100,20 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
       floatingActionButton: LicensesPageFab(
         show: canManageLicense,
         onPressed: openNewLicenseDialog,
+        isMobileSize: isMobileSize,
       ),
       body: CustomScrollView(
         slivers: <Widget>[
           ApplicationBar(),
           LicensesPageHeader(
+            isMobileSize: isMobileSize,
             selectedTab: _selectedTab,
             onChangedTab: onChangedTab,
           ),
           LicensesPageBody(
+            isMobileSize: isMobileSize,
             licenses: _licenses,
-            isLoading: _loading,
+            loading: _loading,
             onTap: onTapLicense,
             selectedTab: _selectedTab,
             onDeleteLicense: canManageLicense ? onDeleteLicense : null,

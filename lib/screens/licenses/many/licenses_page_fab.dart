@@ -8,7 +8,11 @@ class LicensesPageFab extends StatelessWidget {
     required this.show,
     this.onPressed,
     this.tooltip,
+    this.isMobileSize = false,
   }) : super(key: key);
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   /// Doisplay the Floating Action Button if true.
   final bool show;
@@ -25,12 +29,21 @@ class LicensesPageFab extends StatelessWidget {
       return Container();
     }
 
+    if (isMobileSize) {
+      return FloatingActionButton(
+        onPressed: onPressed,
+        tooltip: tooltip,
+        child: Icon(UniconsLine.plus),
+        backgroundColor: Colors.black,
+      );
+    }
+
     return FloatingActionButton.extended(
       onPressed: onPressed,
       tooltip: tooltip,
       icon: Icon(UniconsLine.plus),
       label: Text("license_create".tr()),
-      backgroundColor: Theme.of(context).secondaryHeaderColor,
+      backgroundColor: Colors.black,
     );
   }
 }

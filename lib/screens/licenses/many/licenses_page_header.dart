@@ -9,17 +9,24 @@ class LicensesPageHeader extends StatelessWidget {
     Key? key,
     required this.selectedTab,
     this.onChangedTab,
+    this.isMobileSize = false,
   }) : super(key: key);
 
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
+
+  /// Currently selected tab (staff or user).
   final EnumLicenseType selectedTab;
+
+  /// Callback fired when changing tab.
   final Function(EnumLicenseType)? onChangedTab;
 
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.only(
-        top: 60.0,
-        left: 54.0,
+      padding: EdgeInsets.only(
+        top: isMobileSize ? 24.0 : 60.0,
+        left: isMobileSize ? 12.0 : 54.0,
         bottom: 24.0,
       ),
       sliver: SliverList(
@@ -29,7 +36,7 @@ class LicensesPageHeader extends StatelessWidget {
             child: Text(
               "licenses".tr(),
               style: Utilities.fonts.body(
-                fontSize: 30.0,
+                fontSize: isMobileSize ? 24.0 : 30.0,
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -39,7 +46,7 @@ class LicensesPageHeader extends StatelessWidget {
             child: Text(
               "license_tab_description".tr(),
               style: Utilities.fonts.body(
-                fontSize: 16.0,
+                fontSize: isMobileSize ? 14.0 : 16.0,
                 fontWeight: FontWeight.w600,
               ),
             ),
