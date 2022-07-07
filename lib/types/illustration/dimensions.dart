@@ -35,8 +35,8 @@ class Dimensions {
     }
 
     return Dimensions(
-      height: map['height']?.toInt() ?? 0,
-      width: map['width']?.toInt() ?? 0,
+      height: map["height"]?.toInt() ?? 0,
+      width: map["width"]?.toInt() ?? 0,
     );
   }
 

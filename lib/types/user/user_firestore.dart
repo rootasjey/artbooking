@@ -8,34 +8,59 @@ import 'package:artbooking/types/user/user_social_links.dart';
 class UserFirestore {
   const UserFirestore({
     required this.createdAt,
-    this.email = '',
     required this.id,
-    this.job = '',
-    this.location = '',
-    this.language = 'en',
-    this.name = '',
-    this.nameLowerCase = '',
     required this.profilePicture,
-    this.pricing = 'free',
     required this.rights,
     required this.socialLinks,
-    this.bio = '',
+    this.bio = "",
+    this.email = "",
+    this.job = "",
+    this.location = "",
+    this.language = 'en',
+    this.name = "",
+    this.nameLowerCase = "",
+    this.pricing = "free",
     this.updatedAt,
   });
 
+  /// When this account was created.
   final DateTime createdAt;
+
+  /// User's email.
   final String email;
+
+  /// Unique identifier.
   final String id;
+
+  /// What they do for a living?.
   final String job;
+
+  /// Default language.
   final String language;
+
+  /// Where they live?
   final String location;
+
+  /// User's name.
   final String name;
+
+  /// User's name in lower case to check unicity.
   final String nameLowerCase;
+
+  /// Profile picture.
   final ProfilePicture profilePicture;
   final String pricing;
+
+  /// Social links (e.g. Twitch, discord, instagram, ...).
   final UserSocialLinks socialLinks;
+
+  /// About this user.
   final String bio;
+
+  /// Last time this account was updated (any field update).
   final DateTime? updatedAt;
+
+  /// What this user can do?
   final UserRights rights;
 
   UserFirestore copyWith({
@@ -75,16 +100,16 @@ class UserFirestore {
   factory UserFirestore.empty() {
     return UserFirestore(
       createdAt: DateTime.now(),
-      email: 'anonymous@rootasjey.dev',
-      id: '',
-      job: 'Ghosting',
-      language: 'en',
-      location: 'Nowhere',
-      name: 'Anonymous',
-      nameLowerCase: 'anonymous',
+      email: "anonymous@rootasjey.dev",
+      id: "",
+      job: "Ghosting",
+      language: "en",
+      location: "Nowhere",
+      name: "Anonymous",
+      nameLowerCase: "anonymous",
       profilePicture: ProfilePicture.empty(),
-      pricing: 'free',
-      bio: 'An anonymous user ghosting decent people.',
+      pricing: "free",
+      bio: "An anonymous user ghosting decent people.",
       updatedAt: DateTime.now(),
       socialLinks: UserSocialLinks.empty(),
       rights: UserRights(),
@@ -97,20 +122,20 @@ class UserFirestore {
     }
 
     return UserFirestore(
-      bio: map['bio'] ?? '',
-      createdAt: Utilities.date.fromFirestore(map['created_at']),
-      email: map['email'] ?? '',
-      id: map['id'] ?? '',
-      job: map['job'] ?? '',
-      language: map['language'] ?? '',
-      location: map['location'] ?? '',
-      socialLinks: UserSocialLinks.fromMap(map['social_links']),
-      name: map['name'] ?? '',
-      nameLowerCase: map['name_lower_case'] ?? '',
-      profilePicture: ProfilePicture.fromMap(map['profile_picture']),
-      pricing: map['pricing'] ?? 'free',
-      updatedAt: Utilities.date.fromFirestore(map['updated_at']),
-      rights: UserRights.fromMap(map['rights']),
+      bio: map["bio"] ?? "",
+      createdAt: Utilities.date.fromFirestore(map["created_at"]),
+      email: map["email"] ?? "",
+      id: map["id"] ?? "",
+      job: map["job"] ?? "",
+      language: map["language"] ?? "",
+      location: map["location"] ?? "",
+      socialLinks: UserSocialLinks.fromMap(map["social_links"]),
+      name: map["name"] ?? "",
+      nameLowerCase: map["name_lower_case"] ?? "",
+      profilePicture: ProfilePicture.fromMap(map["profile_picture"]),
+      pricing: map["pricing"] ?? "free",
+      updatedAt: Utilities.date.fromFirestore(map["updated_at"]),
+      rights: UserRights.fromMap(map["rights"]),
     );
   }
 
@@ -120,20 +145,20 @@ class UserFirestore {
     Map<String, dynamic> map = Map();
 
     if (withAllFields) {
-      map['email'] = email;
-      map['name'] = name;
-      map['name_lower_case'] = nameLowerCase;
+      map["email"] = email;
+      map["name"] = name;
+      map["name_lower_case"] = nameLowerCase;
     }
 
-    map['bio'] = bio;
-    map['job'] = job;
-    map['language'] = language;
-    map['location'] = location;
-    map['social_links'] = socialLinks.toMap();
-    map['profile_picture'] = profilePicture.toMap();
-    map['pricing'] = pricing;
-    map['updated_at'] = DateTime.now().millisecondsSinceEpoch;
-    map['rights'] = rights.toMap();
+    map["bio"] = bio;
+    map["job"] = job;
+    map["language"] = language;
+    map["location"] = location;
+    map["social_links"] = socialLinks.toMap();
+    map["profile_picture"] = profilePicture.toMap();
+    map["pricing"] = pricing;
+    map["updated_at"] = DateTime.now().millisecondsSinceEpoch;
+    map["rights"] = rights.toMap();
 
     return map;
   }
@@ -143,12 +168,12 @@ class UserFirestore {
 
   @override
   String toString() {
-    return 'UserFirestore(createdAt: $createdAt, email: $email,'
-        ' id: $id, job: $job, language: $language, location: $location, '
-        'name: $name, nameLowerCase: $nameLowerCase, '
-        'profilePicture: $profilePicture, pricing: $pricing, '
-        'bio: $bio, '
-        'updatedAt: $updatedAt, socialLinks: $socialLinks, rights: $rights)';
+    return "UserFirestore(createdAt: $createdAt, email: $email,"
+        " id: $id, job: $job, language: $language, location: $location, "
+        "name: $name, nameLowerCase: $nameLowerCase, "
+        "profilePicture: $profilePicture, pricing: $pricing, "
+        "bio: $bio, "
+        "updatedAt: $updatedAt, socialLinks: $socialLinks, rights: $rights)";
   }
 
   @override
@@ -194,13 +219,13 @@ class UserFirestore {
   /// If [placeholder] is `true`, the method will return
   /// a default picture if the user hasn't set one.
   String getProfilePicture() {
-    final edited = profilePicture.links.edited;
+    final String edited = profilePicture.links.edited;
 
     if (edited.isNotEmpty) {
       return edited;
     }
 
-    final original = profilePicture.links.original;
+    final String original = profilePicture.links.original;
     return original;
   }
 }

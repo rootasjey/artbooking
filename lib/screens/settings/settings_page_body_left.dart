@@ -46,17 +46,19 @@ class SettingsPageBodyLeft extends StatelessWidget {
             ),
           ),
           DarkElevatedButton.icon(
+            elevation: 4.0,
             iconData: UniconsLine.edit,
             labelValue: "picture_edit".tr(),
             foreground: foregroundColor,
             onPressed: onEditPicture,
           ),
-          Padding(padding: const EdgeInsets.only(top: 16.0)),
           DarkElevatedButton.icon(
+            elevation: 4.0,
             iconData: UniconsLine.upload,
             labelValue: "picture_upload".tr(),
             foreground: foregroundColor,
             onPressed: onUploadPicture,
+            margin: const EdgeInsets.only(top: 16.0),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),

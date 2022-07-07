@@ -7,13 +7,13 @@ import 'package:artbooking/types/string_map.dart';
 
 class ProfilePicture {
   const ProfilePicture({
-    this.dimensions = const Dimensions(),
-    this.extension = '',
     required this.links,
     required this.path,
-    this.size = 0,
-    this.type = '',
     required this.updatedAt,
+    this.dimensions = const Dimensions(),
+    this.extension = "",
+    this.size = 0,
+    this.type = "",
   });
 
   static const List<String> _sampleAvatars = [
@@ -23,12 +23,20 @@ class ProfilePicture {
 
   final Dimensions dimensions;
 
-  /// Picture extension.
+  /// Picture extension (e.g. jpeg, png, ...).
   final String extension;
+
+  /// Firebase Storage thumbnail links
   final StringMap links;
+
+  /// Firebase Storage path.
   final StringMap path;
+
+  /// Size in octects.
   final int size;
   final String type;
+
+  /// Last time this profile picture was updated.
   final DateTime updatedAt;
 
   ProfilePicture copyWith({
@@ -49,17 +57,17 @@ class ProfilePicture {
 
   Map<String, dynamic> toMap() {
     return {
-      'extension': extension,
-      'links': links.toMap(),
-      'path': path.toMap(),
-      'size': size,
-      'updated_at': updatedAt.millisecondsSinceEpoch,
+      "extension": extension,
+      "links": links.toMap(),
+      "path": path.toMap(),
+      "size": size,
+      "updated_at": updatedAt.millisecondsSinceEpoch,
     };
   }
 
   factory ProfilePicture.empty() {
     return ProfilePicture(
-      extension: '',
+      extension: "",
       size: 0,
       updatedAt: DateTime.now(),
       path: StringMap.empty(),
@@ -76,7 +84,7 @@ class ProfilePicture {
       return ProfilePicture.empty();
     }
 
-    StringMap links = StringMap.fromMap(map['links']);
+    StringMap links = StringMap.fromMap(map["links"]);
 
     if (links.original.isEmpty) {
       links = StringMap(
@@ -87,13 +95,13 @@ class ProfilePicture {
     }
 
     return ProfilePicture(
-      dimensions: Dimensions.fromMap(map['dimensions']),
-      extension: map['extension'] ?? '',
+      dimensions: Dimensions.fromMap(map["dimensions"]),
+      extension: map["extension"] ?? "",
       links: links,
-      path: StringMap.fromMap(map['path']),
-      size: map['size']?.toInt() ?? 0,
-      type: map['type'] ?? '',
-      updatedAt: Utilities.date.fromFirestore(map['updated_at']),
+      path: StringMap.fromMap(map["path"]),
+      size: map["size"]?.toInt() ?? 0,
+      type: map["type"] ?? "dimensions",
+      updatedAt: Utilities.date.fromFirestore(map["updated_at"]),
     );
   }
 
@@ -104,8 +112,8 @@ class ProfilePicture {
 
   @override
   String toString() {
-    return 'ProfilePicture(extension: $extension, size: $size, '
-        'updatedAt: $updatedAt, path: $path, url: $links)';
+    return "ProfilePicture(extension: $extension, size: $size, "
+        "updatedAt: $updatedAt, path: $path, url: $links)";
   }
 
   @override
