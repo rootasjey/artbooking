@@ -10,7 +10,11 @@ class SheetHeader extends StatelessWidget {
     this.tooltip,
     this.bottom,
     this.heroTitleTag = "",
+    this.margin = EdgeInsets.zero,
   });
+
+  /// External space around this widget.
+  final EdgeInsets margin;
 
   /// Widget to show below subtitle if any.
   final Widget? bottom;
@@ -29,51 +33,54 @@ class SheetHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(right: 16.0),
-          child: CircleButton(
-            onTap: () => Utilities.navigation.back(context),
-            tooltip: tooltip,
-            icon: Icon(
-              UniconsLine.times,
-              size: 20.0,
-              color: Theme.of(context).primaryColor,
+    return Padding(
+      padding: margin,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: CircleButton(
+              onTap: () => Utilities.navigation.back(context),
+              tooltip: tooltip,
+              icon: Icon(
+                UniconsLine.times,
+                size: 20.0,
+                color: Theme.of(context).primaryColor,
+              ),
             ),
           ),
-        ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Hero(
-                tag: heroTitleTag,
-                child: Opacity(
-                  opacity: 0.4,
-                  child: Text(
-                    title,
-                    style: Utilities.fonts.body(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w600,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Hero(
+                  tag: heroTitleTag,
+                  child: Opacity(
+                    opacity: 0.4,
+                    child: Text(
+                      title,
+                      style: Utilities.fonts.body(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              if (subtitle != null)
-                Text(
-                  subtitle!,
-                  style: Utilities.fonts.body(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.w500,
+                if (subtitle != null)
+                  Text(
+                    subtitle!,
+                    style: Utilities.fonts.body(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-              if (bottom != null) bottom!,
-            ],
+                if (bottom != null) bottom!,
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
