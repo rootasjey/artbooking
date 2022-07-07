@@ -1,3 +1,4 @@
+import 'package:artbooking/components/buttons/circle_button.dart';
 import 'package:artbooking/components/icons/app_icon.dart';
 import 'package:artbooking/components/application_bar/middle_section/application_bar_middle_desktop.dart';
 import 'package:artbooking/components/application_bar/user_section/application_bar_auth_user.dart';
@@ -66,24 +67,11 @@ class ApplicationBar extends ConsumerWidget {
                   if (hasHistory)
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: Container(
-                        height: 28.0,
-                        width: 28.0,
-                        decoration: BoxDecoration(
-                          border: Border.all(width: 2.0),
-                          borderRadius: BorderRadius.circular(24.0),
-                        ),
-                        clipBehavior: Clip.hardEdge,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(24.0),
-                          onTap: () => Utilities.navigation.back(
-                            context,
-                            isMobile: isMobileSize,
-                          ),
-                          child: Icon(
-                            UniconsLine.arrow_left,
-                            color: Colors.black,
-                          ),
+                      child: CircleButton.outlined(
+                        onTap: () => Utilities.navigation.back(context),
+                        child: Icon(
+                          UniconsLine.arrow_left,
+                          color: Theme.of(context).textTheme.bodyText2?.color,
                         ),
                       ),
                     ),
