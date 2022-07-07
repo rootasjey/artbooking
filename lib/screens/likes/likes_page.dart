@@ -106,6 +106,8 @@ class _LikesPageState extends ConsumerState<LikesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Scaffold(
       floatingActionButton: LikesPageFab(
         show: _showFab,
@@ -116,10 +118,12 @@ class _LikesPageState extends ConsumerState<LikesPage> {
         slivers: <Widget>[
           ApplicationBar(),
           LikesPageHeader(
+            isMobileSize: isMobileSize,
             selectedTab: _selectedTab,
             onChangedTab: onChangedTab,
           ),
           LikesPageBody(
+            isMobileSize: isMobileSize,
             loading: _loading,
             books: _likedBooks,
             selectedTab: _selectedTab,

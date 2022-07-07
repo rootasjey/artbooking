@@ -9,17 +9,24 @@ class LikesPageHeader extends StatelessWidget {
     Key? key,
     required this.selectedTab,
     this.onChangedTab,
+    this.isMobileSize = false,
   }) : super(key: key);
 
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
+
+  /// Current tab selected (illustration or books).
   final EnumLikeType selectedTab;
+
+  /// Callback fired when changing tab.
   final Function(EnumLikeType)? onChangedTab;
 
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.only(
-        top: 60.0,
-        left: 54.0,
+      padding: EdgeInsets.only(
+        top: isMobileSize ? 24.0 : 60.0,
+        left: isMobileSize ? 12.0 : 54.0,
         bottom: 24.0,
       ),
       sliver: SliverList(

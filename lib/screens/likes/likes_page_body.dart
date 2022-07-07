@@ -26,25 +26,47 @@ class LikesPageBody extends StatelessWidget {
     this.onUnlikeBook,
     this.onUnlikeIllustration,
     this.onTapBrowse,
+    this.isMobileSize = false,
   }) : super(key: key);
 
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
+
+  /// The data is loading if true.
   final bool loading;
 
+  /// Current tab selected (illustration or books).
   final EnumLikeType selectedTab;
 
+  /// Illustrations data list.
   final List<Illustration> illustrations;
+
+  /// Books data list.
   final List<Book> books;
 
+  /// Popup entries for illustrations.
   final List<PopupMenuEntry<EnumIllustrationItemAction>>
       illustrationPopupMenuEntries;
+
+  /// Popup entries for books.
   final List<PopupMenuEntry<EnumBookItemAction>> bookPopupMenuEntries;
 
+  /// Callback fired on illustration tap.
   final void Function(Illustration)? onTapIllustration;
+
+  /// Callback fired on book tap.
   final void Function(Book)? onTapBook;
+
+  /// Callback fired when a book is removed from favourite.
   final void Function(Book, int)? onUnlikeBook;
+
+  /// Callback fired when an illustration is removed from favourite.
   final void Function(Illustration, int)? onUnlikeIllustration;
+
+  /// Callback to redirect user to books page if they favourites are empty.
   final void Function()? onTapBrowse;
 
+  /// Callback fired after selecting an item from an illustration popup menu.
   final void Function(
     EnumIllustrationItemAction,
     int,
@@ -52,6 +74,7 @@ class LikesPageBody extends StatelessWidget {
     String,
   )? onPopupMenuIllustrationSelected;
 
+  /// Callback fired after selecting an item from a book popup menu.
   final void Function(
     EnumBookItemAction,
     int,
@@ -75,6 +98,7 @@ class LikesPageBody extends StatelessWidget {
 
     final bool illustrationsEmpty =
         selectedTab == EnumLikeType.illustration && illustrations.isEmpty;
+
     final bool booksEmpty = selectedTab == EnumLikeType.book && books.isEmpty;
 
     if (illustrationsEmpty || booksEmpty) {
@@ -86,13 +110,15 @@ class LikesPageBody extends StatelessWidget {
 
     if (selectedTab == EnumLikeType.book) {
       return SliverPadding(
-        padding: const EdgeInsets.all(40.0),
+        padding: isMobileSize
+            ? const EdgeInsets.only(top: 40.0)
+            : const EdgeInsets.all(40.0),
         sliver: SliverGrid(
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            mainAxisExtent: 360.0,
-            maxCrossAxisExtent: 290.0,
-            mainAxisSpacing: 12.0,
-            crossAxisSpacing: 12.0,
+            mainAxisExtent: isMobileSize ? 161.0 : 360.0,
+            maxCrossAxisExtent: isMobileSize ? 220.0 : 290.0,
+            mainAxisSpacing: isMobileSize ? 0.0 : 12.0,
+            crossAxisSpacing: isMobileSize ? 0.0 : 12.0,
           ),
           delegate: SliverChildBuilderDelegate(
             (context, index) {
@@ -102,8 +128,8 @@ class LikesPageBody extends StatelessWidget {
                 book: book,
                 index: index,
                 heroTag: book.id,
-                width: 280.0,
-                height: 332.0,
+                width: isMobileSize ? 220.0 : 280.0,
+                height: isMobileSize ? 161.0 : 332.0,
                 onTap: () => onTapBook?.call(book),
                 onDoubleTap: () => onUnlikeBook?.call(book, index),
                 onLike: (_) => onUnlikeBook?.call(book, index),
@@ -118,10 +144,10 @@ class LikesPageBody extends StatelessWidget {
     }
 
     return SliverPadding(
-      padding: const EdgeInsets.only(
+      padding: EdgeInsets.only(
         top: 40.0,
-        left: 40.0,
-        right: 40.0,
+        left: isMobileSize ? 12.0 : 40.0,
+        right: isMobileSize ? 12.0 : 40.0,
         bottom: 100.0,
       ),
       sliver: SliverGrid(
@@ -132,7 +158,7 @@ class LikesPageBody extends StatelessWidget {
         ),
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            final illustration = illustrations.elementAt(index);
+            final Illustration illustration = illustrations.elementAt(index);
 
             return IllustrationCard(
               borderRadius: BorderRadius.circular(16.0),
