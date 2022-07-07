@@ -23,6 +23,7 @@ class EditItemSheetHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return SheetHeader(
       heroTitleTag: heroTitleTag,
+      margin: const EdgeInsets.only(left: 12.0, top: 24.0),
       subtitle: subtitleValue,
       title: titleValue,
       tooltip: "close".tr(),

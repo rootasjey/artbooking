@@ -54,6 +54,7 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
     final bool isLicenseIdEmpty = _license.id.isEmpty;
     final String licenseName = _license.name;
 
@@ -65,28 +66,35 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
         isLicenseIdEmpty ? "license_create".tr() : "license_edit_existing".tr();
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: Colors.black,
+        onPressed: tryCreateOrUpdateLicense,
+        label: Text(
+          isLicenseIdEmpty ? "create".tr() : "update".tr(),
+          style: Utilities.fonts.body(
+            fontSize: 16.0,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
       body: Stack(
         children: [
           SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(60.0),
+              padding: EdgeInsets.all(isMobileSize ? 0.0 : 60.0),
               child: Column(
                 children: [
                   EditItemSheetHeader(
                     heroTitleTag: _license.id,
                     titleValue: headerTitleValue,
                     subtitleValue: headerSubtitle,
-                    // itemId: _license.id,
-                    // itemName: _license.name,
-                    // subtitleCreate: "license_create".tr(),
-                    // subtitleEdit: "license_edit_existing".tr(),
                   ),
                   EditLicensePageBody(
+                    isMobileSize: isMobileSize,
                     license: _license,
-                    isLoading: _isLoading,
-                    isSaving: _isSaving,
+                    loading: _isLoading,
+                    saving: _isSaving,
                     isNewLicense: widget.licenseId.isEmpty,
-                    onValidate: tryCreateOrUpdateLicense,
                     onUsageValueChange: onUsageValueChanged,
                     onDescriptionChanged: onDescriptionChanged,
                     onTitleChanged: onTitleChanged,
@@ -102,8 +110,8 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
             child: PopupProgressIndicator(
               show: _isSaving,
               message: widget.licenseId.isEmpty
-                  ? '${"license_creating".tr()}...'
-                  : '${"license_updating".tr()}...',
+                  ? "${"license_creating".tr()}..."
+                  : "${"license_updating".tr()}...",
             ),
           ),
         ],

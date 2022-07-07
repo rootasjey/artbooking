@@ -1,4 +1,3 @@
-import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page_links.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page_usage.dart';
@@ -12,33 +11,47 @@ import 'package:flutter/material.dart';
 class EditLicensePageBody extends StatelessWidget {
   const EditLicensePageBody({
     Key? key,
-    required this.isLoading,
-    required this.isSaving,
+    required this.loading,
+    required this.saving,
     required this.isNewLicense,
     required this.license,
     this.onUsageValueChange,
-    this.onValidate,
     this.onTitleChanged,
     this.onDescriptionChanged,
     this.onLinkValueChange,
+    this.isMobileSize = false,
   }) : super(key: key);
 
-  final bool isLoading;
-  final bool isSaving;
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
+
+  /// Currently loading license data if true.
+  final bool loading;
+
+  /// Currently saving license data if true.
+  final bool saving;
 
   /// True if we create a new license. It's an update therwise.
   final bool isNewLicense;
+
+  /// Main page data.
   final License license;
 
+  /// Callback fired when selected usage is updated.
   final void Function(LicenseUsage)? onUsageValueChange;
+
+  /// Callback fired when license's link is updated.
   final void Function(LicenseLinks)? onLinkValueChange;
-  final void Function()? onValidate;
+
+  /// Callback fired when title is updated.
   final void Function(String)? onTitleChanged;
+
+  /// Callback fired when descriptionis updated.
   final void Function(String)? onDescriptionChanged;
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (loading) {
       return LoadingView(
         sliver: false,
         title: Padding(
@@ -52,7 +65,10 @@ class EditLicensePageBody extends StatelessWidget {
     }
 
     return Padding(
-      padding: EdgeInsets.only(top: 90.0),
+      padding: EdgeInsets.only(
+        top: isMobileSize ? 24.0 : 90.0,
+        bottom: 200.0,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -60,6 +76,7 @@ class EditLicensePageBody extends StatelessWidget {
             descriptionHintText: "license_description_sample".tr(),
             initialDescription: license.description,
             initialName: license.name,
+            isMobileSize: isMobileSize,
             titleHintText: "Attribution 4.0 International",
             onTitleChanged: onTitleChanged,
             onDescriptionChanged: onDescriptionChanged,
@@ -71,18 +88,6 @@ class EditLicensePageBody extends StatelessWidget {
           EditLicensePageLinks(
             links: license.links,
             onValueChange: onLinkValueChange,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, top: 80.0),
-            child: DarkElevatedButton.large(
-              onPressed: isSaving ? null : onValidate,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 64.0),
-                child: Text(
-                  isNewLicense ? "create".tr() : "update".tr(),
-                ),
-              ),
-            ),
           ),
         ],
       ),

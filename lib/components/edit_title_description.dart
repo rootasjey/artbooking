@@ -15,7 +15,11 @@ class EditTitleDescription extends StatefulWidget {
     this.initialDescription = "",
     this.descriptionHintText = "",
     this.titleHintText = "",
+    this.isMobileSize = false,
   }) : super(key: key);
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   /// Initial section's name.
   final String initialName;
@@ -64,7 +68,7 @@ class _EditTitleDescriptionState extends State<EditTitleDescription> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -88,8 +92,10 @@ class _EditTitleDescriptionState extends State<EditTitleDescription> {
               FadeInY(
                 beginY: 12.0,
                 delay: Duration(milliseconds: 50),
-                child: SizedBox(
-                  width: 300.0,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: widget.isMobileSize ? double.infinity : 300.0,
+                  ),
                   child: OutlinedTextField(
                     controller: _nameTextController,
                     onChanged: widget.onTitleChanged,
@@ -103,7 +109,11 @@ class _EditTitleDescriptionState extends State<EditTitleDescription> {
         Align(
           alignment: Alignment.topLeft,
           child: Padding(
-            padding: const EdgeInsets.only(top: 20.0, left: 12.0),
+            padding: const EdgeInsets.only(
+              top: 20.0,
+              left: 12.0,
+              right: 12.0,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,8 +138,10 @@ class _EditTitleDescriptionState extends State<EditTitleDescription> {
                 FadeInY(
                   beginY: 12.0,
                   delay: Duration(milliseconds: 125),
-                  child: SizedBox(
-                    width: 300.0,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: widget.isMobileSize ? double.infinity : 300.0,
+                    ),
                     child: OutlinedTextField(
                       hintText: widget.descriptionHintText,
                       controller: _descriptionTextController,
