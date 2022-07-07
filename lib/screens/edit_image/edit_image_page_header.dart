@@ -10,36 +10,39 @@ class EditImagePageHeader extends StatelessWidget {
     Key? key,
     required this.isProcessing,
     this.goToEditIllustrationMetada,
+    this.isMobileSize = false,
   }) : super(key: key);
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   final bool isProcessing;
   final void Function()? goToEditIllustrationMetada;
 
   @override
   Widget build(BuildContext context) {
+    final EdgeInsets padding =
+        isMobileSize ? const EdgeInsets.all(12.0) : const EdgeInsets.all(60.0);
+
     return Padding(
-      padding: const EdgeInsets.only(
-        top: 40.0,
-        left: 60.0,
-        bottom: 60.0,
-        right: 60.0,
-      ),
+      padding: padding,
       child: Column(
         children: [
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 24.0),
-                child: Opacity(
-                  opacity: 0.8,
-                  child: IconButton(
-                    tooltip: "back".tr(),
-                    onPressed: Beamer.of(context).popRoute,
-                    icon: Icon(UniconsLine.arrow_left),
+              if (!isMobileSize)
+                Padding(
+                  padding: const EdgeInsets.only(right: 24.0),
+                  child: Opacity(
+                    opacity: 0.8,
+                    child: IconButton(
+                      tooltip: "back".tr(),
+                      onPressed: Beamer.of(context).popRoute,
+                      icon: Icon(UniconsLine.arrow_left),
+                    ),
                   ),
                 ),
-              ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

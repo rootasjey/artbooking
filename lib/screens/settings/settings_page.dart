@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:animations/animations.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
@@ -23,6 +22,7 @@ import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mime_type/mime_type.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({
@@ -128,13 +128,16 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   void onGoToEditProfilePicture() {
-    final firestoreUser = ref.read(AppState.userProvider).firestoreUser;
+    final UserFirestore? firestoreUser =
+        ref.read(AppState.userProvider).firestoreUser;
+
     if (firestoreUser == null) {
       throw Exception("user_not_connected".tr());
     }
 
-    Navigator.of(context).push(
-      PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) {
+    showCupertinoModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
         return EditImagePage(
           heroTag: heroTag,
           onSave: onSaveEditedProfilePicture,
@@ -146,12 +149,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             cacheMaxAge: const Duration(seconds: 3),
           ),
         );
-      }, transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeScaleTransition(
-          animation: animation,
-          child: child,
-        );
-      }),
+      },
     );
   }
 

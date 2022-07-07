@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:artbooking/components/buttons/circle_button.dart';
 import 'package:artbooking/components/buttons/elevated_list_tile.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/edit_image/edit_image_page_header.dart';
@@ -16,10 +17,10 @@ import 'package:unicons/unicons.dart';
 class EditImagePage extends ConsumerStatefulWidget {
   const EditImagePage({
     Key? key,
+    required this.dimensions,
     required this.imageToEdit,
     this.onSave,
     this.useNativeLib = false,
-    required this.dimensions,
     this.heroTag = '',
     this.goToEditIllustrationMetada,
   }) : super(key: key);
@@ -38,6 +39,7 @@ class EditImagePage extends ConsumerStatefulWidget {
 }
 
 class _EditImagePageState extends ConsumerState<EditImagePage> {
+  /// If true, the image is being
   bool _isProcessing = false;
 
   final GlobalKey<ExtendedImageEditorState> _editorKey =
@@ -89,114 +91,199 @@ class _EditImagePageState extends ConsumerState<EditImagePage> {
 
   @override
   Widget build(BuildContext context) {
-    final double height = MediaQuery.of(context).size.height;
-    final double relativeHeight = height * 60 / 100;
-    final imageWidth = widget.dimensions.getRelativeWidth(relativeHeight);
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _isProcessing ? null : validateEdit,
-        label: Text("save".tr()),
-        extendedTextStyle: Utilities.fonts.body(
-          fontWeight: FontWeight.w700,
-        ),
-        icon: Icon(UniconsLine.save),
-        backgroundColor:
-            _isProcessing ? Colors.grey : Theme.of(context).primaryColor,
-        extendedPadding: EdgeInsetsDirectional.all(38.0),
-      ),
+      floatingActionButton: fab(isMobileSize: isMobileSize),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      EditImagePageHeader(
-                        isProcessing: _isProcessing,
-                        goToEditIllustrationMetada:
-                            widget.goToEditIllustrationMetada,
-                      ),
-                      Hero(
-                        tag: widget.heroTag,
-                        child: ExtendedImage(
-                          width: imageWidth,
-                          height: relativeHeight,
-                          image: widget.imageToEdit,
-                          fit: BoxFit.contain,
-                          mode: ExtendedImageMode.editor,
-                          extendedImageEditorKey: _editorKey,
-                          initEditorConfigHandler: (state) {
-                            return EditorConfig(
-                              maxScale: 8.0,
-                              cropRectPadding: const EdgeInsets.all(20.0),
-                              hitTestSize: 20.0,
-                            );
-                          },
-                        ),
-                      ),
-                    ],
+            child: Padding(
+              padding: const EdgeInsets.only(top: 24.0, left: 24.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircleButton.outlined(
+                    onTap: () => Navigator.pop(context),
+                    child: Icon(UniconsLine.times),
                   ),
-                ),
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: height,
-                    maxHeight: height,
-                    maxWidth: 300.0,
-                  ),
-                  child: Material(
-                    elevation: 6.0,
-                    color: Theme.of(context).backgroundColor,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(24.0),
-                          child: Center(
-                            child: Opacity(
-                              opacity: 0.6,
-                              child: Text(
-                                "panel_edit".tr().toUpperCase(),
-                                style: Utilities.fonts.body(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Divider(
-                          thickness: 2.0,
-                          height: 0.0,
-                        ),
-                        SizedBox(
-                          width: 300.0,
-                          height: height - 100.0,
-                          child: ListView.separated(
-                            itemBuilder: (context, index) {
-                              final buttonData =
-                                  _actionsDataList.elementAt(index);
-
-                              return ElevatedListTile(
-                                onTap: buttonData.onTap,
-                                leading: buttonData.icon,
-                                titleValue: buttonData.textValue,
-                              );
-                            },
-                            separatorBuilder: (context, index) => Divider(),
-                            itemCount: _actionsDataList.length,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
+                ],
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.only(bottom: 200.0),
+            sliver: SliverToBoxAdapter(
+              child: isMobileSize ? mobileBody(isMobileSize) : desktopBody(),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget desktopBody() {
+    final double height = MediaQuery.of(context).size.height;
+    final double relativeHeight = height * 60 / 100;
+    final double imageWidth = widget.dimensions.getRelativeWidth(
+      relativeHeight,
+    );
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            children: [
+              EditImagePageHeader(
+                isProcessing: _isProcessing,
+                goToEditIllustrationMetada: widget.goToEditIllustrationMetada,
+              ),
+              Hero(
+                tag: widget.heroTag,
+                child: ExtendedImage(
+                  width: imageWidth,
+                  height: relativeHeight,
+                  image: widget.imageToEdit,
+                  fit: BoxFit.contain,
+                  mode: ExtendedImageMode.editor,
+                  extendedImageEditorKey: _editorKey,
+                  initEditorConfigHandler: (state) {
+                    return EditorConfig(
+                      maxScale: 8.0,
+                      cropRectPadding: const EdgeInsets.all(20.0),
+                      hitTestSize: 20.0,
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: height,
+            maxHeight: height,
+            maxWidth: 300.0,
+          ),
+          child: Material(
+            elevation: 6.0,
+            color: Theme.of(context).backgroundColor,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Center(
+                    child: Opacity(
+                      opacity: 0.6,
+                      child: Text(
+                        "panel_edit".tr().toUpperCase(),
+                        style: Utilities.fonts.body(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Divider(
+                  thickness: 2.0,
+                  height: 0.0,
+                ),
+                SizedBox(
+                  width: 300.0,
+                  height: height - 100.0,
+                  child: ListView.separated(
+                    itemBuilder: (context, index) {
+                      final buttonData = _actionsDataList.elementAt(index);
+
+                      return ElevatedListTile(
+                        onTap: buttonData.onTap,
+                        leading: buttonData.icon,
+                        titleValue: buttonData.textValue,
+                      );
+                    },
+                    separatorBuilder: (context, index) => Divider(),
+                    itemCount: _actionsDataList.length,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget fab({bool isMobileSize = false}) {
+    final Color backgroundColor =
+        _isProcessing ? Colors.grey : Theme.of(context).primaryColor;
+
+    if (isMobileSize) {
+      return FloatingActionButton(
+        onPressed: _isProcessing ? null : validateEdit,
+        child: Icon(UniconsLine.save),
+        backgroundColor: backgroundColor,
+      );
+    }
+
+    return FloatingActionButton.extended(
+      onPressed: _isProcessing ? null : validateEdit,
+      label: Text("save".tr()),
+      extendedTextStyle: Utilities.fonts.body(
+        fontWeight: FontWeight.w700,
+      ),
+      icon: Icon(UniconsLine.save),
+      backgroundColor: backgroundColor,
+      extendedPadding: EdgeInsetsDirectional.all(38.0),
+    );
+  }
+
+  Widget mobileBody(bool isMobileSize) {
+    final double percent = isMobileSize ? 0.5 : 0.6;
+    final double height = MediaQuery.of(context).size.height;
+    final double relativeHeight = height * percent;
+    final double imageWidth = widget.dimensions.getRelativeWidth(
+      relativeHeight,
+    );
+
+    return Column(
+      children: [
+        EditImagePageHeader(
+          isMobileSize: isMobileSize,
+          isProcessing: _isProcessing,
+          goToEditIllustrationMetada: widget.goToEditIllustrationMetada,
+        ),
+        Hero(
+          tag: widget.heroTag,
+          child: ExtendedImage(
+            width: imageWidth,
+            height: relativeHeight,
+            image: widget.imageToEdit,
+            fit: BoxFit.contain,
+            mode: ExtendedImageMode.editor,
+            extendedImageEditorKey: _editorKey,
+            initEditorConfigHandler: (state) {
+              return EditorConfig(
+                maxScale: 8.0,
+                cropRectPadding: const EdgeInsets.all(20.0),
+                hitTestSize: 20.0,
+              );
+            },
+          ),
+        ),
+        Wrap(
+          spacing: 12.0,
+          runSpacing: 12.0,
+          children: _actionsDataList.map((final ButtonData buttonData) {
+            return IconButton(
+              tooltip: buttonData.textValue,
+              onPressed: buttonData.onTap,
+              icon: buttonData.icon,
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 
@@ -218,7 +305,7 @@ class _EditImagePageState extends ConsumerState<EditImagePage> {
           state: extendedImageEditorState,
         );
       } else {
-        // Because cropImageDataWithDartLibrary is time consuming
+        // Due to cropImageDataWithDartLibrary is time consuming
         // on main thread, it will block showBusyingDialog.
         // Use compute/isolate to avoid blocking UI, but it costs more time.
         // await Future.delayed(Duration(milliseconds: 200));
