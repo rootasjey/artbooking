@@ -1641,7 +1641,7 @@ async function setUserProfilePicture(objectMeta: functions.storage.ObjectMetadat
     .collection(USERS_COLLECTION_NAME)
     .doc(userId)
     .update({
-      profile_icture: {
+      profile_picture: {
         dimensions: {
           height: dimensions.height ?? 0,
           width: dimensions.width ?? 0,
