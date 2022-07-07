@@ -27,10 +27,13 @@ class CircleButton extends StatelessWidget {
   /// Widget content backrgound color.
   final Color backgroundColor;
 
+  /// This button's elevation. Shadow will be painted behind.
   final double elevation;
+
+  /// Spacing outside of this button.
   final EdgeInsets margin;
 
-  // final BorderSide borderSide;
+  /// If true, will paint a border around this button.
   final bool showBorder;
 
   @override
@@ -69,8 +72,27 @@ class CircleButton extends StatelessWidget {
     );
   }
 
+  static Widget outlined({
+    required final Function()? onTap,
+    required final Widget child,
+  }) {
+    return Container(
+      height: 28.0,
+      width: 28.0,
+      decoration: BoxDecoration(
+        border: Border.all(width: 2.0),
+        borderRadius: BorderRadius.circular(24.0),
+      ),
+      clipBehavior: Clip.hardEdge,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24.0),
+        onTap: onTap,
+        child: child,
+      ),
+    );
+  }
+
   static Widget withNoEvent({
-    final VoidCallback? onTap,
     required Icon icon,
     double radius = 20.0,
     double elevation = 0.0,
