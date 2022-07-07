@@ -11,13 +11,17 @@ import 'package:flutter/material.dart';
 class LicensePageBody extends StatelessWidget {
   const LicensePageBody({
     Key? key,
+    required this.canManageLicense,
     required this.license,
     required this.loading,
     this.deleting = false,
     this.onEditLicense,
     this.onDeleteLicense,
-    required this.canManageLicense,
+    this.isMobileSize = false,
   }) : super(key: key);
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   /// Fetching data on the license.
   final bool loading;
@@ -41,10 +45,10 @@ class LicensePageBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.only(
+      padding: EdgeInsets.only(
         top: 12.0,
-        left: 60.0,
-        right: 60.0,
+        left: isMobileSize ? 12.0 : 60.0,
+        right: isMobileSize ? 12.0 : 60.0,
         bottom: 260.0,
       ),
       sliver: loading || deleting ? loadingView() : idleView(),

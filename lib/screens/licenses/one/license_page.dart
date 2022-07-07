@@ -63,6 +63,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
     final User user = ref.watch(AppState.userProvider);
     final bool canManageLicense =
         user.firestoreUser?.rights.canManageLicenses ?? false;
@@ -72,8 +73,11 @@ class _LicensePageState extends ConsumerState<LicensePage> {
       body: CustomScrollView(
         slivers: [
           ApplicationBar(),
-          LicensePageHeader(),
+          LicensePageHeader(
+            isMobileSize: isMobileSize,
+          ),
           LicensePageBody(
+            isMobileSize: isMobileSize,
             loading: _loading,
             deleting: _deleting,
             license: _license,
@@ -104,7 +108,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
             fontSize: 18.0,
             fontWeight: FontWeight.w600,
           ),
-          backgroundColor: Theme.of(context).secondaryHeaderColor,
+          backgroundColor: Colors.black,
           extendedPadding: EdgeInsets.symmetric(
             horizontal: 20.0,
             vertical: 20.0,
