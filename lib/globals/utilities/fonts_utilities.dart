@@ -78,6 +78,24 @@ class FontsUtilities {
     );
   }
 
+  /// Secondary title's font style.
+  /// Eventually for blog post title.
+  TextStyle body4({
+    FontWeight fontWeight = FontWeight.w400,
+    double fontSize = 16.0,
+    double? height,
+    Color? color,
+    TextDecoration? decoration,
+  }) {
+    return GoogleFonts.raleway(
+      color: color,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      height: height,
+      decoration: decoration,
+    );
+  }
+
   /// Return a colored dot aq a Widget.
   /// Useful in bullet list or as a separator.
   Widget coloredDot({
