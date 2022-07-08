@@ -34,10 +34,14 @@ class EditLicensePage extends ConsumerStatefulWidget {
 }
 
 class _EditLicensePageState extends ConsumerState<EditLicensePage> {
-  bool _isSaving = false;
-  bool _isLoading = false;
+  /// True if the data is being loading.
+  bool _loading = false;
 
-  var _license = License.empty();
+  /// True if the data is being saved.
+  bool _saving = false;
+
+  /// Main page data.
+  License _license = License.empty();
 
   @override
   void initState() {
@@ -92,8 +96,8 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
                   EditLicensePageBody(
                     isMobileSize: isMobileSize,
                     license: _license,
-                    loading: _isLoading,
-                    saving: _isSaving,
+                    loading: _loading,
+                    saving: _saving,
                     isNewLicense: widget.licenseId.isEmpty,
                     onUsageValueChange: onUsageValueChanged,
                     onDescriptionChanged: onDescriptionChanged,
@@ -108,7 +112,7 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
             top: 40.0,
             right: 24.0,
             child: PopupProgressIndicator(
-              show: _isSaving,
+              show: _saving,
               message: widget.licenseId.isEmpty
                   ? "${"license_creating".tr()}..."
                   : "${"license_updating".tr()}...",
@@ -140,7 +144,7 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
       return;
     }
 
-    setState(() => _isLoading = true);
+    setState(() => _loading = true);
 
     try {
       final DocumentMap query = getLicenseQuery();
@@ -156,7 +160,7 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
-      setState(() => _isLoading = false);
+      setState(() => _loading = false);
     }
   }
 
@@ -170,11 +174,11 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
   }
 
   void tryCreateLicense() async {
-    if (_isSaving) {
+    if (_saving) {
       return;
     }
 
-    setState(() => _isSaving = true);
+    setState(() => _saving = true);
 
     try {
       final HttpsCallableResult<dynamic> response =
@@ -194,16 +198,16 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     } finally {
-      setState(() => _isSaving = false);
+      setState(() => _saving = false);
     }
   }
 
   void tryUpdateLicense() async {
-    if (_isSaving) {
+    if (_saving) {
       return;
     }
 
-    setState(() => _isSaving = true);
+    setState(() => _saving = true);
 
     try {
       final HttpsCallableResult<dynamic> response =
@@ -223,7 +227,7 @@ class _EditLicensePageState extends ConsumerState<EditLicensePage> {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     } finally {
-      setState(() => _isSaving = false);
+      setState(() => _saving = false);
     }
   }
 

@@ -9,6 +9,7 @@ import 'package:artbooking/screens/licenses/one/license_page_header.dart';
 import 'package:artbooking/types/cloud_functions/license_response.dart';
 import 'package:artbooking/types/firestore/doc_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/firestore/document_map.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:artbooking/types/enums/enum_license_type.dart';
@@ -47,7 +48,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
   DocSnapshotStreamSubscription? _licenseSubscription;
 
   /// Actual license.
-  var _license = License.empty();
+  License _license = License.empty();
 
   @override
   void initState() {
@@ -147,18 +148,18 @@ class _LicensePageState extends ConsumerState<LicensePage> {
     setState(() => _loading = true);
 
     try {
-      final query = getLicenseQuery();
+      final DocumentMap query = getLicenseQuery();
 
-      final docSnapshot = await query.get();
-      final data = docSnapshot.data();
+      final DocumentSnapshotMap snapshot = await query.get();
+      final Json? data = snapshot.data();
 
-      if (!docSnapshot.exists || data == null) {
+      if (!snapshot.exists || data == null) {
         return;
       }
 
       listenLicenseEvents(query);
 
-      data['id'] = docSnapshot.id;
+      data["id"] = snapshot.id;
       setState(() => _license = License.fromMap(data));
     } catch (error) {
       Utilities.logger.e(error);
@@ -181,7 +182,7 @@ class _LicensePageState extends ConsumerState<LicensePage> {
       }
 
       setState(() {
-        data['id'] = docSnapshot.id;
+        data["id"] = docSnapshot.id;
         _license = License.fromMap(data);
       });
     });

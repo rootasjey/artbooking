@@ -16,9 +16,6 @@ class SheetHeader extends StatelessWidget {
   /// External space around this widget.
   final EdgeInsets margin;
 
-  /// Widget to show below subtitle if any.
-  final Widget? bottom;
-
   /// If provided, will try to make a hero transition with the title.
   final String heroTitleTag;
 
@@ -31,6 +28,9 @@ class SheetHeader extends StatelessWidget {
   /// Tooltip's message if anny.
   final String? tooltip;
 
+  /// Widget to show below subtitle if any.
+  final Widget? bottom;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -41,7 +41,8 @@ class SheetHeader extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: CircleButton(
-              onTap: () => Utilities.navigation.back(context),
+              // NOTE: We don't need beamer here as it's a ephemeral route.
+              onTap: () => Navigator.of(context).pop(),
               tooltip: tooltip,
               icon: Icon(
                 UniconsLine.times,
