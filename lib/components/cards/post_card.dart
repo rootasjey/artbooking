@@ -9,40 +9,56 @@ class PostCard extends StatefulWidget {
     Key? key,
     required this.post,
     required this.index,
-    this.onTap,
-    this.onDelete,
-    this.onEdit,
-    this.heroTag = "",
-    this.popupMenuEntries = const [],
-    this.onPopupMenuItemSelected,
-    this.width = 260.0,
-    this.height = 300.0,
     this.descriptionMaxLines = 5,
     this.borderColor = Colors.transparent,
+    this.height = 300.0,
+    this.heroTag = "",
+    this.isWide = false,
+    this.onDelete,
+    this.onEdit,
+    this.onPopupMenuItemSelected,
+    this.onTap,
+    this.popupMenuEntries = const [],
+    this.width = 260.0,
   }) : super(key: key);
 
+  /// If true, the card will have a wide layout.
+  final bool isWide;
+
+  /// Card's border color.
   final Color borderColor;
 
+  /// Card's width.
   final double width;
+
+  /// Card's height.
   final double height;
 
+  /// Maximum allowed for the description.
   final int descriptionMaxLines;
+
+  /// This item position.
   final int index;
+
+  /// Callback fired after this card is tapped.
   final void Function(Post post, String heroTag)? onTap;
 
-  /// onDelete callback function (after selecting 'delete' item menu)
+  /// Callback fired after selecting 'delete' item menu.
   final Function(Post, int)? onDelete;
 
-  /// onEdit callback function (after selecting 'edit' item menu)
+  /// Callback fired after selecting 'edit' item menu.
   final Function(Post, int)? onEdit;
 
+  /// Main data. A post on a subject.
   final Post post;
+
+  /// Hero tag for smooth transition.
   final String heroTag;
 
-  /// Popup menu item entries.
+  /// List of entries for this post card popup menu.
   final List<PopupMenuEntry<EnumPostItemAction>> popupMenuEntries;
 
-  /// Callback function when popup menu item entries are tapped.
+  /// Callback function when a popup menu item entry is selected.
   final void Function(
     EnumPostItemAction action,
     int index,
@@ -70,6 +86,81 @@ class _PostCardState extends State<PostCard> {
   @override
   Widget build(BuildContext context) {
     final Post post = widget.post;
+
+    if (widget.isWide) {
+      return SizedBox(
+        width: widget.width,
+        child: Card(
+          elevation: _elevation,
+          color: Theme.of(context).backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(6.0),
+            side: BorderSide(
+              color: _borderColor,
+              width: _borderWidth,
+            ),
+          ),
+          child: InkWell(
+            onTap: () => widget.onTap?.call(post, widget.heroTag),
+            onHover: (isHover) {
+              setState(() {
+                _elevation = isHover ? 4.0 : 2.0;
+
+                _borderWidth = isHover ? 3.0 : 2.0;
+                _textBgColor = isHover ? Colors.amber : Colors.transparent;
+
+                if (widget.borderColor != Colors.transparent) {
+                  _borderColor = isHover
+                      ? widget.borderColor
+                      : widget.borderColor.withOpacity(0.6);
+                }
+              });
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Hero(
+                          tag: post.id,
+                          child: Opacity(
+                            opacity: 0.8,
+                            child: Text(
+                              post.name,
+                              maxLines: 2,
+                              style: Utilities.fonts.body(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w600,
+                                backgroundColor: _textBgColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Opacity(
+                          opacity: 0.4,
+                          child: Text(
+                            post.description,
+                            maxLines: widget.descriptionMaxLines,
+                            overflow: TextOverflow.ellipsis,
+                            style: Utilities.fonts.body(
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     return SizedBox(
       width: widget.width,
