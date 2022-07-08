@@ -19,6 +19,7 @@ class ReviewPageBody extends StatelessWidget {
     required this.illustrationPopupMenuEntries,
     required this.loading,
     required this.selectedTab,
+    this.isMobileSize = false,
     this.onTapIllustration,
     this.onPopupMenuIllustrationSelected,
     this.onTapBook,
@@ -27,22 +28,41 @@ class ReviewPageBody extends StatelessWidget {
     this.onApproveIllustration,
   }) : super(key: key);
 
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
+
+  /// True if data is currently loading.
   final bool loading;
 
+  /// Currently selected tab (books or illustrations).
   final EnumTabDataType selectedTab;
 
+  /// List of illustrations (main data).
   final List<Illustration> illustrations;
+
+  /// List of books (main data).
   final List<Book> books;
 
+  /// List of popup menu entry for illustrations.
   final List<PopupMenuEntry<EnumIllustrationItemAction>>
       illustrationPopupMenuEntries;
+
+  /// List of popup menu entry for books.
   final List<PopupMenuEntry<EnumBookItemAction>> bookPopupMenuEntries;
 
+  /// Callback fired after tapping on an illustration.
   final void Function(Illustration)? onTapIllustration;
+
+  /// Callback fired after tapping on aa book.
   final void Function(Book)? onTapBook;
+
+  /// Callback fired when a book is approved.
   final void Function(Book, int)? onApproveBook;
+
+  /// Callback fired when an illustration is approved.
   final void Function(Illustration, int)? onApproveIllustration;
 
+  /// Callback fired when an item from the illustration menu popup is selected.
   final void Function(
     EnumIllustrationItemAction,
     int,
@@ -50,6 +70,7 @@ class ReviewPageBody extends StatelessWidget {
     String,
   )? onPopupMenuIllustrationSelected;
 
+  /// Callback fired when an item from the book menu popup is selected.
   final void Function(
     EnumBookItemAction,
     int,
@@ -84,13 +105,13 @@ class ReviewPageBody extends StatelessWidget {
 
     if (selectedTab == EnumTabDataType.books) {
       return SliverPadding(
-        padding: const EdgeInsets.all(40.0),
+        padding: EdgeInsets.all(isMobileSize ? 12.0 : 40.0),
         sliver: SliverGrid(
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            mainAxisExtent: 360.0,
-            maxCrossAxisExtent: 290.0,
-            mainAxisSpacing: 12.0,
-            crossAxisSpacing: 12.0,
+            mainAxisExtent: isMobileSize ? 161.0 : 360.0,
+            maxCrossAxisExtent: isMobileSize ? 220.0 : 290.0,
+            mainAxisSpacing: isMobileSize ? 0.0 : 12.0,
+            crossAxisSpacing: isMobileSize ? 0.0 : 12.0,
           ),
           delegate: SliverChildBuilderDelegate(
             (context, index) {
@@ -100,8 +121,8 @@ class ReviewPageBody extends StatelessWidget {
                 book: book,
                 index: index,
                 heroTag: book.id,
-                width: 280.0,
-                height: 332.0,
+                width: isMobileSize ? 220.0 : 280.0,
+                height: isMobileSize ? 161.0 : 332.0,
                 onTap: () => onTapBook?.call(book),
                 onPopupMenuItemSelected: onPopupMenuBookSelected,
                 popupMenuEntries: bookPopupMenuEntries,
@@ -114,17 +135,17 @@ class ReviewPageBody extends StatelessWidget {
     }
 
     return SliverPadding(
-      padding: const EdgeInsets.only(
-        top: 40.0,
-        left: 40.0,
-        right: 40.0,
+      padding: EdgeInsets.only(
+        top: isMobileSize ? 12.0 : 40.0,
+        left: isMobileSize ? 12.0 : 40.0,
+        right: isMobileSize ? 12.0 : 40.0,
         bottom: 100.0,
       ),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 240.0,
-          mainAxisSpacing: 20.0,
-          crossAxisSpacing: 20.0,
+          mainAxisSpacing: 12.0,
+          crossAxisSpacing: 12.0,
         ),
         delegate: SliverChildBuilderDelegate(
           (context, index) {

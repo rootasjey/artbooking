@@ -9,29 +9,40 @@ import 'package:unicons/unicons.dart';
 class ReviewPageHeader extends StatelessWidget {
   const ReviewPageHeader({
     Key? key,
-    required this.selectedTab,
-    this.onChangedTab,
     required this.hideDisapproved,
-    this.onUpdateShowHidden,
+    required this.selectedTab,
+    this.isMobileSize = false,
+    this.onChangedTab,
+    this.onToggleShowDisapproved,
   }) : super(key: key);
 
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
+
+  /// If true, disapproved items (books or illustrations) will be hidden.
   final bool hideDisapproved;
+
+  /// Current selected tab (books or illustrations).
   final EnumTabDataType selectedTab;
 
+  /// Callback fired when the tab changes.
   final void Function(EnumTabDataType)? onChangedTab;
-  final void Function()? onUpdateShowHidden;
+
+  /// Callback fired when we toggle the [hideDisapproved] value.
+  final void Function()? onToggleShowDisapproved;
 
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.only(
-        top: 60.0,
-        left: 54.0,
+      padding: EdgeInsets.only(
+        top: isMobileSize ? 42.0 : 60.0,
+        left: isMobileSize ? 12.0 : 54.0,
         bottom: 24.0,
       ),
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
           PageTitle(
+            isMobileSize: isMobileSize,
             renderSliver: false,
             titleValue: "review".tr(),
             subtitleValue: "review_subtitle".tr(),
@@ -64,7 +75,7 @@ class ReviewPageHeader extends StatelessWidget {
                   message: hideDisapproved
                       ? "review_show_disapproved".tr()
                       : "review_hide_disapproved".tr(),
-                  onTap: onUpdateShowHidden,
+                  onTap: onToggleShowDisapproved,
                   opacity: hideDisapproved ? 1.0 : 0.4,
                   child: Icon(
                     UniconsLine.eye_slash,

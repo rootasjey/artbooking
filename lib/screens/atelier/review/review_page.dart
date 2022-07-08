@@ -126,6 +126,8 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Scaffold(
       floatingActionButton: LikesPageFab(
         show: _showFab,
@@ -142,18 +144,19 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
             slivers: <Widget>[
               ApplicationBar(),
               ReviewPageHeader(
-                selectedTab: _selectedTab,
-                onChangedTab: onChangedTab,
+                isMobileSize: isMobileSize,
                 hideDisapproved: _hideDisapproved,
-                onUpdateShowHidden: onUpdateShowHidden,
+                onChangedTab: onChangedTab,
+                onToggleShowDisapproved: onToggleShowDisapproved,
+                selectedTab: _selectedTab,
               ),
               ReviewPageBody(
-                loading: _loading,
                 books: _books,
-                selectedTab: _selectedTab,
-                illustrations: _illustrations,
                 bookPopupMenuEntries: _bookPopupMenuEntries,
+                illustrations: _illustrations,
                 illustrationPopupMenuEntries: _illustrationPopupMenuEntries,
+                isMobileSize: isMobileSize,
+                loading: _loading,
                 onTapBook: onTapBook,
                 onTapIllustration: onTapIllustration,
                 onApproveBook: onApproveBook,
@@ -161,6 +164,7 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
                 onPopupMenuBookSelected: onPopupMenuBookSelected,
                 onPopupMenuIllustrationSelected:
                     onPopupMenuIllustrationSelected,
+                selectedTab: _selectedTab,
               )
             ],
           ),
@@ -677,7 +681,7 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
     }
   }
 
-  void onUpdateShowHidden() {
+  void onToggleShowDisapproved() {
     setState(() => _hideDisapproved = !_hideDisapproved);
     fetch();
 
