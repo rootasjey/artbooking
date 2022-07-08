@@ -54,7 +54,7 @@ class ApplicationBar extends ConsumerWidget {
         automaticallyImplyLeading: false,
         title: Padding(
           padding: EdgeInsets.only(
-            top: 12.0,
+            top: 16.0,
             left: isMobileSize ? 0.0 : 48.0,
           ),
           child: Row(
