@@ -5,6 +5,7 @@ import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/state/user_notifier.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/user/user.dart';
+import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -41,7 +42,8 @@ void main() async {
   // if the user was already connected.
   final authUser = await Utilities.getFireAuthUser();
   if (authUser != null) {
-    final firestoreUser = await Utilities.getFirestoreUser(authUser.uid);
+    final UserFirestore? firestoreUser =
+        await Utilities.getFirestoreUser(authUser.uid);
 
     AppState.userProvider = StateNotifierProvider<UserNotifier, User>(
       (ref) => UserNotifier(User(
@@ -53,8 +55,7 @@ void main() async {
 
   setPathUrlStrategy();
 
-  final savedThemeMode = await AdaptiveTheme.getThemeMode();
-
+  final AdaptiveThemeMode? savedThemeMode = await AdaptiveTheme.getThemeMode();
   await windowManager.ensureInitialized();
 
   windowManager.waitUntilReadyToShow(

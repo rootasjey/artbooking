@@ -89,7 +89,7 @@ class _LikesPageState extends ConsumerState<LikesPage> {
   QuerySnapshotStreamSubscription? _likeSubscription;
 
   /// Page scroll controller.
-  final _scrollController = ScrollController();
+  final _pageScrollController = ScrollController();
 
   @override
   initState() {
@@ -111,10 +111,10 @@ class _LikesPageState extends ConsumerState<LikesPage> {
     return Scaffold(
       floatingActionButton: LikesPageFab(
         show: _showFab,
-        scrollController: _scrollController,
+        scrollController: _pageScrollController,
       ),
       body: CustomScrollView(
-        controller: _scrollController,
+        controller: _pageScrollController,
         slivers: <Widget>[
           ApplicationBar(),
           LikesPageHeader(

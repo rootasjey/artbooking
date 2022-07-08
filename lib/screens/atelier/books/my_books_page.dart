@@ -178,7 +178,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   QuerySnapshotStreamSubscription? _bookSubscription;
 
   /// Page scroll controller.
-  final _scrollController = ScrollController();
+  final _pageScrollController = ScrollController();
 
   /// This books page owner's name.
   /// Used when the current authenticated user is different
@@ -230,7 +230,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
     return Scaffold(
       floatingActionButton: MyBooksPageFab(
-        scrollController: _scrollController,
+        scrollController: _pageScrollController,
         show: _showFab,
         isOwner: isOwner,
         onShowCreateBookDialog: showCreateBookDialog,
@@ -257,13 +257,13 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                   borderRadius: BorderRadius.circular(4.0),
                 ),
                 child: ImprovedScrolling(
-                  scrollController: _scrollController,
+                  scrollController: _pageScrollController,
                   enableKeyboardScrolling: true,
                   onScroll: onScroll,
                   child: ScrollConfiguration(
                     behavior: CustomScrollBehavior(),
                     child: CustomScrollView(
-                      controller: _scrollController,
+                      controller: _pageScrollController,
                       slivers: <Widget>[
                         ApplicationBar(),
                         MyBooksPageHeader(
@@ -346,7 +346,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     /// Amount of offset to jump when dragging an element to the edge.
     final double jumpOffset = 42.0;
 
-    if (dy < scrollTreshold && _scrollController.offset > 0) {
+    if (dy < scrollTreshold && _pageScrollController.offset > 0) {
       if (_activateAutoScrollOnce && _isAutoScrolling) {
         return;
       }
@@ -355,13 +355,13 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       _scrollTimer = Timer.periodic(
         Duration(milliseconds: duration),
         (Timer timer) {
-          _scrollController.animateTo(
-            _scrollController.offset - jumpOffset,
+          _pageScrollController.animateTo(
+            _pageScrollController.offset - jumpOffset,
             duration: Duration(milliseconds: duration),
             curve: Curves.easeIn,
           );
 
-          if (_scrollController.position.outOfRange) {
+          if (_pageScrollController.position.outOfRange) {
             _scrollTimer?.cancel();
             _isAutoScrolling = false;
           }
@@ -374,8 +374,8 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
     final double windowHeight = MediaQuery.of(context).size.height;
     final bool pointerIsAtBottom = dy >= windowHeight - scrollTreshold;
-    final bool scrollIsAtBottomEdge =
-        _scrollController.offset >= _scrollController.position.maxScrollExtent;
+    final bool scrollIsAtBottomEdge = _pageScrollController.offset >=
+        _pageScrollController.position.maxScrollExtent;
 
     if (pointerIsAtBottom && !scrollIsAtBottomEdge) {
       if (_activateAutoScrollOnce && _isAutoScrolling) {
@@ -386,13 +386,13 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       _scrollTimer = Timer.periodic(
         Duration(milliseconds: duration),
         (Timer timer) {
-          _scrollController.animateTo(
-            _scrollController.offset + jumpOffset,
+          _pageScrollController.animateTo(
+            _pageScrollController.offset + jumpOffset,
             duration: Duration(milliseconds: duration),
             curve: Curves.easeIn,
           );
 
-          if (_scrollController.position.outOfRange) {
+          if (_pageScrollController.position.outOfRange) {
             _scrollTimer?.cancel();
             _isAutoScrolling = false;
           }
@@ -1267,7 +1267,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       setState(() => _showFab = true);
     }
 
-    if (_scrollController.position.atEdge &&
+    if (_pageScrollController.position.atEdge &&
         scrollOffset > 50 &&
         _hasNext &&
         !_loadingMore) {

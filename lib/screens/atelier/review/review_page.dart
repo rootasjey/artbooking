@@ -65,7 +65,7 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
   DocumentSnapshot<Object>? _lastDocument;
 
   /// Selected tab showing data (books or illustrations).
-  var _selectedTab = EnumTabDataType.illustrations;
+  EnumTabDataType _selectedTab = EnumTabDataType.illustrations;
 
   /// Maximum items (illustrations or books) to fetch per page.
   final int _limit = 20;
@@ -109,7 +109,7 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
   QuerySnapshotStreamSubscription? _dataSubscription;
 
   /// Page scroll controller.
-  final _scrollController = ScrollController();
+  final _pageScrollController = ScrollController();
 
   @override
   initState() {
@@ -131,16 +131,16 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
     return Scaffold(
       floatingActionButton: LikesPageFab(
         show: _showFab,
-        scrollController: _scrollController,
+        scrollController: _pageScrollController,
       ),
       body: ImprovedScrolling(
-        scrollController: _scrollController,
+        scrollController: _pageScrollController,
         enableKeyboardScrolling: true,
         onScroll: onScroll,
         child: ScrollConfiguration(
           behavior: CustomScrollBehavior(),
           child: CustomScrollView(
-            controller: _scrollController,
+            controller: _pageScrollController,
             slivers: <Widget>[
               ApplicationBar(),
               ReviewPageHeader(
@@ -673,7 +673,7 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
       setState(() => _showFab = true);
     }
 
-    if (_scrollController.position.atEdge &&
+    if (_pageScrollController.position.atEdge &&
         scrollOffset > 50 &&
         _hasNext &&
         !_loadingMore) {
