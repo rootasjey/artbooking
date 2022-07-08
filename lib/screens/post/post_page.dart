@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:artbooking/components/application_bar/application_bar.dart';
-import 'package:artbooking/components/buttons/lang_popup_menu_button.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
-import 'package:artbooking/components/user_avatar_extended.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
@@ -14,6 +12,8 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
+import 'package:artbooking/screens/post/post_page_body.dart';
+import 'package:artbooking/screens/post/post_page_header.dart';
 import 'package:artbooking/types/cloud_functions/post_response.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/enums/enum_post_item_action.dart';
@@ -29,7 +29,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:lottie/lottie.dart';
 import 'package:super_editor/super_editor.dart';
 import 'package:unicons/unicons.dart';
@@ -53,27 +52,40 @@ class _PostPageState extends ConsumerState<PostPage> {
   /// True if the post is being saved.
   bool _saving = false;
 
+  /// True if the post is being deleted.
   bool _deleting = false;
 
+  final List<PopupMenuEntry<EnumContentVisibility>> _postPopupMenuItems = [
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.keyhole_square),
+      textLabel: "make_private".tr(),
+      value: EnumContentVisibility.private,
+      selected: false,
+      // selected: post.visibility == EnumContentVisibility.private,
+    ),
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.envelope_upload_alt),
+      textLabel: "publish".tr(),
+      value: EnumContentVisibility.public,
+      selected: false,
+      // selected: post.visibility == EnumContentVisibility.public,
+    ),
+  ];
+
   /// Post model.
-  var _post = Post.empty();
+  Post _post = Post.empty();
 
   /// Visible if the authenticated user has the right to edit this post.
-  var _documentEditor = DocumentEditor(document: MutableDocument());
+  DocumentEditor _documentEditor = DocumentEditor(document: MutableDocument());
 
   /// Post's content.
-  var _document = MutableDocument();
+  MutableDocument _document = MutableDocument();
 
   /// Input controller for post's title (metadata).
-  final _titleController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
 
   /// Input controller for post's description (metadata).
-  final _descriptionController = TextEditingController();
-
-  final _pagePadding = const EdgeInsets.symmetric(
-    vertical: 56,
-    horizontal: 24,
-  );
+  final TextEditingController _descriptionController = TextEditingController();
 
   /// Post's document subcription.
   /// We use this stream to listen to document fields updates.
@@ -118,11 +130,13 @@ class _PostPageState extends ConsumerState<PostPage> {
   Widget build(BuildContext context) {
     final UserFirestore? userFirestore =
         ref.watch(AppState.userProvider).firestoreUser;
-    final canManagePosts = userFirestore?.rights.canManagePosts ?? false;
+    final bool canManagePosts = userFirestore?.rights.canManagePosts ?? false;
 
     if (_deleting) {
       return deletingWidget();
     }
+
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
 
     return Scaffold(
       body: Stack(
@@ -130,8 +144,27 @@ class _PostPageState extends ConsumerState<PostPage> {
           CustomScrollView(
             slivers: [
               ApplicationBar(),
-              header(canEdit: canManagePosts),
-              body(canEdit: canManagePosts),
+              PostPageHeader(
+                canManagePosts: canManagePosts,
+                descriptionController: _descriptionController,
+                isMobileSize: isMobileSize,
+                onLangChanged: updatePostLang,
+                onShowAddTagModal: onShowAddTagModal,
+                onTitleChanged: onTitleChanged,
+                onDeleteTag: onDeleteTag,
+                post: _post,
+                titleController: _titleController,
+                popupVisibilityItems: _postPopupMenuItems,
+                onVisibilityItemSelected: onVisibilityItemSelected,
+              ),
+              PostPageBody(
+                document: _document,
+                documentEditor: _documentEditor,
+                canManagePosts: canManagePosts,
+                isMobileSize: isMobileSize,
+                loading: _loading,
+                post: _post,
+              ),
             ],
           ),
           Positioned(
@@ -173,75 +206,6 @@ class _PostPageState extends ConsumerState<PostPage> {
     );
   }
 
-  Widget authorsWidget() {
-    if (_post.userIds.isEmpty || _post.userIds.first.isEmpty) {
-      return Container();
-    }
-
-    return UserAvatarExtended(
-      userId: _post.userIds.first,
-      padding: const EdgeInsets.only(top: 24.0),
-    );
-  }
-
-  Widget body({bool canEdit = false}) {
-    if (_post.content.isEmpty) {
-      return SliverToBoxAdapter();
-    }
-
-    if (_loading) {
-      return LoadingView(
-        title: Text(
-          "loading".tr(),
-        ),
-      );
-    }
-
-    if (!canEdit) {
-      return SliverToBoxAdapter(
-        child: Padding(
-          padding: _pagePadding,
-          child: SingleColumnDocumentLayout(
-            presenter: SingleColumnLayoutPresenter(
-              document: _document,
-              componentBuilders: defaultComponentBuilders,
-              pipeline: [
-                SingleColumnStylesheetStyler(stylesheet: defaultStylesheet),
-              ],
-            ),
-            componentBuilders: defaultComponentBuilders,
-          ),
-        ),
-      );
-    }
-
-    return SliverToBoxAdapter(
-      child: SuperEditor(
-        editor: _documentEditor,
-        stylesheet: defaultStylesheet.copyWith(
-          documentPadding: const EdgeInsets.symmetric(
-            vertical: 56,
-            horizontal: 24,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget dateWidget() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Wrap(
-        spacing: 12.0,
-        runSpacing: 12.0,
-        children: [
-          publishedAtWidget(),
-          updatedAtWidget(),
-        ],
-      ),
-    );
-  }
-
   Widget deletingWidget() {
     final double marginTop = MediaQuery.of(context).size.height / 3;
 
@@ -262,288 +226,6 @@ class _PostPageState extends ConsumerState<PostPage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget descriptionWidget({bool canEdit = false}) {
-    if (!canEdit && _post.description.isNotEmpty) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
-        child: Text(
-          _post.description,
-          style: Utilities.fonts.title3(
-            fontSize: 14.0,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Opacity(
-        opacity: 0.6,
-        child: TextField(
-          controller: _descriptionController,
-          style: Utilities.fonts.body(
-            fontSize: 14.0,
-            fontWeight: FontWeight.w700,
-          ),
-          maxLines: null,
-          onChanged: onTitleChanged,
-          decoration: InputDecoration(
-            hintText: "post_description".tr() + "...",
-            border: InputBorder.none,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget header({bool canEdit = false}) {
-    return SliverToBoxAdapter(
-      child: Center(
-        child: Container(
-          padding: _pagePadding,
-          width: 600.0,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              IconButton(
-                tooltip: "back".tr(),
-                onPressed: () => Beamer.of(context).beamBack(),
-                icon: Icon(UniconsLine.arrow_left),
-              ),
-              titleWidget(canEdit: canEdit),
-              descriptionWidget(canEdit: canEdit),
-              dateWidget(),
-              tagsWidget(canEdit: canEdit),
-              pubAndLangWidgets(canEdit: canEdit),
-              authorsWidget(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget pubAndLangWidgets({bool canEdit = false}) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 12.0),
-      child: Row(
-        children: [
-          pubWidget(canEdit: canEdit),
-          Container(
-            height: 40.0,
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: VerticalDivider(
-              width: 2.0,
-              thickness: 2.0,
-            ),
-          ),
-          LangPopupMenuButton(
-            outlined: true,
-            lang: _post.language,
-            onLangChanged: updatePostLang,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget pubWidget({bool canEdit = false}) {
-    if (!canEdit) {
-      return Container();
-    }
-
-    final Color baseColor =
-        Theme.of(context).textTheme.bodyText2?.color?.withOpacity(0.4) ??
-            Colors.black;
-
-    return PopupMenuButton(
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 12.0,
-          vertical: 6.0,
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(3.0),
-          border: Border.all(
-            color: baseColor.withOpacity(0.3),
-            width: 2.0,
-          ),
-        ),
-        child: Text(
-          _post.visibility == EnumContentVisibility.public
-              ? "published".tr()
-              : "visibility_private".tr(),
-          style: Utilities.fonts.body(
-            color: baseColor,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
-      onSelected: (EnumContentVisibility visibility) {
-        if (_post.visibility == visibility) {
-          return;
-        }
-
-        updatePostVisibility(visibility);
-      },
-      itemBuilder: (_) => [
-        PopupMenuItemIcon(
-          icon: PopupMenuIcon(UniconsLine.keyhole_square),
-          textLabel: "make_private".tr(),
-          value: EnumContentVisibility.private,
-          selected: _post.visibility == EnumContentVisibility.private,
-        ),
-        PopupMenuItemIcon(
-          icon: PopupMenuIcon(UniconsLine.envelope_upload_alt),
-          textLabel: "publish".tr(),
-          value: EnumContentVisibility.public,
-          selected: _post.visibility == EnumContentVisibility.public,
-        ),
-      ],
-    );
-  }
-
-  Widget titleWidget({bool canEdit = false}) {
-    if (!canEdit) {
-      return Text(
-        _post.name,
-        style: Utilities.fonts.title3(
-          fontSize: 64.0,
-          fontWeight: FontWeight.w700,
-        ),
-      );
-    }
-
-    return Hero(
-      tag: _post.id,
-      child: Material(
-        color: Colors.transparent,
-        child: TextField(
-          controller: _titleController,
-          style: Utilities.fonts.title3(
-            fontSize: 64.0,
-            fontWeight: FontWeight.w700,
-          ),
-          maxLines: null,
-          onChanged: onTitleChanged,
-          decoration: InputDecoration(
-            hintText: "post_title".tr(),
-            border: InputBorder.none,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget tagsWidget({bool canEdit = false}) {
-    final children = <Widget>[];
-
-    for (final String tag in _post.tags) {
-      children.add(
-        Chip(
-          label: Opacity(
-            opacity: 0.8,
-            child: Text(
-              tag,
-              style: Utilities.fonts.body3(),
-            ),
-          ),
-          onDeleted: canEdit ? () => onDeleteTag(tag) : null,
-        ),
-      );
-    }
-
-    if (canEdit) {
-      children.add(
-        ActionChip(
-          tooltip: "tag_add".tr(),
-          elevation: 2.0,
-          label: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (_post.tags.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: Opacity(
-                    opacity: 0.8,
-                    child: Text(
-                      "tag_add".tr().toLowerCase(),
-                      style: Utilities.fonts.body(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              Icon(UniconsLine.plus, size: 16.0),
-            ],
-          ),
-          onPressed: showAddTagModal,
-        ),
-      );
-    }
-
-    return Wrap(
-      spacing: 12.0,
-      runSpacing: 12.0,
-      children: children,
-    );
-  }
-
-  Widget publishedAtWidget() {
-    final publishedAt = _post.publishedAt;
-    final publishedAtDiff = DateTime.now().difference(publishedAt);
-    final publishedAtStr = publishedAtDiff.inDays > 20
-        ? Jiffy(publishedAt).yMMMEd
-        : Jiffy(publishedAt).fromNow();
-
-    return Opacity(
-      opacity: 0.8,
-      child: Text(
-        publishedAtStr,
-        style: Utilities.fonts.body3(
-          fontSize: 16.0,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
-  Widget updatedAtWidget() {
-    final updatedAt = _post.updatedAt;
-    final bool updateSameOrBeforePub =
-        Jiffy(updatedAt).isSameOrBefore(_post.publishedAt);
-
-    final bool updatePubDiff =
-        updatedAt.difference(_post.publishedAt).inMinutes < 30;
-
-    final bool dateTooClose = updateSameOrBeforePub || updatePubDiff;
-
-    if (_post.visibility == EnumContentVisibility.public && dateTooClose) {
-      return Container();
-    }
-
-    if (updatedAt.difference(_post.createdAt).inMinutes < 10) {
-      return Container();
-    }
-
-    final updatedAtDiff = DateTime.now().difference(updatedAt);
-    final updatedAtStr = updatedAtDiff.inDays > 20
-        ? Jiffy(updatedAt).format("dd/MM/yy")
-        : Jiffy(updatedAt).fromNow();
-
-    return Opacity(
-      opacity: 0.8,
-      child: Text(
-        "(" + "date_last_update".tr() + ": $updatedAtStr)",
-        style: Utilities.fonts.body3(
-          fontSize: 16.0,
-          fontWeight: FontWeight.w400,
-        ),
       ),
     );
   }
@@ -635,6 +317,14 @@ class _PostPageState extends ConsumerState<PostPage> {
     updateMetrics();
   }
 
+  void onVisibilityItemSelected(EnumContentVisibility visibility) {
+    if (_post.visibility == visibility) {
+      return;
+    }
+
+    updatePostVisibility(visibility);
+  }
+
   void savePostContent() async {
     setState(() => _saving = true);
 
@@ -709,7 +399,7 @@ class _PostPageState extends ConsumerState<PostPage> {
     }
   }
 
-  void onTitleChanged(String value) {
+  void onTitleChanged(String? value) {
     _metadataUpdateTimer?.cancel();
     _metadataUpdateTimer = Timer(const Duration(seconds: 1), savePostTitle);
   }
@@ -733,7 +423,7 @@ class _PostPageState extends ConsumerState<PostPage> {
     }
   }
 
-  void showAddTagModal() {
+  void onShowAddTagModal() {
     showDialog(
       context: context,
       builder: (context) {

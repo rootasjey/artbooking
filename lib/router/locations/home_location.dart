@@ -8,7 +8,7 @@ import 'package:artbooking/screens/book/books_page.dart';
 import 'package:artbooking/screens/home_mobile_page.dart';
 import 'package:artbooking/screens/illustrations/illustration_page.dart';
 import 'package:artbooking/screens/illustrations/illustrations_page.dart';
-import 'package:artbooking/screens/post_page.dart';
+import 'package:artbooking/screens/post/post_page.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/widgets.dart';

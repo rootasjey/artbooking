@@ -5,7 +5,7 @@ import 'package:artbooking/screens/atelier/atelier_page.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page.dart';
 import 'package:artbooking/screens/atelier/review/review_page.dart';
 import 'package:artbooking/screens/likes/likes_page.dart';
-import 'package:artbooking/screens/post_page.dart';
+import 'package:artbooking/screens/post/post_page.dart';
 import 'package:artbooking/screens/posts/many/posts_page.dart';
 import 'package:artbooking/screens/sections/edit/edit_section_page.dart';
 import 'package:artbooking/screens/sections/many/sections_page.dart';
