@@ -23,14 +23,31 @@ class PostsPageBody extends StatelessWidget {
     this.onTap,
     this.onCreatePost,
     this.onPopupMenuItemSelected,
+    this.isMobileSize = false,
   }) : super(key: key);
 
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
+
+  /// Main data. List of posts.
   final List<Post> posts;
+
+  /// Data is currently loading if true.
   final bool loading;
+
+  /// Callback fired to delete a post.
   final Function(Post, int)? onDeletePost;
+
+  /// Callback fired to create a post.
   final Function()? onCreatePost;
+
+  /// Callback fired after a post has been tapped.
   final Function(Post)? onTap;
+
+  /// Currently selected tab (drafts or published).
   final EnumContentVisibility selectedTab;
+
+  /// List of entries in post's popup menu.
   final List<PopupMenuEntry<EnumPostItemAction>> popupMenuEntries;
 
   /// Callback function when popup menu item entries are tapped.
@@ -57,9 +74,9 @@ class PostsPageBody extends StatelessWidget {
 
     if (posts.isEmpty) {
       return SliverPadding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 80.0,
-          vertical: 69.0,
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobileSize ? 12.0 : 80.0,
+          vertical: isMobileSize ? 24.0 : 69.0,
         ),
         sliver: SliverList(
           delegate: SliverChildListDelegate.fixed([
@@ -106,10 +123,42 @@ class PostsPageBody extends StatelessWidget {
     final Color borderColor =
         onPublishedPosts ? Theme.of(context).primaryColor : Colors.grey;
 
+    if (isMobileSize) {
+      return SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (BuildContext context, int index) {
+            final Post post = posts.elementAt(index);
+
+            return PostCard(
+              post: post,
+              index: index,
+              isWide: isMobileSize,
+              heroTag: post.id,
+              borderColor: borderColor,
+              descriptionMaxLines: onPublishedPosts ? 5 : 3,
+              onTap: (Post post, String heroTag) {
+                NavigationStateHelper.post = post;
+                Beamer.of(context).beamToNamed(
+                  AtelierLocationContent.postRoute
+                      .replaceFirst(":postId", post.id),
+                  routeState: {
+                    "postId": post.id,
+                  },
+                );
+              },
+              popupMenuEntries: popupMenuEntries,
+              onPopupMenuItemSelected: onPopupMenuItemSelected,
+            );
+          },
+          childCount: posts.length,
+        ),
+      );
+    }
+
     return SliverPadding(
-      padding: const EdgeInsets.only(
-        left: 34.0,
-        right: 30.0,
+      padding: EdgeInsets.only(
+        left: isMobileSize ? 12.0 : 34.0,
+        right: isMobileSize ? 12.0 : 34.0,
         bottom: 300.0,
       ),
       sliver: SliverGrid(
@@ -119,8 +168,8 @@ class PostsPageBody extends StatelessWidget {
           crossAxisSpacing: 8.0,
         ),
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final post = posts.elementAt(index);
+          (BuildContext context, int index) {
+            final Post post = posts.elementAt(index);
 
             return PostCard(
               post: post,

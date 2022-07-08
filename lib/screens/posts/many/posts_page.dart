@@ -111,28 +111,32 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
       return creatingWidget();
     }
 
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Scaffold(
       floatingActionButton: LicensesPageFab(
         show: canManagePosts,
         onPressed: tryCreatePost,
-        tooltip: "post_create".tr(),
+        label: Text("post_create".tr()),
       ),
       body: CustomScrollView(
         slivers: <Widget>[
           ApplicationBar(),
           PostsPageHeader(
-            selectedTab: _selectedTab,
+            isMobileSize: isMobileSize,
             onChangedTab: onChangedTab,
+            selectedTab: _selectedTab,
           ),
           PostsPageBody(
-            posts: _posts,
+            isMobileSize: isMobileSize,
             loading: _loading,
-            onTap: onTapPost,
-            selectedTab: _selectedTab,
-            onDeletePost: canManagePosts ? onDeletePost : null,
             onCreatePost: tryCreatePost,
-            popupMenuEntries: _postPopupMenuEntries,
+            onDeletePost: canManagePosts ? onDeletePost : null,
             onPopupMenuItemSelected: onPopupMenuItemSelected,
+            onTap: onTapPost,
+            posts: _posts,
+            popupMenuEntries: _postPopupMenuEntries,
+            selectedTab: _selectedTab,
           )
         ],
       ),
