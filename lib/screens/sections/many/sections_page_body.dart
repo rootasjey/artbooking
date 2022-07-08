@@ -14,6 +14,7 @@ class SectionsPageBody extends StatelessWidget {
     Key? key,
     required this.sections,
     required this.loading,
+    this.isMobileSize = false,
     this.onDeleteSection,
     this.onEditSection,
     this.onTapSection,
@@ -21,6 +22,9 @@ class SectionsPageBody extends StatelessWidget {
     this.popupMenuEntries = const [],
     this.onPopupMenuItemSelected,
   }) : super(key: key);
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   /// Data list.
   final List<Section> sections;
@@ -67,8 +71,8 @@ class SectionsPageBody extends StatelessWidget {
 
     if (sections.isEmpty) {
       return SliverPadding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 80.0,
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobileSize ? 12.0 : 80.0,
           vertical: 69.0,
         ),
         sliver: SliverList(
@@ -100,11 +104,41 @@ class SectionsPageBody extends StatelessWidget {
       );
     }
 
+    if (isMobileSize) {
+      return SliverPadding(
+        padding: EdgeInsets.only(
+          top: 24.0,
+          bottom: 300.0,
+        ),
+        sliver: SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (BuildContext context, int index) {
+              final Section section = sections.elementAt(index);
+
+              return SectionCardItem(
+                key: ValueKey(section.id),
+                margin: const EdgeInsets.only(bottom: 6.0),
+                index: index,
+                isWide: isMobileSize,
+                section: section,
+                onTap: onTapSection,
+                onDelete: onDeleteSection,
+                onEdit: onEditSection,
+                popupMenuEntries: popupMenuEntries,
+                onPopupMenuItemSelected: onPopupMenuItemSelected,
+              );
+            },
+            childCount: sections.length,
+          ),
+        ),
+      );
+    }
+
     return SliverPadding(
-      padding: const EdgeInsets.only(
-        top: 42.0,
-        left: 34.0,
-        right: 30.0,
+      padding: EdgeInsets.only(
+        top: isMobileSize ? 24.0 : 42.0,
+        left: isMobileSize ? 12.0 : 34.0,
+        right: isMobileSize ? 12.0 : 30.0,
         bottom: 300.0,
       ),
       sliver: SliverGrid(
@@ -115,7 +149,7 @@ class SectionsPageBody extends StatelessWidget {
           childAspectRatio: 0.9,
         ),
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
+          (BuildContext context, int index) {
             final Section section = sections.elementAt(index);
 
             return SectionCardItem(

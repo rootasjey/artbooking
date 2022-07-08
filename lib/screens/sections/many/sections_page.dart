@@ -83,6 +83,8 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         onPressed: navigateToAddSection,
@@ -94,16 +96,19 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
       body: CustomScrollView(
         slivers: <Widget>[
           ApplicationBar(),
-          SectionsPageHeader(),
+          SectionsPageHeader(
+            isMobileSize: isMobileSize,
+          ),
           SectionsPageBody(
-            sections: _sections,
+            isMobileSize: isMobileSize,
             loading: _loading,
             onTapSection: onTapSection,
             onDeleteSection: onDeleteSection,
             onEditSection: onEditSection,
             onCreateSection: navigateToAddSection,
-            popupMenuEntries: _popupMenuEntries,
             onPopupMenuItemSelected: onPopupMenuItemSelected,
+            popupMenuEntries: _popupMenuEntries,
+            sections: _sections,
           )
         ],
       ),

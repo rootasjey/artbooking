@@ -3,14 +3,20 @@ import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 
 class SectionsPageHeader extends StatelessWidget {
-  const SectionsPageHeader({Key? key}) : super(key: key);
+  const SectionsPageHeader({
+    Key? key,
+    this.isMobileSize = false,
+  }) : super(key: key);
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.only(
-        left: 54.0,
-        top: 60.0,
+      padding: EdgeInsets.only(
+        left: isMobileSize ? 12.0 : 54.0,
+        top: isMobileSize ? 24.0 : 60.0,
       ),
       sliver: PageTitle(
         crossAxisAlignment: CrossAxisAlignment.start,
