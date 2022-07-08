@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
@@ -6,6 +5,7 @@ class LicensesPageFab extends StatelessWidget {
   const LicensesPageFab({
     Key? key,
     required this.show,
+    required this.label,
     this.onPressed,
     this.tooltip,
     this.isMobileSize = false,
@@ -22,6 +22,8 @@ class LicensesPageFab extends StatelessWidget {
 
   /// Message to display while hovering FAB.
   final String? tooltip;
+
+  final Widget label;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +44,7 @@ class LicensesPageFab extends StatelessWidget {
       onPressed: onPressed,
       tooltip: tooltip,
       icon: Icon(UniconsLine.plus),
-      label: Text("license_create".tr()),
+      label: label,
       backgroundColor: Colors.black,
     );
   }

@@ -101,6 +101,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
         show: canManageLicense,
         onPressed: openNewLicenseDialog,
         isMobileSize: isMobileSize,
+        label: Text("license_create".tr()),
       ),
       body: CustomScrollView(
         slivers: <Widget>[
