@@ -18,7 +18,11 @@ class SectionPageBody extends StatelessWidget {
     required this.loading,
     required this.deleting,
     required this.section,
+    this.isMobileSize = false,
   }) : super(key: key);
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   /// Fetching section's data if true.
   final bool loading;
@@ -36,10 +40,10 @@ class SectionPageBody extends StatelessWidget {
 
     if (loading || deleting) {
       return SliverPadding(
-        padding: const EdgeInsets.only(
-          top: 60.0,
-          left: 60.0,
-          right: 60.0,
+        padding: EdgeInsets.only(
+          top: isMobileSize ? 24.0 : 60.0,
+          left: isMobileSize ? 12.0 : 60.0,
+          right: isMobileSize ? 12.0 : 60.0,
           bottom: 260.0,
         ),
         sliver: LoadingView(
@@ -50,24 +54,25 @@ class SectionPageBody extends StatelessWidget {
     }
 
     return SliverPadding(
-      padding: const EdgeInsets.only(
-        top: 60.0,
-        left: 60.0,
-        right: 60.0,
-        bottom: 100.0,
+      padding: EdgeInsets.only(
+        top: isMobileSize ? 24.0 : 60.0,
+        left: isMobileSize ? 12.0 : 60.0,
+        right: isMobileSize ? 12.0 : 60.0,
+        bottom: 200.0,
       ),
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
-          Align(
-            alignment: Alignment.topLeft,
-            child: IconButton(
-              tooltip: "back".tr(),
-              onPressed: () => Utilities.navigation.back(context),
-              icon: Icon(UniconsLine.arrow_left),
+          if (!isMobileSize)
+            Align(
+              alignment: Alignment.topLeft,
+              child: IconButton(
+                tooltip: "back".tr(),
+                onPressed: () => Utilities.navigation.back(context),
+                icon: Icon(UniconsLine.arrow_left),
+              ),
             ),
-          ),
           Padding(
-            padding: const EdgeInsets.only(left: 12.0, top: 12),
+            padding: const EdgeInsets.only(top: 12),
             child: Wrap(
               children: [
                 SizedBox(

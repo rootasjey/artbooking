@@ -6,6 +6,7 @@ import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/sections/one/section_page_body.dart';
 import 'package:artbooking/types/firestore/doc_snapshot_stream_subscription.dart';
+import 'package:artbooking/types/firestore/document_map.dart';
 import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/section.dart';
@@ -40,7 +41,7 @@ class _LicensePageState extends ConsumerState<SectionPage> {
   DocSnapshotStreamSubscription? _sectionSubscription;
 
   /// Section's page data.
-  var _section = Section.empty();
+  Section _section = Section.empty();
 
   @override
   void initState() {
@@ -51,7 +52,7 @@ class _LicensePageState extends ConsumerState<SectionPage> {
     if (sectionFromNav != null && sectionFromNav.id == widget.sectionId) {
       _section = sectionFromNav;
 
-      final query =
+      final DocumentMap query =
           FirebaseFirestore.instance.collection("sections").doc(_section.id);
 
       listenSectionEvents(query);
@@ -69,12 +70,15 @@ class _LicensePageState extends ConsumerState<SectionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Scaffold(
       floatingActionButton: fab(),
       body: CustomScrollView(
         slivers: [
           ApplicationBar(),
           SectionPageBody(
+            isMobileSize: isMobileSize,
             loading: _loading,
             deleting: _deleting,
             section: _section,
@@ -96,7 +100,7 @@ class _LicensePageState extends ConsumerState<SectionPage> {
             fontSize: 18.0,
             fontWeight: FontWeight.w600,
           ),
-          backgroundColor: Theme.of(context).secondaryHeaderColor,
+          backgroundColor: Colors.black,
           extendedPadding: EdgeInsets.symmetric(
             horizontal: 20.0,
             vertical: 20.0,
