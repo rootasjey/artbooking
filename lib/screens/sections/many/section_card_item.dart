@@ -12,21 +12,32 @@ class SectionCardItem extends StatefulWidget {
     Key? key,
     required this.section,
     required this.index,
+    this.isWide = false,
+    this.margin = EdgeInsets.zero,
     this.onTap,
     this.onDelete,
     this.onEdit,
-    this.popupMenuEntries = const [],
     this.onPopupMenuItemSelected,
+    this.popupMenuEntries = const [],
   }) : super(key: key);
 
+  /// If true, the card will have a wide layout.
+  final bool isWide;
+
+  /// Outer space of this widget.
+  final EdgeInsets margin;
+
+  /// Position of this item.
   final int index;
-  final void Function(Section, int)? onTap;
 
   /// onDelete callback function (after selecting 'delete' item menu)
   final Function(Section, int)? onDelete;
 
   /// onEdit callback function (after selecting 'edit' item menu)
   final Function(Section, int)? onEdit;
+
+  /// Callback fired after tapping this card.
+  final void Function(Section, int)? onTap;
 
   /// Main data representing a section.
   final Section section;
@@ -64,10 +75,97 @@ class _SectionCardItemState extends State<SectionCardItem> {
 
   @override
   Widget build(BuildContext context) {
-    final section = widget.section;
+    final Section section = widget.section;
 
     if (_borderColor == Colors.pink) {
       _borderColor = Theme.of(context).primaryColor.withOpacity(0.6);
+    }
+
+    if (widget.isWide) {
+      return Container(
+        width: 260.0,
+        padding: widget.margin,
+        child: Card(
+          elevation: _elevation,
+          color: Theme.of(context).backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(6.0),
+            side: BorderSide(
+              color: _borderColor,
+              width: _borderWidth,
+            ),
+          ),
+          child: InkWell(
+            onTap: () => widget.onTap?.call(widget.section, widget.index),
+            onHover: (isHover) {
+              setState(() {
+                _elevation = isHover ? 4.0 : 2.0;
+                _borderColor = isHover
+                    ? Theme.of(context).primaryColor
+                    : Theme.of(context).primaryColor.withOpacity(0.6);
+                _borderWidth = isHover ? 3.0 : 2.0;
+                _textBgColor = isHover ? Colors.amber : Colors.transparent;
+                _showPopupMenu = isHover;
+              });
+            },
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Opacity(
+                          opacity: 0.6,
+                          child: Icon(
+                            Utilities.ui.getSectionIcon(section.id),
+                            size: 24.0,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Hero(
+                              tag: section.id,
+                              child: Opacity(
+                                opacity: 0.8,
+                                child: Text(
+                                  "section_name.${section.id}".tr(),
+                                  maxLines: 2,
+                                  style: Utilities.fonts.body(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w600,
+                                    backgroundColor: _textBgColor,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Opacity(
+                              opacity: 0.4,
+                              child: Text(
+                                "section_description.${section.id}".tr(),
+                                maxLines: 5,
+                                style: Utilities.fonts.body(
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                popupMenuButton(),
+              ],
+            ),
+          ),
+        ),
+      );
     }
 
     return SizedBox(
