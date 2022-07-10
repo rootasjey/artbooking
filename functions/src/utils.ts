@@ -20,6 +20,9 @@ export const ILLUSTRATIONS_COLLECTION_NAME = 'illustrations'
 export const LICENSES_COLLECTION_NAME = 'licenses'
 export const LAYOUT_DOC_NAME = 'layout'
 export const NOTIFICATIONS_DOCUMENT_NAME = 'notifications'
+export const POSTS_COLLECTION_NAME = 'posts'
+export const POST_LIKED_BY_COLLECTION_NAME = 'post_liked_by'
+export const POST_STATISTICS_COLLECTION_NAME = 'post_statistics'
 export const STATISTICS_COLLECTION_NAME = 'statistics'
 export const STORAGES_DOCUMENT_NAME = 'storages'
 export const TASKS_COLLECTION_NAME = 'tasks'
@@ -32,6 +35,7 @@ export const USERS_COLLECTION_NAME = 'users'
 
 export const LIKE_ILLUSTRATION_TYPE = 'illustration';
 export const LIKE_BOOK_TYPE = 'book';
+export const LIKE_POST_TYPE = 'post';
 
 export const cloudRegions = {
   eu: 'europe-west1'
@@ -46,6 +50,30 @@ export enum BookCoverMode {
   
   /** User upload a specific image to use as book's cover. */
   uploadedCover = "uploaded_cover",
+}
+
+export function arraysEqual(array1: any[], array2: any[]) {
+  // if the other array is a falsy value, return
+  if (!array2)
+      return false;
+
+  // compare lengths - can save a lot of time 
+  if (array1.length != array2.length)
+      return false;
+
+  for (var i = 0, l = array1.length; i < l; i++) {
+      // Check if we have nested arrays
+      if (array1[i] instanceof Array && array2[i] instanceof Array) {
+          // recurse into the nested arrays
+          if (!arraysEqual(array1[i], array2[i]))
+              return false;    
+      }           
+      else if (array1[i] != array2[i]) { 
+          // Warning - two different object instances will never be equal: {x:20} != {x:20}
+          return false;   
+      }           
+  }       
+  return true;
 }
 
 /**

@@ -17,7 +17,11 @@ import {
   LAYOUT_DOC_NAME, 
   LIKE_BOOK_TYPE, 
   LIKE_ILLUSTRATION_TYPE, 
+  LIKE_POST_TYPE, 
   NOTIFICATIONS_DOCUMENT_NAME, 
+  POSTS_COLLECTION_NAME, 
+  POST_LIKED_BY_COLLECTION_NAME, 
+  POST_STATISTICS_COLLECTION_NAME, 
   randomIntFromInterval, 
   STORAGES_DOCUMENT_NAME, 
   USERS_COLLECTION_NAME, 
@@ -257,7 +261,8 @@ export const onLike = functions
       return await likeSnapshot.ref.delete();
     }
 
-    if (type !== LIKE_ILLUSTRATION_TYPE && type !== LIKE_BOOK_TYPE) {
+    if (type !== LIKE_ILLUSTRATION_TYPE && type !== LIKE_BOOK_TYPE 
+        && type !== LIKE_POST_TYPE) {
       return await likeSnapshot.ref.delete();
     }
 
@@ -284,6 +289,17 @@ export const onLike = functions
         .get();
 
       if (!bookSnapshot.exists) {
+        return await likeSnapshot.ref.delete();
+      }
+    }
+
+    if (type === LIKE_POST_TYPE) {
+      const postSnapshot = await firestore
+        .collection(POSTS_COLLECTION_NAME)
+        .doc(likeSnapshot.id)
+        .get();
+
+      if (!postSnapshot.exists) {
         return await likeSnapshot.ref.delete();
       }
     }
@@ -304,10 +320,14 @@ export const onLike = functions
       await addUserToIllustrationLike(likeSnapshot.id, user_id_path_param)
     }
 
+    if (type === LIKE_POST_TYPE) {
+      await addUserToPostLike(likeSnapshot.id, user_id_path_param)
+    }
+
     return await likeSnapshot.ref.update({
       created_at: adminApp.firestore.FieldValue.serverTimestamp(),
     });
-  })
+  });
 
 /**
  * When an user un-likes something (illustration, book).
@@ -325,7 +345,8 @@ export const onUnLike = functions
       return;
     }
 
-    if (type !== LIKE_ILLUSTRATION_TYPE && type !== LIKE_BOOK_TYPE) {
+    if (type !== LIKE_ILLUSTRATION_TYPE && type !== LIKE_BOOK_TYPE 
+        && type !== LIKE_POST_TYPE) {
       return;
     }
 
@@ -356,6 +377,17 @@ export const onUnLike = functions
       }
     }
 
+    if (type === LIKE_POST_TYPE) {
+      const bookSnapshot = await firestore
+        .collection(POSTS_COLLECTION_NAME)
+        .doc(likeSnapshot.id)
+        .get();
+
+      if (!bookSnapshot.exists) {
+        return;
+      }
+    }
+
     const user_id_path_param: string = context.params.user_id
     await decrementUserLikeCount(user_id_path_param, type)
     await decrementDocumentLikeCount(likeSnapshot.id, type)
@@ -368,8 +400,12 @@ export const onUnLike = functions
       await removeUserToIllustrationLike(likeSnapshot.id, user_id_path_param)
     }
 
+    if (type === LIKE_POST_TYPE) {
+      await removeUserToPostLike(likeSnapshot.id, user_id_path_param)
+    }
+
     return true
-  })
+  });
 
 /**
  * Create user's public information from private fields.
@@ -398,7 +434,7 @@ export const onCreatePublicInfo = functions
         type: "base",
         updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
       });
-  })
+  });
 
 /**
  * Keep public user's information in-sync with privated fields.
@@ -430,7 +466,7 @@ export const onUpdatePublicInfo = functions
         social_links: afterData.social_links,
         updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
       });
-  })
+  });
 
 /**
  * Update an user's email in Firebase auth and in Firestore.
@@ -586,7 +622,7 @@ export const updatePublicStrings = functions
         bio,
         location,
       });
-  })
+  });
 
 /**
  * Update user's social links.
@@ -630,7 +666,7 @@ export const updateSocialLinks = functions
       .update({
         social_links: social_links
       });
-  })
+  });
 
 // ----------------
 // HELPER FUNCTIONS
@@ -746,6 +782,19 @@ async function createUserSettingsCollection(user_id: string) {
     })
 
   await userStatsCollection
+    .doc(POSTS_COLLECTION_NAME)
+    .create({
+      created: 0,
+      deleted: 0,
+      drafts: 0,
+      liked: 0,
+      name: POSTS_COLLECTION_NAME,
+      owned: 0,
+      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      user_id,
+    })
+
+  await userStatsCollection
     .doc(NOTIFICATIONS_DOCUMENT_NAME)
     .create({
       name: NOTIFICATIONS_DOCUMENT_NAME,
@@ -757,21 +806,21 @@ async function createUserSettingsCollection(user_id: string) {
 
 
   await userStatsCollection
-  .doc(STORAGES_DOCUMENT_NAME)
-  .create({ // all number values are in bytes
-    illustrations: {
-      total: 0,
-      used: 0,
-      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
-    },
-    name: STORAGES_DOCUMENT_NAME,
-    user_id,
-    videos: {
-      total: 0,
-      used: 0,
-      updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
-    },
-  })
+    .doc(STORAGES_DOCUMENT_NAME)
+    .create({ // all number values are in bytes
+      illustrations: {
+        total: 0,
+        used: 0,
+        updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      },
+      name: STORAGES_DOCUMENT_NAME,
+      user_id,
+      videos: {
+        total: 0,
+        used: 0,
+        updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      },
+    })
 }
 
 /**
@@ -781,9 +830,15 @@ async function createUserSettingsCollection(user_id: string) {
  * @returns void.
  */
 async function decrementUserLikeCount(userId:string, likeType: string) {
-  const docName = likeType === 'books' 
-  ? BOOKS_COLLECTION_NAME
-  : ILLUSTRATIONS_COLLECTION_NAME;
+  let docName = ''; 
+
+  if (likeType === LIKE_BOOK_TYPE) {
+    docName = BOOKS_COLLECTION_NAME;
+  } else if (likeType === LIKE_ILLUSTRATION_TYPE) {
+    docName = ILLUSTRATIONS_COLLECTION_NAME;
+  } else if (likeType === LIKE_POST_TYPE) {
+    docName = POSTS_COLLECTION_NAME;
+  }
 
   const snapshot = await firestore
     .collection(USERS_COLLECTION_NAME)
@@ -812,13 +867,19 @@ async function decrementUserLikeCount(userId:string, likeType: string) {
  * @returns void.
  */
 async function decrementDocumentLikeCount(documentId:string, likeType: string) {
-  const collectionName = likeType === 'book' 
-    ? BOOKS_COLLECTION_NAME
-    : ILLUSTRATIONS_COLLECTION_NAME;
+  let collectionName = ''; 
+  let statsCollectionName = '';
 
-  const statsCollectionName = likeType === 'book'
-    ? BOOK_STATISTICS_COLLECTION_NAME
-    : ILLUSTRATION_STATISTICS_COLLECTION_NAME;
+  if (likeType === LIKE_BOOK_TYPE) {
+    collectionName = BOOKS_COLLECTION_NAME;
+    statsCollectionName = BOOK_STATISTICS_COLLECTION_NAME;
+  } else if (likeType === LIKE_ILLUSTRATION_TYPE) {
+    collectionName = ILLUSTRATIONS_COLLECTION_NAME;
+    statsCollectionName = ILLUSTRATION_STATISTICS_COLLECTION_NAME;
+  } else if (likeType === LIKE_POST_TYPE) {
+    collectionName = POSTS_COLLECTION_NAME;
+    statsCollectionName = POST_STATISTICS_COLLECTION_NAME;
+  }
 
   const snapshot = await firestore
     .collection(collectionName)
@@ -847,9 +908,15 @@ async function decrementDocumentLikeCount(documentId:string, likeType: string) {
  * @returns void.
  */
  async function incrementUserLikeCount(userId:string, likeType: string) {
-  const docStatsName = likeType === 'books' 
-  ? BOOKS_COLLECTION_NAME
-  : ILLUSTRATIONS_COLLECTION_NAME;
+  let docStatsName = '';
+
+  if (likeType === LIKE_BOOK_TYPE) {
+    docStatsName = BOOKS_COLLECTION_NAME;
+  } else if (likeType === LIKE_ILLUSTRATION_TYPE) {
+    docStatsName = ILLUSTRATIONS_COLLECTION_NAME;
+  } else if (likeType === LIKE_POST_TYPE) {
+    docStatsName = POSTS_COLLECTION_NAME;
+  }
 
   const userStatsSnapshot = await firestore
     .collection(USERS_COLLECTION_NAME)
@@ -894,13 +961,19 @@ function getRandomProfilePictureLink(): string {
  * @returns void.
  */
  async function incrementDocumentLikeCount(documentId:string, likeType: string) {
-  const collectionName = likeType === 'book' 
-    ? BOOKS_COLLECTION_NAME
-    : ILLUSTRATIONS_COLLECTION_NAME;
-
-  const statsCollectionName = likeType === 'book'
-    ? BOOK_STATISTICS_COLLECTION_NAME
-    : ILLUSTRATION_STATISTICS_COLLECTION_NAME;
+  let collectionName = '';
+  let statsCollectionName = '';
+  
+  if (likeType === LIKE_BOOK_TYPE) {
+    collectionName = BOOKS_COLLECTION_NAME;
+    statsCollectionName = BOOK_STATISTICS_COLLECTION_NAME;
+  } else if (likeType === LIKE_ILLUSTRATION_TYPE) {
+    collectionName = ILLUSTRATIONS_COLLECTION_NAME;
+    statsCollectionName = ILLUSTRATION_STATISTICS_COLLECTION_NAME;
+  } else if (likeType === LIKE_POST_TYPE) {
+    collectionName = POSTS_COLLECTION_NAME;
+    statsCollectionName = POST_STATISTICS_COLLECTION_NAME;
+  }
 
   const snapshot = await firestore
     .collection(collectionName)
@@ -923,7 +996,7 @@ function getRandomProfilePictureLink(): string {
 
 /**
  * Add a target user to book's [book_liked_by] collection.
- * @param bookId Illustration's id or book's id.
+ * @param bookId Book's id.
  * @param userId User's id who liked this book.
  * @returns void.
  */
@@ -942,8 +1015,8 @@ function getRandomProfilePictureLink(): string {
 
 /**
  * Add a target user to illustration's [illustration_liked_by] collection.
- * @param illustrationId Illustration's id or book's id.
- * @param userId User's id who liked this book.
+ * @param illustrationId Illustration's id.
+ * @param userId User's id who liked this illustration.
  * @returns void.
  */
  async function addUserToIllustrationLike(illustrationId:string, userId: string) {
@@ -955,6 +1028,25 @@ function getRandomProfilePictureLink(): string {
     .create({
       created_at: adminApp.firestore.FieldValue.serverTimestamp(),
       illustration_id: illustrationId,
+      user_id: userId,
+    })
+}
+
+/**
+ * Add a target user to post's [post_liked_by] collection.
+ * @param postId Post's id.
+ * @param userId User's id who liked this post.
+ * @returns void.
+ */
+ async function addUserToPostLike(postId:string, userId: string) {
+  return await firestore
+    .collection(POSTS_COLLECTION_NAME)
+    .doc(postId)
+    .collection(POST_LIKED_BY_COLLECTION_NAME)
+    .doc(userId)
+    .create({
+      created_at: adminApp.firestore.FieldValue.serverTimestamp(),
+      post_id: postId,
       user_id: userId,
     })
 }
@@ -1031,6 +1123,21 @@ async function isUserExistsByUsername(nameLowerCase: string) {
     .collection(ILLUSTRATIONS_COLLECTION_NAME)
     .doc(illustrationId)
     .collection(ILLUSTRATION_LIKED_BY_COLLECTION_NAME)
+    .doc(userId)
+    .delete()
+}
+
+/**
+ * Remove a target user to post's [post_liked_by] collection.
+ * @param postId post's id or book's id.
+ * @param userId User's id who liked this book.
+ * @returns void.
+ */
+ async function removeUserToPostLike(postId:string, userId: string) {
+  await firestore
+    .collection(POSTS_COLLECTION_NAME)
+    .doc(postId)
+    .collection(POST_LIKED_BY_COLLECTION_NAME)
     .doc(userId)
     .delete()
 }

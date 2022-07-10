@@ -538,3 +538,13 @@ interface UpdateIllusVisibilityParams {
 interface UpdateUsernameParams {
   username: string;
 }
+
+interface UpdateUserPostStatsParams {
+  userId: string;
+  postData: FirebaseFirestore.DocumentData;
+}
+
+interface UpdateUserListPostStatsParams {
+  userIds: string[];
+  postData: FirebaseFirestore.DocumentData;
+}
