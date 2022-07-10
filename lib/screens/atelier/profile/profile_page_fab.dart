@@ -47,13 +47,13 @@ class ProfilePageFAB extends StatelessWidget {
               onPressed: onToggleEditMode,
               backgroundColor: Colors.amber.shade600,
               label: Text(
-                editMode ? "edit_mode".tr() : "view_mode".tr(),
+                editMode ? "view_mode".tr() : "edit_mode".tr(),
                 style: Utilities.fonts.body(
                   fontWeight: FontWeight.w600,
                 ),
               ),
               icon: Icon(
-                editMode ? UniconsLine.pen : UniconsLine.eye,
+                editMode ? UniconsLine.eye : UniconsLine.pen,
               ),
             ),
           ),
