@@ -47,7 +47,6 @@ class SectionWrapper extends StatefulWidget {
   final int sectionCount;
 
   /// Section's data.
-
   final Section section;
 
   /// Current authenticated user's id.
@@ -168,6 +167,8 @@ class _SectionWrapperState extends State<SectionWrapper> {
       return sectionWidget;
     }
 
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return MouseRegion(
       onEnter: (PointerEnterEvent pointerEnterEvent) {
         setState(() => _isHover = true);
@@ -186,7 +187,7 @@ class _SectionWrapperState extends State<SectionWrapper> {
           if (_isHover)
             Positioned(
               top: 24.0,
-              right: 92.0,
+              right: isMobileSize ? 16.0 : 92.0,
               child: Draggable<DragData>(
                 data: DragData(
                   index: widget.index,
