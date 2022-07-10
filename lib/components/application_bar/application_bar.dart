@@ -68,7 +68,10 @@ class ApplicationBar extends ConsumerWidget {
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
                       child: CircleButton.outlined(
-                        onTap: () => Utilities.navigation.back(context),
+                        onTap: () => Utilities.navigation.back(
+                          context,
+                          isMobile: isMobileSize,
+                        ),
                         child: Icon(
                           UniconsLine.arrow_left,
                           color: Theme.of(context).textTheme.bodyText2?.color,
