@@ -152,7 +152,7 @@ class _MozaicSectionState extends State<MozaicSection> {
             padding: padding,
             child: Column(
               children: [
-                titleSectionWidget(isMobileSize),
+                titleWidget(isMobileSize),
                 maybeHelperText(),
                 Padding(
                   padding: const EdgeInsets.only(top: 34.0),
@@ -361,7 +361,7 @@ class _MozaicSectionState extends State<MozaicSection> {
     );
   }
 
-  Widget titleSectionWidget(bool isMobileSize) {
+  Widget titleWidget(bool isMobileSize) {
     final String title = widget.section.name;
     final String description = widget.section.description;
 
@@ -371,37 +371,34 @@ class _MozaicSectionState extends State<MozaicSection> {
 
     return Align(
       alignment: Alignment.topLeft,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 12.0),
-        child: InkWell(
-          onTap: widget.editMode ? onTapTitleDescription : null,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (title.isNotEmpty)
-                Opacity(
-                  opacity: 0.8,
-                  child: Text(
-                    title,
-                    style: Utilities.fonts.title(
-                      fontSize: isMobileSize ? 26.0 : 42.0,
-                      fontWeight: FontWeight.w700,
-                    ),
+      child: InkWell(
+        onTap: widget.editMode ? onTapTitleDescription : null,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (title.isNotEmpty)
+              Opacity(
+                opacity: 0.8,
+                child: Text(
+                  title,
+                  style: Utilities.fonts.title(
+                    fontSize: isMobileSize ? 26.0 : 42.0,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-              if (description.isNotEmpty)
-                Opacity(
-                  opacity: 0.6,
-                  child: Text(
-                    description,
-                    style: Utilities.fonts.body3(
-                      fontSize: isMobileSize ? 14.0 : 16.0,
-                      fontWeight: FontWeight.w400,
-                    ),
+              ),
+            if (description.isNotEmpty)
+              Opacity(
+                opacity: 0.6,
+                child: Text(
+                  description,
+                  style: Utilities.fonts.body3(
+                    fontSize: isMobileSize ? 14.0 : 16.0,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
       ),
     );

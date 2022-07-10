@@ -31,18 +31,29 @@ class RowFeaturesSection extends StatelessWidget {
   /// If true, the current authenticated user is the owner and
   /// this section can be edited.
   final bool editMode;
+
+  /// True if pointer is hover this section.
   final bool isHover;
+
+  /// True if this section is the last one.
   final bool isLast;
+
+  /// True is this section is being hovered with a draggable item.
   final bool usingAsDropTarget;
 
   /// Section's position in the layout (e.g. 0 is the first).
   final int index;
 
+  /// List of entries for the popup menu.
   final List<PopupMenuItemSection> popupMenuEntries;
 
+  /// Main data.
+  /// A section in a page. Its design is unique from other sections.
   final Section section;
 
+  /// Callback fired when an entry is selected from the popup menu.
   final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
+
   @override
   Widget build(BuildContext context) {
     final EdgeInsets outerPadding =
@@ -168,9 +179,7 @@ class RowFeaturesSection extends StatelessWidget {
             ),
             title: "app_features.atelier.title".tr(),
             description: "app_features.atelier.description".tr(),
-            onTap: () => Beamer.of(context).beamToNamed(
-              AtelierLocationContent.activityRoute,
-            ),
+            onTap: () => onTapAtelier(context),
           ),
           VerticalCard(
             icon: Icon(
@@ -203,9 +212,7 @@ class RowFeaturesSection extends StatelessWidget {
         children: [
           horizontalFeatureCard(
             iconData: UniconsLine.ruler_combined,
-            onTap: () => Beamer.of(context).beamToNamed(
-              AtelierLocationContent.activityRoute,
-            ),
+            onTap: () => onTapAtelier(context),
             titleValue: "app_features.atelier.title".tr(),
             subtitleValue: "app_features.atelier.description".tr(),
           ),
@@ -404,6 +411,12 @@ class RowFeaturesSection extends StatelessWidget {
       EnumSectionAction.rename,
       index,
       section,
+    );
+  }
+
+  void onTapAtelier(BuildContext context) {
+    Beamer.of(context).beamToNamed(
+      AtelierLocationContent.activityRoute,
     );
   }
 }

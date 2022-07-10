@@ -183,6 +183,10 @@ class ProfilePageBody extends StatelessWidget {
         SectionWrapper(
           editMode: editMode && isOwner,
           index: index,
+          onDraggableSectionCanceled: onDraggableSectionCanceled,
+          onDragSectionCompleted: onDragSectionCompleted,
+          onDragSectionEnd: onDragSectionEnd,
+          onDragSectionStarted: onDragSectionStarted,
           onDropSection: onDropSection,
           onNavigateFromSection: onNavigateFromSection,
           onPopupMenuItemSelected: onPopupMenuItemSelected,
@@ -193,10 +197,6 @@ class ProfilePageBody extends StatelessWidget {
           section: section,
           sectionCount: modularPage.sections.length - 1,
           userId: userId,
-          onDragSectionStarted: onDragSectionStarted,
-          onDragSectionCompleted: onDragSectionCompleted,
-          onDragSectionEnd: onDragSectionEnd,
-          onDraggableSectionCanceled: onDraggableSectionCanceled,
         ),
       );
 

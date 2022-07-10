@@ -403,12 +403,12 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
   }
 
   void onPageScroll(double offset) {
-    final bool isScrollingDown = offset - _previousOffset > 0;
+    final bool scrollingDown = offset - _previousOffset > 0;
     _previousOffset = offset;
 
     _showNavToTopFab = offset == 0.0 ? false : true;
 
-    if (isScrollingDown) {
+    if (scrollingDown) {
       if (!_showFab) {
         return;
       }

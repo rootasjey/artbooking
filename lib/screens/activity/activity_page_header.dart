@@ -20,7 +20,6 @@ class ActivityPageHeader extends StatelessWidget {
         bottom: 24.0,
       ),
       sliver: PageTitle(
-        // showBackButton: isMobileSize,
         isMobileSize: isMobileSize,
         titleValue: "activity".tr(),
         subtitleValue: "activity_subtitle".tr(),
