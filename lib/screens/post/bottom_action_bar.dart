@@ -15,6 +15,7 @@ class BottomActionBar extends StatelessWidget {
     this.onDelete,
     this.show = true,
     this.liked = false,
+    this.published = false,
   }) : super(key: key);
 
   /// True if the current user is authenticated.
@@ -26,6 +27,9 @@ class BottomActionBar extends StatelessWidget {
 
   /// True if the post is in the current authenticated user's favourites.
   final bool liked;
+
+  /// True if the post is published.
+  final bool published;
 
   /// If true, the bar will be displayed. Will show an empty container otherwise.
   final bool show;
@@ -67,7 +71,7 @@ class BottomActionBar extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (authenticated)
+                  if (authenticated && published)
                     BottomActionBarButton(
                       iconData:
                           liked ? FontAwesomeIcons.heart : UniconsLine.heart,

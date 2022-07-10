@@ -218,6 +218,7 @@ class _PostPageState extends ConsumerState<PostPage> {
             onDelete: showDeleteConfirm,
             onShare: onSharePost,
             onToggleLike: onToggleLike,
+            published: _post.visibility == EnumContentVisibility.public,
             show: _showBottomActionBar,
           ),
         ],
@@ -484,10 +485,10 @@ class _PostPageState extends ConsumerState<PostPage> {
   }
 
   void onPageScroll(double offset) {
-    final bool scrollingForward = offset - _previousOffset > 0;
+    final bool scrollingDown = offset - _previousOffset > 0;
     _previousOffset = offset;
 
-    if (scrollingForward) {
+    if (scrollingDown) {
       if (_showBottomActionBar) {
         setState(() => _showBottomActionBar = false);
       }
