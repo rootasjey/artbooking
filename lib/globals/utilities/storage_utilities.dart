@@ -173,6 +173,11 @@ class StorageUtilities {
     return drafts;
   }
 
+  bool getModularPageEditMode() {
+    final String key = Constants.storageKeys.modularPageEditMode;
+    return _localStorage.getBool(key) ?? true;
+  }
+
   EnumItemsLayout getItemsStyle(String pageRoute) {
     final itemsStyle = _localStorage
         .getString('${Constants.storageKeys.itemsStyle}$pageRoute');
@@ -203,6 +208,11 @@ class StorageUtilities {
   bool getDashboardSideMenuExpanded() {
     final String key = Constants.storageKeys.dashboardSideMenuExpanded;
     return _localStorage.getBool(key) ?? true;
+  }
+
+  void saveModularPageEditMode(bool isEdit) {
+    final String key = Constants.storageKeys.modularPageEditMode;
+    _localStorage.setBool(key, isEdit);
   }
 
   void saveIllustrationsTab(EnumVisibilityTab visibilityTab) {

@@ -158,7 +158,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       isOwner: isOwner,
       showBackButton: true,
       scrollController: _scrollController,
-      showFabToTop: _showFabToTop,
+      showFab: _showFabToTop,
       onToggleFabToTop: onToggleFabToTop,
       modularPage: _profilePage,
       onAddSection: tryAddSection,

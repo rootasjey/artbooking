@@ -70,17 +70,25 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
   /// this page sections.
   bool _editMode = true;
 
-  bool _showFabToTop = false;
+  /// If true, Floating Action Button will be displayed.
+  bool _showFab = true;
+
+  /// If true, a Floating Action Button to scroll to top will be displayed.
+  bool _showNavToTopFab = false;
 
   /// If true, a section is being dragged from its original position.
   bool _isDraggingSection = false;
+
+  /// Previous scroll offset.
+  /// Works with [_pageScrollController] to show/hide FAB.
+  double _previousOffset = 0.0;
 
   /// Run a periodic timer to continuously scroll in a direction
   /// (without necessarly moving the cursor).
   Timer? _scrollTimer;
 
   /// Modular page data.
-  var _modularPage = ModularPage.empty();
+  ModularPage _modularPage = ModularPage.empty();
 
   /// Listens to book's updates.
   DocSnapshotStreamSubscription? _modularPageSubscription;
@@ -119,11 +127,12 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
   ];
 
   /// Scroll controller to move inside the page.
-  final _scrollController = ScrollController();
+  final ScrollController _pageCcrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    loadPreferences();
     tryFetchPage();
   }
 
@@ -180,29 +189,30 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     final bool canManagePages = userFirestore?.rights.canManagePages ?? false;
 
     return ProfilePageBody(
-      userId: userId ?? "",
-      scrollController: _scrollController,
-      showFabToTop: _showFabToTop,
-      onToggleFabToTop: onToggleFabToTop,
+      editMode: _editMode,
       isOwner: canManagePages,
       modularPage: _modularPage,
       onAddSection: tryAddSection,
-      editMode: _editMode,
-      onToggleEditMode: onToggleEditMode,
-      popupMenuEntries: _popupMenuEntries,
-      onPopupMenuItemSelected: onPopupMenuItemSelected,
-      onShowAddSection: onShowAddSection,
-      onShowIllustrationDialog: onShowIllustrationDialog,
-      onUpdateSectionItems: tryUpdateSectionItems,
-      onShowBookDialog: onShowBookDialog,
+      onDragSectionStarted: onDragSectionStarted,
+      onDraggableSectionCanceled: onDraggableSectionCanceled,
       onDropSection: onDropSection,
-      onDropSectionInBetween: onDropSectionInBetween,
-      onNavigateFromSection: onNavigateFromSection,
       onDragSectionCompleted: onDragSectionCompleted,
       onDragSectionEnd: onDragSectionEnd,
-      onDraggableSectionCanceled: onDraggableSectionCanceled,
-      onDragSectionStarted: onDragSectionStarted,
+      onDropSectionInBetween: onDropSectionInBetween,
+      onNavigateFromSection: onNavigateFromSection,
+      onPageScroll: onPageScroll,
       onPointerMove: onPointerMove,
+      onPopupMenuItemSelected: onPopupMenuItemSelected,
+      onShowAddSection: onShowAddSection,
+      onShowBookDialog: onShowBookDialog,
+      onShowIllustrationDialog: onShowIllustrationDialog,
+      onToggleEditMode: onToggleEditMode,
+      onUpdateSectionItems: tryUpdateSectionItems,
+      popupMenuEntries: _popupMenuEntries,
+      scrollController: _pageCcrollController,
+      showFab: _showFab,
+      showNavToTopFab: _showNavToTopFab,
+      userId: userId ?? "",
     );
   }
 
@@ -235,6 +245,12 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
       });
     }, onError: (error) {
       Utilities.logger.e(error);
+    });
+  }
+
+  void loadPreferences() {
+    setState(() {
+      _editMode = Utilities.storage.getModularPageEditMode();
     });
   }
 
@@ -384,6 +400,32 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
       Beamer.of(context).beamToNamed("/illustrations");
       return;
     }
+  }
+
+  void onPageScroll(double offset) {
+    final bool isScrollingDown = offset - _previousOffset > 0;
+    _previousOffset = offset;
+
+    _showNavToTopFab = offset == 0.0 ? false : true;
+
+    if (isScrollingDown) {
+      if (!_showFab) {
+        return;
+      }
+
+      setState(() => _showFab = false);
+      return;
+    }
+
+    if (offset == 0.0) {
+      setState(() => _showNavToTopFab = false);
+    }
+
+    if (_showFab) {
+      return;
+    }
+
+    setState(() => _showFab = true);
   }
 
   void onPopupMenuItemSelected(
@@ -644,10 +686,8 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     setState(() {
       _editMode = !_editMode;
     });
-  }
 
-  void onToggleFabToTop(bool show) {
-    setState(() => _showFabToTop = show);
+    Utilities.storage.saveModularPageEditMode(_editMode);
   }
 
   void showRenameSectionDialog(Section section, int index) {
@@ -1159,18 +1199,18 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
 
     final double scrollTreshold = 100.0;
 
-    if (dy < scrollTreshold && _scrollController.offset > 0) {
+    if (dy < scrollTreshold && _pageCcrollController.offset > 0) {
       _scrollTimer?.cancel();
       _scrollTimer = Timer.periodic(
         Duration(milliseconds: duration),
         (Timer timer) {
-          _scrollController.animateTo(
-            _scrollController.offset - jumpOffset,
+          _pageCcrollController.animateTo(
+            _pageCcrollController.offset - jumpOffset,
             duration: Duration(milliseconds: duration),
             curve: Curves.easeIn,
           );
 
-          if (_scrollController.position.outOfRange) {
+          if (_pageCcrollController.position.outOfRange) {
             _scrollTimer?.cancel();
           }
         },
@@ -1182,18 +1222,18 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     final double windowHeight = MediaQuery.of(context).size.height;
 
     if (dy >= windowHeight - scrollTreshold &&
-        !_scrollController.position.atEdge) {
+        !_pageCcrollController.position.atEdge) {
       _scrollTimer?.cancel();
       _scrollTimer = Timer.periodic(
         Duration(milliseconds: duration),
         (Timer timer) {
-          _scrollController.animateTo(
-            _scrollController.offset + jumpOffset,
+          _pageCcrollController.animateTo(
+            _pageCcrollController.offset + jumpOffset,
             duration: Duration(milliseconds: duration),
             curve: Curves.easeIn,
           );
 
-          if (_scrollController.position.outOfRange) {
+          if (_pageCcrollController.position.outOfRange) {
             _scrollTimer?.cancel();
           }
         },

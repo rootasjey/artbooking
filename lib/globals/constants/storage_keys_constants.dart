@@ -13,6 +13,7 @@ class StorageKeys {
   final String drafts = "drafts";
   final String email = "email";
   final String firstLaunch = "first_launch";
+  final String modularPageEditMode = "modular_page_edit_mode";
   final String headerSeparatorTab = "header_separator_tab";
   final String imageShareColor = "image_share_color";
   final String imageShareTextColor = "image_share_text_color";

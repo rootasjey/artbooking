@@ -20,30 +20,32 @@ import 'package:unicons/unicons.dart';
 class ProfilePageBody extends StatelessWidget {
   const ProfilePageBody({
     Key? key,
-    required this.userId,
     required this.modularPage,
     required this.scrollController,
-    this.onPopupMenuItemSelected,
-    this.popupMenuEntries = const [],
-    this.onAddSection,
-    this.isOwner = false,
+    required this.userId,
     this.editMode = false,
-    this.showFabToTop = false,
-    this.onToggleFabToTop,
-    this.onShowAddSection,
-    this.onShowIllustrationDialog,
-    this.onUpdateSectionItems,
-    this.onShowBookDialog,
-    this.onDropSection,
-    this.showBackButton = false,
-    this.onToggleEditMode,
-    this.onDropSectionInBetween,
-    this.onNavigateFromSection,
+    this.isOwner = false,
+    this.onAddSection,
     this.onDraggableSectionCanceled,
     this.onDragSectionCompleted,
     this.onDragSectionEnd,
     this.onDragSectionStarted,
+    this.onDropSection,
+    this.onDropSectionInBetween,
+    this.onNavigateFromSection,
+    this.onPageScroll,
+    this.onPopupMenuItemSelected,
     this.onPointerMove,
+    this.onShowAddSection,
+    this.onShowBookDialog,
+    this.onShowIllustrationDialog,
+    this.onToggleEditMode,
+    this.onToggleFabToTop,
+    this.onUpdateSectionItems,
+    this.popupMenuEntries = const [],
+    this.showBackButton = false,
+    this.showFab = false,
+    this.showNavToTopFab = false,
   }) : super(key: key);
 
   /// True if the current authenticated user- if any - is the owner of this page.
@@ -52,8 +54,11 @@ class ProfilePageBody extends StatelessWidget {
   /// If true, a back button will be display on the page.
   final bool showBackButton;
 
+  /// If true, Floating Action Button will be displayed.
+  final bool showFab;
+
   /// If true, a Floating Action Button to scroll to top will be displayed.
-  final bool showFabToTop;
+  final bool showNavToTopFab;
 
   /// If true, the current user is an admin or owner and can add, remove, and edit
   /// this page sections.
@@ -89,6 +94,8 @@ class ProfilePageBody extends StatelessWidget {
     int dropTargetIndex,
     List<int> dragIndexes,
   )? onDropSectionInBetween;
+
+  final void Function(double)? onPageScroll;
 
   /// Callback to handle add secction action.
   final void Function(int index)? onShowAddSection;
@@ -211,8 +218,9 @@ class ProfilePageBody extends StatelessWidget {
         editMode: editMode,
         isOwner: isOwner,
         onToggleEditMode: onToggleEditMode,
-        scrollController: scrollController,
-        showFabToTop: showFabToTop,
+        pageScrollController: scrollController,
+        showFab: showFab,
+        showNavToTopFab: showNavToTopFab,
       ),
       body: Listener(
         onPointerMove: onPointerMove,
@@ -221,17 +229,8 @@ class ProfilePageBody extends StatelessWidget {
             ImprovedScrolling(
               scrollController: scrollController,
               enableKeyboardScrolling: true,
-              onScroll: (double vOffset) {
-                if (vOffset > 200.0 && !showFabToTop) {
-                  onToggleFabToTop?.call(true);
-                  return;
-                }
-
-                if (vOffset < 200.0 && showFabToTop) {
-                  onToggleFabToTop?.call(false);
-                  return;
-                }
-              },
+              enableMMBScrolling: true,
+              onScroll: onPageScroll,
               child: CustomScrollView(
                 controller: scrollController,
                 slivers: slivers,
