@@ -11,11 +11,11 @@ import 'package:unicons/unicons.dart';
 class AvatarMenu extends StatelessWidget {
   const AvatarMenu({
     Key? key,
-    this.padding = EdgeInsets.zero,
-    this.isMobileSize = false,
-    this.avatarURL = '',
-    this.avatarInitials = '',
     required this.onSignOut,
+    this.avatarInitials = "",
+    this.avatarURL = "",
+    this.isMobileSize = false,
+    this.padding = EdgeInsets.zero,
   }) : super(key: key);
 
   /// If true, this widget should adapt to small screen size.
@@ -24,13 +24,13 @@ class AvatarMenu extends StatelessWidget {
   /// This widget's margin.
   final EdgeInsets padding;
 
+  final Function() onSignOut;
+
   /// If set, this will take priority over [avatarInitials] property.
   final String avatarURL;
 
   /// Show initials letters if [avatarURL] is empty.
   final String avatarInitials;
-
-  final VoidCallback onSignOut;
 
   @override
   Widget build(BuildContext context) {
@@ -48,8 +48,8 @@ class AvatarMenu extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(6.0),
         ),
-        onSelected: (String path) async {
-          if (path == 'signout') {
+        onSelected: (final String path) async {
+          if (path == "signout") {
             onSignOut();
             return;
           }
@@ -79,7 +79,7 @@ class AvatarMenu extends StatelessWidget {
           textLabel: "home".tr(),
           value: HomeLocation.route,
         ),
-      if (!pathIsDashboard)
+      if (!pathIsDashboard && !isMobileSize)
         PopupMenuItemIcon(
           delay: Duration(milliseconds: 25),
           icon: PopupMenuIcon(UniconsLine.ruler_combined, color: iconColor),
