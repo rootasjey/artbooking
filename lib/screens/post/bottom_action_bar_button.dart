@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class BottomActionBarButton extends StatelessWidget {
   const BottomActionBarButton({
     Key? key,
-    required this.iconData,
+    required this.icon,
     this.onPressed,
     this.tooltip,
   }) : super(key: key);
 
-  /// This icon data will be wrapped inside an icon with a predefined style.
-  final IconData iconData;
+  /// Icon widget.
+  final Widget icon;
 
   /// Callback fired when the button is pressed.
   final void Function()? onPressed;
@@ -25,7 +25,7 @@ class BottomActionBarButton extends StatelessWidget {
         tooltip: tooltip,
         icon: Opacity(
           opacity: 0.6,
-          child: Icon(iconData),
+          child: icon,
         ),
         onPressed: onPressed,
       ),

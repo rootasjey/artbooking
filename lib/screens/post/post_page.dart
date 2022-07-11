@@ -127,6 +127,7 @@ class _PostPageState extends ConsumerState<PostPage> {
       _titleController.text = _post.name;
       _descriptionController.text = _post.description;
       fetchPostContent();
+      fetchLike();
       listenToDocumentChanges(
           FirebaseFirestore.instance.collection("posts").doc(widget.postId));
     } else {
@@ -274,9 +275,7 @@ class _PostPageState extends ConsumerState<PostPage> {
           .doc(_post.id)
           .snapshots()
           .listen((snapshot) {
-        setState(() {
-          _liked = snapshot.exists;
-        });
+        setState(() => _liked = snapshot.exists);
       }, onDone: () {
         _likeSubscription?.cancel();
       });
@@ -356,6 +355,8 @@ class _PostPageState extends ConsumerState<PostPage> {
       map["id"] = snapshot.id;
       _post = Post.fromMap(map);
       _titleController.text = _post.name;
+
+      fetchLike();
     } catch (error) {
       Utilities.logger.e(error);
     } finally {

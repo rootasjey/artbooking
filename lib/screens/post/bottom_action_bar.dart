@@ -1,4 +1,5 @@
 import 'package:artbooking/components/animations/fade_in_y.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/screens/post/bottom_action_bar_button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -73,19 +74,24 @@ class BottomActionBar extends StatelessWidget {
                 children: [
                   if (authenticated && published)
                     BottomActionBarButton(
-                      iconData:
-                          liked ? FontAwesomeIcons.heart : UniconsLine.heart,
+                      icon: liked
+                          ? Icon(
+                              FontAwesomeIcons.solidHeart,
+                              size: 20.0,
+                              color: Constants.colors.secondary,
+                            )
+                          : Icon(UniconsLine.heart),
                       onPressed: onToggleLike,
                       tooltip: liked ? "unlike".tr() : "like".tr(),
                     ),
                   if (canManagePosts)
                     BottomActionBarButton(
-                      iconData: UniconsLine.trash,
+                      icon: Icon(UniconsLine.trash),
                       onPressed: onDelete,
                       tooltip: "delete".tr(),
                     ),
                   BottomActionBarButton(
-                    iconData: UniconsLine.link,
+                    icon: Icon(UniconsLine.link),
                     onPressed: onShare,
                     tooltip: "copy_link".tr(),
                   ),
