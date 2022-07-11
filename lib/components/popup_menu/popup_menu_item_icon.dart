@@ -40,7 +40,7 @@ class PopupMenuItemIcon<T> extends PopupMenuItem<T> {
                       child: icon.runtimeType == PopupMenuIcon
                           ? PopupMenuIcon(
                               (icon as PopupMenuIcon).iconData,
-                              color: selectedColor,
+                              color: selectedColor ?? icon.color,
                             )
                           : icon,
                     ),
