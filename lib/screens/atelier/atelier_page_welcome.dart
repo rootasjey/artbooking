@@ -261,16 +261,17 @@ class AtelierPageWelcome extends ConsumerWidget {
             context.beamToNamed(AtelierLocationContent.postsRoute);
           },
         ),
-      AtelierPageCard(
-        noSizeConstraints: true,
-        hoverColor: Constants.colors.home,
-        iconData: UniconsLine.home,
-        textTitle: "home".tr(),
-        textSubtitle: "home_subtitle".tr(),
-        onTap: () {
-          Beamer.of(context, root: true).beamToNamed(HomeLocation.route);
-        },
-      ),
+      if (!isMobileSize)
+        AtelierPageCard(
+          noSizeConstraints: true,
+          hoverColor: Constants.colors.home,
+          iconData: UniconsLine.home,
+          textTitle: "home".tr(),
+          textSubtitle: "home_subtitle".tr(),
+          onTap: () {
+            Beamer.of(context, root: true).beamToNamed(HomeLocation.route);
+          },
+        ),
     ].map((child) {
       index++;
 
