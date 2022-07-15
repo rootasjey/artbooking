@@ -17,37 +17,46 @@ class ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return SliverToBoxAdapter(
-      child: Column(
-        children: [
-          LottieBuilder.asset(
-            "assets/animations/whale.json",
-            width: 500.0,
-            height: 500.0,
-          ),
-          Text(
-            title,
-            style: Utilities.fonts.body(
-              fontSize: 24.0,
-              fontWeight: FontWeight.w400,
-              color: Theme.of(context).primaryColor.withOpacity(0.9),
+      child: Padding(
+        padding: EdgeInsets.only(top: isMobileSize ? 54.0 : 0.0),
+        child: Column(
+          children: [
+            LottieBuilder.asset(
+              "assets/animations/whale.json",
+              width: isMobileSize ? 200.0 : 500.0,
+              height: isMobileSize ? 200.0 : 500.0,
             ),
-          ),
-          if (subtitle.isNotEmpty)
-            InkWell(
-              onTap: onReload,
-              child: Opacity(
-                opacity: 0.6,
-                child: Text(
-                  subtitle,
-                  style: Utilities.fonts.body(
-                    fontWeight: FontWeight.w700,
-                    backgroundColor: Constants.colors.tertiary,
-                  ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              child: Text(
+                title,
+                textAlign: TextAlign.center,
+                style: Utilities.fonts.body(
+                  fontSize: isMobileSize ? 20.0 : 24.0,
+                  fontWeight: FontWeight.w400,
+                  color: Theme.of(context).primaryColor.withOpacity(0.9),
                 ),
               ),
             ),
-        ],
+            if (subtitle.isNotEmpty)
+              InkWell(
+                onTap: onReload,
+                child: Opacity(
+                  opacity: 0.6,
+                  child: Text(
+                    subtitle,
+                    style: Utilities.fonts.body(
+                      fontWeight: FontWeight.w700,
+                      backgroundColor: Constants.colors.tertiary,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
