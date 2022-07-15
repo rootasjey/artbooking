@@ -92,7 +92,9 @@ class IllustrationPageBody extends StatelessWidget {
       ),
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
-          IllustrationPageHeader(),
+          IllustrationPageHeader(
+            show: !isMobileSize,
+          ),
           IllustrationPoster(
             isOwner: isOwner,
             illustration: illustration,
