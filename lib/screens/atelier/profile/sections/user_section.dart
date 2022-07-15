@@ -6,6 +6,8 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/components/user_social_links_component.dart';
 import 'package:artbooking/screens/atelier/profile/popup_menu_button_section.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/popup_item_section.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
@@ -72,7 +74,38 @@ class _UserSectionState extends State<UserSection> {
       );
     }
 
-    final double height = MediaQuery.of(context).size.height - 200.0;
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    double height = double.infinity;
+
+    Widget child = Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        userWidget(
+          isMobileSize: isMobileSize,
+        ),
+      ],
+    );
+
+    EdgeInsets padding = const EdgeInsets.only(
+      left: 12.0,
+      right: 12.0,
+      top: 90.0,
+    );
+
+    if (!isMobileSize) {
+      height = MediaQuery.of(context).size.height - 200.0;
+      child = SizedBox(
+        height: height,
+        child: child,
+      );
+
+      padding = const EdgeInsets.only(
+        left: 24.0,
+        top: 60.0,
+        right: 24.0,
+      );
+    }
 
     final EdgeInsets outerPadding =
         widget.usingAsDropTarget ? const EdgeInsets.all(4.0) : EdgeInsets.zero;
@@ -96,20 +129,8 @@ class _UserSectionState extends State<UserSection> {
         children: [
           Container(
             decoration: boxDecoration,
-            padding: const EdgeInsets.only(
-              left: 24.0,
-              top: 60.0,
-              right: 24.0,
-            ),
-            child: SizedBox(
-              height: height,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  userWidget(),
-                ],
-              ),
-            ),
+            padding: padding,
+            child: child,
           ),
           rightPopupMenuButton(),
         ],
@@ -165,7 +186,7 @@ class _UserSectionState extends State<UserSection> {
     );
   }
 
-  Widget userWidget() {
+  Widget userWidget({bool isMobileSize = false}) {
     final String imageUrl = _userFirestore.getProfilePicture();
 
     return Flexible(
@@ -174,6 +195,7 @@ class _UserSectionState extends State<UserSection> {
         child: Column(
           children: [
             BetterAvatar(
+              size: isMobileSize ? 100.0 : 220.0,
               image: NetworkImage(imageUrl),
               colorFilter: ColorFilter.mode(
                 Colors.grey,
@@ -190,29 +212,26 @@ class _UserSectionState extends State<UserSection> {
                 ),
               ),
             ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    right: 8.0,
-                  ),
-                  child: Opacity(
-                    opacity: 0.6,
+            Opacity(
+              opacity: 0.4,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      right: 8.0,
+                    ),
                     child: Icon(UniconsLine.location_point),
                   ),
-                ),
-                Opacity(
-                  opacity: 0.6,
-                  child: Text(
+                  Text(
                     _userFirestore.location,
                     style: Utilities.fonts.body(
-                      fontSize: 18.0,
+                      fontSize: 16.0,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             userLinks(),
             SizedBox(
@@ -257,14 +276,14 @@ class _UserSectionState extends State<UserSection> {
 
   Future<void> fetchUser() async {
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final DocumentSnapshotMap snapshot = await FirebaseFirestore.instance
           .collection("users")
           .doc(widget.userId)
           .collection("user_public_fields")
           .doc("base")
           .get();
 
-      final data = snapshot.data();
+      final Json? data = snapshot.data();
 
       if (!snapshot.exists || data == null) {
         return;

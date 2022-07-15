@@ -84,15 +84,17 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final Size size = MediaQuery.of(context).size;
     checkData();
+
+    final bool isMobileSize = size.width <= Utilities.size.mobileWidthTreshold;
 
     if (_illustration.id.isEmpty) {
       return Stack(
         children: [
           Container(
             width: size.width,
-            height: size.height,
+            height: isMobileSize ? size.width : size.height,
             decoration: ShapeDecoration(
               shape: RoundedRectangleBorder(side: BorderSide()),
             ),
@@ -111,8 +113,10 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
       );
     }
 
-    final double space = 80.0;
     final String heroTag = "${widget.section.id}-${_illustration.id}";
+    final double space = isMobileSize ? 12.0 : 80.0;
+    final double height =
+        isMobileSize ? (size.width - space) : (size.height - space);
 
     return Container(
       color: Color(widget.section.backgroundColor),
@@ -121,7 +125,7 @@ class _BorderedPosterSectionState extends State<BorderedPosterSection> {
           Center(
             child: Container(
               width: size.width - space,
-              height: size.height - space,
+              height: height,
               padding: const EdgeInsets.only(
                 top: 54.0,
               ),

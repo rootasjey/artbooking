@@ -126,6 +126,8 @@ class _IllustrationRowSectionState extends State<IllustrationRowSection> {
             color: Color(widget.section.backgroundColor),
           );
 
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Stack(
       children: [
         Padding(
@@ -142,13 +144,13 @@ class _IllustrationRowSectionState extends State<IllustrationRowSection> {
                   titleSectionWidget(),
                   maybeHelperText(),
                   Container(
-                    height: 220.0,
+                    height: isMobileSize ? 150.0 : 220.0,
                     padding: const EdgeInsets.only(top: 34.0),
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       shrinkWrap: true,
-                      itemExtent: 200.0,
-                      children: getChildren(),
+                      itemExtent: isMobileSize ? 120.0 : 200.0,
+                      children: getChildren(isMobileSize: isMobileSize),
                     ),
                   ),
                 ],
@@ -161,12 +163,14 @@ class _IllustrationRowSectionState extends State<IllustrationRowSection> {
     );
   }
 
-  List<Widget> getChildren() {
+  List<Widget> getChildren({bool isMobileSize = false}) {
     int index = -1;
-    final size = 200.0;
+    final double width = isMobileSize ? 100.0 : 200.0;
 
     final bool canDrag = getCanDrag();
-    final onDrop = canDrag ? onDropIllustration : null;
+    final void Function(int, List<int>)? onDrop =
+        canDrag ? onDropIllustration : null;
+
     final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries =
         canDrag
             ? [
@@ -178,26 +182,31 @@ class _IllustrationRowSectionState extends State<IllustrationRowSection> {
               ]
             : [];
 
-    final children = _illustrations.map((Illustration illustration) {
-      index++;
+    final List<IllustrationCard> children = _illustrations.map(
+      (final Illustration illustration) {
+        index++;
 
-      final heroTag = "${widget.section.id}-${index}-${illustration.id}";
+        final String heroTag =
+            "${widget.section.id}-${index}-${illustration.id}";
 
-      return IllustrationCard(
-        borderRadius: BorderRadius.circular(16.0),
-        canDrag: canDrag,
-        onDrop: onDrop,
-        dragGroupName: "${widget.section.id}-${widget.index}",
-        heroTag: heroTag,
-        illustration: illustration,
-        index: index,
-        size: size,
-        onTap: () => navigateToIllustrationPage(illustration, heroTag),
-        padding: const EdgeInsets.only(right: 24.0),
-        popupMenuEntries: popupMenuEntries,
-        onPopupMenuItemSelected: onIllustrationItemSelected,
-      );
-    }).toList();
+        return IllustrationCard(
+          borderRadius: isMobileSize
+              ? BorderRadius.circular(24.0)
+              : BorderRadius.circular(16.0),
+          canDrag: canDrag,
+          onDrop: onDrop,
+          dragGroupName: "${widget.section.id}-${widget.index}",
+          heroTag: heroTag,
+          illustration: illustration,
+          index: index,
+          size: width,
+          onTap: () => navigateToIllustrationPage(illustration, heroTag),
+          padding: EdgeInsets.only(right: isMobileSize ? 6.0 : 24.0),
+          popupMenuEntries: popupMenuEntries,
+          onPopupMenuItemSelected: onIllustrationItemSelected,
+        );
+      },
+    ).toList();
 
     if (widget.editMode && (children.length % 3 != 0 && children.length < 6) ||
         children.isEmpty) {
@@ -208,7 +217,7 @@ class _IllustrationRowSectionState extends State<IllustrationRowSection> {
           heroTag: "empty_${DateTime.now()}",
           illustration: Illustration.empty(),
           index: index,
-          size: size,
+          size: width,
           onTap: () => widget.onShowIllustrationDialog?.call(
             section: widget.section,
             index: widget.index,

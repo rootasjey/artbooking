@@ -152,7 +152,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  titleSectionWidget(isMobileSize),
+                  titleWidget(isMobileSize),
                   maybeHelperText(),
                   Padding(
                     padding: const EdgeInsets.only(top: 34.0),
@@ -433,7 +433,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
     );
   }
 
-  Widget titleSectionWidget(bool isMobileSize) {
+  Widget titleWidget(bool isMobileSize) {
     final String title = widget.section.name;
     final String description = widget.section.description;
 

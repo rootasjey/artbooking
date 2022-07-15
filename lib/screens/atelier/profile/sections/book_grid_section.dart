@@ -130,30 +130,32 @@ class _BookGridSectionState extends State<BookGridSection> {
             color: Color(widget.section.backgroundColor),
           );
 
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Padding(
       padding: outerPadding,
       child: Stack(
         children: [
           Container(
             decoration: boxDecoration,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 70.0,
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobileSize ? 12.0 : 70.0,
               vertical: 24.0,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                titleSectionWidget(),
+                titleWidget(isMobileSize: isMobileSize),
                 maybeHelperText(),
                 Padding(
                   padding: const EdgeInsets.only(top: 34.0),
                   child: GridView.count(
-                    crossAxisCount: 3,
+                    crossAxisCount: isMobileSize ? 2 : 3,
                     shrinkWrap: true,
-                    mainAxisSpacing: 24.0,
-                    crossAxisSpacing: 24.0,
-                    childAspectRatio: 0.8,
-                    children: getChildren(),
+                    mainAxisSpacing: isMobileSize ? 0.0 : 24.0,
+                    crossAxisSpacing: isMobileSize ? 0.0 : 24.0,
+                    // childAspectRatio: 0.8,
+                    children: getChildren(isMobileSize: isMobileSize),
                   ),
                 ),
               ],
@@ -165,7 +167,7 @@ class _BookGridSectionState extends State<BookGridSection> {
     );
   }
 
-  List<Widget> getChildren() {
+  List<Widget> getChildren({bool isMobileSize = false}) {
     int index = -1;
     final bool canDrag = getCanDrag();
     final onDrop = canDrag ? onDropBook : null;
@@ -179,21 +181,23 @@ class _BookGridSectionState extends State<BookGridSection> {
           ]
         : [];
 
-    final children = _books.map((Book book) {
+    final List<BookCard> children = _books.map((Book book) {
       index++;
 
       final heroTag = "${widget.section.id}-${index}-${book.id}";
 
       return BookCard(
-        index: index,
+        book: book,
         canDrag: canDrag,
         dragGroupName: "${widget.section.id}-${widget.index}",
+        height: isMobileSize ? 161.0 : 342.0,
         heroTag: heroTag,
+        index: index,
         onDrop: onDrop,
-        book: book,
+        onPopupMenuItemSelected: onBookItemSelected,
         onTap: book.available ? () => navigateToBookPage(book, heroTag) : null,
         popupMenuEntries: popupMenuEntries,
-        onPopupMenuItemSelected: onBookItemSelected,
+        width: isMobileSize ? 220.0 : 400.0,
       );
     }).toList();
 
@@ -201,15 +205,17 @@ class _BookGridSectionState extends State<BookGridSection> {
         children.isEmpty) {
       children.add(
         BookCard(
-          useAsPlaceholder: true,
-          heroTag: "empty_${DateTime.now()}",
           book: Book.empty(),
+          height: isMobileSize ? 161.0 : 342.0,
+          heroTag: "empty_${DateTime.now()}",
           index: index,
           onTap: () => widget.onShowBookDialog?.call(
             section: widget.section,
             index: widget.index,
             selectType: EnumSelectType.add,
           ),
+          useAsPlaceholder: true,
+          width: isMobileSize ? 220.0 : 400.0,
         ),
       );
     }
@@ -325,9 +331,9 @@ class _BookGridSectionState extends State<BookGridSection> {
     );
   }
 
-  Widget titleSectionWidget() {
-    final title = widget.section.name;
-    final description = widget.section.description;
+  Widget titleWidget({bool isMobileSize = false}) {
+    final String title = widget.section.name;
+    final String description = widget.section.description;
 
     if (title.isEmpty && description.isEmpty) {
       return Container();
@@ -351,7 +357,7 @@ class _BookGridSectionState extends State<BookGridSection> {
                       child: Text(
                         title,
                         style: Utilities.fonts.title(
-                          fontSize: 42.0,
+                          fontSize: isMobileSize ? 24 : 42.0,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -362,7 +368,7 @@ class _BookGridSectionState extends State<BookGridSection> {
                       child: Text(
                         description,
                         style: Utilities.fonts.body(
-                          fontSize: 16.0,
+                          fontSize: isMobileSize ? 14.0 : 16.0,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

@@ -75,15 +75,16 @@ class _PosterSectionState extends State<PosterSection> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     checkData();
+    final Size size = MediaQuery.of(context).size;
+    final bool isMobileSize = size.width <= Utilities.size.mobileWidthTreshold;
 
     if (_illustration.id.isEmpty) {
       return Stack(
         children: [
           Container(
             width: size.width,
-            height: size.height,
+            height: isMobileSize ? size.width : size.height,
             padding: const EdgeInsets.all(16.0),
             child: IllustrationCard(
               borderRadius: BorderRadius.circular(16.0),
@@ -99,18 +100,33 @@ class _PosterSectionState extends State<PosterSection> {
       );
     }
 
+    Widget poster = SizedBox(
+      width: size.width,
+      height: size.height,
+      child: Image.network(
+        _illustration.getHDThumbnail(),
+        width: size.width,
+        height: size.height,
+        fit: BoxFit.cover,
+      ),
+    );
+
+    if (isMobileSize) {
+      poster = SizedBox(
+        width: size.width,
+        height: size.width,
+        child: Image.network(
+          _illustration.getHDThumbnail(),
+          width: size.width,
+          height: size.width,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+
     return Stack(
       children: [
-        Container(
-          width: size.width,
-          height: size.height,
-          child: Image.network(
-            _illustration.getHDThumbnail(),
-            width: size.width,
-            height: size.height,
-            fit: BoxFit.cover,
-          ),
-        ),
+        poster,
         Positioned(
           right: 24.0,
           bottom: 24.0,
