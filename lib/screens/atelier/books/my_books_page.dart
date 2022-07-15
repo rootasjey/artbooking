@@ -178,7 +178,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   QuerySnapshotStreamSubscription? _bookSubscription;
 
   /// Page scroll controller.
-  final _pageScrollController = ScrollController();
+  final ScrollController _pageScrollController = ScrollController();
 
   /// This books page owner's name.
   /// Used when the current authenticated user is different

@@ -42,7 +42,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
   /// If true, the UI is in multi-select mode.
   final bool forceMultiSelect;
 
-  /// If true, this widget adapt its layout to small screens.
+  /// If true, this widget adapts its layout to small screens.
   final bool isMobileSize;
 
   /// True if the current authenticated user is the owner of these books.
