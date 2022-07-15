@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/dialogs/add_section_dialog.dart';
 import 'package:artbooking/components/dialogs/colors_selector.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
@@ -9,18 +8,20 @@ import 'package:artbooking/components/dialogs/select_artist_dialog.dart';
 import 'package:artbooking/components/dialogs/select_books_dialog.dart';
 import 'package:artbooking/components/dialogs/select_illustrations_dialog.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
-import 'package:artbooking/components/error_view.dart';
-import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/router/locations/home_location.dart';
+import 'package:artbooking/screens/atelier/profile/modular_page_error.dart';
+import 'package:artbooking/screens/atelier/profile/modular_page_loading.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_body.dart';
-import 'package:artbooking/screens/atelier/profile/profile_page_empty.dart';
+import 'package:artbooking/screens/atelier/profile/modular_page_empty.dart';
 import 'package:artbooking/types/firestore/document_map.dart';
 import 'package:artbooking/types/firestore/document_snapshot_map.dart';
+import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
+import 'package:artbooking/types/firestore/query_snap_map.dart';
 import 'package:artbooking/types/modular_page.dart';
 import 'package:artbooking/types/book/scale_factor.dart';
 import 'package:artbooking/types/enums/enum_navigation_section.dart';
@@ -48,9 +49,22 @@ class ModularPagePresenter extends ConsumerStatefulWidget {
   const ModularPagePresenter({
     Key? key,
     required this.pageId,
+    required this.userId,
+    required this.pageType,
   }) : super(key: key);
 
+  /// Page unique identifier.
+  /// If this parameter is filled, this page is a part of this app.
+  /// May be empty if [userId] is populated.
   final String pageId;
+
+  /// Page's owner id.
+  /// If this parameter is filled, this page belongs to an user.
+  /// May be empty if [pageId] is populated.
+  final String userId;
+
+  /// Either home page or an user page/
+  final EnumPageType pageType;
 
   @override
   ConsumerState<ModularPagePresenter> createState() => _ModularPageState();
@@ -74,7 +88,10 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
   bool _showFab = true;
 
   /// If true, a Floating Action Button to scroll to top will be displayed.
-  bool _showNavToTopFab = false;
+  bool _showFabToTop = false;
+
+  /// Show profile page username if true, and if it's a profile page type.
+  bool _showAppBarTitle = false;
 
   /// If true, a section is being dragged from its original position.
   bool _isDraggingSection = false;
@@ -129,6 +146,8 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
   /// Scroll controller to move inside the page.
   final ScrollController _pageCcrollController = ScrollController();
 
+  String _username = "";
+
   @override
   void initState() {
     super.initState();
@@ -145,52 +164,45 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     if (_hasErrors) {
-      return Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            ApplicationBar(),
-            ErrorView(
-              subtitle: "try_again_later".tr(),
-              title: "home_loading_error".tr(),
-              onReload: tryFetchPage,
-            ),
-          ],
-        ),
+      return ModularPageError(
+        isMobileSize: isMobileSize,
+        onTryFetchPage: tryFetchPage,
+        pageType: widget.pageType,
       );
     }
 
     if (_isEmpty) {
-      return ProfilePageEmpty(
-        username: "",
+      return ModularPageEmpty(
+        isMobileSize: isMobileSize,
+        username: getUserName(),
+        pageType: widget.pageType,
       );
     }
 
     if (_loading) {
-      return Scaffold(
-        body: LoadingView(
-          sliver: false,
-          title: Center(
-            child: Text(
-              "profile_page_loading".tr() + "...",
-              style: Utilities.fonts.body(
-                fontSize: 26.0,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
+      return ModularPageLoading(
+        pageType: widget.pageType,
       );
     }
 
     final UserFirestore? userFirestore =
         ref.watch(AppState.userProvider).firestoreUser;
+
     final String? userId = userFirestore?.id;
     final bool canManagePages = userFirestore?.rights.canManagePages ?? false;
 
+    final bool isPageOwner = userId == getUserId();
+
+    final bool isOwner =
+        widget.pageType == EnumPageType.profile ? isPageOwner : canManagePages;
+
     return ProfilePageBody(
       editMode: _editMode,
-      isOwner: canManagePages,
+      isMobileSize: isMobileSize,
+      isOwner: isOwner,
       modularPage: _modularPage,
       onAddSection: tryAddSection,
       onDragSectionStarted: onDragSectionStarted,
@@ -208,11 +220,14 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
       onShowIllustrationDialog: onShowIllustrationDialog,
       onToggleEditMode: onToggleEditMode,
       onUpdateSectionItems: tryUpdateSectionItems,
+      pageType: widget.pageType,
       popupMenuEntries: _popupMenuEntries,
       scrollController: _pageCcrollController,
+      showAppBarTitle: _showAppBarTitle,
       showFab: _showFab,
-      showNavToTopFab: _showNavToTopFab,
-      userId: userId ?? "",
+      showNavToTopFab: _showFabToTop,
+      userId: getUserId(),
+      username: _username,
     );
   }
 
@@ -228,6 +243,43 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
         );
       },
     );
+  }
+
+  Future<void> fetchUsername() async {
+    try {
+      final DocumentSnapshotMap snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(_modularPage.userId)
+          .collection("user_public_fields")
+          .doc("base")
+          .get();
+
+      final Json? data = snapshot.data();
+
+      if (!snapshot.exists || data == null) {
+        return;
+      }
+
+      data["id"] = _modularPage.userId;
+      final UserFirestore userFirestore = UserFirestore.fromMap(data);
+      _username = userFirestore.name;
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
+  String getUserId() {
+    String userId = _modularPage.userId;
+    if (userId.isEmpty) {
+      userId = ref.read(AppState.userProvider).authUser?.uid ?? '';
+    }
+
+    return userId;
+  }
+
+  String getUserName() {
+    return ref.read(AppState.userProvider).firestoreUser?.name ?? '';
   }
 
   void listenModularPage(DocumentReference<Map<String, dynamic>> query) {
@@ -260,7 +312,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
       return;
     }
 
-    final sections = _modularPage.sections;
+    final List<Section> sections = _modularPage.sections;
 
     if (dropTargetIndex < 0 ||
         firstDragIndex < 0 ||
@@ -269,8 +321,8 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
       return;
     }
 
-    final dropTargetSection = sections.elementAt(dropTargetIndex);
-    final dragSection = sections.elementAt(firstDragIndex);
+    final Section dropTargetSection = sections.elementAt(dropTargetIndex);
+    final Section dragSection = sections.elementAt(firstDragIndex);
 
     setState(() {
       _modularPage.sections[firstDragIndex] = dropTargetSection;
@@ -278,12 +330,10 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     });
 
     try {
-      await FirebaseFirestore.instance
-          .collection("pages")
-          .doc(_modularPage.id)
-          .update({
-        "sections": _modularPage.sections.map((x) => x.toMap()).toList(),
-      });
+      final bool success = await updateSectionData();
+      if (!success) {
+        throw ErrorDescription("modular_page_error_update".tr());
+      }
 
       setState(() {});
     } catch (error) {
@@ -301,7 +351,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
       return;
     }
 
-    final sections = _modularPage.sections;
+    final List<Section> sections = _modularPage.sections;
 
     if (dropTargetIndex < 0 ||
         firstDragIndex < 0 ||
@@ -317,12 +367,10 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     });
 
     try {
-      await FirebaseFirestore.instance
-          .collection("pages")
-          .doc(_modularPage.id)
-          .update({
-        "sections": _modularPage.sections.map((x) => x.toMap()).toList(),
-      });
+      final bool success = await updateSectionData();
+      if (!success) {
+        throw ErrorDescription("modular_page_error_update".tr());
+      }
 
       setState(() {});
     } catch (error) {
@@ -348,8 +396,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
       final String userId = _modularPage.userId;
 
       if (_modularPage.userId.isEmpty) {
-        const String message = "Cannot navigate to user's illustrations page "
-            "because userId is empty.";
+        final String message = "modular_page_navigate_books_error".tr();
 
         Utilities.logger.e(message);
         context.showErrorBar(
@@ -378,8 +425,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
       final String userId = _modularPage.userId;
 
       if (_modularPage.userId.isEmpty) {
-        const String message = "Cannot navigate to user's illustrations page "
-            "because userId is empty.";
+        final String message = "modular_page_navigate_illustrations_error".tr();
 
         Utilities.logger.e(message);
         context.showErrorBar(
@@ -403,10 +449,12 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
   }
 
   void onPageScroll(double offset) {
+    updateAppBarTitleVisibility(offset);
+
     final bool scrollingDown = offset - _previousOffset > 0;
     _previousOffset = offset;
 
-    _showNavToTopFab = offset == 0.0 ? false : true;
+    _showFabToTop = offset == 0.0 ? false : true;
 
     if (scrollingDown) {
       if (!_showFab) {
@@ -418,7 +466,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     }
 
     if (offset == 0.0) {
-      setState(() => _showNavToTopFab = false);
+      setState(() => _showFabToTop = false);
     }
 
     if (_showFab) {
@@ -690,6 +738,19 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     Utilities.storage.saveModularPageEditMode(_editMode);
   }
 
+  Future<void> popuplateUsername() async {
+    final UserFirestore? firestoreUser =
+        ref.read(AppState.userProvider).firestoreUser;
+
+    final String? userId = firestoreUser?.id;
+
+    if (firestoreUser != null && userId != null) {
+      _username = firestoreUser.name;
+    }
+
+    await fetchUsername();
+  }
+
   void showRenameSectionDialog(Section section, int index) {
     final _nameController = TextEditingController();
     final _descriptionController = TextEditingController();
@@ -749,7 +810,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
 
   void tryAddSection(Section section, int index) async {
     try {
-      final dataMode = section.dataFetchModes.isNotEmpty
+      final EnumSectionDataMode dataMode = section.dataFetchModes.isNotEmpty
           ? section.dataFetchModes.first
           : EnumSectionDataMode.chosen;
 
@@ -764,12 +825,10 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
         _modularPage.sections.insert(index, editedSection);
       }
 
-      await FirebaseFirestore.instance
-          .collection("pages")
-          .doc(_modularPage.id)
-          .update({
-        "sections": _modularPage.sections.map((x) => x.toMap()).toList(),
-      });
+      final bool success = await updateSectionData();
+      if (!success) {
+        throw ErrorDescription("modular_page_error_update".tr());
+      }
 
       setState(() {});
     } catch (error) {
@@ -782,12 +841,10 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     try {
       _modularPage.sections.removeAt(index);
 
-      await FirebaseFirestore.instance
-          .collection("pages")
-          .doc(_modularPage.id)
-          .update({
-        "sections": _modularPage.sections.map((x) => x.toMap()).toList(),
-      });
+      final bool success = await updateSectionData();
+      if (!success) {
+        throw ErrorDescription("modular_page_error_update".tr());
+      }
 
       setState(() {});
     } catch (error) {
@@ -809,12 +866,10 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
       _modularPage.sections.removeAt(index);
       _modularPage.sections.insert(newIndex, section);
 
-      await FirebaseFirestore.instance
-          .collection("pages")
-          .doc(_modularPage.id)
-          .update({
-        "sections": _modularPage.sections.map((x) => x.toMap()).toList(),
-      });
+      final bool success = await updateSectionData();
+      if (!success) {
+        throw ErrorDescription("modular_page_error_update".tr());
+      }
 
       setState(() {});
     } catch (error) {
@@ -830,7 +885,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     required String description,
   }) async {
     try {
-      final editedSection = section.copyWith(
+      final Section editedSection = section.copyWith(
         description: description,
         name: name,
       );
@@ -841,12 +896,10 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
         [editedSection],
       );
 
-      await FirebaseFirestore.instance
-          .collection("pages")
-          .doc(_modularPage.id)
-          .update({
-        "sections": _modularPage.sections.map((x) => x.toMap()).toList(),
-      });
+      final bool success = await updateSectionData();
+      if (!success) {
+        throw ErrorDescription("modular_page_error_update".tr());
+      }
 
       setState(() {});
     } catch (error) {
@@ -861,7 +914,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     required String name,
   }) async {
     try {
-      final editedSection = section.copyWith(
+      final Section editedSection = section.copyWith(
         name: name,
       );
 
@@ -871,12 +924,10 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
         [editedSection],
       );
 
-      await FirebaseFirestore.instance
-          .collection("pages")
-          .doc(_modularPage.id)
-          .update({
-        "sections": _modularPage.sections.map((x) => x.toMap()).toList(),
-      });
+      final bool success = await updateSectionData();
+      if (!success) {
+        throw ErrorDescription("modular_page_error_update".tr());
+      }
 
       setState(() {});
     } catch (error) {
@@ -892,7 +943,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     final List<Section> sections = [];
 
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final QuerySnapMap snapshot = await FirebaseFirestore.instance
           .collection("sections")
           .limit(limit)
           .orderBy("created_at", descending: descending)
@@ -902,8 +953,8 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
         return sections;
       }
 
-      for (var doc in snapshot.docs) {
-        final data = doc.data();
+      for (final QueryDocSnapMap doc in snapshot.docs) {
+        final Json data = doc.data();
         data["id"] = doc.id;
         sections.add(Section.fromMap(data));
       }
@@ -916,10 +967,37 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     }
   }
 
+  Future<DocumentMap?> getQuery() async {
+    if (widget.pageType == EnumPageType.profile) {
+      final QuerySnapMap snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(widget.userId)
+          .collection("user_pages")
+          .where("type", isEqualTo: "profile")
+          .limit(1)
+          .get();
+
+      if (snapshot.size == 0) {
+        _isEmpty = true;
+        return null;
+      }
+
+      final QueryDocSnapMap doc = snapshot.docs.first;
+
+      return FirebaseFirestore.instance
+          .collection("users")
+          .doc(widget.userId)
+          .collection("user_pages")
+          .doc(doc.id);
+    }
+
+    return FirebaseFirestore.instance.collection("pages").doc(widget.pageId);
+  }
+
   void tryFetchPage() async {
-    if (widget.pageId.isEmpty) {
+    if (widget.pageId.isEmpty && widget.userId.isEmpty) {
       context.showErrorBar(
-        content: Text("error_user_no_id".tr()),
+        content: Text("modular_page_error_empty_parameters".tr()),
       );
 
       setState(() => _hasErrors = true);
@@ -933,8 +1011,11 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     });
 
     try {
-      final DocumentMap query =
-          FirebaseFirestore.instance.collection("pages").doc(widget.pageId);
+      final DocumentMap? query = await getQuery();
+      if (query == null) {
+        _isEmpty = true;
+        return;
+      }
 
       listenModularPage(query);
       final DocumentSnapshotMap snapshot = await query.get();
@@ -951,6 +1032,10 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
 
       map["id"] = snapshot.id;
       _modularPage = ModularPage.fromMap(map);
+
+      if (widget.pageType == EnumPageType.profile) {
+        await popuplateUsername();
+      }
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
@@ -966,7 +1051,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     EnumSectionDataMode mode,
   ) async {
     try {
-      final editedSection = section.copyWith(
+      final Section editedSection = section.copyWith(
         dataFetchMode: mode,
       );
 
@@ -976,14 +1061,10 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
         [editedSection],
       );
 
-      // final String userId = getUserId();
-
-      await FirebaseFirestore.instance
-          .collection("pages")
-          .doc(_modularPage.id)
-          .update({
-        "sections": _modularPage.sections.map((x) => x.toMap()).toList(),
-      });
+      final bool success = await updateSectionData();
+      if (!success) {
+        throw ErrorDescription("modular_page_error_update".tr());
+      }
 
       setState(() {});
     } catch (error) {
@@ -998,7 +1079,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     Section section,
   ) async {
     try {
-      final editedSection = section.copyWith(
+      final Section editedSection = section.copyWith(
         backgroundColor: selectedNamedColor.color.value,
       );
 
@@ -1008,14 +1089,10 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
         [editedSection],
       );
 
-      // final String userId = getUserId();
-
-      await FirebaseFirestore.instance
-          .collection("pages")
-          .doc(_modularPage.id)
-          .update({
-        "sections": _modularPage.sections.map((x) => x.toMap()).toList(),
-      });
+      final bool success = await updateSectionData();
+      if (!success) {
+        throw ErrorDescription("modular_page_error_update".tr());
+      }
 
       setState(() {});
     } catch (error) {
@@ -1030,7 +1107,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     Section section,
   ) async {
     try {
-      final editedSection = section.copyWith(
+      final Section editedSection = section.copyWith(
         borderColor: selectedNamedColor.color.value,
       );
 
@@ -1040,12 +1117,10 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
         [editedSection],
       );
 
-      await FirebaseFirestore.instance
-          .collection("pages")
-          .doc(_modularPage.id)
-          .update({
-        "sections": _modularPage.sections.map((x) => x.toMap()).toList(),
-      });
+      final bool success = await updateSectionData();
+      if (!success) {
+        throw ErrorDescription("modular_page_error_update".tr());
+      }
 
       setState(() {});
     } catch (error) {
@@ -1060,7 +1135,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     Section section,
   ) async {
     try {
-      final editedSection = section.copyWith(
+      final Section editedSection = section.copyWith(
         textColor: selectedNamedColor.color.value,
       );
 
@@ -1070,12 +1145,10 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
         [editedSection],
       );
 
-      await FirebaseFirestore.instance
-          .collection("pages")
-          .doc(_modularPage.id)
-          .update({
-        "sections": _modularPage.sections.map((x) => x.toMap()).toList(),
-      });
+      final bool success = await updateSectionData();
+      if (!success) {
+        throw ErrorDescription("modular_page_error_update".tr());
+      }
 
       setState(() {});
     } catch (error) {
@@ -1126,12 +1199,10 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
         [editedSection],
       );
 
-      await FirebaseFirestore.instance
-          .collection("pages")
-          .doc(_modularPage.id)
-          .update({
-        "sections": _modularPage.sections.map((x) => x.toMap()).toList(),
-      });
+      final bool success = await updateSectionData();
+      if (!success) {
+        throw ErrorDescription("modular_page_error_update".tr());
+      }
 
       setState(() {});
     } catch (error) {
@@ -1145,7 +1216,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     int index,
     List<String> items,
   ) async {
-    final editedSection = section.copyWith(
+    final Section editedSection = section.copyWith(
       items: items,
     );
 
@@ -1156,12 +1227,10 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     );
 
     try {
-      await FirebaseFirestore.instance
-          .collection("pages")
-          .doc(_modularPage.id)
-          .update({
-        "sections": _modularPage.sections.map((x) => x.toMap()).toList(),
-      });
+      final bool success = await updateSectionData();
+      if (!success) {
+        throw ErrorDescription("modular_page_error_update".tr());
+      }
 
       setState(() {});
     } catch (error) {
@@ -1242,5 +1311,61 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     }
 
     _scrollTimer?.cancel();
+  }
+
+  Future<bool> updateSectionData() async {
+    if (widget.pageType == EnumPageType.profile) {
+      return updateUserPageData();
+    }
+
+    return updateHomePageData();
+  }
+
+  Future<bool> updateHomePageData() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection("pages")
+          .doc(_modularPage.id)
+          .update({
+        "sections": _modularPage.sections.map((x) => x.toMap()).toList(),
+      });
+
+      return true;
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+      return false;
+    }
+  }
+
+  Future<bool> updateUserPageData() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(widget.userId)
+          .collection("user_pages")
+          .doc(_modularPage.id)
+          .update({
+        "sections": _modularPage.sections.map((x) => x.toMap()).toList(),
+      });
+
+      return true;
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+      return false;
+    }
+  }
+
+  void updateAppBarTitleVisibility(double offset) {
+    final double treshold = 400.0;
+
+    if (_showAppBarTitle && offset < treshold) {
+      setState(() => _showAppBarTitle = false);
+    }
+
+    if (!_showAppBarTitle && offset >= treshold) {
+      setState(() => _showAppBarTitle = true);
+    }
   }
 }

@@ -2,6 +2,7 @@ import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/screens/atelier/atelier_page_welcome.dart';
 import 'package:artbooking/screens/atelier/profile/modular_page_presenter.dart';
 import 'package:artbooking/screens/search_page.dart';
+import 'package:artbooking/types/enums/enum_page_type.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
@@ -25,7 +26,11 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
   int _tabIndex = 0;
 
   final List<Widget> _bodies = [
-    ModularPagePresenter(pageId: "home"),
+    ModularPagePresenter(
+      pageId: "home",
+      userId: "",
+      pageType: EnumPageType.home,
+    ),
     SearchPage(),
     AtelierPageWelcome(),
   ];

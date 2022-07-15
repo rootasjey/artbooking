@@ -2,7 +2,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/signin_location.dart';
 import 'package:artbooking/screens/atelier/atelier_page_welcome.dart';
 import 'package:artbooking/screens/atelier/atelier_page.dart';
-import 'package:artbooking/screens/atelier/profile/profile_page.dart';
+import 'package:artbooking/screens/atelier/profile/modular_page_presenter.dart';
 import 'package:artbooking/screens/atelier/review/review_page.dart';
 import 'package:artbooking/screens/likes/likes_page.dart';
 import 'package:artbooking/screens/post/post_page.dart';
@@ -24,6 +24,7 @@ import 'package:artbooking/screens/settings/update_password/update_password_page
 import 'package:artbooking/screens/settings/update_username/update_username_page.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/types/enums/enum_license_type.dart';
+import 'package:artbooking/types/enums/enum_page_type.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -200,8 +201,10 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
         ),
       if (state.pathPatternSegments.contains("profile"))
         BeamPage(
-          child: ProfilePage(
-            userId: state.pathParameters["userId"] ?? "",
+          child: ModularPagePresenter(
+            userId: getUserId(state.routeState),
+            pageId: "",
+            pageType: EnumPageType.profile,
           ),
           key: ValueKey("$profileRoute"),
           title: Utilities.ui.getPageTitle("profile".tr()),
@@ -368,6 +371,11 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
     }
 
     return EnumLicenseType.user;
+  }
+
+  String getUserId(Object? routeState) {
+    final mapState = routeState as Map<String, dynamic>;
+    return state.pathParameters["userId"] ?? mapState["userId"] ?? "";
   }
 
   bool isAddSection(BeamState state) {

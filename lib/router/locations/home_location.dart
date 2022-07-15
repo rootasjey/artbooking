@@ -9,6 +9,7 @@ import 'package:artbooking/screens/home_mobile_page.dart';
 import 'package:artbooking/screens/illustrations/illustration_page.dart';
 import 'package:artbooking/screens/illustrations/illustrations_page.dart';
 import 'package:artbooking/screens/post/post_page.dart';
+import 'package:artbooking/types/enums/enum_page_type.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/widgets.dart';
@@ -75,7 +76,11 @@ class HomeLocation extends BeamLocation<BeamState> {
             type: BeamPageType.fadeTransition,
           )
         : BeamPage(
-            child: ModularPagePresenter(pageId: "home"),
+            child: ModularPagePresenter(
+              pageId: "home",
+              userId: "",
+              pageType: EnumPageType.profile,
+            ),
             key: ValueKey(route),
             title: Utilities.ui.getPageTitle("home".tr()),
             type: BeamPageType.fadeTransition,

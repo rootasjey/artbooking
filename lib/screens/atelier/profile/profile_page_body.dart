@@ -1,28 +1,28 @@
 import 'package:artbooking/components/application_bar/application_bar.dart';
-import 'package:artbooking/components/buttons/circle_button.dart';
+import 'package:artbooking/components/application_bar/profile_application_bar.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
-import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/constants/section_ids.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/line_drop_zone.dart';
 import 'package:artbooking/screens/atelier/profile/profile_page_fab.dart';
 import 'package:artbooking/screens/atelier/profile/section_wrapper.dart';
+import 'package:artbooking/types/enums/enum_page_type.dart';
 import 'package:artbooking/types/modular_page.dart';
 import 'package:artbooking/types/enums/enum_navigation_section.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
 import 'package:artbooking/types/section.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
-import 'package:unicons/unicons.dart';
 
 class ProfilePageBody extends StatelessWidget {
   const ProfilePageBody({
     Key? key,
     required this.modularPage,
+    required this.pageType,
     required this.scrollController,
     required this.userId,
+    required this.username,
     this.editMode = false,
     this.isOwner = false,
     this.onAddSection,
@@ -43,16 +43,24 @@ class ProfilePageBody extends StatelessWidget {
     this.onToggleFabToTop,
     this.onUpdateSectionItems,
     this.popupMenuEntries = const [],
-    this.showBackButton = false,
     this.showFab = false,
     this.showNavToTopFab = false,
+    this.isMobileSize = false,
+    this.showAppBarTitle = false,
   }) : super(key: key);
+
+  /// If true, the current user is an admin or owner and can add, remove, and edit
+  /// this page sections.
+  final bool editMode;
+
+  /// If true, this widget adapts its layout to small screens.
+  final bool isMobileSize;
 
   /// True if the current authenticated user- if any - is the owner of this page.
   final bool isOwner;
 
-  /// If true, a back button will be display on the page.
-  final bool showBackButton;
+  /// Show profile page username if true, and if it's a profile page type.
+  final bool showAppBarTitle;
 
   /// If true, Floating Action Button will be displayed.
   final bool showFab;
@@ -60,12 +68,7 @@ class ProfilePageBody extends StatelessWidget {
   /// If true, a Floating Action Button to scroll to top will be displayed.
   final bool showNavToTopFab;
 
-  /// If true, the current user is an admin or owner and can add, remove, and edit
-  /// this page sections.
-  final bool editMode;
-
-  /// Current authenticated user's id;
-  final String userId;
+  final EnumPageType pageType;
 
   /// Modular page fetched and composed of modular sections.
   final ModularPage modularPage;
@@ -126,9 +129,6 @@ class ProfilePageBody extends StatelessWidget {
   /// Callback to handle edit mode toggle.
   final void Function()? onToggleEditMode;
 
-  /// Scroll controller to move inside the page.
-  final ScrollController scrollController;
-
   /// Callback to handle navigation from a section.
   final void Function(
     EnumNavigationSection enumNavigationSection,
@@ -149,6 +149,13 @@ class ProfilePageBody extends StatelessWidget {
   /// Callback to handle the move a pointer on the page.
   /// Useful to scroll the page when dragging a section to the edges.
   final void Function(PointerMoveEvent)? onPointerMove;
+
+  /// Scroll controller to move inside the page.
+  final ScrollController scrollController;
+
+  /// Current authenticated user's id;
+  final String userId;
+  final String username;
 
   @override
   Widget build(BuildContext context) {
@@ -213,6 +220,24 @@ class ProfilePageBody extends StatelessWidget {
       );
     }
 
+    if (pageType == EnumPageType.profile) {
+      slivers.insert(
+        0,
+        ProfileApplicationBar(
+          title: Padding(
+            padding: const EdgeInsets.only(left: 12.0),
+            child: Text(
+              showAppBarTitle ? username : "",
+              style: Utilities.fonts.body(
+                color: Theme.of(context).textTheme.bodyText2?.color,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       floatingActionButton: ProfilePageFAB(
         editMode: editMode,
@@ -236,21 +261,6 @@ class ProfilePageBody extends StatelessWidget {
                 slivers: slivers,
               ),
             ),
-            if (showBackButton)
-              Positioned(
-                top: 16.0,
-                left: 64.0,
-                child: CircleButton(
-                  tooltip: "back".tr(),
-                  elevation: 2.0,
-                  backgroundColor: Constants.colors.tertiary,
-                  onTap: () => Utilities.navigation.back(context),
-                  icon: Icon(
-                    UniconsLine.arrow_left,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
           ],
         ),
       ),

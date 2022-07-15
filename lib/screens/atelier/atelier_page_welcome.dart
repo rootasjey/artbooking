@@ -205,7 +205,12 @@ class AtelierPageWelcome extends ConsumerWidget {
         textTitle: "profile".tr(),
         textSubtitle: "profile_subtitle".tr(),
         onTap: () {
-          context.beamToNamed(AtelierLocationContent.profileRoute);
+          context.beamToNamed(
+            AtelierLocationContent.profileRoute,
+            routeState: {
+              "userId": userFirestore?.id,
+            },
+          );
         },
       ),
       AtelierPageCard(
