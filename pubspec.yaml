@@ -112,6 +112,7 @@ flutter:
     - assets/animations/dots.json
     - assets/animations/heart.json
     - assets/animations/particles.json
+    - assets/animations/search_box.json
     - assets/animations/waves.json
     - assets/animations/whale.json
     - assets/translations/
