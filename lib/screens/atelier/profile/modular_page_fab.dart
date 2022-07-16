@@ -4,8 +4,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
-class ProfilePageFAB extends StatelessWidget {
-  const ProfilePageFAB({
+class ModularPageFAB extends StatelessWidget {
+  const ModularPageFAB({
     Key? key,
     required this.isOwner,
     required this.onToggleEditMode,

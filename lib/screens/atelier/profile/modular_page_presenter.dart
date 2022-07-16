@@ -16,7 +16,7 @@ import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/screens/atelier/profile/modular_page_error.dart';
 import 'package:artbooking/screens/atelier/profile/modular_page_loading.dart';
-import 'package:artbooking/screens/atelier/profile/profile_page_body.dart';
+import 'package:artbooking/screens/atelier/profile/modular_page_body.dart';
 import 'package:artbooking/screens/atelier/profile/modular_page_empty.dart';
 import 'package:artbooking/types/firestore/document_map.dart';
 import 'package:artbooking/types/firestore/document_snapshot_map.dart';
@@ -199,7 +199,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     final bool isOwner =
         widget.pageType == EnumPageType.profile ? isPageOwner : canManagePages;
 
-    return ProfilePageBody(
+    return ModularPageBody(
       editMode: _editMode,
       isMobileSize: isMobileSize,
       isOwner: isOwner,

@@ -2,7 +2,6 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/books/my_books_page.dart';
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page.dart';
 import 'package:artbooking/screens/atelier/profile/modular_page_presenter.dart';
-import 'package:artbooking/screens/atelier/profile/profile_page.dart';
 import 'package:artbooking/screens/book/book_page.dart';
 import 'package:artbooking/screens/book/books_page.dart';
 import 'package:artbooking/screens/home_mobile_page.dart';
@@ -91,8 +90,10 @@ class HomeLocation extends BeamLocation<BeamState> {
       if (state.pathPatternSegments.contains("users") &&
           state.pathPatternSegments.contains(":userId"))
         BeamPage(
-          child: ProfilePage(
-            userId: state.pathParameters["userId"] ?? "",
+          child: ModularPagePresenter(
+            pageId: "",
+            userId: getUserId(state.routeState),
+            pageType: EnumPageType.profile,
           ),
           key: ValueKey("$profileRoute"),
           title: Utilities.ui.getPageTitle("profile".tr()),
@@ -176,5 +177,10 @@ class HomeLocation extends BeamLocation<BeamState> {
     final mapState = routeState as Map<String, dynamic>;
     final int initialTabIndex = mapState["initialTabIndex"] ?? 0;
     return initialTabIndex;
+  }
+
+  String getUserId(Object? routeState) {
+    final mapState = routeState as Map<String, dynamic>;
+    return state.pathParameters["userId"] ?? mapState["userId"] ?? "";
   }
 }

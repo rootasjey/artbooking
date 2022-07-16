@@ -4,7 +4,7 @@ import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants/section_ids.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/line_drop_zone.dart';
-import 'package:artbooking/screens/atelier/profile/profile_page_fab.dart';
+import 'package:artbooking/screens/atelier/profile/modular_page_fab.dart';
 import 'package:artbooking/screens/atelier/profile/section_wrapper.dart';
 import 'package:artbooking/types/enums/enum_page_type.dart';
 import 'package:artbooking/types/modular_page.dart';
@@ -15,8 +15,8 @@ import 'package:artbooking/types/section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 
-class ProfilePageBody extends StatelessWidget {
-  const ProfilePageBody({
+class ModularPageBody extends StatelessWidget {
+  const ModularPageBody({
     Key? key,
     required this.modularPage,
     required this.pageType,
@@ -239,7 +239,7 @@ class ProfilePageBody extends StatelessWidget {
     }
 
     return Scaffold(
-      floatingActionButton: ProfilePageFAB(
+      floatingActionButton: ModularPageFAB(
         editMode: editMode,
         isOwner: isOwner,
         onToggleEditMode: onToggleEditMode,
