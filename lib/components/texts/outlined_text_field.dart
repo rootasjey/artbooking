@@ -7,7 +7,7 @@ class OutlinedTextField extends StatelessWidget {
     Key? key,
     this.label,
     this.controller,
-    this.hintText = '',
+    this.hintText = "",
     this.onChanged,
     this.onSubmitted,
     this.constraints = const BoxConstraints(maxHeight: 140.0),
@@ -17,6 +17,7 @@ class OutlinedTextField extends StatelessWidget {
     this.keyboardType,
     this.focusNode,
     this.obscureText = false,
+    this.textCapitalization = TextCapitalization.sentences,
   }) : super(key: key);
 
   final bool autofocus;
@@ -39,6 +40,8 @@ class OutlinedTextField extends StatelessWidget {
 
   /// The label will be displayed on top of the input.
   final String? label;
+
+  final TextCapitalization textCapitalization;
 
   /// A controller to manipulate the input component.
   final TextEditingController? controller;
