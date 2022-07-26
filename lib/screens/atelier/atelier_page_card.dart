@@ -1,17 +1,17 @@
-import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
 
 class AtelierPageCard extends StatefulWidget {
   const AtelierPageCard({
     Key? key,
-    this.hoverColor = Colors.pink,
     required IconData this.iconData,
-    required String this.textTitle,
     required String this.textSubtitle,
+    required String this.textTitle,
+    this.backgroundColor = Colors.white,
     this.compact = false,
-    this.onTap,
+    this.hoverColor = Colors.pink,
     this.noSizeConstraints = false,
+    this.onTap,
   }) : super(key: key);
 
   /// If true, this card won't have size constrains
@@ -21,6 +21,12 @@ class AtelierPageCard extends StatefulWidget {
   /// If true, the card's width will be 200.0.
   final bool compact;
 
+  /// Card's background color.
+  final Color backgroundColor;
+
+  /// Icon will be of this color on hover.
+  final Color hoverColor;
+
   /// Icon's data which will be displayed before text.
   final IconData iconData;
 
@@ -29,9 +35,6 @@ class AtelierPageCard extends StatefulWidget {
 
   /// Secondary card's text.
   final String textSubtitle;
-
-  /// Icon will be of this color on hover.
-  final Color hoverColor;
 
   /// Callback fired when this card is tapped.
   final Function()? onTap;
@@ -51,7 +54,7 @@ class _AtelierPageCardState extends State<AtelierPageCard> {
   Widget build(BuildContext context) {
     final Widget card = Card(
       elevation: _elevation,
-      color: Constants.colors.clairPink,
+      color: widget.backgroundColor,
       child: InkWell(
         onTap: widget.onTap,
         onHover: (isHover) {
