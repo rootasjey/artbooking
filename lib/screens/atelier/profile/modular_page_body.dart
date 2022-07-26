@@ -98,6 +98,7 @@ class ModularPageBody extends StatelessWidget {
     List<int> dragIndexes,
   )? onDropSectionInBetween;
 
+  /// Callback fired when the page scrolls.
   final void Function(double)? onPageScroll;
 
   /// Callback to handle add secction action.

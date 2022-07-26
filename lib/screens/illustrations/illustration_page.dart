@@ -112,7 +112,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
         illustrationFromNav.id == widget.illustrationId) {
       _illustration = illustrationFromNav;
 
-      final query = FirebaseFirestore.instance
+      final DocumentMap query = FirebaseFirestore.instance
           .collection("illustrations")
           .doc(_illustration.id);
 
