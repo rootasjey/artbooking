@@ -14,10 +14,10 @@ import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/router/locations/home_location.dart';
+import 'package:artbooking/screens/atelier/profile/default_profile_page.dart';
 import 'package:artbooking/screens/atelier/profile/modular_page_error.dart';
 import 'package:artbooking/screens/atelier/profile/modular_page_loading.dart';
 import 'package:artbooking/screens/atelier/profile/modular_page_body.dart';
-import 'package:artbooking/screens/atelier/profile/modular_page_empty.dart';
 import 'package:artbooking/types/firestore/document_map.dart';
 import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
@@ -151,6 +151,11 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
   @override
   void initState() {
     super.initState();
+
+    _modularPage = _modularPage.copyWith(
+      userId: widget.userId,
+    );
+
     loadPreferences();
     tryFetchPage();
   }
@@ -174,14 +179,6 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
       );
     }
 
-    if (_isEmpty) {
-      return ModularPageEmpty(
-        isMobileSize: isMobileSize,
-        username: getUserName(),
-        pageType: widget.pageType,
-      );
-    }
-
     if (_loading) {
       return ModularPageLoading(
         pageType: widget.pageType,
@@ -198,6 +195,15 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
 
     final bool isOwner =
         widget.pageType == EnumPageType.profile ? isPageOwner : canManagePages;
+
+    if (_isEmpty) {
+      return DefaultProfilePage(
+        userId: getUserId(),
+        isMobileSize: isMobileSize,
+        isOwner: isOwner,
+        onCreateProfilePage: tryCreatePage,
+      );
+    }
 
     return ModularPageBody(
       editMode: _editMode,
@@ -834,6 +840,53 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
+  void tryCreatePage() async {
+    final String userId = getUserId();
+
+    if (userId.isEmpty) {
+      context.showErrorBar(
+        content: Text(
+          "profile_page_create_error_empty_id".tr(),
+        ),
+      );
+
+      setState(() => _hasErrors = true);
+      return;
+    }
+
+    setState(() {
+      _loading = true;
+      _hasErrors = false;
+      _isEmpty = false;
+    });
+
+    try {
+      final sections = await tryFetchSections();
+      if (sections.isEmpty) return;
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_pages")
+          .add({
+        "created_at": Timestamp.now(),
+        "is_ctive": true,
+        "is_draft": false,
+        "name": "Sample-${DateTime.now()}",
+        "sections": sections.map((x) => x.toMap()).toList(),
+        "type": "profile",
+        "updated_at": Timestamp.now(),
+        "user_id": userId,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+      _hasErrors = true;
+    } finally {
+      tryFetchPage();
     }
   }
 
