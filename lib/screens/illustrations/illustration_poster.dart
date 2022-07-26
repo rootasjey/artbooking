@@ -137,6 +137,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
           opacity: 0.8,
           child: Text(
             illustration.name,
+            textAlign: isMobileSize ? TextAlign.center : TextAlign.start,
             style: Utilities.fonts.body(
               fontSize: 20.0,
               fontWeight: FontWeight.w700,
@@ -202,7 +203,11 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
         ),
         Container(
           width: 500.0,
-          padding: const EdgeInsets.only(top: 60.0),
+          padding: const EdgeInsets.only(
+            top: 60.0,
+            left: 12.0,
+            right: 12.0,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
