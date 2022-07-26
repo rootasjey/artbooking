@@ -8,10 +8,13 @@ import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/screens/search_page/search_page_body.dart';
 import 'package:artbooking/screens/search_page/search_page_fab.dart';
 import 'package:artbooking/screens/search_page/search_page_header.dart';
+import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/enums/enum_search_item_type.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:artbooking/types/json_types.dart';
+import 'package:artbooking/types/search_result_item.dart';
+import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flash/src/flash_helper.dart';
@@ -45,11 +48,11 @@ class _SearchPageState extends State<SearchPage> {
   /// Used to focus search input.
   final FocusNode _searchFocusNode = FocusNode();
 
-  /// Search results for illustrations.
-  final List<Illustration> _illustrationsSuggestions = [];
+  /// Search results containing books, illustrations, artists.
+  final List<SearchResultItem> _searchResultItemList = [];
 
   /// Search results' limit.
-  int _limit = 30;
+  int _limit = 10;
 
   /// Page scroll controller.
   /// Multiple purpose: show/hide FAB.
@@ -95,7 +98,7 @@ class _SearchPageState extends State<SearchPage> {
             ApplicationBar(),
             SearchPageHeader(
               isMobileSize: isMobileSize,
-              resultCount: _illustrationsSuggestions.length,
+              resultCount: _searchResultItemList.length,
               showResultMetrics: _showResults && !_isFirstSearch,
               onInputChanged: onInputChanged,
               searching: _searching,
@@ -109,7 +112,7 @@ class _SearchPageState extends State<SearchPage> {
               onInputChanged: onInputChanged,
               onTapSearchItem: onTapSearchItem,
               pageScrollController: _pageScrollController,
-              results: _illustrationsSuggestions,
+              results: _searchResultItemList,
               searching: _searching,
               searchFocusNode: _searchFocusNode,
               searchInputController: _searchInputController,
@@ -129,12 +132,44 @@ class _SearchPageState extends State<SearchPage> {
     context.showSuccessBar(content: Text("copy_link_success".tr()));
   }
 
-  void navigateToIllustration(String illustrationId) {
+  void navigateToBook(String bookId) {
+    final String route = HomeLocation.bookRoute.replaceFirst(
+      ":bookId",
+      bookId,
+    );
+
     Beamer.of(context).beamToNamed(
-      HomeLocation.illustrationRoute
-          .replaceFirst(":illustrationId", illustrationId),
+      route,
+      routeState: {
+        "heroTag": bookId,
+      },
+    );
+  }
+
+  void navigateToIllustration(String illustrationId) {
+    final String route = HomeLocation.illustrationRoute.replaceFirst(
+      ":illustrationId",
+      illustrationId,
+    );
+
+    Beamer.of(context).beamToNamed(
+      route,
       routeState: {
         "heroTag": illustrationId,
+      },
+    );
+  }
+
+  void navigateToUser(String userId) {
+    final String route = HomeLocation.profileRoute.replaceFirst(
+      ":userId",
+      userId,
+    );
+
+    Beamer.of(context).beamToNamed(
+      route,
+      routeState: {
+        "heroTag": userId,
       },
     );
   }
@@ -174,27 +209,108 @@ class _SearchPageState extends State<SearchPage> {
   void onTapSearchItem(EnumSearchItemType searchItemType, String id) {
     switch (searchItemType) {
       case EnumSearchItemType.book:
+        navigateToBook(id);
         break;
       case EnumSearchItemType.illustration:
         navigateToIllustration(id);
         break;
       case EnumSearchItemType.user:
+        navigateToUser(id);
         break;
       default:
     }
   }
 
   Future search() async {
-    trySearchIllustrations();
-  }
+    _searchResultItemList.clear();
 
-  void trySearchIllustrations() async {
     setState(() {
       _isFirstSearch = false;
       _searching = true;
-      _illustrationsSuggestions.clear();
     });
 
+    await Future.wait([
+      trySearchUsers(),
+      trySearchBooks(),
+      trySearchIllustrations(),
+    ]);
+
+    setState(() => _searching = false);
+  }
+
+  Future<void> trySearchUsers() async {
+    try {
+      final AlgoliaQuery query = SearchUtilities.algolia
+          .index("users")
+          .query(_searchInputValue)
+          .setHitsPerPage(_limit)
+          .setPage(0);
+
+      final AlgoliaQuerySnapshot snapshot = await query.getObjects();
+
+      if (snapshot.empty) {
+        setState(() => _searching = false);
+        return;
+      }
+
+      for (final AlgoliaObjectSnapshot hit in snapshot.hits) {
+        final Json data = hit.data;
+        data["id"] = hit.objectID;
+
+        final UserFirestore user = UserFirestore.fromMap(data);
+
+        _searchResultItemList.add(
+          SearchResultItem(
+            type: EnumSearchItemType.user,
+            index: _searchResultItemList.length,
+            id: user.id,
+            name: user.name,
+            imageUrl: user.getProfilePicture(),
+          ),
+        );
+      }
+    } catch (error) {
+      Utilities.logger.e(error);
+    }
+  }
+
+  Future<void> trySearchBooks() async {
+    try {
+      final AlgoliaQuery query = SearchUtilities.algolia
+          .index("books")
+          .query(_searchInputValue)
+          .setHitsPerPage(_limit)
+          .setPage(0);
+
+      final AlgoliaQuerySnapshot snapshot = await query.getObjects();
+
+      if (snapshot.empty) {
+        setState(() => _searching = false);
+        return;
+      }
+
+      for (final AlgoliaObjectSnapshot hit in snapshot.hits) {
+        final Json data = hit.data;
+        data["id"] = hit.objectID;
+
+        final Book book = Book.fromMap(data);
+
+        _searchResultItemList.add(
+          SearchResultItem(
+            type: EnumSearchItemType.book,
+            index: _searchResultItemList.length,
+            id: book.id,
+            name: book.name,
+            imageUrl: book.getCoverLink(),
+          ),
+        );
+      }
+    } catch (error) {
+      Utilities.logger.e(error);
+    }
+  }
+
+  Future<void> trySearchIllustrations() async {
     try {
       final AlgoliaQuery query = SearchUtilities.algolia
           .index("illustrations")
@@ -211,16 +327,22 @@ class _SearchPageState extends State<SearchPage> {
 
       for (final AlgoliaObjectSnapshot hit in snapshot.hits) {
         final Json data = hit.data;
-        data['id'] = hit.objectID;
+        data["id"] = hit.objectID;
 
         final Illustration illustration = Illustration.fromMap(data);
-        _illustrationsSuggestions.add(illustration);
-      }
 
-      setState(() => _searching = false);
+        _searchResultItemList.add(
+          SearchResultItem(
+            type: EnumSearchItemType.illustration,
+            index: _searchResultItemList.length,
+            id: illustration.id,
+            name: illustration.name,
+            imageUrl: illustration.getThumbnail(),
+          ),
+        );
+      }
     } catch (error) {
       Utilities.logger.e(error);
-      setState(() => _searching = false);
     }
   }
 

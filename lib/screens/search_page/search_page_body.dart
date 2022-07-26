@@ -1,8 +1,8 @@
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/screens/search_page/search_result_item.dart';
+import 'package:artbooking/screens/search_page/search_result_card.dart';
 import 'package:artbooking/screens/search_page/search_welcome.dart';
 import 'package:artbooking/types/enums/enum_search_item_type.dart';
-import 'package:artbooking/types/illustration/illustration.dart';
+import 'package:artbooking/types/search_result_item.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -38,7 +38,7 @@ class SearchPageBody extends StatelessWidget {
   final FocusNode searchFocusNode;
 
   /// Search results.
-  final List<Illustration> results;
+  final List<SearchResultItem> results;
 
   /// Callback fired to clear search input.
   final void Function()? onClearInput;
@@ -94,15 +94,15 @@ class SearchPageBody extends StatelessWidget {
         ),
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) {
-            final Illustration illustration = results.elementAt(index);
+            final SearchResultItem searchResultItem = results.elementAt(index);
 
-            return SearchResultItem(
-              id: illustration.id,
-              imageUrl: illustration.getThumbnail(),
+            return SearchResultCard(
+              id: searchResultItem.id,
+              imageUrl: searchResultItem.imageUrl,
               index: index,
               onTap: onTapSearchItem,
-              searchItemType: EnumSearchItemType.illustration,
-              titleValue: illustration.name,
+              searchItemType: searchResultItem.type,
+              titleValue: searchResultItem.name,
             );
           },
           childCount: results.length,
