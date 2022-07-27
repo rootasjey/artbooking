@@ -169,6 +169,13 @@
   },
   "book_quebert": "The Truth About the Harry Quebert Affair",
   "book_create": "Create book",
+  "book_create_and_add_illustration": {
+    "zero": "Create and add illustration",
+    "one": "Create and add illustration",
+    "two": "Create and add illustrations",
+    "many": "Create and add illustrations",
+    "other": "Create and add illustrations"
+  },
   "book_create_description": "A book containing your illustrations.",
   "book_create_hint_text": "Epilogues for the End of the Sky",
   "book_create_hint_texts": {
@@ -181,7 +188,10 @@
     "6": "BADLANDS",
     "7": "Colors pt. II",
     "8": "I Love You.",
-    "9": "Real Love Baby"
+    "9": "Real Love Baby",
+    "10": "Welcome to the Treehouse, Pt. I",
+    "11": "Snakes & Ladders",
+    "12": "Deep Six Textbook"
   },
   "book_create_hint_description_texts": {
     "0": "This is my learning process.",
@@ -195,7 +205,8 @@
     "8": "Real life is make-believe. All that glitters isn't gold to me.",
     "9": "And if the stripes keep us apart, I will write your name up in the stars.",
     "10": "All species that I know. Vol 2.",
-    "11": "Our hearts are free, so tell me what's wrong with the feeling?"
+    "11": "Our hearts are free, so tell me what's wrong with the feeling?",
+    "12": "I was so inspired by the grass, the street, the barbed wire."
   },
   "book_creating": "Creating book",
   "book_creating_name": "Creating book {}",
@@ -215,6 +226,7 @@
     "many": "Deleting these books won't delete illustrations inside it. Illustrations live on their own. This action is irrevsible.",
     "other": "Deleting these books won't delete illustrations inside it. Illustrations live on their own. This action is irrevsible."
   },
+  "book_description": "Book's description",
   "book_edit_visibility": "Edit book's visiblity",
   "book_illustrations_remove": {
     "zero": "Don't remove",
@@ -238,6 +250,7 @@
     "other": "Illustrations will still exist outside of this book."
   },
   "book_loading": "Loading book",
+  "book_name": "Book's name",
   "book_no_illustration": "This book is currently empty.",
   "book_owner_no_illustrations": "You haven't added any illustration to this book yet. You can add one from your illustrations page.",
   "book_permutation_description": "Drop this book on another one to permute them.",
@@ -290,7 +303,20 @@
   },
   "books_archived_word": "Archived",
   "books_browse": "You can browse all public books on this page.",
-  "books_choose_add_illustrations_in": "Choose the books to add the illustrations in.",
+  "books_choose_add_illustration_in": {
+    "zero": "Choose the books to add the illustration in.",
+    "one": "Choose the books to add the illustration in.",
+    "two": "Choose the books to add the illustrations in.",
+    "many": "Choose the books to add the illustrations in.",
+    "other": "Choose the books to add the illustrations in."
+  },
+  "books_create_and_add_illustration_in": {
+    "zero": "Create a book to add the illustration in.",
+    "one": "Create a book to add the illustration in.",
+    "two": "Create a book to add the illustrations in.",
+    "many": "Create a book to add the illustrations in.",
+    "other": "Create a book to add the illustrations in."
+  },
   "books_delete": "Delete these book",
   "books_delete_description": "Deleting these books won't delete illustrations inside it. Illustrations live on their own. This action is irrevsible.",
   "books_description": "Reading moments are peaceful, calm and often thrilling. A short list of my most liked books of all times:",

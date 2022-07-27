@@ -167,6 +167,13 @@
     "other": "Ajout des illustrations au book"
   },
   "book_create": "Créer un book",
+  "book_create_and_add_illustration": {
+    "zero": "Créer et ajouter l'illustration",
+    "one": "Créer et ajouter l'illustration",
+    "two": "Créer et ajouter les illustrations",
+    "many": "Créer et ajouter les illustrations",
+    "other": "Créer et ajouter les illustrations"
+  },
   "book_create_description": "Un book continant vos illustrations.",
   "book_create_hint_text": "Epilogues for the End of the Sky",
   "book_create_hint_texts": {
@@ -213,6 +220,7 @@
     "many": "La suppression de ces books n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de ceux-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible.",
     "other": "La suppression de ces books n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de ceux-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible."
   },
+  "book_description": "Description du book",
   "book_edit_visibility": "Modifier la visibilité du book",
   "book_illustrations_remove": {
     "zero": "Rien retirer",
@@ -236,6 +244,7 @@
     "other": "Lss illustrations en elles-même continueront d'exister en dehors de ce book."
   },
   "book_loading": "Chargement du book",
+  "book_name": "Nom du book",
   "book_no_illustration": "Ce book est vide pour l'instant.",
   "book_owner_no_illustration": "Vous avez ajouté aucune illustrations à ce book pour le moment. Vous pouvez en ajouter depuis votre page d'illustrations.",
   "book_permutation_description": "Déposez ce book sur un autre pour les permutter.",
@@ -290,7 +299,20 @@
   },
   "books_archived_word": "Archivés",
   "books_browse": "vous pouvez parcourir tous les books publiques sur cette page.",
-  "books_choose_add_illustrations_in": "Choisissez les books où ajouter les illustrations.",
+  "books_choose_add_illustration_in": {
+    "zero": "Choisissez les books où ajouter l'illustration.",
+    "one": "Choisissez les books où ajouter l'illustration.",
+    "two": "Choisissez les books où ajouter les illustrations.",
+    "many": "Choisissez les books où ajouter les illustrations.",
+    "other": "Choisissez les books où ajouter les illustrations."
+  },
+  "books_create_and_add_illustration_in": {
+    "zero": "Créer un book afin d'ajouter l'illustration à celui-ci.",
+    "one": "Créer un book afin d'ajouter l'illustration à celui-ci.",
+    "two": "Créer un book afin d'ajouter les illustrations à celui-ci.",
+    "many": "Créer un book afin d'ajouter les illustrations à celui-ci.",
+    "other": "Créer un book afin d'ajouter les illustrations à celui-ci."
+  },
   "books_delete": "Supprimer ces books",
   "books_delete_description": "La suppression de ces books n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de ceux-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible.",
   "books_description": "Les moments de lecture sont reposants, calme et souvent frétillants. Une petite liste de books que j'ai adorés:",
