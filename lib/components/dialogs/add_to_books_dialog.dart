@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
+import 'package:artbooking/components/texts/outlined_text_field.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/book/book.dart';
@@ -23,12 +26,14 @@ import 'package:supercharged/supercharged.dart';
 class AddToBooksDialog extends StatefulWidget {
   AddToBooksDialog({
     required this.illustrations,
-    this.books = const [],
     this.autoFocus = false,
+    this.books = const [],
+    this.isMobileSize = false,
     this.onComplete,
   });
 
   final bool autoFocus;
+  final bool isMobileSize;
   final List<Illustration> illustrations;
   final List<Book> books;
 
@@ -54,9 +59,9 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
   List<Book> _books = [];
   List<Book> _selectedBooks = [];
 
-  var _scrollController = ScrollController();
-  var _nameController = TextEditingController();
-  var _descriptionController = TextEditingController();
+  final _scrollController = ScrollController();
+  final _nameController = TextEditingController();
+  final _descriptionController = TextEditingController();
 
   @override
   void initState() {
@@ -76,95 +81,29 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
   @override
   Widget build(BuildContext context) {
     if (_createMode) {
-      return InputDialog(
-        titleValue: "book_create".tr().toUpperCase(),
-        subtitleValue: "book_create_description".tr(),
-        nameController: _nameController,
-        descriptionController: _descriptionController,
-        onCancel: Beamer.of(context).popRoute,
-        onSubmitted: (value) {
-          createBookAndAddIllustrations();
-          Beamer.of(context).popRoute();
-        },
-      );
+      return createBookWidget();
     }
 
-    final _onValidate = _loading || _selectedBooks.isEmpty ? null : onValidate;
+    final void Function()? _onValidate =
+        _loading || _selectedBooks.isEmpty ? null : onValidate;
+
+    if (widget.isMobileSize) {
+      return mobileWidget(onValidate: _onValidate);
+    }
 
     return ThemedDialog(
       autofocus: widget.autoFocus,
       useRawDialog: true,
-      title: Column(
-        children: [
-          Opacity(
-            opacity: 0.8,
-            child: Text(
-              "books".tr().toUpperCase(),
-              style: Utilities.fonts.body(
-                color: Colors.black,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: Opacity(
-              opacity: 0.4,
-              child: Text(
-                "books_choose_add_illustrations_in".tr(),
-                textAlign: TextAlign.center,
-                style: Utilities.fonts.body(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: body(),
+      title: header(),
+      body: desktopBody(),
       textButtonValidation: "books_add_to".plural(_selectedBooks.length),
-      footer: Material(
-        elevation: 4.0,
-        color: Constants.colors.clairPink,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(12.0),
-              child: DarkElevatedButton.large(
-                onPressed: _onValidate,
-                child: Text("books_add_to".plural(_selectedBooks.length)),
-              ),
-            ),
-            Tooltip(
-              message: "book_create".tr(),
-              child: DarkElevatedButton.iconOnly(
-                color: Theme.of(context).secondaryHeaderColor.withOpacity(0.8),
-                onPressed: _loading ? null : showCreationInputs,
-                child: Icon(UniconsLine.plus),
-              ),
-            ),
-          ],
-        ),
-      ),
+      footer: footer(onValidate: _onValidate),
       onCancel: Beamer.of(context).popRoute,
       onValidate: _onValidate,
     );
   }
 
-  void showCreationInputs() {
-    setState(() {
-      _createMode = true;
-    });
-  }
-
-  void onValidate() {
-    addIllustrationToBooks();
-    Beamer.of(context).popRoute();
-  }
-
-  Widget body() {
+  Widget desktopBody() {
     if (_loading) {
       return SingleChildScrollView(
         child: Padding(
@@ -199,8 +138,8 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
           slivers: [
             SliverList(
               delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final book = _books.elementAt(index);
+                (BuildContext context, int index) {
+                  final Book book = _books.elementAt(index);
                   return bookTile(book);
                 },
                 childCount: _books.length,
@@ -346,6 +285,212 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
             ),
         ],
       ),
+    );
+  }
+
+  Widget createBookWidget() {
+    if (widget.isMobileSize) {
+      return Material(
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.only(
+              top: 24.0,
+              left: 12.0,
+              right: 12.0,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                header(
+                  create: true,
+                  margin: const EdgeInsets.only(bottom: 24.0),
+                ),
+                OutlinedTextField(
+                  controller: _nameController,
+                  label: "book_name".tr(),
+                  hintText:
+                      "book_create_hint_texts.${Random().nextInt(13)}".tr(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: OutlinedTextField(
+                    autofocus: false,
+                    controller: _descriptionController,
+                    label: "book_description".tr(),
+                    hintText:
+                        "book_create_hint_description_texts.${Random().nextInt(13)}"
+                            .tr(),
+                  ),
+                ),
+                DarkElevatedButton.large(
+                  child: Text("book_create_and_add_illustration"
+                      .plural(widget.books.length)),
+                  margin: const EdgeInsets.only(top: 24.0, bottom: 16.0),
+                  onPressed: () {
+                    createBookAndAddIllustrations();
+                    Beamer.of(context).popRoute();
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return InputDialog(
+      titleValue: "book_create".tr().toUpperCase(),
+      subtitleValue: "book_create_description".tr(),
+      nameController: _nameController,
+      descriptionController: _descriptionController,
+      onCancel: Beamer.of(context).popRoute,
+      onSubmitted: (_) {
+        createBookAndAddIllustrations();
+        Beamer.of(context).popRoute();
+      },
+    );
+  }
+
+  Widget footer({void Function()? onValidate}) {
+    return Material(
+      elevation: 4.0,
+      color: Constants.colors.clairPink,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(12.0),
+            child: widget.isMobileSize
+                ? DarkElevatedButton(
+                    onPressed: onValidate,
+                    child: Text("books_add_to".plural(_selectedBooks.length)),
+                  )
+                : DarkElevatedButton.large(
+                    onPressed: onValidate,
+                    child: Text("books_add_to".plural(_selectedBooks.length)),
+                  ),
+          ),
+          Tooltip(
+            message: "book_create".tr(),
+            child: DarkElevatedButton.iconOnly(
+              color: Theme.of(context).secondaryHeaderColor.withOpacity(0.8),
+              onPressed: _loading ? null : showCreationInputs,
+              child: Icon(UniconsLine.plus),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget header({
+    bool create = false,
+    EdgeInsets margin = EdgeInsets.zero,
+  }) {
+    return Padding(
+      padding: margin,
+      child: Column(
+        children: [
+          Opacity(
+            opacity: 0.8,
+            child: Text(
+              "books".tr().toUpperCase(),
+              style: Utilities.fonts.body(
+                color: Colors.black,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: Opacity(
+              opacity: 0.4,
+              child: Text(
+                create
+                    ? "books_create_and_add_illustration_in"
+                        .plural(widget.illustrations.length)
+                    : "books_choose_add_illustration_in"
+                        .plural(widget.illustrations.length),
+                textAlign: TextAlign.center,
+                style: Utilities.fonts.body(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget mobileWidget({void Function()? onValidate}) {
+    if (_loading) {
+      return SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(26.0),
+          child: Column(
+            children: [
+              Opacity(
+                opacity: 0.8,
+                child: Text(
+                  "loading".tr(),
+                  style: Utilities.fonts.body(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              LinearProgressIndicator(),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Stack(
+      children: [
+        NotificationListener<ScrollNotification>(
+          onNotification: onScrollNotification,
+          child: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    header(
+                      margin: const EdgeInsets.all(12.0),
+                    ),
+                    Divider(
+                      thickness: 2.0,
+                      color: Theme.of(context).secondaryHeaderColor,
+                    ),
+                  ],
+                ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      final Book book = _books.elementAt(index);
+                      return bookTile(book);
+                    },
+                    childCount: _books.length,
+                  ),
+                ),
+              ),
+              SliverPadding(padding: const EdgeInsets.only(bottom: 150.0)),
+            ],
+          ),
+        ),
+        Positioned(
+          bottom: 0.0,
+          left: 0.0,
+          right: 0.0,
+          child: footer(onValidate: onValidate),
+        ),
+      ],
     );
   }
 
@@ -537,6 +682,12 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
     setState(() {});
   }
 
+  void showCreationInputs() {
+    setState(() {
+      _createMode = true;
+    });
+  }
+
   void showProgress(String progressId, int illustrationCount) {
     String message = "";
 
@@ -554,5 +705,10 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
       icon: Icon(UniconsLine.plus),
       duration: 60.seconds,
     );
+  }
+
+  void onValidate() {
+    addIllustrationToBooks();
+    Beamer.of(context).popRoute();
   }
 }
