@@ -6,6 +6,7 @@ import 'package:artbooking/types/enums/enum_separator_shape.dart';
 import 'package:artbooking/types/named_color.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:unicons/unicons.dart';
 
 class UIUtilities {
@@ -212,5 +213,28 @@ class UIUtilities {
       default:
         return UniconsLine.books;
     }
+  }
+
+  /// Show a dialog or a modal bottom sheet according to `isMobileSize` value.
+  void showAdaptiveDialog(
+    BuildContext context, {
+    required Widget Function(BuildContext) builder,
+    bool isMobileSize = false,
+    Color backgroundColor = Colors.white70,
+  }) {
+    if (isMobileSize) {
+      showCupertinoModalBottomSheet(
+        context: context,
+        expand: false,
+        backgroundColor: backgroundColor,
+        builder: builder,
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: builder,
+    );
   }
 }
