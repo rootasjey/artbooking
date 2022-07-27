@@ -1443,14 +1443,17 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   }
 
   void showAddToBook(Illustration illustration) {
-    showDialog(
-      context: context,
-      builder: (context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    Utilities.ui.showAdaptiveDialog(
+      context,
+      isMobileSize: isMobileSize,
+      backgroundColor: Colors.white,
+      builder: (BuildContext context) {
         return AddToBooksDialog(
           illustrations: [illustration] + _multiSelectedItems.values.toList(),
-          onComplete: () {
-            onClearSelection();
-          },
+          isMobileSize: isMobileSize,
+          onComplete: onClearSelection,
         );
       },
     );
