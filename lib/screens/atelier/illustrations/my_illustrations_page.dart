@@ -93,12 +93,17 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   bool _loadingMore = false;
 
   /// Show the page floating action button if true.
-  bool _showFab = false;
+  bool _showFabUpload = true;
+
+  /// If true, show FAB to scroll to the top of the page.
+  bool _showFabToTop = false;
 
   var _selectedTab = EnumVisibilityTab.active;
 
   /// Last fetched illustration document.
   DocumentSnapshot? _lastDocument;
+
+  double _previousOffset = 0.0;
 
   /// Max illustrations to fetch per page.
   final int _limit = 20;
@@ -223,7 +228,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       controller: HeroController(),
       child: Scaffold(
         floatingActionButton: MyIllustrationsPageFab(
-          show: _showFab,
+          showFabUpload: _showFabUpload,
+          showFabToTop: _showFabToTop,
           scrollController: _pageScrollController,
           isOwner: isOwner,
           uploadIllustration: uploadIllustration,
@@ -253,7 +259,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                   child: ImprovedScrolling(
                     scrollController: _pageScrollController,
                     enableKeyboardScrolling: true,
-                    onScroll: onScroll,
+                    onScroll: onPageScroll,
                     child: ScrollConfiguration(
                       behavior: CustomScrollBehavior(),
                       child: CustomScrollView(
@@ -1232,10 +1238,10 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   bool onScrollNotification(ScrollNotification notification) {
     // FAB visibility
-    if (notification.metrics.pixels < 50 && _showFab) {
-      setState(() => _showFab = false);
-    } else if (notification.metrics.pixels > 50 && !_showFab) {
-      setState(() => _showFab = true);
+    if (notification.metrics.pixels < 50 && _showFabUpload) {
+      setState(() => _showFabUpload = false);
+    } else if (notification.metrics.pixels > 50 && !_showFabUpload) {
+      setState(() => _showFabUpload = true);
     }
 
     if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
@@ -1319,22 +1325,44 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   }
 
   /// Callback when the page scrolls up and down.
-  void onScroll(double scrollOffset) {
-    if (scrollOffset < 50 && _showFab) {
-      setState(() => _showFab = false);
-      return;
-    }
+  void onPageScroll(double offset) {
+    maybeShowFab(offset);
+    maybeFetchMore(offset);
+  }
 
-    if (scrollOffset > 50 && !_showFab) {
-      setState(() => _showFab = true);
-    }
-
+  void maybeFetchMore(double offset) {
     if (_pageScrollController.position.atEdge &&
-        scrollOffset > 50 &&
+        offset > 50 &&
         _hasNext &&
         !_loadingMore) {
       fetchMoreIllustrations();
     }
+  }
+
+  void maybeShowFab(double offset) {
+    final bool scrollingDown = offset - _previousOffset > 0;
+    _previousOffset = offset;
+
+    _showFabToTop = offset == 0.0 ? false : true;
+
+    if (scrollingDown) {
+      if (!_showFabUpload) {
+        return;
+      }
+
+      setState(() => _showFabUpload = false);
+      return;
+    }
+
+    if (offset == 0.0) {
+      setState(() => _showFabToTop = false);
+    }
+
+    if (_showFabUpload) {
+      return;
+    }
+
+    setState(() => _showFabUpload = true);
   }
 
   void onSelectAll() {

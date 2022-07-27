@@ -7,23 +7,38 @@ import 'package:unicons/unicons.dart';
 class MyIllustrationsPageActions extends StatelessWidget {
   const MyIllustrationsPageActions({
     Key? key,
+    required this.limitThreeInRow,
     required this.multiSelectActive,
     required this.show,
-    required this.limitThreeInRow,
-    this.onUploadIllustration,
+    this.isMobileSize = false,
+    this.isOwner = false,
     this.onTriggerMultiSelect,
     this.onUpdateLayout,
-    this.isOwner = false,
+    this.onUploadIllustration,
   }) : super(key: key);
 
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
+
+  /// I true, the current authenticated user is the owner of the illustrations.
   final bool isOwner;
+
+  /// If true, multiple illustrations are currently selected.
   final bool multiSelectActive;
+
+  /// This widget will be displayed if true.
   final bool show;
+
+  /// If true, the page layout will be limited to 3 illustrations in a row.
   final bool limitThreeInRow;
+
+  /// Callback fired when multi-select is toggled on/off.
   final void Function()? onTriggerMultiSelect;
 
-  /// Limit number of illustrations to 3 in a row.
+  /// Callback fired to un-/limit number of illustrations to 3 in a row.
   final void Function()? onUpdateLayout;
+
+  /// Callback fired when we want to upload new illustrations.
   final void Function()? onUploadIllustration;
 
   @override
@@ -36,22 +51,24 @@ class MyIllustrationsPageActions extends StatelessWidget {
       spacing: 12.0,
       runSpacing: 12.0,
       children: [
-        TextRectangleButton(
-          onPressed: onUploadIllustration,
-          icon: Icon(UniconsLine.upload),
-          label: Text("upload".tr()),
-          primary: Colors.black38,
-        ),
-        SquareButton(
-          active: multiSelectActive,
-          message: "multi_select".tr(),
-          onTap: onTriggerMultiSelect,
-          opacity: multiSelectActive ? 1.0 : 0.4,
-          child: Icon(
-            UniconsLine.layers,
-            color: multiSelectActive ? Colors.white : null,
+        if (!isMobileSize)
+          TextRectangleButton(
+            onPressed: onUploadIllustration,
+            icon: Icon(UniconsLine.upload),
+            label: Text("upload".tr()),
+            primary: Colors.black38,
           ),
-        ),
+        // SquareButton(
+        //   active: multiSelectActive,
+        //   message: "multi_select".tr(),
+        //   onTap: onTriggerMultiSelect,
+        //   opacity: multiSelectActive ? 1.0 : 0.4,
+        //   child: Icon(
+        //     UniconsLine.layers,
+        //     color: multiSelectActive ? Colors.white : null,
+        //   ),
+        // ),
+        multiSelectButton(context),
         SquareButton(
           active: limitThreeInRow,
           message: "illustrations_layout_three_in_a_row".tr(),
@@ -63,6 +80,30 @@ class MyIllustrationsPageActions extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget multiSelectButton(BuildContext context) {
+    if (isMobileSize) {
+      return TextRectangleButton(
+        onPressed: onTriggerMultiSelect,
+        icon: Icon(UniconsLine.layers),
+        label: Text("multi_select".tr()),
+        primary: multiSelectActive ? Colors.white : Colors.black38,
+        backgroundColor:
+            multiSelectActive ? Theme.of(context).primaryColor : null,
+      );
+    }
+
+    return SquareButton(
+      active: multiSelectActive,
+      message: "multi_select".tr(),
+      onTap: onTriggerMultiSelect,
+      opacity: multiSelectActive ? 1.0 : 0.4,
+      child: Icon(
+        UniconsLine.layers,
+        color: multiSelectActive ? Colors.white : null,
+      ),
     );
   }
 }

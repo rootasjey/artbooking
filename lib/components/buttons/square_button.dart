@@ -4,21 +4,30 @@ class SquareButton extends StatelessWidget {
   const SquareButton({
     Key? key,
     required this.child,
+    this.active = false,
     this.message,
     this.onTap,
     this.opacity = 0.4,
-    this.active = false,
   }) : super(key: key);
 
-  final String? message;
-  final void Function()? onTap;
-  final Widget child;
-  final double opacity;
+  /// If true, this button is active.
   final bool active;
+
+  /// Widget opacity.
+  final double opacity;
+
+  /// Callback fired when this button is tapped.
+  final void Function()? onTap;
+
+  /// Tooltip message.
+  final String? message;
+
+  /// Child widget to display as button's content.
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final _childWidget = InkWell(
+    final Widget _childWidget = InkWell(
       onTap: onTap,
       child: Opacity(
         opacity: opacity,

@@ -4,16 +4,29 @@ import 'package:flutter/material.dart';
 class TextRectangleButton extends StatelessWidget {
   const TextRectangleButton({
     Key? key,
-    this.onPressed,
     required this.icon,
     required this.label,
+    this.backgroundColor,
+    this.onPressed,
     this.primary,
   }) : super(key: key);
 
-  final Function()? onPressed;
-  final Widget icon;
-  final Widget label;
+  /// Primary color.
   final Color? primary;
+
+  /// Button's background color.
+  final Color? backgroundColor;
+
+  /// Callback fired when this button is pressed.
+  final void Function()? onPressed;
+
+  /// Icon widget to display as leading content inside the button.
+  /// Typically an `Icon` widget.
+  final Widget icon;
+
+  /// Content widget to display as main content inside the button.
+  /// Typically a `Text` widget.
+  final Widget label;
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +35,7 @@ class TextRectangleButton extends StatelessWidget {
       icon: icon,
       label: label,
       style: OutlinedButton.styleFrom(
+        backgroundColor: backgroundColor,
         primary: primary,
         shape: RoundedRectangleBorder(),
         textStyle: Utilities.fonts.body(
