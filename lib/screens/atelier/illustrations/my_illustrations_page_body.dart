@@ -180,6 +180,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
                   authenticated ? illustrationPopupMenuEntries : [],
               selected: selected,
               selectionMode: selectionMode,
+              size: isMobileSize ? 100.0 : 300.0,
             );
           },
           childCount: illustrations.length,
