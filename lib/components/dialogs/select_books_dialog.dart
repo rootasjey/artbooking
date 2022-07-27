@@ -16,12 +16,12 @@ import 'package:unicons/unicons.dart';
 /// Add a group of illustrations to one or more books.
 class SelectBooksDialog extends StatefulWidget {
   SelectBooksDialog({
-    this.autoFocus = false,
-    this.onComplete,
     required this.userId,
-    this.onValidate,
-    this.maxPick = 6,
     this.admin = false,
+    this.autoFocus = false,
+    this.maxPick = 6,
+    this.onComplete,
+    this.onValidate,
   });
 
   final bool autoFocus;
@@ -37,6 +37,8 @@ class SelectBooksDialog extends StatefulWidget {
 
   /// Maximum number of illustrations that can be choosen.
   final int maxPick;
+
+  /// Current authenticated user's id.
   final String userId;
 
   @override
@@ -44,18 +46,32 @@ class SelectBooksDialog extends StatefulWidget {
 }
 
 class _SelectBooksDialogState extends State<SelectBooksDialog> {
-  bool _loading = false;
+  /// True if there's a next page (data) to fetch.
   bool _hasNext = false;
+
+  /// If true, this widget is fetching data.
+  bool _loading = false;
+
+  /// True if this widget is fetching data after initial fetch.
   bool _loadingMore = false;
+
+  /// Order data result from the most recent to the oldest.
   bool _descending = true;
 
+  /// Last fetched document.
   DocumentSnapshot? _lastDocument;
 
+  /// Maximum documents to fetch in a page.
   final int _limit = 20;
+
+  /// List of books owned by the current authenticated user.
   List<Book> _books = [];
+
+  /// Map to follow selected books.
   final Map<String, bool> _selectedBookIds = Map();
 
-  var _scrollController = ScrollController();
+  /// Page's scroll controller.
+  final ScrollController _pageScrollController = ScrollController();
 
   @override
   void initState() {
@@ -65,7 +81,7 @@ class _SelectBooksDialogState extends State<SelectBooksDialog> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _pageScrollController.dispose();
     _lastDocument = null;
     super.dispose();
   }
@@ -95,7 +111,7 @@ class _SelectBooksDialogState extends State<SelectBooksDialog> {
             child: Opacity(
               opacity: 0.4,
               child: Text(
-                "books_choose_add_illustrations_in".tr(),
+                "books_choose_add_illustration_in".plural(2),
                 textAlign: TextAlign.center,
                 style: Utilities.fonts.body(
                   color: Colors.black,
@@ -145,7 +161,7 @@ class _SelectBooksDialogState extends State<SelectBooksDialog> {
       child: NotificationListener<ScrollNotification>(
         onNotification: onScrollNotification,
         child: CustomScrollView(
-          controller: _scrollController,
+          controller: _pageScrollController,
           slivers: [
             SliverList(
               delegate: SliverChildBuilderDelegate(
