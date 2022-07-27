@@ -64,6 +64,10 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   /// (PS: this variable is set to true on dragging file).
   bool _activateAutoScrollOnce = false;
 
+  /// (Mobile specific) If true, long pressing a card will start a drag.
+  /// Otherwise, long pressing a card will display a context menu.
+  bool _draggingActive = false;
+
   /// Disable file drop when navigating to a new page.
   bool _enableFileDrop = true;
 
@@ -267,6 +271,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                         slivers: <Widget>[
                           ApplicationBar(),
                           MyIllustrationsPageHeader(
+                            draggingActive: _draggingActive,
                             isMobileSize: isMobileSize,
                             isOwner: isOwner,
                             limitThreeInRow: _layoutThreeInRow,
@@ -279,6 +284,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                             onConfirmDeleteGroup: confirmDeleteGroup,
                             onGoToUserProfile: onGoToUserProfile,
                             onSelectAll: onSelectAll,
+                            onToggleDrag: onToggleDrag,
                             onTriggerMultiSelect: onTriggerMultiSelect,
                             onUpdateLayout: onUpdateLayout,
                             onUploadIllustration: uploadIllustration,
@@ -288,6 +294,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                           ),
                           MyIllustrationsPageBody(
                             authenticated: authenticated,
+                            draggingActive: _draggingActive,
                             forceMultiSelect: _forceMultiSelect,
                             illustrations: _illustrations,
                             isMobileSize: isMobileSize,
@@ -907,6 +914,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   }
 
   void loadPreferences() {
+    _draggingActive = Utilities.storage.getMobileDraggingActive();
     _selectedTab = Utilities.storage.getIllustrationsTab();
   }
 
@@ -1679,5 +1687,10 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
       return null;
     }
+  }
+
+  void onToggleDrag() {
+    setState(() => _draggingActive = !_draggingActive);
+    Utilities.storage.saveMobileDraggingActive(_draggingActive);
   }
 }

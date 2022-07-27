@@ -13,6 +13,7 @@ import 'package:unicons/unicons.dart';
 class MyIllustrationsPageHeader extends StatelessWidget {
   const MyIllustrationsPageHeader({
     Key? key,
+    required this.draggingActive,
     required this.limitThreeInRow,
     required this.multiSelectActive,
     required this.multiSelectedItems,
@@ -27,11 +28,16 @@ class MyIllustrationsPageHeader extends StatelessWidget {
     this.onGoToUserProfile,
     this.onSelectAll,
     this.onUploadIllustration,
+    this.onToggleDrag,
     this.onTriggerMultiSelect,
     this.onUpdateLayout,
     this.showBackButton = false,
     this.username = "",
   }) : super(key: key);
+
+  /// (Mobile specific) If true, long pressing a card will start a drag.
+  /// Otherwise, long pressing a card will display a context menu.
+  final bool draggingActive;
 
   /// If true, this widget adapt its layout to small screens.
   final bool isMobileSize;
@@ -70,6 +76,9 @@ class MyIllustrationsPageHeader extends StatelessWidget {
 
   /// Callback fired to select all displayed illustrations.
   final void Function()? onSelectAll;
+
+  /// Callback fired when activate/deactivate drag status.
+  final void Function()? onToggleDrag;
 
   /// Callback fired to toggle multi-select.
   final void Function()? onTriggerMultiSelect;
@@ -142,10 +151,12 @@ class MyIllustrationsPageHeader extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 4.0),
           ),
           MyIllustrationsPageActions(
+            draggingActive: draggingActive,
             isMobileSize: isMobileSize,
             isOwner: isOwner,
             multiSelectActive: multiSelectActive,
             show: multiSelectedItems.isEmpty,
+            onToggleDrag: onToggleDrag,
             onTriggerMultiSelect: onTriggerMultiSelect,
             onUploadIllustration: onUploadIllustration,
             limitThreeInRow: limitThreeInRow,

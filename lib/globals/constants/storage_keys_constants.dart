@@ -11,6 +11,7 @@ class StorageKeys {
   final String dashboardBooksTab = "dashboard_books_tab";
   final String dashboardReviewTab = "dashboard_review_tab";
   final String drafts = "drafts";
+  final String draggingActive = "dragging_active";
   final String email = "email";
   final String firstLaunch = "first_launch";
   final String modularPageEditMode = "modular_page_edit_mode";

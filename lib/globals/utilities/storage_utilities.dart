@@ -173,6 +173,11 @@ class StorageUtilities {
     return drafts;
   }
 
+  bool getMobileDraggingActive() {
+    final String key = Constants.storageKeys.draggingActive;
+    return _localStorage.getBool(key) ?? false;
+  }
+
   bool getModularPageEditMode() {
     final String key = Constants.storageKeys.modularPageEditMode;
     return _localStorage.getBool(key) ?? true;
@@ -228,6 +233,11 @@ class StorageUtilities {
   void saveLicenseTab(EnumLicenseType licenseTab) {
     final String key = Constants.storageKeys.dashboardLicensesTab;
     _localStorage.setString(key, licenseTab.name);
+  }
+
+  void saveMobileDraggingActive(bool draggingActive) {
+    final String key = Constants.storageKeys.draggingActive;
+    _localStorage.setBool(key, draggingActive);
   }
 
   void savePostTab(EnumContentVisibility postTab) {

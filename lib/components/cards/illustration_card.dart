@@ -1,4 +1,5 @@
 import 'package:artbooking/actions/illustrations.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/resizer/frame.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/drag_data.dart';
@@ -10,6 +11,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
@@ -49,6 +51,7 @@ class IllustrationCard extends StatefulWidget {
     this.onDraggableCanceled,
     this.borderRadius = BorderRadius.zero,
     this.elevation = 3.0,
+    this.useBottomSheet = false,
   }) : super(key: key);
 
   /// If true, the card can be dragged. Usually used to re-order items.
@@ -66,6 +69,11 @@ class IllustrationCard extends StatefulWidget {
 
   /// If true, this card will be used as a placeholder.
   final bool useAsPlaceholder;
+
+  /// If true, a bottom sheet will be displayed on long press event.
+  /// Setting this property to true will deactivate popup menu and
+  /// hide like button.
+  final bool useBottomSheet;
 
   /// If true, a "plus" icon will be used as the placeholder child.
   final bool useIconPlaceholder;
@@ -291,7 +299,7 @@ class _IllustrationCardState extends State<IllustrationCard>
                 height: widget.size,
                 child: InkWell(
                   onTap: widget.onTap,
-                  // onLongPress: onLongPressImage,
+                  onLongPress: widget.useBottomSheet ? onLongPressImage : null,
                   onHover: onHoverImage,
                   onDoubleTap: widget.onDoubleTap != null ? onDoubleTap : null,
                   child: Stack(
@@ -580,7 +588,7 @@ class _IllustrationCardState extends State<IllustrationCard>
   }
 
   Widget popupMenuButton() {
-    if (widget.popupMenuEntries.isEmpty) {
+    if (widget.popupMenuEntries.isEmpty || widget.useBottomSheet) {
       return Container();
     }
 
@@ -654,9 +662,13 @@ class _IllustrationCardState extends State<IllustrationCard>
 
   void onHoverImage(isHover) {
     if (isHover) {
+      // Don't show popup menu button if we're using modal bottom sheet.
+      if (!widget.useBottomSheet) {
+        _showPopupMenu = true;
+      }
+
       setState(() {
         _elevation = _endElevation;
-        _showPopupMenu = true;
         _scaleController.forward();
       });
 
@@ -671,6 +683,60 @@ class _IllustrationCardState extends State<IllustrationCard>
   }
 
   void onLongPressImage() {
+    showCupertinoModalBottomSheet(
+      context: context,
+      expand: false,
+      backgroundColor: Colors.white70,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Material(
+            borderRadius: BorderRadius.circular(8.0),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: widget.popupMenuEntries.map((popupMenuEntry) {
+                  final popupMenuItemIcon = popupMenuEntry
+                      as PopupMenuItemIcon<EnumIllustrationItemAction>;
+
+                  return ListTile(
+                    title: Opacity(
+                      opacity: 0.8,
+                      child: Text(
+                        popupMenuItemIcon.textLabel,
+                        style: Utilities.fonts.body(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    trailing: popupMenuItemIcon.icon,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      final EnumIllustrationItemAction? action =
+                          popupMenuItemIcon.value;
+
+                      if (action == null) {
+                        return;
+                      }
+
+                      widget.onPopupMenuItemSelected?.call(
+                        action,
+                        widget.index,
+                        widget.illustration,
+                        widget.illustrationKey,
+                      );
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
     widget.onLongPress?.call(
       widget.illustrationKey,
       widget.illustration,

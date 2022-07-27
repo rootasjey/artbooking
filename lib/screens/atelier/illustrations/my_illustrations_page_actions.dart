@@ -7,6 +7,7 @@ import 'package:unicons/unicons.dart';
 class MyIllustrationsPageActions extends StatelessWidget {
   const MyIllustrationsPageActions({
     Key? key,
+    required this.draggingActive,
     required this.limitThreeInRow,
     required this.multiSelectActive,
     required this.show,
@@ -15,7 +16,12 @@ class MyIllustrationsPageActions extends StatelessWidget {
     this.onTriggerMultiSelect,
     this.onUpdateLayout,
     this.onUploadIllustration,
+    this.onToggleDrag,
   }) : super(key: key);
+
+  /// (Mobile specific) If true, long pressing a card will start a drag.
+  /// Otherwise, long pressing a card will display a context menu.
+  final bool draggingActive;
 
   /// If true, this widget adapt its layout to small screens.
   final bool isMobileSize;
@@ -34,6 +40,9 @@ class MyIllustrationsPageActions extends StatelessWidget {
 
   /// Callback fired when multi-select is toggled on/off.
   final void Function()? onTriggerMultiSelect;
+
+  /// Callback fired when activate/deactivate drag status.
+  final void Function()? onToggleDrag;
 
   /// Callback fired to un-/limit number of illustrations to 3 in a row.
   final void Function()? onUpdateLayout;
@@ -58,16 +67,6 @@ class MyIllustrationsPageActions extends StatelessWidget {
             label: Text("upload".tr()),
             primary: Colors.black38,
           ),
-        // SquareButton(
-        //   active: multiSelectActive,
-        //   message: "multi_select".tr(),
-        //   onTap: onTriggerMultiSelect,
-        //   opacity: multiSelectActive ? 1.0 : 0.4,
-        //   child: Icon(
-        //     UniconsLine.layers,
-        //     color: multiSelectActive ? Colors.white : null,
-        //   ),
-        // ),
         multiSelectButton(context),
         SquareButton(
           active: limitThreeInRow,
@@ -79,6 +78,7 @@ class MyIllustrationsPageActions extends StatelessWidget {
             color: limitThreeInRow ? Colors.white : null,
           ),
         ),
+        mobileDragToggleButton(context),
       ],
     );
   }
@@ -103,6 +103,25 @@ class MyIllustrationsPageActions extends StatelessWidget {
       child: Icon(
         UniconsLine.layers,
         color: multiSelectActive ? Colors.white : null,
+      ),
+    );
+  }
+
+  Widget mobileDragToggleButton(BuildContext context) {
+    if (!isMobileSize) {
+      return Container();
+    }
+
+    final String status = draggingActive ? "deactivate" : "activate";
+
+    return SquareButton(
+      active: draggingActive,
+      message: "dragging_mode.$status".tr(),
+      onTap: onToggleDrag,
+      opacity: draggingActive ? 1.0 : 0.4,
+      child: Icon(
+        UniconsLine.minus_path,
+        color: draggingActive ? Colors.white : null,
       ),
     );
   }

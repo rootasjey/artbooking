@@ -11,13 +11,15 @@ import 'package:flutter/material.dart';
 class MyIllustrationsPageBody extends StatelessWidget {
   const MyIllustrationsPageBody({
     Key? key,
-    required this.loading,
-    required this.illustrations,
-    required this.multiSelectedItems,
+    required this.draggingActive,
     required this.forceMultiSelect,
+    required this.illustrations,
+    required this.loading,
+    required this.multiSelectedItems,
     required this.popupMenuEntries,
     required this.selectedTab,
     this.authenticated = false,
+    this.isMobileSize = false,
     this.isOwner = false,
     this.likePopupMenuEntries = const [],
     this.limitThreeInRow = false,
@@ -33,11 +35,14 @@ class MyIllustrationsPageBody extends StatelessWidget {
     this.onTapIllustration,
     this.uploadIllustration,
     this.unlikePopupMenuEntries = const [],
-    this.isMobileSize = false,
   }) : super(key: key);
 
   /// If true, the current user is authenticated.
   final bool authenticated;
+
+  /// (Mobile specific) If true, long pressing a card will start a drag.
+  /// Otherwise, long pressing a card will display a context menu.
+  final bool draggingActive;
 
   /// If true, the UI is in multi-select mode.
   final bool forceMultiSelect;
@@ -161,7 +166,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
 
             return IllustrationCard(
               borderRadius: BorderRadius.circular(isMobileSize ? 24.0 : 16.0),
-              canDrag: isOwner,
+              canDrag: isOwner && draggingActive,
               elevation: 8.0,
               heroTag: illustration.id,
               illustration: illustration,
@@ -181,6 +186,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
               selected: selected,
               selectionMode: selectionMode,
               size: isMobileSize ? 100.0 : 300.0,
+              useBottomSheet: isMobileSize,
             );
           },
           childCount: illustrations.length,
