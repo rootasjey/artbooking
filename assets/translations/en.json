@@ -439,6 +439,10 @@
   "download": "Download",
   "download_file_error": "We could not download file. Try again later",
   "downloading": "Downloading",
+  "dragging_mode": {
+    "activate": "Activate dragging mode",
+    "deactivate": "Deactivate dragging mode"
+  },
   "ecommerce": "E-Commerce",
   "edit": "Edit",
   "edit_background_color": "Edit background color",

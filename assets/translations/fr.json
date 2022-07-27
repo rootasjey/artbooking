@@ -439,6 +439,10 @@
   "download": "Télécharger",
   "download_file_error": "Nous n'avons pas pu télécharger le fichier. Veuillez réessayer plus tard.",
   "downloading": "Téléchargement",
+  "dragging_mode": {
+    "activate": "Activer le mode de déplacement",
+    "deactivate": "Désactiver le mode de déplacement"
+  },
   "ecommerce": "E-Commerce",
   "edit": "Editer",
   "edit_mode": "Mode édition",
