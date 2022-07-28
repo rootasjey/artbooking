@@ -220,7 +220,7 @@ class UIUtilities {
     BuildContext context, {
     required Widget Function(BuildContext) builder,
     bool isMobileSize = false,
-    Color backgroundColor = Colors.white70,
+    Color backgroundColor = Colors.white,
   }) {
     if (isMobileSize) {
       showCupertinoModalBottomSheet(
