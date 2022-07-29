@@ -14,6 +14,7 @@ import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
+import 'package:artbooking/screens/atelier/illustrations/illustration_visibility_sheet.dart';
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_body.dart';
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_fab.dart';
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_header.dart';
@@ -42,6 +43,7 @@ import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:unicons/unicons.dart';
 
 class MyIllustrationsPage extends ConsumerStatefulWidget {
@@ -103,18 +105,26 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   /// If true, show FAB to scroll to the top of the page.
   bool _showFabToTop = false;
 
-  var _selectedTab = EnumVisibilityTab.active;
+  /// If true, show a list of visibility items.
+  bool _showVisibilityChooser = false;
 
   /// Last fetched illustration document.
   DocumentSnapshot? _lastDocument;
 
+  /// Last saved Y offset.
+  /// Used while scrolling to know the direction.
   double _previousOffset = 0.0;
+
+  /// Currently selected tab (active or archived).
+  EnumVisibilityTab _selectedTab = EnumVisibilityTab.active;
+
+  /// Used to request focus.
+  final FocusNode _popupFocusNode = FocusNode();
 
   /// Max illustrations to fetch per page.
   final int _limit = 20;
 
-  final _popupFocusNode = FocusNode();
-
+  /// List of illustrations.
   final List<Illustration> _illustrations = [];
 
   /// Available items for authenticated user and the illustration is not liked yet.
@@ -1347,7 +1357,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         showAddToBook(illustration);
         break;
       case EnumIllustrationItemAction.updateVisibility:
-        showVisibilityDialog(illustration, index);
+        showVisibilityDialogOrBottomSheet(illustration, index);
         break;
       case EnumIllustrationItemAction.share:
         showShareDialog(illustration, index);
@@ -1428,6 +1438,28 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     });
 
     setState(() {});
+  }
+
+  void onTapVisibilityTile(
+    Illustration illustration,
+    EnumContentVisibility visibility,
+    int index,
+  ) {
+    onChangedVisibility(
+      context,
+      illustration: illustration,
+      index: index,
+      visibility: visibility,
+    );
+  }
+
+  void onToggleDrag() {
+    setState(() => _draggingActive = !_draggingActive);
+    Utilities.storage.saveMobileDraggingActive(_draggingActive);
+  }
+
+  void onToggleVisibilityChoice(void Function(void Function()) childSetState) {
+    childSetState(() => _showVisibilityChooser = !_showVisibilityChooser);
   }
 
   void onTriggerMultiSelect() {
@@ -1516,7 +1548,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
     final Illustration illustration = _multiSelectedItems.values.first;
     final int index = _illustrations.indexWhere((x) => x.id == illustration.id);
-    showVisibilityDialog(illustration, index);
+    showVisibilityDialogOrBottomSheet(illustration, index);
   }
 
   void showShareDialog(Illustration illustration, int index) {
@@ -1531,8 +1563,55 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         shareContentType: EnumShareContentType.illustration,
         username: getUsername(),
         visibility: illustration.visibility,
-        onShowVisibilityDialog: () => showVisibilityDialog(illustration, index),
+        onShowVisibilityDialog: () =>
+            showVisibilityDialogOrBottomSheet(illustration, index),
       ),
+    );
+  }
+
+  Future<EnumContentVisibility?>? showVisibilityDialogOrBottomSheet(
+    Illustration illustration,
+    int index,
+  ) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    if (isMobileSize) {
+      return showVisibilityBottomSheet(illustration, index);
+    }
+
+    return showVisibilityDialog(illustration, index);
+  }
+
+  Future<EnumContentVisibility?>? showVisibilityBottomSheet(
+    Illustration illustration,
+    int index,
+  ) async {
+    return await showCupertinoModalBottomSheet<Future<EnumContentVisibility?>?>(
+      context: context,
+      expand: false,
+      backgroundColor: Colors.white,
+      builder: (BuildContext context) {
+        return StatefulBuilder(builder: (
+          BuildContext context,
+          void Function(void Function()) childSetState,
+        ) {
+          return IllustrationVisibilitySheet(
+            multiSelectedItemLength: _multiSelectedItems.length,
+            onTapVisibilityTile: (EnumContentVisibility visibility) =>
+                onTapVisibilityTile(
+              illustration,
+              visibility,
+              index,
+            ),
+            onToggleVisibilityChoice: () => onToggleVisibilityChoice(
+              childSetState,
+            ),
+            showVisibilityChooser: _showVisibilityChooser,
+            visibilityString:
+                "visibility_${illustration.visibility.name}".tr().toUpperCase(),
+          );
+        });
+      },
     );
   }
 
@@ -1739,10 +1818,5 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
       return null;
     }
-  }
-
-  void onToggleDrag() {
-    setState(() => _draggingActive = !_draggingActive);
-    Utilities.storage.saveMobileDraggingActive(_draggingActive);
   }
 }

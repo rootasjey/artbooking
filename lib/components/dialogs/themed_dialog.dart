@@ -10,8 +10,8 @@ import 'package:flutter/material.dart';
 class ThemedDialog extends StatelessWidget {
   const ThemedDialog({
     Key? key,
-    required this.onCancel,
     required this.body,
+    required this.onCancel,
     required this.textButtonValidation,
     this.onValidate,
     this.title,
@@ -28,6 +28,7 @@ class ThemedDialog extends StatelessWidget {
     this.footer,
   }) : super(key: key);
 
+  /// Show a divider below the header if true.
   final bool showDivider;
 
   /// If true, this widget will use [Dialog] as a basis
@@ -74,8 +75,10 @@ class ThemedDialog extends StatelessWidget {
   /// If true, this dialog will try to request focus on load.
   final bool autofocus;
 
+  /// Title as string.
   final String titleValue;
 
+  /// Subtitle as string.
   final String subtitleValue;
 
   @override
