@@ -1533,7 +1533,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       builder: (BuildContext context) {
         return AddToBooksDialog(
           illustrations: [illustration] + _multiSelectedItems.values.toList(),
-          isMobileSize: isMobileSize,
+          asBottomSheet: isMobileSize,
           onComplete: onClearSelection,
         );
       },

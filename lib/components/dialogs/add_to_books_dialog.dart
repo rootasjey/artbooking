@@ -26,18 +26,27 @@ import 'package:supercharged/supercharged.dart';
 class AddToBooksDialog extends StatefulWidget {
   AddToBooksDialog({
     required this.illustrations,
+    this.asBottomSheet = false,
     this.autoFocus = false,
     this.books = const [],
-    this.isMobileSize = false,
     this.onComplete,
   });
 
+  /// If true, this widget will take a suitable layout for bottom sheet.
+  /// Otherwise, it will have a dialog layout.
+  final bool asBottomSheet;
+
+  /// Will request focus on mount if true.
   final bool autoFocus;
-  final bool isMobileSize;
+
+  /// Illustrations to add to books.
   final List<Illustration> illustrations;
+
+  /// Books to add to other books.
   final List<Book> books;
 
-  /// When the operation complete (illustrations has been added to books).
+  /// Callback fired when the operation complete
+  /// (illustrations has been added to books).
   final void Function()? onComplete;
 
   @override
@@ -45,23 +54,39 @@ class AddToBooksDialog extends StatefulWidget {
 }
 
 class _AddToBooksDialogState extends State<AddToBooksDialog> {
+  /// Currently fetching data if true.
   bool _loading = false;
+
+  /// More books can be fetched if true.
   bool _hasNext = false;
+
+  /// Currently fetching more data (page >= 2) if true.
   bool _loadingMore = false;
 
   /// If true, the widget will show inputs to create a new book.
   /// Otherwise, a list of available books will be displayed.
   bool _createMode = false;
 
+  /// Last fetched document (from Firestore).
   DocumentSnapshot? _lastDocument;
 
+  /// Maximum books to fetch per page.
   final int _limit = 20;
+
+  /// Books fetched.
   List<Book> _books = [];
+
+  /// Selected books to add illustration(s) in.
   List<Book> _selectedBooks = [];
 
-  final _scrollController = ScrollController();
-  final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  /// Scroll controller for this widget.
+  final ScrollController _pageScrollController = ScrollController();
+
+  /// Controller for new book name.
+  final TextEditingController _nameController = TextEditingController();
+
+  /// Controller for new book description.
+  final TextEditingController _descriptionController = TextEditingController();
 
   @override
   void initState() {
@@ -71,7 +96,7 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _pageScrollController.dispose();
     _lastDocument = null;
     _nameController.dispose();
     _descriptionController.dispose();
@@ -87,7 +112,7 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
     final void Function()? _onValidate =
         _loading || _selectedBooks.isEmpty ? null : onValidate;
 
-    if (widget.isMobileSize) {
+    if (widget.asBottomSheet) {
       return mobileWidget(onValidate: _onValidate);
     }
 
@@ -134,7 +159,7 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
       child: NotificationListener<ScrollNotification>(
         onNotification: onScrollNotification,
         child: CustomScrollView(
-          controller: _scrollController,
+          controller: _pageScrollController,
           slivers: [
             SliverList(
               delegate: SliverChildBuilderDelegate(
@@ -289,7 +314,7 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
   }
 
   Widget createBookWidget() {
-    if (widget.isMobileSize) {
+    if (widget.asBottomSheet) {
       return Material(
         child: SafeArea(
           top: false,
@@ -361,7 +386,7 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
         children: [
           Padding(
             padding: EdgeInsets.all(12.0),
-            child: widget.isMobileSize
+            child: widget.asBottomSheet
                 ? DarkElevatedButton(
                     onPressed: onValidate,
                     child: Text("books_add_to".plural(_selectedBooks.length)),
@@ -453,7 +478,7 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
         NotificationListener<ScrollNotification>(
           onNotification: onScrollNotification,
           child: CustomScrollView(
-            controller: _scrollController,
+            controller: _pageScrollController,
             slivers: [
               SliverToBoxAdapter(
                 child: Column(
