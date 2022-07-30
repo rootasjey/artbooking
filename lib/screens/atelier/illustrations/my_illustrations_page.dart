@@ -1552,10 +1552,14 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   }
 
   void showShareDialog(Illustration illustration, int index) {
-    showDialog(
-      context: context,
-      builder: (context) => ShareDialog(
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    Utilities.ui.showAdaptiveDialog(
+      context,
+      isMobileSize: isMobileSize,
+      builder: (BuildContext context) => ShareDialog(
         extension: illustration.extension,
+        asBottomSheet: isMobileSize,
         itemId: illustration.id,
         imageProvider: NetworkImage(illustration.getThumbnail()),
         name: illustration.name,

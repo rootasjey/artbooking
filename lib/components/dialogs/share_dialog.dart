@@ -27,18 +27,25 @@ class ShareDialog extends StatefulWidget {
     required this.imageUrl,
     required this.extension,
     required this.visibility,
-    this.userId = "",
+    this.asBottomSheet = false,
     this.onShowVisibilityDialog,
+    this.userId = "",
   }) : super(key: key);
+
+  /// If true, this widget will take a suitable layout for bottom sheet.
+  /// Otherwise, it will have a dialog layout.
+  final bool asBottomSheet;
 
   /// Define if we're sharing a book or an illustration.
   final EnumShareContentType shareContentType;
 
+  /// Current content visibility.
   final EnumContentVisibility visibility;
 
   /// Thumbnail to display in the dialog.
   final ImageProvider imageProvider;
 
+  /// Content's extension if any.
   final String extension;
 
   /// Id of the book/illustraton.
@@ -49,6 +56,8 @@ class ShareDialog extends StatefulWidget {
 
   /// Name of the book/illustration.
   final String name;
+
+  /// Useful to fetch user's `name` if not provided.
   final String userId;
 
   /// Owner of this book/illustration.
@@ -62,11 +71,12 @@ class ShareDialog extends StatefulWidget {
 }
 
 class _ShareDialogState extends State<ShareDialog> {
-  String _username = "";
-
   /// Current content's visibility.
   /// Take the initial value of [widget.visibility] in `initState()`.
-  var _contentVisibility = EnumContentVisibility.public;
+  EnumContentVisibility _contentVisibility = EnumContentVisibility.public;
+
+  /// Content's owner name.
+  String _username = "";
 
   @override
   void initState() {
@@ -81,91 +91,76 @@ class _ShareDialogState extends State<ShareDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final double size = 310.0;
-    final Color? textColor = Theme.of(context).textTheme.bodyText2?.color;
+    if (widget.asBottomSheet) {
+      return mobileLayout();
+    }
 
     return ThemedDialog(
       showDivider: true,
-      title: Text.rich(
-        TextSpan(
-          text: "share".tr() + ": ",
-          children: [
-            TextSpan(
-              text: "${widget.name}",
-              style: Utilities.fonts.body(
-                fontWeight: FontWeight.w700,
-                color: textColor,
-              ),
-            ),
-          ],
-          style: Utilities.fonts.body(
-            color: textColor?.withOpacity(0.4),
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        maxLines: 1,
-      ),
+      title: header(),
       onValidate: Beamer.of(context).popRoute,
       onCancel: Beamer.of(context).popRoute,
       textButtonValidation: "close".tr(),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 24.0),
-          child: Column(
-            children: [
-              Container(
-                child: Card(
-                  color: Theme.of(context).backgroundColor,
-                  elevation: 4.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    side: BorderSide.none,
-                  ),
-                  clipBehavior: Clip.hardEdge,
-                  child: Ink.image(
-                    image: widget.imageProvider,
-                    fit: BoxFit.cover,
-                    width: size,
-                    height: size,
-                    child: InkWell(
-                      onTap: () {},
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                child: Opacity(
-                  opacity: 0.6,
-                  child: Text.rich(
-                    TextSpan(
-                      text: "by".tr().toLowerCase(),
-                      children: [
-                        TextSpan(
-                          text: " ${_username}",
-                          style: Utilities.fonts.body(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                    style: Utilities.fonts.body(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ),
-              visibilityWidget(context),
-            ],
-          ),
-        ),
-      ),
-      footer: footerWidget(),
+      body: SingleChildScrollView(child: body()),
+      footer: footer(),
     );
   }
 
-  Widget footerWidget() {
+  Widget body() {
+    final double size = 310.0;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            child: Card(
+              color: Theme.of(context).backgroundColor,
+              elevation: 0.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                side: BorderSide.none,
+              ),
+              clipBehavior: Clip.hardEdge,
+              child: Ink.image(
+                image: widget.imageProvider,
+                fit: BoxFit.cover,
+                width: size,
+                height: size,
+              ),
+            ),
+          ),
+          Container(
+            child: Opacity(
+              opacity: 0.6,
+              child: Text.rich(
+                TextSpan(
+                  text: "by".tr().toLowerCase(),
+                  children: [
+                    TextSpan(
+                      text: " ${_username}",
+                      style: Utilities.fonts.body(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                style: Utilities.fonts.body(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+          ),
+          visibilityWidget(context),
+        ],
+      ),
+    );
+  }
+
+  Widget footer() {
     if (_contentVisibility != EnumContentVisibility.public) {
       return Container();
     }
@@ -204,6 +199,63 @@ class _ShareDialogState extends State<ShareDialog> {
             ),
         ],
       ),
+    );
+  }
+
+  Widget header({
+    EdgeInsets margin = EdgeInsets.zero,
+  }) {
+    final Color? textColor = Theme.of(context).textTheme.bodyText2?.color;
+
+    return Padding(
+      padding: margin,
+      child: Text.rich(
+        TextSpan(
+          text: "share".tr() + ": ",
+          children: [
+            TextSpan(
+              text: widget.name,
+              style: Utilities.fonts.body(
+                fontWeight: FontWeight.w700,
+                color: textColor,
+              ),
+            ),
+          ],
+          style: Utilities.fonts.body(
+            color: textColor?.withOpacity(0.4),
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        maxLines: widget.asBottomSheet ? 3 : 1,
+      ),
+    );
+  }
+
+  Widget mobileLayout() {
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              header(
+                margin: const EdgeInsets.only(
+                  top: 28.0,
+                  left: 12.0,
+                  right: 12.0,
+                  bottom: 16.0,
+                ),
+              ),
+              Divider(
+                thickness: 2.0,
+                color: Theme.of(context).secondaryHeaderColor,
+              ),
+            ],
+          ),
+        ),
+        SliverToBoxAdapter(child: body()),
+        SliverToBoxAdapter(child: footer()),
+      ],
     );
   }
 
