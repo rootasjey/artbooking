@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/book/book.dart';
@@ -12,6 +13,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:supercharged/supercharged.dart';
@@ -48,6 +50,7 @@ class BookCard extends StatefulWidget {
     this.onTapCaption,
     this.popupMenuEntries = const [],
     this.dragGroupName = "",
+    this.useBottomSheet = false,
   }) : super(key: key);
 
   /// Book's data for this card.
@@ -69,6 +72,11 @@ class BookCard extends StatefulWidget {
 
   /// If true, this card will be used as a place holder.
   final bool useAsPlaceholder;
+
+  /// If true, a bottom sheet will be displayed on long press event.
+  /// Setting this property to true will deactivate popup menu and
+  /// hide like button.
+  final bool useBottomSheet;
 
   /// Book card's width.
   final double width;
@@ -103,10 +111,14 @@ class BookCard extends StatefulWidget {
   final void Function(int dropTargetIndex, List<int> dragIndexes)? onDrop;
 
   /// Callback fired on long press.
-  final Function(bool)? onLongPress;
+  final void Function(Book book, bool selected)? onLongPress;
 
   /// Callback fired when one of the popup menu item entries is selected.
-  final void Function(EnumBookItemAction, int, Book)? onPopupMenuItemSelected;
+  final void Function(
+    EnumBookItemAction action,
+    int index,
+    Book book,
+  )? onPopupMenuItemSelected;
 
   /// Callback fired on tap.
   final void Function()? onTap;
@@ -516,7 +528,8 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
                           child: InkWell(
                             onTap: widget.onTap,
                             onDoubleTap: onDoubleTapOrNull,
-                            // onLongPress: onLongPress,
+                            onLongPress:
+                                widget.useBottomSheet ? onLongPress : null,
                             onHover: onHoverFrontCard,
                             child: Stack(
                               children: [
@@ -662,7 +675,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   }
 
   Widget popupMenuButton() {
-    if (widget.popupMenuEntries.isEmpty) {
+    if (widget.popupMenuEntries.isEmpty || widget.useBottomSheet) {
       return Container();
     }
 
@@ -716,9 +729,13 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   /// Callback fired when the hover state of the front card of the book changes.
   void onHoverFrontCard(isHover) {
     if (isHover) {
+      // Don't show popup menu button if we're using modal bottom sheet.
+      if (!widget.useBottomSheet) {
+        _showPopupMenu = true;
+      }
+
       setState(() {
         _elevation = _initElevation * 1.5;
-        _showPopupMenu = true;
         _scaleController.forward();
       });
 
@@ -733,9 +750,63 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   }
 
   void onLongPress() {
-    if (widget.onLongPress != null) {
-      widget.onLongPress?.call(widget.selected);
-    }
+    showCupertinoModalBottomSheet(
+      context: context,
+      expand: false,
+      backgroundColor: Colors.white70,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Material(
+            borderRadius: BorderRadius.circular(8.0),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: widget.popupMenuEntries.map((popupMenuEntry) {
+                  final popupMenuItemIcon =
+                      popupMenuEntry as PopupMenuItemIcon<EnumBookItemAction>;
+
+                  return ListTile(
+                    title: Opacity(
+                      opacity: 0.8,
+                      child: Text(
+                        popupMenuItemIcon.textLabel,
+                        style: Utilities.fonts.body(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    trailing: popupMenuItemIcon.icon,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      final EnumBookItemAction? action =
+                          popupMenuItemIcon.value;
+
+                      if (action == null) {
+                        return;
+                      }
+
+                      widget.onPopupMenuItemSelected?.call(
+                        action,
+                        widget.index,
+                        widget.book,
+                      );
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    widget.onLongPress?.call(
+      widget.book,
+      widget.selected,
+    );
   }
 
   void onDragFileEntered(DropEventDetails details) {
