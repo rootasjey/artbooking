@@ -11,36 +11,58 @@ import 'package:flutter/material.dart';
 class InputDialog extends StatelessWidget {
   const InputDialog({
     Key? key,
-    required this.titleValue,
+    required this.onCancel,
+    required this.onSubmitted,
     required this.subtitleValue,
+    required this.titleValue,
+    this.asBottomSheet = false,
+    this.descriptionController,
     this.nameController,
     this.onNameChanged,
     this.onDescriptionChanged,
-    required this.onSubmitted,
-    required this.onCancel,
-    this.descriptionController,
-    this.submitButtonValue = '',
+    this.submitButtonValue = "",
   }) : super(key: key);
 
-  final String submitButtonValue;
-  final String titleValue;
-  final String subtitleValue;
-  final TextEditingController? nameController;
-  final TextEditingController? descriptionController;
+  /// If true, this widget will take a suitable layout for bottom sheet.
+  /// Otherwise, it will have a dialog layout.
+  final bool asBottomSheet;
+
+  /// Callback fired when name input value has changed.
   final void Function(String)? onNameChanged;
+
+  /// Callback fired when description input value has changed.
   final void Function(String)? onDescriptionChanged;
+
+  /// Callback fired when we validate inputs.
   final void Function(String) onSubmitted;
+
+  /// Callback fired when we cancel and close the inputs.
   final void Function() onCancel;
+
+  /// Text value for the submit button.
+  final String submitButtonValue;
+
+  /// Title value.
+  final String titleValue;
+
+  /// Subtitle value.
+  final String subtitleValue;
+
+  /// Controller for name input.
+  final TextEditingController? nameController;
+
+  /// Controller for description input.
+  final TextEditingController? descriptionController;
 
   @override
   Widget build(BuildContext context) {
+    if (asBottomSheet) {
+      return mobileLayout();
+    }
+
     return SimpleDialog(
       backgroundColor: Constants.colors.clairPink,
-      title: TitleDialog(
-        titleValue: titleValue,
-        subtitleValue: subtitleValue,
-        onCancel: onCancel,
-      ),
+      title: header(),
       titlePadding: EdgeInsets.zero,
       contentPadding: const EdgeInsets.all(16.0),
       children: [
@@ -64,15 +86,12 @@ class InputDialog extends StatelessWidget {
       padding: EdgeInsets.symmetric(
         horizontal: 25.0,
       ),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 200.0),
-        child: OutlinedTextField(
-          label: "description".tr().toUpperCase(),
-          controller: descriptionController,
-          hintText: hintText,
-          onChanged: onDescriptionChanged,
-          onSubmitted: onSubmitted,
-        ),
+      child: OutlinedTextField(
+        label: "description".tr().toUpperCase(),
+        controller: descriptionController,
+        hintText: hintText,
+        onChanged: onDescriptionChanged,
+        onSubmitted: onSubmitted,
       ),
     );
   }
@@ -89,6 +108,32 @@ class InputDialog extends StatelessWidget {
           onSubmitted.call(value);
         },
         child: Text(textValue),
+      ),
+    );
+  }
+
+  Widget header() {
+    return TitleDialog(
+      titleValue: titleValue,
+      subtitleValue: subtitleValue,
+      onCancel: onCancel,
+    );
+  }
+
+  Widget mobileLayout() {
+    return Material(
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            header(),
+            nameInput(),
+            descriptionInput(),
+            footerButtons(),
+          ],
+        ),
       ),
     );
   }
