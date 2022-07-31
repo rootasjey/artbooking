@@ -6,28 +6,40 @@ import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
+/// Body part of a page showing all books.
 class BooksPageBody extends StatelessWidget {
   const BooksPageBody({
     Key? key,
-    required this.loading,
     required this.books,
-    this.onLongPressBook,
-    this.onTap,
+    required this.loading,
+    this.likePopupMenuEntries = const [],
     this.onDoubleTap,
+    this.onLongPressBook,
     this.onLike,
     this.onPopupMenuItemSelected,
-    this.likePopupMenuEntries = const [],
+    this.onTap,
     this.unlikePopupMenuEntries = const [],
   }) : super(key: key);
 
+  /// Currently fetching books if true.
   final bool loading;
+
+  /// List of books.
   final List<Book> books;
-  final void Function(bool)? onLongPressBook;
-  final void Function(Book)? onTap;
-  final void Function(Book, int)? onDoubleTap;
+
+  /// Callback fired when a card is long pressed.
+  final void Function(Book book, bool selected)? onLongPressBook;
+
+  /// Callback fired when a card is tapped.
+  final void Function(Book book)? onTap;
+
+  /// Callback fired when a card is double tapped.
+  final void Function(Book book, int index)? onDoubleTap;
 
   /// Callback fired on toggle book existence in an user's favourites.
   final void Function(Book book)? onLike;
+
+  /// Callback fired when a popup item is selected.
   final void Function(EnumBookItemAction, int, Book)? onPopupMenuItemSelected;
 
   /// Entries if this book is NOT already liked.

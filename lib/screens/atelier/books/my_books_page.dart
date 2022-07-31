@@ -47,6 +47,7 @@ import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
+/// A page showing an user's books.
 class MyBooksPage extends ConsumerStatefulWidget {
   MyBooksPage({this.userId = ""});
 
@@ -1444,9 +1445,13 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     _nameController.text = book.name;
     _descriptionController.text = book.description;
 
-    showDialog(
-      context: context,
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    Utilities.ui.showAdaptiveDialog(
+      context,
+      isMobileSize: isMobileSize,
       builder: (context) => InputDialog(
+        asBottomSheet: isMobileSize,
         submitButtonValue: "rename".tr(),
         nameController: _nameController,
         descriptionController: _descriptionController,
@@ -1466,9 +1471,13 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   }
 
   void showShareDialog(Book book, int index) {
-    showDialog(
-      context: context,
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    Utilities.ui.showAdaptiveDialog(
+      context,
+      isMobileSize: isMobileSize,
       builder: (context) => ShareDialog(
+        asBottomSheet: isMobileSize,
         extension: "",
         itemId: book.id,
         imageProvider: NetworkImage(book.getCoverLink()),

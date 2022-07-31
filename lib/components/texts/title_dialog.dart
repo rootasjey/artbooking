@@ -3,6 +3,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 
+/// A component displaying a title and subtitle with a close button.
 class TitleDialog extends StatelessWidget {
   const TitleDialog({
     Key? key,
@@ -11,9 +12,14 @@ class TitleDialog extends StatelessWidget {
     required this.onCancel,
   }) : super(key: key);
 
+  /// Text title.
   final String titleValue;
+
+  /// Text subtitle.
   final String subtitleValue;
-  final VoidCallback onCancel;
+
+  /// Close button callback.
+  final void Function()? onCancel;
 
   @override
   Widget build(BuildContext context) {

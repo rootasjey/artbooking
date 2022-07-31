@@ -9,6 +9,7 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
+/// Body part of a page showing an user's books.
 class MyBooksPageBody extends StatelessWidget {
   const MyBooksPageBody({
     Key? key,
@@ -162,7 +163,7 @@ class MyBooksPageBody extends StatelessWidget {
           crossAxisSpacing: 0.0,
         ),
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
+          (BuildContext context, int index) {
             final Book book = books.elementAt(index);
             final bool selected = multiSelectedItems.containsKey(book.id);
 
@@ -202,6 +203,7 @@ class MyBooksPageBody extends StatelessWidget {
               popupMenuEntries: authenticated ? bookPopupMenuEntries : [],
               selected: selected,
               selectionMode: selectionMode,
+              useBottomSheet: isMobileSize,
             );
           },
           childCount: books.length,

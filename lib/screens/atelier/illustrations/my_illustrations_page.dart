@@ -46,6 +46,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:unicons/unicons.dart';
 
+/// A page showing an user's illustrations.
 class MyIllustrationsPage extends ConsumerStatefulWidget {
   MyIllustrationsPage({this.userId = ""});
 
@@ -1558,8 +1559,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       context,
       isMobileSize: isMobileSize,
       builder: (BuildContext context) => ShareDialog(
-        extension: illustration.extension,
         asBottomSheet: isMobileSize,
+        extension: illustration.extension,
         itemId: illustration.id,
         imageProvider: NetworkImage(illustration.getThumbnail()),
         name: illustration.name,

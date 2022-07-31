@@ -640,13 +640,13 @@ class _IllustrationCardState extends State<IllustrationCard>
   /// try retrieve the urls from Firebase Storage
   /// and set them to the Firestore document.
   void checkProperties() async {
-    final illustration = widget.illustration;
+    final Illustration illustration = widget.illustration;
 
     if (illustration.version < 1) {
       return;
     }
 
-    final thumbnailUrl = illustration.getThumbnail();
+    final String thumbnailUrl = illustration.getThumbnail();
     if (thumbnailUrl.isNotEmpty) {
       return;
     }
