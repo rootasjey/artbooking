@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:artbooking/actions/books.dart';
+import 'package:artbooking/components/bottom_sheet/delete_content_bottom_sheet.dart';
 import 'package:artbooking/components/custom_scroll_behavior.dart';
 import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
 import 'package:artbooking/components/buttons/visibility_button.dart';
@@ -460,21 +461,35 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
   /// Show a dialog to confirm a single book deletion.
   void confirmDeleteBook(Book book, int index) async {
-    showDialog(
-      context: context,
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    Utilities.ui.showAdaptiveDialog(
+      context,
+      isMobileSize: isMobileSize,
       builder: (context) {
         final int count = _multiSelectedItems.length;
+
+        final void Function()? onConfirm = () {
+          if (_multiSelectedItems.isEmpty) {
+            deleteBook(book, index);
+          } else {
+            _multiSelectedItems.putIfAbsent(book.id, () => book);
+            deleteGroup();
+          }
+        };
+
+        if (isMobileSize) {
+          return DeleteContentBottomSheet(
+            titleValue: "book_delete".plural(count).toUpperCase(),
+            subtitleValue: "book_delete_description".plural(count),
+            onConfirm: onConfirm,
+          );
+        }
+
         return DeleteDialog(
           titleValue: "book_delete".plural(count).toUpperCase(),
           descriptionValue: "book_delete_description".plural(count),
-          onValidate: () {
-            if (_multiSelectedItems.isEmpty) {
-              deleteBook(book, index);
-            } else {
-              _multiSelectedItems.putIfAbsent(book.id, () => book);
-              deleteGroup();
-            }
-          },
+          onValidate: onConfirm,
           showCounter: _multiSelectedItems.isNotEmpty,
           count: count,
         );
