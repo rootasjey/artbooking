@@ -213,6 +213,13 @@
     "many": "Supprimer ces books",
     "other": "Supprimer ces books"
   },
+  "book_delete_count": {
+    "zero": "Aucun book à supprimer",
+    "one": "Supprimer ce book",
+    "two": "Supprimer ces {} books",
+    "many": "Supprimer ces {} books",
+    "other": "Supprimer ces {} books"
+  },
   "book_delete_description": {
     "zero": "La suppression de ce book n'entraînera PAS la suppression des illustrations contenues à l'intérieur de celui-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible.",
     "one": "La suppression de ce book n'entraînera PAS la suppression des illustrations contenues à l'intérieur de celui-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible.",
@@ -623,6 +630,13 @@
   "illustration_change": "Changer d'illustration",
   "illustration_create_error": "Désolés, nous avons rencontré une erreur durant la création de votre illustration. Veuillez réessayer plus tard.",
   "illustration_delete": "Supprimer cette illustration",
+  "illustration_delete_count": {
+    "zero": "Aucune illustration à supprimer",
+    "one": "Supprimer cette illustration",
+    "two": "Supprimer ces {} illustrations",
+    "many": "Supprimer ces {} illustrations",
+    "other": "Supprimer ces {} illustrations"
+  },
   "illustration_delete_description": "Si cette illustration est référencée à l'intérieur de books, concours, challenges, galleries, cette suppression entraînera la formation de liens morts. Cette action est irrevsible.",
   "illustration_delete_description_plural": {
     "zero": "La suppression de ce book n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de celui-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible.",

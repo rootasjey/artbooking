@@ -213,11 +213,18 @@
   "book_creation_error": "Sorry, there was an error while creating your book. Please try again later.",
   "book_creation_success": "Your book has been successfully created!",
   "book_delete": {
-    "zero": "Delete this book",
+    "zero": "No book to delete",
     "one": "Delete this book",
     "two": "Delete these books",
     "many": "Delete these books",
     "other": "Delete these books"
+  },
+  "book_delete_count": {
+    "zero": "No book to delete",
+    "one": "Delete this book",
+    "two": "Delete these {} books",
+    "many": "Delete these {} books",
+    "other": "Delete these {} books"
   },
   "book_delete_description": {
     "zero": "Deleting this book won't delete illustrations inside it. Illustrations live on their own. This action is irrevsible.",
@@ -627,6 +634,13 @@
   "illustration_change": "Change illustration",
   "illustration_create_error": "Sorry, there was an issue while creating your illustration. Please try again later.",
   "illustration_delete": "Delete this illustration",
+  "illustration_delete_count": {
+    "zero": "No illustration to delete",
+    "one": "Delete this illustration",
+    "two": "Delete these {} illustrations",
+    "many": "Delete these {} illustrations",
+    "other": "Delete these {} illustrations"
+  },
   "illustration_delete_description": "If this illustration is referenced inside books, contests, challenges, galleries, it will leave a dead link. This action is irrevsible.",
   "illustration_delete_description_plural": {
     "zero": "If this illustration is referenced inside books, contests, challenges, galleries, it will leave a dead link. This action is irrevsible.",
@@ -636,7 +650,7 @@
     "other": "If these illustrations are referenced inside books, contests, challenges, galleries, it will leave dead links. This action is irrevsible."
   },
   "illustration_delete_plural": {
-    "zero": "Delete this illustration",
+    "zero": "No illustration to delete",
     "one": "Delete this illustration",
     "two": "Delete these illustrations",
     "many": "Delete these illustrations",
