@@ -633,7 +633,13 @@
   "illustration_add_new": "Add a illustration",
   "illustration_change": "Change illustration",
   "illustration_create_error": "Sorry, there was an issue while creating your illustration. Please try again later.",
-  "illustration_delete": "Delete this illustration",
+  "illustration_delete": {
+    "zero": "No illustration to delete",
+    "one": "Delete this illustration",
+    "two": "Delete these illustrations",
+    "many": "Delete these illustrations",
+    "other": "Delete these illustrations"
+  },
   "illustration_delete_count": {
     "zero": "No illustration to delete",
     "one": "Delete this illustration",
@@ -641,20 +647,12 @@
     "many": "Delete these {} illustrations",
     "other": "Delete these {} illustrations"
   },
-  "illustration_delete_description": "If this illustration is referenced inside books, contests, challenges, galleries, it will leave a dead link. This action is irrevsible.",
-  "illustration_delete_description_plural": {
+  "illustration_delete_description": {
     "zero": "If this illustration is referenced inside books, contests, challenges, galleries, it will leave a dead link. This action is irrevsible.",
     "one": "If this illustration is referenced inside books, contests, challenges, galleries, it will leave a dead link. This action is irrevsible.",
     "two": "If these illustrations are referenced inside books, contests, challenges, galleries, it will leave dead links. This action is irrevsible.",
     "many": "If these illustrations are referenced inside books, contests, challenges, galleries, it will leave dead links. This action is irrevsible.",
     "other": "If these illustrations are referenced inside books, contests, challenges, galleries, it will leave dead links. This action is irrevsible."
-  },
-  "illustration_delete_plural": {
-    "zero": "No illustration to delete",
-    "one": "Delete this illustration",
-    "two": "Delete these illustrations",
-    "many": "Delete these illustrations",
-    "other": "Delete these illustrations"
   },
   "illustration_description_dot": "Illustration's description...",
   "illustration_description_sample": "It's a flower on a balcony...",
