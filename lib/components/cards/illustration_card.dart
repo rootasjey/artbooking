@@ -299,7 +299,9 @@ class _IllustrationCardState extends State<IllustrationCard>
                 height: widget.size,
                 child: InkWell(
                   onTap: widget.onTap,
-                  onLongPress: widget.useBottomSheet ? onLongPressImage : null,
+                  onLongPress: widget.useBottomSheet && !widget.canDrag
+                      ? onLongPressImage
+                      : null,
                   onHover: onHoverImage,
                   onDoubleTap: widget.onDoubleTap != null ? onDoubleTap : null,
                   child: Stack(
