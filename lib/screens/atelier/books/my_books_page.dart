@@ -494,7 +494,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         }
 
         return DeleteDialog(
-          textButtonValidation: confirmButtonValue,
+          confirmButtonValue: confirmButtonValue,
           count: count,
           descriptionValue: "book_delete_description".plural(count),
           onValidate: onConfirm,

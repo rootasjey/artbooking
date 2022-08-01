@@ -7,22 +7,35 @@ import 'package:flutter/material.dart';
 class DeleteDialog extends StatelessWidget {
   const DeleteDialog({
     Key? key,
-    this.focusNode,
-    required this.titleValue,
     required this.descriptionValue,
+    required this.titleValue,
+    this.confirmButtonValue,
+    this.count = 1,
+    this.focusNode,
     this.onValidate,
     this.showCounter = false,
-    this.count = 1,
-    this.textButtonValidation,
   }) : super(key: key);
 
+  /// Show how many items are going to be deleted, if true.
   final bool showCounter;
-  final int count;
+
+  /// Used to request focus on mount.
   final FocusNode? focusNode;
-  final String titleValue;
-  final String descriptionValue;
+
+  /// Callback fired when we confirm the deletion.
   final void Function()? onValidate;
-  final String? textButtonValidation;
+
+  /// Number of items is going to be deleted, if true.
+  final int count;
+
+  /// Description string value.
+  final String descriptionValue;
+
+  /// Validation button's string value.
+  final String? confirmButtonValue;
+
+  /// Title string value.
+  final String titleValue;
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +95,7 @@ class DeleteDialog extends StatelessWidget {
           ],
         ),
       ),
-      textButtonValidation: textButtonValidation ?? "delete".tr(),
+      textButtonValidation: confirmButtonValue ?? "delete".tr(),
       onCancel: Beamer.of(context).popRoute,
       onValidate: () {
         onValidate?.call();

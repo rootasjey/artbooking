@@ -313,7 +313,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
           count: count,
           titleValue: titleValue,
           descriptionValue: descriptionValue,
-          textButtonValidation: textButtonValidation,
+          confirmButtonValue: textButtonValidation,
           onValidate: () {
             _multiSelectedItems.putIfAbsent(
               illustrationKey,

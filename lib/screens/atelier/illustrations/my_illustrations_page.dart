@@ -523,7 +523,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         }
 
         return DeleteDialog(
-          textButtonValidation: confirmButtonValue,
+          confirmButtonValue: confirmButtonValue,
           count: count,
           descriptionValue: subtitleValue,
           onValidate: onConfirm,
