@@ -1,17 +1,17 @@
 import 'dart:async';
 
 import 'package:artbooking/actions/books.dart';
+import 'package:artbooking/components/bottom_sheet/book_visibility_sheet.dart';
 import 'package:artbooking/components/bottom_sheet/delete_content_bottom_sheet.dart';
 import 'package:artbooking/components/custom_scroll_behavior.dart';
 import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
-import 'package:artbooking/components/buttons/visibility_button.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/dialogs/share_dialog.dart';
+import 'package:artbooking/components/dialogs/visibility_dialog.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
-import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/constants.dart';
@@ -46,6 +46,7 @@ import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:unicons/unicons.dart';
 
 /// A page showing an user's books.
@@ -103,6 +104,9 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
   /// Show the page floating action button if true.
   bool _showFab = false;
+
+  /// If true, show a list of visibility items.
+  bool _showVisibilityChooser = false;
 
   /// Last fetched book document.
   DocumentSnapshot? _lastDocument;
@@ -467,7 +471,8 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       context,
       isMobileSize: isMobileSize,
       builder: (context) {
-        final int count = _multiSelectedItems.length;
+        final int count =
+            _multiSelectedItems.isEmpty ? 1 : _multiSelectedItems.length;
 
         final void Function()? onConfirm = () {
           if (_multiSelectedItems.isEmpty) {
@@ -1245,7 +1250,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         confirmDeleteBook(book, index);
         break;
       case EnumBookItemAction.updateVisibility:
-        showVisibilityDialog(book, index);
+        showVisibilityDialogOrBottomSheet(book, index);
         break;
       case EnumBookItemAction.uploadIllustrations:
         ref
@@ -1322,6 +1327,25 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
   void onTapBookCaption(Book book) {
     showRenameBookDialog(book);
+  }
+
+  /// Callback when a tile about content visibility is tapped.
+  void onTapVisibilityTile(
+    Book book,
+    EnumContentVisibility visibility,
+    int index,
+  ) {
+    onChangedVisibility(
+      context,
+      book: book,
+      index: index,
+      visibility: visibility,
+    );
+  }
+
+  /// Callback fired to show or hide visibility choices.
+  void onToggleVisibilityChoice(void Function(void Function()) childSetState) {
+    childSetState(() => _showVisibilityChooser = !_showVisibilityChooser);
   }
 
   /// Fire when a new document has been updated in Firestore.
@@ -1514,80 +1538,78 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     );
   }
 
+  Future<EnumContentVisibility?>? showVisibilityBottomSheet(
+    Book book,
+    int index,
+  ) async {
+    return await showCupertinoModalBottomSheet<Future<EnumContentVisibility?>?>(
+      context: context,
+      expand: false,
+      backgroundColor: Colors.white,
+      builder: (BuildContext context) {
+        return StatefulBuilder(builder: (
+          BuildContext context,
+          void Function(void Function()) childSetState,
+        ) {
+          return BookVisibilitySheet(
+            multiSelectedItemLength: _multiSelectedItems.length,
+            onTapVisibilityTile: (EnumContentVisibility visibility) {
+              onTapVisibilityTile(
+                book,
+                visibility,
+                index,
+              );
+            },
+            onToggleVisibilityChoice: () => onToggleVisibilityChoice(
+              childSetState,
+            ),
+            showVisibilityChooser: _showVisibilityChooser,
+            visibilityString:
+                "visibility_${book.visibility.name}".tr().toUpperCase(),
+          );
+        });
+      },
+    );
+  }
+
+  Future<EnumContentVisibility?>? showVisibilityDialogOrBottomSheet(
+    Book book,
+    int index,
+  ) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    if (isMobileSize) {
+      return showVisibilityBottomSheet(book, index);
+    }
+
+    return showVisibilityDialog(book, index);
+  }
+
   Future<EnumContentVisibility?>? showVisibilityDialog(
     Book book,
     int index,
   ) async {
-    final double width = 310.0;
-
     return await showDialog<Future<EnumContentVisibility?>?>(
       context: context,
-      builder: (context) => ThemedDialog(
-        showDivider: true,
+      builder: (BuildContext context) => VisibilityDialog(
+        textBodyValue: "book_visibility_choose".plural(
+          _multiSelectedItems.length,
+        ),
         titleValue: "book_visibility_change".plural(
           _multiSelectedItems.length,
         ),
-        textButtonValidation: "close".tr(),
-        onValidate: Beamer.of(context).popRoute,
-        onCancel: Beamer.of(context).popRoute,
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (_multiSelectedItems.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.only(left: 18.0),
-                    width: 300.0,
-                    child: Opacity(
-                      opacity: 0.6,
-                      child: Text(
-                        "multi_items_selected".plural(
-                          _multiSelectedItems.length,
-                        ),
-                        style: Utilities.fonts.body(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-                Container(
-                  padding: const EdgeInsets.only(left: 16.0),
-                  width: width,
-                  child: Opacity(
-                    opacity: 0.6,
-                    child: Text(
-                      "book_visibility_choose".plural(
-                        _multiSelectedItems.length,
-                      ),
-                      style: Utilities.fonts.body(
-                        fontSize: 16.0,
-                      ),
-                    ),
-                  ),
-                ),
-                VisibilityButton(
-                  maxWidth: width,
-                  visibility: book.visibility,
-                  onChangedVisibility: (EnumContentVisibility visibility) =>
-                      onChangedVisibility(
-                    context,
-                    visibility: visibility,
-                    book: book,
-                    index: index,
-                  ),
-                  padding: const EdgeInsets.only(
-                    left: 16.0,
-                    top: 12.0,
-                    bottom: 32.0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        visibility: book.visibility,
+        onChangedVisibility: (
+          BuildContext context,
+          EnumContentVisibility visibility,
+        ) {
+          onChangedVisibility(
+            context,
+            visibility: visibility,
+            book: book,
+            index: index,
+          );
+        },
       ),
     );
   }

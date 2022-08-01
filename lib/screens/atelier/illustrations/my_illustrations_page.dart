@@ -3,19 +3,18 @@ import 'dart:async';
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/bottom_sheet/delete_content_bottom_sheet.dart';
-import 'package:artbooking/components/buttons/visibility_button.dart';
 import 'package:artbooking/components/custom_scroll_behavior.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/share_dialog.dart';
+import 'package:artbooking/components/dialogs/visibility_dialog.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
-import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
-import 'package:artbooking/screens/atelier/illustrations/illustration_visibility_sheet.dart';
+import 'package:artbooking/components/bottom_sheet/illustration_visibility_sheet.dart';
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_body.dart';
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_fab.dart';
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_header.dart';
@@ -492,20 +491,11 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       context,
       isMobileSize: isMobileSize,
       builder: (context) {
-        final int count = _multiSelectedItems.length;
+        final int count =
+            _multiSelectedItems.isEmpty ? 1 : _multiSelectedItems.length;
+
         final void Function()? onConfirm =
             () => onConfirmDelete(illustration, index);
-
-        final String titleValue = "illustration_delete_plural"
-            .plural(
-              _multiSelectedItems.length,
-            )
-            .toUpperCase();
-
-        final String subtitleValue =
-            "illustration_delete_description_plural".plural(
-          _multiSelectedItems.length,
-        );
 
         final String confirmButtonValue = "illustration_delete_count".plural(
           count,
@@ -517,18 +507,18 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
             confirmButtonValue: confirmButtonValue,
             onConfirm: onConfirm,
             showDivider: false,
-            subtitleValue: subtitleValue,
-            titleValue: titleValue,
+            subtitleValue: "illustration_delete_description".plural(count),
+            titleValue: "illustration_delete".plural(count).toUpperCase(),
           );
         }
 
         return DeleteDialog(
           confirmButtonValue: confirmButtonValue,
           count: count,
-          descriptionValue: subtitleValue,
+          descriptionValue: "illustration_delete_description".plural(count),
           onValidate: onConfirm,
           showCounter: _multiSelectedItems.isNotEmpty,
-          titleValue: titleValue,
+          titleValue: "illustration_delete".plural(count).toUpperCase(),
         );
       },
     );
@@ -1372,6 +1362,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     setState(() {});
   }
 
+  /// Callback when a tile about content visibility is tapped.
   void onTapVisibilityTile(
     Illustration illustration,
     EnumContentVisibility visibility,
@@ -1390,6 +1381,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     Utilities.storage.saveMobileDraggingActive(_draggingActive);
   }
 
+  /// Callback fired to show or hide visibility choices.
   void onToggleVisibilityChoice(void Function(void Function()) childSetState) {
     childSetState(() => _showVisibilityChooser = !_showVisibilityChooser);
   }
@@ -1533,12 +1525,13 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         ) {
           return IllustrationVisibilitySheet(
             multiSelectedItemLength: _multiSelectedItems.length,
-            onTapVisibilityTile: (EnumContentVisibility visibility) =>
-                onTapVisibilityTile(
-              illustration,
-              visibility,
-              index,
-            ),
+            onTapVisibilityTile: (EnumContentVisibility visibility) {
+              onTapVisibilityTile(
+                illustration,
+                visibility,
+                index,
+              );
+            },
             onToggleVisibilityChoice: () => onToggleVisibilityChoice(
               childSetState,
             ),
@@ -1555,77 +1548,27 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     Illustration illustration,
     int index,
   ) async {
-    final double width = 310.0;
-
     return await showDialog<Future<EnumContentVisibility?>?>(
       context: context,
-      builder: (context) => ThemedDialog(
-        showDivider: true,
+      builder: (BuildContext context) => VisibilityDialog(
+        textBodyValue: "illustration_visibility_choose".plural(
+          _multiSelectedItems.length,
+        ),
         titleValue: "illustration_visibility_change".plural(
           _multiSelectedItems.length,
         ),
-        textButtonValidation: "close".tr(),
-        onValidate: Beamer.of(context).popRoute,
-        onCancel: Beamer.of(context).popRoute,
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (_multiSelectedItems.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.only(left: 16.0),
-                    width: width,
-                    child: Opacity(
-                      opacity: 0.6,
-                      child: Text(
-                        "multi_items_selected".plural(
-                          _multiSelectedItems.length,
-                        ),
-                        style: Utilities.fonts.body(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-                Container(
-                  padding: const EdgeInsets.only(left: 16.0),
-                  width: width,
-                  child: Opacity(
-                    opacity: 0.6,
-                    child: Text(
-                      "illustration_visibility_choose".plural(
-                        _multiSelectedItems.length,
-                      ),
-                      style: Utilities.fonts.body(
-                        fontSize: 16.0,
-                      ),
-                    ),
-                  ),
-                ),
-                VisibilityButton(
-                  maxWidth: width,
-                  group: _multiSelectedItems.isNotEmpty,
-                  visibility: illustration.visibility,
-                  onChangedVisibility: (EnumContentVisibility visibility) =>
-                      onChangedVisibility(
-                    context,
-                    visibility: visibility,
-                    illustration: illustration,
-                    index: index,
-                  ),
-                  padding: const EdgeInsets.only(
-                    left: 16.0,
-                    top: 12.0,
-                    bottom: 32.0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        visibility: illustration.visibility,
+        onChangedVisibility: (
+          BuildContext context,
+          EnumContentVisibility visibility,
+        ) {
+          onChangedVisibility(
+            context,
+            visibility: visibility,
+            illustration: illustration,
+            index: index,
+          );
+        },
       ),
     );
   }

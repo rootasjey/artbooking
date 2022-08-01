@@ -46,7 +46,6 @@ class DeleteContentBottomSheet extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               header(
-                create: true,
                 margin: const EdgeInsets.only(bottom: 24.0),
               ),
               if (showDivider)
@@ -76,7 +75,6 @@ class DeleteContentBottomSheet extends StatelessWidget {
   }
 
   Widget header({
-    bool create = false,
     EdgeInsets margin = EdgeInsets.zero,
   }) {
     return Padding(
