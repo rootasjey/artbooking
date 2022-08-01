@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
-import 'package:artbooking/components/buttons/dark_elevated_button.dart';
+import 'package:artbooking/components/bottom_sheet/delete_content_bottom_sheet.dart';
 import 'package:artbooking/components/buttons/visibility_button.dart';
 import 'package:artbooking/components/custom_scroll_behavior.dart';
+import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/share_dialog.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
@@ -349,109 +350,6 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     );
   }
 
-  Widget deleteBody() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (_multiSelectedItems.isNotEmpty)
-            Container(
-              padding: const EdgeInsets.only(left: 24.0),
-              width: 300.0,
-              child: Opacity(
-                opacity: 0.6,
-                child: Text(
-                  "multi_items_selected".plural(
-                    _multiSelectedItems.length,
-                  ),
-                  style: Utilities.fonts.body(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget deleteBottomSheetBody(Illustration illustration, int index) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 28.0, bottom: 24.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          deleteHeader(),
-          deleteBody(),
-          DarkElevatedButton.large(
-            child: Text(
-              "delete".tr(),
-              style: Utilities.fonts.body(
-                fontSize: 16.0,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            margin: const EdgeInsets.only(top: 12.0),
-            onPressed: () => onConfirmDelete(illustration, index),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget deleteDialogBody(
-    Illustration illustration,
-    int index,
-  ) {
-    return ThemedDialog(
-      focusNode: _popupFocusNode,
-      title: deleteHeader(),
-      body: deleteBody(),
-      textButtonValidation: "delete".tr(),
-      onCancel: Beamer.of(context).popRoute,
-      onValidate: () => onConfirmDelete(illustration, index),
-    );
-  }
-
-  Widget deleteHeader() {
-    return Column(
-      children: [
-        Opacity(
-          opacity: 0.8,
-          child: Text(
-            "illustration_delete_plural"
-                .plural(
-                  _multiSelectedItems.length,
-                )
-                .toUpperCase(),
-            style: Utilities.fonts.body(
-              color: Colors.black,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        Container(
-          width: 300.0,
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Opacity(
-            opacity: 0.4,
-            child: Text(
-              "illustration_delete_description_plural".plural(
-                _multiSelectedItems.length,
-              ),
-              textAlign: TextAlign.center,
-              style: Utilities.fonts.body(
-                color: Colors.black,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget dropHint() {
     if (!_isDraggingFile) {
       return Container();
@@ -594,11 +492,44 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       context,
       isMobileSize: isMobileSize,
       builder: (context) {
+        final int count = _multiSelectedItems.length;
+        final void Function()? onConfirm =
+            () => onConfirmDelete(illustration, index);
+
+        final String titleValue = "illustration_delete_plural"
+            .plural(
+              _multiSelectedItems.length,
+            )
+            .toUpperCase();
+
+        final String subtitleValue =
+            "illustration_delete_description_plural".plural(
+          _multiSelectedItems.length,
+        );
+
+        final String confirmButtonValue = "illustration_delete_count".plural(
+          count,
+          args: [count.toString()],
+        );
+
         if (isMobileSize) {
-          return deleteBottomSheetBody(illustration, index);
+          return DeleteContentBottomSheet(
+            confirmButtonValue: confirmButtonValue,
+            onConfirm: onConfirm,
+            showDivider: false,
+            subtitleValue: subtitleValue,
+            titleValue: titleValue,
+          );
         }
 
-        return deleteDialogBody(illustration, index);
+        return DeleteDialog(
+          textButtonValidation: confirmButtonValue,
+          count: count,
+          descriptionValue: subtitleValue,
+          onValidate: onConfirm,
+          showCounter: _multiSelectedItems.isNotEmpty,
+          titleValue: titleValue,
+        );
       },
     );
   }
