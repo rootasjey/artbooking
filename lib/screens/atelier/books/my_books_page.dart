@@ -478,20 +478,28 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
           }
         };
 
+        final String confirmButtonValue = "book_delete_count".plural(
+          count,
+          args: [count.toString()],
+        );
+
         if (isMobileSize) {
           return DeleteContentBottomSheet(
-            titleValue: "book_delete".plural(count).toUpperCase(),
-            subtitleValue: "book_delete_description".plural(count),
+            confirmButtonValue: confirmButtonValue,
+            count: count,
             onConfirm: onConfirm,
+            subtitleValue: "book_delete_description".plural(count),
+            titleValue: "book_delete".plural(count).toUpperCase(),
           );
         }
 
         return DeleteDialog(
-          titleValue: "book_delete".plural(count).toUpperCase(),
+          textButtonValidation: confirmButtonValue,
+          count: count,
           descriptionValue: "book_delete_description".plural(count),
           onValidate: onConfirm,
           showCounter: _multiSelectedItems.isNotEmpty,
-          count: count,
+          titleValue: "book_delete".plural(count).toUpperCase(),
         );
       },
     );
