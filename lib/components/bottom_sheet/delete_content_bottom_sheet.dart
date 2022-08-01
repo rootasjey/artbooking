@@ -11,17 +11,29 @@ class DeleteContentBottomSheet extends StatelessWidget {
     Key? key,
     required this.subtitleValue,
     required this.titleValue,
+    this.confirmButtonValue,
     this.onConfirm,
+    this.count = 1,
+    this.showDivider = false,
   }) : super(key: key);
+
+  /// Show a divider below the header if true,
+  final bool showDivider;
 
   /// Callback fired when we confirm this action.
   final void Function()? onConfirm;
+
+  /// Number of items to delete.
+  final int count;
 
   /// Subitle text value.
   final String subtitleValue;
 
   /// Title text value.
   final String titleValue;
+
+  /// String value for button confirmation.
+  final String? confirmButtonValue;
 
   @override
   Widget build(BuildContext context) {
@@ -37,13 +49,20 @@ class DeleteContentBottomSheet extends StatelessWidget {
                 create: true,
                 margin: const EdgeInsets.only(bottom: 24.0),
               ),
-              Divider(
-                thickness: 2.0,
-                color: Theme.of(context).secondaryHeaderColor,
-              ),
+              if (showDivider)
+                Divider(
+                  thickness: 2.0,
+                  color: Theme.of(context).secondaryHeaderColor,
+                ),
               DarkElevatedButton.large(
-                child: Text("delete".tr()),
-                margin: const EdgeInsets.only(top: 24.0, bottom: 16.0),
+                child: Text(
+                  confirmButtonValue ?? "delete".tr(),
+                  style: Utilities.fonts.body(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                margin: const EdgeInsets.only(top: 12.0, bottom: 16.0),
                 onPressed: () {
                   onConfirm?.call();
                   Beamer.of(context).popRoute();
