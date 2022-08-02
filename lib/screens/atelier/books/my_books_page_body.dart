@@ -1,5 +1,6 @@
 import 'package:artbooking/components/cards/book_card.dart';
 import 'package:artbooking/components/icons/animated_app_icon.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/books/my_books_page_empty.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/book/popup_entry_book.dart';
@@ -183,6 +184,7 @@ class MyBooksPageBody extends StatelessWidget {
                     : likePopupMenuEntries;
 
             return BookCard(
+              backIcon: Utilities.ui.generateIcon(book.name),
               book: book,
               canDrag: isOwner && draggingActive,
               heroTag: book.id,

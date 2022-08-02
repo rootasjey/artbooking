@@ -26,6 +26,7 @@ class BookCard extends StatefulWidget {
     required this.book,
     required this.heroTag,
     required this.index,
+    this.backIcon = UniconsLine.tear,
     this.canDropFile = false,
     this.canDrag = false,
     this.selected = false,
@@ -133,6 +134,9 @@ class BookCard extends StatefulWidget {
 
   /// Callback event fired when files exited to being dragged over this book.
   final void Function(DropEventDetails details)? onDragFileExited;
+
+  /// `IconData` behind this card while dragging.
+  final IconData backIcon;
 
   /// Index position in a list, if available.
   final int index;
@@ -299,7 +303,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     return Column(
       children: [
         Container(
-          width: widget.width - 40.0,
+          width: widget.width - 80.0,
           height: widget.height - 30.0,
           padding: const EdgeInsets.all(8.0),
           child: DottedBorder(
@@ -324,16 +328,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
                     child: Opacity(
                       opacity: 0.6,
                       child: Center(
-                        child: Text(
-                          textValue.isNotEmpty
-                              ? textValue
-                              : "book_permutation_description".tr(),
-                          textAlign: TextAlign.center,
-                          style: Utilities.fonts.body(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        child: getVisualChild(textValue: textValue),
                       ),
                     ),
                   ),
@@ -343,6 +338,21 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
           ),
         ),
       ],
+    );
+  }
+
+  Widget getVisualChild({required String textValue}) {
+    if (widget.width < 300.0) {
+      return Icon(widget.backIcon);
+    }
+
+    return Text(
+      textValue.isNotEmpty ? textValue : "book_permutation_description".tr(),
+      textAlign: TextAlign.center,
+      style: Utilities.fonts.body4(
+        fontSize: 18.0,
+        fontWeight: FontWeight.w400,
+      ),
     );
   }
 
