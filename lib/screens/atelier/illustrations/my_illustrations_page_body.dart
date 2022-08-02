@@ -1,5 +1,6 @@
 import 'package:artbooking/components/cards/illustration_card.dart';
 import 'package:artbooking/components/icons/animated_app_icon.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_empty.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/types/enums/enum_visibility_tab.dart';
@@ -165,6 +166,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
                         : likePopupMenuEntries;
 
             return IllustrationCard(
+              backIcon: Utilities.ui.generateIcon(illustration.name),
               borderRadius: BorderRadius.circular(isMobileSize ? 24.0 : 16.0),
               canDrag: isOwner && draggingActive,
               elevation: 8.0,

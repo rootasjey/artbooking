@@ -25,6 +25,7 @@ class IllustrationCard extends StatefulWidget {
     required this.heroTag,
     required this.illustration,
     required this.index,
+    this.backIcon = UniconsLine.tear,
     this.illustrationKey = '',
     this.selected = false,
     this.selectionMode = false,
@@ -86,12 +87,6 @@ class IllustrationCard extends StatefulWidget {
   /// Card's size (width = height).
   final double size;
 
-  /// Illustration's data for this card.
-  final Illustration illustration;
-
-  /// Index position in a list, if available.
-  final int index;
-
   /// Card's padding.
   final EdgeInsets padding;
 
@@ -143,6 +138,15 @@ class IllustrationCard extends StatefulWidget {
     Illustration illustration,
     String illustrationKey,
   )? onPopupMenuItemSelected;
+
+  /// `IconData` behind this card while dragging.
+  final IconData backIcon;
+
+  /// Illustration's data for this card.
+  final Illustration illustration;
+
+  /// Index position in a list, if available.
+  final int index;
 
   /// Menu item list displayed after tapping on the corresponding popup button.
   final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries;
@@ -393,6 +397,7 @@ class _IllustrationCardState extends State<IllustrationCard>
             child: InkWell(
               onTap: onTapPlaceholder,
               child: Padding(
+                // padding: EdgeInsets.all(widget.size < 300.0 ? 4.0 : 16.0),
                 padding: const EdgeInsets.all(16.0),
                 child: Opacity(
                   opacity: 0.6,
@@ -417,14 +422,18 @@ class _IllustrationCardState extends State<IllustrationCard>
       return Icon(UniconsLine.plus);
     }
 
+    if (widget.size < 300.0) {
+      return Icon(widget.backIcon);
+    }
+
     return Text(
       textValue.isNotEmpty
           ? textValue
           : "illustration_permutation_description".tr(),
       textAlign: TextAlign.center,
-      style: Utilities.fonts.body(
+      style: Utilities.fonts.body4(
         fontSize: 18.0,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w400,
       ),
     );
   }
