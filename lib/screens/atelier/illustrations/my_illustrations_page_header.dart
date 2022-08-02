@@ -101,16 +101,16 @@ class MyIllustrationsPageHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     EdgeInsets padding = EdgeInsets.only(
-      top: isMobileSize ? 24.0 : 60.0,
-      left: isMobileSize ? 12.0 : 50.0,
       bottom: 24.0,
+      left: isMobileSize ? 12.0 : 50.0,
+      top: isMobileSize ? 24.0 : 60.0,
     );
 
     if (limitThreeInRow) {
       padding = EdgeInsets.only(
-        top: isMobileSize ? 24.0 : 60.0,
-        left: isMobileSize ? 12.0 : 120.0,
         bottom: 24.0,
+        left: isMobileSize ? 12.0 : 120.0,
+        top: isMobileSize ? 24.0 : 60.0,
       );
     }
 
@@ -130,9 +130,9 @@ class MyIllustrationsPageHeader extends StatelessWidget {
               child: Align(
                 alignment: Alignment.topLeft,
                 child: CircleButton(
-                  tooltip: "back".tr(),
-                  onTap: () => Utilities.navigation.back(context),
                   icon: Icon(UniconsLine.arrow_left, color: Colors.black),
+                  onTap: () => Utilities.navigation.back(context),
+                  tooltip: "back".tr(),
                 ),
               ),
             ),
@@ -142,34 +142,35 @@ class MyIllustrationsPageHeader extends StatelessWidget {
             title: MyIllustrationsPageTitle(
               isMobileSize: isMobileSize,
               isOwner: isOwner,
-              selectedTab: selectedTab,
               onChangedTab: onChangedTab,
-              username: username,
               onGoToUserProfile: onGoToUserProfile,
+              selectedTab: selectedTab,
+              username: username,
             ),
             subtitleValue: subtitleValue,
-            padding: const EdgeInsets.only(bottom: 4.0),
+            padding: const EdgeInsets.only(bottom: 16.0),
           ),
           MyIllustrationsPageActions(
             draggingActive: draggingActive,
             isMobileSize: isMobileSize,
             isOwner: isOwner,
+            limitThreeInRow: limitThreeInRow,
             multiSelectActive: multiSelectActive,
-            show: multiSelectedItems.isEmpty,
             onToggleDrag: onToggleDrag,
             onTriggerMultiSelect: onTriggerMultiSelect,
-            onUploadIllustration: onUploadIllustration,
-            limitThreeInRow: limitThreeInRow,
             onUpdateLayout: onUpdateLayout,
+            onUploadIllustration: onUploadIllustration,
+            show: multiSelectedItems.isEmpty,
           ),
           MyIllustrationsPageGroupActions(
-            show: multiSelectedItems.isNotEmpty,
+            isMobileSize: isMobileSize,
             multiSelectedItems: multiSelectedItems,
-            onSelectAll: onSelectAll,
-            onClearSelection: onClearSelection,
-            onConfirmDeleteGroup: onConfirmDeleteGroup,
             onAddToBook: onAddGroupToBook,
             onChangeGroupVisibility: onChangeGroupVisibility,
+            onClearSelection: onClearSelection,
+            onConfirmDeleteGroup: onConfirmDeleteGroup,
+            onSelectAll: onSelectAll,
+            show: multiSelectedItems.isNotEmpty,
           ),
         ]),
       ),

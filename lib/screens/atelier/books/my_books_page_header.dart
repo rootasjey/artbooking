@@ -14,6 +14,7 @@ class MyBooksPageHeader extends StatelessWidget {
     required this.multiSelectActive,
     required this.multiSelectedItems,
     required this.selectedTab,
+    this.isMobileSize = false,
     this.isOwner = false,
     this.onAddToBook,
     this.onChangedTab,
@@ -26,7 +27,6 @@ class MyBooksPageHeader extends StatelessWidget {
     this.onToggleDrag,
     this.onTriggerMultiSelect,
     this.username = "",
-    this.isMobileSize = false,
   }) : super(key: key);
 
   /// (Mobile specific) If true, long pressing a card will start a drag.
@@ -93,9 +93,9 @@ class MyBooksPageHeader extends StatelessWidget {
 
     return SliverPadding(
       padding: EdgeInsets.only(
-        top: isMobileSize ? 24.0 : 60.0,
-        left: isMobileSize ? 12.0 : 64.0,
         bottom: 24.0,
+        left: isMobileSize ? 12.0 : 64.0,
+        top: isMobileSize ? 24.0 : 60.0,
       ),
       sliver: SliverList(
         delegate: SliverChildListDelegate.fixed([
@@ -105,9 +105,9 @@ class MyBooksPageHeader extends StatelessWidget {
             title: MyBooksPageTitle(
               isMobileSize: isMobileSize,
               isOwner: isOwner,
-              selectedTab: selectedTab,
               onChangedTab: onChangedTab,
               onGoToUserProfile: onGoToUserProfile,
+              selectedTab: selectedTab,
               username: username,
             ),
             subtitleValue: subtitleValue,
@@ -117,20 +117,21 @@ class MyBooksPageHeader extends StatelessWidget {
             draggingActive: draggingActive,
             isMobileSize: isMobileSize,
             isOwner: isOwner,
-            show: multiSelectedItems.isEmpty,
             multiSelectActive: multiSelectActive,
             onToggleDrag: onToggleDrag,
             onTriggerMultiSelect: onTriggerMultiSelect,
             onShowCreateBookDialog: onShowCreateBookDialog,
+            show: multiSelectedItems.isEmpty,
           ),
           MyBooksPageGroupActions(
-            show: multiSelectedItems.isNotEmpty,
+            isMobileSize: isMobileSize,
             multiSelectedItems: multiSelectedItems,
-            onSelectAll: onSelectAll,
-            onClearSelection: onClearSelection,
             onAddToBook: onAddToBook,
             onChangeGroupVisibility: onChangeGroupVisibility,
+            onClearSelection: onClearSelection,
             onConfirmDeleteGroup: onConfirmDeleteGroup,
+            onSelectAll: onSelectAll,
+            show: multiSelectedItems.isNotEmpty,
           ),
         ]),
       ),
