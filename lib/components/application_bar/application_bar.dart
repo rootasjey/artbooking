@@ -15,14 +15,21 @@ import 'package:unicons/unicons.dart';
 
 class ApplicationBar extends ConsumerWidget {
   ApplicationBar({
-    this.padding = const EdgeInsets.only(top: 30.0),
+    this.bottom,
     this.minimal = false,
+    this.padding = const EdgeInsets.only(top: 30.0),
+    this.pinned = true,
   });
-
-  final EdgeInsets padding;
 
   /// If true, will only display right section with search, language, & avatar.
   final bool minimal;
+
+  /// Whether the app bar should remain visible at the start of the scroll view.
+  final bool pinned;
+
+  final EdgeInsets padding;
+
+  final PreferredSizeWidget? bottom;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -49,7 +56,7 @@ class ApplicationBar extends ConsumerWidget {
       sliver: SliverAppBar(
         floating: true,
         snap: true,
-        pinned: true,
+        pinned: pinned,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         automaticallyImplyLeading: false,
         title: Padding(
@@ -94,6 +101,7 @@ class ApplicationBar extends ConsumerWidget {
             ],
           ),
         ),
+        bottom: bottom,
       ),
     );
   }
