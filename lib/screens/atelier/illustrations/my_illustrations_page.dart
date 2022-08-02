@@ -282,7 +282,6 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                         controller: _pageScrollController,
                         slivers: <Widget>[
                           ApplicationBar(
-                            pinned: false,
                             bottom: PreferredSize(
                               child: MyIllustrationsPageHeader(
                                 draggingActive: _draggingActive,
@@ -309,6 +308,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                               ),
                               preferredSize: Size.fromHeight(160.0),
                             ),
+                            pinned: false,
                           ),
                           MyIllustrationsPageBody(
                             authenticated: authenticated,

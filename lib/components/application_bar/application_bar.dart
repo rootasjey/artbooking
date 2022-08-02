@@ -17,7 +17,6 @@ class ApplicationBar extends ConsumerWidget {
   ApplicationBar({
     this.bottom,
     this.minimal = false,
-    this.padding = const EdgeInsets.only(top: 30.0),
     this.pinned = true,
   });
 
@@ -26,8 +25,6 @@ class ApplicationBar extends ConsumerWidget {
 
   /// Whether the app bar should remain visible at the start of the scroll view.
   final bool pinned;
-
-  final EdgeInsets padding;
 
   final PreferredSizeWidget? bottom;
 
@@ -52,7 +49,7 @@ class ApplicationBar extends ConsumerWidget {
     final bool hasHistory = location != HomeLocation.route;
 
     return SliverPadding(
-      padding: padding,
+      padding: const EdgeInsets.only(top: 30.0),
       sliver: SliverAppBar(
         floating: true,
         snap: true,
