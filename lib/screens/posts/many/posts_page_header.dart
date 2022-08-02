@@ -8,8 +8,8 @@ class PostsPageHeader extends StatelessWidget {
   const PostsPageHeader({
     Key? key,
     required this.selectedTab,
-    this.onChangedTab,
     this.isMobileSize = false,
+    this.onChangedTab,
   }) : super(key: key);
 
   /// If true, this widget adapt its layout to small screens.
@@ -19,18 +19,17 @@ class PostsPageHeader extends StatelessWidget {
   final EnumContentVisibility selectedTab;
 
   /// Callback fired when selected tab changes.
-  final Function(EnumContentVisibility)? onChangedTab;
+  final void Function(EnumContentVisibility)? onChangedTab;
 
   @override
   Widget build(BuildContext context) {
-    return SliverPadding(
+    return Padding(
       padding: EdgeInsets.only(
-        top: isMobileSize ? 24.0 : 60.0,
-        left: isMobileSize ? 12.0 : 54.0,
-        bottom: 24.0,
+        left: isMobileSize ? 0.0 : 54.0,
+        bottom: 8.0,
       ),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
+      child: Column(
+        children: [
           Opacity(
             opacity: 0.8,
             child: Text(
@@ -72,7 +71,8 @@ class PostsPageHeader extends StatelessWidget {
               ],
             ),
           ),
-        ]),
+        ],
+        crossAxisAlignment: CrossAxisAlignment.start,
       ),
     );
   }

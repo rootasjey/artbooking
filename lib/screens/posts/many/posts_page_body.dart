@@ -15,8 +15,8 @@ import 'package:unicons/unicons.dart';
 class PostsPageBody extends StatelessWidget {
   const PostsPageBody({
     Key? key,
-    required this.posts,
     required this.loading,
+    required this.posts,
     required this.selectedTab,
     this.popupMenuEntries = const [],
     this.onDeletePost,
@@ -124,42 +124,45 @@ class PostsPageBody extends StatelessWidget {
         onPublishedPosts ? Theme.of(context).primaryColor : Colors.grey;
 
     if (isMobileSize) {
-      return SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (BuildContext context, int index) {
-            final Post post = posts.elementAt(index);
+      return SliverPadding(
+        padding: const EdgeInsets.only(top: 24.0),
+        sliver: SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (BuildContext context, int index) {
+              final Post post = posts.elementAt(index);
 
-            return PostCard(
-              post: post,
-              index: index,
-              isWide: isMobileSize,
-              heroTag: post.id,
-              borderColor: borderColor,
-              descriptionMaxLines: onPublishedPosts ? 5 : 3,
-              onTap: (Post post, String heroTag) {
-                NavigationStateHelper.post = post;
-                Beamer.of(context).beamToNamed(
-                  AtelierLocationContent.postRoute
-                      .replaceFirst(":postId", post.id),
-                  routeState: {
-                    "postId": post.id,
-                  },
-                );
-              },
-              popupMenuEntries: popupMenuEntries,
-              onPopupMenuItemSelected: onPopupMenuItemSelected,
-            );
-          },
-          childCount: posts.length,
+              return PostCard(
+                post: post,
+                index: index,
+                isWide: isMobileSize,
+                heroTag: post.id,
+                borderColor: borderColor,
+                descriptionMaxLines: onPublishedPosts ? 5 : 3,
+                onTap: (Post post, String heroTag) {
+                  NavigationStateHelper.post = post;
+                  Beamer.of(context).beamToNamed(
+                    AtelierLocationContent.postRoute
+                        .replaceFirst(":postId", post.id),
+                    routeState: {
+                      "postId": post.id,
+                    },
+                  );
+                },
+                popupMenuEntries: popupMenuEntries,
+                onPopupMenuItemSelected: onPopupMenuItemSelected,
+              );
+            },
+            childCount: posts.length,
+          ),
         ),
       );
     }
 
     return SliverPadding(
       padding: EdgeInsets.only(
+        bottom: 300.0,
         left: isMobileSize ? 12.0 : 34.0,
         right: isMobileSize ? 12.0 : 34.0,
-        bottom: 300.0,
       ),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(

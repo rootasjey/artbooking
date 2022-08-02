@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:artbooking/components/application_bar/application_bar.dart';
+import 'package:artbooking/components/custom_scroll_behavior.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
@@ -8,8 +9,8 @@ import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
-import 'package:artbooking/screens/licenses/many/licenses_page_fab.dart';
 import 'package:artbooking/screens/posts/many/posts_page_body.dart';
+import 'package:artbooking/screens/posts/many/posts_page_fab.dart';
 import 'package:artbooking/screens/posts/many/posts_page_header.dart';
 import 'package:artbooking/types/cloud_functions/post_response.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
@@ -28,6 +29,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
@@ -54,8 +56,18 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
   /// Loading the current page if true.
   bool _loading = false;
 
+  /// Show this page floating action button if true.
+  bool _showFabCreate = true;
+
+  /// Show FAB to scroll to the top of the page if true.
+  bool _showFabToTop = false;
+
   /// Last fetched document snapshot. Used for pagination.
   DocumentSnapshot<Object>? _lastDocument;
+
+  /// Last saved Y offset.
+  /// Used while scrolling to know the direction.
+  double _previousOffset = 0.0;
 
   /// Selected tab to show (published or drafts).
   var _selectedTab = EnumContentVisibility.public;
@@ -75,16 +87,16 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
     ),
   ];
 
-  /// Search results.
-  // final List<IllustrationLicense> _suggestionsLicenses = [];
-
   QuerySnapshotStreamSubscription? _postSubscription;
 
-  /// Delay search after typing input.
-  Timer? _searchTimer;
+  /// Page scroll controller.
+  final _pageScrollController = ScrollController();
 
   /// Search controller.
   final _searchTextController = TextEditingController();
+
+  /// Delay search after typing input.
+  Timer? _searchTimer;
 
   @override
   initState() {
@@ -114,31 +126,48 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
     final bool isMobileSize = Utilities.size.isMobileSize(context);
 
     return Scaffold(
-      floatingActionButton: LicensesPageFab(
-        show: canManagePosts,
-        onPressed: tryCreatePost,
+      floatingActionButton: PostsPageFab(
+        isOwner: canManagePosts,
         label: Text("post_create".tr()),
+        onPressed: tryCreatePost,
+        pageScrollController: _pageScrollController,
+        showFabCreate: _showFabCreate,
+        showFabToTop: _showFabToTop,
       ),
-      body: CustomScrollView(
-        slivers: <Widget>[
-          ApplicationBar(),
-          PostsPageHeader(
-            isMobileSize: isMobileSize,
-            onChangedTab: onChangedTab,
-            selectedTab: _selectedTab,
+      body: ImprovedScrolling(
+        scrollController: _pageScrollController,
+        enableKeyboardScrolling: true,
+        onScroll: onPageScroll,
+        child: ScrollConfiguration(
+          behavior: CustomScrollBehavior(),
+          child: CustomScrollView(
+            controller: _pageScrollController,
+            slivers: <Widget>[
+              ApplicationBar(
+                bottom: PreferredSize(
+                  child: PostsPageHeader(
+                    isMobileSize: isMobileSize,
+                    onChangedTab: onChangedTab,
+                    selectedTab: _selectedTab,
+                  ),
+                  preferredSize: Size.fromHeight(160.0),
+                ),
+                pinned: false,
+              ),
+              PostsPageBody(
+                isMobileSize: isMobileSize,
+                loading: _loading,
+                onCreatePost: tryCreatePost,
+                onDeletePost: canManagePosts ? onDeletePost : null,
+                onPopupMenuItemSelected: onPopupMenuItemSelected,
+                onTap: onTapPost,
+                posts: _posts,
+                popupMenuEntries: _postPopupMenuEntries,
+                selectedTab: _selectedTab,
+              )
+            ],
           ),
-          PostsPageBody(
-            isMobileSize: isMobileSize,
-            loading: _loading,
-            onCreatePost: tryCreatePost,
-            onDeletePost: canManagePosts ? onDeletePost : null,
-            onPopupMenuItemSelected: onPopupMenuItemSelected,
-            onTap: onTapPost,
-            posts: _posts,
-            popupMenuEntries: _postPopupMenuEntries,
-            selectedTab: _selectedTab,
-          )
-        ],
+        ),
       ),
     );
   }
@@ -457,6 +486,43 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
     );
   }
 
+  void maybeFetchMore(double offset) {
+    if (_pageScrollController.position.atEdge &&
+        offset > 50 &&
+        _hasNext &&
+        !_loadingMore) {
+      _selectedTab == EnumContentVisibility.private
+          ? fetchMoreDrafts()
+          : fetchMorePublishedPosts();
+    }
+  }
+
+  void maybeShowFab(double offset) {
+    final bool scrollingDown = offset - _previousOffset > 0;
+    _previousOffset = offset;
+
+    _showFabToTop = offset == 0.0 ? false : true;
+
+    if (scrollingDown) {
+      if (!_showFabCreate) {
+        return;
+      }
+
+      setState(() => _showFabCreate = false);
+      return;
+    }
+
+    if (offset == 0.0) {
+      setState(() => _showFabToTop = false);
+    }
+
+    if (_showFabCreate) {
+      return;
+    }
+
+    setState(() => _showFabCreate = true);
+  }
+
   /// Fire when a new document has been created in Firestore.
   /// Add the corresponding document in the UI.
   void onAddStreamingPost(DocumentChangeMap documentChange) {
@@ -475,6 +541,12 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
 
   void onDeletePost(Post post, int index) {
     showDeleteConfirmDialog(post, index);
+  }
+
+  /// Callback when the page scrolls up and down.
+  void onPageScroll(double offset) {
+    maybeShowFab(offset);
+    maybeFetchMore(offset);
   }
 
   /// Fire when a new document has been delete from Firestore.
