@@ -7,8 +7,8 @@ import 'package:unicons/unicons.dart';
 class MyIllustrationsPageFab extends StatelessWidget {
   const MyIllustrationsPageFab({
     Key? key,
+    required this.pageScrollController,
     required this.showFabUpload,
-    required this.scrollController,
     this.uploadIllustration,
     this.isOwner = false,
     this.showFabToTop = false,
@@ -27,7 +27,7 @@ class MyIllustrationsPageFab extends StatelessWidget {
   final void Function()? uploadIllustration;
 
   /// Page scroll controller to scroll to top.
-  final ScrollController scrollController;
+  final ScrollController pageScrollController;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +41,7 @@ class MyIllustrationsPageFab extends StatelessWidget {
             duration: Duration(milliseconds: 250),
             child: FloatingActionButton.extended(
               onPressed: uploadIllustration,
-              backgroundColor: Theme.of(context).primaryColor,
+              backgroundColor: Colors.grey.shade900,
               label: Text(
                 "upload".tr(),
                 style: Utilities.fonts.body(
@@ -59,7 +59,7 @@ class MyIllustrationsPageFab extends StatelessWidget {
               padding: const EdgeInsets.only(left: 8.0),
               child: FloatingActionButton(
                 onPressed: () {
-                  scrollController.animateTo(
+                  pageScrollController.animateTo(
                     0.0,
                     duration: Duration(milliseconds: 250),
                     curve: Curves.decelerate,

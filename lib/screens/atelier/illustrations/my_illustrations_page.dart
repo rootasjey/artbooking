@@ -246,7 +246,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         floatingActionButton: MyIllustrationsPageFab(
           showFabUpload: _showFabUpload,
           showFabToTop: _showFabToTop,
-          scrollController: _pageScrollController,
+          pageScrollController: _pageScrollController,
           isOwner: isOwner,
           uploadIllustration: uploadIllustration,
         ),
