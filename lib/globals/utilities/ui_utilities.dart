@@ -12,6 +12,61 @@ import 'package:unicons/unicons.dart';
 class UIUtilities {
   const UIUtilities();
 
+  /// Return a `DataIcon` according the passed name.
+  IconData generateIcon(String name) {
+    final normalizedName = name.toLowerCase();
+
+    if (normalizedName.startsWith("a")) {
+      return UniconsLine.adjust_alt;
+    }
+
+    if (normalizedName.startsWith("b")) {
+      return UniconsLine.basketball;
+    }
+
+    if (normalizedName.startsWith("c")) {
+      return UniconsLine.camera;
+    }
+
+    if (normalizedName.startsWith("d")) {
+      return UniconsLine.dice_two;
+    }
+
+    if (normalizedName.startsWith("e")) {
+      return UniconsLine.estate;
+    }
+
+    if (normalizedName.startsWith("f")) {
+      return UniconsLine.film;
+    }
+
+    if (normalizedName.startsWith("g")) {
+      return UniconsLine.gift;
+    }
+
+    if (normalizedName.startsWith("h")) {
+      return UniconsLine.heart;
+    }
+
+    if (normalizedName.startsWith("i")) {
+      return UniconsLine.image;
+    }
+
+    if (normalizedName.startsWith("j")) {
+      return UniconsLine.jackhammer;
+    }
+
+    if (normalizedName.startsWith("k")) {
+      return UniconsLine.keyhole_square;
+    }
+
+    if (normalizedName.startsWith("l")) {
+      return UniconsLine.letter_english_a;
+    }
+
+    return UniconsLine.tear;
+  }
+
   String getPageTitle(String trailingText) {
     final base = "ArtBooking •";
     return "$base $trailingText";
