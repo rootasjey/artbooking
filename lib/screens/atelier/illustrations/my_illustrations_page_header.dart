@@ -27,10 +27,10 @@ class MyIllustrationsPageHeader extends StatelessWidget {
     this.onConfirmDeleteGroup,
     this.onGoToUserProfile,
     this.onSelectAll,
-    this.onUploadIllustration,
     this.onToggleDrag,
     this.onTriggerMultiSelect,
     this.onUpdateLayout,
+    this.onUploadIllustration,
     this.showBackButton = false,
     this.username = "",
   }) : super(key: key);
@@ -101,16 +101,14 @@ class MyIllustrationsPageHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     EdgeInsets padding = EdgeInsets.only(
-      bottom: 24.0,
+      bottom: 8.0,
       left: isMobileSize ? 12.0 : 50.0,
-      top: isMobileSize ? 24.0 : 60.0,
     );
 
     if (limitThreeInRow) {
       padding = EdgeInsets.only(
-        bottom: 24.0,
+        bottom: 8.0,
         left: isMobileSize ? 12.0 : 120.0,
-        top: isMobileSize ? 24.0 : 60.0,
       );
     }
 
@@ -120,10 +118,11 @@ class MyIllustrationsPageHeader extends StatelessWidget {
       subtitleValue = "user_illustrations_page".tr(args: [username]);
     }
 
-    return SliverPadding(
+    return Padding(
       padding: padding,
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           if (showBackButton)
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
@@ -172,7 +171,7 @@ class MyIllustrationsPageHeader extends StatelessWidget {
             onSelectAll: onSelectAll,
             show: multiSelectedItems.isNotEmpty,
           ),
-        ]),
+        ],
       ),
     );
   }
