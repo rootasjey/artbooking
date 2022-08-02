@@ -91,14 +91,14 @@ class MyBooksPageHeader extends StatelessWidget {
       subtitleValue = "user_books_page".tr(args: [username]);
     }
 
-    return SliverPadding(
+    return Padding(
       padding: EdgeInsets.only(
-        bottom: 24.0,
+        bottom: 8.0,
         left: isMobileSize ? 12.0 : 64.0,
-        top: isMobileSize ? 24.0 : 60.0,
       ),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           PageTitle(
             isMobileSize: isMobileSize,
             renderSliver: false,
@@ -133,7 +133,7 @@ class MyBooksPageHeader extends StatelessWidget {
             onSelectAll: onSelectAll,
             show: multiSelectedItems.isNotEmpty,
           ),
-        ]),
+        ],
       ),
     );
   }
