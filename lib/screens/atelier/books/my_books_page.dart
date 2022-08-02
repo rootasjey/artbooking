@@ -74,6 +74,10 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   /// Creating a new book if true.
   bool _creating = false;
 
+  /// (Mobile specific) If true, long pressing a card will start a drag.
+  /// Otherwise, long pressing a card will display a context menu.
+  bool _draggingActive = false;
+
   /// Disable file drop when navigating to a new page.
   bool _enableFileDrop = true;
 
@@ -273,6 +277,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                       slivers: <Widget>[
                         ApplicationBar(),
                         MyBooksPageHeader(
+                          draggingActive: _draggingActive,
                           isMobileSize: isMobileSize,
                           isOwner: isOwner,
                           multiSelectActive: _forceMultiSelect,
@@ -285,6 +290,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                           onGoToUserProfile: onGoToUserProfile,
                           onSelectAll: onSelectAll,
                           onShowCreateBookDialog: showCreateBookDialog,
+                          onToggleDrag: onToggleDrag,
                           onTriggerMultiSelect: triggerMultiSelect,
                           selectedTab: _selectedTab,
                           username: _username,
@@ -292,6 +298,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                         MyBooksPageBody(
                           authenticated: authenticated,
                           books: _books,
+                          draggingActive: _draggingActive,
                           forceMultiSelect: _forceMultiSelect,
                           isMobileSize: isMobileSize,
                           isOwner: isOwner,
@@ -888,6 +895,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   }
 
   void loadPreferences() {
+    _draggingActive = Utilities.storage.getMobileDraggingActive();
     _selectedTab = Utilities.storage.getBooksTab();
   }
 
@@ -1341,6 +1349,11 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       index: index,
       visibility: visibility,
     );
+  }
+
+  void onToggleDrag() {
+    setState(() => _draggingActive = !_draggingActive);
+    Utilities.storage.saveMobileDraggingActive(_draggingActive);
   }
 
   /// Callback fired to show or hide visibility choices.

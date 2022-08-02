@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 class MyBooksPageHeader extends StatelessWidget {
   const MyBooksPageHeader({
     Key? key,
+    required this.draggingActive,
     required this.multiSelectActive,
     required this.multiSelectedItems,
     required this.selectedTab,
@@ -22,10 +23,15 @@ class MyBooksPageHeader extends StatelessWidget {
     this.onGoToUserProfile,
     this.onShowCreateBookDialog,
     this.onSelectAll,
+    this.onToggleDrag,
     this.onTriggerMultiSelect,
     this.username = "",
     this.isMobileSize = false,
   }) : super(key: key);
+
+  /// (Mobile specific) If true, long pressing a card will start a drag.
+  /// Otherwise, long pressing a card will display a context menu.
+  final bool draggingActive;
 
   /// If true, this widget adapt its layout to small screens.
   final bool isMobileSize;
@@ -57,6 +63,9 @@ class MyBooksPageHeader extends StatelessWidget {
 
   /// Callback fired to show create book dialog.
   final void Function()? onShowCreateBookDialog;
+
+  /// Callback fired when activate/deactivate drag status.
+  final void Function()? onToggleDrag;
 
   /// Callback fired to toggle multi-select.
   final void Function()? onTriggerMultiSelect;
@@ -105,9 +114,12 @@ class MyBooksPageHeader extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 16.0),
           ),
           MyBooksPageActions(
+            draggingActive: draggingActive,
+            isMobileSize: isMobileSize,
             isOwner: isOwner,
             show: multiSelectedItems.isEmpty,
             multiSelectActive: multiSelectActive,
+            onToggleDrag: onToggleDrag,
             onTriggerMultiSelect: onTriggerMultiSelect,
             onShowCreateBookDialog: onShowCreateBookDialog,
           ),

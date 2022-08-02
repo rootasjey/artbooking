@@ -14,6 +14,7 @@ class MyBooksPageBody extends StatelessWidget {
   const MyBooksPageBody({
     Key? key,
     required this.books,
+    required this.draggingActive,
     required this.forceMultiSelect,
     required this.loading,
     required this.multiSelectedItems,
@@ -45,6 +46,10 @@ class MyBooksPageBody extends StatelessWidget {
 
   /// If true, the current user is authenticated.
   final bool authenticated;
+
+  /// (Mobile specific) If true, long pressing a card will start a drag.
+  /// Otherwise, long pressing a card will display a context menu.
+  final bool draggingActive;
 
   /// If true, the UI is in multi-select mode.
   final bool forceMultiSelect;
@@ -179,7 +184,7 @@ class MyBooksPageBody extends StatelessWidget {
 
             return BookCard(
               book: book,
-              canDrag: isOwner,
+              canDrag: isOwner && draggingActive,
               heroTag: book.id,
               index: index,
               key: ValueKey(book.id),

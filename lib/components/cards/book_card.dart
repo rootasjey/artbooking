@@ -529,7 +529,9 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
                             onTap: widget.onTap,
                             onDoubleTap: onDoubleTapOrNull,
                             onLongPress:
-                                widget.useBottomSheet ? onLongPress : null,
+                                widget.useBottomSheet && !widget.canDrag
+                                    ? onLongPress
+                                    : null,
                             onHover: onHoverFrontCard,
                             child: Stack(
                               children: [
