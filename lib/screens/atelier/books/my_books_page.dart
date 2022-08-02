@@ -106,8 +106,11 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   /// Loading the next page if true.
   bool _loadingMore = false;
 
-  /// Show the page floating action button if true.
-  bool _showFab = false;
+  /// Show create floating action button if true.
+  bool _showFabCreate = true;
+
+  /// Show 'scroll to top' floating action button if true.
+  bool _showFabToTop = false;
 
   /// If true, show a list of visibility items.
   bool _showVisibilityChooser = false;
@@ -115,8 +118,12 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   /// Last fetched book document.
   DocumentSnapshot? _lastDocument;
 
+  /// Last saved Y offset.
+  /// Used while scrolling to know the direction.
+  double _previousOffset = 0.0;
+
   /// Page active tab.
-  var _selectedTab = EnumVisibilityTab.active;
+  EnumVisibilityTab _selectedTab = EnumVisibilityTab.active;
 
   /// Book list.
   final List<Book> _books = [];
@@ -240,8 +247,9 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
     return Scaffold(
       floatingActionButton: MyBooksPageFab(
-        scrollController: _pageScrollController,
-        show: _showFab,
+        pageScrollController: _pageScrollController,
+        showFabCreate: _showFabCreate,
+        showFabToTop: _showFabToTop,
         isOwner: isOwner,
         onShowCreateBookDialog: showCreateBookDialog,
       ),
@@ -269,7 +277,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                 child: ImprovedScrolling(
                   scrollController: _pageScrollController,
                   enableKeyboardScrolling: true,
-                  onScroll: onScroll,
+                  onScroll: onPageScroll,
                   child: ScrollConfiguration(
                     behavior: CustomScrollBehavior(),
                     child: CustomScrollView(
@@ -1294,22 +1302,59 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   }
 
   /// Callback when the page scrolls up and down.
-  void onScroll(double scrollOffset) {
-    if (scrollOffset < 50 && _showFab) {
-      setState(() => _showFab = false);
-      return;
-    }
+  void onPageScroll(double offset) {
+    // if (offset < 50 && _showFabCreate) {
+    //   setState(() => _showFabCreate = false);
+    //   return;
+    // }
 
-    if (scrollOffset > 50 && !_showFab) {
-      setState(() => _showFab = true);
-    }
+    // if (offset > 50 && !_showFabCreate) {
+    //   setState(() => _showFabCreate = true);
+    // }
 
+    // if (_pageScrollController.position.atEdge &&
+    //     offset > 50 &&
+    //     _hasNext &&
+    //     !_loadingMore) {
+    //   fetchMoreBooks();
+    // }
+    maybeShowFab(offset);
+    maybeFetchMore(offset);
+  }
+
+  void maybeFetchMore(double offset) {
     if (_pageScrollController.position.atEdge &&
-        scrollOffset > 50 &&
+        offset > 50 &&
         _hasNext &&
         !_loadingMore) {
       fetchMoreBooks();
     }
+  }
+
+  void maybeShowFab(double offset) {
+    final bool scrollingDown = offset - _previousOffset > 0;
+    _previousOffset = offset;
+
+    _showFabToTop = offset == 0.0 ? false : true;
+
+    if (scrollingDown) {
+      if (!_showFabCreate) {
+        return;
+      }
+
+      setState(() => _showFabCreate = false);
+      return;
+    }
+
+    if (offset == 0.0) {
+      setState(() => _showFabToTop = false);
+    }
+
+    if (_showFabCreate) {
+      return;
+    }
+
+    setState(() => _showFabCreate = true);
   }
 
   void onSelectAll() {
