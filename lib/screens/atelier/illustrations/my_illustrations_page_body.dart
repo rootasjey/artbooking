@@ -66,23 +66,6 @@ class MyIllustrationsPageBody extends StatelessWidget {
   /// Callback fired when an illustration card receives a double tap event.
   final void Function(Illustration illustration, int index)? onDoubleTap;
 
-  /// Callback fired when an illustration card receives a tap event.
-  final void Function(Illustration)? onTapIllustration;
-
-  /// Callback fired after selecting a popup menu item.
-  final void Function(
-    EnumIllustrationItemAction,
-    int,
-    Illustration,
-    String,
-  )? onPopupMenuItemSelected;
-
-  /// Will navigate to active illustrations tab.
-  final void Function()? onGoToActiveTab;
-
-  /// Callback fired to start an illustration upload.
-  final void Function()? uploadIllustration;
-
   /// Callback when illustration dragging is completed.
   final void Function()? onDragIllustrationCompleted;
 
@@ -100,6 +83,23 @@ class MyIllustrationsPageBody extends StatelessWidget {
 
   /// Callback when drag and dropping item on this illustration card.
   final void Function(int, List<int>)? onDropIllustration;
+
+  /// Will navigate to active illustrations tab.
+  final void Function()? onGoToActiveTab;
+
+  /// Callback fired after selecting a popup menu item.
+  final void Function(
+    EnumIllustrationItemAction,
+    int,
+    Illustration,
+    String,
+  )? onPopupMenuItemSelected;
+
+  /// Callback fired when an illustration card receives a tap event.
+  final void Function(Illustration)? onTapIllustration;
+
+  /// Callback fired to start an illustration upload.
+  final void Function()? uploadIllustration;
 
   /// Illustration list.
   final List<Illustration> illustrations;

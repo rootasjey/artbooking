@@ -100,10 +100,10 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   /// Loading the next page if true.
   bool _loadingMore = false;
 
-  /// Show the page floating action button if true.
+  /// Show this page floating action button if true.
   bool _showFabUpload = true;
 
-  /// If true, show FAB to scroll to the top of the page.
+  /// Show FAB to scroll to the top of the page if true.
   bool _showFabToTop = false;
 
   /// If true, show a list of visibility items.
@@ -244,10 +244,10 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       controller: HeroController(),
       child: Scaffold(
         floatingActionButton: MyIllustrationsPageFab(
-          showFabUpload: _showFabUpload,
-          showFabToTop: _showFabToTop,
-          pageScrollController: _pageScrollController,
           isOwner: isOwner,
+          pageScrollController: _pageScrollController,
+          showFabToTop: _showFabToTop,
+          showFabUpload: _showFabUpload,
           uploadIllustration: uploadIllustration,
         ),
         body: Listener(
@@ -483,11 +483,11 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
     final Illustration illustration = _multiSelectedItems.values.first;
     final int index = _illustrations.indexWhere((x) => x.id == illustration.id);
-    confirmDeleteIllustration(illustration, index);
+    showConfirmDeleteIllustration(illustration, index);
   }
 
   /// Show a dialog to confirm single illustration deletion.
-  void confirmDeleteIllustration(
+  void showConfirmDeleteIllustration(
     Illustration illustration,
     int index,
   ) async {
@@ -496,7 +496,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     Utilities.ui.showAdaptiveDialog(
       context,
       isMobileSize: isMobileSize,
-      builder: (context) {
+      builder: (BuildContext context) {
         final int count =
             _multiSelectedItems.isEmpty ? 1 : _multiSelectedItems.length;
 
@@ -1279,7 +1279,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   ) {
     switch (action) {
       case EnumIllustrationItemAction.delete:
-        confirmDeleteIllustration(illustration, index);
+        showConfirmDeleteIllustration(illustration, index);
         break;
       case EnumIllustrationItemAction.addToBook:
         showAddToBook(illustration);
