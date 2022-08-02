@@ -1513,9 +1513,13 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     final _nameController = TextEditingController();
     final _descriptionController = TextEditingController();
 
-    showDialog(
-      context: context,
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    Utilities.ui.showAdaptiveDialog(
+      context,
+      isMobileSize: isMobileSize,
       builder: (context) => InputDialog(
+        asBottomSheet: isMobileSize,
         titleValue: "book_create".tr().toUpperCase(),
         subtitleValue: "book_create_description".tr(),
         nameController: _nameController,
