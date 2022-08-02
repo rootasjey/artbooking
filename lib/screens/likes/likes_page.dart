@@ -116,11 +116,16 @@ class _LikesPageState extends ConsumerState<LikesPage> {
       body: CustomScrollView(
         controller: _pageScrollController,
         slivers: <Widget>[
-          ApplicationBar(),
-          LikesPageHeader(
-            isMobileSize: isMobileSize,
-            selectedTab: _selectedTab,
-            onChangedTab: onChangedTab,
+          ApplicationBar(
+            bottom: PreferredSize(
+              child: LikesPageHeader(
+                isMobileSize: isMobileSize,
+                selectedTab: _selectedTab,
+                onChangedTab: onChangedTab,
+              ),
+              preferredSize: Size.fromHeight(160.0),
+            ),
+            pinned: false,
           ),
           LikesPageBody(
             isMobileSize: isMobileSize,

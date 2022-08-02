@@ -23,14 +23,13 @@ class LikesPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverPadding(
+    return Padding(
       padding: EdgeInsets.only(
-        top: isMobileSize ? 24.0 : 60.0,
         left: isMobileSize ? 12.0 : 54.0,
-        bottom: 24.0,
+        bottom: 8.0,
       ),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
+      child: Column(
+        children: [
           PageTitle(
             renderSliver: false,
             titleValue: "likes".tr(),
@@ -56,7 +55,8 @@ class LikesPageHeader extends StatelessWidget {
               ],
             ),
           ),
-        ]),
+        ],
+        crossAxisAlignment: CrossAxisAlignment.start,
       ),
     );
   }

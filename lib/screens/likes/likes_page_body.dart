@@ -19,14 +19,14 @@ class LikesPageBody extends StatelessWidget {
     required this.illustrationPopupMenuEntries,
     required this.loading,
     required this.selectedTab,
-    this.onTapIllustration,
+    this.isMobileSize = false,
     this.onPopupMenuIllustrationSelected,
-    this.onTapBook,
     this.onPopupMenuBookSelected,
+    this.onTapBook,
+    this.onTapBrowse,
+    this.onTapIllustration,
     this.onUnlikeBook,
     this.onUnlikeIllustration,
-    this.onTapBrowse,
-    this.isMobileSize = false,
   }) : super(key: key);
 
   /// If true, this widget adapt its layout to small screens.
@@ -121,20 +121,21 @@ class LikesPageBody extends StatelessWidget {
             crossAxisSpacing: isMobileSize ? 0.0 : 12.0,
           ),
           delegate: SliverChildBuilderDelegate(
-            (context, index) {
+            (BuildContext context, int index) {
               final book = books.elementAt(index);
 
               return BookCard(
                 book: book,
-                index: index,
-                heroTag: book.id,
-                width: isMobileSize ? 220.0 : 280.0,
                 height: isMobileSize ? 161.0 : 332.0,
+                heroTag: book.id,
+                index: index,
                 onTap: () => onTapBook?.call(book),
                 onDoubleTap: () => onUnlikeBook?.call(book, index),
                 onLike: (_) => onUnlikeBook?.call(book, index),
                 onPopupMenuItemSelected: onPopupMenuBookSelected,
                 popupMenuEntries: bookPopupMenuEntries,
+                useBottomSheet: isMobileSize,
+                width: isMobileSize ? 220.0 : 280.0,
               );
             },
             childCount: books.length,
@@ -157,21 +158,25 @@ class LikesPageBody extends StatelessWidget {
           crossAxisSpacing: 20.0,
         ),
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
+          (BuildContext context, int index) {
             final Illustration illustration = illustrations.elementAt(index);
 
             return IllustrationCard(
               borderRadius: BorderRadius.circular(16.0),
-              index: index,
-              size: 250.0,
+              elevation: 6.0,
               heroTag: illustration.id,
               illustration: illustration,
-              onTap: () => onTapIllustration?.call(illustration),
-              onDoubleTap: () =>
-                  onUnlikeIllustration?.call(illustration, index),
-              onTapLike: () => onUnlikeIllustration?.call(illustration, index),
+              index: index,
+              onDoubleTap: () => onUnlikeIllustration?.call(
+                illustration,
+                index,
+              ),
               onPopupMenuItemSelected: onPopupMenuIllustrationSelected,
               popupMenuEntries: illustrationPopupMenuEntries,
+              onTap: () => onTapIllustration?.call(illustration),
+              onTapLike: () => onUnlikeIllustration?.call(illustration, index),
+              size: 250.0,
+              useBottomSheet: isMobileSize,
             );
           },
           childCount: illustrations.length,
