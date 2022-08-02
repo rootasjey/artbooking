@@ -8,8 +8,8 @@ class LicensesPageHeader extends StatelessWidget {
   const LicensesPageHeader({
     Key? key,
     required this.selectedTab,
-    this.onChangedTab,
     this.isMobileSize = false,
+    this.onChangedTab,
   }) : super(key: key);
 
   /// If true, this widget adapt its layout to small screens.
@@ -23,14 +23,13 @@ class LicensesPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverPadding(
+    return Padding(
       padding: EdgeInsets.only(
-        top: isMobileSize ? 24.0 : 60.0,
         left: isMobileSize ? 12.0 : 54.0,
-        bottom: 24.0,
+        bottom: 8.0,
       ),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
+      child: Column(
+        children: [
           Opacity(
             opacity: 0.8,
             child: Text(
@@ -70,7 +69,8 @@ class LicensesPageHeader extends StatelessWidget {
               ],
             ),
           ),
-        ]),
+        ],
+        crossAxisAlignment: CrossAxisAlignment.start,
       ),
     );
   }

@@ -1,7 +1,9 @@
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/licenses/license_card_item.dart';
+import 'package:artbooking/types/enums/enum_license_item_action.dart';
 import 'package:artbooking/types/enums/enum_license_type.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:easy_localization/src/public_ext.dart';
@@ -13,12 +15,14 @@ class LicensesPageBody extends StatelessWidget {
     Key? key,
     required this.licenses,
     required this.loading,
+    required this.selectedTab,
+    this.isMobileSize = false,
+    this.onCreateLicense,
     this.onDeleteLicense,
     this.onEditLicense,
     this.onTap,
-    this.onCreateLicense,
-    required this.selectedTab,
-    this.isMobileSize = false,
+    this.popupMenuEntries = const [],
+    this.onPopupMenuItemSelected,
   }) : super(key: key);
 
   /// If true, this widget adapt its layout to small screens.
@@ -30,20 +34,30 @@ class LicensesPageBody extends StatelessWidget {
   /// True if data is currently loading.
   final bool loading;
 
-  /// Callback to confirm license deletion.
-  final Function(License, int)? onDeleteLicense;
-
-  /// Callback to navigate to license edit page.
-  final Function(License, int)? onEditLicense;
-
-  /// Callback to go to the license create page.
-  final Function()? onCreateLicense;
-
-  /// Callback fired after license tap.
-  final Function(License)? onTap;
-
   /// Currently selected tab (staff or user).
   final EnumLicenseType selectedTab;
+
+  /// Callback to confirm license deletion.
+  final void Function(License, int)? onDeleteLicense;
+
+  /// Callback to go to the license create page.
+  final void Function()? onCreateLicense;
+
+  /// Callback to navigate to license edit page.
+  final void Function(License, int)? onEditLicense;
+
+  /// Callback fired after selecting a popup menu item.
+  final void Function(
+    EnumLicenseItemAction action,
+    int index,
+    License license,
+  )? onPopupMenuItemSelected;
+
+  /// Callback fired after license tap.
+  final void Function(License)? onTap;
+
+  /// Owner popup menu entries.
+  final List<PopupMenuItemIcon<EnumLicenseItemAction>> popupMenuEntries;
 
   @override
   Widget build(BuildContext context) {
@@ -117,16 +131,19 @@ class LicensesPageBody extends StatelessWidget {
       ),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
+          (BuildContext context, int index) {
             final License license = licenses.elementAt(index);
 
             return LicenseCardItem(
-              key: ValueKey(license.id),
               index: index,
+              key: ValueKey(license.id),
               license: license,
-              onTap: onTap,
-              onDelete: onDeleteLicense,
               onEdit: onEditLicense,
+              onDelete: onDeleteLicense,
+              onPopupMenuItemSelected: onPopupMenuItemSelected,
+              onTap: onTap,
+              popupMenuEntries: popupMenuEntries,
+              useBottomSheet: isMobileSize,
             );
           },
           childCount: licenses.length,

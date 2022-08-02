@@ -1,10 +1,10 @@
-import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:artbooking/types/enums/enum_license_item_action.dart';
-import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:unicons/unicons.dart';
 
 class LicenseCardItem extends StatelessWidget {
@@ -12,10 +12,18 @@ class LicenseCardItem extends StatelessWidget {
     Key? key,
     required this.index,
     required this.license,
-    this.onTap,
     this.onDelete,
     this.onEdit,
+    this.onTap,
+    this.useBottomSheet = false,
+    this.popupMenuEntries = const [],
+    this.onPopupMenuItemSelected,
   }) : super(key: key);
+
+  /// If true, a bottom sheet will be displayed on long press event.
+  /// Setting this property to true will deactivate popup menu and
+  /// hide like button.
+  final bool useBottomSheet;
 
   /// Item's position in the list.
   final int index;
@@ -23,26 +31,32 @@ class LicenseCardItem extends StatelessWidget {
   /// License instance to populate this card.
   final License license;
 
+  /// Callback fired after selecting a popup menu item.
+  final void Function(
+    EnumLicenseItemAction action,
+    int index,
+    License license,
+  )? onPopupMenuItemSelected;
+
   /// onTap callback function
-  final Function(License)? onTap;
+  final void Function(License)? onTap;
 
   /// onDelete callback function (after selecting 'delete' item menu)
-  final Function(License, int)? onDelete;
+  final void Function(License, int)? onDelete;
 
   /// onEdit callback function (after selecting 'edit' item menu)
-  final Function(License, int)? onEdit;
+  final void Function(License, int)? onEdit;
 
+  /// Owner popup menu entries.
+  final List<PopupMenuItemIcon<EnumLicenseItemAction>> popupMenuEntries;
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 0.0,
       color: Theme.of(context).backgroundColor,
       child: InkWell(
-        onTap: onTap != null
-            ? () {
-                onTap?.call(license);
-              }
-            : null,
+        onLongPress: useBottomSheet ? () => onLongPress(context) : null,
+        onTap: onTap != null ? () => onTap?.call(license) : null,
         child: Row(
           children: [
             Expanded(
@@ -80,51 +94,92 @@ class LicenseCardItem extends StatelessWidget {
                 ),
               ),
             ),
-            popupMenuButton(license, index),
+            popupMenuButton(),
           ],
         ),
       ),
     );
   }
 
-  Widget popupMenuButton(License license, int index) {
-    if (onDelete == null && onEdit == null) {
+  Widget popupMenuButton() {
+    if (popupMenuEntries.isEmpty || useBottomSheet) {
       return Container();
     }
 
     return PopupMenuButton(
-      icon: Icon(UniconsLine.ellipsis_v),
-      onSelected: (value) {
-        switch (value) {
-          case EnumLicenseItemAction.delete:
-            onDelete?.call(license, index);
-            break;
-          case EnumLicenseItemAction.edit:
-            onEdit?.call(license, index);
-            break;
-          default:
-        }
+      child: CircleAvatar(
+        radius: 15.0,
+        backgroundColor: Constants.colors.clairPink,
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Icon(UniconsLine.ellipsis_h, size: 20),
+        ),
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(6.0),
+      ),
+      onSelected: (EnumLicenseItemAction action) {
+        onPopupMenuItemSelected?.call(
+          action,
+          index,
+          license,
+        );
       },
-      itemBuilder: itemBuilder,
+      itemBuilder: (_) => popupMenuEntries,
     );
   }
 
-  List<PopupMenuEntry<EnumLicenseItemAction>> itemBuilder(
-    BuildContext context,
-  ) {
-    return [
-      if (onDelete != null)
-        PopupMenuItemIcon(
-          icon: PopupMenuIcon(UniconsLine.trash),
-          textLabel: "delete".tr(),
-          value: EnumLicenseItemAction.delete,
-        ),
-      if (onEdit != null)
-        PopupMenuItemIcon(
-          icon: PopupMenuIcon(UniconsLine.edit),
-          textLabel: "edit".tr(),
-          value: EnumLicenseItemAction.edit,
-        ),
-    ];
+  void onLongPress(BuildContext context) {
+    showCupertinoModalBottomSheet(
+      context: context,
+      expand: false,
+      backgroundColor: Colors.white70,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Material(
+            borderRadius: BorderRadius.circular(8.0),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: popupMenuEntries.map(
+                  (PopupMenuItemIcon<EnumLicenseItemAction> popupMenuEntry) {
+                    return ListTile(
+                      title: Opacity(
+                        opacity: 0.8,
+                        child: Text(
+                          popupMenuEntry.textLabel,
+                          style: Utilities.fonts.body(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      trailing: popupMenuEntry.icon,
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        final EnumLicenseItemAction? action =
+                            popupMenuEntry.value;
+
+                        if (action == null) {
+                          return;
+                        }
+
+                        onPopupMenuItemSelected?.call(
+                          action,
+                          index,
+                          license,
+                        );
+                      },
+                    );
+                  },
+                ).toList(),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }

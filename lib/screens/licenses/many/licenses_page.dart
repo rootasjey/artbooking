@@ -1,7 +1,11 @@
 import 'dart:async';
 
 import 'package:artbooking/components/application_bar/application_bar.dart';
+import 'package:artbooking/components/bottom_sheet/delete_content_bottom_sheet.dart';
+import 'package:artbooking/components/custom_scroll_behavior.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
@@ -10,6 +14,7 @@ import 'package:artbooking/screens/licenses/many/licenses_page_fab.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page_header.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page_body.dart';
 import 'package:artbooking/types/cloud_functions/license_response.dart';
+import 'package:artbooking/types/enums/enum_license_item_action.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
@@ -24,8 +29,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:unicons/unicons.dart';
 
 class LicensesPage extends ConsumerStatefulWidget {
   const LicensesPage({Key? key}) : super(key: key);
@@ -47,8 +54,18 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   /// True if loading more style from Firestore.
   bool _loadingMore = false;
 
+  /// Show this page floating action button if true.
+  bool _showFabCreate = true;
+
+  /// Show FAB to scroll to the top of the page if true.
+  bool _showFabToTop = false;
+
   /// Last fetched document snapshot. Used for pagination.
   DocumentSnapshot<Object>? _lastDocument;
+
+  /// Last saved Y offset.
+  /// Used while scrolling to know the direction.
+  double _previousOffset = 0.0;
 
   /// Selected tab to show license (staff or user).
   var _selectedTab = EnumLicenseType.staff;
@@ -62,8 +79,25 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   /// Maximum licenses to fetch in one request.
   final int _limit = 20;
 
+  /// Items when the current authenticated user own these illustrations.
+  final List<PopupMenuItemIcon<EnumLicenseItemAction>> _popupMenuEntries = [
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.trash),
+      textLabel: "delete".tr(),
+      value: EnumLicenseItemAction.delete,
+    ),
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.edit),
+      textLabel: "edit".tr(),
+      value: EnumLicenseItemAction.edit,
+    ),
+  ];
+
   /// Subscribe to license collection updates.
   QuerySnapshotStreamSubscription? _licenseSubscription;
+
+  /// Page scroll controller.
+  final _pageScrollController = ScrollController();
 
   /// Search controller.
   final _searchTextController = TextEditingController();
@@ -98,30 +132,49 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
 
     return Scaffold(
       floatingActionButton: LicensesPageFab(
-        show: canManageLicense,
+        isOwner: canManageLicense,
+        showFabCreate: _showFabCreate,
+        showFabToTop: _showFabToTop,
         onPressed: openNewLicenseDialog,
         isMobileSize: isMobileSize,
         label: Text("license_create".tr()),
+        pageScrollController: _pageScrollController,
       ),
-      body: CustomScrollView(
-        slivers: <Widget>[
-          ApplicationBar(),
-          LicensesPageHeader(
-            isMobileSize: isMobileSize,
-            selectedTab: _selectedTab,
-            onChangedTab: onChangedTab,
+      body: ImprovedScrolling(
+        scrollController: _pageScrollController,
+        enableKeyboardScrolling: true,
+        onScroll: onPageScroll,
+        child: ScrollConfiguration(
+          behavior: CustomScrollBehavior(),
+          child: CustomScrollView(
+            controller: _pageScrollController,
+            slivers: <Widget>[
+              ApplicationBar(
+                bottom: PreferredSize(
+                  child: LicensesPageHeader(
+                    isMobileSize: isMobileSize,
+                    selectedTab: _selectedTab,
+                    onChangedTab: onChangedTab,
+                  ),
+                  preferredSize: Size.fromHeight(160.0),
+                ),
+                pinned: false,
+              ),
+              LicensesPageBody(
+                isMobileSize: isMobileSize,
+                licenses: _licenses,
+                loading: _loading,
+                onCreateLicense: openNewLicenseDialog,
+                onDeleteLicense: canManageLicense ? onDeleteLicense : null,
+                onEditLicense: canManageLicense ? onEditLicense : null,
+                onPopupMenuItemSelected: onPopupMenuItemSelected,
+                onTap: onTapLicense,
+                popupMenuEntries: _popupMenuEntries,
+                selectedTab: _selectedTab,
+              )
+            ],
           ),
-          LicensesPageBody(
-            isMobileSize: isMobileSize,
-            licenses: _licenses,
-            loading: _loading,
-            onTap: onTapLicense,
-            selectedTab: _selectedTab,
-            onDeleteLicense: canManageLicense ? onDeleteLicense : null,
-            onEditLicense: canManageLicense ? onEditLicense : null,
-            onCreateLicense: openNewLicenseDialog,
-          )
-        ],
+        ),
       ),
     );
   }
@@ -352,6 +405,43 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     _selectedTab = Utilities.storage.getLicenseTab();
   }
 
+  void maybeFetchMore(double offset) {
+    if (_pageScrollController.position.atEdge &&
+        offset > 50 &&
+        _hasNext &&
+        !_loadingMore) {
+      _selectedTab == EnumLicenseType.staff
+          ? fetchMoreStaffLicenses()
+          : fetchMoreUserLicenses();
+    }
+  }
+
+  void maybeShowFab(double offset) {
+    final bool scrollingDown = offset - _previousOffset > 0;
+    _previousOffset = offset;
+
+    _showFabToTop = offset == 0.0 ? false : true;
+
+    if (scrollingDown) {
+      if (!_showFabCreate) {
+        return;
+      }
+
+      setState(() => _showFabCreate = false);
+      return;
+    }
+
+    if (offset == 0.0) {
+      setState(() => _showFabToTop = false);
+    }
+
+    if (_showFabCreate) {
+      return;
+    }
+
+    setState(() => _showFabCreate = true);
+  }
+
   void onChangedTab(EnumLicenseType licenseTab) {
     Utilities.storage.saveLicenseTab(licenseTab);
 
@@ -370,17 +460,27 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     }
   }
 
-  /// On scroll notification
-  bool onNotification(ScrollNotification notification) {
-    if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
-      return false;
-    }
+  /// Callback when the page scrolls up and down.
+  void onPageScroll(double offset) {
+    maybeShowFab(offset);
+    maybeFetchMore(offset);
+  }
 
-    if (_hasNext && !_loadingMore && _lastDocument != null) {
-      fetchMoreStaffLicenses();
+  void onPopupMenuItemSelected(
+    EnumLicenseItemAction action,
+    int index,
+    License license,
+  ) {
+    switch (action) {
+      case EnumLicenseItemAction.delete:
+        showConfirmDeleteLicense(license, index);
+        break;
+      case EnumLicenseItemAction.edit:
+        onEditLicense(license, index);
+        break;
+      default:
+        break;
     }
-
-    return false;
   }
 
   /// Listen to the last Firestore query of this page.
@@ -429,7 +529,7 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   }
 
   void onDeleteLicense(targetLicense, targetIndex) {
-    showDeleteConfirmDialog(targetLicense, targetIndex);
+    showConfirmDeleteLicense(targetLicense, targetIndex);
   }
 
   void onEditLicense(License targetLicense, int targetIndex) {
@@ -507,10 +607,24 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
     );
   }
 
-  void showDeleteConfirmDialog(License license, int index) {
-    showDialog(
-      context: context,
-      builder: (context) {
+  void showConfirmDeleteLicense(License license, int index) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    Utilities.ui.showAdaptiveDialog(
+      context,
+      isMobileSize: isMobileSize,
+      builder: (BuildContext context) {
+        if (isMobileSize) {
+          return DeleteContentBottomSheet(
+            confirmButtonValue: "delete".tr(),
+            onConfirm: () => tryDeleteLicense(license, index),
+            showDivider: false,
+            subtitleValue:
+                "${'license_delete_are_you_sure'.tr()} ${license.name}} ?",
+            titleValue: "license_delete".tr().toUpperCase(),
+          );
+        }
+
         return ThemedDialog(
           spaceActive: false,
           centerTitle: false,
