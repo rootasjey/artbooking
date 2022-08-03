@@ -15,9 +15,9 @@ import 'package:unicons/unicons.dart';
 
 class ApplicationBar extends ConsumerWidget {
   ApplicationBar({
-    this.bottom,
     this.minimal = false,
     this.pinned = true,
+    this.bottom,
   });
 
   /// If true, will only display right section with search, language, & avatar.
@@ -26,6 +26,7 @@ class ApplicationBar extends ConsumerWidget {
   /// Whether the app bar should remain visible at the start of the scroll view.
   final bool pinned;
 
+  /// This widget appears across the bottom of the app bar.
   final PreferredSizeWidget? bottom;
 
   @override

@@ -13,14 +13,14 @@ class BookSquareCover extends StatefulWidget {
   const BookSquareCover({
     Key? key,
     required this.book,
-    required this.bookHeroTag,
     required this.index,
+    required this.bookHeroTag,
     this.authenticated = false,
     this.liked = false,
     this.onLike,
-    this.popupMenuEntries = const [],
     this.onPopupMenuItemSelected,
     this.onShowDatesDialog,
+    this.popupMenuEntries = const [],
   }) : super(key: key);
 
   /// Main widget data. A book containing illustrations.

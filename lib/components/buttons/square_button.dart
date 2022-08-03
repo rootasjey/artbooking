@@ -5,9 +5,9 @@ class SquareButton extends StatelessWidget {
     Key? key,
     required this.child,
     this.active = false,
-    this.message,
-    this.onTap,
     this.opacity = 0.4,
+    this.onTap,
+    this.message,
   }) : super(key: key);
 
   /// If true, this button is active.

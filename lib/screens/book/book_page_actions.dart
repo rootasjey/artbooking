@@ -12,14 +12,14 @@ class BookPageActions extends StatelessWidget {
     required this.multiSelectedItems,
     required this.visibility,
     this.forceMultiSelect = false,
-    this.onToggleMultiSelect,
-    this.onConfirmDeleteBook,
-    this.onShowRenameBookDialog,
-    this.onUploadToThisBook,
-    this.visible = true,
-    this.onUpdateVisibility,
-    this.onShareBook,
     this.isMobileSize = false,
+    this.visible = true,
+    this.onConfirmDeleteBook,
+    this.onShareBook,
+    this.onShowRenameBookDialog,
+    this.onToggleMultiSelect,
+    this.onUpdateVisibility,
+    this.onUploadToThisBook,
   }) : super(key: key);
 
   /// Will activate multi-select if true.
