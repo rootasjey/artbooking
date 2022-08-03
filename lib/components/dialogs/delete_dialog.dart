@@ -9,11 +9,11 @@ class DeleteDialog extends StatelessWidget {
     Key? key,
     required this.descriptionValue,
     required this.titleValue,
-    this.confirmButtonValue,
-    this.count = 1,
-    this.focusNode,
-    this.onValidate,
     this.showCounter = false,
+    this.focusNode,
+    this.count = 1,
+    this.onValidate,
+    this.confirmButtonValue,
   }) : super(key: key);
 
   /// Show how many items are going to be deleted, if true.

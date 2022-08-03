@@ -11,10 +11,10 @@ class DeleteContentBottomSheet extends StatelessWidget {
     Key? key,
     required this.subtitleValue,
     required this.titleValue,
-    this.confirmButtonValue,
-    this.onConfirm,
-    this.count = 1,
     this.showDivider = false,
+    this.count = 1,
+    this.onConfirm,
+    this.confirmButtonValue,
   }) : super(key: key);
 
   /// Show a divider below the header if true,

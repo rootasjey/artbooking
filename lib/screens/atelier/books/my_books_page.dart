@@ -24,6 +24,7 @@ import 'package:artbooking/screens/atelier/books/my_books_page_fab.dart';
 import 'package:artbooking/screens/atelier/books/my_books_page_header.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/book/popup_entry_book.dart';
+import 'package:artbooking/types/cloud_functions/books_response.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/enums/enum_share_content_type.dart';
@@ -497,10 +498,10 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
         final void Function()? onConfirm = () {
           if (_multiSelectedItems.isEmpty) {
-            deleteBook(book, index);
+            tryDeleteBook(book, index);
           } else {
             _multiSelectedItems.putIfAbsent(book.id, () => book);
-            deleteGroup();
+            tryDeleteGroup();
           }
         };
 
@@ -557,7 +558,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     return response.book.id;
   }
 
-  void deleteBook(Book book, int index) async {
+  void tryDeleteBook(Book book, int index) async {
     setState(() => _books.removeAt(index));
 
     final response = await BooksActions.deleteOne(
@@ -575,20 +576,20 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     );
   }
 
-  void deleteGroup() async {
+  void tryDeleteGroup() async {
     _multiSelectedItems.entries.forEach((multiSelectItem) {
       _books.removeWhere((item) => item.id == multiSelectItem.key);
     });
 
-    final copyItems = _multiSelectedItems.values.toList();
-    final booksIds = _multiSelectedItems.keys.toList();
+    final List<Book> copyItems = _multiSelectedItems.values.toList();
+    final List<String?> booksIds = _multiSelectedItems.keys.toList();
 
     setState(() {
       _multiSelectedItems.clear();
       _forceMultiSelect = false;
     });
 
-    final response = await BooksActions.deleteMany(
+    final BooksResponse response = await BooksActions.deleteMany(
       bookIds: booksIds,
     );
 
@@ -1591,7 +1592,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     Utilities.ui.showAdaptiveDialog(
       context,
       isMobileSize: isMobileSize,
-      builder: (context) => ShareDialog(
+      builder: (BuildContext context) => ShareDialog(
         asBottomSheet: isMobileSize,
         extension: "",
         itemId: book.id,
