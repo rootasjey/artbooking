@@ -132,6 +132,8 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
           pageScrollController: _pageScrollController,
         ),
         body: ImprovedScrolling(
+          enableKeyboardScrolling: true,
+          enableMMBScrolling: true,
           onScroll: onPageScroll,
           scrollController: _pageScrollController,
           child: CustomScrollView(
