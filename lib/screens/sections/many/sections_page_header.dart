@@ -13,15 +13,16 @@ class SectionsPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverPadding(
+    return Padding(
       padding: EdgeInsets.only(
         left: isMobileSize ? 12.0 : 54.0,
-        top: isMobileSize ? 24.0 : 60.0,
+        bottom: 8.0,
       ),
-      sliver: PageTitle(
+      child: PageTitle(
         crossAxisAlignment: CrossAxisAlignment.start,
-        titleValue: "sections".tr(),
+        renderSliver: false,
         subtitleValue: "sections_description".tr(),
+        titleValue: "sections".tr(),
       ),
     );
   }

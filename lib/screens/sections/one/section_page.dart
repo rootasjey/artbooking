@@ -5,6 +5,7 @@ import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/sections/one/section_page_body.dart';
+import 'package:artbooking/screens/sections/one/section_page_fab.dart';
 import 'package:artbooking/types/firestore/doc_snapshot_stream_subscription.dart';
 import 'package:artbooking/types/firestore/document_map.dart';
 import 'package:artbooking/types/firestore/document_snapshot_map.dart';
@@ -16,7 +17,6 @@ import 'package:easy_localization/src/public_ext.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:unicons/unicons.dart';
 
 class SectionPage extends ConsumerStatefulWidget {
   const SectionPage({
@@ -73,7 +73,10 @@ class _LicensePageState extends ConsumerState<SectionPage> {
     final bool isMobileSize = Utilities.size.isMobileSize(context);
 
     return Scaffold(
-      floatingActionButton: fab(),
+      floatingActionButton: SectionPageFab(
+        onDeleteSection: onDeleteSection,
+        onEditSection: onEditSection,
+      ),
       body: CustomScrollView(
         slivers: [
           ApplicationBar(),
@@ -85,37 +88,6 @@ class _LicensePageState extends ConsumerState<SectionPage> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget fab() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        FloatingActionButton.extended(
-          onPressed: onEditSection,
-          icon: Icon(UniconsLine.pen, size: 24.0),
-          label: Text("section_edit".tr()),
-          extendedTextStyle: Utilities.fonts.body(
-            fontSize: 18.0,
-            fontWeight: FontWeight.w600,
-          ),
-          backgroundColor: Colors.black,
-          extendedPadding: EdgeInsets.symmetric(
-            horizontal: 20.0,
-            vertical: 20.0,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: FloatingActionButton(
-            heroTag: null,
-            onPressed: onDeleteSection,
-            child: Icon(UniconsLine.trash),
-            backgroundColor: Theme.of(context).secondaryHeaderColor,
-          ),
-        ),
-      ],
     );
   }
 

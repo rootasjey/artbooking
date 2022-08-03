@@ -1,9 +1,9 @@
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/loading_view.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/sections/many/section_card_item.dart';
 import 'package:artbooking/types/enums/enum_section_item_action.dart';
-import 'package:artbooking/types/popup_entry_section.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +13,8 @@ class SectionsPageBody extends StatelessWidget {
   const SectionsPageBody({
     Key? key,
     required this.sections,
-    required this.loading,
     this.isMobileSize = false,
+    this.loading = false,
     this.onDeleteSection,
     this.onEditSection,
     this.onTapSection,
@@ -45,7 +45,7 @@ class SectionsPageBody extends StatelessWidget {
   final Function(Section, int)? onTapSection;
 
   /// Menu item list displayed after tapping on the corresponding popup button.
-  final List<PopupEntrySection> popupMenuEntries;
+  final List<PopupMenuItemIcon<EnumSectionItemAction>> popupMenuEntries;
 
   /// Callback fired when one of the popup menu item entries is selected.
   final void Function(
@@ -126,6 +126,7 @@ class SectionsPageBody extends StatelessWidget {
                 onEdit: onEditSection,
                 popupMenuEntries: popupMenuEntries,
                 onPopupMenuItemSelected: onPopupMenuItemSelected,
+                useBottomSheet: isMobileSize,
               );
             },
             childCount: sections.length,
@@ -161,6 +162,7 @@ class SectionsPageBody extends StatelessWidget {
               onEdit: onEditSection,
               popupMenuEntries: popupMenuEntries,
               onPopupMenuItemSelected: onPopupMenuItemSelected,
+              useBottomSheet: isMobileSize,
             );
           },
           childCount: sections.length,

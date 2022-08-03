@@ -1,7 +1,10 @@
 import 'package:artbooking/components/application_bar/application_bar.dart';
+import 'package:artbooking/components/buttons/double_action_fab.dart';
+import 'package:artbooking/components/custom_scroll_behavior.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
+import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
@@ -12,13 +15,14 @@ import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
 import 'package:artbooking/types/firestore/document_change_map.dart';
 import 'package:artbooking/types/firestore/query_map.dart';
 import 'package:artbooking/types/firestore/query_snapshot_stream_subscription.dart';
-import 'package:artbooking/types/popup_entry_section.dart';
 import 'package:artbooking/types/section.dart';
+import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
@@ -43,14 +47,24 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
   /// True if loading more style from Firestore.
   bool _loadingMore = false;
 
+  /// Show this page floating action button if true.
+  bool _showMainFab = true;
+
+  /// Show FAB to scroll to the top of the page if true.
+  bool _showFabToTop = false;
+
   /// Last fetched document snapshot. Used for pagination.
   DocumentSnapshot<Object>? _lastDocumentSnapshot;
+
+  /// Last saved Y offset.
+  /// Used while scrolling to know the direction.
+  double _previousOffset = 0.0;
 
   /// Staff's available licenses.
   final List<Section> _sections = [];
 
   /// Available items for authenticated user and book is not liked yet.
-  final List<PopupEntrySection> _popupMenuEntries = [
+  final List<PopupMenuItemIcon<EnumSectionItemAction>> _popupMenuEntries = [
     PopupMenuItemIcon(
       value: EnumSectionItemAction.edit,
       icon: PopupMenuIcon(UniconsLine.pen),
@@ -69,6 +83,8 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
   /// Subscribe to Firestore collection.
   QuerySnapshotStreamSubscription? _sectionSubscription;
 
+  final ScrollController _pageScrollController = ScrollController();
+
   @override
   initState() {
     super.initState();
@@ -85,32 +101,54 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
   Widget build(BuildContext context) {
     final bool isMobileSize = Utilities.size.isMobileSize(context);
 
+    final UserFirestore? firestoreUser =
+        ref.watch(AppState.userProvider).firestoreUser;
+
+    final bool canManageSections =
+        firestoreUser?.rights.canManageSections ?? false;
+
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: navigateToAddSection,
-        icon: Icon(UniconsLine.plus),
-        label: Text("section_create_abbreviation".tr()),
-        extendedTextStyle: Utilities.fonts.body(fontWeight: FontWeight.w600),
-        backgroundColor: Theme.of(context).secondaryHeaderColor,
+      floatingActionButton: DoubleActionFAB(
+        labelValue: "section_create_abbreviation".tr(),
+        onMainActionPressed: navigateToAddSection,
+        showFabToTop: _showFabToTop,
+        showMainFab: _showMainFab,
+        pageScrollController: _pageScrollController,
+        isMainActionAvailable: canManageSections,
       ),
-      body: CustomScrollView(
-        slivers: <Widget>[
-          ApplicationBar(),
-          SectionsPageHeader(
-            isMobileSize: isMobileSize,
+      body: ImprovedScrolling(
+        enableKeyboardScrolling: true,
+        enableMMBScrolling: true,
+        onScroll: onPageScroll,
+        scrollController: _pageScrollController,
+        child: ScrollConfiguration(
+          behavior: CustomScrollBehavior(),
+          child: CustomScrollView(
+            controller: _pageScrollController,
+            slivers: <Widget>[
+              ApplicationBar(
+                bottom: PreferredSize(
+                  child: SectionsPageHeader(
+                    isMobileSize: isMobileSize,
+                  ),
+                  preferredSize: Size.fromHeight(120.0),
+                ),
+                pinned: false,
+              ),
+              SectionsPageBody(
+                isMobileSize: isMobileSize,
+                loading: _loading,
+                onTapSection: onTapSection,
+                onDeleteSection: onDeleteSection,
+                onEditSection: onEditSection,
+                onCreateSection: navigateToAddSection,
+                onPopupMenuItemSelected: onPopupMenuItemSelected,
+                popupMenuEntries: _popupMenuEntries,
+                sections: _sections,
+              )
+            ],
           ),
-          SectionsPageBody(
-            isMobileSize: isMobileSize,
-            loading: _loading,
-            onTapSection: onTapSection,
-            onDeleteSection: onDeleteSection,
-            onEditSection: onEditSection,
-            onCreateSection: navigateToAddSection,
-            onPopupMenuItemSelected: onPopupMenuItemSelected,
-            popupMenuEntries: _popupMenuEntries,
-            sections: _sections,
-          )
-        ],
+        ),
       ),
     );
   }
@@ -243,6 +281,41 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
     );
   }
 
+  void maybeFetchMore(double offset) {
+    if (_pageScrollController.position.atEdge &&
+        offset > 50 &&
+        _hasNext &&
+        !_loadingMore) {
+      fetchMoreSections();
+    }
+  }
+
+  void maybeShowFab(double offset) {
+    final bool scrollingDown = offset - _previousOffset > 0;
+    _previousOffset = offset;
+
+    _showFabToTop = offset == 0.0 ? false : true;
+
+    if (scrollingDown) {
+      if (!_showMainFab) {
+        return;
+      }
+
+      setState(() => _showMainFab = false);
+      return;
+    }
+
+    if (offset == 0.0) {
+      setState(() => _showFabToTop = false);
+    }
+
+    if (_showMainFab) {
+      return;
+    }
+
+    setState(() => _showMainFab = true);
+  }
+
   void navigateToAddSection() {
     Beamer.of(context).beamToNamed(
       AtelierLocationContent.addSectionRoute,
@@ -257,7 +330,7 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
     NavigationStateHelper.section = section;
 
     final String route = AtelierLocationContent.editSectionRoute
-        .replaceFirst(':sectionId', section.id);
+        .replaceFirst(":sectionId", section.id);
 
     Beamer.of(context).beamToNamed(route, data: {
       "sectionId": section.id,
@@ -294,6 +367,12 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
         "sectionId": targetSection.id,
       },
     );
+  }
+
+  /// Callback when the page scrolls up and down.
+  void onPageScroll(double offset) {
+    maybeShowFab(offset);
+    maybeFetchMore(offset);
   }
 
   void onPopupMenuItemSelected(

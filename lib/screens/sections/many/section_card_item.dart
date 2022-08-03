@@ -1,10 +1,11 @@
+import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums/enum_section_item_action.dart';
-import 'package:artbooking/types/popup_entry_section.dart';
 import 'package:artbooking/types/section.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:unicons/unicons.dart';
 
 class SectionCardItem extends StatefulWidget {
@@ -13,16 +14,22 @@ class SectionCardItem extends StatefulWidget {
     required this.section,
     required this.index,
     this.isWide = false,
+    this.useBottomSheet = false,
     this.margin = EdgeInsets.zero,
-    this.onTap,
     this.onDelete,
     this.onEdit,
+    this.onTap,
     this.onPopupMenuItemSelected,
     this.popupMenuEntries = const [],
   }) : super(key: key);
 
   /// If true, the card will have a wide layout.
   final bool isWide;
+
+  /// If true, a bottom sheet will be displayed on long press event.
+  /// Setting this property to true will deactivate popup menu and
+  /// hide like button.
+  final bool useBottomSheet;
 
   /// Outer space of this widget.
   final EdgeInsets margin;
@@ -31,19 +38,13 @@ class SectionCardItem extends StatefulWidget {
   final int index;
 
   /// onDelete callback function (after selecting 'delete' item menu)
-  final Function(Section, int)? onDelete;
+  final void Function(Section, int)? onDelete;
 
   /// onEdit callback function (after selecting 'edit' item menu)
-  final Function(Section, int)? onEdit;
+  final void Function(Section, int)? onEdit;
 
   /// Callback fired after tapping this card.
   final void Function(Section, int)? onTap;
-
-  /// Main data representing a section.
-  final Section section;
-
-  /// Menu item list displayed after tapping on the corresponding popup button.
-  final List<PopupEntrySection> popupMenuEntries;
 
   /// Callback fired when one of the popup menu item entries is selected.
   final void Function(
@@ -51,6 +52,12 @@ class SectionCardItem extends StatefulWidget {
     Section section,
     int index,
   )? onPopupMenuItemSelected;
+
+  /// Menu item list displayed after tapping on the corresponding popup button.
+  final List<PopupMenuItemIcon<EnumSectionItemAction>> popupMenuEntries;
+
+  /// Main data representing a section.
+  final Section section;
 
   @override
   State<SectionCardItem> createState() => _SectionCardItemState();
@@ -96,6 +103,8 @@ class _SectionCardItemState extends State<SectionCardItem> {
             ),
           ),
           child: InkWell(
+            onLongPress:
+                widget.useBottomSheet ? () => onLongPress(context) : null,
             onTap: () => widget.onTap?.call(widget.section, widget.index),
             onHover: (isHover) {
               setState(() {
@@ -249,7 +258,7 @@ class _SectionCardItemState extends State<SectionCardItem> {
   }
 
   Widget popupMenuButton() {
-    if (widget.popupMenuEntries.isEmpty) {
+    if (widget.popupMenuEntries.isEmpty || widget.useBottomSheet) {
       return Container();
     }
 
@@ -280,6 +289,60 @@ class _SectionCardItemState extends State<SectionCardItem> {
           itemBuilder: (_) => widget.popupMenuEntries,
         ),
       ),
+    );
+  }
+
+  void onLongPress(BuildContext context) {
+    showCupertinoModalBottomSheet(
+      context: context,
+      expand: false,
+      backgroundColor: Colors.white70,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Material(
+            borderRadius: BorderRadius.circular(8.0),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: widget.popupMenuEntries.map(
+                  (PopupMenuItemIcon<EnumSectionItemAction> popupMenuEntry) {
+                    return ListTile(
+                      title: Opacity(
+                        opacity: 0.8,
+                        child: Text(
+                          popupMenuEntry.textLabel,
+                          style: Utilities.fonts.body(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      trailing: popupMenuEntry.icon,
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        final EnumSectionItemAction? action =
+                            popupMenuEntry.value;
+
+                        if (action == null) {
+                          return;
+                        }
+
+                        widget.onPopupMenuItemSelected?.call(
+                          action,
+                          widget.section,
+                          widget.index,
+                        );
+                      },
+                    );
+                  },
+                ).toList(),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
