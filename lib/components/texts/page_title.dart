@@ -5,14 +5,14 @@ import 'package:unicons/unicons.dart';
 class PageTitle extends StatelessWidget {
   const PageTitle({
     Key? key,
-    required this.subtitleValue,
-    this.titleValue,
+    this.isMobileSize = false,
+    this.renderSliver = true,
     this.showBackButton = false,
-    this.title,
     this.crossAxisAlignment = CrossAxisAlignment.start,
     this.padding = EdgeInsets.zero,
-    this.renderSliver = true,
-    this.isMobileSize = false,
+    this.subtitleValue = "",
+    this.titleValue,
+    this.title,
   }) : super(key: key);
 
   /// True if this widget must adapt its size to small screen.
@@ -21,21 +21,23 @@ class PageTitle extends StatelessWidget {
   /// If true, render this Widget as a sliver box.
   final bool renderSliver;
 
+  /// If true, show a back icon button before title & subtitle.
+  final bool showBackButton;
+
+  /// Alignment of children to the cross axis.
+  final CrossAxisAlignment crossAxisAlignment;
+
+  /// Spacing around this page title widget.
+  final EdgeInsets padding;
+
+  /// String value for subtitle.
+  final String subtitleValue;
+
   /// If specified, [titleValue] will be ignored.
   final Widget? title;
 
   /// String value for title.
   final String? titleValue;
-
-  /// String value for subtitle.
-  final String subtitleValue;
-
-  /// If true, show a back icon button before title & subtitle.
-  final bool showBackButton;
-
-  final CrossAxisAlignment crossAxisAlignment;
-
-  final EdgeInsets padding;
 
   @override
   Widget build(BuildContext context) {
@@ -82,24 +84,25 @@ class PageTitle extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     titleWidget,
-                    ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: isMobileSize ? double.infinity : 500.0,
-                        minWidth: isMobileSize ? 0.0 : 500.0,
-                      ),
-                      child: Opacity(
-                        opacity: 0.4,
-                        child: Text(
-                          subtitleValue,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: Utilities.fonts.body(
-                            fontSize: isMobileSize ? 14.0 : 16.0,
-                            fontWeight: FontWeight.w600,
+                    if (subtitleValue.isNotEmpty)
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: isMobileSize ? double.infinity : 500.0,
+                          minWidth: isMobileSize ? 0.0 : 500.0,
+                        ),
+                        child: Opacity(
+                          opacity: 0.4,
+                          child: Text(
+                            subtitleValue,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: Utilities.fonts.body(
+                              fontSize: isMobileSize ? 14.0 : 16.0,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),
