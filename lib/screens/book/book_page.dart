@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
+import 'package:artbooking/components/bottom_sheet/delete_content_bottom_sheet.dart';
 import 'package:artbooking/components/buttons/visibility_button.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
@@ -21,6 +22,7 @@ import 'package:artbooking/screens/book/book_page_header.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/book/book_illustration.dart';
 import 'package:artbooking/types/book/popup_entry_book.dart';
+import 'package:artbooking/types/cloud_functions/book_response.dart';
 import 'package:artbooking/types/cloud_functions/upload_cover_response.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
@@ -230,7 +232,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
                   onConfirmRemoveGroup: onConfirmRemoveGroup,
                   onCoverPopupMenuItemSelected: onCoverPopupMenuItemSelected,
                   onMultiSelectAll: onMultiSelectAll,
-                  onShareBook: onShareBook,
+                  onShareBook: showShareDialog,
                   onToggleMultiSelect: onToggleMultiSelect,
                   onShowDatesDialog: onShowDatesDialog,
                   onShowRenameBookDialog: onShowRenameBookDialog,
@@ -328,7 +330,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
 
   /// Delete the currevent viewing book
   /// and navigate back to the preview location or MyBooksPage.
-  void deleteBook() async {
+  void tryDeleteBook() async {
     if (_book.id.isEmpty) {
       return;
     }
@@ -756,47 +758,37 @@ class _MyBookPageState extends ConsumerState<BookPage> {
 
   /// Show a dialog to confirm a single book deletion.
   void onConfirmDeleteBook() async {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return ThemedDialog(
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    Utilities.ui.showAdaptiveDialog(
+      context,
+      isMobileSize: isMobileSize,
+      builder: (BuildContext context) {
+        final int count = 1;
+
+        final String confirmButtonValue = "book_delete_count".plural(
+          count,
+          args: [count.toString()],
+        );
+
+        if (isMobileSize) {
+          return DeleteContentBottomSheet(
+            confirmButtonValue: confirmButtonValue,
+            count: count,
+            onConfirm: tryDeleteBook,
+            subtitleValue: "book_delete_description".plural(count),
+            titleValue: "book_delete".plural(count).toUpperCase(),
+          );
+        }
+
+        return DeleteDialog(
+          confirmButtonValue: confirmButtonValue,
+          count: count,
+          descriptionValue: "book_delete_description".plural(count),
           focusNode: _keyboardFocusNode,
-          title: Column(
-            children: [
-              Opacity(
-                opacity: 0.8,
-                child: Text(
-                  "book_delete".plural(1).toUpperCase(),
-                  style: Utilities.fonts.body(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Container(
-                width: 300.0,
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Opacity(
-                  opacity: 0.4,
-                  child: Text(
-                    "book_delete_description".plural(1),
-                    textAlign: TextAlign.center,
-                    style: Utilities.fonts.body(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          body: SingleChildScrollView(),
-          textButtonValidation: "delete".tr(),
-          onCancel: Beamer.of(context).popRoute,
-          onValidate: () {
-            deleteBook();
-            Beamer.of(context).popRoute();
-          },
+          onValidate: tryDeleteBook,
+          showCounter: _multiSelectedItems.isNotEmpty,
+          titleValue: "book_delete".plural(count).toUpperCase(),
         );
       },
     );
@@ -1124,9 +1116,13 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     _nameController.text = _book.name;
     _descriptionController.text = _book.description;
 
-    showDialog(
-      context: context,
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    Utilities.ui.showAdaptiveDialog(
+      context,
+      isMobileSize: isMobileSize,
       builder: (context) => InputDialog(
+        asBottomSheet: isMobileSize,
         descriptionController: _descriptionController,
         nameController: _nameController,
         submitButtonValue: "rename".tr(),
@@ -1134,7 +1130,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
         subtitleValue: "book_rename_description".tr(),
         onCancel: Beamer.of(context).popRoute,
         onSubmitted: (value) {
-          renameBook(
+          tryRenameBook(
             _nameController.text,
             _descriptionController.text,
           );
@@ -1274,9 +1270,9 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   }
 
   /// Rename one book.
-  void renameBook(String name, String description) async {
-    final prevName = _book.name;
-    final prevDescription = _book.description;
+  void tryRenameBook(String name, String description) async {
+    final String prevName = _book.name;
+    final String prevDescription = _book.description;
 
     setState(() {
       _book = _book.copyWith(
@@ -1286,7 +1282,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     });
 
     try {
-      final response = await BooksActions.renameOne(
+      final BookResponse response = await BooksActions.renameOne(
         name: name,
         description: description,
         bookId: _book.id,
@@ -1495,10 +1491,14 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     }
   }
 
-  void onShareBook() {
-    showDialog(
-      context: context,
-      builder: (context) => ShareDialog(
+  void showShareDialog() {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    Utilities.ui.showAdaptiveDialog(
+      context,
+      isMobileSize: isMobileSize,
+      builder: (BuildContext context) => ShareDialog(
+        asBottomSheet: isMobileSize,
         extension: "",
         itemId: _book.id,
         imageProvider: NetworkImage(_book.getCoverLink()),
