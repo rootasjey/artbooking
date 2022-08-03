@@ -1,4 +1,5 @@
 import 'package:artbooking/components/buttons/square_button.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/illustration_map.dart';
@@ -90,7 +91,7 @@ class BookPageActions extends StatelessWidget {
           onTap: onToggleMultiSelect,
           child: Icon(
             UniconsLine.layers,
-            color: forceMultiSelect ? Colors.lightGreen : null,
+            color: forceMultiSelect ? Constants.colors.secondary : null,
           ),
           message: "multi_select".tr(),
         ),
