@@ -1,4 +1,5 @@
 import 'package:artbooking/components/application_bar/application_bar.dart';
+import 'package:artbooking/components/bottom_sheet/delete_content_bottom_sheet.dart';
 import 'package:artbooking/components/buttons/double_action_fab.dart';
 import 'package:artbooking/components/custom_scroll_behavior.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
@@ -356,7 +357,7 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
   }
 
   void onDeleteSection(targetLicense, targetIndex) {
-    showDeleteConfirmDialog(targetLicense, targetIndex);
+    showConfirmDeleteSection(targetLicense, targetIndex);
   }
 
   void onEditSection(Section targetSection, int targetIndex) {
@@ -385,7 +386,7 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
         navigateToEditSectionPage(section);
         break;
       case EnumSectionItemAction.delete:
-        showDeleteConfirmDialog(section, index);
+        showConfirmDeleteSection(section, index);
         break;
       default:
         break;
@@ -443,10 +444,27 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
     }
   }
 
-  void showDeleteConfirmDialog(Section section, int index) {
-    showDialog(
-      context: context,
-      builder: (context) {
+  void showConfirmDeleteSection(Section section, int index) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    Utilities.ui.showAdaptiveDialog(
+      context,
+      isMobileSize: isMobileSize,
+      builder: (BuildContext context) {
+        if (isMobileSize) {
+          return DeleteContentBottomSheet(
+            confirmButtonValue: "delete".tr(),
+            onConfirm: () {
+              tryDeleteSection(section, index);
+              Beamer.of(context).popRoute();
+            },
+            showDivider: false,
+            subtitleValue:
+                "${'section_delete_description'.tr()} \"${section.name}\"?",
+            titleValue: "section_delete".tr().toUpperCase(),
+          );
+        }
+
         return ThemedDialog(
           spaceActive: false,
           centerTitle: false,
@@ -485,7 +503,7 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
                           color: Theme.of(context).secondaryHeaderColor,
                         ),
                       ),
-                      TextSpan(text: " ?"),
+                      TextSpan(text: "?"),
                     ],
                   ),
                 ),
