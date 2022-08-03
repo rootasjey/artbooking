@@ -16,13 +16,25 @@ class IllustrationsPageBody extends StatelessWidget {
     this.onTapIllustrationCard,
     this.onPopupMenuItemSelected,
     this.onDoubleTap,
+    this.isMobileSize = false,
   }) : super(key: key);
 
+  /// If true, this widget adapts its layout to small screens.
+  final bool isMobileSize;
+
+  /// The page is fetching illustrations if true.
   final bool loading;
+
+  /// List of illustrations.
   final List<Illustration> illustrations;
 
+  /// Callback fired when an illustration card is tapped.
   final void Function(Illustration)? onTapIllustrationCard;
+
+  /// Callback fired when an illustration card is double tapped.
   final void Function(Illustration, int)? onDoubleTap;
+
+  /// Callback fired when a popup item is selected.
   final void Function(
     EnumIllustrationItemAction,
     int,
@@ -30,7 +42,12 @@ class IllustrationsPageBody extends StatelessWidget {
     String,
   )? onPopupMenuItemSelected;
 
+  /// List of popup items if the illustration is NOT in
+  /// the current authenticated user's favorites.
   final List<PopupMenuEntry<EnumIllustrationItemAction>> likePopupMenuEntries;
+
+  /// List of popup items if the illustration is in
+  /// the current authenticated user's favorites.
   final List<PopupMenuEntry<EnumIllustrationItemAction>> unlikePopupMenuEntries;
 
   @override
@@ -53,32 +70,36 @@ class IllustrationsPageBody extends StatelessWidget {
     }
 
     return SliverPadding(
-      padding: const EdgeInsets.only(
+      padding: EdgeInsets.only(
         top: 40.0,
-        left: 40.0,
-        right: 40.0,
+        left: isMobileSize ? 12.0 : 40.0,
+        right: isMobileSize ? 12.0 : 40.0,
         bottom: 100.0,
       ),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 300.0,
-          mainAxisSpacing: 20.0,
-          crossAxisSpacing: 20.0,
+          maxCrossAxisExtent: isMobileSize ? 150.0 : 300.0,
+          mainAxisSpacing: isMobileSize ? 4.0 : 20.0,
+          crossAxisSpacing: isMobileSize ? 4.0 : 20.0,
         ),
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final illustration = illustrations.elementAt(index);
+          (BuildContext context, int index) {
+            final Illustration illustration = illustrations.elementAt(index);
 
-            final _onDoubleTap = onDoubleTap != null
+            final void Function()? _onDoubleTap = onDoubleTap != null
                 ? () => onDoubleTap?.call(illustration, index)
                 : null;
 
-            final popupMenuEntries = illustration.liked
-                ? unlikePopupMenuEntries
-                : likePopupMenuEntries;
+            final List<PopupMenuEntry<EnumIllustrationItemAction>>
+                popupMenuEntries = illustration.liked
+                    ? unlikePopupMenuEntries
+                    : likePopupMenuEntries;
 
             return IllustrationCard(
-              borderRadius: BorderRadius.circular(16.0),
+              borderRadius: isMobileSize
+                  ? BorderRadius.zero
+                  : BorderRadius.circular(16.0),
+              elevation: 3.0,
               index: index,
               heroTag: illustration.id,
               illustration: illustration,
@@ -87,6 +108,9 @@ class IllustrationsPageBody extends StatelessWidget {
               onTapLike: _onDoubleTap,
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               popupMenuEntries: popupMenuEntries,
+              size: isMobileSize ? 150.0 : 300.0,
+              useBottomSheet: isMobileSize,
+              margin: EdgeInsets.zero,
             );
           },
           childCount: illustrations.length,

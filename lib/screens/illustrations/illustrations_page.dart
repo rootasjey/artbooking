@@ -25,6 +25,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
@@ -47,10 +48,14 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
   bool _loadingMore = false;
 
   /// Show the page floating action button if true.
-  bool _showFab = false;
+  bool _showFabToTop = false;
 
   /// Last fetched illustration document.
   DocumentSnapshot? _lastDocument;
+
+  /// Last saved Y offset.
+  /// Used while scrolling to know the direction.
+  double _previousOffset = 0.0;
 
   /// Maximum books fetched in a page.
   final int _limit = 30;
@@ -93,7 +98,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
   QuerySnapshotStreamSubscription? _likeSubscription;
 
   /// Page scroll controller.
-  final _scrollController = ScrollController();
+  final _pageScrollController = ScrollController();
 
   @override
   void initState() {
@@ -106,7 +111,7 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
   void dispose() {
     _illustrationSubscription?.cancel();
     _likeSubscription?.cancel();
-    _scrollController.dispose();
+    _pageScrollController.dispose();
     super.dispose();
   }
 
@@ -117,31 +122,40 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
     final List<PopupEntryIllustration> likePopupMenuEntries =
         authenticated ? _likePopupMenuEntries : [];
 
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return HeroControllerScope(
       controller: HeroController(),
       child: Scaffold(
         floatingActionButton: IllustrationsPageFab(
-          show: _showFab,
-          scrollController: _scrollController,
+          show: _showFabToTop,
+          pageScrollController: _pageScrollController,
         ),
-        body: NotificationListener<ScrollNotification>(
-          onNotification: onNotification,
+        body: ImprovedScrolling(
+          onScroll: onPageScroll,
+          scrollController: _pageScrollController,
           child: CustomScrollView(
-            controller: _scrollController,
+            controller: _pageScrollController,
             slivers: <Widget>[
-              ApplicationBar(),
-              PageTitle(
-                showBackButton: true,
-                titleValue: "illustrations".tr(),
-                subtitleValue: "illustrations_browse".tr(),
-                crossAxisAlignment: CrossAxisAlignment.start,
-                padding: const EdgeInsets.only(
-                  left: 36.0,
-                  top: 40.0,
-                  bottom: 24.0,
-                ),
+              ApplicationBar(
+                bottom: PreferredSize(
+                    child: PageTitle(
+                      showBackButton: false,
+                      titleValue: "illustrations".tr(),
+                      subtitleValue: "illustrations_browse".tr(),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      padding: const EdgeInsets.only(
+                        left: 12.0,
+                        top: 0.0,
+                        bottom: 8.0,
+                      ),
+                      renderSliver: false,
+                    ),
+                    preferredSize: Size.fromHeight(120.0)),
+                pinned: false,
               ),
               IllustrationsPageBody(
+                isMobileSize: isMobileSize,
                 loading: _loading,
                 illustrations: _illustrations,
                 onDoubleTap: authenticated ? onDoubleTapIllustrationItem : null,
@@ -359,6 +373,40 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
     );
   }
 
+  void maybeFetchMore(double offset) {
+    if (_pageScrollController.position.atEdge &&
+        offset > 50 &&
+        _hasNext &&
+        !_loadingMore) {
+      fetchMoreIllustrations();
+    }
+  }
+
+  void maybeShowFab(double offset) {
+    final bool scrollingDown = offset - _previousOffset > 0;
+    _previousOffset = offset;
+
+    if (scrollingDown) {
+      if (!_showFabToTop) {
+        return;
+      }
+
+      setState(() => _showFabToTop = false);
+      return;
+    }
+
+    if (offset == 0.0) {
+      setState(() => _showFabToTop = false);
+      return;
+    }
+
+    if (_showFabToTop) {
+      return;
+    }
+
+    setState(() => _showFabToTop = true);
+  }
+
   /// Fire when a new document has been created in Firestore.
   /// Add the corresponding document in the UI.
   void onAddStreamingIllustration(DocumentChangeMap documentChange) {
@@ -409,27 +457,10 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
     return tryLike(illustration, index);
   }
 
-  bool onNotification(ScrollNotification notification) {
-    // FAB visibility
-    if (notification.metrics.pixels < 50 && _showFab) {
-      setState(() {
-        _showFab = false;
-      });
-    } else if (notification.metrics.pixels > 50 && !_showFab) {
-      setState(() {
-        _showFab = true;
-      });
-    }
-
-    if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
-      return false;
-    }
-
-    if (_hasNext && !_loadingMore) {
-      fetchMoreIllustrations();
-    }
-
-    return false;
+  /// Callback when the page scrolls up and down.
+  void onPageScroll(double offset) {
+    maybeShowFab(offset);
+    maybeFetchMore(offset);
   }
 
   void onPopupMenuItemSelected(
