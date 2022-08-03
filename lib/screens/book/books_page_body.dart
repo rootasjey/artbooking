@@ -12,14 +12,18 @@ class BooksPageBody extends StatelessWidget {
     Key? key,
     required this.books,
     required this.loading,
-    this.likePopupMenuEntries = const [],
+    this.isMobileSize = false,
     this.onDoubleTap,
     this.onLongPressBook,
     this.onLike,
     this.onPopupMenuItemSelected,
     this.onTap,
+    this.likePopupMenuEntries = const [],
     this.unlikePopupMenuEntries = const [],
   }) : super(key: key);
+
+  /// If true, this widget adapts its layout to small screens.
+  final bool isMobileSize;
 
   /// Currently fetching books if true.
   final bool loading;
@@ -64,28 +68,29 @@ class BooksPageBody extends StatelessWidget {
     }
 
     return SliverPadding(
-      padding: const EdgeInsets.all(40.0),
+      padding: EdgeInsets.all(isMobileSize ? 12.0 : 40.0),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          mainAxisExtent: 380.0,
-          maxCrossAxisExtent: 380.0,
+          mainAxisExtent: isMobileSize ? 171.0 : 380.0,
+          maxCrossAxisExtent: isMobileSize ? 230.0 : 380.0,
           mainAxisSpacing: 0.0,
           crossAxisSpacing: 0.0,
         ),
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final book = books.elementAt(index);
+          (BuildContext context, int index) {
+            final Book book = books.elementAt(index);
 
-            final onDoubleTapOrNull = onDoubleTap != null
+            final void Function()? onDoubleTapOrNull = onDoubleTap != null
                 ? () => onDoubleTap?.call(book, index)
                 : null;
 
-            final popupMenuEntries =
+            final List<PopupMenuEntry<EnumBookItemAction>> popupMenuEntries =
                 book.liked ? unlikePopupMenuEntries : likePopupMenuEntries;
 
             return BookCard(
               book: book,
               index: index,
+              height: isMobileSize ? 171.0 : 342.0,
               heroTag: book.id,
               onTap: () => onTap?.call(book),
               onDoubleTap: onDoubleTapOrNull,
@@ -93,6 +98,8 @@ class BooksPageBody extends StatelessWidget {
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               popupMenuEntries: popupMenuEntries,
               onLongPress: onLongPressBook,
+              useBottomSheet: isMobileSize,
+              width: isMobileSize ? 230.0 : 400.0,
             );
           },
           childCount: books.length,

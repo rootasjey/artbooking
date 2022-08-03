@@ -24,6 +24,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
@@ -48,10 +49,14 @@ class _BooksPageState extends ConsumerState<BooksPage> {
   bool _loadingMore = true;
 
   /// Show the page floating action button if true.
-  bool _showFab = false;
+  bool _showFabToTop = false;
 
   /// Last fetched book document.
   DocumentSnapshot? _lastDocument;
+
+  /// Last saved Y offset.
+  /// Used while scrolling to know the direction.
+  double _previousOffset = 0.0;
 
   /// Maximum books fetched in a page.
   final int _limit = 50;
@@ -94,7 +99,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
   ];
 
   /// Page scroll controller.
-  final _scrollController = ScrollController();
+  final _pageScrollController = ScrollController();
 
   @override
   void initState() {
@@ -107,7 +112,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
   void dispose() {
     _bookSubscription?.cancel();
     _likeSubscription?.cancel();
-    _scrollController.dispose();
+    _pageScrollController.dispose();
     super.dispose();
   }
 
@@ -119,29 +124,40 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     final likeEntries = isAuth ? _likePopupMenuEntries : <PopupEntryBook>[];
     final unlikeEntries = isAuth ? _unlikePopupMenuEntries : <PopupEntryBook>[];
 
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Scaffold(
       floatingActionButton: BooksPageFab(
-        show: _showFab,
+        show: _showFabToTop,
         onPressed: onPressedFab,
       ),
-      body: NotificationListener<ScrollNotification>(
-        onNotification: onNotification,
+      body: ImprovedScrolling(
+        enableKeyboardScrolling: true,
+        enableMMBScrolling: true,
+        onScroll: onPageScroll,
+        scrollController: _pageScrollController,
         child: CustomScrollView(
-          controller: _scrollController,
+          controller: _pageScrollController,
           slivers: <Widget>[
-            ApplicationBar(),
-            PageTitle(
-              showBackButton: true,
-              titleValue: "books".tr(),
-              subtitleValue: "books_browse".tr(),
-              crossAxisAlignment: CrossAxisAlignment.start,
-              padding: const EdgeInsets.only(
-                left: 36.0,
-                top: 40.0,
-                bottom: 24.0,
+            ApplicationBar(
+              bottom: PreferredSize(
+                child: PageTitle(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  padding: EdgeInsets.only(
+                    left: isMobileSize ? 12.0 : 36.0,
+                    bottom: 8.0,
+                  ),
+                  showBackButton: false,
+                  subtitleValue: "books_browse".tr(),
+                  titleValue: "books".tr(),
+                  renderSliver: false,
+                ),
+                preferredSize: Size.fromHeight(100.0),
               ),
+              pinned: false,
             ),
             BooksPageBody(
+              isMobileSize: isMobileSize,
               loading: _loading,
               books: _books,
               onTap: onTapBook,
@@ -362,6 +378,40 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     );
   }
 
+  void maybeFetchMore(double offset) {
+    if (_pageScrollController.position.atEdge &&
+        offset > 50 &&
+        _hasNext &&
+        !_loadingMore) {
+      fetchMoreBooks();
+    }
+  }
+
+  void maybeShowFab(double offset) {
+    final bool scrollingDown = offset - _previousOffset > 0;
+    _previousOffset = offset;
+
+    if (scrollingDown) {
+      if (!_showFabToTop) {
+        return;
+      }
+
+      setState(() => _showFabToTop = false);
+      return;
+    }
+
+    if (offset == 0.0) {
+      setState(() => _showFabToTop = false);
+      return;
+    }
+
+    if (_showFabToTop) {
+      return;
+    }
+
+    setState(() => _showFabToTop = true);
+  }
+
   void onTapBook(Book book) {
     NavigationStateHelper.book = book;
     Beamer.of(context).beamToNamed(
@@ -414,7 +464,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
   }
 
   void onPressedFab() {
-    _scrollController.animateTo(
+    _pageScrollController.animateTo(
       0.0,
       duration: Duration(seconds: 1),
       curve: Curves.easeOut,
@@ -429,27 +479,10 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     return tryLike(book, index);
   }
 
-  /// On scroll page notifications.
-  bool onNotification(ScrollNotification notification) {
-    if (notification.metrics.pixels < 50 && _showFab) {
-      setState(() {
-        _showFab = false;
-      });
-    } else if (notification.metrics.pixels > 50 && !_showFab) {
-      setState(() {
-        _showFab = true;
-      });
-    }
-
-    if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
-      return false;
-    }
-
-    if (_hasNext && !_loadingMore) {
-      fetchMoreBooks();
-    }
-
-    return false;
+  /// Callback when the page scrolls up and down.
+  void onPageScroll(double offset) {
+    maybeShowFab(offset);
+    maybeFetchMore(offset);
   }
 
   void onPopupMenuItemSelected(
