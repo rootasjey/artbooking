@@ -10,7 +10,7 @@ import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/screens/licenses/edit/edit_license_page.dart';
-import 'package:artbooking/screens/licenses/many/licenses_page_fab.dart';
+import 'package:artbooking/components/buttons/double_action_fab.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page_header.dart';
 import 'package:artbooking/screens/licenses/many/licenses_page_body.dart';
 import 'package:artbooking/types/cloud_functions/license_response.dart';
@@ -131,14 +131,14 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
         _selectedTab == EnumLicenseType.staff ? canManageStaffLicense : true;
 
     return Scaffold(
-      floatingActionButton: LicensesPageFab(
-        isOwner: canManageLicense,
-        showFabCreate: _showFabCreate,
-        showFabToTop: _showFabToTop,
-        onPressed: openNewLicenseDialog,
-        isMobileSize: isMobileSize,
-        label: Text("license_create".tr()),
+      floatingActionButton: DoubleActionFAB(
+        icon: Icon(UniconsLine.plus),
+        isMainActionAvailable: canManageLicense,
+        labelValue: "license_create".tr(),
+        onMainActionPressed: openNewLicenseDialog,
         pageScrollController: _pageScrollController,
+        showMainFab: _showFabCreate,
+        showFabToTop: _showFabToTop,
       ),
       body: ImprovedScrolling(
         scrollController: _pageScrollController,
