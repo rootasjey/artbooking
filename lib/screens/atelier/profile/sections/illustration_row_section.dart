@@ -201,7 +201,7 @@ class _IllustrationRowSectionState extends State<IllustrationRowSection> {
           index: index,
           size: width,
           onTap: () => navigateToIllustrationPage(illustration, heroTag),
-          padding: EdgeInsets.only(right: isMobileSize ? 6.0 : 24.0),
+          margin: EdgeInsets.only(right: isMobileSize ? 6.0 : 24.0),
           popupMenuEntries: popupMenuEntries,
           onPopupMenuItemSelected: onIllustrationItemSelected,
         );

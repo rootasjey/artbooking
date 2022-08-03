@@ -22,37 +22,37 @@ class IllustrationCard extends StatefulWidget {
   /// Create a new illustration card.
   const IllustrationCard({
     Key? key,
-    required this.heroTag,
     required this.illustration,
     required this.index,
-    this.backIcon = UniconsLine.tear,
-    this.illustrationKey = '',
-    this.selected = false,
-    this.selectionMode = false,
-    this.onLongPress,
-    this.size = 300.0,
-    this.onPopupMenuItemSelected,
-    this.onTap,
-    this.popupMenuEntries = const [],
-    this.onDoubleTap,
-    this.onTapLike,
-    this.onDrop,
-    this.onGrowUp,
-    this.onDragUpdate,
-    this.onResizeEnd,
+    required this.heroTag,
     this.canDrag = false,
     this.canResize = false,
+    this.selected = false,
+    this.selectionMode = false,
     this.useAsPlaceholder = false,
+    this.useBottomSheet = false,
     this.useIconPlaceholder = false,
-    this.dragGroupName = "",
-    this.padding = EdgeInsets.zero,
+    this.borderRadius = BorderRadius.zero,
+    this.elevation = 3.0,
+    this.size = 300.0,
+    this.margin = EdgeInsets.zero,
+    this.backIcon = UniconsLine.tear,
+    this.onDoubleTap,
     this.onDragCompleted,
     this.onDragEnd,
     this.onDragStarted,
     this.onDraggableCanceled,
-    this.borderRadius = BorderRadius.zero,
-    this.elevation = 3.0,
-    this.useBottomSheet = false,
+    this.onDragUpdate,
+    this.onDrop,
+    this.onGrowUp,
+    this.onLongPress,
+    this.onPopupMenuItemSelected,
+    this.onResizeEnd,
+    this.onTap,
+    this.onTapLike,
+    this.popupMenuEntries = const [],
+    this.dragGroupName = "",
+    this.illustrationKey = "",
   }) : super(key: key);
 
   /// If true, the card can be dragged. Usually used to re-order items.
@@ -87,8 +87,8 @@ class IllustrationCard extends StatefulWidget {
   /// Card's size (width = height).
   final double size;
 
-  /// Card's padding.
-  final EdgeInsets padding;
+  /// Spacing round this card.
+  final EdgeInsets margin;
 
   /// Callback fired on double tap.
   final void Function()? onDoubleTap;
@@ -224,7 +224,7 @@ class _IllustrationCardState extends State<IllustrationCard>
     }
 
     return Padding(
-      padding: widget.padding,
+      padding: widget.margin,
       child: Hero(
         tag: widget.heroTag,
         child: SizedBox(
@@ -278,6 +278,7 @@ class _IllustrationCardState extends State<IllustrationCard>
     }
 
     Widget cardChild = Card(
+      margin: EdgeInsets.zero,
       color: Theme.of(context).backgroundColor,
       elevation: _elevation,
       shape: RoundedRectangleBorder(

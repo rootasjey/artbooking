@@ -194,7 +194,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
             index: widget.index,
             selectType: EnumSelectType.add,
           ),
-          padding: EdgeInsets.only(right: 4.0),
+          margin: EdgeInsets.only(right: 4.0),
         ),
         widthFactor: isMobileSize ? 1.0 : 0.6,
       );
@@ -230,7 +230,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
         onDrop: onDrop,
         dragGroupName: "${widget.section.id}-${widget.index}",
         onTap: () => navigateToIllustrationPage(firstIllustration, heroTag),
-        padding: EdgeInsets.only(right: 4.0),
+        margin: EdgeInsets.only(right: 4.0),
         popupMenuEntries: popupMenuEntries,
         onPopupMenuItemSelected: onIllustrationItemSelected,
       ),
