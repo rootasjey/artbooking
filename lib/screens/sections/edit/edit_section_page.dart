@@ -57,6 +57,7 @@ class _EditSectionPageState extends State<EditSectionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
     final bool isSectionIdEmpty = _section.id.isEmpty;
     final String sectionName = _section.name;
 
@@ -77,12 +78,13 @@ class _EditSectionPageState extends State<EditSectionPage> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Colors.grey.shade900,
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(60.0),
+          padding: EdgeInsets.all(isMobileSize ? 12.0 : 60.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               EditItemSheetHeader(
                 heroTitleTag: _section.id,
@@ -104,6 +106,7 @@ class _EditSectionPageState extends State<EditSectionPage> {
                 onShowHeaderSeparatorDialog: onShowHeaderSeparatorDialog,
                 onVisibilityChanged: onVisibilityChanged,
               ),
+              Padding(padding: const EdgeInsets.only(bottom: 200.0)),
             ],
           ),
         ),
