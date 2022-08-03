@@ -14,26 +14,26 @@ class BookPageHeader extends StatelessWidget {
     Key? key,
     required this.book,
     required this.multiSelectedItems,
+    this.authenticated = false,
+    this.forceMultiSelect = false,
+    this.isMobileSize = false,
+    this.isOwner = false,
     this.liked = false,
     this.onAddToBook,
-    this.onShowDatesDialog,
-    this.onLike,
-    this.forceMultiSelect = false,
     this.onClearMultiSelect,
     this.onConfirmRemoveGroup,
     this.onConfirmDeleteBook,
+    this.onCoverPopupMenuItemSelected,
+    this.onLike,
     this.onMultiSelectAll,
     this.onShareBook,
-    this.onToggleMultiSelect,
+    this.onShowDatesDialog,
     this.onShowRenameBookDialog,
-    this.onUploadToThisBook,
-    this.isOwner = false,
+    this.onToggleMultiSelect,
     this.onUpdateVisibility,
-    this.authenticated = false,
-    this.heroTag = "",
+    this.onUploadToThisBook,
     this.coverPopupMenuEntries = const [],
-    this.onCoverPopupMenuItemSelected,
-    this.isMobileSize = false,
+    this.heroTag = "",
   }) : super(key: key);
 
   /// Main page data.
@@ -53,9 +53,6 @@ class BookPageHeader extends StatelessWidget {
 
   /// If true, illustrations in this book can be selected in group.
   final bool forceMultiSelect;
-
-  /// Currently selected illustrations.
-  final IllustrationMap multiSelectedItems;
 
   /// Callback fired when an illustration is added to a book.
   final void Function()? onAddToBook;
@@ -97,8 +94,14 @@ class BookPageHeader extends StatelessWidget {
   /// Callback fired when the book's visibility is updated.
   final void Function(EnumContentVisibility)? onUpdateVisibility;
 
+  /// Callback showing a popup/bottom sheet to share the target book
+  /// on social network, by link or any other means.
   final void Function()? onShareBook;
 
+  /// Currently selected illustrations.
+  final IllustrationMap multiSelectedItems;
+
+  /// List of popup items for book's cover.
   final List<PopupEntryBook> coverPopupMenuEntries;
 
   /// Custom hero tag (if `book.id` default tag is not unique).
@@ -115,10 +118,12 @@ class BookPageHeader extends StatelessWidget {
             bookHeroTag: bookHeroTag,
             index: 0,
             liked: liked,
+            onDoubleTap: onLike,
             onLike: onLike,
             onPopupMenuItemSelected: onCoverPopupMenuItemSelected,
             onShowDatesDialog: onShowDatesDialog,
             popupMenuEntries: coverPopupMenuEntries,
+            useBottomSheet: isMobileSize,
           )
         : BookSquareCover(
             authenticated: authenticated,
