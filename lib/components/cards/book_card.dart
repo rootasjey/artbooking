@@ -24,14 +24,14 @@ class BookCard extends StatefulWidget {
   const BookCard({
     Key? key,
     required this.book,
-    required this.heroTag,
     required this.index,
-    this.backIcon = UniconsLine.tear,
+    required this.heroTag,
     this.canDropFile = false,
     this.canDrag = false,
     this.selected = false,
     this.selectionMode = false,
     this.useAsPlaceholder = false,
+    this.useBottomSheet = false,
     this.width = 400.0,
     this.height = 342.0,
     this.onDoubleTap,
@@ -49,9 +49,9 @@ class BookCard extends StatefulWidget {
     this.onPopupMenuItemSelected,
     this.onTap,
     this.onTapCaption,
+    this.backIcon = UniconsLine.tear,
     this.popupMenuEntries = const [],
     this.dragGroupName = "",
-    this.useBottomSheet = false,
   }) : super(key: key);
 
   /// Book's data for this card.

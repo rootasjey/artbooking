@@ -20,12 +20,12 @@ class RowFeaturesSection extends StatelessWidget {
     Key? key,
     required this.index,
     required this.section,
-    this.onPopupMenuItemSelected,
-    this.popupMenuEntries = const [],
-    this.isLast = false,
-    this.usingAsDropTarget = false,
     this.editMode = false,
     this.isHover = false,
+    this.isLast = false,
+    this.usingAsDropTarget = false,
+    this.onPopupMenuItemSelected,
+    this.popupMenuEntries = const [],
   }) : super(key: key);
 
   /// If true, the current authenticated user is the owner and
@@ -41,6 +41,9 @@ class RowFeaturesSection extends StatelessWidget {
   /// True is this section is being hovered with a draggable item.
   final bool usingAsDropTarget;
 
+  /// Callback fired when an entry is selected from the popup menu.
+  final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
+
   /// Section's position in the layout (e.g. 0 is the first).
   final int index;
 
@@ -50,9 +53,6 @@ class RowFeaturesSection extends StatelessWidget {
   /// Main data.
   /// A section in a page. Its design is unique from other sections.
   final Section section;
-
-  /// Callback fired when an entry is selected from the popup menu.
-  final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
 
   @override
   Widget build(BuildContext context) {
