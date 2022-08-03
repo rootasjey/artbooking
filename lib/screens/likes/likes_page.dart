@@ -1,11 +1,12 @@
 import 'package:artbooking/components/application_bar/application_bar.dart';
+import 'package:artbooking/components/custom_scroll_behavior.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/likes/likes_page_body.dart';
-import 'package:artbooking/screens/likes/likes_page_fab.dart';
+import 'package:artbooking/components/buttons/fab_to_top.dart';
 import 'package:artbooking/screens/likes/likes_page_header.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/book/popup_entry_book.dart';
@@ -26,6 +27,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
@@ -50,10 +52,12 @@ class _LikesPageState extends ConsumerState<LikesPage> {
   bool _loading = false;
 
   /// Show the page floating action button if true.
-  bool _showFab = false;
+  bool _showFabToTop = false;
 
   /// Last fetched document snapshot. Used for pagination.
   DocumentSnapshot<Object>? _lastDocument;
+
+  double _previousOffset = 0.0;
 
   /// Selected tab to show license (staff or user).
   var _selectedTab = EnumLikeType.illustration;
@@ -109,41 +113,51 @@ class _LikesPageState extends ConsumerState<LikesPage> {
     final bool isMobileSize = Utilities.size.isMobileSize(context);
 
     return Scaffold(
-      floatingActionButton: LikesPageFab(
-        show: _showFab,
-        scrollController: _pageScrollController,
+      floatingActionButton: FabToTop(
+        show: _showFabToTop,
+        pageScrollController: _pageScrollController,
       ),
-      body: CustomScrollView(
-        controller: _pageScrollController,
-        slivers: <Widget>[
-          ApplicationBar(
-            bottom: PreferredSize(
-              child: LikesPageHeader(
-                isMobileSize: isMobileSize,
-                selectedTab: _selectedTab,
-                onChangedTab: onChangedTab,
+      body: ImprovedScrolling(
+        scrollController: _pageScrollController,
+        enableKeyboardScrolling: true,
+        enableMMBScrolling: true,
+        onScroll: onPageScroll,
+        child: ScrollConfiguration(
+          behavior: CustomScrollBehavior(),
+          child: CustomScrollView(
+            controller: _pageScrollController,
+            slivers: <Widget>[
+              ApplicationBar(
+                bottom: PreferredSize(
+                  child: LikesPageHeader(
+                    isMobileSize: isMobileSize,
+                    selectedTab: _selectedTab,
+                    onChangedTab: onChangedTab,
+                  ),
+                  preferredSize: Size.fromHeight(160.0),
+                ),
+                pinned: false,
               ),
-              preferredSize: Size.fromHeight(160.0),
-            ),
-            pinned: false,
+              LikesPageBody(
+                isMobileSize: isMobileSize,
+                loading: _loading,
+                books: _likedBooks,
+                selectedTab: _selectedTab,
+                illustrations: _likedIllustrations,
+                bookPopupMenuEntries: _bookPopupMenuEntries,
+                illustrationPopupMenuEntries: _illustrationPopupMenuEntries,
+                onTapBrowse: onTapBrowse,
+                onTapBook: onTapBook,
+                onTapIllustration: onTapIllustration,
+                onUnlikeBook: onUnlikeBook,
+                onUnlikeIllustration: onUnlikeIllustration,
+                onPopupMenuBookSelected: onPopupMenuBookSelected,
+                onPopupMenuIllustrationSelected:
+                    onPopupMenuIllustrationSelected,
+              )
+            ],
           ),
-          LikesPageBody(
-            isMobileSize: isMobileSize,
-            loading: _loading,
-            books: _likedBooks,
-            selectedTab: _selectedTab,
-            illustrations: _likedIllustrations,
-            bookPopupMenuEntries: _bookPopupMenuEntries,
-            illustrationPopupMenuEntries: _illustrationPopupMenuEntries,
-            onTapBrowse: onTapBrowse,
-            onTapBook: onTapBook,
-            onTapIllustration: onTapIllustration,
-            onUnlikeBook: onUnlikeBook,
-            onUnlikeIllustration: onUnlikeIllustration,
-            onPopupMenuBookSelected: onPopupMenuBookSelected,
-            onPopupMenuIllustrationSelected: onPopupMenuIllustrationSelected,
-          )
-        ],
+        ),
       ),
     );
   }
@@ -431,6 +445,42 @@ class _LikesPageState extends ConsumerState<LikesPage> {
     _selectedTab = Utilities.storage.getLikesTab();
   }
 
+  void maybeFetchMore(double offset) {
+    if (_pageScrollController.position.atEdge &&
+        offset > 50 &&
+        _hasNext &&
+        !_loadingMore) {
+      _selectedTab == EnumLikeType.book
+          ? fetchMoreLikedBooks()
+          : fetchMoreLikedIllustrations();
+    }
+  }
+
+  void maybeShowFab(double offset) {
+    final bool scrollingDown = offset - _previousOffset > 0;
+    _previousOffset = offset;
+
+    if (scrollingDown) {
+      if (!_showFabToTop) {
+        return;
+      }
+
+      setState(() => _showFabToTop = false);
+      return;
+    }
+
+    if (offset == 0.0) {
+      setState(() => _showFabToTop = false);
+      return;
+    }
+
+    if (_showFabToTop) {
+      return;
+    }
+
+    setState(() => _showFabToTop = true);
+  }
+
   void onChangedTab(EnumLikeType likeType) {
     setState(() {
       _selectedTab = likeType;
@@ -504,10 +554,10 @@ class _LikesPageState extends ConsumerState<LikesPage> {
 
   /// On scroll notification
   bool onNotification(ScrollNotification notification) {
-    if (notification.metrics.pixels < 50 && _showFab) {
-      setState(() => _showFab = false);
-    } else if (notification.metrics.pixels > 50 && !_showFab) {
-      setState(() => _showFab = true);
+    if (notification.metrics.pixels < 50 && _showFabToTop) {
+      setState(() => _showFabToTop = false);
+    } else if (notification.metrics.pixels > 50 && !_showFabToTop) {
+      setState(() => _showFabToTop = true);
     }
 
     if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
@@ -519,6 +569,12 @@ class _LikesPageState extends ConsumerState<LikesPage> {
     }
 
     return false;
+  }
+
+  /// Callback when the page scrolls up and down.
+  void onPageScroll(double offset) {
+    maybeShowFab(offset);
+    maybeFetchMore(offset);
   }
 
   void onPopupMenuBookSelected(

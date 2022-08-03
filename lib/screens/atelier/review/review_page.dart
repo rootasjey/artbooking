@@ -8,7 +8,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/atelier/review/review_page_body.dart';
 import 'package:artbooking/screens/atelier/review/review_page_header.dart';
-import 'package:artbooking/screens/likes/likes_page_fab.dart';
+import 'package:artbooking/components/buttons/fab_to_top.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/book/popup_entry_book.dart';
 import 'package:artbooking/types/cloud_functions/illustration_response.dart';
@@ -59,10 +59,14 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
   bool _loadingMore = false;
 
   /// Show the page floating action button if true.
-  bool _showFab = false;
+  bool _showFabToTop = false;
 
   /// Last fetched document snapshot. Used for pagination.
   DocumentSnapshot<Object>? _lastDocument;
+
+  /// Last saved Y offset.
+  /// Used while scrolling to know the direction.
+  double _previousOffset = 0.0;
 
   /// Selected tab showing data (books or illustrations).
   EnumTabDataType _selectedTab = EnumTabDataType.illustrations;
@@ -129,26 +133,31 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
     final bool isMobileSize = Utilities.size.isMobileSize(context);
 
     return Scaffold(
-      floatingActionButton: LikesPageFab(
-        show: _showFab,
-        scrollController: _pageScrollController,
+      floatingActionButton: FabToTop(
+        show: _showFabToTop,
+        pageScrollController: _pageScrollController,
       ),
       body: ImprovedScrolling(
         scrollController: _pageScrollController,
         enableKeyboardScrolling: true,
-        onScroll: onScroll,
+        onScroll: onPageScroll,
         child: ScrollConfiguration(
           behavior: CustomScrollBehavior(),
           child: CustomScrollView(
             controller: _pageScrollController,
             slivers: <Widget>[
-              ApplicationBar(),
-              ReviewPageHeader(
-                isMobileSize: isMobileSize,
-                hideDisapproved: _hideDisapproved,
-                onChangedTab: onChangedTab,
-                onToggleShowDisapproved: onToggleShowDisapproved,
-                selectedTab: _selectedTab,
+              ApplicationBar(
+                bottom: PreferredSize(
+                  child: ReviewPageHeader(
+                    isMobileSize: isMobileSize,
+                    hideDisapproved: _hideDisapproved,
+                    onChangedTab: onChangedTab,
+                    onToggleShowDisapproved: onToggleShowDisapproved,
+                    selectedTab: _selectedTab,
+                  ),
+                  preferredSize: Size.fromHeight(120.0),
+                ),
+                pinned: false,
               ),
               ReviewPageBody(
                 books: _books,
@@ -482,6 +491,40 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
     );
   }
 
+  void maybeFetchMore(double offset) {
+    if (_pageScrollController.position.atEdge &&
+        offset > 50 &&
+        _hasNext &&
+        !_loadingMore) {
+      fetchMore();
+    }
+  }
+
+  void maybeShowFab(double offset) {
+    final bool scrollingDown = offset - _previousOffset > 0;
+    _previousOffset = offset;
+
+    if (scrollingDown) {
+      if (!_showFabToTop) {
+        return;
+      }
+
+      setState(() => _showFabToTop = false);
+      return;
+    }
+
+    if (offset == 0.0) {
+      setState(() => _showFabToTop = false);
+      return;
+    }
+
+    if (_showFabToTop) {
+      return;
+    }
+
+    setState(() => _showFabToTop = true);
+  }
+
   /// Fire when a new document has been created in Firestore.
   /// Add the corresponding document in the UI.
   void onAddStreamingItem(DocumentChangeMap documentChange) {
@@ -663,22 +706,9 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
   }
 
   /// Callback when the page scrolls up and down.
-  void onScroll(double scrollOffset) {
-    if (scrollOffset < 50 && _showFab) {
-      setState(() => _showFab = false);
-      return;
-    }
-
-    if (scrollOffset > 50 && !_showFab) {
-      setState(() => _showFab = true);
-    }
-
-    if (_pageScrollController.position.atEdge &&
-        scrollOffset > 50 &&
-        _hasNext &&
-        !_loadingMore) {
-      fetchMore();
-    }
+  void onPageScroll(double offset) {
+    maybeShowFab(offset);
+    maybeFetchMore(offset);
   }
 
   void onToggleShowDisapproved() {

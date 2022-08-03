@@ -33,42 +33,38 @@ class ReviewPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverPadding(
+    return Padding(
       padding: EdgeInsets.only(
-        top: isMobileSize ? 42.0 : 60.0,
         left: isMobileSize ? 12.0 : 54.0,
-        bottom: 24.0,
+        bottom: 8.0,
       ),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
+      child: Column(
+        children: [
           PageTitle(
             isMobileSize: isMobileSize,
             renderSliver: false,
             titleValue: "review".tr(),
             subtitleValue: "review_subtitle".tr(),
           ),
-          Padding(
+          Container(
+            height: 52.0,
             padding: const EdgeInsets.only(top: 8.0),
-            child: Wrap(
-              spacing: 12.0,
-              runSpacing: 12.0,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              shrinkWrap: false,
               children: [
                 DarkOutlinedButton(
-                  selected: EnumTabDataType.illustrations == selectedTab,
+                  child: Text("illustrations".tr().toUpperCase()),
+                  margin: const EdgeInsets.only(right: 6.0),
                   onPressed:
                       onChangedTab != null ? onPressedIllustration : null,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5.0),
-                    child: Text("illustrations".tr().toUpperCase()),
-                  ),
+                  selected: EnumTabDataType.illustrations == selectedTab,
                 ),
                 DarkOutlinedButton(
-                  selected: EnumTabDataType.books == selectedTab,
+                  child: Text("books".tr().toUpperCase()),
+                  margin: const EdgeInsets.only(right: 6.0),
                   onPressed: onChangedTab != null ? onPressedBook : null,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5.0),
-                    child: Text("books".tr().toUpperCase()),
-                  ),
+                  selected: EnumTabDataType.books == selectedTab,
                 ),
                 SquareButton(
                   active: hideDisapproved,
@@ -85,7 +81,7 @@ class ReviewPageHeader extends StatelessWidget {
               ],
             ),
           ),
-        ]),
+        ],
       ),
     );
   }

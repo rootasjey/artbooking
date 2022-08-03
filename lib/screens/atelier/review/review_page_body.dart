@@ -114,8 +114,8 @@ class ReviewPageBody extends StatelessWidget {
             crossAxisSpacing: isMobileSize ? 0.0 : 12.0,
           ),
           delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final book = books.elementAt(index);
+            (BuildContext context, int index) {
+              final Book book = books.elementAt(index);
 
               return BookCard(
                 book: book,
@@ -126,6 +126,7 @@ class ReviewPageBody extends StatelessWidget {
                 onTap: () => onTapBook?.call(book),
                 onPopupMenuItemSelected: onPopupMenuBookSelected,
                 popupMenuEntries: bookPopupMenuEntries,
+                useBottomSheet: isMobileSize,
               );
             },
             childCount: books.length,
@@ -148,8 +149,8 @@ class ReviewPageBody extends StatelessWidget {
           crossAxisSpacing: 12.0,
         ),
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final illustration = illustrations.elementAt(index);
+          (BuildContext context, int index) {
+            final Illustration illustration = illustrations.elementAt(index);
 
             return IllustrationCard(
               borderRadius: BorderRadius.circular(16.0),
@@ -160,6 +161,7 @@ class ReviewPageBody extends StatelessWidget {
               onTap: () => onTapIllustration?.call(illustration),
               onPopupMenuItemSelected: onPopupMenuIllustrationSelected,
               popupMenuEntries: illustrationPopupMenuEntries,
+              useBottomSheet: isMobileSize,
             );
           },
           childCount: illustrations.length,
