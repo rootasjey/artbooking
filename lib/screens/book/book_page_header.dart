@@ -15,6 +15,7 @@ class BookPageHeader extends StatelessWidget {
     required this.book,
     required this.multiSelectedItems,
     this.authenticated = false,
+    this.draggingActive = false,
     this.forceMultiSelect = false,
     this.isMobileSize = false,
     this.isOwner = false,
@@ -29,6 +30,7 @@ class BookPageHeader extends StatelessWidget {
     this.onShareBook,
     this.onShowDatesDialog,
     this.onShowRenameBookDialog,
+    this.onToggleDrag,
     this.onToggleMultiSelect,
     this.onUpdateVisibility,
     this.onUploadToThisBook,
@@ -38,6 +40,10 @@ class BookPageHeader extends StatelessWidget {
 
   /// Main page data.
   final Book book;
+
+  /// (Mobile specific) If true, long pressing a card will start a drag.
+  /// Otherwise, long pressing a card will display a context menu.
+  final bool draggingActive;
 
   /// If true, this widget adapt its layout to small screens.
   final bool isMobileSize;
@@ -87,6 +93,9 @@ class BookPageHeader extends StatelessWidget {
 
   /// Callback showing an input dialog to rename this book.
   final void Function()? onShowRenameBookDialog;
+
+  /// Callback fired when activate/deactivate drag status.
+  final void Function()? onToggleDrag;
 
   /// Callback fired when a file is uploaded and added to this book.
   final void Function()? onUploadToThisBook;
@@ -153,6 +162,7 @@ class BookPageHeader extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   BookPageActions(
+                    draggingActive: draggingActive,
                     forceMultiSelect: forceMultiSelect,
                     isMobileSize: isMobileSize,
                     multiSelectedItems: multiSelectedItems,
@@ -160,6 +170,7 @@ class BookPageHeader extends StatelessWidget {
                     onToggleMultiSelect: onToggleMultiSelect,
                     onShareBook: onShareBook,
                     onShowRenameBookDialog: onShowRenameBookDialog,
+                    onToggleDrag: onToggleDrag,
                     onUploadToThisBook: onUploadToThisBook,
                     onUpdateVisibility: onUpdateVisibility,
                     visible: multiSelectedItems.isEmpty,

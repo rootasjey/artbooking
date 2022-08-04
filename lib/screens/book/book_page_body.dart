@@ -18,6 +18,7 @@ class BookPageBody extends StatelessWidget {
     required this.loading,
     required this.multiSelectedItems,
     required this.popupMenuEntries,
+    this.draggingActive = false,
     this.forceMultiSelect = false,
     this.hasError = false,
     this.onPopupMenuItemSelected,
@@ -30,18 +31,18 @@ class BookPageBody extends StatelessWidget {
     this.isMobileSize = false,
   }) : super(key: key);
 
-  /// Why a map and not just a list?
-  ///
-  /// -> faster access & because it's already done.
-  ///
-  /// -> for [multiSelectedItems] allow instant access to know
-  /// if an illustration is currently in multi-select.
-  final IllustrationMap illustrationMap;
-
-  final List<BookIllustration> bookIllustrations;
+  /// (Mobile specific) If true, long pressing a card will start a drag.
+  /// Otherwise, long pressing a card will display a context menu.
+  final bool draggingActive;
 
   /// If true, this widget adapt its layout to small screens.
   final bool isMobileSize;
+
+  /// Activate multiselect illustrations if true.
+  final bool forceMultiSelect;
+
+  /// An error occurred if true.
+  final bool hasError;
 
   /// True if the page is currently loading.
   final bool loading;
@@ -51,10 +52,11 @@ class BookPageBody extends StatelessWidget {
 
   /// Currently selected illustrations.
   final IllustrationMap multiSelectedItems;
-  final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries;
-  final bool forceMultiSelect;
-  final bool hasError;
 
+  /// List of popup menu entries for illustrations inside the book.
+  final List<PopupMenuEntry<EnumIllustrationItemAction>> popupMenuEntries;
+
+  /// Callback fired when a popup menu item is selected.
   final void Function(
     EnumIllustrationItemAction,
     int,
@@ -62,6 +64,7 @@ class BookPageBody extends StatelessWidget {
     String,
   )? onPopupMenuItemSelected;
 
+  /// Callback fired when an illustration card is tapped.
   final void Function(String, Illustration)? onTapIllustrationCard;
 
   /// Upload a new illustration and add it to this book.
@@ -75,6 +78,17 @@ class BookPageBody extends StatelessWidget {
 
   /// Callback when dragging a book around.
   final void Function(DragUpdateDetails details)? onDragUpdateBook;
+
+  /// Why a map and not just a list?
+  ///
+  /// -> faster access & because it's already done.
+  ///
+  /// -> for [multiSelectedItems] allow instant access to know
+  /// if an illustration is currently in multi-select.
+  final IllustrationMap illustrationMap;
+
+  /// List of illustrations inside the book.
+  final List<BookIllustration> bookIllustrations;
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +144,9 @@ class BookPageBody extends StatelessWidget {
                 );
 
             return IllustrationCard(
+              backIcon: Utilities.ui.generateIcon(illustration.name),
               borderRadius: BorderRadius.circular(isMobileSize ? 24.0 : 16.0),
+              canDrag: isOwner && draggingActive,
               index: index,
               heroTag: key,
               illustration: illustration,
@@ -138,12 +154,13 @@ class BookPageBody extends StatelessWidget {
               illustrationKey: key,
               selected: selected,
               selectionMode: selectionMode,
-              canDrag: isOwner,
+              size: isMobileSize ? 100.0 : 300.0,
               onDragUpdate: onDragUpdateBook,
               onDrop: onDropIllustration,
               onTap: onTap,
               onPopupMenuItemSelected: isOwner ? onPopupMenuItemSelected : null,
               popupMenuEntries: isOwner ? popupMenuEntries : [],
+              useBottomSheet: isMobileSize,
             );
           },
           childCount: bookIllustrations.length,

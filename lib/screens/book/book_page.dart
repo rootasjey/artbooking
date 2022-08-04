@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/bottom_sheet/delete_content_bottom_sheet.dart';
+import 'package:artbooking/components/buttons/double_action_fab.dart';
 import 'package:artbooking/components/buttons/visibility_button.dart';
+import 'package:artbooking/components/custom_scroll_behavior.dart';
 import 'package:artbooking/components/dialogs/delete_dialog.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
@@ -17,7 +19,6 @@ import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/book/book_page_body.dart';
-import 'package:artbooking/screens/book/book_page_fab.dart';
 import 'package:artbooking/screens/book/book_page_header.dart';
 import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/book/book_illustration.dart';
@@ -41,6 +42,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:supercharged/supercharged.dart';
@@ -67,6 +69,10 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   /// The book displayed on this page.
   Book _book = Book.empty();
 
+  /// (Mobile specific) If true, long pressing a card will start a drag.
+  /// Otherwise, long pressing a card will display a context menu.
+  bool _draggingActive = false;
+
   /// True if the page is loading.
   bool _loading = false;
 
@@ -76,9 +82,6 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   /// True if there's a next page to fetch for this book's illustrations.
   bool _hasNext = false;
 
-  /// True if the floating action button is visible.
-  bool _showFab = false;
-
   /// True if the view is in multiselect mode.
   bool _forceMultiSelect = false;
 
@@ -87,6 +90,12 @@ class _MyBookPageState extends ConsumerState<BookPage> {
 
   /// True if the current authenticated user has liked this book.
   bool _liked = false;
+
+  /// Show this page Floating Action Button if true.
+  bool _showMainFab = true;
+
+  /// Show FAB to scroll to the top of the page if true.
+  bool _showFabToTop = false;
 
   /// Currently changing book's cover if true.
   /// It may be fast or takes more time if there's file upload + thumbnails
@@ -104,6 +113,10 @@ class _MyBookPageState extends ConsumerState<BookPage> {
 
   /// Distance to the edge where the scroll viewer starts to jump.
   final double _edgeDistance = 200.0;
+
+  /// Last saved Y offset.
+  /// Used while scrolling to know the direction.
+  double _previousOffset = 0.0;
 
   /// Why a map and not just a list?
   ///
@@ -202,65 +215,78 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     final bool isMobileSize = Utilities.size.isMobileSize(context);
 
     return Scaffold(
-      floatingActionButton: BookPageFab(
-        show: _showFab,
-        scrollController: _pageScrollController,
+      floatingActionButton: DoubleActionFAB(
+        icon: Icon(UniconsLine.upload),
+        isMainActionAvailable: isOwner,
+        labelValue: "upload".tr(),
+        pageScrollController: _pageScrollController,
+        showMainFab: _showMainFab,
+        showFabToTop: _showFabToTop,
       ),
       body: Stack(
         children: [
-          NotificationListener<ScrollNotification>(
-            onNotification: onScrollNotification,
-            child: CustomScrollView(
-              controller: _pageScrollController,
-              slivers: <Widget>[
-                ApplicationBar(
-                  minimal: true,
-                ),
-                BookPageHeader(
-                  book: _book,
-                  forceMultiSelect: _forceMultiSelect,
-                  isMobileSize: isMobileSize,
-                  liked: _liked,
-                  heroTag: widget.heroTag,
-                  authenticated: authenticated,
-                  coverPopupMenuEntries: _coverPopupMenuEntries,
-                  multiSelectedItems: _multiSelectedItems,
-                  onLike: onLike,
-                  onAddToBook: showAddGroupToBook,
-                  onClearMultiSelect: onClearMultiSelect,
-                  onConfirmDeleteBook: onConfirmDeleteBook,
-                  onConfirmRemoveGroup: onConfirmRemoveGroup,
-                  onCoverPopupMenuItemSelected: onCoverPopupMenuItemSelected,
-                  onMultiSelectAll: onMultiSelectAll,
-                  onShareBook: showShareDialog,
-                  onToggleMultiSelect: onToggleMultiSelect,
-                  onShowDatesDialog: onShowDatesDialog,
-                  onShowRenameBookDialog: onShowRenameBookDialog,
-                  onUploadToThisBook: onUploadToThisBook,
-                  onUpdateVisibility: onUpdateVisibility,
-                  isOwner: isOwner,
-                ),
-                BookPageBody(
-                  hasError: _hasError,
-                  isMobileSize: isMobileSize,
-                  loading: _loading,
-                  forceMultiSelect: _forceMultiSelect,
-                  illustrationMap: _illustrationMap,
-                  bookIllustrations: _book.illustrations,
-                  multiSelectedItems: _multiSelectedItems,
-                  popupMenuEntries: _popupMenuEntries,
-                  onBrowseIllustrations: onBrowseIllustrations,
-                  onDragUpdateBook: onDragUpdateBook,
-                  onPopupMenuItemSelected: onPopupMenuItemSelected,
-                  onTapIllustrationCard: onTapIllustrationCard,
-                  onUploadToThisBook: onUploadToThisBook,
-                  onDropIllustration: onDropIllustration,
-                  isOwner: isOwner,
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.only(bottom: 100.0),
-                ),
-              ],
+          ImprovedScrolling(
+            enableKeyboardScrolling: true,
+            enableMMBScrolling: true,
+            onScroll: onPageScroll,
+            scrollController: _pageScrollController,
+            child: ScrollConfiguration(
+              behavior: CustomScrollBehavior(),
+              child: CustomScrollView(
+                controller: _pageScrollController,
+                slivers: <Widget>[
+                  ApplicationBar(
+                    minimal: true,
+                  ),
+                  BookPageHeader(
+                    book: _book,
+                    draggingActive: _draggingActive,
+                    forceMultiSelect: _forceMultiSelect,
+                    isMobileSize: isMobileSize,
+                    liked: _liked,
+                    heroTag: widget.heroTag,
+                    authenticated: authenticated,
+                    coverPopupMenuEntries: _coverPopupMenuEntries,
+                    multiSelectedItems: _multiSelectedItems,
+                    onLike: onLike,
+                    onAddToBook: showAddGroupToBook,
+                    onClearMultiSelect: onClearMultiSelect,
+                    onConfirmDeleteBook: onConfirmDeleteBook,
+                    onConfirmRemoveGroup: onConfirmRemoveGroup,
+                    onCoverPopupMenuItemSelected: onCoverPopupMenuItemSelected,
+                    onMultiSelectAll: onMultiSelectAll,
+                    onShareBook: showShareDialog,
+                    onToggleDrag: onToggleDrag,
+                    onToggleMultiSelect: onToggleMultiSelect,
+                    onShowDatesDialog: onShowDatesDialog,
+                    onShowRenameBookDialog: onShowRenameBookDialog,
+                    onUploadToThisBook: onUploadToThisBook,
+                    onUpdateVisibility: onUpdateVisibility,
+                    isOwner: isOwner,
+                  ),
+                  BookPageBody(
+                    draggingActive: _draggingActive,
+                    hasError: _hasError,
+                    isMobileSize: isMobileSize,
+                    loading: _loading,
+                    forceMultiSelect: _forceMultiSelect,
+                    illustrationMap: _illustrationMap,
+                    bookIllustrations: _book.illustrations,
+                    multiSelectedItems: _multiSelectedItems,
+                    popupMenuEntries: _popupMenuEntries,
+                    onBrowseIllustrations: onBrowseIllustrations,
+                    onDragUpdateBook: onDragUpdateBook,
+                    onPopupMenuItemSelected: onPopupMenuItemSelected,
+                    onTapIllustrationCard: onTapIllustrationCard,
+                    onUploadToThisBook: onUploadToThisBook,
+                    onDropIllustration: onDropIllustration,
+                    isOwner: isOwner,
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.only(bottom: 100.0),
+                  ),
+                ],
+              ),
             ),
           ),
           Positioned(
@@ -474,7 +500,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     listenBook(query);
   }
 
-  void fetchIllustrationsMore() async {
+  void fetchMoreIllustrations() async {
     if (!_hasNext || _book.id.isEmpty || _loadingMore) {
       return;
     }
@@ -538,6 +564,38 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     } catch (error) {
       Utilities.logger.e(error);
     }
+  }
+
+  String getIllustratioinNavRoute(Illustration illustration) {
+    final location = Beamer.of(context)
+        .beamingHistory
+        .last
+        .history
+        .last
+        .routeInformation
+        .location;
+
+    if (location == null) {
+      return HomeLocation.illustrationBookRoute
+          .replaceFirst(":bookId", _book.id)
+          .replaceFirst(":illustrationId", illustration.id);
+    }
+
+    if (location.contains("atelier") && location.contains("profile")) {
+      return AtelierLocationContent.profileIllustrationBookRoute
+          .replaceFirst(":bookId", _book.id)
+          .replaceFirst(":illustrationId", illustration.id);
+    }
+
+    if (location.contains("atelier")) {
+      return AtelierLocationContent.illustrationBookRoute
+          .replaceFirst(":bookId", _book.id)
+          .replaceFirst(":illustrationId", illustration.id);
+    }
+
+    return HomeLocation.illustrationBookRoute
+        .replaceFirst(":bookId", _book.id)
+        .replaceFirst(":illustrationId", illustration.id);
   }
 
   /// Find new values in [book.illustrationMap]
@@ -658,6 +716,41 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     );
   }
 
+  void maybeFetchMore(double offset) {
+    if (_pageScrollController.position.atEdge &&
+        offset > 50 &&
+        _hasNext &&
+        !_loadingMore) {
+      fetchMoreIllustrations();
+    }
+  }
+
+  void maybeShowFab(double offset) {
+    final bool scrollingDown = offset - _previousOffset > 0;
+    _previousOffset = offset;
+
+    _showFabToTop = offset == 0.0 ? false : true;
+
+    if (scrollingDown) {
+      if (!_showMainFab) {
+        return;
+      }
+
+      setState(() => _showMainFab = false);
+      return;
+    }
+
+    if (offset == 0.0) {
+      setState(() => _showFabToTop = false);
+    }
+
+    if (_showMainFab) {
+      return;
+    }
+
+    setState(() => _showMainFab = true);
+  }
+
   void multiSelectIllustration(
       String illustrationKey, Illustration illustration) {
     final selected = _multiSelectedItems.containsKey(illustrationKey);
@@ -696,38 +789,6 @@ class _MyBookPageState extends ConsumerState<BookPage> {
         "heroTag": illustrationKey,
       },
     );
-  }
-
-  String getIllustratioinNavRoute(Illustration illustration) {
-    final location = Beamer.of(context)
-        .beamingHistory
-        .last
-        .history
-        .last
-        .routeInformation
-        .location;
-
-    if (location == null) {
-      return HomeLocation.illustrationBookRoute
-          .replaceFirst(":bookId", _book.id)
-          .replaceFirst(":illustrationId", illustration.id);
-    }
-
-    if (location.contains("atelier") && location.contains("profile")) {
-      return AtelierLocationContent.profileIllustrationBookRoute
-          .replaceFirst(":bookId", _book.id)
-          .replaceFirst(":illustrationId", illustration.id);
-    }
-
-    if (location.contains("atelier")) {
-      return AtelierLocationContent.illustrationBookRoute
-          .replaceFirst(":bookId", _book.id)
-          .replaceFirst(":illustrationId", illustration.id);
-    }
-
-    return HomeLocation.illustrationBookRoute
-        .replaceFirst(":bookId", _book.id)
-        .replaceFirst(":illustrationId", illustration.id);
   }
 
   void onBrowseIllustrations() {
@@ -928,6 +989,12 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     setState(() {});
   }
 
+  /// Callback when the page scrolls up and down.
+  void onPageScroll(double offset) {
+    maybeShowFab(offset);
+    maybeFetchMore(offset);
+  }
+
   void onPopupMenuItemSelected(
     EnumIllustrationItemAction action,
     int index,
@@ -955,30 +1022,6 @@ class _MyBookPageState extends ConsumerState<BookPage> {
         break;
       default:
     }
-  }
-
-  /// On scroll notifications.
-  bool onScrollNotification(ScrollNotification notification) {
-    // FAB visibility
-    if (notification.metrics.pixels < 50 && _showFab) {
-      setState(() {
-        _showFab = false;
-      });
-    } else if (notification.metrics.pixels > 50 && !_showFab) {
-      setState(() {
-        _showFab = true;
-      });
-    }
-
-    if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
-      return false;
-    }
-
-    if (_hasNext && !_loadingMore) {
-      fetchIllustrationsMore();
-    }
-
-    return false;
   }
 
   void onShowDatesDialog() {
@@ -1150,6 +1193,11 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     }
 
     multiSelectIllustration(illustrationKey, illustration);
+  }
+
+  void onToggleDrag() {
+    setState(() => _draggingActive = !_draggingActive);
+    Utilities.storage.saveMobileDraggingActive(_draggingActive);
   }
 
   void onToggleMultiSelect() {
