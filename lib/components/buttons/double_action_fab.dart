@@ -1,6 +1,5 @@
 import 'package:artbooking/components/animations/fade_in_y.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
@@ -55,7 +54,7 @@ class DoubleActionFAB extends StatelessWidget {
               onPressed: onMainActionPressed,
               backgroundColor: Colors.grey.shade900,
               label: Text(
-                "license_create".tr(),
+                labelValue,
                 style: Utilities.fonts.body(
                   fontWeight: FontWeight.w600,
                 ),
