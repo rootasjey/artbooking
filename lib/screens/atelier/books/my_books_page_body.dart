@@ -160,7 +160,9 @@ class MyBooksPageBody extends StatelessWidget {
         forceMultiSelect || multiSelectedItems.isNotEmpty;
 
     return SliverPadding(
-      padding: isMobileSize ? EdgeInsets.zero : const EdgeInsets.all(40.0),
+      padding: isMobileSize
+          ? const EdgeInsets.only(top: 24.0)
+          : const EdgeInsets.all(40.0),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
           mainAxisExtent: isMobileSize ? 161.0 : 380.0,
