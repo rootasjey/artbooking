@@ -919,6 +919,41 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     );
   }
 
+  void maybeFetchMore(double offset) {
+    if (_pageScrollController.position.atEdge &&
+        offset > 50 &&
+        _hasNext &&
+        !_loadingMore) {
+      fetchMoreIllustrations();
+    }
+  }
+
+  void maybeShowFab(double offset) {
+    final bool scrollingDown = offset - _previousOffset > 0;
+    _previousOffset = offset;
+
+    _showFabToTop = offset == 0.0 ? false : true;
+
+    if (scrollingDown) {
+      if (!_showFabUpload) {
+        return;
+      }
+
+      setState(() => _showFabUpload = false);
+      return;
+    }
+
+    if (offset == 0.0) {
+      setState(() => _showFabToTop = false);
+    }
+
+    if (_showFabUpload) {
+      return;
+    }
+
+    setState(() => _showFabUpload = true);
+  }
+
   void multiSelectIllustration(Illustration illustration) {
     final selected = _multiSelectedItems.containsKey(illustration.id);
 
@@ -1269,41 +1304,6 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     autoScrollOnEdges(
       dy: pointerMoveEvent.position.dy,
     );
-  }
-
-  void maybeFetchMore(double offset) {
-    if (_pageScrollController.position.atEdge &&
-        offset > 50 &&
-        _hasNext &&
-        !_loadingMore) {
-      fetchMoreIllustrations();
-    }
-  }
-
-  void maybeShowFab(double offset) {
-    final bool scrollingDown = offset - _previousOffset > 0;
-    _previousOffset = offset;
-
-    _showFabToTop = offset == 0.0 ? false : true;
-
-    if (scrollingDown) {
-      if (!_showFabUpload) {
-        return;
-      }
-
-      setState(() => _showFabUpload = false);
-      return;
-    }
-
-    if (offset == 0.0) {
-      setState(() => _showFabToTop = false);
-    }
-
-    if (_showFabUpload) {
-      return;
-    }
-
-    setState(() => _showFabUpload = true);
   }
 
   void onPopupMenuItemSelected(
