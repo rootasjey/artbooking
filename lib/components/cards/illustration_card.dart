@@ -553,7 +553,7 @@ class _IllustrationCardState extends State<IllustrationCard>
         left: 10.0,
         child: Material(
           elevation: 2.0,
-          color: Colors.indigo,
+          color: Colors.black87,
           clipBehavior: Clip.hardEdge,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(6.0),
@@ -572,7 +572,7 @@ class _IllustrationCardState extends State<IllustrationCard>
       left: 10.0,
       child: Material(
         elevation: 4.0,
-        color: Colors.indigo.shade700,
+        color: Constants.colors.tertiary,
         clipBehavior: Clip.hardEdge,
         shape: RoundedRectangleBorder(
           side: BorderSide(color: Colors.white, width: 2.0),
