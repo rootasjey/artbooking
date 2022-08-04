@@ -25,7 +25,6 @@ class DarkElevatedButton extends StatelessWidget {
       ),
       style: ElevatedButton.styleFrom(
         primary: Colors.black,
-        shape: RoundedRectangleBorder(),
         textStyle: Utilities.fonts.body(
           fontWeight: FontWeight.w600,
         ),
