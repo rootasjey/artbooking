@@ -1,5 +1,5 @@
 import 'package:artbooking/screens/search_page/search_page_header_results.dart';
-import 'package:artbooking/screens/search_page/search_text_field.dart';
+import 'package:artbooking/components/inputs/search_text_input.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -57,7 +57,7 @@ class SearchPageHeader extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(bottom: 4.0),
-                  child: SearchTextField(
+                  child: SearchTextInput(
                     autofocus: true,
                     controller: searchInputController,
                     focusNode: searchFocusNode,

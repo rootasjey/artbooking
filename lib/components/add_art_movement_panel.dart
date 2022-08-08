@@ -5,7 +5,7 @@ import 'package:artbooking/components/buttons/circle_button.dart';
 import 'package:artbooking/components/animations/fade_in_x.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
-import 'package:artbooking/screens/search_page/search_text_field.dart';
+import 'package:artbooking/components/inputs/search_text_input.dart';
 import 'package:artbooking/types/art_movement/art_movement.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
@@ -467,7 +467,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SearchTextField(
+          SearchTextInput(
             autofocus: true,
             controller: _searchTextController,
             focusNode: _searchFocusNode,

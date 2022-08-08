@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 
 /// A TextField in order to search content.
-class SearchTextField extends StatelessWidget {
-  const SearchTextField({
+class SearchTextInput extends StatelessWidget {
+  const SearchTextInput({
     Key? key,
     this.label,
     this.controller,
