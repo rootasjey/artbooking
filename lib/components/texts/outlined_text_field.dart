@@ -20,13 +20,19 @@ class OutlinedTextField extends StatelessWidget {
     this.textCapitalization = TextCapitalization.sentences,
   }) : super(key: key);
 
+  /// Will immediately request focus on mount if true.
   final bool autofocus;
+
+  /// Will hide characters of true (usually for passwords).
   final bool obscureText;
 
+  /// Limit this widget constrants.
   final BoxConstraints constraints;
 
+  /// Allow to request focus.
   final FocusNode? focusNode;
 
+  /// Maxium allowed lines.
   final int? maxLines;
 
   /// Fires when the user modify the input's value.
@@ -41,18 +47,21 @@ class OutlinedTextField extends StatelessWidget {
   /// The label will be displayed on top of the input.
   final String? label;
 
+  /// How to capitalize this text input.
   final TextCapitalization textCapitalization;
 
   /// A controller to manipulate the input component.
   final TextEditingController? controller;
 
+  /// Associated keyboard to this input (on mobile).
   final TextInputAction? textInputAction;
 
+  /// Adapt mobile keyboard to this input (sentences, email, ...).
   final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
-    final _primaryColor = Theme.of(context).primaryColor;
+    final Color _primaryColor = Theme.of(context).primaryColor;
 
     final BorderRadius borderRadius = BorderRadius.circular(4.0);
 

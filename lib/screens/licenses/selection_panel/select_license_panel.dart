@@ -28,11 +28,11 @@ class SelectLicensePanel extends ConsumerStatefulWidget {
     this.elevation = 4.0,
   }) : super(key: key);
 
-  /// Aleady selected styles for the illustration.
-  final License selectedLicense;
-
   /// True if the panel is visible.
   final bool isVisible;
+
+  /// Aleady selected styles for the illustration.
+  final License selectedLicense;
 
   /// Function callback when the panel is closed.
   final void Function()? onClose;
@@ -52,10 +52,10 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
   bool _hasNext = false;
 
   /// True if loading licenses.
-  bool _isLoading = false;
+  bool _loading = false;
 
   /// True if loading more licenses.
-  bool _isLoadingMore = false;
+  bool _loadingMore = false;
 
   /// True if the style's image is visible.
   bool _showLicenseInfo = false;
@@ -129,7 +129,7 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
             fit: StackFit.expand,
             children: [
               SelectLicensePanelBody(
-                isLoading: _isLoading,
+                isLoading: _loading,
                 selectedTab: _selectedTab,
                 onChangedTab: onChangedTab,
                 showLicenseInfo: _showLicenseInfo,
@@ -159,7 +159,7 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
   void fetchStaffLicenses() async {
     setState(() {
       _staffLicenses.clear();
-      _isLoading = true;
+      _loading = true;
     });
 
     try {
@@ -172,7 +172,7 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
       if (snapshot.size == 0) {
         setState(() {
           _hasNext = false;
-          _isLoading = false;
+          _loading = false;
         });
 
         return;
@@ -194,14 +194,14 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
       Utilities.logger.e(error);
     } finally {
       setState(() {
-        _isLoading = false;
+        _loading = false;
       });
     }
   }
 
   /// Fetch more licenses on Firestore.
   void fetchStaffLicensesMore() async {
-    _isLoadingMore = true;
+    _loadingMore = true;
 
     try {
       final snapshot = await FirebaseFirestore.instance
@@ -242,7 +242,7 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
     setState(() {
       _lastDocumentSnapshot = null;
       _userLicenses.clear();
-      _isLoading = true;
+      _loading = true;
     });
 
     try {
@@ -260,7 +260,7 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
       if (snapshot.size == 0) {
         setState(() {
           _hasNext = false;
-          _isLoading = false;
+          _loading = false;
         });
 
         return;
@@ -283,14 +283,14 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
       context.showErrorBar(content: Text(error.toString()));
     } finally {
       setState(() {
-        _isLoading = false;
+        _loading = false;
       });
     }
   }
 
   /// Fetch more user's licenses on Firestore.
   void fetchUserLicensesMore() async {
-    setState(() => _isLoadingMore = true);
+    setState(() => _loadingMore = true);
 
     try {
       final String? uid = ref.read(AppState.userProvider).authUser?.uid;
@@ -307,7 +307,7 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
       if (snapshot.size == 0) {
         setState(() {
           _hasNext = false;
-          _isLoadingMore = false;
+          _loadingMore = false;
           _lastDocumentSnapshot = null;
         });
 
@@ -330,7 +330,7 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
     } finally {
-      setState(() => _isLoadingMore = false);
+      setState(() => _loadingMore = false);
     }
   }
 
@@ -340,7 +340,7 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
       return false;
     }
 
-    if (_hasNext && !_isLoadingMore && _lastDocumentSnapshot != null) {
+    if (_hasNext && !_loadingMore && _lastDocumentSnapshot != null) {
       fetchStaffLicensesMore();
     }
 

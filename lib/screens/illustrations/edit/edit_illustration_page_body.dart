@@ -17,7 +17,7 @@ import 'package:unicons/unicons.dart';
 class EditIllustrationPageBody extends StatelessWidget {
   const EditIllustrationPageBody({
     Key? key,
-    required this.isLoading,
+    required this.loading,
     required this.illustration,
     required this.illustrationName,
     required this.illustrationDescription,
@@ -27,7 +27,7 @@ class EditIllustrationPageBody extends StatelessWidget {
     required this.license,
     required this.presentationCardKey,
     required this.showArtMovementPanel,
-    required this.showLicensesPanel,
+    required this.showLicensePanel,
     this.onUpdatePresentation,
     this.onToggleArtMovementPanel,
     this.onRemoveArtMovementAndUpdate,
@@ -42,42 +42,78 @@ class EditIllustrationPageBody extends StatelessWidget {
     this.goToEditImagePage,
   }) : super(key: key);
 
-  final bool isLoading;
-  final bool showLicensesPanel;
+  /// Loading this widget if true.
+  final bool loading;
+
+  /// Show panel to select/deselect license if true.
+  final bool showLicensePanel;
+
+  /// Show panel to select/deselect art movement if true.
   final bool showArtMovementPanel;
 
   final GlobalKey<ExpansionTileCardState> presentationCardKey;
+
+  /// Target illustration.
   final Illustration illustration;
+
+  /// Selected license for the target illustration.
   final License license;
 
+  /// Illustration's name.
   final String illustrationName;
+
+  /// Illustration's description.
   final String illustrationDescription;
+
+  /// Illustration's lore.
   final String illustrationLore;
+
+  /// Illustration's topics.
   final List<String> illustrationTopics;
+
+  /// Illustration's visibility.
   final EnumContentVisibility illustrationVisibility;
 
+  /// Callback to navigate to image edit.
   final void Function()? goToEditImagePage;
 
+  /// Callback fired to update illustration's presentation.
   final void Function(String, String, String)? onUpdatePresentation;
 
+  /// Callback to toggle art movement panel.
   final void Function()? onToggleArtMovementPanel;
+
+  /// Callback fired to remove art movement.
   final void Function(String)? onRemoveArtMovementAndUpdate;
 
+  /// Callback fired to add a topic to an illustration.
   final void Function(String)? onAddTopicAndUpdate;
+
+  /// Callback fired to remove a topic to an illustration.
   final void Function(String)? onRemoveTopicAndUpdate;
 
+  /// Callback fired to update illustration's visibility.
   final void Function(EnumContentVisibility)? onUpdateVisibility;
 
+  /// Callback fired when we tap on a license.
   final void Function()? onTapCurrentLicense;
+
+  /// Callback fired to show/hide the license panel.
   final void Function()? onToggleLicensePanel;
+
+  /// Callback fired to unselect a license.
   final void Function()? onUnselectLicenseAndUpdate;
+
+  /// Callback fired when the license section is expanded.
+  /// The callback will fetch license's data (from its id).
   final void Function(bool)? onExpandStateLicenseChanged;
 
+  /// Callback fired when we tap on "done" button.
   final void Function()? onDone;
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (loading) {
       return LoadingView(
         sliver: false,
         title: Padding(
@@ -131,7 +167,7 @@ class EditIllustrationPageBody extends StatelessWidget {
             onUpdateVisibility: onUpdateVisibility,
           ),
           EditIllustrationPageLicense(
-            showLicensesPanel: showLicensesPanel,
+            showLicensesPanel: showLicensePanel,
             license: license,
             onTapCurrentLicense: onTapCurrentLicense,
             onToggleLicensePanel: onToggleLicensePanel,

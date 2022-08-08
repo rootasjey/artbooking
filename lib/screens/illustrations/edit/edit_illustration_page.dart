@@ -75,12 +75,21 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Scaffold(
       body: Stack(
         children: [
           SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(60.0),
+              padding: isMobileSize
+                  ? const EdgeInsets.only(
+                      bottom: 100.0,
+                      left: 12.0,
+                      right: 12.0,
+                      top: 60.0,
+                    )
+                  : const EdgeInsets.all(60.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -104,7 +113,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
                     ),
                   ),
                   EditIllustrationPageBody(
-                    isLoading: _isLoading,
+                    loading: _isLoading,
                     license: _license,
                     illustration: widget.illustration,
                     illustrationName: _illustrationName,
@@ -124,7 +133,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
                     onUpdateVisibility: onUpdateVisibility,
                     onDone: Beamer.of(context).popRoute,
                     presentationCardKey: _presentationCardKey,
-                    showLicensesPanel: _showLicensesPanel,
+                    showLicensePanel: _showLicensesPanel,
                     showArtMovementPanel: _showArtMovementPanel,
                     goToEditImagePage: widget.goToEditImagePage,
                   )
@@ -140,10 +149,12 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
               message: '${"illustration_updating".tr()}...',
             ),
           ),
-          artMovementsSidePanel(),
+          artMovementsSidePanel(
+            isMobileSize: isMobileSize,
+          ),
           Positioned(
             top: 100.0,
-            right: 24.0,
+            right: isMobileSize ? 0.0 : 24.0,
             child: SelectLicensePanel(
               elevation: 8.0,
               isVisible: _showLicensesPanel,
@@ -157,11 +168,13 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
     );
   }
 
-  Widget artMovementsSidePanel() {
+  Widget artMovementsSidePanel({bool isMobileSize = false}) {
     return Positioned(
-      top: 100.0,
-      right: 24.0,
+      top: isMobileSize ? 0.0 : 100.0,
+      right: isMobileSize ? 0.0 : 24.0,
+      left: isMobileSize ? 0.0 : null,
       child: AddArtMovementPanel(
+        isMobileSize: isMobileSize,
         isVisible: _showArtMovementPanel,
         selectedArtMovements: widget.illustration.artMovements,
         onClose: () {

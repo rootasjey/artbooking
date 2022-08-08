@@ -5,6 +5,7 @@ import 'package:artbooking/components/buttons/circle_button.dart';
 import 'package:artbooking/components/animations/fade_in_x.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/screens/search_page/search_text_field.dart';
 import 'package:artbooking/types/art_movement/art_movement.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:artbooking/types/firestore/query_doc_snap_map.dart';
@@ -27,13 +28,20 @@ class AddArtMovementPanel extends StatefulWidget {
     this.onClose,
     this.onToggleArtMovementAndUpdate,
     this.elevation = 4.0,
+    this.isMobileSize = false,
   }) : super(key: key);
 
-  /// Aleady selected art movements for the illustration.
-  final List<String?> selectedArtMovements;
+  /// If true, this widget adapts its layout to small screens.
+  final bool isMobileSize;
 
   /// True if the panel is visible.
   final bool isVisible;
+
+  /// The panel elevation.
+  final double elevation;
+
+  /// Aleady selected art movements for the illustration.
+  final List<String?> selectedArtMovements;
 
   /// Function callback when the panel is closed.
   final void Function()? onClose;
@@ -44,25 +52,40 @@ class AddArtMovementPanel extends StatefulWidget {
     bool selected,
   )? onToggleArtMovementAndUpdate;
 
-  /// The panel elevation.
-  final double elevation;
-
   @override
   _AddArtMovementPanelState createState() => _AddArtMovementPanelState();
 }
 
 class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
+  /// Selected art movement for image preview.
+  ArtMovement _selectedArtMovementPreview = ArtMovement.empty();
+
   /// True if there're more data to fetch.
   bool _hasNext = false;
 
   /// True if loading more art movement from Firestore.
-  bool _isLoadingMore = false;
+  bool _loadingMore = false;
+
+  /// Searching art movements according to `_searchTextController.text` if true.
+  bool _searching = false;
 
   /// True if the art movement's image is visible.
   bool _isImagePreviewVisible = false;
 
+  final Color _clairPink = Constants.colors.clairPink;
+  final Color _secondaryColor = Constants.colors.secondary;
+
   /// Last fetched document snapshot. Useful for pagination.
   DocumentSnapshot<Object>? _lastDocumentSnapshot;
+
+  /// Maximum container's width.
+  double _containerWidth = 400.0;
+
+  /// Search input focus node.
+  final FocusNode _searchFocusNode = FocusNode();
+
+  /// Maximum art movements to fetch in one request.
+  int _limit = 10;
 
   /// All available art art movements.
   final List<ArtMovement> _availableArtMovements = [];
@@ -70,37 +93,28 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
   /// Search results.
   final List<ArtMovement> _suggestionsList = [];
 
-  /// Search controller.
-  final _searchTextController = TextEditingController();
-
-  /// Maximum container's width.
-  final double _containerWidth = 400.0;
-
-  /// Maximum art movements to fetch in one request.
-  int _limit = 10;
-
-  /// Selected art movement for image preview.
-
   /// Delay search after typing input.
   Timer? _searchTimer;
 
-  final Color _clairPink = Constants.colors.clairPink;
-  final Color _secondaryColor = Constants.colors.secondary;
+  /// Page scroll controller.
+  final ScrollController _scrollController = ScrollController();
 
-  final _scrollController = ScrollController();
-
-  var _selectedArtMovementPreview = ArtMovement.empty();
+  /// Search text controller.
+  final TextEditingController _searchTextController = TextEditingController();
 
   @override
   initState() {
     super.initState();
+    _containerWidth = widget.isMobileSize ? 300.0 : 400.0;
     fetchArtMovements();
   }
 
   @override
   void dispose() {
     _searchTimer?.cancel();
+    _scrollController.dispose();
     _searchTextController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -109,6 +123,10 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
     if (!widget.isVisible) {
       return Container();
     }
+
+    final double height = widget.isMobileSize
+        ? MediaQuery.of(context).size.height
+        : MediaQuery.of(context).size.height - 200.0;
 
     return FadeInX(
       beginX: 16.0,
@@ -120,11 +138,11 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
         ),
         child: Container(
           width: _containerWidth,
-          height: MediaQuery.of(context).size.height - 200.0,
+          height: height,
           child: Stack(
             fit: StackFit.expand,
             children: [
-              content(),
+              body(),
               header(),
             ],
           ),
@@ -133,43 +151,28 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
     );
   }
 
-  Widget content() {
+  Widget body() {
     if (_isImagePreviewVisible) {
       return imagePreview();
     }
 
     return Padding(
-      padding: const EdgeInsets.only(top: 120.0),
+      padding: widget.isMobileSize
+          ? const EdgeInsets.only(top: 180.0)
+          : const EdgeInsets.only(top: 120.0),
       child: NotificationListener<ScrollNotification>(
         onNotification: onNotification,
         child: CustomScrollView(
           controller: _scrollController,
           slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.only(top: 0.0),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate.fixed([
-                  Column(
-                    children: [
-                      searchInput(),
-                    ],
-                  ),
-                ]),
-              ),
-            ),
-            body(),
+            _searchTextController.text.isNotEmpty && _suggestionsList.isNotEmpty
+                ? searchResultListView()
+                : predefinedListView(),
+            SliverPadding(padding: const EdgeInsets.only(bottom: 100.0)),
           ],
         ),
       ),
     );
-  }
-
-  Widget body() {
-    if (_searchTextController.text.isNotEmpty && _suggestionsList.isNotEmpty) {
-      return searchResultListView();
-    }
-
-    return predefinedListView();
   }
 
   Widget header() {
@@ -185,7 +188,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              width: 380.0,
+              width: _containerWidth,
               child: Row(
                 children: [
                   Padding(
@@ -208,7 +211,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                           Text(
                             "art_movements_available".tr(),
                             style: Utilities.fonts.body(
-                              fontSize: 22.0,
+                              fontSize: widget.isMobileSize ? 16.0 : 22.0,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -230,13 +233,26 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                 ],
               ),
             ),
-            SizedBox(
-              width: _containerWidth,
-              child: Divider(
-                thickness: 2.0,
-                color: _secondaryColor,
-                height: 40.0,
-              ),
+            searchInput(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minWidth: _containerWidth,
+                      maxWidth: _containerWidth * 1.5,
+                    ),
+                    child: _searching
+                        ? LinearProgressIndicator()
+                        : Divider(
+                            thickness: 2.0,
+                            color: _secondaryColor,
+                          ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -338,7 +354,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
       padding: const EdgeInsets.all(8.0),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
+          (BuildContext context, int index) {
             final artMovement = _availableArtMovements.elementAt(index);
             final selected = widget.selectedArtMovements.contains(
               artMovement.id,
@@ -396,9 +412,9 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
       padding: const EdgeInsets.all(8.0),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final artMovement = _suggestionsList.elementAt(index);
-            final selected = widget.selectedArtMovements.contains(
+          (BuildContext context, int index) {
+            final ArtMovement artMovement = _suggestionsList.elementAt(index);
+            final bool selected = widget.selectedArtMovements.contains(
               artMovement.id,
             );
 
@@ -445,72 +461,40 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
 
   Widget searchInput() {
     return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: widget.isMobileSize
+          ? EdgeInsets.only(left: 8.0, right: 6.0, top: 24.0)
+          : const EdgeInsets.all(24.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                width: 300.0,
-                child: TextFormField(
-                  autofocus: true,
-                  controller: _searchTextController,
-                  decoration: InputDecoration(
-                    filled: true,
-                    isDense: true,
-                    labelText: "art_movement_label_text".tr(),
-                    fillColor: _clairPink,
-                    focusColor: _clairPink,
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        width: 4.0,
-                        color: Constants.colors.primary,
-                      ),
-                    ),
-                  ),
-                  onChanged: (value) {
-                    _searchTimer?.cancel();
+          SearchTextField(
+            autofocus: true,
+            controller: _searchTextController,
+            focusNode: _searchFocusNode,
+            label: "search".tr(),
+            hintText: "art_movement_label_text".tr(),
+            constraints: BoxConstraints(maxWidth: 300.0, maxHeight: 140.0),
+            onChanged: (String newValue) {
+              _searchTimer?.cancel();
 
-                    _searchTimer = Timer(
-                      500.milliseconds,
-                      trySearch,
-                    );
-                  },
-                  onFieldSubmitted: (value) {},
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Opacity(
-                  opacity: 0.6,
-                  child: IconButton(
-                    tooltip: "art_movements_search".tr(),
-                    icon: Icon(UniconsLine.search),
-                    onPressed: trySearch,
-                  ),
-                ),
-              ),
-            ],
+              _searchTimer = Timer(
+                500.milliseconds,
+                trySearch,
+              );
+            },
+            onClearInput: () {
+              setState(() {
+                _searchTextController.clear();
+                _suggestionsList.clear();
+              });
+
+              _searchFocusNode.requestFocus();
+            },
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 6.0),
-            child: TextButton.icon(
-              onPressed: () {
-                setState(() {
-                  _searchTextController.clear();
-                });
-              },
-              icon: Icon(UniconsLine.times),
-              label: Text("clear".tr()),
-              style: TextButton.styleFrom(
-                primary: Colors.black54,
-                textStyle: Utilities.fonts.body(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
+          CircleButton(
+            icon: Icon(UniconsLine.search, color: Colors.black87),
+            margin: const EdgeInsets.only(left: 4.0, top: 18.0),
+            onTap: trySearch,
           ),
         ],
       ),
@@ -553,7 +537,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
   }
 
   void fetchMoreArtMovements() async {
-    _isLoadingMore = true;
+    _loadingMore = true;
 
     try {
       final QuerySnapMap snapshot = await FirebaseFirestore.instance
@@ -594,7 +578,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
       return false;
     }
 
-    if (_hasNext && !_isLoadingMore && _lastDocumentSnapshot != null) {
+    if (_hasNext && !_loadingMore && _lastDocumentSnapshot != null) {
       fetchMoreArtMovements();
     }
 
@@ -602,7 +586,10 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
   }
 
   void trySearch() async {
-    _suggestionsList.clear();
+    setState(() {
+      _suggestionsList.clear();
+      _searching = true;
+    });
 
     try {
       final AlgoliaQuery query = await SearchUtilities.algolia
@@ -628,6 +615,8 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
       });
     } catch (error) {
       Utilities.logger.e(error);
+    } finally {
+      setState(() => _searching = false);
     }
   }
 }

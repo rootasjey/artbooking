@@ -97,9 +97,6 @@ class SearchTextField extends StatelessWidget {
                 ),
                 cursorColor: _primaryColor,
                 decoration: InputDecoration(
-                  // filled: true,
-                  // fillColor: Theme.of(context).primaryColor,
-                  // fillColor: Theme.of(context).backgroundColor,
                   hintText: hintText,
                   contentPadding: EdgeInsets.only(
                     left: 20.0,
