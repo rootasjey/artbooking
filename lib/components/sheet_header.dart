@@ -36,7 +36,7 @@ class SheetHeader extends StatelessWidget {
     return Padding(
       padding: margin,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
