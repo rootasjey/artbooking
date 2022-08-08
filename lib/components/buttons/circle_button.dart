@@ -9,8 +9,8 @@ class CircleButton extends StatelessWidget {
     this.elevation = 0.0,
     this.backgroundColor = Colors.black12,
     this.tooltip,
-    this.showBorder = false,
     this.margin = EdgeInsets.zero,
+    this.shape = const CircleBorder(side: BorderSide.none),
   });
 
   /// Tap callback.
@@ -33,8 +33,8 @@ class CircleButton extends StatelessWidget {
   /// Spacing outside of this button.
   final EdgeInsets margin;
 
-  /// If true, will paint a border around this button.
-  final bool showBorder;
+  /// Defines the material's shape as well its shadow.
+  final ShapeBorder? shape;
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +59,7 @@ class CircleButton extends StatelessWidget {
     return Padding(
       padding: margin,
       child: Material(
-        shape: CircleBorder(
-          side: showBorder
-              ? BorderSide(color: Colors.white38, width: 2.0)
-              : BorderSide.none,
-        ),
+        shape: shape,
         clipBehavior: Clip.antiAlias,
         color: Colors.transparent,
         elevation: elevation,

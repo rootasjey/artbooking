@@ -21,14 +21,18 @@ class SectionIllustrationButtons extends StatelessWidget {
       children: [
         CircleButton(
           elevation: 2.0,
-          showBorder: true,
+          shape: CircleBorder(
+            side: BorderSide(color: Colors.white38, width: 2.0),
+          ),
           onTap: onRemoveIllustration,
           tooltip: "illustration_remove".tr(),
           icon: Icon(UniconsLine.minus),
         ),
         CircleButton(
           elevation: 2.0,
-          showBorder: true,
+          shape: CircleBorder(
+            side: BorderSide(color: Colors.white38, width: 2.0),
+          ),
           onTap: onPickIllustration,
           tooltip: "illustration_change".tr(),
           icon: Icon(UniconsLine.exchange),
