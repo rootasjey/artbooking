@@ -28,11 +28,7 @@ class AddArtMovementPanel extends StatefulWidget {
     this.onClose,
     this.onToggleArtMovementAndUpdate,
     this.elevation = 4.0,
-    this.isMobileSize = false,
   }) : super(key: key);
-
-  /// If true, this widget adapts its layout to small screens.
-  final bool isMobileSize;
 
   /// True if the panel is visible.
   final bool isVisible;
@@ -66,7 +62,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
   /// True if loading more art movement from Firestore.
   bool _loadingMore = false;
 
-  /// Searching art movements according to `_searchTextController.text` if true.
+  /// Searching art movements according to `_searchInputController.text` if true.
   bool _searching = false;
 
   /// True if the art movement's image is visible.
@@ -100,12 +96,11 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
   final ScrollController _scrollController = ScrollController();
 
   /// Search text controller.
-  final TextEditingController _searchTextController = TextEditingController();
+  final TextEditingController _searchInputController = TextEditingController();
 
   @override
   initState() {
     super.initState();
-    _containerWidth = widget.isMobileSize ? 300.0 : 400.0;
     fetchArtMovements();
   }
 
@@ -113,7 +108,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
   void dispose() {
     _searchTimer?.cancel();
     _scrollController.dispose();
-    _searchTextController.dispose();
+    _searchInputController.dispose();
     _searchFocusNode.dispose();
     super.dispose();
   }
@@ -124,7 +119,11 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
       return Container();
     }
 
-    final double height = widget.isMobileSize
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    _containerWidth = isMobileSize ? 300.0 : 400.0;
+
+    final double height = isMobileSize
         ? MediaQuery.of(context).size.height
         : MediaQuery.of(context).size.height - 200.0;
 
@@ -142,8 +141,8 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              body(),
-              header(),
+              body(isMobileSize: isMobileSize),
+              header(isMobileSize: isMobileSize),
             ],
           ),
         ),
@@ -151,13 +150,13 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
     );
   }
 
-  Widget body() {
+  Widget body({bool isMobileSize = false}) {
     if (_isImagePreviewVisible) {
       return imagePreview();
     }
 
     return Padding(
-      padding: widget.isMobileSize
+      padding: isMobileSize
           ? const EdgeInsets.only(top: 180.0)
           : const EdgeInsets.only(top: 120.0),
       child: NotificationListener<ScrollNotification>(
@@ -165,7 +164,8 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
         child: CustomScrollView(
           controller: _scrollController,
           slivers: [
-            _searchTextController.text.isNotEmpty && _suggestionsList.isNotEmpty
+            _searchInputController.text.isNotEmpty &&
+                    _suggestionsList.isNotEmpty
                 ? searchResultListView()
                 : predefinedListView(),
             SliverPadding(padding: const EdgeInsets.only(bottom: 100.0)),
@@ -175,7 +175,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
     );
   }
 
-  Widget header() {
+  Widget header({bool isMobileSize = false}) {
     return Positioned(
       top: 0.0,
       child: Container(
@@ -211,7 +211,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                           Text(
                             "art_movements_available".tr(),
                             style: Utilities.fonts.body(
-                              fontSize: widget.isMobileSize ? 16.0 : 22.0,
+                              fontSize: isMobileSize ? 16.0 : 22.0,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -233,7 +233,9 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
                 ],
               ),
             ),
-            searchInput(),
+            searchInput(
+              isMobileSize: isMobileSize,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -459,9 +461,9 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
     );
   }
 
-  Widget searchInput() {
+  Widget searchInput({bool isMobileSize = false}) {
     return Padding(
-      padding: widget.isMobileSize
+      padding: isMobileSize
           ? EdgeInsets.only(left: 8.0, right: 6.0, top: 24.0)
           : const EdgeInsets.all(24.0),
       child: Row(
@@ -469,7 +471,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
         children: [
           SearchTextInput(
             autofocus: true,
-            controller: _searchTextController,
+            controller: _searchInputController,
             focusNode: _searchFocusNode,
             label: "search".tr(),
             hintText: "art_movement_label_text".tr(),
@@ -484,7 +486,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
             },
             onClearInput: () {
               setState(() {
-                _searchTextController.clear();
+                _searchInputController.clear();
                 _suggestionsList.clear();
               });
 
@@ -594,7 +596,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
     try {
       final AlgoliaQuery query = await SearchUtilities.algolia
           .index("art_movements")
-          .query(_searchTextController.text)
+          .query(_searchInputController.text)
           .setHitsPerPage(_limit)
           .setPage(0);
 
