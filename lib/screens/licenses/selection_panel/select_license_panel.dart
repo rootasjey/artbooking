@@ -354,6 +354,18 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
     }
   }
 
+  List<License> getLicensesDataList() {
+    if (_searchInputController.text.isNotEmpty) {
+      return _searchResultLicenses;
+    }
+
+    if (_selectedTab == EnumLicenseType.staff) {
+      return _staffLicenses;
+    }
+
+    return _userLicenses;
+  }
+
   void maybeFetchMore(double offset) {
     if (_pageScrollController.position.atEdge &&
         offset > 50 &&
@@ -365,9 +377,57 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
     }
   }
 
+  void onChangedTab(EnumLicenseType newSelectedTab) {
+    setState(() {
+      _selectedTab = newSelectedTab;
+    });
+
+    switch (newSelectedTab) {
+      case EnumLicenseType.staff:
+        fetchStaffLicenses();
+        break;
+      case EnumLicenseType.user:
+        fetchUserLicenses();
+        break;
+      default:
+    }
+  }
+
+  void onClearInput() {
+    setState(() {
+      _searchInputController.clear();
+      _searchResultLicenses.clear();
+    });
+
+    _searchFocusNode.requestFocus();
+  }
+
+  void onInputChanged(String _) {
+    _searchTimer?.cancel();
+
+    if (_searchInputController.text.isEmpty) {
+      onClearInput();
+      return;
+    }
+
+    _searchTimer = Timer(
+      500.milliseconds,
+      trySearchLicense,
+    );
+  }
+
   /// Callback when the page scrolls up and down.
   void onPageScroll(double offset) {
     maybeFetchMore(offset);
+  }
+
+  void onToggleLicenseInfo(bool visible, License? license) {
+    setState(() {
+      _showLicenseInfo = visible;
+      if (license != null) {
+        _moreInfoLicense = license;
+      }
+    });
   }
 
   /// Run a search based on the user input.
@@ -404,65 +464,5 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
     } finally {
       setState(() => _searching = false);
     }
-  }
-
-  void onInputChanged(String _) {
-    _searchTimer?.cancel();
-
-    if (_searchInputController.text.isEmpty) {
-      onClearInput();
-      return;
-    }
-
-    _searchTimer = Timer(
-      500.milliseconds,
-      trySearchLicense,
-    );
-  }
-
-  void onToggleLicenseInfo(bool visible, License? license) {
-    setState(() {
-      _showLicenseInfo = visible;
-      if (license != null) {
-        _moreInfoLicense = license;
-      }
-    });
-  }
-
-  void onChangedTab(EnumLicenseType newSelectedTab) {
-    setState(() {
-      _selectedTab = newSelectedTab;
-    });
-
-    switch (newSelectedTab) {
-      case EnumLicenseType.staff:
-        fetchStaffLicenses();
-        break;
-      case EnumLicenseType.user:
-        fetchUserLicenses();
-        break;
-      default:
-    }
-  }
-
-  void onClearInput() {
-    setState(() {
-      _searchInputController.clear();
-      _searchResultLicenses.clear();
-    });
-
-    _searchFocusNode.requestFocus();
-  }
-
-  List<License> getLicensesDataList() {
-    if (_searchInputController.text.isNotEmpty) {
-      return _searchResultLicenses;
-    }
-
-    if (_selectedTab == EnumLicenseType.staff) {
-      return _staffLicenses;
-    }
-
-    return _userLicenses;
   }
 }

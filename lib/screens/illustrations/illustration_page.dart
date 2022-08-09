@@ -629,8 +629,13 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
   void onShowEditMetadataPanel() async {
     await showCupertinoModalBottomSheet(
       context: context,
-      builder: (context) => EditIllustrationPage(
-          illustration: _illustration, goToEditImagePage: goToEditImagePage),
+      expand: true,
+      builder: (BuildContext context) {
+        return EditIllustrationPage(
+          illustration: _illustration,
+          goToEditImagePage: goToEditImagePage,
+        );
+      },
     );
   }
 
