@@ -8,6 +8,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/licenses/selection_panel/select_license_panel_body.dart';
 import 'package:artbooking/screens/licenses/selection_panel/select_license_panel_header.dart';
 import 'package:artbooking/types/enums/enum_license_type.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/license/license.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -57,6 +58,9 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
   /// True if loading more licenses.
   bool _loadingMore = false;
 
+  /// Searching art movements according to `_searchInputController.text` if true.
+  bool _searching = false;
+
   /// True if the style's image is visible.
   bool _showLicenseInfo = false;
 
@@ -64,7 +68,9 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
   DocumentSnapshot<Object>? _lastDocumentSnapshot;
 
   /// Maximum container's width.
-  final double _containerWidth = 400.0;
+  double _width = 400.0;
+
+  final FocusNode _searchFocusNode = FocusNode();
 
   /// Staff licenses.
   final List<License> _staffLicenses = [];
@@ -75,7 +81,7 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
   /// Search results.
   final List<License> _searchResultLicenses = [];
 
-  final _panelScrollController = ScrollController();
+  EnumLicenseType _selectedTab = EnumLicenseType.staff;
 
   /// Maximum licenses to fetch in one request.
   int _limit = 10;
@@ -86,12 +92,12 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
   /// License we want to show information preview.
   License _moreInfoLicense = License.empty();
 
-  String _searchInputValue = '';
+  final ScrollController _pageScrollController = ScrollController();
+
+  final TextEditingController _searchInputController = TextEditingController();
 
   /// Delay search after typing input.
   Timer? _searchTimer;
-
-  var _selectedTab = EnumLicenseType.staff;
 
   @override
   initState() {
@@ -102,7 +108,9 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
   @override
   void dispose() {
     _searchTimer?.cancel();
-    _panelScrollController.dispose();
+    _pageScrollController.dispose();
+    _searchFocusNode.dispose();
+    _searchInputController.dispose();
     super.dispose();
   }
 
@@ -114,6 +122,12 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
 
     _selectedLicense = widget.selectedLicense;
 
+    final Size size = MediaQuery.of(context).size;
+    final bool isMobileSize = size.width < Utilities.size.mobileWidthTreshold;
+
+    _width = isMobileSize ? size.width : 400.0;
+    final double height = isMobileSize ? size.height : size.height - 200.0;
+
     return FadeInX(
       beginX: 16.0,
       child: Material(
@@ -123,30 +137,36 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
           borderRadius: BorderRadius.circular(12.0),
         ),
         child: Container(
-          width: _containerWidth,
-          height: MediaQuery.of(context).size.height - 200.0,
+          width: _width,
+          height: height,
           child: Stack(
             fit: StackFit.expand,
             children: [
               SelectLicensePanelBody(
-                isLoading: _loading,
-                selectedTab: _selectedTab,
-                onChangedTab: onChangedTab,
+                isMobileSize: isMobileSize,
+                loading: _loading,
+                showSearchResults: _searchInputController.text.isNotEmpty,
                 showLicenseInfo: _showLicenseInfo,
                 moreInfoLicense: _moreInfoLicense,
                 selectedLicense: _selectedLicense,
                 licenses: getLicensesDataList(),
-                onScrollNotification: onScrollNotification,
-                panelScrollController: _panelScrollController,
-                onInputChanged: onInputChanged,
-                searchInputValue: _searchInputValue,
+                onPageScroll: onPageScroll,
+                panelScrollController: _pageScrollController,
                 onTogglePreview: onToggleLicenseInfo,
-                onSearchLicense: onSearchLicense,
+                searching: _searching,
                 toggleLicenseAndUpdate: widget.onToggleLicenseAndUpdate,
               ),
               SelectLicensePanelHeader(
                 onClose: widget.onClose,
-                containerWidth: _containerWidth,
+                width: _width,
+                selectedTab: _selectedTab,
+                onChangedTab: onChangedTab,
+                onClearInput: onClearInput,
+                onInputChanged: onInputChanged,
+                trySearchLicense: trySearchLicense,
+                searchInputController: _searchInputController,
+                searching: _searching,
+                searchFocusNode: _searchFocusNode,
               ),
             ],
           ),
@@ -200,7 +220,7 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
   }
 
   /// Fetch more licenses on Firestore.
-  void fetchStaffLicensesMore() async {
+  void fetchMoreStaffLicenses() async {
     _loadingMore = true;
 
     try {
@@ -289,7 +309,7 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
   }
 
   /// Fetch more user's licenses on Firestore.
-  void fetchUserLicensesMore() async {
+  void fetchMoreUserLicenses() async {
     setState(() => _loadingMore = true);
 
     try {
@@ -334,26 +354,31 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
     }
   }
 
-  /// On scroll notification
-  bool onScrollNotification(ScrollNotification notification) {
-    if (notification.metrics.pixels < notification.metrics.maxScrollExtent) {
-      return false;
+  void maybeFetchMore(double offset) {
+    if (_pageScrollController.position.atEdge &&
+        offset > 50 &&
+        _hasNext &&
+        !_loadingMore) {
+      _selectedTab == EnumLicenseType.staff
+          ? fetchMoreStaffLicenses()
+          : fetchMoreUserLicenses();
     }
-
-    if (_hasNext && !_loadingMore && _lastDocumentSnapshot != null) {
-      fetchStaffLicensesMore();
-    }
-
-    return false;
   }
 
-  void onSearchLicense() async {
+  /// Callback when the page scrolls up and down.
+  void onPageScroll(double offset) {
+    maybeFetchMore(offset);
+  }
+
+  /// Run a search based on the user input.
+  void trySearchLicense() async {
     _searchResultLicenses.clear();
+    setState(() => _searching = true);
 
     try {
       final AlgoliaQuery query = await SearchUtilities.algolia
           .index("licenses")
-          .query(_searchInputValue)
+          .query(_searchInputController.text)
           .setHitsPerPage(_limit)
           .setPage(0);
 
@@ -366,26 +391,32 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
 
       setState(() {
         for (final AlgoliaObjectSnapshot hit in snapshot.hits) {
-          final data = hit.data;
-          data['id'] = hit.objectID;
+          final Json data = hit.data;
+          data["id"] = hit.objectID;
 
-          final license = License.fromMap(data);
+          final License license = License.fromMap(data);
           _searchResultLicenses.add(license);
         }
       });
     } catch (error) {
       Utilities.logger.e(error);
       context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _searching = false);
     }
   }
 
-  void onInputChanged(String newSearchInputValue) {
-    _searchInputValue = newSearchInputValue;
+  void onInputChanged(String _) {
     _searchTimer?.cancel();
+
+    if (_searchInputController.text.isEmpty) {
+      onClearInput();
+      return;
+    }
 
     _searchTimer = Timer(
       500.milliseconds,
-      onSearchLicense,
+      trySearchLicense,
     );
   }
 
@@ -414,8 +445,17 @@ class _SelectLicensePanelState extends ConsumerState<SelectLicensePanel> {
     }
   }
 
+  void onClearInput() {
+    setState(() {
+      _searchInputController.clear();
+      _searchResultLicenses.clear();
+    });
+
+    _searchFocusNode.requestFocus();
+  }
+
   List<License> getLicensesDataList() {
-    if (_searchInputValue.isNotEmpty) {
+    if (_searchInputController.text.isNotEmpty) {
       return _searchResultLicenses;
     }
 

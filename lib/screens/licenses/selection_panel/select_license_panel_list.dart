@@ -10,37 +10,61 @@ import 'package:unicons/unicons.dart';
 class SelectLicensePanelList extends StatelessWidget {
   const SelectLicensePanelList({
     Key? key,
+    required this.loading,
     required this.licenses,
     required this.selectedLicenseId,
-    this.toggleLicenseAndUpdate,
+    this.isMobileSize = false,
+    this.searching = false,
+    this.showSearchResults = false,
     this.onShowLicensePreview,
-    this.searchON = false,
-    required this.isLoading,
+    this.toggleLicenseAndUpdate,
   }) : super(key: key);
 
-  final bool isLoading;
-  final bool searchON;
-  final Function(License, bool)? toggleLicenseAndUpdate;
-  final Function(License)? onShowLicensePreview;
+  /// If true, this widget adapts its layout to small screens.
+  final bool isMobileSize;
+
+  /// Fetching data if true.
+  final bool loading;
+
+  /// Searching license matchs according to the search input's value.
+  final bool searching;
+
+  /// Show specific texts about search results if this field is true.
+  final bool showSearchResults;
+
+  /// Callback fired when a license is un-/selected.
+  final Function(License license, bool selected)? toggleLicenseAndUpdate;
+
+  /// Callback fired to show more information about a license.
+  final Function(License license)? onShowLicensePreview;
+
+  /// List of available licenses.
   final List<License> licenses;
+
+  /// Currently selected license's id.
   final String selectedLicenseId;
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (loading) {
       return SliverList(delegate: SliverChildListDelegate.fixed([]));
     }
 
-    if (licenses.isEmpty) {
+    if (licenses.isEmpty && !searching) {
       return SliverPadding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.only(
+          bottom: 24.0,
+          left: 24.0,
+          right: 24.0,
+          top: 60.0,
+        ),
         sliver: SliverList(
           delegate: SliverChildListDelegate.fixed([
             Opacity(
               opacity: 0.6,
               child: Icon(
                 UniconsLine.no_entry,
-                size: 80.0,
+                size: isMobileSize ? 40.0 : 80.0,
               ),
             ),
             Padding(
@@ -48,18 +72,18 @@ class SelectLicensePanelList extends StatelessWidget {
               child: Opacity(
                 opacity: 0.6,
                 child: Text(
-                  searchON
+                  showSearchResults
                       ? "license_search_result_empty".tr()
                       : "license_personal_empty_create".tr(),
                   textAlign: TextAlign.center,
                   style: Utilities.fonts.body(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.w400,
+                    fontSize: isMobileSize ? 18.0 : 24.0,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
             ),
-            if (!searchON)
+            if (!showSearchResults)
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Center(
@@ -80,9 +104,9 @@ class SelectLicensePanelList extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final currentLicense = licenses.elementAt(index);
-            final selected = selectedLicenseId == currentLicense.id;
+          (BuildContext context, int index) {
+            final License currentLicense = licenses.elementAt(index);
+            final bool selected = selectedLicenseId == currentLicense.id;
 
             return ListTile(
               onLongPress: () => onShowLicensePreview?.call(currentLicense),
@@ -94,16 +118,9 @@ class SelectLicensePanelList extends StatelessWidget {
                 opacity: 0.8,
                 child: Row(
                   children: [
-                    if (selected)
-                      Icon(
-                        UniconsLine.check,
-                        color: selected
-                            ? Theme.of(context).secondaryHeaderColor
-                            : null,
-                      ),
                     Expanded(
                       child: Text(
-                        currentLicense.name.toUpperCase(),
+                        currentLicense.name,
                         style: Utilities.fonts.body(
                           fontSize: 18.0,
                           fontWeight: FontWeight.w700,
@@ -113,16 +130,27 @@ class SelectLicensePanelList extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (selected)
+                      Icon(
+                        UniconsLine.check,
+                        color: selected
+                            ? Theme.of(context).secondaryHeaderColor
+                            : null,
+                      ),
                   ],
                 ),
               ),
               subtitle: Text(
                 currentLicense.description,
+                maxLines: isMobileSize ? 3 : null,
+                overflow: TextOverflow.ellipsis,
                 style: Utilities.fonts.body(
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              contentPadding: const EdgeInsets.all(16.0),
+              contentPadding: isMobileSize
+                  ? const EdgeInsets.all(6.0)
+                  : const EdgeInsets.all(16.0),
             );
           },
           childCount: licenses.length,

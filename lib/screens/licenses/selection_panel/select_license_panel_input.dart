@@ -1,5 +1,5 @@
-import 'package:artbooking/globals/constants.dart';
-import 'package:artbooking/globals/utilities.dart';
+import 'package:artbooking/components/buttons/circle_button.dart';
+import 'package:artbooking/components/inputs/search_text_input.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -7,96 +7,64 @@ import 'package:unicons/unicons.dart';
 class SelectLicensePanelInput extends StatelessWidget {
   const SelectLicensePanelInput({
     Key? key,
+    required this.searchInputController,
     this.onInputChanged,
-    this.onSearchLicense,
-    this.searchInputValue = '',
+    this.trySearchLicense,
+    this.width = 300.0,
+    this.isMobileSize = false,
+    this.onClearInput,
+    this.searchFocusNode,
   }) : super(key: key);
 
-  final Function(String)? onInputChanged;
-  final Function()? onSearchLicense;
-  final String searchInputValue;
+  /// If true, this widget adapts its layout to small screens.
+  final bool isMobileSize;
+
+  /// This widget's width.
+  final double width;
+
+  /// Search focus node to request focus.
+  final FocusNode? searchFocusNode;
+
+  /// Callback fired when the search input value has changed.
+  final void Function(String newValue)? onInputChanged;
+
+  /// Callback fired to search a specific license..
+  final void Function()? trySearchLicense;
+
+  /// Callback fired to clear the search input.
+  final void Function()? onClearInput;
+
+  /// Search text controller.
+  final TextEditingController searchInputController;
 
   @override
   Widget build(BuildContext context) {
-    final searchInput = TextEditingController();
-    final searchInputFocus = FocusNode();
-
-    if (searchInputValue.isNotEmpty) {
-      searchInput.text = searchInputValue;
-      searchInput.selection = TextSelection(
-        baseOffset: searchInputValue.length,
-        extentOffset: searchInputValue.length,
-      );
-    }
-
-    return SliverPadding(
-      padding: const EdgeInsets.all(24.0),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    width: 300.0,
-                    child: TextFormField(
-                      autofocus: true,
-                      controller: searchInput,
-                      focusNode: searchInputFocus,
-                      decoration: InputDecoration(
-                        filled: true,
-                        isDense: true,
-                        labelText: "license_label_text".tr(),
-                        fillColor: Constants.colors.clairPink,
-                        focusColor: Constants.colors.clairPink,
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            width: 4.0,
-                            color: Constants.colors.primary,
-                          ),
-                        ),
-                      ),
-                      onChanged: (value) {
-                        onInputChanged?.call(value);
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Opacity(
-                      opacity: 0.6,
-                      child: IconButton(
-                        tooltip: "license_find".tr(),
-                        icon: Icon(UniconsLine.search),
-                        onPressed: onSearchLicense,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 6.0),
-                child: TextButton.icon(
-                  onPressed: () {
-                    searchInput.clear();
-                    onInputChanged?.call(searchInput.text);
-                    searchInputFocus.requestFocus();
-                  },
-                  icon: Icon(UniconsLine.times),
-                  label: Text("clear".tr()),
-                  style: TextButton.styleFrom(
-                    primary: Colors.black54,
-                    textStyle: Utilities.fonts.body(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+    return Padding(
+      padding: isMobileSize
+          ? EdgeInsets.only(left: 8.0, right: 6.0, top: 24.0)
+          : const EdgeInsets.all(24.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SearchTextInput(
+            autofocus: true,
+            controller: searchInputController,
+            focusNode: searchFocusNode,
+            label: "search".tr(),
+            hintText: "license_label_text".tr(),
+            constraints: BoxConstraints(
+              maxWidth: width - 90.0,
+              maxHeight: 140.0,
+            ),
+            onChanged: onInputChanged,
+            onClearInput: onClearInput,
           ),
-        ]),
+          CircleButton(
+            icon: Icon(UniconsLine.search, color: Colors.black87),
+            margin: const EdgeInsets.only(left: 4.0, top: 18.0),
+            onTap: trySearchLicense,
+          ),
+        ],
       ),
     );
   }

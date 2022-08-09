@@ -10,33 +10,32 @@ class SelectLicensePanelTabs extends StatelessWidget {
     this.onChangedTab,
   }) : super(key: key);
 
+  /// Currently selected tab.
   final EnumLicenseType selectedTab;
-  final Function(EnumLicenseType)? onChangedTab;
+
+  /// Callback fired when a tab is selected.
+  final Function(EnumLicenseType enumLicenseType)? onChangedTab;
 
   @override
   Widget build(BuildContext context) {
-    return SliverList(
-      delegate: SliverChildListDelegate.fixed([
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0, left: 24.0),
-          child: Wrap(
-            spacing: 12.0,
-            runSpacing: 12.0,
-            children: [
-              DarkOutlinedButton(
-                selected: EnumLicenseType.staff == selectedTab,
-                onPressed: onChangedTab != null ? onPressedStaff : null,
-                child: Text("staff".tr().toUpperCase()),
-              ),
-              DarkOutlinedButton(
-                selected: EnumLicenseType.user == selectedTab,
-                onPressed: onChangedTab != null ? onPressedUser : onPressedUser,
-                child: Text("user".tr().toUpperCase()),
-              ),
-            ],
+    return Padding(
+      padding: const EdgeInsets.only(top: 12.0, left: 24.0),
+      child: Wrap(
+        spacing: 12.0,
+        runSpacing: 12.0,
+        children: [
+          DarkOutlinedButton(
+            selected: EnumLicenseType.staff == selectedTab,
+            onPressed: onChangedTab != null ? onPressedStaff : null,
+            child: Text("staff".tr().toUpperCase()),
           ),
-        )
-      ]),
+          DarkOutlinedButton(
+            selected: EnumLicenseType.user == selectedTab,
+            onPressed: onChangedTab != null ? onPressedUser : onPressedUser,
+            child: Text("user".tr().toUpperCase()),
+          ),
+        ],
+      ),
     );
   }
 

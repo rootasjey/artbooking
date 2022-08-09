@@ -20,6 +20,7 @@ import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:verbal_expressions/verbal_expressions.dart';
 
 class EditIllustrationPage extends ConsumerStatefulWidget {
@@ -69,13 +70,13 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
     ..oneOrMore();
 
   /// Illustration's name.
-  String _illustrationName = '';
+  String _illustrationName = "";
 
   /// Illustration's descriptin..
-  String _illustrationDescription = '';
+  String _illustrationDescription = "";
 
   /// Illustration's lore..
-  String _illustrationLore = '';
+  String _illustrationLore = "";
 
   @override
   void initState() {
@@ -103,6 +104,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       body: Stack(
         children: [
           SingleChildScrollView(
+            controller: ModalScrollController.of(context),
             child: Padding(
               padding: isMobileSize
                   ? const EdgeInsets.only(
@@ -135,6 +137,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
                     ),
                   ),
                   EditIllustrationPageBody(
+                    isMobileSize: isMobileSize,
                     loading: _loading,
                     license: _license,
                     illustration: widget.illustration,
@@ -172,20 +175,8 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
               message: '${"illustration_updating".tr()}...',
             ),
           ),
-          artMovementsSidePanel(
-            isMobileSize: isMobileSize,
-          ),
-          Positioned(
-            top: 100.0,
-            right: isMobileSize ? 0.0 : 24.0,
-            child: SelectLicensePanel(
-              elevation: 8.0,
-              isVisible: _showLicensesPanel,
-              selectedLicense: _license,
-              onClose: () => setState(() => _showLicensesPanel = false),
-              onToggleLicenseAndUpdate: onToggleLicenseAndUpdate,
-            ),
-          ),
+          artMovementsSidePanel(isMobileSize: isMobileSize),
+          licensePanel(isMobileSize: isMobileSize),
         ],
       ),
     );
@@ -197,13 +188,27 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       right: isMobileSize ? 0.0 : 24.0,
       left: isMobileSize ? 0.0 : null,
       child: AddArtMovementPanel(
-        isMobileSize: isMobileSize,
         isVisible: _showArtMovementPanel,
         selectedArtMovements: widget.illustration.artMovements,
         onClose: () {
           setState(() => _showArtMovementPanel = false);
         },
         onToggleArtMovementAndUpdate: onToggleArtMovementAndUpdate,
+      ),
+    );
+  }
+
+  Widget licensePanel({bool isMobileSize = false}) {
+    return Positioned(
+      top: isMobileSize ? 0.0 : 100.0,
+      right: isMobileSize ? null : 24.0,
+      left: isMobileSize ? 0.0 : null,
+      child: SelectLicensePanel(
+        elevation: 8.0,
+        isVisible: _showLicensesPanel,
+        selectedLicense: _license,
+        onClose: () => setState(() => _showLicensesPanel = false),
+        onToggleLicenseAndUpdate: onToggleLicenseAndUpdate,
       ),
     );
   }

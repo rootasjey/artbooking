@@ -28,6 +28,7 @@ class EditIllustrationPageBody extends StatelessWidget {
     required this.illustrationName,
     required this.illustrationDescription,
     required this.illustrationLore,
+    this.isMobileSize = false,
     this.topicInputFocusNode,
     this.goToEditImagePage,
     this.onAddTopicAndUpdate,
@@ -42,6 +43,9 @@ class EditIllustrationPageBody extends StatelessWidget {
     this.onUpdateVisibility,
     this.onUpdatePresentation,
   }) : super(key: key);
+
+  /// If true, this widget adapts its layout to small screens.
+  final bool isMobileSize;
 
   /// Loading this widget if true.
   final bool loading;
@@ -59,13 +63,13 @@ class EditIllustrationPageBody extends StatelessWidget {
   final void Function()? goToEditImagePage;
 
   /// Callback fired to add a topic to an illustration.
-  final void Function(String)? onAddTopicAndUpdate;
+  final void Function(String topic)? onAddTopicAndUpdate;
 
   /// Callback fired to remove art movement.
-  final void Function(String)? onRemoveArtMovementAndUpdate;
+  final void Function(String artMovement)? onRemoveArtMovementAndUpdate;
 
   /// Callback fired to remove a topic to an illustration.
-  final void Function(String)? onRemoveTopicAndUpdate;
+  final void Function(String topic)? onRemoveTopicAndUpdate;
 
   /// Callback fired when we tap on a license.
   final void Function()? onTapCurrentLicense;
@@ -155,6 +159,7 @@ class EditIllustrationPageBody extends StatelessWidget {
           ),
           EditIllustrationPagePresentation(
             cardKey: presentationCardKey,
+            isMobileSize: isMobileSize,
             name: illustrationName,
             description: illustrationDescription,
             lore: illustrationLore,
@@ -177,6 +182,7 @@ class EditIllustrationPageBody extends StatelessWidget {
             onUpdateVisibility: onUpdateVisibility,
           ),
           EditIllustrationPageLicense(
+            isMobileSize: isMobileSize,
             showLicensesPanel: showLicensePanel,
             license: license,
             onTapCurrentLicense: onTapCurrentLicense,
@@ -185,10 +191,21 @@ class EditIllustrationPageBody extends StatelessWidget {
             onExpandStateLicenseChanged: onExpandStateLicenseChanged,
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 80.0),
-            child: DarkElevatedButton.large(
-              onPressed: onDone,
-              child: Text("done".tr()),
+            padding: isMobileSize
+                ? const EdgeInsets.only(left: 12.0, top: 0.0)
+                : const EdgeInsets.only(left: 12.0, top: 80.0),
+            child: Column(
+              children: [
+                if (isMobileSize)
+                  Divider(
+                    thickness: 2.0,
+                    height: 56.0,
+                  ),
+                DarkElevatedButton.large(
+                  onPressed: onDone,
+                  child: Text("done".tr()),
+                ),
+              ],
             ),
           ),
         ],

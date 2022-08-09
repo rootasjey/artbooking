@@ -8,20 +8,24 @@ import 'package:url_launcher/url_launcher.dart';
 class SelectLicensePanelMoreInfo extends StatelessWidget {
   const SelectLicensePanelMoreInfo({
     Key? key,
-    this.onBack,
     required this.license,
+    this.margin = EdgeInsets.zero,
+    this.onBack,
   }) : super(key: key);
 
+  /// Spacing around this widget.
+  final EdgeInsets margin;
+
+  /// Callback fired to navigate back.
   final Function()? onBack;
+
+  /// Selected license to show info about.
   final License license;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-        top: 140.0,
-        bottom: 12.0,
-      ),
+      padding: margin,
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,

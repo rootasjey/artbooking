@@ -13,18 +13,33 @@ class EditIllustrationPageLicense extends StatelessWidget {
     Key? key,
     required this.showLicensesPanel,
     required this.license,
+    this.isMobileSize = false,
     this.onTapCurrentLicense,
     this.onUnselectLicenseAndUpdate,
     this.onExpandStateLicenseChanged,
     this.onToggleLicensePanel,
   }) : super(key: key);
 
+  /// If true, this widget adapts its layout to small screens.
+  final bool isMobileSize;
+
+  /// Display the license panel is true.
   final bool showLicensesPanel;
+
+  /// Current selected license.
   final License license;
+
+  /// Callback fired when the current license button is tapped.
   final void Function()? onTapCurrentLicense;
+
+  /// Callback fired to toggle the license panel selection.
   final void Function()? onToggleLicensePanel;
+
+  /// Callback fired to unselect a license.
   final void Function()? onUnselectLicenseAndUpdate;
-  final void Function(bool)? onExpandStateLicenseChanged;
+
+  /// Callback fired when this section is expanded or minimized.
+  final void Function(bool isExpanded)? onExpandStateLicenseChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -126,11 +141,6 @@ class EditIllustrationPageLicense extends StatelessWidget {
               ),
               child: DarkElevatedButton.large(
                 onPressed: onToggleLicensePanel,
-                // onPressed: () {
-                //   setState(() {
-                //     _showLicensesPanel = !_showLicensesPanel;
-                //   });
-                // },
                 child: Text(
                   showLicensesPanel
                       ? "license_hide_panel".tr()

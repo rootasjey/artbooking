@@ -11,10 +11,14 @@ class EditIllustrationPageTopics extends StatelessWidget {
   const EditIllustrationPageTopics({
     Key? key,
     required this.topics,
+    this.isMobileSize = false,
     this.onAddTopicAndUpdate,
     this.onRemoveTopicAndUpdate,
     this.topicInputFocusNode,
   }) : super(key: key);
+
+  /// If true, this widget adapts its layout to small screens.
+  final bool isMobileSize;
 
   /// Allow to request focus after adding a topic.
   final FocusNode? topicInputFocusNode;
@@ -107,9 +111,7 @@ class EditIllustrationPageTopics extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       SizedBox(
-                        width: Utilities.size.isMobileSize(context)
-                            ? 260.0
-                            : 300.0,
+                        width: isMobileSize ? 260.0 : 300.0,
                         child: TextFormField(
                           focusNode: topicInputFocusNode,
                           controller: _topicInputController,

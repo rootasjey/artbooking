@@ -16,11 +16,15 @@ class EditIllustrationPagePresentation extends StatelessWidget {
     required this.description,
     required this.name,
     required this.lore,
+    this.isMobileSize = false,
     this.onDescriptionChanged,
     this.onLoreChanged,
     this.onTitleChanged,
     this.onUpdatePresentation,
   }) : super(key: key);
+
+  /// If true, this widget adapts its layout to small screens.
+  final bool isMobileSize;
 
   /// Callback fired when illustrations's description is updated.
   final void Function(String)? onDescriptionChanged;
@@ -75,8 +79,7 @@ class EditIllustrationPagePresentation extends StatelessWidget {
     _descriptionInputController.text = _initialDescription;
     _loreInputController.text = _initialStory;
 
-    final double inputWidth =
-        Utilities.size.isMobileSize(context) ? 320.0 : 600.0;
+    final double inputWidth = isMobileSize ? 320.0 : 600.0;
 
     return SizedBox(
       width: 600.0,
