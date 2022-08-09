@@ -199,6 +199,10 @@ class EditIllustrationPagePresentation extends StatelessWidget {
                       currentTextValue: _descriptionInputController.text,
                       initialTextValue: _initialDescription,
                     ),
+                    style: Utilities.fonts.body(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
                 Opacity(
@@ -248,6 +252,10 @@ class EditIllustrationPagePresentation extends StatelessWidget {
                       context,
                       currentTextValue: _loreInputController.text,
                       initialTextValue: _initialStory,
+                    ),
+                    style: Utilities.fonts.body(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
