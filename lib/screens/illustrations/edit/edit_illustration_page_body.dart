@@ -18,28 +18,29 @@ class EditIllustrationPageBody extends StatelessWidget {
   const EditIllustrationPageBody({
     Key? key,
     required this.loading,
+    required this.showArtMovementPanel,
+    required this.showLicensePanel,
+    required this.illustrationVisibility,
+    required this.presentationCardKey,
     required this.illustration,
+    required this.license,
+    required this.illustrationTopics,
     required this.illustrationName,
     required this.illustrationDescription,
     required this.illustrationLore,
-    required this.illustrationTopics,
-    required this.illustrationVisibility,
-    required this.license,
-    required this.presentationCardKey,
-    required this.showArtMovementPanel,
-    required this.showLicensePanel,
-    this.onUpdatePresentation,
-    this.onToggleArtMovementPanel,
-    this.onRemoveArtMovementAndUpdate,
+    this.topicInputFocusNode,
+    this.goToEditImagePage,
     this.onAddTopicAndUpdate,
-    this.onRemoveTopicAndUpdate,
-    this.onUpdateVisibility,
-    this.onTapCurrentLicense,
-    this.onToggleLicensePanel,
-    this.onUnselectLicenseAndUpdate,
     this.onDone,
     this.onExpandStateLicenseChanged,
-    this.goToEditImagePage,
+    this.onRemoveArtMovementAndUpdate,
+    this.onRemoveTopicAndUpdate,
+    this.onTapCurrentLicense,
+    this.onToggleArtMovementPanel,
+    this.onToggleLicensePanel,
+    this.onUnselectLicenseAndUpdate,
+    this.onUpdateVisibility,
+    this.onUpdatePresentation,
   }) : super(key: key);
 
   /// Loading this widget if true.
@@ -51,6 +52,51 @@ class EditIllustrationPageBody extends StatelessWidget {
   /// Show panel to select/deselect art movement if true.
   final bool showArtMovementPanel;
 
+  /// Allow the topic input to request focus.
+  final FocusNode? topicInputFocusNode;
+
+  /// Callback to navigate to image edit.
+  final void Function()? goToEditImagePage;
+
+  /// Callback fired to add a topic to an illustration.
+  final void Function(String)? onAddTopicAndUpdate;
+
+  /// Callback fired to remove art movement.
+  final void Function(String)? onRemoveArtMovementAndUpdate;
+
+  /// Callback fired to remove a topic to an illustration.
+  final void Function(String)? onRemoveTopicAndUpdate;
+
+  /// Callback fired when we tap on a license.
+  final void Function()? onTapCurrentLicense;
+
+  /// Callback fired to show/hide the license panel.
+  final void Function()? onToggleLicensePanel;
+
+  /// Callback to toggle art movement panel.
+  final void Function()? onToggleArtMovementPanel;
+
+  /// Callback fired to unselect a license.
+  final void Function()? onUnselectLicenseAndUpdate;
+
+  /// Callback fired when illustration's name, description and/or lore
+  /// has changed.
+  final void Function(
+    String name,
+    String description,
+    String lore,
+  )? onUpdatePresentation;
+
+  /// Callback fired to update illustration's visibility.
+  final void Function(EnumContentVisibility)? onUpdateVisibility;
+
+  /// Callback fired when the license section is expanded.
+  /// The callback will fetch license's data (from its id).
+  final void Function(bool)? onExpandStateLicenseChanged;
+
+  /// Callback fired when we tap on "done" button.
+  final void Function()? onDone;
+
   final GlobalKey<ExpansionTileCardState> presentationCardKey;
 
   /// Target illustration.
@@ -58,6 +104,12 @@ class EditIllustrationPageBody extends StatelessWidget {
 
   /// Selected license for the target illustration.
   final License license;
+
+  /// Illustration's topics.
+  final List<String> illustrationTopics;
+
+  /// Illustration's visibility.
+  final EnumContentVisibility illustrationVisibility;
 
   /// Illustration's name.
   final String illustrationName;
@@ -67,49 +119,6 @@ class EditIllustrationPageBody extends StatelessWidget {
 
   /// Illustration's lore.
   final String illustrationLore;
-
-  /// Illustration's topics.
-  final List<String> illustrationTopics;
-
-  /// Illustration's visibility.
-  final EnumContentVisibility illustrationVisibility;
-
-  /// Callback to navigate to image edit.
-  final void Function()? goToEditImagePage;
-
-  /// Callback fired to update illustration's presentation.
-  final void Function(String, String, String)? onUpdatePresentation;
-
-  /// Callback to toggle art movement panel.
-  final void Function()? onToggleArtMovementPanel;
-
-  /// Callback fired to remove art movement.
-  final void Function(String)? onRemoveArtMovementAndUpdate;
-
-  /// Callback fired to add a topic to an illustration.
-  final void Function(String)? onAddTopicAndUpdate;
-
-  /// Callback fired to remove a topic to an illustration.
-  final void Function(String)? onRemoveTopicAndUpdate;
-
-  /// Callback fired to update illustration's visibility.
-  final void Function(EnumContentVisibility)? onUpdateVisibility;
-
-  /// Callback fired when we tap on a license.
-  final void Function()? onTapCurrentLicense;
-
-  /// Callback fired to show/hide the license panel.
-  final void Function()? onToggleLicensePanel;
-
-  /// Callback fired to unselect a license.
-  final void Function()? onUnselectLicenseAndUpdate;
-
-  /// Callback fired when the license section is expanded.
-  /// The callback will fetch license's data (from its id).
-  final void Function(bool)? onExpandStateLicenseChanged;
-
-  /// Callback fired when we tap on "done" button.
-  final void Function()? onDone;
 
   @override
   Widget build(BuildContext context) {
@@ -161,6 +170,7 @@ class EditIllustrationPageBody extends StatelessWidget {
             topics: illustrationTopics,
             onAddTopicAndUpdate: onAddTopicAndUpdate,
             onRemoveTopicAndUpdate: onRemoveTopicAndUpdate,
+            topicInputFocusNode: topicInputFocusNode,
           ),
           EditIllustrationPageVisibility(
             visibility: illustrationVisibility,

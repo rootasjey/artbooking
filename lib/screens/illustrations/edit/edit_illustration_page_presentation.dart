@@ -12,25 +12,44 @@ import 'package:unicons/unicons.dart';
 class EditIllustrationPagePresentation extends StatelessWidget {
   const EditIllustrationPagePresentation({
     Key? key,
-    this.onUpdatePresentation,
     required this.cardKey,
-    this.onTitleChanged,
-    this.onDescriptionChanged,
-    this.onStoryChanged,
-    required this.name,
     required this.description,
+    required this.name,
     required this.lore,
+    this.onDescriptionChanged,
+    this.onLoreChanged,
+    this.onTitleChanged,
+    this.onUpdatePresentation,
   }) : super(key: key);
 
-  final void Function(String, String, String)? onUpdatePresentation;
-  final void Function(String)? onTitleChanged;
+  /// Callback fired when illustrations's description is updated.
   final void Function(String)? onDescriptionChanged;
-  final void Function(String)? onStoryChanged;
+
+  /// Callback fired when illustrations's lore is updated.
+  final void Function(String)? onLoreChanged;
+
+  /// Callback fired when illustrations's title is updated.
+  final void Function(String)? onTitleChanged;
+
+  /// Callback fired when illustrations's title, description and/or lore
+  /// has changed.
+  final void Function(
+    String name,
+    String description,
+    String lore,
+  )? onUpdatePresentation;
+
+  /// Card's key to follow expansion tile card state.
   final GlobalKey<ExpansionTileCardState> cardKey;
 
-  final String name;
+  /// Illustration's description.
   final String description;
+
+  /// Illustration's lore.
   final String lore;
+
+  /// Illustration's title.
+  final String name;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +57,7 @@ class EditIllustrationPagePresentation extends StatelessWidget {
 
     final _descriptionInputController = TextEditingController();
     final _nameInputController = TextEditingController();
-    final _storyInputController = TextEditingController();
+    final _loreInputController = TextEditingController();
 
     /// Illustration's name after page loading.
     /// Used to know if they're pending changes.
@@ -54,10 +73,10 @@ class EditIllustrationPagePresentation extends StatelessWidget {
 
     _nameInputController.text = _initialName;
     _descriptionInputController.text = _initialDescription;
-    _storyInputController.text = _initialStory;
+    _loreInputController.text = _initialStory;
 
     final double inputWidth =
-        Utilities.size.isMobileSize(context) ? 300.0 : 600.0;
+        Utilities.size.isMobileSize(context) ? 320.0 : 600.0;
 
     return SizedBox(
       width: 600.0,
@@ -199,8 +218,8 @@ class EditIllustrationPagePresentation extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 36.0),
                   child: TextFormField(
                     maxLines: null,
-                    controller: _storyInputController,
-                    onChanged: onStoryChanged,
+                    controller: _loreInputController,
+                    onChanged: onLoreChanged,
                     decoration: InputDecoration(
                       filled: true,
                       isDense: true,
@@ -217,7 +236,7 @@ class EditIllustrationPagePresentation extends StatelessWidget {
                     onFieldSubmitted: (value) => onUpdatePresentation?.call(
                       _nameInputController.text,
                       _descriptionInputController.text,
-                      _storyInputController.text,
+                      _loreInputController.text,
                     ),
                     buildCounter: (
                       context, {
@@ -227,7 +246,7 @@ class EditIllustrationPagePresentation extends StatelessWidget {
                     }) =>
                         buildCounter(
                       context,
-                      currentTextValue: _storyInputController.text,
+                      currentTextValue: _loreInputController.text,
                       initialTextValue: _initialStory,
                     ),
                   ),
@@ -254,7 +273,7 @@ class EditIllustrationPagePresentation extends StatelessWidget {
 
                         _nameInputController.text = _initialName;
                         _descriptionInputController.text = _initialDescription;
-                        _storyInputController.text = _initialStory;
+                        _loreInputController.text = _initialStory;
                       },
                     ),
                     DarkElevatedButton(
@@ -262,7 +281,7 @@ class EditIllustrationPagePresentation extends StatelessWidget {
                       onPressed: () => onUpdatePresentation?.call(
                         _nameInputController.text,
                         _descriptionInputController.text,
-                        _storyInputController.text,
+                        _loreInputController.text,
                       ),
                     ),
                   ],

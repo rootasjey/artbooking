@@ -37,16 +37,32 @@ class EditIllustrationPage extends ConsumerStatefulWidget {
 }
 
 class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
-  bool _isLoading = false;
+  /// Fetching data if true.
+  bool _loading = false;
+
+  /// Saving new illustration's metadata if true.
   bool _saving = false;
+
+  /// Display art movement panel if true.
   bool _showArtMovementPanel = false;
+
+  /// Display license panel if true.
   bool _showLicensesPanel = false;
 
-  License _license = License.empty();
+  /// Current illustration's visibility.
   EnumContentVisibility _visibility = EnumContentVisibility.public;
-  List<String> _topics = [];
 
+  /// Allow the topic input to request focus.
+  final FocusNode _topicInputFocusNode = FocusNode();
+
+  /// Used to follow the associated expansion card's state.
   final GlobalKey<ExpansionTileCardState> _presentationCardKey = GlobalKey();
+
+  /// Current illustration's license.
+  License _license = License.empty();
+
+  /// Current illustration's topics.
+  List<String> _topics = [];
 
   final _numberRegex = VerbalExpression()
     ..digit()
@@ -71,6 +87,12 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
     _illustrationName = illustration.name;
     _illustrationDescription = illustration.description;
     _illustrationLore = illustration.lore;
+  }
+
+  @override
+  void dispose() {
+    _topicInputFocusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -113,7 +135,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
                     ),
                   ),
                   EditIllustrationPageBody(
-                    loading: _isLoading,
+                    loading: _loading,
                     license: _license,
                     illustration: widget.illustration,
                     illustrationName: _illustrationName,
@@ -135,6 +157,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
                     presentationCardKey: _presentationCardKey,
                     showLicensePanel: _showLicensesPanel,
                     showArtMovementPanel: _showArtMovementPanel,
+                    topicInputFocusNode: _topicInputFocusNode,
                     goToEditImagePage: widget.goToEditImagePage,
                   )
                 ],
@@ -237,6 +260,8 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
   }
 
   void onAddTopicAndUpdate(String topicString) async {
+    _topicInputFocusNode.requestFocus();
+
     if (topicString.isEmpty) {
       context.showErrorBar(
         content: Text("input_empty_invalid".tr()),
@@ -246,14 +271,14 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
     }
 
     bool hasNewValues = false;
-    final topicsToAdd = topicString.split(",");
-    final topicsMap = Map<String, bool>();
+    final List<String> topicsToAdd = topicString.split(",");
+    final Map<String, bool> topicsMap = Map();
 
-    for (String topic in _topics) {
+    for (final String topic in _topics) {
       topicsMap[topic] = true;
     }
 
-    for (String topic in topicsToAdd) {
+    for (final String topic in topicsToAdd) {
       if (!topicsMap.containsKey(topic)) {
         hasNewValues = true;
       }
@@ -271,7 +296,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
     });
 
     try {
-      final response =
+      final HttpsCallableResult response =
           await Utilities.cloud.illustrations("updateTopics").call({
         "illustration_id": widget.illustration.id,
         "topics": _topics,
@@ -290,7 +315,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
       }
 
       String errorMessage = error.message ??
-          'There was an issue while adding topics to your illustration.';
+          "There was an issue while adding topics to your illustration.";
 
       if (error.code == "out-of-range") {
         final matches = _numberRegex.toRegExp().allMatches(error.message!);

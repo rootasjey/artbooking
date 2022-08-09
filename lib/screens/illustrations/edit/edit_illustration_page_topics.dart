@@ -13,16 +13,24 @@ class EditIllustrationPageTopics extends StatelessWidget {
     required this.topics,
     this.onAddTopicAndUpdate,
     this.onRemoveTopicAndUpdate,
+    this.topicInputFocusNode,
   }) : super(key: key);
 
+  /// Allow to request focus after adding a topic.
+  final FocusNode? topicInputFocusNode;
+
+  /// Callback fired when a topic is added to an illustration.
+  final void Function(String topic)? onAddTopicAndUpdate;
+
+  /// Callback fired when a topic is removed from an illustration.
+  final void Function(String topic)? onRemoveTopicAndUpdate;
+
+  /// List of illustration's topics.
   final List<String> topics;
-  final void Function(String)? onAddTopicAndUpdate;
-  final void Function(String)? onRemoveTopicAndUpdate;
 
   @override
   Widget build(BuildContext context) {
     final _topicInputController = TextEditingController();
-    final _inputFocusNode = FocusNode();
 
     return Container(
       width: 600.0,
@@ -71,7 +79,7 @@ class EditIllustrationPageTopics extends StatelessWidget {
                     },
                     onSelected: (isSelected) {
                       _topicInputController.text = topic;
-                      _inputFocusNode.requestFocus();
+                      topicInputFocusNode?.requestFocus();
                     },
                   );
                 }).toList(),
@@ -99,16 +107,29 @@ class EditIllustrationPageTopics extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       SizedBox(
-                        width: 300.0,
+                        width: Utilities.size.isMobileSize(context)
+                            ? 260.0
+                            : 300.0,
                         child: TextFormField(
-                          focusNode: _inputFocusNode,
+                          focusNode: topicInputFocusNode,
                           controller: _topicInputController,
                           decoration: InputDecoration(
-                            labelText: "topics_label_text".tr(),
+                            hintText: "topics_label_text".tr(),
                             filled: true,
                             isDense: true,
                             fillColor: Constants.colors.clairPink,
                             focusColor: Constants.colors.clairPink,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                width: 2.0,
+                                color: Theme.of(context)
+                                        .textTheme
+                                        .bodyText2
+                                        ?.color
+                                        ?.withOpacity(0.6) ??
+                                    Colors.black54,
+                              ),
+                            ),
                             border: OutlineInputBorder(
                               borderSide: BorderSide(
                                 width: 2.0,
@@ -117,6 +138,10 @@ class EditIllustrationPageTopics extends StatelessWidget {
                             ),
                           ),
                           onFieldSubmitted: onAddTopicAndUpdate,
+                          style: Utilities.fonts.body(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                       Padding(
