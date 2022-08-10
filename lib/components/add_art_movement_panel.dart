@@ -289,7 +289,7 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
 
     return Padding(
       padding: const EdgeInsets.only(
-        top: 140.0,
+        top: 120.0,
         bottom: 12.0,
       ),
       child: SingleChildScrollView(
@@ -396,6 +396,8 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
               ),
               subtitle: Text(
                 artMovement.description,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
                 style: Utilities.fonts.body(
                   fontWeight: FontWeight.w600,
                 ),
@@ -462,6 +464,10 @@ class _AddArtMovementPanelState extends State<AddArtMovementPanel> {
   }
 
   Widget searchInput({bool isMobileSize = false}) {
+    if (_isImagePreviewVisible) {
+      return Container();
+    }
+
     return Padding(
       padding: isMobileSize
           ? EdgeInsets.only(left: 8.0, right: 6.0, top: 24.0)

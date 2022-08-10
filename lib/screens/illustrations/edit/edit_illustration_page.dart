@@ -81,7 +81,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
   @override
   void initState() {
     super.initState();
-    final illustration = widget.illustration;
+    final Illustration illustration = widget.illustration;
     _license = illustration.license;
     _visibility = illustration.visibility;
     _topics = illustration.topics;
@@ -172,7 +172,7 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
             right: 24.0,
             child: PopupProgressIndicator(
               show: _saving,
-              message: '${"illustration_updating".tr()}...',
+              message: "${'illustration_updating'.tr()}...",
             ),
           ),
           artMovementsSidePanel(isMobileSize: isMobileSize),
@@ -183,6 +183,10 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
   }
 
   Widget artMovementsSidePanel({bool isMobileSize = false}) {
+    if (isMobileSize) {
+      return Container();
+    }
+
     return Positioned(
       top: isMobileSize ? 0.0 : 100.0,
       right: isMobileSize ? 0.0 : 24.0,
@@ -515,12 +519,34 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
   }
 
   void onTapCurrentLicense() {
-    setState(() {
-      _showLicensesPanel = !_showLicensesPanel;
-    });
+    onToggleArtMovementPanel();
   }
 
-  void onToggleArtMovementPanel() {
+  void onToggleArtMovementPanel() async {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    if (isMobileSize) {
+      _showArtMovementPanel = true;
+
+      await showCupertinoModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return AddArtMovementPanel(
+            isVisible: true,
+            selectedArtMovements: widget.illustration.artMovements,
+            onClose: () {
+              setState(() => _showArtMovementPanel = false);
+              Navigator.of(context).pop();
+            },
+            onToggleArtMovementAndUpdate: onToggleArtMovementAndUpdate,
+          );
+        },
+      );
+
+      _showArtMovementPanel = false;
+      return;
+    }
+
     setState(() {
       _showArtMovementPanel = !_showArtMovementPanel;
     });
@@ -539,7 +565,33 @@ class _EditIllustrationPageState extends ConsumerState<EditIllustrationPage> {
     setState(() => _showLicensesPanel = false);
   }
 
-  void onToggleLicensePanel() {
+  void onToggleLicensePanel() async {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    if (isMobileSize) {
+      _showLicensesPanel = true;
+
+      await showCupertinoModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          _showArtMovementPanel = true;
+          return SelectLicensePanel(
+            elevation: 0.0,
+            isVisible: true,
+            selectedLicense: _license,
+            onClose: () {
+              setState(() => _showLicensesPanel = false);
+              Navigator.of(context).pop();
+            },
+            onToggleLicenseAndUpdate: onToggleLicenseAndUpdate,
+          );
+        },
+      );
+
+      _showLicensesPanel = false;
+      return;
+    }
+
     setState(() {
       _showLicensesPanel = !_showLicensesPanel;
     });
