@@ -172,6 +172,7 @@ class EditIllustrationPageBody extends StatelessWidget {
             onToggleArtMovementPanel: onToggleArtMovementPanel,
           ),
           EditIllustrationPageTopics(
+            isMobileSize: isMobileSize,
             topics: illustrationTopics,
             onAddTopicAndUpdate: onAddTopicAndUpdate,
             onRemoveTopicAndUpdate: onRemoveTopicAndUpdate,
