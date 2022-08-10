@@ -511,25 +511,37 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
 
   void onGoToEditImagePage() {
     Navigator.of(context).push(
-      PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) {
-        return EditImagePage(
-          heroTag: _illustration.id,
-          onSave: onSaveEditedIllustration,
-          dimensions: _illustration.dimensions,
-          imageToEdit: ExtendedNetworkImageProvider(
-            _illustration.links.original,
-            cache: true,
-            cacheRawData: true,
-            cacheMaxAge: const Duration(seconds: 3),
-          ),
-          goToEditIllustrationMetada: goToEditIllustrationMetada,
-        );
-      }, transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeScaleTransition(
-          animation: animation,
-          child: child,
-        );
-      }),
+      PageRouteBuilder(
+        pageBuilder: (
+          BuildContext context,
+          Animation<double> animation,
+          Animation<double> secondaryAnimation,
+        ) {
+          return EditImagePage(
+            heroTag: _illustration.id,
+            onSave: onSaveEditedIllustration,
+            dimensions: _illustration.dimensions,
+            imageToEdit: ExtendedNetworkImageProvider(
+              _illustration.links.original,
+              cache: true,
+              cacheRawData: true,
+              cacheMaxAge: const Duration(seconds: 3),
+            ),
+            goToEditIllustrationMetada: goToEditIllustrationMetada,
+          );
+        },
+        transitionsBuilder: (
+          BuildContext context,
+          Animation<double> animation,
+          Animation<double> secondaryAnimation,
+          Widget child,
+        ) {
+          return FadeScaleTransition(
+            animation: animation,
+            child: child,
+          );
+        },
+      ),
     );
   }
 

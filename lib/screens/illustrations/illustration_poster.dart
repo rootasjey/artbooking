@@ -1,4 +1,5 @@
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
+import 'package:artbooking/components/hero_image.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/illustrations/illustration_poster_actions.dart';
 import 'package:artbooking/screens/illustrations/illustration_poster_description.dart';
@@ -8,6 +9,7 @@ import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dismissible_page/dismissible_page.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
@@ -128,7 +130,9 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
                   _imageUrl,
                 ),
                 fit: BoxFit.cover,
-                child: InkWell(),
+                child: InkWell(
+                  onTap: onTapImage,
+                ),
               ),
             ),
           ),
@@ -360,6 +364,15 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
           onCancel: Beamer.of(context).popRoute,
         );
       },
+    );
+  }
+
+  void onTapImage() {
+    context.pushTransparentRoute(
+      HeroImage(
+        heroTag: widget.heroTag,
+        imageProvider: NetworkImage(_imageUrl),
+      ),
     );
   }
 }
