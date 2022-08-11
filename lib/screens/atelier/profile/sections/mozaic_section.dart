@@ -170,8 +170,8 @@ class _MozaicSectionState extends State<MozaicSection> {
   Widget mozaicBody(bool isMobileSize) {
     return StaggeredGrid.count(
       crossAxisCount: isMobileSize ? 4 : 6,
-      mainAxisSpacing: isMobileSize ? 8.0 : 24.0,
-      crossAxisSpacing: isMobileSize ? 8.0 : 24.0,
+      mainAxisSpacing: isMobileSize ? 16.0 : 24.0,
+      crossAxisSpacing: isMobileSize ? 16.0 : 24.0,
       children: getChildrenInMozaic(isMobileSize),
     );
   }
