@@ -12,9 +12,9 @@
     "preview": "Voici quelques avantages",
     "community": "Devenez un membre de la communauté",
     "create_book": "Vous pourrez créer des books pour grouper vos illustrations",
-    "profile_page": "Créer votre page de profile er exposez vos œuvres",
+    "profile_page": "Créez votre page de profile et exposez vos œuvres",
     "stats": "Gardez un œil sur vos stats, si vous le souhaitez",
-    "upload_illustration": "Chargez vos illustration dans votre atelier (votre espace personel)"
+    "upload_illustration": "Sauvegardez vos illustration dans votre atelier virtuel"
   },
   "account_create_error": "Il y a eu une erreur lors de la création de votre compte. Veuillez réessayer.",
   "account_create_new": "Créer un nouveau compte",
