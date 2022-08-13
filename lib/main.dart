@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:artbooking/app.dart';
 import 'package:artbooking/firebase_options.dart';
@@ -56,16 +58,19 @@ void main() async {
   setPathUrlStrategy();
 
   final AdaptiveThemeMode? savedThemeMode = await AdaptiveTheme.getThemeMode();
-  await windowManager.ensureInitialized();
 
-  windowManager.waitUntilReadyToShow(
-    WindowOptions(
-      titleBarStyle: TitleBarStyle.hidden,
-    ),
-    () async {
-      await windowManager.show();
-    },
-  );
+  if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
+    await windowManager.ensureInitialized();
+
+    windowManager.waitUntilReadyToShow(
+      WindowOptions(
+        titleBarStyle: TitleBarStyle.hidden,
+      ),
+      () async {
+        await windowManager.show();
+      },
+    );
+  }
 
   return runApp(
     ProviderScope(
