@@ -18,6 +18,7 @@ class ApplicationBar extends ConsumerWidget {
     this.minimal = false,
     this.pinned = true,
     this.bottom,
+    this.right,
   });
 
   /// If true, will only display right section with search, language, & avatar.
@@ -28,6 +29,8 @@ class ApplicationBar extends ConsumerWidget {
 
   /// This widget appears across the bottom of the app bar.
   final PreferredSizeWidget? bottom;
+
+  final Widget? right;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -48,9 +51,11 @@ class ApplicationBar extends ConsumerWidget {
         .location;
 
     final bool hasHistory = location != HomeLocation.route;
+    final Widget rightWidget = right ?? Container();
 
     return SliverPadding(
-      padding: const EdgeInsets.only(top: 30.0),
+      padding:
+          isMobileSize ? EdgeInsets.zero : const EdgeInsets.only(top: 30.0),
       sliver: SliverAppBar(
         floating: true,
         snap: true,
@@ -96,6 +101,7 @@ class ApplicationBar extends ConsumerWidget {
                 initials: initials,
                 avatarUrl: avatarUrl ?? "",
               ),
+              if (right != null) rightWidget,
             ],
           ),
         ),
@@ -136,7 +142,9 @@ class ApplicationBar extends ConsumerWidget {
       );
     }
 
-    return ApplicationBarGuestUser();
+    return ApplicationBarGuestUser(
+      isMobileSize: isMobileSize,
+    );
   }
 
   void onSignOut(BuildContext context, WidgetRef ref) async {

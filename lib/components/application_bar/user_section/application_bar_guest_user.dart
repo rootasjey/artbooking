@@ -7,10 +7,20 @@ import 'package:artbooking/router/locations/signin_location.dart';
 import 'package:artbooking/router/locations/signup_location.dart';
 
 class ApplicationBarGuestUser extends StatelessWidget {
-  const ApplicationBarGuestUser({Key? key}) : super(key: key);
+  const ApplicationBarGuestUser({
+    Key? key,
+    this.isMobileSize = false,
+  }) : super(key: key);
+
+  /// If true, this widget adapts its layout to small screens.
+  final bool isMobileSize;
 
   @override
   Widget build(BuildContext context) {
+    if (isMobileSize) {
+      return Container();
+    }
+
     return Container(
       padding: const EdgeInsets.only(
         top: 5.0,
