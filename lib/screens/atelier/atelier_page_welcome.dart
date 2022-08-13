@@ -7,6 +7,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/screens/connection/signin_page.dart';
 import 'package:artbooking/types/user/user.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
 import 'package:beamer/beamer.dart';
@@ -30,6 +31,10 @@ class AtelierPageWelcome extends ConsumerWidget {
       name = userFirestore.name.isNotEmpty
           ? userFirestore.name
           : userFirestore.email;
+    }
+
+    if (isMobileSize) {
+      return SigninPage(showBackButton: false);
     }
 
     return Scaffold(

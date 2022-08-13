@@ -10,30 +10,38 @@ class ConnectionPageHeader extends StatelessWidget {
     Key? key,
     required this.title,
     required this.subtitle,
+    this.showBackButton = true,
   }) : super(key: key);
 
-  final String title;
+  /// Show back icon button if true.
+  final bool showBackButton;
+
+  /// Subtitle text value.
   final String subtitle;
+
+  /// Title text value.
+  final String title;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        FadeInX(
-          beginX: 10.0,
-          delay: Duration(milliseconds: 200),
-          child: Padding(
-            padding: const EdgeInsets.only(
-              right: 20.0,
-            ),
-            child: IconButton(
-              tooltip: "back".tr(),
-              onPressed: () => Utilities.navigation.back(context),
-              icon: Icon(UniconsLine.arrow_left),
+        if (showBackButton)
+          FadeInX(
+            beginX: 10.0,
+            delay: Duration(milliseconds: 200),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                right: 20.0,
+              ),
+              child: IconButton(
+                tooltip: "back".tr(),
+                onPressed: () => Utilities.navigation.back(context),
+                icon: Icon(UniconsLine.arrow_left),
+              ),
             ),
           ),
-        ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[

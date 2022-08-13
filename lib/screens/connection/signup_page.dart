@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
+import 'package:artbooking/components/sheet_header.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/globals/app_state.dart';
@@ -13,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:artbooking/actions/users.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
+import 'package:unicons/unicons.dart';
 
 class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({Key? key}) : super(key: key);
@@ -22,20 +24,44 @@ class SignupPage extends ConsumerStatefulWidget {
 }
 
 class _SignupPageState extends ConsumerState<SignupPage> {
+  /// Currently checking email entered if true.
   bool _checkingEmail = false;
-  bool _checkingUsername = false;
-  bool _loading = false;
 
+  /// Currently checking username entered if true.
+  bool _checkingUsername = false;
+
+  /// Trying to create an account if true.
+  bool _creatingAccount = false;
+
+  /// Confirm password. Should be the same as `_password`.
   String _confirmPassword = "";
+
+  /// A hint if the confirm password doesn't match `_password` value.
   String _confirmPasswordHint = "";
+
+  /// Chosen email.
   String _email = "";
+
+  /// A hint if the chosen email is not correct or already taken.
   String _emailHint = "";
+
+  /// Chosen password.
   String _password = "";
+
+  /// A hint if the chosen password doesn't respect the right format.
   String _passwordHint = "";
+
+  /// Chosen username.
   String _username = "";
+
+  /// A hint if the chosen username doesn't respect the right format
+  /// or is already taken.
   String _usernameHint = "";
 
+  /// Timer to debounce email check.
   Timer? _emailTimer;
+
+  /// Timer to debounce username check.
   Timer? _usernameTimer;
 
   @override
@@ -47,29 +73,30 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: showArgumentsDialog,
-        label: Text(
-          "why".tr().toLowerCase(),
-          style: Utilities.fonts.body(
-            fontSize: 14.0,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
       body: CustomScrollView(
         slivers: [
-          ApplicationBar(),
+          ApplicationBar(
+            right: IconButton(
+              onPressed: showArgumentsDialog,
+              color: Theme.of(context).secondaryHeaderColor,
+              icon: Icon(UniconsLine.question_circle),
+              iconSize: 32.0,
+              padding: EdgeInsets.zero,
+            ),
+          ),
           SignupPageBody(
-            loading: _loading,
+            isMobileSize: isMobileSize,
+            loading: _creatingAccount,
             checkingEmail: _checkingEmail,
             checkingUsername: _checkingUsername,
             onUsernameChanged: onUsernameChanged,
             onEmailChanged: onEmailChanged,
             onConfirmPasswordChanged: onConfirmPasswordChanged,
             onPasswordChanged: onPasswordChanged,
-            createAccount: createAccount,
+            tryCreateAccount: createAccount,
             usernameHint: _usernameHint,
             emailErrorMessage: _emailHint,
             confirmPasswordHint: _confirmPasswordHint,
@@ -93,10 +120,10 @@ class _SignupPageState extends ConsumerState<SignupPage> {
   }
 
   void createAccount() async {
-    setState(() => _loading = true);
+    setState(() => _creatingAccount = true);
 
     if (!await checkInputs()) {
-      setState(() => _loading = false);
+      setState(() => _creatingAccount = false);
       return;
     }
 
@@ -108,7 +135,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                 password: _password,
               );
 
-      setState(() => _loading = false);
+      setState(() => _creatingAccount = false);
 
       if (createAccountResponse.success) {
         Beamer.of(context).beamToNamed(HomeLocation.route);
@@ -125,7 +152,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
       context.showErrorBar(content: Text(message));
     } catch (error) {
       Utilities.logger.e(error);
-      setState(() => _loading = false);
+      setState(() => _creatingAccount = false);
       context.showErrorBar(
         content: Text("account_create_error".tr()),
       );
@@ -285,40 +312,65 @@ class _SignupPageState extends ConsumerState<SignupPage> {
   }
 
   void showArgumentsDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return ThemedDialog(
-          onCancel: Beamer.of(context).popRoute,
-          titleValue: "account_create_why".tr(),
-          body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Opacity(
-                    opacity: 0.6,
-                    child: Text(
-                      "account_create_arguments.preview".tr(),
-                      style: Utilities.fonts.body(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.w500,
-                      ),
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    Utilities.ui.showAdaptiveDialog(
+      context,
+      isMobileSize: isMobileSize,
+      builder: (BuildContext context) {
+        final Widget body = Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 24.0),
+                child: Opacity(
+                  opacity: 0.6,
+                  child: Text(
+                    "account_create_arguments.preview".tr() + ":",
+                    style: Utilities.fonts.body(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
-                textArgument("account_create_arguments.community".tr()),
-                textArgument("account_create_arguments.create_book".tr()),
-                textArgument("account_create_arguments.profile_page".tr()),
-                textArgument("account_create_arguments.stats".tr()),
-                textArgument(
-                  "account_create_arguments.upload_illustration".tr(),
-                ),
-              ],
-            ),
+              ),
+              textArgument("account_create_arguments.community".tr()),
+              textArgument("account_create_arguments.create_book".tr()),
+              textArgument("account_create_arguments.profile_page".tr()),
+              textArgument("account_create_arguments.stats".tr()),
+              textArgument(
+                "account_create_arguments.upload_illustration".tr(),
+              ),
+            ],
           ),
+        );
+
+        if (isMobileSize) {
+          return Scaffold(
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SheetHeader(
+                    title: "account_create".tr(),
+                    subtitle: "account_create_why".tr(),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 12.0,
+                      vertical: 24.0,
+                    ),
+                  ),
+                  body,
+                ],
+              ),
+            ),
+          );
+        }
+
+        return ThemedDialog(
+          onCancel: Beamer.of(context).popRoute,
+          titleValue: "account_create_why".tr(),
+          body: body,
           textButtonValidation: "thank_you_exclamation".tr(),
           onValidate: Beamer.of(context).popRoute,
         );
@@ -327,19 +379,33 @@ class _SignupPageState extends ConsumerState<SignupPage> {
   }
 
   Widget textArgument(String text) {
-    final Color color = Colors.amber;
-
-    return Row(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(right: 8.0),
-          child: CircleAvatar(radius: 4.0, backgroundColor: color),
-        ),
-        Text(
-          text,
-          style: Utilities.fonts.body(fontWeight: FontWeight.w600),
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0, top: 4.0),
+            child: CircleAvatar(
+              radius: 4.0,
+              backgroundColor: Theme.of(context).primaryColor,
+            ),
+          ),
+          Expanded(
+            child: Opacity(
+              opacity: 0.6,
+              child: Text(
+                text,
+                style: Utilities.fonts.body(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20.0,
+                  height: 1.0,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

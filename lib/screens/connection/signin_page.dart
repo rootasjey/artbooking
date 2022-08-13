@@ -12,9 +12,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SigninPage extends ConsumerStatefulWidget {
-  final void Function(bool isAuthenticated)? onSigninResult;
+  const SigninPage({
+    Key? key,
+    this.showBackButton = true,
+  }) : super(key: key);
 
-  const SigninPage({Key? key, this.onSigninResult}) : super(key: key);
+  /// Set to false if you want a custom behavior
+  /// (e.g. when this page) is inside `AtelierPageWelcome`.
+  final bool showBackButton;
 
   @override
   _SigninPageState createState() => _SigninPageState();
@@ -42,12 +47,16 @@ class _SigninPageState extends ConsumerState<SigninPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
           ApplicationBar(),
           SigninPageBody(
             connecting: _connecting,
+            isMobileSize: isMobileSize,
+            showBackButton: widget.showBackButton,
             onEmailChanged: onEmailChanged,
             onPasswordChanged: onPasswordChanged,
             tryConnect: tryConnect,
