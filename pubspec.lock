@@ -952,6 +952,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.3.1"
+  screenshot:
+    dependency: "direct main"
+    description:
+      name: screenshot
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.3"
   share:
     dependency: "direct main"
     description:

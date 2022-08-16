@@ -67,6 +67,7 @@ dependencies:
   modal_bottom_sheet: 2.0.0
   photo_view: 0.14.0
   salomon_bottom_bar: 3.3.1
+  screenshot: 1.2.3
   share: 2.0.4
   shimmer_animation: 2.1.0+1
   simple_animations: 4.0.1
@@ -109,6 +110,7 @@ flutter:
   assets:
     - assets/images/app_icon/square_512x512.png
     - assets/images/app_icon/circle_512x512.png
+    - assets/images/app_icon/new_app_poster.png
     - assets/images/app_icon/icon_animation.json
     - assets/animations/dots.json
     - assets/animations/heart.json
