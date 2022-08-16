@@ -66,7 +66,6 @@ class _SearchPageState extends State<SearchPage> {
 
   /// Used to debounce search request.
   Timer? _searchTimer;
-
   @override
   initState() {
     super.initState();
