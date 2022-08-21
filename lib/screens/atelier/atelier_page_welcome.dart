@@ -33,7 +33,9 @@ class AtelierPageWelcome extends ConsumerWidget {
           : userFirestore.email;
     }
 
-    if (isMobileSize) {
+    final bool isAuthenticated = userFirestore?.id.isNotEmpty ?? false;
+
+    if (!isAuthenticated && isMobileSize) {
       return SigninPage(showBackButton: false);
     }
 
