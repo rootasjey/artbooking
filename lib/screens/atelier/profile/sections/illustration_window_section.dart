@@ -177,12 +177,11 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
 
   Widget leftRow(bool isMobileSize) {
     final int index = 0;
-    final double size = 400.0;
+    final double size = isMobileSize ? 300.0 : 400.0;
 
     if (_illustrations.isEmpty) {
       return wrapInResponsiveCard(
         child: IllustrationCard(
-          borderRadius: BorderRadius.circular(16.0),
           useAsPlaceholder: true,
           useIconPlaceholder: true,
           heroTag: "empty_${DateTime.now()}",
@@ -221,7 +220,6 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
 
     return wrapInResponsiveCard(
       child: IllustrationCard(
-        borderRadius: BorderRadius.circular(16.0),
         heroTag: heroTag,
         illustration: firstIllustration,
         index: index,
@@ -230,15 +228,18 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
         onDrop: onDrop,
         dragGroupName: "${widget.section.id}-${widget.index}",
         onTap: () => navigateToIllustrationPage(firstIllustration, heroTag),
-        margin: EdgeInsets.only(right: 4.0),
+        margin: const EdgeInsets.only(right: 4.0),
         popupMenuEntries: popupMenuEntries,
         onPopupMenuItemSelected: onIllustrationItemSelected,
       ),
-      widthFactor: isMobileSize ? 1.0 : 0.6,
+      widthFactor: isMobileSize ? 0.9 : 0.6,
     );
   }
 
-  Widget wrapInResponsiveCard({required Widget child, widthFactor = 0.6}) {
+  Widget wrapInResponsiveCard({
+    required Widget child,
+    widthFactor = 0.6,
+  }) {
     return Flexible(
       flex: 5,
       child: FractionallySizedBox(
@@ -254,21 +255,23 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
   Widget rightRow(bool isMobileSize) {
     return Flexible(
       flex: isMobileSize ? 5 : 3,
-      child: GridView(
-        shrinkWrap: true,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: isMobileSize ? 4.0 : 12.0,
-          crossAxisSpacing: isMobileSize ? 4.0 : 12.0,
+      child: Padding(
+        padding:
+            isMobileSize ? const EdgeInsets.only(left: 8.0) : EdgeInsets.zero,
+        child: Wrap(
+          spacing: isMobileSize ? 12.0 : 12.0,
+          runSpacing: isMobileSize ? 12.0 : 12.0,
+          children: getChildren(
+            isMobileSize: isMobileSize,
+          ),
         ),
-        children: getChildren(),
       ),
     );
   }
 
-  List<Widget> getChildren() {
+  List<Widget> getChildren({bool isMobileSize = false}) {
     int index = 0;
-    final double size = 200.0;
+    final double size = isMobileSize ? 75.0 : 200.0;
 
     final bool canDrag = getCanDrag();
     final onDrop = canDrag ? onDropIllustration : null;
@@ -288,10 +291,9 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
     ) {
       index++;
 
-      final heroTag = "${widget.section.id}-${index}-${illustration.id}";
+      final String heroTag = "${widget.section.id}-${index}-${illustration.id}";
 
       return IllustrationCard(
-        borderRadius: BorderRadius.circular(16.0),
         canDrag: canDrag,
         onDrop: onDrop,
         dragGroupName: "${widget.section.id}-${widget.index}",
@@ -322,7 +324,6 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
     for (var i = 0; i < placeholderMaxCount; i++) {
       children.add(
         IllustrationCard(
-          borderRadius: BorderRadius.circular(16.0),
           useAsPlaceholder: true,
           useIconPlaceholder: true,
           heroTag: "empty_${DateTime.now()}",
