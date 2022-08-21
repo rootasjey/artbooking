@@ -19,14 +19,21 @@ class ModularPageLoading extends StatelessWidget {
         : "loading".tr();
 
     return Scaffold(
-      body: LoadingView(
-        sliver: false,
-        title: Center(
-          child: Text(
-            loadingText,
-            style: Utilities.fonts.body(
-              fontSize: 26.0,
-              fontWeight: FontWeight.w600,
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: LoadingView(
+          sliver: false,
+          title: Center(
+            child: Opacity(
+              opacity: 0.8,
+              child: Text(
+                loadingText,
+                textAlign: TextAlign.center,
+                style: Utilities.fonts.body4(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
         ),
