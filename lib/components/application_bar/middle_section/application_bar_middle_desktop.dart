@@ -1,4 +1,3 @@
-import 'package:artbooking/components/application_bar/application_bar_search_button.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/settings_location.dart';
@@ -36,7 +35,6 @@ class ApplicationBarMiddleDesktop extends ConsumerWidget {
             ),
           ),
         ),
-        ApplicationBarSearchButton(),
       ],
     );
   }
@@ -46,16 +44,16 @@ class ApplicationBarMiddleDesktop extends ConsumerWidget {
     return [
       AppBarButtonData(
         textValue: "illustrations".tr().toUpperCase(),
-        routePath: '/illustrations',
+        routePath: "/illustrations",
       ),
       AppBarButtonData(
         textValue: "books".tr().toUpperCase(),
-        routePath: '/books',
+        routePath: "/books",
       ),
-      AppBarButtonData(
-        textValue: "contests".tr().toUpperCase(),
-        routePath: '/contests',
-      ),
+      // AppBarButtonData(
+      //   textValue: "contests".tr().toUpperCase(),
+      //   routePath: "/contests",
+      // ),
     ];
   }
 
