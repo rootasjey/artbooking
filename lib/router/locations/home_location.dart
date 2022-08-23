@@ -78,7 +78,7 @@ class HomeLocation extends BeamLocation<BeamState> {
             child: ModularPagePresenter(
               pageId: "home",
               userId: "",
-              pageType: EnumPageType.profile,
+              pageType: EnumPageType.home,
             ),
             key: ValueKey(route),
             title: Utilities.ui.getPageTitle("home".tr()),
