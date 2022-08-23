@@ -164,9 +164,11 @@ class AtelierPageWelcome extends ConsumerWidget {
       canManagePosts = userFirestore.rights.canManagePosts;
     }
 
+    final bool noSizeConstraints = isMobileSize;
+
     final List<Widget> children = [
       AtelierPageCard(
-        noSizeConstraints: true,
+        noSizeConstraints: noSizeConstraints,
         hoverColor: Constants.colors.activity,
         iconData: UniconsLine.chart_pie,
         textTitle: "activity".tr(),
@@ -176,7 +178,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         },
       ),
       AtelierPageCard(
-        noSizeConstraints: true,
+        noSizeConstraints: noSizeConstraints,
         hoverColor: Constants.colors.illustrations,
         iconData: UniconsLine.picture,
         textTitle: "illustrations".tr(),
@@ -186,7 +188,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         },
       ),
       AtelierPageCard(
-        noSizeConstraints: true,
+        noSizeConstraints: noSizeConstraints,
         hoverColor: Constants.colors.books,
         iconData: UniconsLine.book_alt,
         textTitle: "books".tr(),
@@ -196,7 +198,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         },
       ),
       AtelierPageCard(
-        noSizeConstraints: true,
+        noSizeConstraints: noSizeConstraints,
         hoverColor: Constants.colors.settings,
         iconData: UniconsLine.setting,
         textTitle: "settings".tr(),
@@ -206,7 +208,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         },
       ),
       AtelierPageCard(
-        noSizeConstraints: true,
+        noSizeConstraints: noSizeConstraints,
         hoverColor: Constants.colors.profile,
         iconData: UniconsLine.user,
         textTitle: "profile".tr(),
@@ -221,7 +223,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         },
       ),
       AtelierPageCard(
-        noSizeConstraints: true,
+        noSizeConstraints: noSizeConstraints,
         hoverColor: Constants.colors.likes,
         iconData: UniconsLine.heart,
         textTitle: "likes".tr(),
@@ -231,7 +233,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         },
       ),
       AtelierPageCard(
-        noSizeConstraints: true,
+        noSizeConstraints: noSizeConstraints,
         hoverColor: Constants.colors.licenses,
         iconData: UniconsLine.document_info,
         textTitle: "licenses".tr(),
@@ -242,7 +244,7 @@ class AtelierPageWelcome extends ConsumerWidget {
       ),
       if (canManageReviews)
         AtelierPageCard(
-          noSizeConstraints: true,
+          noSizeConstraints: noSizeConstraints,
           hoverColor: Constants.colors.review,
           iconData: UniconsLine.image_check,
           textTitle: "review".tr(),
@@ -253,7 +255,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         ),
       if (canManageSections)
         AtelierPageCard(
-          noSizeConstraints: true,
+          noSizeConstraints: noSizeConstraints,
           hoverColor: Constants.colors.sections,
           iconData: UniconsLine.web_grid,
           textTitle: "sections".tr(),
@@ -264,7 +266,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         ),
       if (canManagePosts)
         AtelierPageCard(
-          noSizeConstraints: true,
+          noSizeConstraints: noSizeConstraints,
           hoverColor: Constants.colors.sections,
           iconData: UniconsLine.file_edit_alt,
           textTitle: "posts".tr(),
@@ -275,7 +277,7 @@ class AtelierPageWelcome extends ConsumerWidget {
         ),
       if (!isMobileSize)
         AtelierPageCard(
-          noSizeConstraints: true,
+          noSizeConstraints: noSizeConstraints,
           hoverColor: Constants.colors.home,
           iconData: UniconsLine.home,
           textTitle: "home".tr(),
