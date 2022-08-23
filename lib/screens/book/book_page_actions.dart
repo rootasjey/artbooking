@@ -75,6 +75,8 @@ class BookPageActions extends StatelessWidget {
     }
 
     return Column(
+      crossAxisAlignment:
+          isMobileSize ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       children: [
         Wrap(
           alignment: isMobileSize ? WrapAlignment.center : WrapAlignment.start,

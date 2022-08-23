@@ -78,7 +78,7 @@ class _SigninPageBodyState extends State<SigninPageBody> {
 
     return SliverPadding(
       padding: EdgeInsets.only(
-        top: widget.isMobileSize ? 0.0 : 140.0,
+        top: widget.isMobileSize ? 54.0 : 140.0,
         bottom: widget.isMobileSize ? 150.0 : 300.0,
       ),
       sliver: SliverList(

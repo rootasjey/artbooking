@@ -208,7 +208,7 @@ class _IllustrationCardState extends State<IllustrationCard>
       );
     }
 
-    final illustration = widget.illustration;
+    final Illustration illustration = widget.illustration;
     Widget child = Container();
 
     if (widget.canDrag) {
