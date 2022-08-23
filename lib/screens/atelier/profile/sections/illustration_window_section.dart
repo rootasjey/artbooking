@@ -120,8 +120,6 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
       return loadingWidget();
     }
 
-    final bool isMobileSize = Utilities.size.isMobileSize(context);
-
     final EdgeInsets outerPadding =
         widget.usingAsDropTarget ? const EdgeInsets.all(4.0) : EdgeInsets.zero;
 
@@ -137,6 +135,11 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
         : BoxDecoration(
             color: Color(widget.section.backgroundColor),
           );
+
+    final Size windowSize = MediaQuery.of(context).size;
+    final bool isMobileSize =
+        windowSize.width < Utilities.size.mobileWidthTreshold;
+    // final bool isMobileSize = Utilities.size.isMobileSize(context);
 
     return Padding(
       padding: outerPadding,
@@ -159,9 +162,12 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        leftRow(isMobileSize),
+                        leftColumn(isMobileSize: isMobileSize),
                         if (!isMobileSize) Spacer(),
-                        rightRow(isMobileSize),
+                        rightColumn(
+                          isMobileSize: isMobileSize,
+                          windowSize: windowSize,
+                        ),
                       ],
                     ),
                   ),
@@ -175,7 +181,7 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
     );
   }
 
-  Widget leftRow(bool isMobileSize) {
+  Widget leftColumn({bool isMobileSize = false}) {
     final int index = 0;
     final double size = isMobileSize ? 300.0 : 400.0;
 
@@ -252,7 +258,10 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
     );
   }
 
-  Widget rightRow(bool isMobileSize) {
+  Widget rightColumn({
+    bool isMobileSize = false,
+    Size windowSize = Size.zero,
+  }) {
     return Flexible(
       flex: isMobileSize ? 5 : 3,
       child: Padding(
@@ -262,16 +271,20 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
           spacing: isMobileSize ? 12.0 : 12.0,
           runSpacing: isMobileSize ? 12.0 : 12.0,
           children: getChildren(
-            isMobileSize: isMobileSize,
+            windowSize: windowSize,
           ),
         ),
       ),
     );
   }
 
-  List<Widget> getChildren({bool isMobileSize = false}) {
+  List<Widget> getChildren({
+    Size windowSize = Size.zero,
+  }) {
     int index = 0;
-    final double size = isMobileSize ? 75.0 : 200.0;
+    final double size = getIllustrationCardLength(
+      windowSize: windowSize,
+    );
 
     final bool canDrag = getCanDrag();
     final onDrop = canDrag ? onDropIllustration : null;
@@ -647,6 +660,35 @@ class _IllustrationWindowSectionState extends State<IllustrationWindowSection> {
     }
 
     return _currentMode == EnumSectionDataMode.chosen;
+  }
+
+  double getIllustrationCardLength({
+    Size windowSize = Size.zero,
+  }) {
+    final bool isMobileSize =
+        windowSize.width < Utilities.size.mobileWidthTreshold;
+
+    if (isMobileSize) {
+      return 75.0;
+    }
+
+    if (windowSize.width > 1100.0) {
+      return 170.0;
+    }
+
+    if (windowSize.width > 1060.0) {
+      return 160.0;
+    }
+
+    if (windowSize.width > 1000.0) {
+      return 150.0;
+    }
+
+    if (windowSize.width > 800.0) {
+      return 120.0;
+    }
+
+    return 100.0;
   }
 
   void navigateToIllustrationPage(Illustration illustration, String heroTag) {
