@@ -13,6 +13,7 @@ import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
+import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/screens/atelier/profile/default_profile_page.dart';
 import 'package:artbooking/screens/atelier/profile/modular_page_error.dart';
@@ -278,7 +279,7 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
   String getUserId() {
     String userId = _modularPage.userId;
     if (userId.isEmpty) {
-      userId = ref.read(AppState.userProvider).authUser?.uid ?? '';
+      userId = ref.read(AppState.userProvider).authUser?.uid ?? "";
     }
 
     return userId;
@@ -410,6 +411,15 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
         );
       }
 
+      String authUserId = ref.read(AppState.userProvider).authUser?.uid ?? "";
+
+      if (userId == authUserId) {
+        Beamer.of(context).beamToNamed(
+          AtelierLocationContent.booksRoute,
+        );
+        return;
+      }
+
       Beamer.of(context).beamToNamed(
         HomeLocation.userBooksRoute.replaceFirst(":userId", userId),
         routeState: {
@@ -437,6 +447,15 @@ class _ModularPageState extends ConsumerState<ModularPagePresenter> {
         context.showErrorBar(
           content: Text(message),
         );
+      }
+
+      String authUserId = ref.read(AppState.userProvider).authUser?.uid ?? "";
+
+      if (userId == authUserId) {
+        Beamer.of(context).beamToNamed(
+          AtelierLocationContent.illustrationsRoute,
+        );
+        return;
       }
 
       Beamer.of(context).beamToNamed(
