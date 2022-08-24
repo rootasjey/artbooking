@@ -308,6 +308,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                               ),
                               preferredSize: Size.fromHeight(160.0),
                             ),
+                            minimal: true,
                             pinned: false,
                           ),
                           MyIllustrationsPageBody(
