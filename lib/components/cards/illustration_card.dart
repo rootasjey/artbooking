@@ -398,7 +398,6 @@ class _IllustrationCardState extends State<IllustrationCard>
             child: InkWell(
               onTap: onTapPlaceholder,
               child: Padding(
-                // padding: EdgeInsets.all(widget.size < 300.0 ? 4.0 : 16.0),
                 padding: const EdgeInsets.all(16.0),
                 child: Opacity(
                   opacity: 0.6,
@@ -432,9 +431,9 @@ class _IllustrationCardState extends State<IllustrationCard>
           ? textValue
           : "illustration_permutation_description".tr(),
       textAlign: TextAlign.center,
-      style: Utilities.fonts.body4(
+      style: Utilities.fonts.body3(
         fontSize: 18.0,
-        fontWeight: FontWeight.w400,
+        fontWeight: FontWeight.w600,
       ),
     );
   }
