@@ -158,6 +158,7 @@ class _SectionWrapperState extends State<SectionWrapper> {
       usingAsDropTarget: usingAsDropTarget,
       popupMenuEntries: widget.popupMenuEntries,
       onPopupMenuItemSelected: widget.onPopupMenuItemSelected,
+      onShowIllustrationDialog: widget.onShowIllustrationDialog,
       onUpdateSectionItems: widget.onUpdateSectionItems,
       isHover: _isHover,
       onNavigateFromSection: widget.onNavigateFromSection,
