@@ -52,7 +52,15 @@ class BookGridSection extends StatefulWidget {
 
   final String userId;
 
-  final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
+  final void Function(
+    EnumNavigationSection enumNavigationSection,
+  )? onNavigateFromSection;
+
+  final void Function(
+    EnumSectionAction action,
+    int index,
+    Section section,
+  )? onPopupMenuItemSelected;
 
   final void Function({
     required Section section,
@@ -65,10 +73,6 @@ class BookGridSection extends StatefulWidget {
     int index,
     List<String> items,
   )? onUpdateSectionItems;
-
-  final void Function(
-    EnumNavigationSection enumNavigationSection,
-  )? onNavigateFromSection;
 
   final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
 
@@ -130,9 +134,7 @@ class _BookGridSectionState extends State<BookGridSection> {
             color: Color(widget.section.backgroundColor),
           );
 
-    final Size windowSize = MediaQuery.of(context).size;
-    final bool isMobileSize =
-        windowSize.width < Utilities.size.mobileWidthTreshold;
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
 
     return Padding(
       padding: outerPadding,
@@ -149,10 +151,7 @@ class _BookGridSectionState extends State<BookGridSection> {
               children: [
                 titleWidget(isMobileSize: isMobileSize),
                 maybeHelperText(),
-                gridWidget(
-                  isMobileSize: isMobileSize,
-                  windowSize: windowSize,
-                ),
+                gridWidget(isMobileSize: isMobileSize),
               ],
             ),
           ),
@@ -250,7 +249,6 @@ class _BookGridSectionState extends State<BookGridSection> {
 
   Widget gridWidget({
     bool isMobileSize = false,
-    Size windowSize = Size.zero,
   }) {
     if (isMobileSize) {
       return Padding(
