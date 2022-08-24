@@ -5,6 +5,7 @@ import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
+import 'package:artbooking/types/user/user_rights.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -92,6 +93,9 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
   }
 
   Widget bodySidePanel() {
+    final UserFirestore? userFirestore =
+        ref.watch(AppState.userProvider).firestoreUser;
+
     return SliverPadding(
       padding: EdgeInsets.only(
         left: _isExpanded ? 20.0 : 16.0,
@@ -100,58 +104,71 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
       ),
       sliver: SliverList(
           delegate: SliverChildListDelegate.fixed(
-        getItemList().map((sidePanelItem) {
-          final Color foregroundColor =
-              Theme.of(context).textTheme.bodyText1?.color ?? Colors.white;
+        getItemList(userFirestore: userFirestore).map(
+          (final SideMenuItem sidePanelItem) {
+            final Color foregroundColor =
+                Theme.of(context).textTheme.bodyText1?.color ?? Colors.white;
 
-          Color color = foregroundColor.withOpacity(0.6);
-          Color textColor = foregroundColor.withOpacity(0.4);
-          FontWeight fontWeight = FontWeight.w600;
+            Color color = foregroundColor.withOpacity(0.6);
+            Color textColor = foregroundColor.withOpacity(0.4);
+            FontWeight fontWeight = FontWeight.w600;
 
-          final bool pathMatch = context
-                  .currentBeamLocation.state.routeInformation.location
-                  ?.contains(sidePanelItem.routePath) ??
-              false;
+            final bool pathMatch = context
+                    .currentBeamLocation.state.routeInformation.location
+                    ?.contains(sidePanelItem.routePath) ??
+                false;
 
-          if (pathMatch) {
-            color = sidePanelItem.hoverColor;
-            textColor = foregroundColor.withOpacity(0.6);
-            fontWeight = FontWeight.w700;
-          }
+            if (pathMatch) {
+              color = sidePanelItem.hoverColor;
+              textColor = foregroundColor.withOpacity(0.6);
+              fontWeight = FontWeight.w700;
+            }
 
-          return Align(
-            alignment: Alignment.topLeft,
-            child: Padding(
-              padding: EdgeInsets.only(
-                left: _isExpanded ? 24.0 : 0.0,
-                top: 32.0,
-              ),
-              child: TextButtonIcon(
-                compact: !_isExpanded,
-                tooltip: sidePanelItem.label,
-                leading: Padding(
-                  padding: const EdgeInsets.only(right: 16.0),
-                  child: Icon(
-                    sidePanelItem.iconData,
-                    color: color,
-                  ),
+            return Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: _isExpanded ? 24.0 : 0.0,
+                  top: 32.0,
                 ),
-                child: Text(
-                  sidePanelItem.label,
-                  style: Utilities.fonts.body(
-                    color: textColor,
-                    fontSize: 16.0,
-                    fontWeight: fontWeight,
+                child: TextButtonIcon(
+                  compact: !_isExpanded,
+                  tooltip: sidePanelItem.label,
+                  leading: Padding(
+                    padding: const EdgeInsets.only(right: 16.0),
+                    child: Icon(
+                      sidePanelItem.iconData,
+                      color: color,
+                    ),
                   ),
+                  child: Text(
+                    sidePanelItem.label,
+                    style: Utilities.fonts.body(
+                      color: textColor,
+                      fontSize: 16.0,
+                      fontWeight: fontWeight,
+                    ),
+                  ),
+                  onTap: () {
+                    if (sidePanelItem.routePath ==
+                        AtelierLocationContent.profileRoute) {
+                      context.beamToNamed(
+                        sidePanelItem.routePath,
+                        routeState: {
+                          "userId": userFirestore?.id ?? "",
+                        },
+                      );
+                    } else {
+                      context.beamToNamed(sidePanelItem.routePath);
+                    }
+
+                    setState(() {});
+                  },
                 ),
-                onTap: () {
-                  context.beamToNamed(sidePanelItem.routePath);
-                  setState(() {});
-                },
               ),
-            ),
-          );
-        }).toList(),
+            );
+          },
+        ).toList(),
       )),
     );
   }
@@ -238,10 +255,10 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
     );
   }
 
-  List<SideMenuItem> getItemList() {
+  List<SideMenuItem> getItemList({UserFirestore? userFirestore}) {
     return [
       ...getBaseItemList(),
-      ...getAdminItemList(),
+      ...getAdminItemList(userFirestore: userFirestore),
     ];
   }
 
@@ -292,15 +309,12 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
     ];
   }
 
-  List<SideMenuItem> getAdminItemList() {
-    final UserFirestore? userFirestore =
-        ref.watch(AppState.userProvider).firestoreUser;
-
+  List<SideMenuItem> getAdminItemList({UserFirestore? userFirestore}) {
     if (userFirestore == null) {
       return [];
     }
 
-    final rights = userFirestore.rights;
+    final UserRights rights = userFirestore.rights;
 
     return [
       if (rights.canManageReviews)
