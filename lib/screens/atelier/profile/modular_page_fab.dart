@@ -45,7 +45,7 @@ class ModularPageFAB extends StatelessWidget {
             duration: Duration(milliseconds: 250),
             child: FloatingActionButton.extended(
               onPressed: onToggleEditMode,
-              backgroundColor: Colors.amber.shade600,
+              backgroundColor: Colors.grey.shade800,
               label: Text(
                 editMode ? "view_mode".tr() : "edit_mode".tr(),
                 style: Utilities.fonts.body(
