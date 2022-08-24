@@ -161,14 +161,14 @@ class MyBooksPageBody extends StatelessWidget {
 
     return SliverPadding(
       padding: isMobileSize
-          ? const EdgeInsets.only(top: 24.0)
+          ? const EdgeInsets.only(top: 24.0, left: 8.0, right: 8.0)
           : const EdgeInsets.all(40.0),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          mainAxisExtent: isMobileSize ? 161.0 : 380.0,
-          maxCrossAxisExtent: isMobileSize ? 220.0 : 380.0,
-          mainAxisSpacing: 0.0,
-          crossAxisSpacing: 0.0,
+          mainAxisExtent: isMobileSize ? 170.0 : 380.0,
+          maxCrossAxisExtent: isMobileSize ? 200.0 : 380.0,
+          mainAxisSpacing: 8.0,
+          crossAxisSpacing: 8.0,
         ),
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) {
@@ -192,8 +192,8 @@ class MyBooksPageBody extends StatelessWidget {
               heroTag: book.id,
               index: index,
               key: ValueKey(book.id),
-              width: isMobileSize ? 220.0 : 400.0,
-              height: isMobileSize ? 161.0 : 342.0,
+              width: isMobileSize ? 200.0 : 400.0,
+              height: isMobileSize ? 170.0 : 342.0,
               canDropFile: isOwner,
               onDragFileDone: onDragFileDone,
               onDragFileEntered: onDragFileEntered,

@@ -182,7 +182,7 @@ class _BookWideCoverState extends State<BookWideCover> with AnimationMixin {
         : Theme.of(context).primaryColor;
 
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
+      padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
       child: Wrap(
         alignment: WrapAlignment.center,
         crossAxisAlignment: WrapCrossAlignment.center,
