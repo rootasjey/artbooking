@@ -78,6 +78,7 @@ class SectionChooser {
         onPopupMenuItemSelected: onPopupMenuItemSelected,
         popupMenuEntries: popupMenuEntries,
         isLast: index == count,
+        onNavigateFromSection: onNavigateFromSection,
         onShowIllustrationDialog: onShowIllustrationDialog,
         onUpdateSectionItems: onUpdateSectionItems,
         isHover: isHover,
