@@ -1,3 +1,4 @@
+import 'package:artbooking/components/buttons/dark_text_button.dart';
 import 'package:artbooking/components/cards/illustration_card.dart';
 import 'package:artbooking/components/cards/shimmer_card.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
@@ -5,6 +6,7 @@ import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/profile/popup_menu_button_section.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
+import 'package:artbooking/types/enums/enum_navigation_section.dart';
 import 'package:artbooking/types/enums/enum_section_action.dart';
 import 'package:artbooking/types/enums/enum_section_data_mode.dart';
 import 'package:artbooking/types/enums/enum_select_type.dart';
@@ -30,6 +32,7 @@ class IllustrationGridSection extends StatefulWidget {
     required this.index,
     required this.section,
     this.isLast = false,
+    this.onNavigateFromSection,
     this.onShowIllustrationDialog,
     this.onUpdateSectionItems,
     this.usingAsDropTarget = false,
@@ -48,6 +51,10 @@ class IllustrationGridSection extends StatefulWidget {
   final int index;
 
   final List<PopupMenuItemIcon<EnumSectionAction>> popupMenuEntries;
+
+  final void Function(
+    EnumNavigationSection enumNavigationSection,
+  )? onNavigateFromSection;
 
   final void Function(
     EnumSectionAction action,
@@ -129,30 +136,25 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
             color: Color(widget.section.backgroundColor),
           );
 
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return Padding(
       padding: outerPadding,
       child: Stack(
         children: [
           Container(
             decoration: boxDecoration,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 90.0,
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobileSize ? 12.0 : 90.0,
               vertical: 24.0,
             ),
             child: Center(
               child: Column(
                 children: [
-                  titleSectionWidget(),
+                  titleWidget(isMobileSize: isMobileSize),
                   maybeHelperText(),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 34.0),
-                    child: GridView.count(
-                      crossAxisCount: 3,
-                      shrinkWrap: true,
-                      mainAxisSpacing: 24.0,
-                      crossAxisSpacing: 24.0,
-                      children: getChildren(),
-                    ),
+                  gridWidget(
+                    isMobileSize: isMobileSize,
                   ),
                 ],
               ),
@@ -164,7 +166,7 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
     );
   }
 
-  List<Widget> getChildren() {
+  List<Widget> getChildren({bool isMobileSize = false}) {
     int index = -1;
     final bool canDrag = getCanDrag();
     final onDrop = canDrag ? onDropIllustration : null;
@@ -179,24 +181,31 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
               ]
             : [];
 
-    final children = _illustrations.map((Illustration illustration) {
-      index++;
+    final List<Widget> children = _illustrations.map(
+      (final Illustration illustration) {
+        index++;
 
-      final heroTag = "${widget.section.id}-${index}-${illustration.id}";
+        final String heroTag =
+            "${widget.section.id}-${index}-${illustration.id}";
 
-      return IllustrationCard(
-        borderRadius: BorderRadius.circular(16.0),
-        canDrag: canDrag,
-        onDrop: onDrop,
-        dragGroupName: "${widget.section.id}-${widget.index}",
-        heroTag: heroTag,
-        illustration: illustration,
-        index: index,
-        onTap: () => navigateToIllustrationPage(illustration, heroTag),
-        popupMenuEntries: popupMenuEntries,
-        onPopupMenuItemSelected: onIllustrationItemSelected,
-      );
-    }).toList();
+        return Padding(
+          padding: isMobileSize ? EdgeInsets.zero : const EdgeInsets.all(8.0),
+          child: IllustrationCard(
+            borderRadius: BorderRadius.circular(16.0),
+            canDrag: canDrag,
+            onDrop: onDrop,
+            dragGroupName: "${widget.section.id}-${widget.index}",
+            heroTag: heroTag,
+            illustration: illustration,
+            index: index,
+            onTap: () => navigateToIllustrationPage(illustration, heroTag),
+            popupMenuEntries: popupMenuEntries,
+            onPopupMenuItemSelected: onIllustrationItemSelected,
+            size: isMobileSize ? 100.0 : 300.0,
+          ),
+        );
+      },
+    ).toList();
 
     if (widget.editMode && (children.length % 3 != 0 && children.length < 6) ||
         children.isEmpty) {
@@ -245,6 +254,31 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
     }
 
     return popupMenuEntries;
+  }
+
+  Widget gridWidget({bool isMobileSize = false}) {
+    if (isMobileSize) {
+      return Wrap(
+        spacing: 12.0,
+        runSpacing: 12.0,
+        children: getChildren(
+          isMobileSize: isMobileSize,
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 34.0),
+      child: GridView.count(
+        crossAxisCount: 3,
+        shrinkWrap: true,
+        mainAxisSpacing: 24.0,
+        crossAxisSpacing: 24.0,
+        children: getChildren(
+          isMobileSize: isMobileSize,
+        ),
+      ),
+    );
   }
 
   Widget loadingWidget() {
@@ -312,53 +346,63 @@ class _IllustrationGridSectionState extends State<IllustrationGridSection> {
     );
   }
 
-  Widget titleSectionWidget() {
-    final title = widget.section.name;
-    final description = widget.section.description;
+  Widget seeMoreButton() {
+    return DarkTextButton(
+      backgroundColor: Colors.black12,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [Text("see_more".tr()), Icon(UniconsLine.arrow_right)],
+      ),
+      margin: const EdgeInsets.only(top: 12.0),
+      onPressed: () {
+        widget.onNavigateFromSection?.call(
+          EnumNavigationSection.illustrations,
+        );
+      },
+    );
+  }
+
+  Widget titleWidget({bool isMobileSize = false}) {
+    final String title = widget.section.name;
+    final String description = widget.section.description;
 
     if (title.isEmpty && description.isEmpty) {
       return Container();
     }
 
-    return Column(
-      children: [
-        InkWell(
-          onTap: onTapTitleDescription,
-          child: Column(
-            children: [
-              if (title.isNotEmpty)
-                Opacity(
-                  opacity: 0.6,
-                  child: Text(
-                    title,
-                    style: Utilities.fonts.body(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w600,
-                    ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: InkWell(
+        onTap: widget.editMode ? onTapTitleDescription : null,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            if (title.isNotEmpty)
+              Opacity(
+                opacity: 0.8,
+                child: Text(
+                  title,
+                  style: Utilities.fonts.title(
+                    fontSize: isMobileSize ? 24.0 : 42.0,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-              if (description.isNotEmpty)
-                Opacity(
-                  opacity: 0.4,
-                  child: Text(
-                    description,
-                    style: Utilities.fonts.body(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w600,
-                    ),
+              ),
+            if (description.isNotEmpty)
+              Opacity(
+                opacity: 0.4,
+                child: Text(
+                  description,
+                  style: Utilities.fonts.body(
+                    fontSize: isMobileSize ? 14.0 : 16.0,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-            ],
-          ),
+              ),
+            seeMoreButton(),
+          ],
         ),
-        SizedBox(
-          width: 200.0,
-          child: Divider(
-            color: Theme.of(context).secondaryHeaderColor,
-            thickness: 4.0,
-          ),
-        ),
-      ],
+      ),
     );
   }
 
