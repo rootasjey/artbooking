@@ -180,6 +180,9 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   /// Card's border radius.
   final double _cardRadius = 8.0;
 
+  /// Image card's height.
+  double _coverCardHeight = 0.0;
+
   /// Initial elevation.
   double _initElevation = 6.0;
 
@@ -189,6 +192,8 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
   @override
   void initState() {
     super.initState();
+
+    _coverCardHeight = widget.height - _captionHeight;
 
     _scaleController = createController()..duration = 250.milliseconds;
     _scaleAnimation =
@@ -208,15 +213,10 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
 
     return Hero(
       tag: widget.heroTag,
-      child: OverflowBox(
-        // avoid hero animation overflow
-        minHeight: widget.height - _captionHeight,
-        maxHeight: widget.height,
-        child: SizedBox(
-          width: widget.width,
-          height: widget.height,
-          child: widget.canDrag ? dragTarget() : fullstackCard(),
-        ),
+      child: SizedBox(
+        width: widget.width,
+        height: widget.height,
+        child: widget.canDrag ? dragTarget() : fullstackCard(),
       ),
     );
   }
@@ -303,7 +303,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     return Column(
       children: [
         Container(
-          width: widget.width - 80.0,
+          width: widget.width,
           height: widget.height - 30.0,
           padding: const EdgeInsets.all(8.0),
           child: DottedBorder(
@@ -375,7 +375,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
       scale: _scaleAnimation,
       child: SizedBox(
         width: widget.width - 60.0,
-        height: widget.height - _captionHeight,
+        height: _coverCardHeight,
         child: Material(
           color: Colors.black.withOpacity(0.3),
           child: Center(
@@ -394,10 +394,10 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     return Positioned(
       top: 0.0,
       right: 0.0,
-      width: widget.width - 100.0,
+      width: widget.width / 2,
       child: SizedBox(
-        width: widget.width - 80.0,
-        height: widget.height - _captionHeight,
+        width: widget.width,
+        height: _coverCardHeight,
         child: Card(
           elevation: _elevation / 3.0,
           color: Constants.colors.clairPink,
@@ -414,10 +414,10 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     return Positioned(
       top: 0.0,
       right: 12.0,
-      width: widget.width - 100.0,
+      width: widget.width / 2,
       child: SizedBox(
-        width: widget.width - 80.0,
-        height: widget.height - _captionHeight,
+        width: widget.width,
+        height: _coverCardHeight,
         child: Card(
           elevation: _elevation / 2.0,
           color: Colors.white70,
@@ -500,14 +500,15 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     final Color borderColor = _isFileHover
         ? Constants.colors.tertiary
         : Theme.of(context).primaryColor;
-    final onDoubleTapOrNull = widget.onDoubleTap != null ? onDoubleTap : null;
-    final double width = widget.width - 80.0;
+
+    final void Function()? onDoubleTapOrNull =
+        widget.onDoubleTap != null ? onDoubleTap : null;
 
     return Opacity(
       opacity: widget.book.available ? 1.0 : 0.9,
       child: Container(
-        width: width,
-        height: widget.height - _captionHeight,
+        width: widget.width,
+        height: _coverCardHeight,
         padding: const EdgeInsets.only(right: 24.0),
         child: ScaleTransition(
           scale: _scaleAnimation,
@@ -526,8 +527,8 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
                 ExtendedImage.network(
                   widget.book.getCoverLink(),
                   fit: BoxFit.cover,
-                  width: width,
-                  height: widget.height - _captionHeight,
+                  width: widget.width,
+                  height: _coverCardHeight,
                   clearMemoryCacheWhenDispose: true,
                   loadStateChanged: (state) {
                     switch (state.extendedImageLoadState) {

@@ -130,7 +130,9 @@ class _BookGridSectionState extends State<BookGridSection> {
             color: Color(widget.section.backgroundColor),
           );
 
-    final bool isMobileSize = Utilities.size.isMobileSize(context);
+    final Size windowSize = MediaQuery.of(context).size;
+    final bool isMobileSize =
+        windowSize.width < Utilities.size.mobileWidthTreshold;
 
     return Padding(
       padding: outerPadding,
@@ -147,16 +149,9 @@ class _BookGridSectionState extends State<BookGridSection> {
               children: [
                 titleWidget(isMobileSize: isMobileSize),
                 maybeHelperText(),
-                Padding(
-                  padding: const EdgeInsets.only(top: 34.0),
-                  child: GridView.count(
-                    crossAxisCount: isMobileSize ? 2 : 3,
-                    shrinkWrap: true,
-                    mainAxisSpacing: isMobileSize ? 0.0 : 24.0,
-                    crossAxisSpacing: isMobileSize ? 0.0 : 24.0,
-                    // childAspectRatio: 0.8,
-                    children: getChildren(isMobileSize: isMobileSize),
-                  ),
+                gridWidget(
+                  isMobileSize: isMobileSize,
+                  windowSize: windowSize,
                 ),
               ],
             ),
@@ -167,7 +162,9 @@ class _BookGridSectionState extends State<BookGridSection> {
     );
   }
 
-  List<Widget> getChildren({bool isMobileSize = false}) {
+  List<Widget> getChildren({
+    bool isMobileSize = false,
+  }) {
     int index = -1;
     final bool canDrag = getCanDrag();
     final onDrop = canDrag ? onDropBook : null;
@@ -181,23 +178,23 @@ class _BookGridSectionState extends State<BookGridSection> {
           ]
         : [];
 
-    final List<BookCard> children = _books.map((Book book) {
+    final List<Widget> children = _books.map((Book book) {
       index++;
 
-      final heroTag = "${widget.section.id}-${index}-${book.id}";
+      final String heroTag = "${widget.section.id}-${index}-${book.id}";
 
       return BookCard(
         book: book,
         canDrag: canDrag,
         dragGroupName: "${widget.section.id}-${widget.index}",
-        height: isMobileSize ? 161.0 : 342.0,
+        height: isMobileSize ? 161.0 : 320.0,
         heroTag: heroTag,
         index: index,
         onDrop: onDrop,
         onPopupMenuItemSelected: onBookItemSelected,
         onTap: book.available ? () => navigateToBookPage(book, heroTag) : null,
         popupMenuEntries: popupMenuEntries,
-        width: isMobileSize ? 220.0 : 400.0,
+        width: isMobileSize ? 160.0 : 380.0,
       );
     }).toList();
 
@@ -249,6 +246,37 @@ class _BookGridSectionState extends State<BookGridSection> {
     }
 
     return popupMenuEntries;
+  }
+
+  Widget gridWidget({
+    bool isMobileSize = false,
+    Size windowSize = Size.zero,
+  }) {
+    if (isMobileSize) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 34.0),
+        child: Wrap(
+          spacing: 6.0,
+          runSpacing: 6.0,
+          children: getChildren(
+            isMobileSize: isMobileSize,
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 34.0),
+      child: GridView.count(
+        crossAxisCount: 3,
+        shrinkWrap: true,
+        mainAxisSpacing: 24.0,
+        crossAxisSpacing: 24.0,
+        children: getChildren(
+          isMobileSize: isMobileSize,
+        ),
+      ),
+    );
   }
 
   Widget loadingWidget() {
