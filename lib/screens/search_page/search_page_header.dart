@@ -51,25 +51,30 @@ class SearchPageHeader extends StatelessWidget {
           right: 12.0,
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: isMobileSize
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
           children: [
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4.0),
-                  child: SearchTextInput(
-                    autofocus: true,
-                    controller: searchInputController,
-                    focusNode: searchFocusNode,
-                    hintText: "search_input_hint_text".tr(),
-                    keyboardType: TextInputType.multiline,
-                    textCapitalization: TextCapitalization.sentences,
-                    onChanged: onInputChanged,
-                    onClearInput: onClearInput,
+            SizedBox(
+              width: isMobileSize ? null : 400.0,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4.0),
+                    child: SearchTextInput(
+                      autofocus: true,
+                      loading: searching,
+                      controller: searchInputController,
+                      focusNode: searchFocusNode,
+                      hintText: "search_input_hint_text".tr(),
+                      keyboardType: TextInputType.multiline,
+                      textCapitalization: TextCapitalization.sentences,
+                      onChanged: onInputChanged,
+                      onClearInput: onClearInput,
+                    ),
                   ),
-                ),
-                if (searching) LinearProgressIndicator(),
-              ],
+                ],
+              ),
             ),
             SearchPageHeaderResults(
               resultCount: resultCount,

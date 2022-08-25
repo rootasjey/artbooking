@@ -5,6 +5,7 @@ import 'package:artbooking/types/enums/enum_search_item_type.dart';
 import 'package:artbooking/types/search_result_item.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:unicons/unicons.dart';
 
 class SearchPageBody extends StatelessWidget {
   const SearchPageBody({
@@ -62,32 +63,45 @@ class SearchPageBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!showWelcomePage) {
-      return SearchWelcome();
+      return SearchWelcome(
+        isMobileSize: isMobileSize,
+      );
     }
 
-    if (results.isEmpty) {
+    if (results.isEmpty && !searching) {
       return SliverToBoxAdapter(
         child: Padding(
           padding: const EdgeInsets.all(12.0),
-          child: Opacity(
-            opacity: 0.6,
-            child: Text(
-              "search_no_result".tr(args: [searchInputController.text]),
-              style: Utilities.fonts.body4(
-                fontSize: 32.0,
-                fontWeight: FontWeight.w200,
+          child: Column(
+            children: [
+              Icon(
+                UniconsLine.trees,
+                size: 72.0,
+                color: Colors.green.shade300,
               ),
-            ),
+              Opacity(
+                opacity: 0.6,
+                child: Text(
+                  "search_no_result".tr(args: [searchInputController.text]),
+                  style: Utilities.fonts.body4(
+                    fontSize: 32.0,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       );
     }
 
     return SliverPadding(
-      padding: const EdgeInsets.all(12.0),
+      padding: isMobileSize
+          ? const EdgeInsets.all(12.0)
+          : const EdgeInsets.symmetric(horizontal: 64.0, vertical: 12.0),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 160.0,
+          maxCrossAxisExtent: isMobileSize ? 160.0 : 200.0,
           childAspectRatio: 0.7,
           mainAxisSpacing: 12.0,
           crossAxisSpacing: 12.0,
@@ -100,6 +114,7 @@ class SearchPageBody extends StatelessWidget {
               id: searchResultItem.id,
               imageUrl: searchResultItem.imageUrl,
               index: index,
+              isMobileSize: isMobileSize,
               onTap: onTapSearchItem,
               searchItemType: searchResultItem.type,
               titleValue: searchResultItem.name,

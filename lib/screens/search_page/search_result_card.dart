@@ -12,14 +12,30 @@ class SearchResultCard extends StatelessWidget {
     required this.index,
     required this.searchItemType,
     required this.titleValue,
+    this.isMobileSize = false,
     this.onTap,
   }) : super(key: key);
 
+  /// If true, this widget adapts its size to small screens.
+  final bool isMobileSize;
+
+  /// Type of the search result (e.g. book illustration, user).
   final EnumSearchItemType searchItemType;
+
+  /// Index of this widget, if in a list.
   final int index;
+
+  /// Callback fired when this widget is tapped.
   final void Function(EnumSearchItemType searchItemType, String id)? onTap;
+
+  /// Unique identifier for this widget (probably matches item's id like a book).
   final String id;
+
+  /// String value of an image to display as the main content of this card.
   final String imageUrl;
+
+  /// String value to display as the title of this card.
+  /// This text will be placed below the image.
   final String titleValue;
 
   @override
@@ -47,7 +63,7 @@ class SearchResultCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Utilities.fonts.body4(
-                      fontSize: 12.0,
+                      fontSize: isMobileSize ? 12.0 : 16.0,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

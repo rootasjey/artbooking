@@ -6,7 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
 class SearchWelcome extends StatelessWidget {
-  const SearchWelcome({Key? key}) : super(key: key);
+  const SearchWelcome({
+    Key? key,
+    this.isMobileSize = false,
+  }) : super(key: key);
+
+  /// If true, this widget adapts its size to small screens.
+  final bool isMobileSize;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +27,9 @@ class SearchWelcome extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: isMobileSize
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
           children: [
             Opacity(
               opacity: 0.8,
