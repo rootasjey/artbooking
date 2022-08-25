@@ -1,3 +1,4 @@
+import 'package:artbooking/components/animations/themed_circular_progress.dart';
 import 'package:artbooking/components/buttons/circle_button.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:flutter/material.dart';
@@ -7,37 +8,48 @@ import 'package:unicons/unicons.dart';
 class SearchTextInput extends StatelessWidget {
   const SearchTextInput({
     Key? key,
-    this.label,
-    this.controller,
-    this.hintText = "",
+    this.autofocus = true,
+    this.loading = false,
+    this.obscureText = false,
+    this.constraints = const BoxConstraints(maxHeight: 140.0),
+    this.focusNode,
+    this.maxLines = 1,
     this.onChanged,
     this.onSubmitted,
-    this.constraints = const BoxConstraints(maxHeight: 140.0),
-    this.autofocus = true,
-    this.maxLines = 1,
+    this.hintText = "",
+    this.label,
+    this.textCapitalization = TextCapitalization.sentences,
+    this.controller,
     this.textInputAction,
     this.keyboardType,
-    this.focusNode,
-    this.obscureText = false,
-    this.textCapitalization = TextCapitalization.sentences,
     this.onClearInput,
   }) : super(key: key);
 
+  /// The input will request focus on mount if true.
   final bool autofocus;
+
+  /// Display a circular progress indicator if true.
+  final bool loading;
+
+  /// Hide previous typed characters if true.
   final bool obscureText;
 
+  /// Give size constraints to this widget.
   final BoxConstraints constraints;
 
+  /// Focus node to manually request focus.
   final FocusNode? focusNode;
 
+  /// Maximum allowed displayed lines for this inpput.
   final int? maxLines;
 
-  /// Fires when the user modify the input's value.
-  final Function(String)? onChanged;
+  /// Callback fired when the user modify the input's value.
+  final void Function(String value)? onChanged;
 
-  /// Fires when the user send/validate the input's value.
-  final Function(String)? onSubmitted;
+  /// Callback fired when the user send/validate the input's value.
+  final void Function(String value)? onSubmitted;
 
+  /// Callback fired when the input value is cleared.
   final void Function()? onClearInput;
 
   /// The [hintText] will be displayed inside the input.
@@ -46,18 +58,21 @@ class SearchTextInput extends StatelessWidget {
   /// The label will be displayed on top of the input.
   final String? label;
 
+  /// How to capitalized text inside this input.
   final TextCapitalization textCapitalization;
 
   /// A controller to manipulate the input component.
   final TextEditingController? controller;
 
+  /// Action button to display on mobile to validate this input.
   final TextInputAction? textInputAction;
 
+  /// Keyboard type on mobile (e.g. sentence, number, email).
   final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
-    final _primaryColor = Theme.of(context).primaryColor;
+    final Color _primaryColor = Theme.of(context).primaryColor;
 
     final BorderRadius borderRadius = BorderRadius.circular(24.0);
 
@@ -128,6 +143,12 @@ class SearchTextInput extends StatelessWidget {
                 ),
               ),
             ),
+            if (loading)
+              Positioned(
+                top: 6.0,
+                right: 6.0,
+                child: ThemedCircularProgress(),
+              ),
             Positioned(
               top: 3.0,
               right: 4.0,
