@@ -24,27 +24,34 @@ class BetterAvatar extends StatefulWidget {
     this.onPopupMenuItemSelected,
     this.id = "",
     this.title = "",
-    this.padding = EdgeInsets.zero,
+    this.margin = EdgeInsets.zero,
     this.dragGroupName = "",
     this.showTitleOnHover = false,
   });
 
-  final bool useAsPlaceholder;
+  /// This widget is draggable if this is true.
+  final bool canDrag;
+
+  /// By default hide the title and only display it on cursor hover if true.
   final bool showTitleOnHover;
+
+  /// Will display an empty circle with a dotted border if true.
+  final bool useAsPlaceholder;
 
   /// Not used if onTap is null.
   final ColorFilter? colorFilter;
+
+  /// Avatar's size.
   final double size;
+
+  /// Avatar's elevation.
   final double elevation;
-  final VoidCallback? onTap;
-  final ImageProvider<Object> image;
-  final EdgeInsets padding;
 
-  final int index;
-  final bool canDrag;
+  /// Spacing around this widget.
+  final EdgeInsets margin;
 
-  /// Popup menu item entries.
-  final List<PopupMenuEntry<EnumArtistItemAction>> popupMenuEntries;
+  /// Callback when drag and dropping items on this illustration card.
+  final void Function(int dropTargetIndex, List<int> dragIndexes)? onDrop;
 
   /// Callback function when popup menu item entries are tapped.
   final void Function(
@@ -53,12 +60,26 @@ class BetterAvatar extends StatefulWidget {
     String artistId,
   )? onPopupMenuItemSelected;
 
-  /// Callback when drag and dropping items on this illustration card.
-  final void Function(int dropTargetIndex, List<int> dragIndexes)? onDrop;
+  /// Callback fired when this widget is tapped.
+  final void Function()? onTap;
 
-  final String id;
-  final String title;
+  /// Image for this avatar.
+  final ImageProvider<Object> image;
+
+  /// Index of this widget if it's in a list.
+  final int index;
+
+  /// Popup menu item entries.
+  final List<PopupMenuEntry<EnumArtistItemAction>> popupMenuEntries;
+
+  /// Useful to filter wich widget can be dropped on a certain drag target.
   final String dragGroupName;
+
+  /// This widget unique identifier.
+  final String id;
+
+  /// Text title to show belon the image.
+  final String title;
 
   @override
   _BetterAvatarState createState() => _BetterAvatarState();
@@ -146,7 +167,7 @@ class _BetterAvatarState extends State<BetterAvatar>
 
   Widget avatarWidget({bool usingAsDroptarget = false}) {
     return Padding(
-      padding: widget.padding,
+      padding: widget.margin,
       child: Column(
         children: [
           imageContainerWidget(
@@ -283,7 +304,7 @@ class _BetterAvatarState extends State<BetterAvatar>
     final size = widget.size;
 
     return Padding(
-      padding: widget.padding,
+      padding: widget.margin,
       child: Material(
         elevation: _elevation,
         color: Constants.colors.clairPink,
