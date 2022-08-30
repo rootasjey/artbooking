@@ -1,4 +1,5 @@
 import 'package:artbooking/components/buttons/circle_button.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:dismissible_page/dismissible_page.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
@@ -21,9 +22,12 @@ class HeroImage extends StatefulWidget {
 }
 
 class _HeroImageState extends State<HeroImage> {
-  ///
+  /// Currently tring to navigate back to the previous route.
   bool _isPopping = false;
+
+  /// Show imagE/page controls if true.
   bool _showControls = false;
+  bool _initialized = false;
 
   final double _minScale = 0.3;
 
@@ -33,14 +37,22 @@ class _HeroImageState extends State<HeroImage> {
   void initState() {
     super.initState();
 
+    _showControls = Utilities.storage.getHeroImageControlsVisible();
+
     _photoViewController.outputStateStream.listen(
       (PhotoViewControllerValue event) {
-        if (event.scale! < _minScale && !_isPopping) {
+        final double scale = event.scale ?? 0.0;
+
+        if (_initialized && scale < _minScale && !_isPopping) {
           _isPopping = true;
           Navigator.of(context).pop();
         }
       },
     );
+
+    Future.delayed(Duration(milliseconds: 500), () {
+      _initialized = true;
+    });
   }
 
   @override
@@ -70,7 +82,9 @@ class _HeroImageState extends State<HeroImage> {
                 TapUpDetails tapUpDetails,
                 PhotoViewControllerValue controller,
               ) {
-                setState(() => _showControls = !_showControls);
+                final bool newValue = !_showControls;
+                setState(() => _showControls = newValue);
+                Utilities.storage.setHeroImageControlsVisible(newValue);
               },
               scaleStateChangedCallback: (PhotoViewScaleState state) {},
             ),

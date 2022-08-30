@@ -120,6 +120,13 @@ class StorageUtilities {
         : EnumVisibilityTab.active;
   }
 
+  /// Return `true` if the controls are visible, `false` otherwise (on hero image).
+  bool getHeroImageControlsVisible() {
+    final String key = Constants.storageKeys.heroImageControlsVisible;
+    final bool? value = _localStorage.getBool(key);
+    return value ?? true;
+  }
+
   EnumVisibilityTab getIllustrationsTab() {
     final String key = Constants.storageKeys.dashboardIllustrationsTab;
     final String? value = _localStorage.getString(key);
@@ -283,13 +290,19 @@ class StorageUtilities {
     );
   }
 
+  /// Save hero image controls visibility.
+  void setHeroImageControlsVisible(bool isVisible) {
+    final String key = Constants.storageKeys.heroImageControlsVisible;
+    _localStorage.setBool(key, isVisible);
+  }
+
   void setPageLang({required String lang, String? pageRoute}) {
-    final key = '$pageRoute?lang';
+    final String key = '$pageRoute?lang';
     _localStorage.setString(key, lang);
   }
 
   void setPageOrder({required bool descending, String? pageRoute}) {
-    final key = '$pageRoute?order';
+    final String key = '$pageRoute?order';
     _localStorage.setBool(key, descending);
   }
 }
