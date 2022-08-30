@@ -89,7 +89,7 @@ class _FooterCompanyWatermarkState extends State<FooterCompanyWatermark> {
                 WidgetSpan(
                   child: HeartButton(
                     autoReverse: true,
-                    padding: const EdgeInsets.only(left: 12.0),
+                    margin: const EdgeInsets.only(left: 12.0),
                   ),
                 ),
               ],

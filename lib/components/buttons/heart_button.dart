@@ -10,7 +10,7 @@ class HeartButton extends StatefulWidget {
     Key? key,
     this.onTap,
     this.liked = false,
-    this.padding = EdgeInsets.zero,
+    this.margin = EdgeInsets.zero,
     this.autoReverse = false,
     this.asIconButton = false,
     this.tooltip,
@@ -25,11 +25,14 @@ class HeartButton extends StatefulWidget {
   /// If true, the icon is initially filled.
   final bool liked;
 
-  /// Callback after a tap event.
+  /// Callback fired on a tap event.
   final void Function()? onTap;
 
-  final EdgeInsets padding;
+  /// Margin around this widget.
+  final EdgeInsets margin;
 
+  /// ext that describes the action that will occur when the button is pressed.
+  /// This text is displayed when the user long-presses on the button and is used for accessibility.
   final String? tooltip;
 
   @override
@@ -98,42 +101,7 @@ class _HeartButtonState extends State<HeartButton> with AnimationMixin {
               .whenComplete(() => _heartAnimationController.reverse());
         }
       },
-      icon: Stack(
-        children: [
-          if (completed)
-            Icon(
-              widget.liked ? FontAwesomeIcons.solidHeart : UniconsLine.heart,
-              size: widget.liked ? 18.0 : 24.0,
-              color:
-                  widget.liked ? Theme.of(context).secondaryHeaderColor : null,
-            ),
-          if (!completed)
-            Positioned(
-              top: 2.0,
-              left: 2.0,
-              child: Container(
-                width: 20.0,
-                height: 20.0,
-                margin: widget.padding,
-                child: OverflowBox(
-                  maxWidth: 140.0,
-                  maxHeight: 140.0,
-                  child: Lottie.asset(
-                    "assets/animations/heart.json",
-                    width: 96.0,
-                    height: 72.0,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.bottomLeft,
-                    controller: _heartAnimationController,
-                    onLoaded: (LottieComposition composition) {
-                      _heartAnimationController.duration = composition.duration;
-                    },
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
+      icon: completed ? completedIconWidget() : uncompletedIconWidget(),
     );
   }
 
@@ -160,7 +128,7 @@ class _HeartButtonState extends State<HeartButton> with AnimationMixin {
       child: Container(
         width: 20.0,
         height: 20.0,
-        margin: widget.padding,
+        margin: widget.margin,
         child: OverflowBox(
           maxWidth: 140.0,
           maxHeight: 140.0,
@@ -182,6 +150,54 @@ class _HeartButtonState extends State<HeartButton> with AnimationMixin {
                 }
               },
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget completedIconWidget() {
+    return Stack(
+      children: [
+        Positioned(
+          left: widget.liked ? 3.0 : 0.0,
+          top: widget.liked ? 2.0 : 0.0,
+          child: Icon(
+            widget.liked ? FontAwesomeIcons.solidHeart : UniconsLine.heart,
+            size: widget.liked ? 18.0 : 24.0,
+            color: widget.liked ? Theme.of(context).secondaryHeaderColor : null,
+          ),
+        ),
+        if (widget.liked)
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Icon(UniconsLine.heart),
+          ),
+      ],
+    );
+  }
+
+  Widget uncompletedIconWidget() {
+    return Positioned(
+      top: 2.0,
+      left: 2.0,
+      child: Container(
+        width: 20.0,
+        height: 20.0,
+        margin: widget.margin,
+        child: OverflowBox(
+          maxWidth: 140.0,
+          maxHeight: 140.0,
+          child: Lottie.asset(
+            "assets/animations/heart.json",
+            width: 96.0,
+            height: 72.0,
+            fit: BoxFit.cover,
+            alignment: Alignment.bottomLeft,
+            controller: _heartAnimationController,
+            onLoaded: (LottieComposition composition) {
+              _heartAnimationController.duration = composition.duration;
+            },
           ),
         ),
       ),
