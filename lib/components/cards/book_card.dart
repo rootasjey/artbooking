@@ -494,6 +494,23 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
     );
   }
 
+  Widget filledHeartIcon() {
+    return Stack(
+      children: [
+        Positioned(
+          left: 2.0,
+          top: 2.0,
+          child: Icon(
+            FontAwesomeIcons.solidHeart,
+            color: Theme.of(context).secondaryHeaderColor,
+            size: 12.0,
+          ),
+        ),
+        Icon(UniconsLine.heart, size: 16.0),
+      ],
+    );
+  }
+
   Widget frontCard({
     bool usingAsDropTarget = false,
   }) {
@@ -597,16 +614,9 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
       return Container();
     }
 
-    final IconData iconData =
-        widget.book.liked ? FontAwesomeIcons.solidHeart : UniconsLine.heart;
-
-    final color = widget.book.liked
-        ? Theme.of(context).secondaryHeaderColor
-        : Colors.black;
-
     return Positioned(
-      top: 10.0,
-      left: 10.0,
+      top: 2.0,
+      left: 2.0,
       child: Padding(
         padding: const EdgeInsets.only(left: 8.0, top: 8.0),
         child: InkWell(
@@ -618,14 +628,18 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
               color: Constants.colors.clairPink,
               borderRadius: BorderRadius.circular(24.0),
             ),
-            child: Icon(
-              iconData,
-              color: color,
-              size: 16.0,
-            ),
+            child: widget.book.liked ? filledHeartIcon() : lineHeartIcon(),
           ),
         ),
       ),
+    );
+  }
+
+  Widget lineHeartIcon() {
+    return Icon(
+      UniconsLine.heart,
+      color: Colors.black,
+      size: 16.0,
     );
   }
 
