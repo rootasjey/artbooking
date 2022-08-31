@@ -291,7 +291,10 @@ class _IllustrationCardState extends State<IllustrationCard>
         fit: BoxFit.cover,
         width: widget.size,
         height: widget.size,
+        cache: true,
         clearMemoryCacheWhenDispose: true,
+        imageCacheName: widget.illustration.id,
+        cacheKey: widget.illustration.id,
         loadStateChanged: (state) {
           switch (state.extendedImageLoadState) {
             case LoadState.loading:

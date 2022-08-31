@@ -11,6 +11,7 @@ import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dismissible_page/dismissible_page.dart';
 import 'package:easy_localization/src/public_ext.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:supercharged/supercharged.dart';
@@ -69,7 +70,7 @@ class IllustrationPoster extends StatefulWidget {
 
 class _IllustrationPosterState extends State<IllustrationPoster> {
   /// Illustration image url.
-  String _imageUrl = '';
+  String _imageUrl = "";
 
   /// Illustration image version.
   /// When version changes, image url is fetched.
@@ -126,8 +127,11 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
                 borderRadius: BorderRadius.circular(2.0),
               ),
               child: Ink.image(
-                image: NetworkImage(
+                image: ExtendedNetworkImageProvider(
                   _imageUrl,
+                  cache: true,
+                  imageCacheName: widget.illustration.id,
+                  cacheKey: widget.illustration.id,
                 ),
                 fit: BoxFit.cover,
                 child: InkWell(
