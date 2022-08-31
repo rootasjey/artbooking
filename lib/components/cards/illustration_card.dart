@@ -97,10 +97,10 @@ class IllustrationCard extends StatefulWidget {
   final void Function()? onDragCompleted;
 
   /// Callback fired on drag end.
-  final void Function(DraggableDetails)? onDragEnd;
+  final void Function(DraggableDetails details)? onDragEnd;
 
   /// Callback fired on drag canceled.
-  final void Function(Velocity, Offset)? onDraggableCanceled;
+  final void Function(Velocity velocity, Offset offset)? onDraggableCanceled;
 
   /// Callback fired on drag started.
   final void Function()? onDragStarted;
@@ -112,7 +112,11 @@ class IllustrationCard extends StatefulWidget {
   final void Function(int dropTargetIndex, List<int> dragIndexes)? onDrop;
 
   /// Callback fired on long press.
-  final void Function(String, Illustration, bool)? onLongPress;
+  final void Function(
+    String illustrationKey,
+    Illustration illustration,
+    bool selected,
+  )? onLongPress;
 
   /// Callback fired when this card wants to grow up.
   final void Function(int index)? onGrowUp;

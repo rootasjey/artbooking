@@ -79,19 +79,23 @@ class MyBooksPageBody extends StatelessWidget {
   final void Function(DropEventDetails details)? onDragFileExited;
 
   /// Callback when drag and dropping item on this book card.
-  final void Function(int, List<int>)? onDropBook;
+  final void Function(int index, List<int> books)? onDropBook;
 
   /// Callback opening a dialog to create a new book.
   final void Function()? onShowCreateBookDialog;
 
   /// Callback fired after a tap event on a book card.
-  final void Function(Book)? onTapBook;
+  final void Function(Book book)? onTapBook;
 
   /// Callback fired after selecting a popup menu item.
-  final void Function(EnumBookItemAction, int, Book)? onPopupMenuItemSelected;
+  final void Function(
+    EnumBookItemAction action,
+    int index,
+    Book book,
+  )? onPopupMenuItemSelected;
 
   /// Callback fired after a long press on a book card.
-  final void Function(Book, bool)? onLongPressBook;
+  final void Function(Book book, bool selected)? onLongPressBook;
 
   /// Will navigate to active books tab.
   final void Function()? onGoToActiveBooks;
@@ -107,10 +111,13 @@ class MyBooksPageBody extends StatelessWidget {
   final void Function()? onDragBookCompleted;
 
   /// Callback when book dragging has ended.
-  final void Function(DraggableDetails)? onDragBookEnd;
+  final void Function(DraggableDetails details)? onDragBookEnd;
 
   /// Callback when book dragging has been canceled.
-  final void Function(Velocity, Offset)? onDraggableBookCanceled;
+  final void Function(
+    Velocity velocity,
+    Offset offset,
+  )? onDraggableBookCanceled;
 
   /// Callback when book dragging has started.
   final void Function()? onDragBookStarted;
@@ -206,6 +213,7 @@ class MyBooksPageBody extends StatelessWidget {
               onDraggableCanceled: onDraggableBookCanceled,
               onDrop: onDropBook,
               onLike: authenticated ? onLike : null,
+              onLongPress: onLongPressBook,
               onPopupMenuItemSelected: onPopupMenuItemSelected,
               onTapCaption: onTapBookCaption,
               onTap: () => onTapBook?.call(book),

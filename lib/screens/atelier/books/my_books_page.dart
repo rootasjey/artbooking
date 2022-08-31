@@ -221,6 +221,16 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+    if (!isMobileSize) {
+      _draggingActive = true;
+    }
+  }
+
+  @override
   void dispose() {
     _bookSubscription?.cancel();
     _scrollTimer?.cancel();
@@ -319,7 +329,6 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
                           isMobileSize: isMobileSize,
                           isOwner: isOwner,
                           loading: _loading,
-                          onLongPressBook: onLongPressBook,
                           multiSelectedItems: _multiSelectedItems,
                           onDragBookCompleted: onDragBookCompleted,
                           onDragBookEnd: onDragBookEnd,

@@ -214,6 +214,16 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+    if (!isMobileSize) {
+      _draggingActive = true;
+    }
+  }
+
+  @override
   void dispose() {
     _illustrationSubscription?.cancel();
     _pageScrollController.dispose();
