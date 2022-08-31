@@ -460,6 +460,23 @@ class _IllustrationCardState extends State<IllustrationCard>
     );
   }
 
+  Widget filledHeartIcon() {
+    return Stack(
+      children: [
+        Positioned(
+          left: 2.0,
+          top: 2.0,
+          child: Icon(
+            FontAwesomeIcons.solidHeart,
+            color: Theme.of(context).secondaryHeaderColor,
+            size: 12.0,
+          ),
+        ),
+        Icon(UniconsLine.heart, size: 16.0),
+      ],
+    );
+  }
+
   /// Like icon to toggle favourite.
   Widget likeIcon() {
     if (widget.onTapLike == null) {
@@ -469,14 +486,6 @@ class _IllustrationCardState extends State<IllustrationCard>
     if (!_showPopupMenu) {
       return Container();
     }
-
-    final IconData iconData = widget.illustration.liked
-        ? FontAwesomeIcons.solidHeart
-        : UniconsLine.heart;
-
-    final color = widget.illustration.liked
-        ? Theme.of(context).secondaryHeaderColor
-        : Colors.black;
 
     return Align(
       alignment: Alignment.topLeft,
@@ -491,11 +500,8 @@ class _IllustrationCardState extends State<IllustrationCard>
               color: Constants.colors.clairPink,
               borderRadius: BorderRadius.circular(24.0),
             ),
-            child: Icon(
-              iconData,
-              color: color,
-              size: 16.0,
-            ),
+            child:
+                widget.illustration.liked ? filledHeartIcon() : lineHeartIcon(),
           ),
         ),
       ),
@@ -525,6 +531,14 @@ class _IllustrationCardState extends State<IllustrationCard>
           ),
         ),
       ),
+    );
+  }
+
+  Widget lineHeartIcon() {
+    return Icon(
+      UniconsLine.heart,
+      color: Colors.black,
+      size: 16.0,
     );
   }
 
