@@ -4,6 +4,7 @@ import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/book/popup_entry_book.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:jiffy/jiffy.dart';
@@ -73,7 +74,12 @@ class _BookSquareCoverState extends State<BookSquareCover> {
               ),
               clipBehavior: Clip.antiAlias,
               child: Ink.image(
-                image: NetworkImage(widget.book.getCoverLink()),
+                image: ExtendedNetworkImageProvider(
+                  widget.book.getCoverLink(),
+                  cache: true,
+                  cacheKey: widget.book.id,
+                  imageCacheName: widget.book.id,
+                ),
                 height: 260.0,
                 width: 200.0,
                 fit: BoxFit.cover,
