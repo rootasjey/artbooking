@@ -123,6 +123,7 @@
   "artists_pick_description": "You can pick artists who will be shown in this section.",
   "artworks": "Artworks",
   "atelier": "Atelier",
+  "atelier_access_error_auth": "Please connect first in order to access your atelier",
   "atelier_greetings": "We just wanted to say hello 👋",
   "atelier_sections_navigation": "You can navigate to other sections from here.",
   "audience": {
@@ -1186,7 +1187,10 @@
   "share": "Share",
   "share_book_tweet_text": "I 💜 book \"{}\" by {} //",
   "share_illustration_tweet_text": "I 💜 illustration \"{}\" by {} //",
+  "share_image": "Share image",
+  "share_image_error_size": "We're sorry, this illustration is too large to share its image. Please consider using a link instead.",
   "share_on_twitter": "Share on Twitter",
+  "share_text": "Share text",
   "share_visibility_issue": {
     "book": {
       "archived": "Archived books are only visible to you",

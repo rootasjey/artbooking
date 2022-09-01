@@ -123,6 +123,7 @@
   "artists_pick_description": "Vous pouvez choisir quel•les artistes apparaîtront dans cette seciont.",
   "artworks": "Œures d'art",
   "atelier": "Atelier",
+  "atelier_access_error_auth": "Veuillez d'abord vous connecter afin d'accéder à votre atelier.",
   "atelier_greetings": "On voulait juste vous dire bonjour 👋",
   "atelier_sections_navigation": "Vous pouvez naviguer vers les autres sections à partir d'ici.",
   "audience": {
@@ -1182,7 +1183,10 @@
   "share": "Partager",
   "share_book_tweet_text": "J'💜 le book \"{}\" de {} //",
   "share_illustration_tweet_text": "J'💜 l'illustration \"{}\" de {} //",
+  "share_image": "Partager l'image",
+  "share_image_error_size": "Nous sommes désolés. Cette illustration pèse trop lourd pour être partagé par image. Veuillez utiliser un lien à la place.",
   "share_on_twitter": "Partager sur Twitter",
+  "share_text": "Partager le texte",
   "share_visibility_issue": {
     "book": {
       "archived": "Les books archivés ne sont visibles que par vous",
