@@ -24,6 +24,7 @@ import 'package:artbooking/types/book/book.dart';
 import 'package:artbooking/types/book/book_illustration.dart';
 import 'package:artbooking/types/book/popup_entry_book.dart';
 import 'package:artbooking/types/cloud_functions/book_response.dart';
+import 'package:artbooking/types/cloud_functions/illustrations_response.dart';
 import 'package:artbooking/types/cloud_functions/upload_cover_response.dart';
 import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
@@ -188,6 +189,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   @override
   initState() {
     super.initState();
+    loadPreferences();
 
     Book? bookFromNav = NavigationStateHelper.book;
 
@@ -197,6 +199,16 @@ class _MyBookPageState extends ConsumerState<BookPage> {
       fetchLike();
     } else {
       fetchBookAndIllustrations();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+    if (!isMobileSize) {
+      _draggingActive = true;
     }
   }
 
@@ -351,23 +363,6 @@ class _MyBookPageState extends ConsumerState<BookPage> {
           },
         );
       },
-    );
-  }
-
-  /// Delete the currevent viewing book
-  /// and navigate back to the preview location or MyBooksPage.
-  void tryDeleteBook() async {
-    if (_book.id.isEmpty) {
-      return;
-    }
-
-    // Will delete the book in background.
-    BooksActions.deleteOne(
-      bookId: _book.id,
-    );
-
-    Beamer.of(context).beamToNamed(
-      AtelierLocationContent.booksRoute,
     );
   }
 
@@ -716,6 +711,10 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     );
   }
 
+  void loadPreferences() {
+    _draggingActive = Utilities.storage.getMobileDraggingActive();
+  }
+
   void maybeFetchMore(double offset) {
     if (_pageScrollController.position.atEdge &&
         offset > 50 &&
@@ -753,7 +752,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
 
   void multiSelectIllustration(
       String illustrationKey, Illustration illustration) {
-    final selected = _multiSelectedItems.containsKey(illustrationKey);
+    final bool selected = _multiSelectedItems.containsKey(illustrationKey);
 
     if (selected) {
       setState(() {
@@ -1292,7 +1291,8 @@ class _MyBookPageState extends ConsumerState<BookPage> {
       return;
     }
 
-    final response = await BooksActions.removeIllustrations(
+    final IllustrationsResponse response =
+        await BooksActions.removeIllustrations(
       bookId: _book.id,
       illustrationIds: [illustration.id],
     );
@@ -1317,42 +1317,14 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     }
   }
 
-  /// Rename one book.
-  void tryRenameBook(String name, String description) async {
-    final String prevName = _book.name;
-    final String prevDescription = _book.description;
-
-    setState(() {
-      _book = _book.copyWith(
-        name: name,
-        description: description,
-      );
-    });
-
-    try {
-      final BookResponse response = await BooksActions.renameOne(
-        name: name,
-        description: description,
-        bookId: _book.id,
-      );
-
-      if (response.success) {
-        return;
-      }
-
-      setState(() {
-        _book = _book.copyWith(
-          name: prevName,
-          description: prevDescription,
-        );
-      });
-
-      context.showErrorBar(
-        content: Text(response.error.details),
-      );
-    } catch (error) {
-      Utilities.logger.e(error);
+  void showAddGroupToBook() {
+    if (_multiSelectedItems.isEmpty) {
+      context.showErrorBar(content: Text("multi_select_no_item".tr()));
+      return;
     }
+
+    final mapEntry = _multiSelectedItems.entries.first;
+    showAddToBook(mapEntry.key, mapEntry.value);
   }
 
   void showAddToBook(String illustrationKey, Illustration illustration) {
@@ -1366,177 +1338,6 @@ class _MyBookPageState extends ConsumerState<BookPage> {
         );
       },
     );
-  }
-
-  void showAddGroupToBook() {
-    if (_multiSelectedItems.isEmpty) {
-      context.showErrorBar(content: Text("multi_select_no_item".tr()));
-      return;
-    }
-
-    final mapEntry = _multiSelectedItems.entries.first;
-    showAddToBook(mapEntry.key, mapEntry.value);
-  }
-
-  /// Add a book to a user's favourites.
-  void tryLike() async {
-    try {
-      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
-
-      await FirebaseFirestore.instance
-          .collection("users")
-          .doc(userId)
-          .collection("user_likes")
-          .doc(_book.id)
-          .set({
-        "type": "book",
-        "target_id": _book.id,
-        "user_id": userId,
-      });
-    } catch (error) {
-      Utilities.logger.e(error);
-      context.showErrorBar(content: Text(error.toString()));
-    }
-  }
-
-  /// Remove a book to a user's favourites.
-  void tryUnLike() async {
-    try {
-      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
-
-      await FirebaseFirestore.instance
-          .collection("users")
-          .doc(userId)
-          .collection("user_likes")
-          .doc(_book.id)
-          .delete();
-    } catch (error) {
-      Utilities.logger.e(error);
-      context.showErrorBar(content: Text(error.toString()));
-    }
-  }
-
-  /// If the target illustration has [version] < 1,
-  /// this method will listen to Firestore events in order to update
-  /// the associated data in the map [_illustrationMap].
-  void waitForThumbnail(String illustrationKey, DocumentMap query) {
-    final DocSnapshotStreamSubscription illustrationSub =
-        query.snapshots().listen(
-      (snapshot) {
-        final Map<String, dynamic>? data = snapshot.data();
-
-        if (!snapshot.exists || data == null) {
-          return;
-        }
-
-        data['id'] = snapshot.id;
-        final illustration = Illustration.fromMap(data);
-
-        if (illustration.version < 1) {
-          return;
-        }
-
-        setState(() {
-          _illustrationMap.update(
-            illustrationKey,
-            (value) => illustration,
-            ifAbsent: () => illustration,
-          );
-        });
-
-        if (_illustrationSubs.containsKey(illustration.id)) {
-          final DocSnapshotStreamSubscription? targetSub =
-              _illustrationSubs[illustration.id];
-
-          targetSub?.cancel();
-          _illustrationSubs.remove(illustration.id);
-        }
-      },
-    );
-
-    _illustrationSubs.putIfAbsent(query.id, () => illustrationSub);
-  }
-
-  void onSignOut() async {
-    final user = ref.read(AppState.userProvider.notifier);
-    await user.signOut();
-    Beamer.of(context, root: true).beamToNamed(HomeLocation.route);
-  }
-
-  /// Set the passed illustration as the book's cover.
-  /// This will also update the cover mode to `chosen_illustration`.
-  void trySetIllustrationAsCover(Illustration illustration) async {
-    setState(() => _updatingCover = true);
-
-    try {
-      final HttpsCallableResult response =
-          await Utilities.cloud.fun("books-setCover").call({
-        "book_id": _book.id,
-        "illustration_id": illustration.id,
-        "cover_type": "chosen_illustration",
-      });
-
-      if (response.data["success"]) {
-        return;
-      }
-
-      context.showErrorBar(content: Text("book_set_cover_error".tr()));
-    } catch (error) {
-      Utilities.logger.i(error);
-      context.showErrorBar(content: Text(error.toString()));
-    } finally {
-      setState(() => _updatingCover = false);
-    }
-  }
-
-  /// Set back the book's cover mode as `last_illustration`.
-  /// Delete any uploaded cover if any.
-  void tryResetCover(Book book) async {
-    setState(() => _updatingCover = true);
-
-    try {
-      final HttpsCallableResult response =
-          await Utilities.cloud.fun("books-setCover").call({
-        "book_id": _book.id,
-        "cover_type": "last_illustration_added",
-      });
-
-      if (response.data["success"]) {
-        return;
-      }
-
-      context.showErrorBar(content: Text("book_set_cover_error".tr()));
-    } catch (error) {
-      Utilities.logger.i(error);
-      context.showErrorBar(content: Text(error.toString()));
-    } finally {
-      setState(() => _updatingCover = false);
-    }
-  }
-
-  /// Pick a file, set book cover mode as `uploaded_cover`,
-  /// and upload the file to Firebase Storage.
-  /// Cloud functions will take the process from there, and changes will be
-  /// automatically updated back into the app.
-  void tryUploadCover(Book book) async {
-    setState(() => _updatingCover = true);
-
-    try {
-      final UploadCoverResponse operationResult = await ref
-          .read(AppState.uploadTaskListProvider.notifier)
-          .pickImageAndSetAsBookCover(bookId: book.id);
-
-      if (operationResult.success) {
-        return;
-      }
-
-      context.showErrorBar(content: Text(operationResult.errorMessage));
-    } catch (error) {
-      Utilities.logger.i(error);
-      context.showErrorBar(content: Text(error.toString()));
-    } finally {
-      setState(() => _updatingCover = false);
-    }
   }
 
   void showShareDialog() {
@@ -1622,6 +1423,150 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     );
   }
 
+  /// Delete the currevent viewing book
+  /// and navigate back to the preview location or MyBooksPage.
+  void tryDeleteBook() async {
+    if (_book.id.isEmpty) {
+      return;
+    }
+
+    // Will delete the book in background.
+    BooksActions.deleteOne(
+      bookId: _book.id,
+    );
+
+    Beamer.of(context).beamToNamed(
+      AtelierLocationContent.booksRoute,
+    );
+  }
+
+  /// Add a book to a user's favourites.
+  void tryLike() async {
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(_book.id)
+          .set({
+        "type": "book",
+        "target_id": _book.id,
+        "user_id": userId,
+      });
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
+  /// Rename one book.
+  void tryRenameBook(String name, String description) async {
+    final String prevName = _book.name;
+    final String prevDescription = _book.description;
+
+    setState(() {
+      _book = _book.copyWith(
+        name: name,
+        description: description,
+      );
+    });
+
+    try {
+      final BookResponse response = await BooksActions.renameOne(
+        name: name,
+        description: description,
+        bookId: _book.id,
+      );
+
+      if (response.success) {
+        return;
+      }
+
+      setState(() {
+        _book = _book.copyWith(
+          name: prevName,
+          description: prevDescription,
+        );
+      });
+
+      context.showErrorBar(
+        content: Text(response.error.details),
+      );
+    } catch (error) {
+      Utilities.logger.e(error);
+    }
+  }
+
+  /// Set back the book's cover mode as `last_illustration`.
+  /// Delete any uploaded cover if any.
+  void tryResetCover(Book book) async {
+    setState(() => _updatingCover = true);
+
+    try {
+      final HttpsCallableResult response =
+          await Utilities.cloud.fun("books-setCover").call({
+        "book_id": _book.id,
+        "cover_type": "last_illustration_added",
+      });
+
+      if (response.data["success"]) {
+        return;
+      }
+
+      context.showErrorBar(content: Text("book_set_cover_error".tr()));
+    } catch (error) {
+      Utilities.logger.i(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _updatingCover = false);
+    }
+  }
+
+  /// Set the passed illustration as the book's cover.
+  /// This will also update the cover mode to `chosen_illustration`.
+  void trySetIllustrationAsCover(Illustration illustration) async {
+    setState(() => _updatingCover = true);
+
+    try {
+      final HttpsCallableResult response =
+          await Utilities.cloud.fun("books-setCover").call({
+        "book_id": _book.id,
+        "illustration_id": illustration.id,
+        "cover_type": "chosen_illustration",
+      });
+
+      if (response.data["success"]) {
+        return;
+      }
+
+      context.showErrorBar(content: Text("book_set_cover_error".tr()));
+    } catch (error) {
+      Utilities.logger.i(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _updatingCover = false);
+    }
+  }
+
+  /// Remove a book to a user's favourites.
+  void tryUnLike() async {
+    try {
+      final String? userId = ref.read(AppState.userProvider).firestoreUser?.id;
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .collection("user_likes")
+          .doc(_book.id)
+          .delete();
+    } catch (error) {
+      Utilities.logger.e(error);
+      context.showErrorBar(content: Text(error.toString()));
+    }
+  }
+
   Future<EnumContentVisibility?> tryUpdateVisibility(
     Book book,
     EnumContentVisibility visibility,
@@ -1644,5 +1589,71 @@ class _MyBookPageState extends ConsumerState<BookPage> {
       context.showErrorBar(content: Text(error.toString()));
       return null;
     }
+  }
+
+  /// Pick a file, set book cover mode as `uploaded_cover`,
+  /// and upload the file to Firebase Storage.
+  /// Cloud functions will take the process from there, and changes will be
+  /// automatically updated back into the app.
+  void tryUploadCover(Book book) async {
+    setState(() => _updatingCover = true);
+
+    try {
+      final UploadCoverResponse operationResult = await ref
+          .read(AppState.uploadTaskListProvider.notifier)
+          .pickImageAndSetAsBookCover(bookId: book.id);
+
+      if (operationResult.success) {
+        return;
+      }
+
+      context.showErrorBar(content: Text(operationResult.errorMessage));
+    } catch (error) {
+      Utilities.logger.i(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _updatingCover = false);
+    }
+  }
+
+  /// If the target illustration has [version] < 1,
+  /// this method will listen to Firestore events in order to update
+  /// the associated data in the map [_illustrationMap].
+  void waitForThumbnail(String illustrationKey, DocumentMap query) {
+    final DocSnapshotStreamSubscription illustrationSub =
+        query.snapshots().listen(
+      (snapshot) {
+        final Map<String, dynamic>? data = snapshot.data();
+
+        if (!snapshot.exists || data == null) {
+          return;
+        }
+
+        data['id'] = snapshot.id;
+        final illustration = Illustration.fromMap(data);
+
+        if (illustration.version < 1) {
+          return;
+        }
+
+        setState(() {
+          _illustrationMap.update(
+            illustrationKey,
+            (value) => illustration,
+            ifAbsent: () => illustration,
+          );
+        });
+
+        if (_illustrationSubs.containsKey(illustration.id)) {
+          final DocSnapshotStreamSubscription? targetSub =
+              _illustrationSubs[illustration.id];
+
+          targetSub?.cancel();
+          _illustrationSubs.remove(illustration.id);
+        }
+      },
+    );
+
+    _illustrationSubs.putIfAbsent(query.id, () => illustrationSub);
   }
 }
