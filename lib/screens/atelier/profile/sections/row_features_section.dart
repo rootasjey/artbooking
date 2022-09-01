@@ -1,6 +1,7 @@
 import 'package:artbooking/components/cards/vertical_card.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
+import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
@@ -11,11 +12,13 @@ import 'package:artbooking/types/section.dart';
 import 'package:beamer/beamer.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
 /// A spacing section of 100px height and window screen width.
-class RowFeaturesSection extends StatelessWidget {
+class RowFeaturesSection extends ConsumerWidget {
   const RowFeaturesSection({
     Key? key,
     required this.index,
@@ -55,7 +58,7 @@ class RowFeaturesSection extends StatelessWidget {
   final Section section;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final EdgeInsets outerPadding =
         usingAsDropTarget ? const EdgeInsets.all(4.0) : EdgeInsets.zero;
 
@@ -89,7 +92,7 @@ class RowFeaturesSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 titleWidget(context, isMobileSize),
-                bodyWidget(context, isMobileSize),
+                bodyWidget(context, isMobileSize, ref),
               ],
             ),
           ),
@@ -99,12 +102,12 @@ class RowFeaturesSection extends StatelessWidget {
     );
   }
 
-  Widget bodyWidget(BuildContext context, bool isMobileSize) {
+  Widget bodyWidget(BuildContext context, bool isMobileSize, WidgetRef ref) {
     if (isMobileSize) {
-      return verticalBody(context, isMobileSize);
+      return verticalBody(context, isMobileSize, ref);
     }
 
-    return horizontalBody(context, isMobileSize);
+    return horizontalBody(context, isMobileSize, ref);
   }
 
   Widget horizontalFeatureCard({
@@ -163,7 +166,8 @@ class RowFeaturesSection extends StatelessWidget {
     );
   }
 
-  Widget horizontalBody(BuildContext context, bool isMobileSize) {
+  Widget horizontalBody(
+      BuildContext context, bool isMobileSize, WidgetRef ref) {
     return SizedBox(
       height: 520.0,
       child: ListView(
@@ -179,7 +183,7 @@ class RowFeaturesSection extends StatelessWidget {
             ),
             title: "app_features.atelier.title".tr(),
             description: "app_features.atelier.description".tr(),
-            onTap: () => onTapAtelier(context),
+            onTap: () => onTapAtelier(context, ref),
           ),
           VerticalCard(
             icon: Icon(
@@ -205,14 +209,14 @@ class RowFeaturesSection extends StatelessWidget {
     );
   }
 
-  Widget verticalBody(BuildContext context, bool isMobileSize) {
+  Widget verticalBody(BuildContext context, bool isMobileSize, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
       child: Column(
         children: [
           horizontalFeatureCard(
             iconData: UniconsLine.ruler_combined,
-            onTap: () => onTapAtelier(context),
+            onTap: () => onTapAtelier(context, ref),
             titleValue: "app_features.atelier.title".tr(),
             subtitleValue: "app_features.atelier.description".tr(),
           ),
@@ -414,7 +418,18 @@ class RowFeaturesSection extends StatelessWidget {
     );
   }
 
-  void onTapAtelier(BuildContext context) {
+  void onTapAtelier(BuildContext context, WidgetRef ref) {
+    final String uid = ref.read(AppState.userProvider).authUser?.uid ?? "";
+    final bool isAuthenticated = uid.isNotEmpty;
+
+    if (!isAuthenticated) {
+      context.showErrorBar(
+        content: Text("atelier_access_error_auth".tr()),
+      );
+
+      return;
+    }
+
     Beamer.of(context).beamToNamed(
       AtelierLocationContent.activityRoute,
     );
