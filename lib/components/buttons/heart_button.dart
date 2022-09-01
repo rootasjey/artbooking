@@ -5,6 +5,7 @@ import 'package:simple_animations/anicoto/animation_mixin.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
+/// A button to be used to like or unlike content.
 class HeartButton extends StatefulWidget {
   const HeartButton({
     Key? key,

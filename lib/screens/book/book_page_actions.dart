@@ -63,7 +63,9 @@ class BookPageActions extends StatelessWidget {
   final void Function()? onUploadToThisBook;
 
   /// Callback event to update this book's visibility.
-  final void Function(EnumContentVisibility)? onUpdateVisibility;
+  final void Function(
+    EnumContentVisibility contentVisibility,
+  )? onUpdateVisibility;
 
   /// Currently selected illustrations.
   final IllustrationMap multiSelectedItems;
