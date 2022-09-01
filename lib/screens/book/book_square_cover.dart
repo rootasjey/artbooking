@@ -1,3 +1,4 @@
+import 'package:artbooking/components/buttons/filled_heart_icon.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/book/book.dart';
@@ -6,7 +7,6 @@ import 'package:artbooking/types/enums/enum_book_item_action.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:unicons/unicons.dart';
 
@@ -111,11 +111,7 @@ class _BookSquareCoverState extends State<BookSquareCover> {
     if (widget.liked) {
       return IconButton(
         tooltip: "unlike".tr(),
-        icon: Icon(
-          FontAwesomeIcons.solidHeart,
-        ),
-        iconSize: 18.0,
-        color: Theme.of(context).secondaryHeaderColor,
+        icon: FilledHeartIcon(size: 24.0),
         onPressed: widget.onLike,
       );
     }
@@ -236,7 +232,7 @@ class _BookSquareCoverState extends State<BookSquareCover> {
       child: Opacity(
         opacity: _showPopupMenu ? 1.0 : 0.0,
         child: PopupMenuButton(
-          child: CircleAvatar(
+          icon: CircleAvatar(
             radius: 15.0,
             backgroundColor: Constants.colors.clairPink,
             child: Padding(
@@ -244,9 +240,7 @@ class _BookSquareCoverState extends State<BookSquareCover> {
               child: Icon(UniconsLine.ellipsis_h, size: 20),
             ),
           ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(6.0),
-          ),
+          itemBuilder: (_) => widget.popupMenuEntries,
           onSelected: (EnumBookItemAction action) {
             widget.onPopupMenuItemSelected?.call(
               action,
@@ -254,7 +248,7 @@ class _BookSquareCoverState extends State<BookSquareCover> {
               widget.book,
             );
           },
-          itemBuilder: (_) => widget.popupMenuEntries,
+          padding: EdgeInsets.zero,
         ),
       ),
     );

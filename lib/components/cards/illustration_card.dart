@@ -1,4 +1,5 @@
 import 'package:artbooking/actions/illustrations.dart';
+import 'package:artbooking/components/buttons/filled_heart_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/resizer/frame.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -10,7 +11,6 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:simple_animations/simple_animations.dart';
@@ -464,23 +464,6 @@ class _IllustrationCardState extends State<IllustrationCard>
     );
   }
 
-  Widget filledHeartIcon() {
-    return Stack(
-      children: [
-        Positioned(
-          left: 2.0,
-          top: 2.0,
-          child: Icon(
-            FontAwesomeIcons.solidHeart,
-            color: Theme.of(context).secondaryHeaderColor,
-            size: 12.0,
-          ),
-        ),
-        Icon(UniconsLine.heart, size: 16.0),
-      ],
-    );
-  }
-
   /// Like icon to toggle favourite.
   Widget likeIcon() {
     if (widget.onTapLike == null) {
@@ -505,7 +488,7 @@ class _IllustrationCardState extends State<IllustrationCard>
               borderRadius: BorderRadius.circular(24.0),
             ),
             child:
-                widget.illustration.liked ? filledHeartIcon() : lineHeartIcon(),
+                widget.illustration.liked ? FilledHeartIcon() : lineHeartIcon(),
           ),
         ),
       ),

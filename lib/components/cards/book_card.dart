@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:artbooking/components/buttons/filled_heart_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -628,7 +629,7 @@ class _BookCardState extends State<BookCard> with AnimationMixin {
               color: Constants.colors.clairPink,
               borderRadius: BorderRadius.circular(24.0),
             ),
-            child: widget.book.liked ? filledHeartIcon() : lineHeartIcon(),
+            child: widget.book.liked ? FilledHeartIcon() : lineHeartIcon(),
           ),
         ),
       ),
