@@ -4,6 +4,7 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:artbooking/app.dart';
 import 'package:artbooking/firebase_options.dart';
 import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/state/user_notifier.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/user/user.dart';
@@ -20,7 +21,7 @@ import 'package:window_manager/window_manager.dart';
 
 void main() async {
   LicenseRegistry.addLicense(() async* {
-    final license = await rootBundle.loadString("google_fonts/OFL.txt");
+    final String license = await rootBundle.loadString("google_fonts/OFL.txt");
     yield LicenseEntryWithLineBreaks(["google_fonts"], license);
   });
 
@@ -69,6 +70,16 @@ void main() async {
       () async {
         await windowManager.show();
       },
+    );
+  }
+
+  if (Platform.isAndroid || Platform.isIOS) {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Constants.colors.lightBackground,
+        systemNavigationBarColor: Colors.white,
+        systemNavigationBarDividerColor: Colors.transparent,
+      ),
     );
   }
 
