@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:animations/animations.dart';
@@ -39,6 +40,8 @@ import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -66,6 +69,9 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
 
   /// True if the illustration is being downloaded.
   bool _downloading = false;
+
+  /// True if the is illustration is being downloaded for share.
+  // bool _downloadingImageForShare = false;
 
   /// Disable file drop when navigating to a new page.
   bool _enableFileDrop = true;
@@ -621,20 +627,28 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
   }
 
   void onShare() async {
-    showDialog(
-      context: context,
-      builder: (context) => ShareDialog(
-        extension: _illustration.extension,
-        itemId: _illustration.id,
-        imageProvider: NetworkImage(_illustration.getThumbnail()),
-        name: _illustration.name,
-        imageUrl: _illustration.getThumbnail(),
-        shareContentType: EnumShareContentType.illustration,
-        userId: _illustration.userId,
-        username: "",
-        visibility: _illustration.visibility,
-        onShowVisibilityDialog: () => showVisibilityDialog(_illustration, 0),
-      ),
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    Utilities.ui.showAdaptiveDialog(
+      context,
+      isMobileSize: isMobileSize,
+      builder: (BuildContext context) {
+        return ShareDialog(
+          asBottomSheet: isMobileSize,
+          extension: _illustration.extension,
+          itemId: _illustration.id,
+          imageProvider: NetworkImage(_illustration.getThumbnail()),
+          name: _illustration.name,
+          imageUrl: _illustration.getThumbnail(),
+          shareContentType: EnumShareContentType.illustration,
+          userId: _illustration.userId,
+          username: "",
+          visibility: _illustration.visibility,
+          onShareImage: onShareImage,
+          onShareText: onShareText,
+          onShowVisibilityDialog: () => showVisibilityDialog(_illustration, 0),
+        );
+      },
     );
   }
 
@@ -728,7 +742,88 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     return "${_illustration.name}.${_illustration.extension}";
   }
 
-  void tryDownload() async {
+  Future<void> cleanDirectory(Directory directory) async {
+    final List<FileSystemEntity> filesAndDirectories = directory.listSync();
+    final RegExp regexp = RegExp("illustrations\$");
+
+    final bool illustrationsDirExists = filesAndDirectories
+        .any((FileSystemEntity entity) => entity.path.contains(regexp));
+
+    if (!illustrationsDirExists) {
+      return;
+    }
+
+    final FileSystemEntity dir = filesAndDirectories.firstWhere(
+      (final FileSystemEntity x) => x.path.contains(regexp),
+    );
+
+    final List<FileSystemEntity> files = Directory(dir.path).listSync();
+
+    for (final FileSystemEntity file in files) {
+      file.deleteSync();
+    }
+  }
+
+  /// Invoque sharing system UI of the device to share image.
+  Future<void> onShareImage() async {
+    try {
+      final Reference storageRef = FirebaseStorage.instance.ref();
+      final Reference fileRef = storageRef.child(_illustration.links.storage);
+
+      final Directory directory = await getApplicationDocumentsDirectory();
+      await cleanDirectory(directory);
+
+      final FileQuotaCross quota = await FilePickerCross.quota();
+      final FullMetadata metadata = await fileRef.getMetadata();
+      final int fileSize = metadata.size ?? 0;
+
+      if (quota.remaining <= fileSize) {
+        context.showErrorBar(content: Text("share_error_remaining_space".tr()));
+        return;
+      }
+
+      final String path = "${directory.absolute.path}/illustrations/"
+          "ephemeral.${_illustration.extension}";
+
+      final File file = File(path);
+      file.createSync(recursive: true);
+
+      final DownloadTask task = fileRef.writeToFile(file);
+      await task;
+
+      final RenderBox? box = context.findRenderObject() as RenderBox?;
+      final Rect? sharePositionOrigin =
+          (box != null) ? (box.localToGlobal(Offset.zero) & box.size) : null;
+
+      Share.shareFiles(
+        [path],
+        text: _illustration.name,
+        subject: "illustration",
+        sharePositionOrigin: sharePositionOrigin,
+      );
+    } catch (error) {
+      Utilities.logger.i(error);
+      context.showErrorBar(content: Text(error.toString()));
+    } finally {
+      setState(() => _downloading = false);
+    }
+  }
+
+  /// Share text showing device system UI.
+  void onShareText() {
+    final String url =
+        "https://artbooking.fr/illustrations/${_illustration.id}";
+
+    final RenderBox? box = context.findRenderObject() as RenderBox?;
+
+    Share.share(
+      url,
+      subject: _illustration.name,
+      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+    );
+  }
+
+  Future<void> tryDownload() async {
     setState(() => _downloading = true);
 
     try {
@@ -753,13 +848,12 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
       }
 
       // Load the file in memory
-      // ----------
+      // -----------------------
       final Uint8List? fileData = await fileRef.getData();
       if (fileData == null) {
         context.showErrorBar(
           content: Text("download_file_error".tr()),
         );
-
         return;
       }
 
@@ -769,8 +863,18 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
         type: FileTypeCross.image,
       );
 
+      final RenderBox? box = context.findRenderObject() as RenderBox?;
+      if (box == null) {
+        return;
+      }
+
+      final Rect? rect = box.localToGlobal(Offset.zero) & box.size;
+
       fileCross.exportToStorage(
+        subject: "illustration",
+        text: _illustration.name,
         fileName: _illustration.name,
+        sharePositionOrigin: rect,
       );
     } catch (error) {
       Utilities.logger.i(error);

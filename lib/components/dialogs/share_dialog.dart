@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:artbooking/components/buttons/circle_button.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
+import 'package:artbooking/components/loading_view.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/enums/enum_share_content_type.dart';
@@ -19,16 +20,19 @@ import 'package:url_launcher/url_launcher.dart';
 class ShareDialog extends StatefulWidget {
   const ShareDialog({
     Key? key,
+    required this.shareContentType,
+    required this.visibility,
+    required this.imageProvider,
+    required this.extension,
+    required this.imageUrl,
+    required this.itemId,
     required this.name,
     required this.username,
-    required this.imageProvider,
-    required this.shareContentType,
-    required this.itemId,
-    required this.imageUrl,
-    required this.extension,
-    required this.visibility,
     this.asBottomSheet = false,
+    this.onShareImage,
+    this.onShareText,
     this.onShowVisibilityDialog,
+    this.tryDownloadAndShare,
     this.userId = "",
   }) : super(key: key);
 
@@ -44,6 +48,18 @@ class ShareDialog extends StatefulWidget {
 
   /// Thumbnail to display in the dialog.
   final ImageProvider imageProvider;
+
+  /// Callback fired to share an illustration's image.
+  final Future<void> Function()? onShareImage;
+
+  /// Callback fired to share an illustration's url.
+  final void Function()? onShareText;
+
+  /// Callback fired to show visibility dialog.
+  final Future<EnumContentVisibility?>? Function()? onShowVisibilityDialog;
+
+  /// Callback fired to process image download and share.
+  final Future<void> Function()? tryDownloadAndShare;
 
   /// Content's extension if any.
   final String extension;
@@ -63,14 +79,14 @@ class ShareDialog extends StatefulWidget {
   /// Owner of this book/illustration.
   final String username;
 
-  // final void Function()? onShowVisibilityDialog;
-  final Future<EnumContentVisibility?>? Function()? onShowVisibilityDialog;
-
   @override
   State<ShareDialog> createState() => _ShareDialogState();
 }
 
 class _ShareDialogState extends State<ShareDialog> {
+  /// Downloading image to prepare sharing, if true.
+  bool _tryingToShareImage = false;
+
   /// Current content's visibility.
   /// Take the initial value of [widget.visibility] in `initState()`.
   EnumContentVisibility _contentVisibility = EnumContentVisibility.public;
@@ -106,7 +122,7 @@ class _ShareDialogState extends State<ShareDialog> {
     );
   }
 
-  Widget body() {
+  Widget body({bool showVisibilityButton = true}) {
     final double size = 310.0;
 
     return Padding(
@@ -154,7 +170,7 @@ class _ShareDialogState extends State<ShareDialog> {
               ),
             ),
           ),
-          visibilityWidget(context),
+          if (showVisibilityButton) visibilityWidget(context),
         ],
       ),
     );
@@ -189,14 +205,6 @@ class _ShareDialogState extends State<ShareDialog> {
             backgroundColor: Colors.black87,
             icon: Icon(UniconsLine.link, color: Colors.white),
           ),
-          if (Platform.isAndroid || Platform.isIOS)
-            CircleButton(
-              onTap: () => onShareMore(context),
-              elevation: 2.0,
-              tooltip: "more".tr(),
-              backgroundColor: Colors.black87,
-              icon: Icon(UniconsLine.ellipsis_h, color: Colors.white),
-            ),
         ],
       ),
     );
@@ -232,31 +240,118 @@ class _ShareDialogState extends State<ShareDialog> {
   }
 
   Widget mobileLayout() {
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              header(
-                margin: const EdgeInsets.only(
-                  top: 28.0,
-                  left: 12.0,
-                  right: 12.0,
-                  bottom: 16.0,
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                header(
+                  margin: const EdgeInsets.only(
+                    top: 28.0,
+                    left: 12.0,
+                    right: 12.0,
+                    bottom: 16.0,
+                  ),
                 ),
+                Divider(
+                  thickness: 2.0,
+                  color: Theme.of(context).secondaryHeaderColor,
+                ),
+              ],
+            ),
+          ),
+          if ((Platform.isAndroid || Platform.isIOS))
+            ...platformMobileBodyFooter()
+          else
+            ...webMobileBodyFooter(),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> webMobileBodyFooter() {
+    return [
+      SliverToBoxAdapter(child: body()),
+      SliverToBoxAdapter(child: footer()),
+    ];
+  }
+
+  List<Widget> platformMobileBodyFooter() {
+    if (_tryingToShareImage) {
+      return mobileDownloadingBodyFooter();
+    }
+
+    return mobileIdleBodyFooter();
+  }
+
+  List<Widget> mobileIdleBodyFooter() {
+    return [
+      SliverToBoxAdapter(child: body()),
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 24.0),
+          child: Column(
+            children: [
+              elevatedTile(
+                leading: Icon(UniconsLine.comment_share),
+                textValue: "share_link".tr(),
+                onTap: widget.onShareText,
               ),
-              Divider(
-                thickness: 2.0,
-                color: Theme.of(context).secondaryHeaderColor,
-              ),
+              if (widget.shareContentType == EnumShareContentType.illustration)
+                elevatedTile(
+                  leading: Icon(UniconsLine.image_share),
+                  textValue: "share_image".tr(),
+                  onTap: widget.onShareImage != null ? onShareImage : null,
+                ),
             ],
           ),
         ),
-        SliverToBoxAdapter(child: body()),
-        SliverToBoxAdapter(child: footer()),
-      ],
+      ),
+    ];
+  }
+
+  Widget elevatedTile({
+    required final String textValue,
+    required final Widget leading,
+    final void Function()? onTap,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListTile(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          side: BorderSide(color: Colors.white, width: 2.0),
+        ),
+        tileColor: Color.fromRGBO(255, 246, 247, 1),
+        leading: leading,
+        title: Opacity(
+          opacity: 0.8,
+          child: Text(
+            textValue.toLowerCase(),
+            style: Utilities.fonts.body(
+              fontSize: 20.0,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        onTap: onTap,
+      ),
     );
+  }
+
+  List<Widget> mobileDownloadingBodyFooter() {
+    return [
+      LoadingView(
+        title: Text("${'share_preparing'.tr()} ..."),
+      ),
+      SliverToBoxAdapter(
+        child: body(
+          showVisibilityButton: false,
+        ),
+      ),
+    ];
   }
 
   Widget visibilityWidget(BuildContext context) {
@@ -393,6 +488,12 @@ class _ShareDialogState extends State<ShareDialog> {
     );
   }
 
+  void onShareImage() async {
+    setState(() => _tryingToShareImage = true);
+    await widget.onShareImage?.call();
+    setState(() => _tryingToShareImage = false);
+  }
+
   void onShareOnTwitter() {
     final String type = widget.shareContentType == EnumShareContentType.book
         ? "books"
@@ -412,6 +513,4 @@ class _ShareDialogState extends State<ShareDialog> {
 
     launchUrl(uri);
   }
-
-  void onShareMore(BuildContext context) {}
 }
