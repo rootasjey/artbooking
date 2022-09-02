@@ -452,6 +452,7 @@
   "dev_stack_2": "If you want to learn more about the lines of code behind this website, visit the GitHub repository. Or stay tuned for future blog posts explanations.",
   "developers": "Developers",
   "direct_message": "Direct Message",
+  "directory_cannot_find_error": "Sorry, there was an issue finding the application directory. Please try again or contact us by email or on social media.",
   "disapprove": "Disapprove",
   "discount_first_customers": "For the first 4 customers.",
   "discover": "Discover",
@@ -1186,10 +1187,13 @@
   "shape": "Shape",
   "share": "Share",
   "share_book_tweet_text": "I 💜 book \"{}\" by {} //",
+  "share_error_remaining_space": "Your device does not have enough remaining space to share this illustration. Please free up some space or use a link to share your illustration.",
   "share_illustration_tweet_text": "I 💜 illustration \"{}\" by {} //",
   "share_image": "Share image",
   "share_image_error_size": "We're sorry, this illustration is too large to share its image. Please consider using a link instead.",
+  "share_link": "Share link",
   "share_on_twitter": "Share on Twitter",
+  "share_preparing": "Preparing share",
   "share_text": "Share text",
   "share_visibility_issue": {
     "book": {

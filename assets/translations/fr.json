@@ -448,6 +448,7 @@
   "dev_stack_2": "Si vous souhaitez en savoir plus sur les lignes de code qui constituent ce site, rendez-vous sur le GitHub. Vous pouvez aussi lire les articles concernant les différents aspects de ce site.",
   "developers": "Développeurs",
   "direct_message": "Message instantané",
+  "directory_cannot_find_error": "Nous somme navrés, une erreur est survenue lors de la recherche du répertoire d'application. Veuillez réessayer ou contacter par email ou sur les réseaux sociaux.",
   "disapprove": "Désapprouver",
   "discount_first_customers": "Pour les 4 premiers client(e)s.",
   "discover": "Explorer",
@@ -1182,10 +1183,13 @@
   "shape": "Forme",
   "share": "Partager",
   "share_book_tweet_text": "J'💜 le book \"{}\" de {} //",
+  "share_error_remaining_space": "Votre appareil ne dispose plus d'assez d'espace de stockage pour partager cette illustration. Veuillez libérer de l'espace ou utilisez un lien de partage.",
   "share_illustration_tweet_text": "J'💜 l'illustration \"{}\" de {} //",
   "share_image": "Partager l'image",
   "share_image_error_size": "Nous sommes désolés. Cette illustration pèse trop lourd pour être partagé par image. Veuillez utiliser un lien à la place.",
+  "share_link": "Partager le lien",
   "share_on_twitter": "Partager sur Twitter",
+  "share_preparing": "Préparation du partage",
   "share_text": "Partager le texte",
   "share_visibility_issue": {
     "book": {
