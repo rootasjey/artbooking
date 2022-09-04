@@ -30,6 +30,8 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>You can upload images from your Photo Library</string>
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>en</string>
