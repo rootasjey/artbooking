@@ -43,7 +43,6 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:unicons/unicons.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class IllustrationPage extends ConsumerStatefulWidget {
   const IllustrationPage({
@@ -825,63 +824,8 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
 
   Future<void> tryDownload() async {
     setState(() => _downloading = true);
-
-    try {
-      final Reference storageRef = FirebaseStorage.instance.ref();
-      final Reference fileRef = storageRef.child(_illustration.links.storage);
-
-      // if file's size > 10mb, use a web browser.
-      if (_illustration.size > 10000000) {
-        final HttpsCallableResult response = await Utilities.cloud
-            .illustrations("getSignedUrl")
-            .call({"illustration_id": _illustration.id});
-
-        if (!response.data["success"]) {
-          throw ErrorDescription("download_file_error".tr());
-        }
-
-        final String downloadUrl = response.data["url"];
-
-        final Uri url = Uri.parse(downloadUrl);
-        await launchUrl(url);
-        return;
-      }
-
-      // Load the file in memory
-      // -----------------------
-      final Uint8List? fileData = await fileRef.getData();
-      if (fileData == null) {
-        context.showErrorBar(
-          content: Text("download_file_error".tr()),
-        );
-        return;
-      }
-
-      final fileCross = FilePickerCross(
-        fileData,
-        fileExtension: _illustration.extension,
-        type: FileTypeCross.image,
-      );
-
-      final RenderBox? box = context.findRenderObject() as RenderBox?;
-      if (box == null) {
-        return;
-      }
-
-      final Rect? rect = box.localToGlobal(Offset.zero) & box.size;
-
-      fileCross.exportToStorage(
-        subject: "illustration",
-        text: _illustration.name,
-        fileName: _illustration.name,
-        sharePositionOrigin: rect,
-      );
-    } catch (error) {
-      Utilities.logger.i(error);
-      context.showErrorBar(content: Text(error.toString()));
-    } finally {
-      setState(() => _downloading = false);
-    }
+    await Utilities.io.tryDownload(context, illustration: _illustration);
+    setState(() => _downloading = false);
   }
 
   void tryLike() async {

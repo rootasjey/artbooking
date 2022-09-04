@@ -4,6 +4,7 @@ import 'package:artbooking/globals/utilities/date_utilities.dart';
 import 'package:artbooking/globals/utilities/flash_utilities.dart';
 import 'package:artbooking/globals/utilities/fonts_utilities.dart';
 import 'package:artbooking/globals/utilities/navigation_utilities.dart';
+import 'package:artbooking/globals/utilities/io_utilities.dart';
 import 'package:artbooking/globals/utilities/search_utilities.dart';
 import 'package:artbooking/globals/utilities/storage_utilities.dart';
 import 'package:artbooking/globals/utilities/language_utilities.dart';
@@ -25,6 +26,7 @@ class Utilities {
   static const flash = const FlashUtilities();
   static const fonts = const FontsUtilities();
   static const lang = const LanguageUtilities();
+  static const io = const IOUtilities();
   static const search = const SearchUtilities();
   static const size = const SizeUtils();
   static const storage = const StorageUtilities();
@@ -91,7 +93,7 @@ class Utilities {
       return null;
     }
 
-    data['id'] = docSnapshot.id;
+    data["id"] = docSnapshot.id;
     return UserFirestore.fromMap(data);
   }
 }

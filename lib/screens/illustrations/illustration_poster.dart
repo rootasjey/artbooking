@@ -54,7 +54,7 @@ class IllustrationPoster extends StatefulWidget {
   final Function()? onShare;
 
   /// Callback when tapping on this illustration's owner.
-  final void Function(UserFirestore)? onTapUser;
+  final void Function(UserFirestore userFirestore)? onTapUser;
 
   /// This component's data.
   final Illustration illustration;
