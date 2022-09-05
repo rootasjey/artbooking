@@ -657,6 +657,20 @@
   "illustration_download_completed": "Le téléchargement de l'illustration s'est correctement terminé !",
   "illustration_download_failed": "Une erreur est survenue lors du téléchargement de l'illustration. Veuillez réessayer ou contactez le support si le problème persiste.",
   "illustration_edit_visibility": "Modifier la visibility de l'illustration",
+  "illustration_group_downloading": {
+    "zero": "Téléchargement d'aucune illustration'.",
+    "one": "Téléchargement de {} illustration...",
+    "two": "Téléchargement de {} illustrations...",
+    "many": "Téléchargement de {} illustrations...",
+    "other": "Téléchargement de {} illustrations..."
+  },
+  "illustration_group_download_completed": {
+    "zero": "Aucune illustration téléchargée avec succès.",
+    "one": "{} illustration téléchargée avec succès !",
+    "two": "{} illustrations téléchargées avec succès !",
+    "many": "{} illustrations téléchargées avec succès !",
+    "other": "{} illustrations téléchargées avec succès !"
+  },
   "illustration_license_description": "Définissez comment les règles d'utilisation de votre travail.",
   "illustration_metadata": "Méta-données de l'illustration",
   "illustration_metadata_description": "Modifiez le titre de l'ilustration, son résumé, sa description, ses topics & plus",

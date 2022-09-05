@@ -661,6 +661,20 @@
   "illustration_download_completed": "Illustration download has successfully completed!",
   "illustration_download_failed": "An error occurred while downloading illustration. Please try again or contact us if the problem persists.",
   "illustration_edit_visibility": "Edit illustration's visiblity",
+  "illustration_group_downloading": {
+    "zero": "Downloading nothing.",
+    "one": "Downloading {} illustration...",
+    "two": "Downloading {} illustrations...",
+    "many": "Downloading {} illustrations...",
+    "other": "Downloading {} illustrations..."
+  },
+  "illustration_group_download_completed": {
+    "zero": "Successfully downloaded nothing.",
+    "one": "Successfully downloaded {} illustration!",
+    "two": "Successfully downloaded {} illustrations!",
+    "many": "Successfully downloaded {} illustrations!",
+    "other": "Successfully downloaded {} illustrations!"
+  },
   "illustration_license_description": "Define how other can and cannot use your work.",
   "illustration_metadata": "Illustration's metadata",
   "illustration_metadata_description": "Set Illustration title, summary, description, topics & more",
