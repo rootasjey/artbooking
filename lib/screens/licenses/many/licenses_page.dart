@@ -99,10 +99,10 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   QuerySnapshotStreamSubscription? _licenseSubscription;
 
   /// Page scroll controller.
-  final _pageScrollController = ScrollController();
+  final ScrollController _pageScrollController = ScrollController();
 
   /// Search controller.
-  final _searchTextController = TextEditingController();
+  final TextEditingController _searchTextController = TextEditingController();
 
   /// Delay search after typing input.
   Timer? _searchTimer;

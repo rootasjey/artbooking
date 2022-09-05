@@ -19,7 +19,7 @@ class LicensesPageHeader extends StatelessWidget {
   final EnumLicenseType selectedTab;
 
   /// Callback fired when changing tab.
-  final Function(EnumLicenseType)? onChangedTab;
+  final Function(EnumLicenseType licenseType)? onChangedTab;
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +70,9 @@ class LicensesPageHeader extends StatelessWidget {
             ),
           ),
         ],
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: isMobileSize
+            ? CrossAxisAlignment.start
+            : CrossAxisAlignment.stretch,
       ),
     );
   }
