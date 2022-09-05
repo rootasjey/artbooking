@@ -142,61 +142,68 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     final bool authenticated = userId != null && userId.isNotEmpty;
     final bool isOwner = userId == _illustration.userId;
 
-    return HeroControllerScope(
-      controller: HeroController(),
-      child: Scaffold(
-        floatingActionButton: IllustrationPageFab(
-          show: true,
-          isOwner: isOwner,
-          onDownload: tryDownload,
-          onCreateNewVersion: onCreateNewVersion,
-        ),
-        body: DropTarget(
-          // for file drop -> upload illustration.
-          enable: _enableFileDrop && isOwner,
-          onDragDone: onDragFileDone,
-          onDragEntered: onDragFileEntered,
-          onDragExited: onDragFileExited,
-          child: Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Constants.colors.tertiary,
-                    width: 4.0,
-                    style:
-                        _isDraggingFile ? BorderStyle.solid : BorderStyle.none,
+    return WillPopScope(
+      onWillPop: () {
+        Beamer.of(context).beamBack();
+        return Future.value(false);
+      },
+      child: HeroControllerScope(
+        controller: HeroController(),
+        child: Scaffold(
+          floatingActionButton: IllustrationPageFab(
+            show: true,
+            isOwner: isOwner,
+            onDownload: tryDownload,
+            onCreateNewVersion: onCreateNewVersion,
+          ),
+          body: DropTarget(
+            // for file drop -> upload illustration.
+            enable: _enableFileDrop && isOwner,
+            onDragDone: onDragFileDone,
+            onDragEntered: onDragFileEntered,
+            onDragExited: onDragFileExited,
+            child: Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Constants.colors.tertiary,
+                      width: 4.0,
+                      style: _isDraggingFile
+                          ? BorderStyle.solid
+                          : BorderStyle.none,
+                    ),
                   ),
-                ),
-                child: ImprovedScrolling(
-                  scrollController: _pageScrollController,
-                  child: ScrollConfiguration(
-                    behavior: CustomScrollBehavior(),
-                    child: CustomScrollView(
-                      controller: _pageScrollController,
-                      slivers: [
-                        ApplicationBar(minimal: true),
-                        IllustrationPageBody(
-                          isOwner: isOwner,
-                          loading: _loading,
-                          heroTag: widget.heroTag,
-                          updatingImage: _updatingImage,
-                          illustration: _illustration,
-                          onShowEditMetadataPanel: onShowEditMetadataPanel,
-                          onGoToEditImagePage: onGoToEditImagePage,
-                          onLike: authenticated ? onLike : null,
-                          onShare: onShare,
-                          liked: _liked,
-                          onTapUser: onTapUser,
-                        ),
-                      ],
+                  child: ImprovedScrolling(
+                    scrollController: _pageScrollController,
+                    child: ScrollConfiguration(
+                      behavior: CustomScrollBehavior(),
+                      child: CustomScrollView(
+                        controller: _pageScrollController,
+                        slivers: [
+                          ApplicationBar(minimal: true),
+                          IllustrationPageBody(
+                            isOwner: isOwner,
+                            loading: _loading,
+                            heroTag: widget.heroTag,
+                            updatingImage: _updatingImage,
+                            illustration: _illustration,
+                            onShowEditMetadataPanel: onShowEditMetadataPanel,
+                            onGoToEditImagePage: onGoToEditImagePage,
+                            onLike: authenticated ? onLike : null,
+                            onShare: onShare,
+                            liked: _liked,
+                            onTapUser: onTapUser,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              popupProgressIndicator(),
-              dropHint(),
-            ],
+                popupProgressIndicator(),
+                dropHint(),
+              ],
+            ),
           ),
         ),
       ),
