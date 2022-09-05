@@ -135,16 +135,19 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   /// Available items for authenticated user and the illustration is not liked yet.
   final List<PopupEntryIllustration> _likePopupMenuEntries = [
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 0),
       value: EnumIllustrationItemAction.like,
       icon: PopupMenuIcon(UniconsLine.heart),
       textLabel: "like".tr(),
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 25),
       icon: PopupMenuIcon(UniconsLine.share),
       textLabel: "share".tr(),
       value: EnumIllustrationItemAction.share,
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 50),
       icon: PopupMenuIcon(UniconsLine.download_alt),
       textLabel: "download".tr(),
       value: EnumIllustrationItemAction.download,
@@ -154,26 +157,31 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   /// Items when the current authenticated user own these illustrations.
   final List<PopupEntryIllustration> _popupMenuEntries = [
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 0),
       icon: PopupMenuIcon(UniconsLine.book_medical),
       textLabel: "add_to_book".tr(),
       value: EnumIllustrationItemAction.addToBook,
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 25),
       icon: PopupMenuIcon(UniconsLine.trash),
       textLabel: "delete".tr(),
       value: EnumIllustrationItemAction.delete,
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 50),
       icon: PopupMenuIcon(UniconsLine.eye),
       textLabel: "visibility_change".tr(),
       value: EnumIllustrationItemAction.updateVisibility,
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 75),
       icon: PopupMenuIcon(UniconsLine.share),
       textLabel: "share".tr(),
       value: EnumIllustrationItemAction.share,
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 100),
       icon: PopupMenuIcon(UniconsLine.download_alt),
       textLabel: "download".tr(),
       value: EnumIllustrationItemAction.download,
@@ -184,16 +192,19 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   /// and the illustration is already liked.
   final List<PopupEntryIllustration> _unlikePopupMenuEntries = [
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 0),
       value: EnumIllustrationItemAction.unlike,
       icon: PopupMenuIcon(UniconsLine.heart_break),
       textLabel: "unlike".tr(),
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 25),
       icon: PopupMenuIcon(UniconsLine.share),
       textLabel: "share".tr(),
       value: EnumIllustrationItemAction.share,
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 50),
       icon: PopupMenuIcon(UniconsLine.download_alt),
       textLabel: "download".tr(),
       value: EnumIllustrationItemAction.download,
