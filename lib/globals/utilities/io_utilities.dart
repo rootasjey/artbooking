@@ -69,6 +69,7 @@ class IOUtilities {
   Future<void> tryDownload(
     BuildContext context, {
     required Illustration illustration,
+    bool showBarOnComplete = true,
   }) async {
     try {
       if (Platform.isIOS || Platform.isAndroid) {
@@ -77,10 +78,18 @@ class IOUtilities {
         );
 
         if (success == null || success == false) {
+          if (!showBarOnComplete) {
+            return;
+          }
+
           context.showErrorBar(
             content: Text("illustration_download_failed".tr()),
           );
 
+          return;
+        }
+
+        if (!showBarOnComplete) {
           return;
         }
 
@@ -110,11 +119,20 @@ class IOUtilities {
       final DownloadTask task = fileRef.writeToFile(file);
       await task;
 
+      if (!showBarOnComplete) {
+        return;
+      }
+
       context.showSuccessBar(
         content: Text("illustration_download_completed".tr()),
       );
     } catch (error) {
       Utilities.logger.i(error);
+
+      if (!showBarOnComplete) {
+        return;
+      }
+
       context.showErrorBar(content: Text(error.toString()));
     }
   }
