@@ -82,11 +82,13 @@ class _LicensesPageState extends ConsumerState<LicensesPage> {
   /// Items when the current authenticated user own these illustrations.
   final List<PopupMenuItemIcon<EnumLicenseItemAction>> _popupMenuEntries = [
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 0),
       icon: PopupMenuIcon(UniconsLine.trash),
       textLabel: "delete".tr(),
       value: EnumLicenseItemAction.delete,
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 25),
       icon: PopupMenuIcon(UniconsLine.edit),
       textLabel: "edit".tr(),
       value: EnumLicenseItemAction.edit,

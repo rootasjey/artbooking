@@ -83,11 +83,13 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
   /// Menu items for books.
   final List<PopupEntryBook> _bookPopupMenuEntries = [
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 0),
       value: EnumBookItemAction.approve,
       icon: PopupMenuIcon(UniconsLine.check),
       textLabel: "approve".tr(),
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 25),
       value: EnumBookItemAction.disapprove,
       icon: PopupMenuIcon(UniconsLine.times),
       textLabel: "disapprove".tr(),
@@ -97,11 +99,13 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
   /// Menu items for illustrations.
   final List<PopupEntryIllustration> _illustrationPopupMenuEntries = [
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 0),
       value: EnumIllustrationItemAction.approve,
       icon: PopupMenuIcon(UniconsLine.check),
       textLabel: "approve".tr(),
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 25),
       value: EnumIllustrationItemAction.disapprove,
       icon: PopupMenuIcon(UniconsLine.times),
       textLabel: "disapprove".tr(),

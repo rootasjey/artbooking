@@ -71,6 +71,7 @@ class _LikesPageState extends ConsumerState<LikesPage> {
   /// Menu items for books.
   final List<PopupEntryBook> _bookPopupMenuEntries = [
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 25),
       value: EnumBookItemAction.unlike,
       icon: PopupMenuIcon(UniconsLine.heart_break),
       textLabel: "unlike".tr(),
@@ -80,6 +81,7 @@ class _LikesPageState extends ConsumerState<LikesPage> {
   /// Menu items for illustrations.
   final List<PopupEntryIllustration> _illustrationPopupMenuEntries = [
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 25),
       value: EnumIllustrationItemAction.unlike,
       icon: PopupMenuIcon(UniconsLine.heart_break),
       textLabel: "unlike".tr(),

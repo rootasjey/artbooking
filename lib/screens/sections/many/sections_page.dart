@@ -67,11 +67,13 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
   /// Available items for authenticated user and book is not liked yet.
   final List<PopupMenuItemIcon<EnumSectionItemAction>> _popupMenuEntries = [
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 0),
       value: EnumSectionItemAction.edit,
       icon: PopupMenuIcon(UniconsLine.pen),
       textLabel: "edit".tr(),
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 25),
       value: EnumSectionItemAction.delete,
       icon: PopupMenuIcon(UniconsLine.trash),
       textLabel: "delete".tr(),
