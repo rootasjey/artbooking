@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:artbooking/components/buttons/circle_button.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:dismissible_page/dismissible_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:unicons/unicons.dart';
 
@@ -57,6 +61,16 @@ class _HeroImageState extends State<HeroImage> {
 
   @override
   void dispose() {
+    if (Platform.isAndroid || Platform.isIOS) {
+      SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(
+          statusBarColor: Constants.colors.lightBackground,
+          systemNavigationBarColor: Colors.white,
+          systemNavigationBarDividerColor: Colors.transparent,
+        ),
+      );
+    }
+
     _photoViewController.dispose();
     super.dispose();
   }

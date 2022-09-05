@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/hero_image.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -13,6 +15,7 @@ import 'package:dismissible_page/dismissible_page.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:supercharged/supercharged.dart';
 
@@ -372,6 +375,16 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
   }
 
   void onTapImage() {
+    if (Platform.isAndroid || Platform.isIOS) {
+      SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(
+          statusBarColor: Colors.black,
+          systemNavigationBarColor: Colors.black,
+          systemNavigationBarDividerColor: Colors.transparent,
+        ),
+      );
+    }
+
     context.pushTransparentRoute(
       HeroImage(
         heroTag: widget.heroTag,
