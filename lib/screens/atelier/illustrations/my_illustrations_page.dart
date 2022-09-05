@@ -10,6 +10,7 @@ import 'package:artbooking/components/dialogs/visibility_dialog.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
 import 'package:artbooking/components/dialogs/add_to_books_dialog.dart';
+import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:artbooking/router/locations/home_location.dart';
@@ -67,6 +68,9 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   /// (fix auto-scroll issue when dropping files on window's edges).
   /// (PS: this variable is set to true on dragging file).
   bool _activateAutoScrollOnce = false;
+
+  /// True if the illustration is being downloaded.
+  bool _downloading = false;
 
   /// (Mobile specific) If true, long pressing a card will start a drag.
   /// Otherwise, long pressing a card will display a context menu.
@@ -140,6 +144,11 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       textLabel: "share".tr(),
       value: EnumIllustrationItemAction.share,
     ),
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.download_alt),
+      textLabel: "download".tr(),
+      value: EnumIllustrationItemAction.download,
+    ),
   ];
 
   /// Items when the current authenticated user own these illustrations.
@@ -164,6 +173,11 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       textLabel: "share".tr(),
       value: EnumIllustrationItemAction.share,
     ),
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.download_alt),
+      textLabel: "download".tr(),
+      value: EnumIllustrationItemAction.download,
+    ),
   ];
 
   /// Available items for authenticated user
@@ -178,6 +192,11 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       icon: PopupMenuIcon(UniconsLine.share),
       textLabel: "share".tr(),
       value: EnumIllustrationItemAction.share,
+    ),
+    PopupMenuItemIcon(
+      icon: PopupMenuIcon(UniconsLine.download_alt),
+      textLabel: "download".tr(),
+      value: EnumIllustrationItemAction.download,
     ),
   ];
 
@@ -258,7 +277,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
           pageScrollController: _pageScrollController,
           showFabToTop: _showFabToTop,
           showFabUpload: _showFabUpload,
-          uploadIllustration: uploadIllustration,
+          uploadIllustration: tryUploadIllustration,
         ),
         body: Listener(
           // for auto-scoll on dragging on edges.
@@ -306,12 +325,13 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                                 onChangedTab: onChangedTab,
                                 onClearSelection: onClearSelection,
                                 onConfirmDeleteGroup: confirmDeleteGroup,
+                                onDownloadGroup: onDownloadGroup,
                                 onGoToUserProfile: onGoToUserProfile,
                                 onSelectAll: onSelectAll,
                                 onToggleDrag: onToggleDrag,
                                 onTriggerMultiSelect: onTriggerMultiSelect,
                                 onUpdateLayout: onUpdateLayout,
-                                onUploadIllustration: uploadIllustration,
+                                onUploadIllustration: tryUploadIllustration,
                                 selectedTab: _selectedTab,
                                 showBackButton: widget.userId.isNotEmpty,
                                 username: _username,
@@ -347,7 +367,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                             popupMenuEntries: popupMenuEntries,
                             selectedTab: _selectedTab,
                             unlikePopupMenuEntries: _unlikePopupMenuEntries,
-                            uploadIllustration: uploadIllustration,
+                            uploadIllustration: tryUploadIllustration,
                           ),
                           SliverPadding(
                             padding: const EdgeInsets.only(bottom: 300.0),
@@ -357,6 +377,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
                     ),
                   ),
                 ),
+                popupProgressIndicator(),
                 dropHint(),
               ],
             ),
@@ -408,6 +429,33 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget popupProgressIndicator() {
+    final String message = _multiSelectedItems.isEmpty
+        ? "downloading".tr()
+        : "illustration_group_downloading".plural(
+            _multiSelectedItems.length,
+            args: [_multiSelectedItems.length.toString()],
+          );
+
+    return Positioned(
+      top: 100.0,
+      right: 24.0,
+      child: PopupProgressIndicator(
+        icon: Icon(
+          UniconsLine.download_alt,
+          color: Constants.colors.secondary,
+        ),
+        show: _downloading,
+        message: message,
+        onClose: () {
+          setState(() {
+            _downloading = false;
+          });
+        },
       ),
     );
   }
@@ -1086,6 +1134,31 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     onLike(illustration, index);
   }
 
+  void onDownloadGroup() async {
+    setState(() => _downloading = true);
+
+    final Iterable<Future<void>> futures = _multiSelectedItems.values.map(
+      (Illustration illustration) => Utilities.io.tryDownload(
+        context,
+        illustration: illustration,
+        showBarOnComplete: false,
+      ),
+    );
+
+    await Future.wait(futures);
+
+    context.showSuccessBar(
+      content: Text(
+        "illustration_group_download_completed"
+            .plural(_multiSelectedItems.length, args: [
+          _multiSelectedItems.length.toString(),
+        ]),
+      ),
+    );
+
+    setState(() => _downloading = false);
+  }
+
   /// Callback event fired when files are dropped on this page.
   /// Try to upload them as image and create correspondig illustrations.
   void onDragFileDone(DropDoneDetails dropDoneDetails) async {
@@ -1335,6 +1408,9 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         break;
       case EnumIllustrationItemAction.share:
         showShareDialog(illustration, index);
+        break;
+      case EnumIllustrationItemAction.download:
+        tryDownload(illustration);
         break;
       default:
         break;
@@ -1655,8 +1731,10 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     }
   }
 
-  void uploadIllustration() {
-    ref.read(AppState.uploadTaskListProvider.notifier).pickImage();
+  Future<void> tryDownload(Illustration illustration) async {
+    setState(() => _downloading = true);
+    await Utilities.io.tryDownload(context, illustration: illustration);
+    setState(() => _downloading = false);
   }
 
   void tryUpdateGroupVisibility(EnumContentVisibility visibility) {
@@ -1714,5 +1792,9 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
       return null;
     }
+  }
+
+  void tryUploadIllustration() {
+    ref.read(AppState.uploadTaskListProvider.notifier).pickImage();
   }
 }

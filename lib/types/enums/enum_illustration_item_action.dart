@@ -10,6 +10,9 @@ enum EnumIllustrationItemAction {
   /// Delete this illustration from database.
   delete,
 
+  /// Download this illustration;
+  download,
+
   /// Prevent this illustration to be visible in public spaces (admin action).
   /// Challenges, books and contests may be different from public spaces.
   disapprove,

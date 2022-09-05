@@ -25,6 +25,7 @@ class MyIllustrationsPageHeader extends StatelessWidget {
     this.onChangeGroupVisibility,
     this.onClearSelection,
     this.onConfirmDeleteGroup,
+    this.onDownloadGroup,
     this.onGoToUserProfile,
     this.onSelectAll,
     this.onToggleDrag,
@@ -63,7 +64,7 @@ class MyIllustrationsPageHeader extends StatelessWidget {
   final void Function()? onAddGroupToBook;
 
   /// Callback fired when changing page tab.
-  final void Function(EnumVisibilityTab)? onChangedTab;
+  final void Function(EnumVisibilityTab visibilityTab)? onChangedTab;
 
   /// Callback fired on an illustration group visibility change.
   final void Function()? onChangeGroupVisibility;
@@ -73,6 +74,9 @@ class MyIllustrationsPageHeader extends StatelessWidget {
 
   /// Callback showing a popup to confirm illustrations group deletion.
   final void Function()? onConfirmDeleteGroup;
+
+  /// Callback fired to download a group of illustrations.
+  final void Function()? onDownloadGroup;
 
   /// Callback fired to select all displayed illustrations.
   final void Function()? onSelectAll;
@@ -168,6 +172,7 @@ class MyIllustrationsPageHeader extends StatelessWidget {
             onChangeGroupVisibility: onChangeGroupVisibility,
             onClearSelection: onClearSelection,
             onConfirmDeleteGroup: onConfirmDeleteGroup,
+            onDownloadGroup: onDownloadGroup,
             onSelectAll: onSelectAll,
             show: multiSelectedItems.isNotEmpty,
           ),

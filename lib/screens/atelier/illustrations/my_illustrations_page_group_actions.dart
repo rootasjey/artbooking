@@ -11,11 +11,12 @@ class MyIllustrationsPageGroupActions extends StatelessWidget {
     required this.multiSelectedItems,
     required this.show,
     this.isMobileSize = false,
-    this.onConfirmDeleteGroup,
-    this.onSelectAll,
-    this.onClearSelection,
     this.onAddToBook,
     this.onChangeGroupVisibility,
+    this.onClearSelection,
+    this.onConfirmDeleteGroup,
+    this.onDownloadGroup,
+    this.onSelectAll,
   }) : super(key: key);
 
   /// If true, this widget adapt its layout to small screens.
@@ -27,6 +28,9 @@ class MyIllustrationsPageGroupActions extends StatelessWidget {
   /// Callback showing a dialog/bottom sheet to add selected books to other ones.
   /// Fired when we tap on "add to book" icon button.
   final void Function()? onAddToBook;
+
+  /// Callback fired to download a group of illustrations.
+  final void Function()? onDownloadGroup;
 
   /// Callback to change current selected illustrations' visibility.
   /// Fired when we tap on "visibility" icon button.
@@ -112,7 +116,12 @@ class MyIllustrationsPageGroupActions extends StatelessWidget {
         message: "add_to_book".tr(),
         child: Icon(UniconsLine.book_medical),
         onTap: onAddToBook,
-      )
+      ),
+      SquareButton(
+        message: "download".tr(),
+        child: Icon(UniconsLine.download_alt),
+        onTap: onDownloadGroup,
+      ),
     ];
   }
 
