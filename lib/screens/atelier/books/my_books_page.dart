@@ -135,11 +135,13 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   /// Available items for authenticated user and the book is not liked yet.
   final List<PopupEntryBook> _likePopupMenuEntries = [
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 0),
       value: EnumBookItemAction.like,
       icon: PopupMenuIcon(UniconsLine.heart),
       textLabel: "like".tr(),
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 25),
       icon: PopupMenuIcon(UniconsLine.share),
       textLabel: "share".tr(),
       value: EnumBookItemAction.share,
@@ -149,26 +151,31 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   /// Items when the current authenticated user own these books.
   final List<PopupEntryBook> _ownerPopupMenuEntries = [
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 0),
       icon: PopupMenuIcon(UniconsLine.share),
       textLabel: "share".tr(),
       value: EnumBookItemAction.share,
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 25),
       icon: PopupMenuIcon(UniconsLine.edit_alt),
       textLabel: "rename".tr(),
       value: EnumBookItemAction.rename,
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 50),
       icon: PopupMenuIcon(UniconsLine.trash),
       textLabel: "delete".tr(),
       value: EnumBookItemAction.delete,
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 75),
       icon: PopupMenuIcon(UniconsLine.eye),
       textLabel: "visibility_change".tr(),
       value: EnumBookItemAction.updateVisibility,
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 100),
       icon: PopupMenuIcon(UniconsLine.upload),
       textLabel: "illustration_upload".tr(),
       value: EnumBookItemAction.uploadIllustrations,
@@ -178,11 +185,13 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   /// Available items for authenticated user and the book is already liked.
   final List<PopupEntryBook> _unlikePopupMenuEntries = [
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 0),
       value: EnumBookItemAction.unlike,
       icon: PopupMenuIcon(UniconsLine.heart_break),
       textLabel: "unlike".tr(),
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 25),
       icon: PopupMenuIcon(UniconsLine.share),
       textLabel: "share".tr(),
       value: EnumBookItemAction.share,

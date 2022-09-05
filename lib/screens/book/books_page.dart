@@ -73,11 +73,13 @@ class _BooksPageState extends ConsumerState<BooksPage> {
   /// Available items for authenticated user and book is not liked yet.
   final List<PopupEntryBook> _likePopupMenuEntries = [
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 0),
       value: EnumBookItemAction.like,
       icon: PopupMenuIcon(UniconsLine.heart),
       textLabel: "like".tr(),
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 25),
       icon: PopupMenuIcon(UniconsLine.share),
       textLabel: "share".tr(),
       value: EnumBookItemAction.share,
@@ -87,11 +89,13 @@ class _BooksPageState extends ConsumerState<BooksPage> {
   /// Available items for authenticated user and book is already liked.
   final List<PopupEntryBook> _unlikePopupMenuEntries = [
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 0),
       value: EnumBookItemAction.unlike,
       icon: PopupMenuIcon(UniconsLine.heart_break),
       textLabel: "unlike".tr(),
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 25),
       icon: PopupMenuIcon(UniconsLine.share),
       textLabel: "share".tr(),
       value: EnumBookItemAction.share,
@@ -99,7 +103,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
   ];
 
   /// Page scroll controller.
-  final _pageScrollController = ScrollController();
+  final ScrollController _pageScrollController = ScrollController();
 
   @override
   void initState() {
