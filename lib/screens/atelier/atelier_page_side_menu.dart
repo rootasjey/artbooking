@@ -34,13 +34,23 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
   /// Default to true.
   bool _isExpanded = true;
 
+  /// Show a button to scroll down the side panel if true.
+  bool _showScrollDownButton = true;
+
+  /// Show a button to scroll up the side panel if true.
+  bool _showScrollUpButton = false;
+
   final double _expandedWidth = 300.0;
   final double _collapsedWidth = 70.0;
+
+  final ScrollController _sidePanelScrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _isExpanded = Utilities.storage.getDashboardSideMenuExpanded();
+
+    _sidePanelScrollController.addListener(onScrollPanel);
 
     // NOTE: Beamer state isn't ready on 1st frame
     // probably because [SidePanelMenu] appears before the Beamer widget.
@@ -58,6 +68,8 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
   @override
   void dispose() {
     _beamerDelegate.removeListener(_setStateListener);
+    _sidePanelScrollController.removeListener(onScrollPanel);
+    _sidePanelScrollController.dispose();
     super.dispose();
   }
 
@@ -80,12 +92,16 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
               maxWidth: 300.0,
               alignment: Alignment.topLeft,
               child: CustomScrollView(
+                controller: _sidePanelScrollController,
                 slivers: <Widget>[
                   topSidePanel(),
                   bodySidePanel(),
+                  space(),
                 ],
               ),
             ),
+            scrollUpButton(),
+            scrollDownButton(),
             toggleExpandButton(),
           ],
         ),
@@ -112,17 +128,21 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
 
             Color color = foregroundColor.withOpacity(0.6);
             Color textColor = foregroundColor.withOpacity(0.4);
-            FontWeight fontWeight = FontWeight.w600;
+            FontWeight fontWeight = FontWeight.w700;
 
-            final bool pathMatch = context
+            bool pathMatch = context
                     .currentBeamLocation.state.routeInformation.location
                     ?.contains(sidePanelItem.routePath) ??
                 false;
 
+            if (sidePanelItem.routePath == HomeLocation.route) {
+              pathMatch = false;
+            }
+
             if (pathMatch) {
               color = sidePanelItem.hoverColor;
               textColor = foregroundColor.withOpacity(0.6);
-              fontWeight = FontWeight.w700;
+              fontWeight = FontWeight.w800;
             }
 
             return Align(
@@ -178,7 +198,131 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
     );
   }
 
+  Widget scrollDownButton() {
+    if (!_showScrollDownButton) {
+      return Container();
+    }
+
+    final double maxHeight = 76.0;
+    final Color color =
+        Theme.of(context).textTheme.bodyText2?.color ?? Colors.black;
+
+    return Positioned(
+      bottom: 70.0,
+      left: 0.0,
+      right: 0.0,
+      child: Material(
+        color: Theme.of(context).backgroundColor,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: _expandedWidth,
+            maxHeight: maxHeight,
+          ),
+          child: OverflowBox(
+            maxHeight: maxHeight,
+            child: InkWell(
+              onTap: () {
+                _sidePanelScrollController.animateTo(
+                  _sidePanelScrollController.offset + 70.0,
+                  duration: Duration(milliseconds: 200),
+                  curve: Curves.bounceIn,
+                );
+              },
+              child: Container(
+                padding: EdgeInsets.only(
+                  top: 24.0,
+                  left: 0.0,
+                  bottom: 24.0,
+                ),
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(
+                      color: color.withOpacity(0.1),
+                      width: 2.0,
+                    ),
+                  ),
+                ),
+                child: Tooltip(
+                  message: "scroll_down".tr(),
+                  child: Icon(UniconsLine.arrow_down),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget scrollUpButton() {
+    if (!_showScrollUpButton) {
+      return Container();
+    }
+
+    final double maxHeight = 76.0;
+    final Color color =
+        Theme.of(context).textTheme.bodyText2?.color ?? Colors.black;
+
+    if (!_showScrollUpButton) {
+      return Container();
+    }
+
+    return Positioned(
+      top: 0.0,
+      left: 0.0,
+      right: 0.0,
+      child: Material(
+        color: Theme.of(context).backgroundColor,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: _expandedWidth,
+            maxHeight: maxHeight,
+          ),
+          child: OverflowBox(
+            maxHeight: maxHeight,
+            child: InkWell(
+              onTap: () {
+                _sidePanelScrollController.animateTo(
+                  _sidePanelScrollController.offset - 70.0,
+                  duration: Duration(milliseconds: 200),
+                  curve: Curves.bounceIn,
+                );
+              },
+              child: Container(
+                padding: EdgeInsets.only(
+                  top: 24.0,
+                  left: 0.0,
+                  bottom: 24.0,
+                ),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: color.withOpacity(0.1),
+                      width: 2.0,
+                    ),
+                  ),
+                ),
+                child: Tooltip(
+                  message: "scroll_up".tr(),
+                  child: Icon(UniconsLine.arrow_up),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget space() {
+    return SliverPadding(
+      padding: const EdgeInsets.only(bottom: 70.0),
+    );
+  }
+
   Widget toggleExpandButton() {
+    final Color color =
+        Theme.of(context).textTheme.bodyText2?.color ?? Colors.black;
     final double maxHeight = 76.0;
 
     return Positioned(
@@ -197,7 +341,15 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
             maxHeight: maxHeight,
             child: InkWell(
               onTap: _toggleSideMenu,
-              child: Padding(
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(
+                      color: color.withOpacity(0.025),
+                      width: 2.0,
+                    ),
+                  ),
+                ),
                 padding: EdgeInsets.only(
                   top: 24.0,
                   left: _isExpanded ? 58.0 : 6.0,
@@ -208,9 +360,7 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
                     if (_isExpanded)
                       Tooltip(
                         message: "collapse".tr(),
-                        child: Icon(
-                          UniconsLine.left_arrow_from_left,
-                        ),
+                        child: Icon(UniconsLine.left_arrow_from_left),
                       )
                     else
                       Expanded(
@@ -349,6 +499,26 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
           routePath: AtelierLocationContent.sectionsRoute,
         ),
     ];
+  }
+
+  /// Callback fired when the side panel menu scrolls.
+  /// Update update navigation button variables.
+  void onScrollPanel() {
+    if (_sidePanelScrollController.position.atEdge &&
+        _sidePanelScrollController.offset > 0.0) {
+      _showScrollDownButton = false;
+    } else {
+      _showScrollDownButton = true;
+    }
+
+    if (_sidePanelScrollController.position.atEdge &&
+        _sidePanelScrollController.offset == 0.0) {
+      _showScrollUpButton = false;
+    } else {
+      _showScrollUpButton = true;
+    }
+
+    setState(() {});
   }
 
   void _setStateListener() => setState(() {});
