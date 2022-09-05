@@ -136,6 +136,7 @@ class _LicensesPageState extends ConsumerState<SectionsPage> {
                   ),
                   preferredSize: Size.fromHeight(120.0),
                 ),
+                minimal: true,
                 pinned: false,
               ),
               SectionsPageBody(

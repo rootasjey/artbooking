@@ -161,6 +161,7 @@ class _LikesPageState extends ConsumerState<ReviewPage> {
                   ),
                   preferredSize: Size.fromHeight(120.0),
                 ),
+                minimal: true,
                 pinned: false,
               ),
               ReviewPageBody(

@@ -138,6 +138,7 @@ class _LikesPageState extends ConsumerState<LikesPage> {
                   ),
                   preferredSize: Size.fromHeight(160.0),
                 ),
+                minimal: true,
                 pinned: false,
               ),
               LikesPageBody(

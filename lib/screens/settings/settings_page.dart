@@ -67,7 +67,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             CustomScrollView(
               controller: _pageScrollController,
               slivers: <Widget>[
-                ApplicationBar(),
+                ApplicationBar(minimal: true),
                 SettingsPageHeader(
                   isMobileSize: isMobileSize,
                 ),
@@ -104,7 +104,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   void onEditLocation() {
     final _locationController = TextEditingController();
 
-    final userFirestore = ref.read(AppState.userProvider).firestoreUser;
+    final UserFirestore? userFirestore =
+        ref.read(AppState.userProvider).firestoreUser;
 
     if (userFirestore != null) {
       _locationController.text = userFirestore.location;

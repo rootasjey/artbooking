@@ -69,9 +69,6 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
   /// True if the illustration is being downloaded.
   bool _downloading = false;
 
-  /// True if the is illustration is being downloaded for share.
-  // bool _downloadingImageForShare = false;
-
   /// Disable file drop when navigating to a new page.
   bool _enableFileDrop = true;
 
@@ -97,7 +94,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
   DocSnapshotStreamSubscription? _likeSubscription;
 
   /// Page scroll controller.
-  final _pageScrollController = ScrollController();
+  final ScrollController _pageScrollController = ScrollController();
 
   @override
   void initState() {
@@ -178,7 +175,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
                     child: CustomScrollView(
                       controller: _pageScrollController,
                       slivers: [
-                        ApplicationBar(),
+                        ApplicationBar(minimal: true),
                         IllustrationPageBody(
                           isOwner: isOwner,
                           loading: _loading,
