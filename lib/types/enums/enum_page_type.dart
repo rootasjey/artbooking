@@ -1,4 +1,4 @@
-/// User's page types.
+/// Modular page types.
 enum EnumPageType {
   /// Home page created by staff.
   home,

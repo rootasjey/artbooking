@@ -68,6 +68,7 @@ class ModularPageBody extends StatelessWidget {
   /// If true, a Floating Action Button to scroll to top will be displayed.
   final bool showNavToTopFab;
 
+  /// The type of this page (e.g. home, profile).
   final EnumPageType pageType;
 
   /// Modular page fetched and composed of modular sections.
@@ -142,20 +143,22 @@ class ModularPageBody extends StatelessWidget {
   final void Function()? onDragSectionCompleted;
 
   /// Callback to handle the end of a dragged item.
-  final void Function(DraggableDetails)? onDragSectionEnd;
+  final void Function(DraggableDetails draggableDetails)? onDragSectionEnd;
 
   /// Callback to handle the start of a dragged item.
   final void Function()? onDragSectionStarted;
 
   /// Callback to handle the move a pointer on the page.
   /// Useful to scroll the page when dragging a section to the edges.
-  final void Function(PointerMoveEvent)? onPointerMove;
+  final void Function(PointerMoveEvent pointerMoveEvent)? onPointerMove;
 
   /// Scroll controller to move inside the page.
   final ScrollController scrollController;
 
   /// Current authenticated user's id;
   final String userId;
+
+  /// This page owner's username.
   final String username;
 
   @override

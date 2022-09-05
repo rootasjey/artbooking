@@ -46,12 +46,6 @@ class SectionWrapper extends StatefulWidget {
   /// Useful to quickly find which is the last section in the list.
   final int sectionCount;
 
-  /// Section's data.
-  final Section section;
-
-  /// Current authenticated user's id.
-  final String userId;
-
   /// Callback when drag and dropping items on this book card.
   final void Function(
     int dropTargetIndex,
@@ -63,10 +57,18 @@ class SectionWrapper extends StatefulWidget {
 
   /// Callback fired when a popup menu item has been tapped.
   /// A different action will be performed according to the target item.
-  final void Function(EnumSectionAction, int, Section)? onPopupMenuItemSelected;
+  final void Function(
+    EnumSectionAction action,
+    int index,
+    Section section,
+  )? onPopupMenuItemSelected;
 
   /// Callback fired when section's items has been updated.
-  final void Function(Section, int, List<String>)? onUpdateSectionItems;
+  final void Function(
+    Section section,
+    int index,
+    List<String> items,
+  )? onUpdateSectionItems;
 
   /// Callback to show book selection.
   final void Function({
@@ -89,16 +91,23 @@ class SectionWrapper extends StatefulWidget {
   )? onNavigateFromSection;
 
   /// Callback to handle the cancel of a dragged item.
-  final void Function(Velocity, Offset)? onDraggableSectionCanceled;
+  final void Function(Velocity velocity, Offset offset)?
+      onDraggableSectionCanceled;
 
   /// Callback to handle the completion of a dragged item.
   final void Function()? onDragSectionCompleted;
 
   /// Callback to handle the end of a dragged item.
-  final void Function(DraggableDetails)? onDragSectionEnd;
+  final void Function(DraggableDetails draggableDetails)? onDragSectionEnd;
 
   /// Callback to handle the start of a dragged ite
   final void Function()? onDragSectionStarted;
+
+  /// Section's data.
+  final Section section;
+
+  /// Current authenticated user's id.
+  final String userId;
 
   @override
   State<SectionWrapper> createState() => _SectionWrapperState();
@@ -153,15 +162,15 @@ class _SectionWrapperState extends State<SectionWrapper> {
       count: widget.sectionCount,
       editMode: widget.editMode,
       index: widget.index,
+      isHover: _isHover,
       section: widget.section,
-      userId: widget.userId,
-      usingAsDropTarget: usingAsDropTarget,
-      popupMenuEntries: widget.popupMenuEntries,
       onPopupMenuItemSelected: widget.onPopupMenuItemSelected,
       onShowIllustrationDialog: widget.onShowIllustrationDialog,
       onUpdateSectionItems: widget.onUpdateSectionItems,
-      isHover: _isHover,
       onNavigateFromSection: widget.onNavigateFromSection,
+      popupMenuEntries: widget.popupMenuEntries,
+      userId: widget.userId,
+      usingAsDropTarget: usingAsDropTarget,
     );
 
     if (!widget.editMode) {

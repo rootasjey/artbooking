@@ -36,8 +36,8 @@ class MozaicSection extends StatefulWidget {
     this.popupMenuEntries = const [],
     this.isLast = false,
     this.onShowIllustrationDialog,
-    this.onUpdateSectionItems,
     this.usingAsDropTarget = false,
+    this.onUpdateSectionItems,
     this.editMode = false,
     this.isHover = false,
   }) : super(key: key);
