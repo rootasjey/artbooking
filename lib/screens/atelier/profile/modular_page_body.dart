@@ -163,7 +163,10 @@ class ModularPageBody extends StatelessWidget {
     final List<Widget> slivers = [
       // Sliver issue: https://github.com/flutter/flutter/issues/55170
       SliverToBoxAdapter(),
-      if (modularPage.hasAppBar) ApplicationBar(),
+      if (modularPage.hasAppBar)
+        ApplicationBar(
+          pinned: false,
+        ),
     ];
 
     int index = 0;

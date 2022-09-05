@@ -9,7 +9,9 @@ class SizeUtils {
   /// Return true if the app's window is equal or less than the maximum
   /// mobile width.
   bool isMobileSize(BuildContext context) {
-    final double pageWidth = MediaQuery.of(context).size.width;
-    return pageWidth <= 700.0;
+    final Size size = MediaQuery.of(context).size;
+    final double pageWidth = size.width;
+    final double pageHeight = size.height;
+    return pageWidth <= mobileWidthTreshold || pageHeight < mobileWidthTreshold;
   }
 }
