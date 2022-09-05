@@ -36,13 +36,13 @@ class PostsPageBody extends StatelessWidget {
   final bool loading;
 
   /// Callback fired to delete a post.
-  final Function(Post, int)? onDeletePost;
+  final Function(Post post, int index)? onDeletePost;
 
   /// Callback fired to create a post.
   final Function()? onCreatePost;
 
   /// Callback fired after a post has been tapped.
-  final Function(Post)? onTap;
+  final Function(Post post)? onTap;
 
   /// Currently selected tab (drafts or published).
   final EnumContentVisibility selectedTab;
@@ -163,6 +163,7 @@ class PostsPageBody extends StatelessWidget {
         bottom: 300.0,
         left: isMobileSize ? 12.0 : 34.0,
         right: isMobileSize ? 12.0 : 34.0,
+        top: isMobileSize ? 0.0 : 24.0,
       ),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(

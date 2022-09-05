@@ -152,6 +152,7 @@ class _LicensesPageState extends ConsumerState<PostsPage> {
                   ),
                   preferredSize: Size.fromHeight(160.0),
                 ),
+                minimal: true,
                 pinned: false,
               ),
               PostsPageBody(

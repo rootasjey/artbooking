@@ -25,7 +25,7 @@ class PostsPageHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        left: isMobileSize ? 0.0 : 54.0,
+        left: isMobileSize ? 0.0 : 42.0,
         bottom: 8.0,
       ),
       child: Column(
@@ -72,7 +72,9 @@ class PostsPageHeader extends StatelessWidget {
             ),
           ),
         ],
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: isMobileSize
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.stretch,
       ),
     );
   }
