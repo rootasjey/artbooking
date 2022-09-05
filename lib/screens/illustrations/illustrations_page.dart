@@ -2,8 +2,10 @@ import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/components/dialogs/share_dialog.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_icon.dart';
 import 'package:artbooking/components/popup_menu/popup_menu_item_icon.dart';
+import 'package:artbooking/components/popup_progress_indicator.dart';
 import 'package:artbooking/components/texts/page_title.dart';
 import 'package:artbooking/globals/app_state.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/router/navigation_state_helper.dart';
@@ -38,6 +40,9 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
   /// Start from the most recent.
   bool _descending = true;
 
+  /// True if the illustration is being downloaded.
+  bool _downloading = false;
+
   /// If true, there are more books to fetch.
   bool _hasNext = true;
 
@@ -66,28 +71,44 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
   /// Available items for authenticated user and illustration is not liked yet.
   final List<PopupEntryIllustration> _likePopupMenuEntries = [
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 0),
       value: EnumIllustrationItemAction.like,
       icon: PopupMenuIcon(UniconsLine.heart),
       textLabel: "like".tr(),
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 25),
       icon: PopupMenuIcon(UniconsLine.share),
       textLabel: "share".tr(),
       value: EnumIllustrationItemAction.share,
+    ),
+    PopupMenuItemIcon(
+      delay: Duration(milliseconds: 50),
+      icon: PopupMenuIcon(UniconsLine.download_alt),
+      textLabel: "download".tr(),
+      value: EnumIllustrationItemAction.download,
     ),
   ];
 
   /// Available items for authenticated user and illustration is already liked.
   final List<PopupEntryIllustration> _unlikePopupMenuEntries = [
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 0),
       value: EnumIllustrationItemAction.unlike,
       icon: PopupMenuIcon(UniconsLine.heart_break),
       textLabel: "unlike".tr(),
     ),
     PopupMenuItemIcon(
+      delay: Duration(milliseconds: 25),
       icon: PopupMenuIcon(UniconsLine.share),
       textLabel: "share".tr(),
       value: EnumIllustrationItemAction.share,
+    ),
+    PopupMenuItemIcon(
+      delay: Duration(milliseconds: 50),
+      icon: PopupMenuIcon(UniconsLine.download_alt),
+      textLabel: "download".tr(),
+      value: EnumIllustrationItemAction.download,
     ),
   ];
 
@@ -131,44 +152,68 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
           show: _showFabToTop,
           pageScrollController: _pageScrollController,
         ),
-        body: ImprovedScrolling(
-          enableKeyboardScrolling: true,
-          enableMMBScrolling: true,
-          onScroll: onPageScroll,
-          scrollController: _pageScrollController,
-          child: CustomScrollView(
-            controller: _pageScrollController,
-            slivers: <Widget>[
-              ApplicationBar(
-                bottom: PreferredSize(
-                    child: PageTitle(
-                      showBackButton: false,
-                      titleValue: "illustrations".tr(),
-                      subtitleValue: "illustrations_browse".tr(),
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      padding: const EdgeInsets.only(
-                        left: 12.0,
-                        top: 0.0,
-                        bottom: 8.0,
-                      ),
-                      renderSliver: false,
-                    ),
-                    preferredSize: Size.fromHeight(120.0)),
-                pinned: false,
+        body: Stack(
+          children: [
+            ImprovedScrolling(
+              enableKeyboardScrolling: true,
+              enableMMBScrolling: true,
+              onScroll: onPageScroll,
+              scrollController: _pageScrollController,
+              child: CustomScrollView(
+                controller: _pageScrollController,
+                slivers: <Widget>[
+                  ApplicationBar(
+                    bottom: PreferredSize(
+                        child: PageTitle(
+                          showBackButton: false,
+                          titleValue: "illustrations".tr(),
+                          subtitleValue: "illustrations_browse".tr(),
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          padding: EdgeInsets.only(
+                            left: isMobileSize ? 12.0 : 42.0,
+                            top: 0.0,
+                            bottom: 8.0,
+                          ),
+                          renderSliver: false,
+                        ),
+                        preferredSize: Size.fromHeight(120.0)),
+                    pinned: false,
+                  ),
+                  IllustrationsPageBody(
+                    isMobileSize: isMobileSize,
+                    loading: _loading,
+                    illustrations: _illustrations,
+                    onDoubleTap:
+                        authenticated ? onDoubleTapIllustrationItem : null,
+                    onTapIllustrationCard: onTapIllustration,
+                    likePopupMenuEntries: likePopupMenuEntries,
+                    unlikePopupMenuEntries: _unlikePopupMenuEntries,
+                    onPopupMenuItemSelected: onPopupMenuItemSelected,
+                  ),
+                ],
               ),
-              IllustrationsPageBody(
-                isMobileSize: isMobileSize,
-                loading: _loading,
-                illustrations: _illustrations,
-                onDoubleTap: authenticated ? onDoubleTapIllustrationItem : null,
-                onTapIllustrationCard: onTapIllustration,
-                likePopupMenuEntries: likePopupMenuEntries,
-                unlikePopupMenuEntries: _unlikePopupMenuEntries,
-                onPopupMenuItemSelected: onPopupMenuItemSelected,
-              ),
-            ],
-          ),
+            ),
+            popupProgressIndicator(),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget popupProgressIndicator() {
+    return Positioned(
+      top: 100.0,
+      right: 24.0,
+      child: PopupProgressIndicator(
+        icon: Icon(
+          UniconsLine.download_alt,
+          color: Constants.colors.secondary,
+        ),
+        show: _downloading,
+        message: "downloading".tr(),
+        onClose: () {
+          setState(() => _downloading = false);
+        },
       ),
     );
   }
@@ -479,6 +524,9 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
       case EnumIllustrationItemAction.share:
         showShareDialog(illustration, index);
         break;
+      case EnumIllustrationItemAction.download:
+        tryDownload(illustration);
+        break;
       default:
     }
   }
@@ -574,6 +622,12 @@ class _IllustrationsPageState extends ConsumerState<IllustrationsPage> {
         visibility: illustration.visibility,
       ),
     );
+  }
+
+  Future<void> tryDownload(Illustration illustration) async {
+    setState(() => _downloading = true);
+    await Utilities.io.tryDownload(context, illustration: illustration);
+    setState(() => _downloading = false);
   }
 
   void tryLike(Illustration illustration, int index) async {
