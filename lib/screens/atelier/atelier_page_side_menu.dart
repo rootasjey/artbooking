@@ -1,4 +1,5 @@
 import 'package:artbooking/components/buttons/text_icon_button.dart';
+import 'package:artbooking/router/locations/home_location.dart';
 import 'package:artbooking/types/side_menu_item.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
@@ -158,6 +159,10 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
                           "userId": userFirestore?.id ?? "",
                         },
                       );
+                    } else if (sidePanelItem.routePath == HomeLocation.route) {
+                      Beamer.of(context, root: true).beamToNamed(
+                        HomeLocation.route,
+                      );
                     } else {
                       context.beamToNamed(sidePanelItem.routePath);
                     }
@@ -264,6 +269,12 @@ class _DashboardSideMenuState extends ConsumerState<AtelierPageSideMenu> {
 
   List<SideMenuItem> getBaseItemList() {
     return [
+      SideMenuItem(
+        iconData: UniconsLine.home,
+        label: "home".tr(),
+        hoverColor: Constants.colors.home,
+        routePath: HomeLocation.route,
+      ),
       SideMenuItem(
         iconData: UniconsLine.chart_pie,
         label: "activity".tr(),
