@@ -673,6 +673,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     Beamer.of(context).beamToNamed(
       route,
       data: {"userId": userFirestore.id},
+      routeState: {"userId": userFirestore.id},
     );
   }
 
