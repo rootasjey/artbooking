@@ -32,6 +32,7 @@ class IllustrationPoster extends StatefulWidget {
     this.onGoToEditImagePage,
     this.updatingImage = false,
     this.heroTag = "",
+    this.windowSize = Size.zero,
   }) : super(key: key);
 
   /// True if the current authenticated user is the owner of this illustration.
@@ -61,6 +62,8 @@ class IllustrationPoster extends StatefulWidget {
 
   /// This component's data.
   final Illustration illustration;
+
+  final Size windowSize;
 
   /// Custom hero tag.
   /// To use when default `illustration.id` hero tag is not enough
@@ -92,12 +95,12 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
   @override
   Widget build(BuildContext context) {
     final Illustration illustration = widget.illustration;
-    final Size windowSize = MediaQuery.of(context).size;
+    final Size windowSize = widget.windowSize;
     final bool isMobileSize =
         windowSize.width < Utilities.size.mobileWidthTreshold;
 
     final double maxHeight =
-        isMobileSize ? windowSize.width - 20.0 : windowSize.height * 60 / 100;
+        isMobileSize ? windowSize.width : windowSize.height * 60 / 100;
 
     final double maxWidth = illustration.dimensions.getRelativeWidth(
       maxHeight,
@@ -127,7 +130,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
               elevation: 6.0,
               clipBehavior: Clip.antiAlias,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(2.0),
+                borderRadius: BorderRadius.circular(4.0),
               ),
               child: Ink.image(
                 image: ExtendedNetworkImageProvider(
@@ -235,6 +238,188 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
     );
   }
 
+  Widget bottomSheetDates() {
+    return Material(
+      child: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Opacity(
+                    opacity: 0.8,
+                    child: Text(
+                      "dates".tr().toUpperCase(),
+                      style: Utilities.fonts.body(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ),
+                Text.rich(
+                  TextSpan(
+                    text: "• ${'date_created_at'.tr()} ",
+                    style: Utilities.fonts.body(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context)
+                          .textTheme
+                          .bodyText2
+                          ?.color
+                          ?.withOpacity(0.6),
+                    ),
+                    children: [
+                      TextSpan(
+                        text: Jiffy(widget.illustration.createdAt).fromNow(),
+                        style: Utilities.fonts.body(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context)
+                              .textTheme
+                              .bodyText2
+                              ?.color
+                              ?.withOpacity(1.0),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Text.rich(
+                  TextSpan(
+                    text: "• ${'date_updated_at'.tr()} ",
+                    style: Utilities.fonts.body(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context)
+                          .textTheme
+                          .bodyText2
+                          ?.color
+                          ?.withOpacity(0.6),
+                    ),
+                    children: [
+                      TextSpan(
+                        text: Jiffy(widget.illustration.updatedAt).fromNow(),
+                        style: Utilities.fonts.body(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context)
+                              .textTheme
+                              .bodyText2
+                              ?.color
+                              ?.withOpacity(1.0),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget dialogDates() {
+    return ThemedDialog(
+      spaceActive: false,
+      centerTitle: false,
+      autofocus: true,
+      title: Padding(
+        padding: const EdgeInsets.only(left: 8.0),
+        child: Opacity(
+          opacity: 0.8,
+          child: Text(
+            "dates".tr().toUpperCase(),
+            style: Utilities.fonts.body(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ),
+      body: Container(
+        width: 300.0,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12.0,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text.rich(
+                TextSpan(
+                  text: "• ${'date_created_at'.tr()} ",
+                  style: Utilities.fonts.body(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context)
+                        .textTheme
+                        .bodyText2
+                        ?.color
+                        ?.withOpacity(0.6),
+                  ),
+                  children: [
+                    TextSpan(
+                      text: Jiffy(widget.illustration.createdAt).fromNow(),
+                      style: Utilities.fonts.body(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context)
+                            .textTheme
+                            .bodyText2
+                            ?.color
+                            ?.withOpacity(1.0),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Text.rich(
+                TextSpan(
+                  text: "• ${'date_updated_at'.tr()} ",
+                  style: Utilities.fonts.body(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context)
+                        .textTheme
+                        .bodyText2
+                        ?.color
+                        ?.withOpacity(0.6),
+                  ),
+                  children: [
+                    TextSpan(
+                      text: Jiffy(widget.illustration.updatedAt).fromNow(),
+                      style: Utilities.fonts.body(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context)
+                            .textTheme
+                            .bodyText2
+                            ?.color
+                            ?.withOpacity(1.0),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      textButtonValidation: "close".tr(),
+      onValidate: () {
+        Beamer.of(context).popRoute();
+      },
+      onCancel: Beamer.of(context).popRoute,
+    );
+  }
+
   void fetchHighResImage() {
     Future.delayed(
       1.seconds,
@@ -275,101 +460,17 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
   }
 
   void onTapDate() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return ThemedDialog(
-          spaceActive: false,
-          centerTitle: false,
-          autofocus: true,
-          title: Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Opacity(
-              opacity: 0.8,
-              child: Text(
-                "dates".tr().toUpperCase(),
-                style: Utilities.fonts.body(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ),
-          body: Container(
-            width: 300.0,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12.0,
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text.rich(
-                    TextSpan(
-                      text: "• ${'date_created_at'.tr()} ",
-                      style: Utilities.fonts.body(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context)
-                            .textTheme
-                            .bodyText2
-                            ?.color
-                            ?.withOpacity(0.6),
-                      ),
-                      children: [
-                        TextSpan(
-                          text: Jiffy(widget.illustration.createdAt).fromNow(),
-                          style: Utilities.fonts.body(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context)
-                                .textTheme
-                                .bodyText2
-                                ?.color
-                                ?.withOpacity(1.0),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Text.rich(
-                    TextSpan(
-                      text: "• ${'date_updated_at'.tr()} ",
-                      style: Utilities.fonts.body(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context)
-                            .textTheme
-                            .bodyText2
-                            ?.color
-                            ?.withOpacity(0.6),
-                      ),
-                      children: [
-                        TextSpan(
-                          text: Jiffy(widget.illustration.updatedAt).fromNow(),
-                          style: Utilities.fonts.body(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context)
-                                .textTheme
-                                .bodyText2
-                                ?.color
-                                ?.withOpacity(1.0),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          textButtonValidation: "close".tr(),
-          onValidate: () {
-            Beamer.of(context).popRoute();
-          },
-          onCancel: Beamer.of(context).popRoute,
-        );
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    Utilities.ui.showAdaptiveDialog(
+      context,
+      isMobileSize: isMobileSize,
+      builder: (BuildContext context) {
+        if (isMobileSize) {
+          return bottomSheetDates();
+        }
+
+        return dialogDates();
       },
     );
   }

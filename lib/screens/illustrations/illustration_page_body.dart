@@ -78,7 +78,9 @@ class IllustrationPageBody extends StatelessWidget {
       );
     }
 
-    final bool isMobileSize = Utilities.size.isMobileSize(context);
+    final Size windowSize = MediaQuery.of(context).size;
+    final bool isMobileSize =
+        windowSize.width < Utilities.size.mobileWidthTreshold;
 
     final double left = isMobileSize ? 0.0 : 60.0;
     final double right = isMobileSize ? 0.0 : 60.0;
@@ -106,6 +108,7 @@ class IllustrationPageBody extends StatelessWidget {
             onShare: onShare,
             onTapUser: onTapUser,
             heroTag: heroTag,
+            windowSize: windowSize,
           ),
         ]),
       ),
