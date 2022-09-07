@@ -72,9 +72,14 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
-          ApplicationBar(),
-          ActivityPageHeader(
-            isMobileSize: isMobileSize,
+          ApplicationBar(
+            pinned: false,
+            bottom: PreferredSize(
+              child: ActivityPageHeader(
+                isMobileSize: isMobileSize,
+              ),
+              preferredSize: Size.fromHeight(110.0),
+            ),
           ),
           SliverList(
             delegate: SliverChildListDelegate.fixed([

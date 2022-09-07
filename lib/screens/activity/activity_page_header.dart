@@ -13,17 +13,18 @@ class ActivityPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverPadding(
+    return Padding(
       padding: EdgeInsets.only(
         top: 60.0,
         left: isMobileSize ? 12.0 : 54.0,
         bottom: 24.0,
       ),
-      sliver: PageTitle(
-        isMobileSize: isMobileSize,
-        titleValue: "activity".tr(),
-        subtitleValue: "activity_subtitle".tr(),
+      child: PageTitle(
         crossAxisAlignment: CrossAxisAlignment.start,
+        isMobileSize: isMobileSize,
+        subtitleValue: "activity_subtitle".tr(),
+        titleValue: "activity".tr(),
+        renderSliver: false,
       ),
     );
   }
