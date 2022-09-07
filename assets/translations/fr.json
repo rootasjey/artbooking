@@ -863,6 +863,7 @@
   "link_subtitle": "Ajouter un lien vers un profile externe",
   "link_add": "Ajouter un lien",
   "link_label_text": "https://monprofile...",
+  "link_save": "Sauvegarder ce lien",
   "link_save_new": "Sauvegarder ce nouveau lien",
   "link_select_list": "Sélectionner un lien pour en modifier la valeur",
   "link_selected_edit": "Édition du lien {}...",

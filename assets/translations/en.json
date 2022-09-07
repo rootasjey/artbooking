@@ -866,6 +866,7 @@
   "link": "Link",
   "link_add": "Add link",
   "link_label_text": "https://myprofile...",
+  "link_save": "Save this link",
   "link_save_new": "Save this new link",
   "link_select_list": "Select a link to edit its value",
   "link_selected_edit": "Editing {} link...",
