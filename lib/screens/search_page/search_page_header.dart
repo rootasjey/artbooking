@@ -32,7 +32,7 @@ class SearchPageHeader extends StatelessWidget {
   final void Function()? onClearInput;
 
   /// Callback fired when search input changes.
-  final void Function(String)? onInputChanged;
+  final void Function(String value)? onInputChanged;
 
   /// Number of search result items.
   final int resultCount;
@@ -42,46 +42,43 @@ class SearchPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: EdgeInsets.only(
-          top: isMobileSize ? 54.0 : 100.0,
-          bottom: isMobileSize ? 24.0 : 50.0,
-          left: 12.0,
-          right: 12.0,
-        ),
-        child: Column(
-          crossAxisAlignment: isMobileSize
-              ? CrossAxisAlignment.start
-              : CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: isMobileSize ? null : 400.0,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 4.0),
-                    child: SearchTextInput(
-                      autofocus: true,
-                      loading: searching,
-                      controller: searchInputController,
-                      focusNode: searchFocusNode,
-                      hintText: "search_input_hint_text".tr(),
-                      keyboardType: TextInputType.multiline,
-                      textCapitalization: TextCapitalization.sentences,
-                      onChanged: onInputChanged,
-                      onClearInput: onClearInput,
-                    ),
+    return Padding(
+      padding: EdgeInsets.only(
+        top: isMobileSize ? 24.0 : 100.0,
+        bottom: isMobileSize ? 24.0 : 50.0,
+        left: 12.0,
+        right: 12.0,
+      ),
+      child: Column(
+        crossAxisAlignment:
+            isMobileSize ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: isMobileSize ? null : 400.0,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4.0),
+                  child: SearchTextInput(
+                    autofocus: true,
+                    loading: searching,
+                    controller: searchInputController,
+                    focusNode: searchFocusNode,
+                    hintText: "search_input_hint_text".tr(),
+                    keyboardType: TextInputType.multiline,
+                    textCapitalization: TextCapitalization.sentences,
+                    onChanged: onInputChanged,
+                    onClearInput: onClearInput,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            SearchPageHeaderResults(
-              resultCount: resultCount,
-              show: showResultMetrics,
-            ),
-          ],
-        ),
+          ),
+          SearchPageHeaderResults(
+            resultCount: resultCount,
+            show: showResultMetrics,
+          ),
+        ],
       ),
     );
   }

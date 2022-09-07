@@ -94,16 +94,21 @@ class _SearchPageState extends State<SearchPage> {
         child: CustomScrollView(
           controller: _pageScrollController,
           slivers: <Widget>[
-            ApplicationBar(),
-            SearchPageHeader(
-              isMobileSize: isMobileSize,
-              resultCount: _searchResultItemList.length,
-              showResultMetrics: _showResults && !_isFirstSearch,
-              onInputChanged: onInputChanged,
-              searching: _searching,
-              onClearInput: onClearInput,
-              searchFocusNode: _searchFocusNode,
-              searchInputController: _searchInputController,
+            ApplicationBar(
+              pinned: false,
+              bottom: PreferredSize(
+                child: SearchPageHeader(
+                  isMobileSize: isMobileSize,
+                  resultCount: _searchResultItemList.length,
+                  showResultMetrics: _showResults && !_isFirstSearch,
+                  onInputChanged: onInputChanged,
+                  searching: _searching,
+                  onClearInput: onClearInput,
+                  searchFocusNode: _searchFocusNode,
+                  searchInputController: _searchInputController,
+                ),
+                preferredSize: Size.fromHeight(180.0),
+              ),
             ),
             SearchPageBody(
               isMobileSize: isMobileSize,
