@@ -50,6 +50,10 @@ class App extends StatelessWidget {
           localizationsDelegates: context.localizationDelegates,
           routerDelegate: appLocationsBuilder,
           routeInformationParser: BeamerParser(),
+          backButtonDispatcher: BeamerBackButtonDispatcher(
+            alwaysBeamBack: true,
+            delegate: appLocationsBuilder,
+          ),
         );
       },
     );
