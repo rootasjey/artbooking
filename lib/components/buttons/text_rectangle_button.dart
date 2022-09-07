@@ -9,7 +9,11 @@ class TextRectangleButton extends StatelessWidget {
     this.backgroundColor,
     this.onPressed,
     this.primary,
+    this.compact = false,
   }) : super(key: key);
+
+  /// This button will take less space if this is true.
+  final bool compact;
 
   /// Primary color.
   final Color? primary;
@@ -45,9 +49,9 @@ class TextRectangleButton extends StatelessWidget {
           width: 2.0,
           color: Colors.black38.withOpacity(0.2),
         ),
-        padding: const EdgeInsets.symmetric(
+        padding: EdgeInsets.symmetric(
           horizontal: 28.0,
-          vertical: 18.0,
+          vertical: compact ? 10.0 : 18.0,
         ),
       ),
     );
