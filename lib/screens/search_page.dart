@@ -192,6 +192,10 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void onInputChanged(String newTextValue) {
+    if (newTextValue == _searchInputValue) {
+      return;
+    }
+
     final bool refresh =
         _searchInputValue != newTextValue && newTextValue.isEmpty;
 
