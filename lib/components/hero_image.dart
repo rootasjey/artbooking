@@ -26,15 +26,22 @@ class HeroImage extends StatefulWidget {
 }
 
 class _HeroImageState extends State<HeroImage> {
+  /// Prevent earky navigation back from this page.
+  bool _initialized = false;
+
   /// Currently tring to navigate back to the previous route.
   bool _isPopping = false;
 
   /// Show imagE/page controls if true.
   bool _showControls = false;
-  bool _initialized = false;
 
-  final double _minScale = 0.3;
+  /// Minimum allow scale.
+  double? _minScale;
 
+  /// Maximum allow scale.
+  double? _initScale;
+
+  /// Show imagE/page controls if true.
   PhotoViewController _photoViewController = PhotoViewController();
 
   @override
@@ -46,8 +53,14 @@ class _HeroImageState extends State<HeroImage> {
     _photoViewController.outputStateStream.listen(
       (PhotoViewControllerValue event) {
         final double scale = event.scale ?? 0.0;
+        if (_initScale == null) {
+          _initScale = scale;
+          _minScale = scale * 0.8;
+        }
 
-        if (_initialized && scale < _minScale && !_isPopping) {
+        final double minScale = _minScale ?? 0;
+
+        if (_initialized && scale < minScale && !_isPopping) {
           _isPopping = true;
           Navigator.of(context).pop();
         }
@@ -83,24 +96,18 @@ class _HeroImageState extends State<HeroImage> {
       // If scroll direction matches DismissiblePage direction
       direction: DismissiblePageDismissDirection.down,
       isFullScreen: false,
+      disabled: false,
       child: Stack(
         children: [
           Hero(
             tag: widget.heroTag,
             child: PhotoView(
+              minScale: _minScale,
+              initialScale: _initScale,
               backgroundDecoration: BoxDecoration(color: Colors.transparent),
               controller: _photoViewController,
               imageProvider: widget.imageProvider,
-              onTapUp: (
-                BuildContext context,
-                TapUpDetails tapUpDetails,
-                PhotoViewControllerValue controller,
-              ) {
-                final bool newValue = !_showControls;
-                setState(() => _showControls = newValue);
-                Utilities.storage.setHeroImageControlsVisible(newValue);
-              },
-              scaleStateChangedCallback: (PhotoViewScaleState state) {},
+              onTapUp: onTapUpImage,
             ),
           ),
           if (_showControls)
@@ -119,5 +126,16 @@ class _HeroImageState extends State<HeroImage> {
         ],
       ),
     );
+  }
+
+  void onTapUpImage(
+    BuildContext context,
+    TapUpDetails tapUpDetails,
+    PhotoViewControllerValue controller,
+  ) {
+    final bool newValue = !_showControls;
+
+    setState(() => _showControls = newValue);
+    Utilities.storage.setHeroImageControlsVisible(newValue);
   }
 }
