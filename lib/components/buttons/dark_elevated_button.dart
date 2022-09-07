@@ -42,7 +42,7 @@ class DarkElevatedButton extends StatelessWidget {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           primary: Colors.black87,
-          minimumSize: Size(320.0, 0.0),
+          minimumSize: Size(340.0, 0.0),
           textStyle: Utilities.fonts.body(
             fontWeight: FontWeight.w500,
           ),
