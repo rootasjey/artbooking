@@ -7,16 +7,21 @@ class AtelierPageCard extends StatefulWidget {
     required IconData this.iconData,
     required String this.textSubtitle,
     required String this.textTitle,
-    this.backgroundColor = Colors.white,
     this.compact = false,
-    this.hoverColor = Colors.pink,
+    this.isWide = false,
     this.noSizeConstraints = false,
+    this.backgroundColor = Colors.white,
+    this.hoverColor = Colors.pink,
+    this.elevation = 2.0,
     this.onTap,
   }) : super(key: key);
 
   /// If true, this card won't have size constrains
   /// (height = 116.0 and width = 200 || 300).
   final bool noSizeConstraints;
+
+  /// This card will have less height but with normal width.
+  final bool isWide;
 
   /// If true, the card's width will be 200.0.
   final bool compact;
@@ -26,6 +31,9 @@ class AtelierPageCard extends StatefulWidget {
 
   /// Icon will be of this color on hover.
   final Color hoverColor;
+
+  /// Card's elevation.
+  final double elevation;
 
   /// Icon's data which will be displayed before text.
   final IconData iconData;
@@ -51,6 +59,13 @@ class _AtelierPageCardState extends State<AtelierPageCard> {
   Color? _iconColor;
 
   @override
+  void initState() {
+    super.initState();
+
+    _elevation = widget.elevation;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final Widget card = Card(
       elevation: _elevation,
@@ -60,14 +75,14 @@ class _AtelierPageCardState extends State<AtelierPageCard> {
         onHover: (isHover) {
           if (isHover) {
             setState(() {
-              _elevation = 4.0;
+              _elevation = widget.elevation * 2.0;
               _iconColor = widget.hoverColor;
             });
             return;
           }
 
           setState(() {
-            _elevation = 2.0;
+            _elevation = widget.elevation;
             _iconColor = null;
           });
         },
@@ -88,9 +103,14 @@ class _AtelierPageCardState extends State<AtelierPageCard> {
       return card;
     }
 
+    double width = widget.compact ? 200.0 : 300.0;
+    if (widget.isWide) {
+      width = 360.0;
+    }
+
     return Container(
-      width: widget.compact ? 200.0 : 300.0,
-      height: 116.0,
+      width: width,
+      height: widget.isWide ? 96.0 : 116.0,
       child: card,
     );
   }
@@ -127,7 +147,7 @@ class _AtelierPageCardState extends State<AtelierPageCard> {
             opacity: 0.4,
             child: Text(
               widget.textSubtitle,
-              maxLines: 2,
+              maxLines: widget.isWide ? 1 : 2,
               overflow: TextOverflow.ellipsis,
               style: Utilities.fonts.body(
                 fontSize: 14.0,
