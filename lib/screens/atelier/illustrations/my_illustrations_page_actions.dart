@@ -59,6 +59,7 @@ class MyIllustrationsPageActions extends StatelessWidget {
     return Wrap(
       spacing: 12.0,
       runSpacing: 12.0,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         if (!isMobileSize)
           TextRectangleButton(
@@ -86,12 +87,13 @@ class MyIllustrationsPageActions extends StatelessWidget {
   Widget multiSelectButton(BuildContext context) {
     if (isMobileSize) {
       return TextRectangleButton(
-        onPressed: onTriggerMultiSelect,
-        icon: Icon(UniconsLine.layers),
-        label: Text("multi_select".tr()),
-        primary: multiSelectActive ? Colors.white : Colors.black38,
         backgroundColor:
             multiSelectActive ? Theme.of(context).primaryColor : null,
+        compact: true,
+        icon: Icon(UniconsLine.layers),
+        label: Text("multi_select".tr()),
+        onPressed: onTriggerMultiSelect,
+        primary: multiSelectActive ? Colors.white : Colors.black38,
       );
     }
 
