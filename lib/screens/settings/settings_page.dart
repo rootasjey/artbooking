@@ -67,9 +67,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             CustomScrollView(
               controller: _pageScrollController,
               slivers: <Widget>[
-                ApplicationBar(minimal: true),
-                SettingsPageHeader(
-                  isMobileSize: isMobileSize,
+                ApplicationBar(
+                  minimal: true,
+                  pinned: false,
+                  bottom: PreferredSize(
+                    child: SettingsPageHeader(
+                      isMobileSize: isMobileSize,
+                    ),
+                    preferredSize: Size.fromHeight(120.0),
+                  ),
                 ),
                 SettingsPageBody(
                   isMobileSize: isMobileSize,

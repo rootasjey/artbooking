@@ -13,15 +13,17 @@ class SettingsPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverPadding(
+    return Padding(
       padding: EdgeInsets.only(
         left: isMobileSize ? 12.0 : 54.0,
-        top: isMobileSize ? 24.0 : 60.0,
+        top: isMobileSize ? 0.0 : 60.0,
+        bottom: isMobileSize ? 8.0 : 0.0,
       ),
-      sliver: PageTitle(
+      child: PageTitle(
         crossAxisAlignment: CrossAxisAlignment.start,
-        titleValue: "settings".tr(),
         subtitleValue: "settings_description".tr(),
+        titleValue: "settings".tr(),
+        renderSliver: false,
       ),
     );
   }
