@@ -5,6 +5,7 @@ import 'package:artbooking/components/application_bar/application_bar.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/router/locations/home_location.dart';
+import 'package:artbooking/router/navigation_state_helper.dart';
 import 'package:artbooking/screens/search_page/search_page_body.dart';
 import 'package:artbooking/screens/search_page/search_page_fab.dart';
 import 'package:artbooking/screens/search_page/search_page_header.dart';
@@ -66,9 +67,11 @@ class _SearchPageState extends State<SearchPage> {
 
   /// Used to debounce search request.
   Timer? _searchTimer;
+
   @override
   initState() {
     super.initState();
+    loadPreferences();
   }
 
   @override
@@ -136,6 +139,16 @@ class _SearchPageState extends State<SearchPage> {
     context.showSuccessBar(content: Text("copy_link_success".tr()));
   }
 
+  void loadPreferences() {
+    _searchInputValue = NavigationStateHelper.searchInputValue;
+    _searchInputController.text = _searchInputValue;
+
+    if (_searchInputValue.isNotEmpty) {
+      _showResults = true;
+      search();
+    }
+  }
+
   void navigateToBook(String bookId) {
     final String route = HomeLocation.bookRoute.replaceFirst(
       ":bookId",
@@ -185,6 +198,8 @@ class _SearchPageState extends State<SearchPage> {
     _searchInputValue = newTextValue;
     _showResults = newTextValue.isNotEmpty;
 
+    NavigationStateHelper.searchInputValue = newTextValue;
+
     if (newTextValue.isEmpty) {
       if (refresh) {
         setState(() {});
@@ -192,9 +207,7 @@ class _SearchPageState extends State<SearchPage> {
       return;
     }
 
-    if (_searchTimer != null) {
-      _searchTimer!.cancel();
-    }
+    _searchTimer?.cancel();
 
     _searchTimer = Timer(
       500.milliseconds,
@@ -206,8 +219,17 @@ class _SearchPageState extends State<SearchPage> {
     _searchInputValue = "";
     _searchInputController.clear();
     _searchFocusNode.requestFocus();
+    NavigationStateHelper.searchInputValue = "";
 
     setState(() {});
+  }
+
+  void onTapFab() {
+    _pageScrollController.animateTo(
+      0.0,
+      duration: Duration(seconds: 1),
+      curve: Curves.easeOut,
+    );
   }
 
   void onTapSearchItem(EnumSearchItemType searchItemType, String id) {
@@ -373,13 +395,5 @@ class _SearchPageState extends State<SearchPage> {
     }
 
     setState(() => _showFab = true);
-  }
-
-  void onTapFab() {
-    _pageScrollController.animateTo(
-      0.0,
-      duration: Duration(seconds: 1),
-      curve: Curves.easeOut,
-    );
   }
 }

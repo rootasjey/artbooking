@@ -38,4 +38,10 @@ class NavigationStateHelper {
   /// This state's property allow us to pass section data
   /// outside the page's state (because of the router behavior).
   static Section? section;
+
+  /// Last search input value entered.
+  /// Everytime the search input changes, this variable should be updated.
+  /// Thus if the user leaves the search page and navigates back to it,
+  /// they will keep their last search state.
+  static String searchInputValue = "";
 }
