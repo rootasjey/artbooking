@@ -162,15 +162,15 @@ class InputDialog extends StatelessWidget {
     required final String titleValue,
     required final String subtitleValue,
     required final void Function() onCancel,
-    final TextEditingController? nameController,
+    final bool validateOnEnter = true,
     final void Function(String)? onNameChanged,
     final void Function(String)? onSubmitted,
     final int? maxLines = 1,
-    final String submitButtonValue = '',
+    final String submitButtonValue = "",
     final String? label,
     String? hintText,
+    final TextEditingController? nameController,
     final TextInputAction? textInputAction,
-    final bool validateOnEnter = true,
   }) {
     if (hintText == null &&
         nameController != null &&
