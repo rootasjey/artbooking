@@ -90,8 +90,8 @@ class SearchResultCard extends StatelessWidget {
   }
 
   Widget bookImageWidget() {
-    final double width = 130.0;
-    final double height = 120.0;
+    final double width = isMobileSize ? 80.0 : 130.0;
+    final double height = isMobileSize ? 70.0 : 120.0;
     final double borderRadiusValue = 12.0;
 
     return SizedBox(
@@ -171,7 +171,7 @@ class SearchResultCard extends StatelessWidget {
   Widget userImageWidget() {
     return BetterAvatar(
       image: NetworkImage(imageUrl),
-      size: 140.0,
+      size: isMobileSize ? 70.0 : 140.0,
       onTap: onTap != null ? () => onTap?.call(searchItemType, id) : null,
     );
   }
