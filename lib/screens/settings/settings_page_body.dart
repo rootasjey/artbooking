@@ -48,7 +48,7 @@ class SettingsPageBody extends StatelessWidget {
   /// Callback fired to edit our biography.
   final void Function()? onEditBio;
 
-  /// Callback fired when we tap on a icon link to edit it.
+  /// Callback fired when a social link has changed.
   final void Function(UserSocialLinks userSocialLinks)? onLinkChanged;
 
   /// Callback fired when we upload a new picture.
@@ -76,6 +76,7 @@ class SettingsPageBody extends StatelessWidget {
     return Column(
       children: [
         SettingsPageBodyLeft(
+          isMobileSize: isMobileSize,
           profilePictureHeroTag: profilePictureHeroTag,
           profilePictureUrl: userFirestore.getProfilePicture(),
           onEditPicture: onEditPicture,

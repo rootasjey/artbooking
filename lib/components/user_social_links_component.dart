@@ -1,4 +1,7 @@
+import 'package:artbooking/components/buttons/dark_elevated_button.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
+import 'package:artbooking/components/texts/outlined_text_field.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/icon_social_link_data.dart';
 import 'package:artbooking/types/user/user_social_links.dart';
 import 'package:beamer/beamer.dart';
@@ -13,18 +16,26 @@ class UserSocialLinksComponent extends StatelessWidget {
   const UserSocialLinksComponent({
     Key? key,
     required this.socialLinks,
-    this.onLinkChanged,
-    this.hideEmpty = false,
     this.editMode = false,
+    this.hideEmpty = false,
+    this.isMobileSize = false,
+    this.onLinkChanged,
   }) : super(key: key);
+
+  /// If true, clicking on a link will open edit dialog.
+  final bool editMode;
 
   /// Empty links will hidden if true.
   final bool hideEmpty;
 
-  /// If true, clicking on a link will open edit dialog.
-  final bool editMode;
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
+
+  /// Callback fired when a social link has changed.
+  final void Function(UserSocialLinks userSocialLinks)? onLinkChanged;
+
+  /// User's social links (e.g. instagram, twitter, ...).
   final UserSocialLinks socialLinks;
-  final void Function(UserSocialLinks)? onLinkChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -32,16 +43,16 @@ class UserSocialLinksComponent extends StatelessWidget {
       spacing: 12.0,
       runSpacing: 12.0,
       alignment: WrapAlignment.center,
-      children: getChildren2().map((x) {
+      children: getChildren2().map((final IconSocialLinkData data) {
         return IconButton(
-          tooltip: x.tooltip,
+          tooltip: data.tooltip,
           onPressed: () => onTap(
             context,
-            key: x.socialKey,
-            initialValue: x.initialValue,
-            onValidate: x.onValidate,
+            key: data.socialKey,
+            initialValue: data.initialValue,
+            onValidate: data.onValidate,
           ),
-          icon: x.icon,
+          icon: data.icon,
         );
       }).toList(),
     );
@@ -449,17 +460,66 @@ class UserSocialLinksComponent extends StatelessWidget {
       return;
     }
 
-    final _locationController = TextEditingController();
-    _locationController.text = initialValue;
+    final TextEditingController _inputController = TextEditingController();
+    _inputController.text = initialValue;
 
     final String hintText = initialValue.isNotEmpty
         ? initialValue
         : "https://myawesomelink.art/...";
 
-    showDialog(
-      context: context,
-      builder: (context) => InputDialog.singleInput(
-        nameController: _locationController,
+    Utilities.ui.showAdaptiveDialog(context, isMobileSize: isMobileSize,
+        builder: (BuildContext context) {
+      if (isMobileSize) {
+        return Material(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 400.0,
+              minHeight: 600.0,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(26.0),
+                  child: OutlinedTextField(
+                    label:
+                        "${key.substring(0, 1).toUpperCase()}${key.substring(1)}",
+                    controller: _inputController,
+                    hintText: hintText,
+                    onSubmitted: (final String value) {
+                      final UserSocialLinks newUserSocialLinks =
+                          onValidate.call(value);
+                      onLinkChanged?.call(newUserSocialLinks);
+                      Beamer.of(context).popRoute();
+                    },
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(24.0),
+                      child: DarkElevatedButton.large(
+                        onPressed: () {
+                          final UserSocialLinks newUserSocialLinks =
+                              onValidate.call(_inputController.text);
+                          onLinkChanged?.call(newUserSocialLinks);
+                          Beamer.of(context).popRoute();
+                        },
+                        child: Text("link_save".tr()),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      return InputDialog.singleInput(
+        nameController: _inputController,
         hintText: hintText,
         textInputAction: TextInputAction.send,
         label: "${key.substring(0, 1).toUpperCase()}${key.substring(1)}",
@@ -467,12 +527,12 @@ class UserSocialLinksComponent extends StatelessWidget {
         subtitleValue: "link_update_description".tr(),
         titleValue: "link_update".tr().toUpperCase(),
         onCancel: Beamer.of(context).popRoute,
-        onSubmitted: (value) {
-          final newUserSocialLinks = onValidate.call(value);
+        onSubmitted: (final String value) {
+          final UserSocialLinks newUserSocialLinks = onValidate.call(value);
           onLinkChanged?.call(newUserSocialLinks);
           Beamer.of(context).popRoute();
         },
-      ),
-    );
+      );
+    });
   }
 }

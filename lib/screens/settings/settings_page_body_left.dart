@@ -10,12 +10,16 @@ class SettingsPageBodyLeft extends StatelessWidget {
   const SettingsPageBodyLeft({
     Key? key,
     required this.profilePictureUrl,
-    this.onEditPicture,
-    this.onUploadPicture,
     required this.socialLinks,
+    this.isMobileSize = false,
+    this.onEditPicture,
     this.onLinkChanged,
-    this.profilePictureHeroTag = '',
+    this.onUploadPicture,
+    this.profilePictureHeroTag = "",
   }) : super(key: key);
+
+  /// If true, this widget adapt its layout to small screens.
+  final bool isMobileSize;
 
   /// Callback fired when we tap on the profile picture.
   final void Function()? onEditPicture;
@@ -23,17 +27,17 @@ class SettingsPageBodyLeft extends StatelessWidget {
   /// Callback fired when we upload a new picture.
   final void Function()? onUploadPicture;
 
-  /// Callback fired when we tap on a icon link to edit it.
-  final void Function(UserSocialLinks)? onLinkChanged;
+  /// Callback fired when a social link has changed.
+  final void Function(UserSocialLinks userSocialLinks)? onLinkChanged;
+
+  /// Hero tag to animate profile picutre on navigation.
+  final String profilePictureHeroTag;
 
   /// URL to the current authenticated user profile picture.
   final String profilePictureUrl;
 
   /// User's social links (e.g. instagram, twitter, ...).
   final UserSocialLinks socialLinks;
-
-  /// Hero tag to animate profile picutre on navigation.
-  final String profilePictureHeroTag;
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +94,7 @@ class SettingsPageBodyLeft extends StatelessWidget {
           ),
           UserSocialLinksComponent(
             editMode: true,
+            isMobileSize: isMobileSize,
             socialLinks: socialLinks,
             onLinkChanged: onLinkChanged,
           ),
