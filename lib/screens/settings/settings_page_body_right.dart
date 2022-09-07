@@ -24,25 +24,44 @@ class SettingsPageBodyRight extends ConsumerWidget {
   /// If true, this widget adapt its layout to small screens.
   final bool isMobileSize;
 
+  /// Current authenticated user.
   final UserFirestore userFirestore;
+
+  /// Callback fired to navigate to account deletion.
   final void Function()? onGoToDeleteAccount;
+
+  /// Callback fired to navigate to password update page.
   final void Function()? onGoToUpdatePasssword;
+
+  /// Callback fired to navigate to username update page.
   final void Function()? onGoToUpdateUsername;
+
+  /// Callback fired to navigate to email update page.
   final void Function()? onGoToUpdateEmail;
+
+  /// Callback fired when we tap on the profile picture.
   final void Function()? onEditLocation;
+
+  /// Callback fired to edit our biography.
   final void Function()? onEditBio;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final double width = MediaQuery.of(context).size.width;
     final bool expanded = ref.watch(AppState.dashboardSideMenuOpenProvider);
-    final bool compact = width < 1400.0 && expanded;
+    bool compact = width < 1400.0 && expanded;
+
+    if (isMobileSize) {
+      compact = false;
+    }
 
     int index = 0;
 
     final List<Widget> children = [
       AtelierPageCard(
         compact: compact,
+        isWide: isMobileSize,
+        elevation: isMobileSize ? 0.0 : 2.0,
         hoverColor: Constants.colors.activity,
         iconData: UniconsLine.space_key,
         textTitle: "username".tr(),
@@ -51,6 +70,8 @@ class SettingsPageBodyRight extends ConsumerWidget {
       ),
       AtelierPageCard(
         compact: compact,
+        isWide: isMobileSize,
+        elevation: isMobileSize ? 0.0 : 2.0,
         hoverColor: Constants.colors.email,
         iconData: UniconsLine.envelope,
         textTitle: "email".tr(),
@@ -59,6 +80,8 @@ class SettingsPageBodyRight extends ConsumerWidget {
       ),
       AtelierPageCard(
         compact: compact,
+        isWide: isMobileSize,
+        elevation: isMobileSize ? 0.0 : 2.0,
         hoverColor: Constants.colors.location,
         iconData: UniconsLine.location_point,
         textTitle: "location".tr(),
@@ -67,6 +90,8 @@ class SettingsPageBodyRight extends ConsumerWidget {
       ),
       AtelierPageCard(
         compact: compact,
+        isWide: isMobileSize,
+        elevation: isMobileSize ? 0.0 : 2.0,
         hoverColor: Constants.colors.bio,
         iconData: UniconsLine.subject,
         textTitle: "bio".tr(),
@@ -75,6 +100,8 @@ class SettingsPageBodyRight extends ConsumerWidget {
       ),
       AtelierPageCard(
         compact: compact,
+        isWide: isMobileSize,
+        elevation: isMobileSize ? 0.0 : 2.0,
         hoverColor: Constants.colors.password,
         iconData: UniconsLine.lock,
         textTitle: "security".tr(),
@@ -83,6 +110,8 @@ class SettingsPageBodyRight extends ConsumerWidget {
       ),
       AtelierPageCard(
         compact: compact,
+        isWide: isMobileSize,
+        elevation: isMobileSize ? 0.0 : 2.0,
         hoverColor: Constants.colors.delete,
         iconData: UniconsLine.trash,
         textTitle: "security".tr(),

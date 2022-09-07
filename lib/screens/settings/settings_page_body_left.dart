@@ -17,11 +17,22 @@ class SettingsPageBodyLeft extends StatelessWidget {
     this.profilePictureHeroTag = '',
   }) : super(key: key);
 
+  /// Callback fired when we tap on the profile picture.
   final void Function()? onEditPicture;
+
+  /// Callback fired when we upload a new picture.
   final void Function()? onUploadPicture;
+
+  /// Callback fired when we tap on a icon link to edit it.
   final void Function(UserSocialLinks)? onLinkChanged;
+
+  /// URL to the current authenticated user profile picture.
   final String profilePictureUrl;
+
+  /// User's social links (e.g. instagram, twitter, ...).
   final UserSocialLinks socialLinks;
+
+  /// Hero tag to animate profile picutre on navigation.
   final String profilePictureHeroTag;
 
   @override

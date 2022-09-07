@@ -17,24 +17,44 @@ class SettingsPageBody extends StatelessWidget {
     this.onEditLocation,
     this.onEditBio,
     this.onLinkChanged,
-    this.profilePictureHeroTag = '',
+    this.profilePictureHeroTag = "",
     this.isMobileSize = false,
   }) : super(key: key);
 
   /// If true, this widget adapt its layout to small screens.
   final bool isMobileSize;
 
+  /// Current authenticated user.
   final UserFirestore userFirestore;
+
+  /// Callback fired when we tap on the profile picture.
   final void Function()? onEditPicture;
+
+  /// Callback fired to navigate to account deletion.
+  final void Function()? onGoToDeleteAccount;
+
+  /// Callback fired to navigate to password update page.
+  final void Function()? onGoToUpdatePasssword;
+
+  /// Callback fired to navigate to username update page.
+  final void Function()? onGoToUpdateUsername;
+
+  /// Callback fired to navigate to email update page.
+  final void Function()? onGoToUpdateEmail;
+
+  /// Callback fired to edit our location.
+  final void Function()? onEditLocation;
+
+  /// Callback fired to edit our biography.
+  final void Function()? onEditBio;
+
+  /// Callback fired when we tap on a icon link to edit it.
+  final void Function(UserSocialLinks userSocialLinks)? onLinkChanged;
+
+  /// Callback fired when we upload a new picture.
   final void Function()? onUploadPicture;
 
-  final void Function()? onGoToDeleteAccount;
-  final void Function()? onGoToUpdatePasssword;
-  final void Function()? onGoToUpdateUsername;
-  final void Function()? onGoToUpdateEmail;
-  final void Function()? onEditLocation;
-  final void Function()? onEditBio;
-  final void Function(UserSocialLinks)? onLinkChanged;
+  /// Hero tag to animate profile picutre on navigation.
   final String profilePictureHeroTag;
 
   @override
@@ -43,8 +63,8 @@ class SettingsPageBody extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.only(
           top: 18.0,
-          left: isMobileSize ? 24.0 : 100.0,
-          right: isMobileSize ? 24.0 : 100.0,
+          left: isMobileSize ? 12.0 : 100.0,
+          right: isMobileSize ? 12.0 : 100.0,
           bottom: 300.0,
         ),
         child: isMobileSize ? columnChild() : rowChild(),
