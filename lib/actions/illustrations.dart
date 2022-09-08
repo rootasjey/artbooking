@@ -35,8 +35,8 @@ class IllustrationsActions {
   }) async {
     try {
       final response =
-          await Utilities.cloud.fun('illustrations-checkProperties').call({
-        'illustration_id': illustrationId,
+          await Utilities.cloud.fun("illustrations-checkProperties").call({
+        "illustration_id": illustrationId,
       });
 
       return CheckPropertiesResponse.fromJSON(response.data);
@@ -55,7 +55,7 @@ class IllustrationsActions {
   }) async {
     try {
       final response =
-          await Utilities.cloud.fun('illustrations-createOne').call({
+          await Utilities.cloud.fun("illustrations-createOne").call({
         "name": name,
         "visibility": visibility.name,
       });
@@ -75,8 +75,8 @@ class IllustrationsActions {
   }) async {
     try {
       final response =
-          await Utilities.cloud.fun('illustrations-deleteOne').call({
-        'illustration_id': illustrationId,
+          await Utilities.cloud.fun("illustrations-deleteOne").call({
+        "illustration_id": illustrationId,
       });
 
       return IllustrationResponse.fromJSON(response.data);
@@ -94,8 +94,8 @@ class IllustrationsActions {
   }) async {
     try {
       final response =
-          await Utilities.cloud.fun('illustrations-deleteMany').call({
-        'illustration_ids': illustrationIds,
+          await Utilities.cloud.fun("illustrations-deleteMany").call({
+        "illustration_ids": illustrationIds,
       });
 
       return IllustrationsResponse.fromJSON(response.data);

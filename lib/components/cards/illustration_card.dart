@@ -243,6 +243,94 @@ class _IllustrationCardState extends State<IllustrationCard>
     );
   }
 
+  Widget borderOverlay() {
+    if (!widget.canResize) {
+      return Container();
+    }
+
+    if (!_showPopupMenu) {
+      return Container();
+    }
+
+    return Resizer(
+      onTap: () => widget.onGrowUp?.call(widget.index),
+      onResizeEnd: (endSize, originalSize, details) {
+        widget.onResizeEnd?.call(endSize, originalSize, details, widget.index);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Theme.of(context).primaryColor,
+            width: 4.0,
+          ),
+          borderRadius: BorderRadius.circular(16.0),
+        ),
+      ),
+    );
+  }
+
+  Widget childWhenDragging({
+    String textValue = "",
+    Function()? onTapPlaceholder,
+  }) {
+    return Container(
+      width: widget.size - 30.0,
+      height: widget.size - 30.0,
+      padding: const EdgeInsets.all(8.0),
+      child: DottedBorder(
+        strokeWidth: 3.0,
+        borderType: BorderType.RRect,
+        radius: Radius.circular(16),
+        color: Theme.of(context).primaryColor.withOpacity(0.6),
+        dashPattern: [8, 4],
+        child: ClipRRect(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+          child: Card(
+            elevation: 0.0,
+            color: Constants.colors.clairPink.withOpacity(0.6),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            clipBehavior: Clip.hardEdge,
+            child: InkWell(
+              onTap: onTapPlaceholder,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Opacity(
+                  opacity: 0.6,
+                  child: Center(
+                    child: getVisualChild(
+                      textValue: textValue,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget draggingCard() {
+    String imageUrl = widget.illustration.getThumbnail();
+
+    return Card(
+      elevation: 8.0,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+      ),
+      child: ExtendedImage.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        width: widget.size / 1.3,
+        height: widget.size / 1.3,
+        clearMemoryCacheWhenDispose: true,
+      ),
+    );
+  }
+
   Widget dropTarget() {
     return DragTarget<DragData>(
       builder: (BuildContext context, candidateItems, rejectedItems) {
@@ -268,6 +356,29 @@ class _IllustrationCardState extends State<IllustrationCard>
 
         return true;
       },
+    );
+  }
+
+  Widget getVisualChild({
+    required String textValue,
+  }) {
+    if (widget.useIconPlaceholder) {
+      return Icon(UniconsLine.plus);
+    }
+
+    if (widget.size < 300.0) {
+      return Icon(widget.backIcon);
+    }
+
+    return Text(
+      textValue.isNotEmpty
+          ? textValue
+          : "illustration_permutation_description".tr(),
+      textAlign: TextAlign.center,
+      style: Utilities.fonts.body3(
+        fontSize: 18.0,
+        fontWeight: FontWeight.w600,
+      ),
     );
   }
 
@@ -379,87 +490,28 @@ class _IllustrationCardState extends State<IllustrationCard>
     return cardChild;
   }
 
-  Widget childWhenDragging({
-    String textValue = "",
-    Function()? onTapPlaceholder,
-  }) {
-    return Container(
-      width: widget.size - 30.0,
-      height: widget.size - 30.0,
-      padding: const EdgeInsets.all(8.0),
-      child: DottedBorder(
-        strokeWidth: 3.0,
-        borderType: BorderType.RRect,
-        radius: Radius.circular(16),
-        color: Theme.of(context).primaryColor.withOpacity(0.6),
-        dashPattern: [8, 4],
-        child: ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(16)),
-          child: Card(
-            elevation: 0.0,
-            color: Constants.colors.clairPink.withOpacity(0.6),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.0),
-            ),
-            clipBehavior: Clip.hardEdge,
-            child: InkWell(
-              onTap: onTapPlaceholder,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Opacity(
-                  opacity: 0.6,
-                  child: Center(
-                    child: getVisualChild(
-                      textValue: textValue,
-                    ),
-                  ),
-                ),
-              ),
+  Widget likeAnimationOverlay() {
+    if (!_showLikeAnimation) {
+      return Container();
+    }
+
+    return ScaleTransition(
+      scale: _scaleAnimation,
+      child: SizedBox(
+        width: widget.size,
+        height: widget.size,
+        child: Material(
+          color: Colors.black.withOpacity(0.3),
+          child: Center(
+            child: Icon(
+              widget.illustration.liked
+                  ? UniconsLine.heart
+                  : UniconsLine.heart_break,
+              size: 42.0,
+              color: Theme.of(context).secondaryHeaderColor,
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget getVisualChild({
-    required String textValue,
-  }) {
-    if (widget.useIconPlaceholder) {
-      return Icon(UniconsLine.plus);
-    }
-
-    if (widget.size < 300.0) {
-      return Icon(widget.backIcon);
-    }
-
-    return Text(
-      textValue.isNotEmpty
-          ? textValue
-          : "illustration_permutation_description".tr(),
-      textAlign: TextAlign.center,
-      style: Utilities.fonts.body3(
-        fontSize: 18.0,
-        fontWeight: FontWeight.w600,
-      ),
-    );
-  }
-
-  Widget draggingCard() {
-    String imageUrl = widget.illustration.getThumbnail();
-
-    return Card(
-      elevation: 8.0,
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
-      ),
-      child: ExtendedImage.network(
-        imageUrl,
-        fit: BoxFit.cover,
-        width: widget.size / 1.3,
-        height: widget.size / 1.3,
-        clearMemoryCacheWhenDispose: true,
       ),
     );
   }
@@ -489,32 +541,6 @@ class _IllustrationCardState extends State<IllustrationCard>
             ),
             child:
                 widget.illustration.liked ? FilledHeartIcon() : lineHeartIcon(),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget likeAnimationOverlay() {
-    if (!_showLikeAnimation) {
-      return Container();
-    }
-
-    return ScaleTransition(
-      scale: _scaleAnimation,
-      child: SizedBox(
-        width: widget.size,
-        height: widget.size,
-        child: Material(
-          color: Colors.black.withOpacity(0.3),
-          child: Center(
-            child: Icon(
-              widget.illustration.liked
-                  ? UniconsLine.heart
-                  : UniconsLine.heart_break,
-              size: 42.0,
-              color: Theme.of(context).secondaryHeaderColor,
-            ),
           ),
         ),
       ),
@@ -593,15 +619,6 @@ class _IllustrationCardState extends State<IllustrationCard>
     );
   }
 
-  void onDoubleTap() {
-    widget.onDoubleTap?.call();
-    setState(() => _showLikeAnimation = true);
-
-    Future.delayed(Duration(seconds: 1), () {
-      setState(() => _showLikeAnimation = false);
-    });
-  }
-
   Widget popupMenuButton() {
     if (widget.popupMenuEntries.isEmpty || widget.useBottomSheet) {
       return Container();
@@ -651,6 +668,25 @@ class _IllustrationCardState extends State<IllustrationCard>
     );
   }
 
+  /// Compare current time with the time when the Firestore document was created.
+  /// Delete the document if the elapsed time is equal or greater than 3 min.
+  void checkElapsedTime() async {
+    final Duration elapsed =
+        DateTime.now().difference(widget.illustration.createdAt);
+
+    if (elapsed.inMinutes < 3) {
+      return;
+    }
+
+    try {
+      await IllustrationsActions.checkProperties(
+        illustrationId: widget.illustration.id,
+      );
+    } catch (error) {
+      Utilities.logger.e(error);
+    }
+  }
+
   /// If all thumbnails' urls are empty,
   /// try retrieve the urls from Firebase Storage
   /// and set them to the Firestore document.
@@ -674,6 +710,15 @@ class _IllustrationCardState extends State<IllustrationCard>
     } catch (error) {
       Utilities.logger.e(error);
     }
+  }
+
+  void onDoubleTap() {
+    widget.onDoubleTap?.call();
+    setState(() => _showLikeAnimation = true);
+
+    Future.delayed(Duration(seconds: 1), () {
+      setState(() => _showLikeAnimation = false);
+    });
   }
 
   void onHoverImage(isHover) {
@@ -758,50 +803,5 @@ class _IllustrationCardState extends State<IllustrationCard>
       widget.illustration,
       widget.selected,
     );
-  }
-
-  Widget borderOverlay() {
-    if (!widget.canResize) {
-      return Container();
-    }
-
-    if (!_showPopupMenu) {
-      return Container();
-    }
-
-    return Resizer(
-      onTap: () => widget.onGrowUp?.call(widget.index),
-      onResizeEnd: (endSize, originalSize, details) {
-        widget.onResizeEnd?.call(endSize, originalSize, details, widget.index);
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Theme.of(context).primaryColor,
-            width: 4.0,
-          ),
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-      ),
-    );
-  }
-
-  /// Compare current time with the time when the Firestore document was created.
-  /// Delete the document if the elapsed time is equal or greater than 3 min.
-  void checkElapsedTime() async {
-    final Duration elapsed =
-        DateTime.now().difference(widget.illustration.createdAt);
-
-    if (elapsed.inMinutes < 3) {
-      return;
-    }
-
-    try {
-      await IllustrationsActions.checkProperties(
-        illustrationId: widget.illustration.id,
-      );
-    } catch (error) {
-      Utilities.logger.e(error);
-    }
   }
 }

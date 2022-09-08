@@ -19,6 +19,8 @@ import 'package:artbooking/components/bottom_sheet/illustration_visibility_sheet
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_body.dart';
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_fab.dart';
 import 'package:artbooking/screens/atelier/illustrations/my_illustrations_page_header.dart';
+import 'package:artbooking/types/cloud_functions/illustration_response.dart';
+import 'package:artbooking/types/cloud_functions/illustrations_response.dart';
 import 'package:artbooking/types/enums/enum_content_visibility.dart';
 import 'package:artbooking/types/enums/enum_illustration_item_action.dart';
 import 'package:artbooking/globals/app_state.dart';
@@ -605,7 +607,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       _illustrations.removeAt(index);
     });
 
-    final response = await IllustrationsActions.deleteOne(
+    final IllustrationResponse response = await IllustrationsActions.deleteOne(
       illustrationId: illustration.id,
     );
 
@@ -623,15 +625,17 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       _illustrations.removeWhere((item) => item.id == multiSelectItem.key);
     });
 
-    final duplicatedItems = _multiSelectedItems.values.toList();
-    final illustrationIds = _multiSelectedItems.keys.toList();
+    final List<Illustration> duplicatedItems =
+        _multiSelectedItems.values.toList();
+    final List<String> illustrationIds = _multiSelectedItems.keys.toList();
 
     setState(() {
       _multiSelectedItems.clear();
       _forceMultiSelect = false;
     });
 
-    final response = await IllustrationsActions.deleteMany(
+    final IllustrationsResponse response =
+        await IllustrationsActions.deleteMany(
       illustrationIds: illustrationIds,
     );
 
