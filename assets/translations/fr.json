@@ -632,11 +632,11 @@
   "illustration_change": "Changer d'illustration",
   "illustration_create_error": "Désolés, nous avons rencontré une erreur durant la création de votre illustration. Veuillez réessayer plus tard.",
   "illustration_delete": {
-    "zero": "Supprimer ce book",
-    "one": "Supprimer ce book",
-    "two": "Supprimer ces books",
-    "many": "Supprimer ces books",
-    "other": "Supprimer ces books"
+    "zero": "Supprimer cete illustration",
+    "one": "Supprimer cete illustration",
+    "two": "Supprimer ces illustrations",
+    "many": "Supprimer ces illustrations",
+    "other": "Supprimer ces illustrations"
   },
   "illustration_delete_count": {
     "zero": "Aucune illustration à supprimer",
@@ -646,11 +646,11 @@
     "other": "Supprimer ces {} illustrations"
   },
   "illustration_delete_description": {
-    "zero": "Si cette illustration est référencée à l'intérieur de books, concours, challenges, galleries, cette suppression entraînera la formation de liens morts. Cette action est irrevsible.",
-    "one": "La suppression de ce book n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de celui-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible.",
-    "two": "La suppression de ces books n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de ceux-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible.",
-    "many": "La suppression de ces books n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de ceux-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible.",
-    "other": "La suppression de ces books n'entraînera PAS forcément la suppression des illustrations contenues à l'intérieur de ceux-ci. Les illustrations vivent d'elles-mêmes. Cette action est irrevsible."
+    "zero": "Rien à afficher étant donner qu'il n'y a rien à supprimer.",
+    "one": "Si cette illustration est référencée à l'intérieur d'autres books, concours, challenges, galleries, cette suppression entraînera la formation de liens morts. Cette action est irrevsible.",
+    "two": "Si ces illustrations sont référencées à l'intérieur d'auters books, concours, challenges, galleries, cette suppression entraînera la formation de liens morts. Cette action est irrevsible.",
+    "many": "Si ces illustrations sont référencées à l'intérieur d'auters books, concours, challenges, galleries, cette suppression entraînera la formation de liens morts. Cette action est irrevsible.",
+    "other": "Si ces illustrations sont référencées à l'intérieur d'auters books, concours, challenges, galleries, cette suppression entraînera la formation de liens morts. Cette action est irrevsible."
   },
   "illustration_description_dot": "Description de l'illustration...",
   "illustration_description_sample": "C'est une fleur sur un balcon...",

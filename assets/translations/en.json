@@ -650,11 +650,11 @@
     "other": "Delete these {} illustrations"
   },
   "illustration_delete_description": {
-    "zero": "If this illustration is referenced inside books, contests, challenges, galleries, it will leave a dead link. This action is irrevsible.",
-    "one": "If this illustration is referenced inside books, contests, challenges, galleries, it will leave a dead link. This action is irrevsible.",
-    "two": "If these illustrations are referenced inside books, contests, challenges, galleries, it will leave dead links. This action is irrevsible.",
-    "many": "If these illustrations are referenced inside books, contests, challenges, galleries, it will leave dead links. This action is irrevsible.",
-    "other": "If these illustrations are referenced inside books, contests, challenges, galleries, it will leave dead links. This action is irrevsible."
+    "zero": "Nothing to show as there is nothing to delete.",
+    "one": "If this illustration is referenced inside other books, contests, challenges, galleries, it will leave a dead link. This action is irrevsible.",
+    "two": "If these illustrations are referenced inside other books, contests, challenges, galleries, it will leave dead links. This action is irrevsible.",
+    "many": "If these illustrations are referenced inside other books, contests, challenges, galleries, it will leave dead links. This action is irrevsible.",
+    "other": "If these illustrations are referenced inside other books, contests, challenges, galleries, it will leave dead links. This action is irrevsible."
   },
   "illustration_description_dot": "Illustration's description...",
   "illustration_description_sample": "It's a flower on a balcony...",
