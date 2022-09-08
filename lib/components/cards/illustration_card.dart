@@ -658,6 +658,7 @@ class _IllustrationCardState extends State<IllustrationCard>
     final Illustration illustration = widget.illustration;
 
     if (illustration.version < 1) {
+      checkElapsedTime();
       return;
     }
 
@@ -701,7 +702,7 @@ class _IllustrationCardState extends State<IllustrationCard>
     showCupertinoModalBottomSheet(
       context: context,
       expand: false,
-      backgroundColor: Colors.white70,
+      backgroundColor: Colors.white,
       builder: (BuildContext context) {
         return Padding(
           padding: const EdgeInsets.all(8.0),
@@ -783,5 +784,24 @@ class _IllustrationCardState extends State<IllustrationCard>
         ),
       ),
     );
+  }
+
+  /// Compare current time with the time when the Firestore document was created.
+  /// Delete the document if the elapsed time is equal or greater than 3 min.
+  void checkElapsedTime() async {
+    final Duration elapsed =
+        DateTime.now().difference(widget.illustration.createdAt);
+
+    if (elapsed.inMinutes < 3) {
+      return;
+    }
+
+    try {
+      await IllustrationsActions.checkProperties(
+        illustrationId: widget.illustration.id,
+      );
+    } catch (error) {
+      Utilities.logger.e(error);
+    }
   }
 }
