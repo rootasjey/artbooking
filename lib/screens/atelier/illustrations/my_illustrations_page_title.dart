@@ -9,11 +9,11 @@ class MyIllustrationsPageTitle extends StatelessWidget {
   const MyIllustrationsPageTitle({
     Key? key,
     required this.selectedTab,
+    this.isMobileSize = false,
     this.isOwner = false,
     this.onChangedTab,
     this.onGoToUserProfile,
     this.username = "",
-    this.isMobileSize = false,
   }) : super(key: key);
 
   /// If true, this widget adapt its layout to small screens.
@@ -28,7 +28,7 @@ class MyIllustrationsPageTitle extends StatelessWidget {
 
   /// Callback fired on changed tab.
   /// Can be called only if the current authenticated user is the owner.
-  final void Function(EnumVisibilityTab)? onChangedTab;
+  final void Function(EnumVisibilityTab visibilityTab)? onChangedTab;
 
   /// Callback to navigate to user profile.
   /// Called only if the current authenticated user is NOT the owner.
@@ -144,7 +144,7 @@ class MyIllustrationsPageTitle extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    selectedTab.name,
+                    "illustrations_${selectedTab.name}_word".tr().toLowerCase(),
                     style: Utilities.fonts.body(
                       fontSize: titleFontSize,
                       fontWeight: FontWeight.w700,
