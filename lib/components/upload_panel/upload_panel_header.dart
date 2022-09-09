@@ -4,6 +4,7 @@ import 'package:artbooking/components/upload_panel/upload_panel_header_title.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// Header of `UploadPanel`.
 class UploadWindowHeader extends ConsumerWidget {
   const UploadWindowHeader({
     Key? key,

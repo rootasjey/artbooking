@@ -16,7 +16,7 @@ class UploadPanelHeaderTitle extends StatelessWidget {
         ? "illustration_uploading_files".plural(
             pendingTaskCount,
           )
-        : "All done.";
+        : "all_done".tr();
 
     return Text(
       textValue,

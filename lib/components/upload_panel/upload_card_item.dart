@@ -11,14 +11,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
-class UploadPanelItemCard extends ConsumerStatefulWidget {
-  const UploadPanelItemCard({
+/// A card to display one uploading illustration.
+class UploadCardItem extends ConsumerStatefulWidget {
+  const UploadCardItem({
     Key? key,
     required this.customUploadTask,
     this.onCancel,
     this.onDone,
     this.onTap,
+    this.alternativeTheme = false,
   }) : super(key: key);
+
+  /// This item will have a different set of colors if true.
+  /// (On mobile, we show a more discrete set of colors).
+  final bool alternativeTheme;
 
   /// Upload task to follow upload progression.
   final CustomUploadTask customUploadTask;
@@ -36,7 +42,7 @@ class UploadPanelItemCard extends ConsumerStatefulWidget {
   _UploadItemCardState createState() => _UploadItemCardState();
 }
 
-class _UploadItemCardState extends ConsumerState<UploadPanelItemCard> {
+class _UploadItemCardState extends ConsumerState<UploadCardItem> {
   /// This items card's elevation.
   double _elevation = 0.0;
 
@@ -82,7 +88,8 @@ class _UploadItemCardState extends ConsumerState<UploadPanelItemCard> {
         borderRadius: BorderRadius.zero,
       ),
       elevation: _elevation,
-      color: Constants.colors.clairPink,
+      color:
+          widget.alternativeTheme ? Colors.white : Constants.colors.clairPink,
       child: InkWell(
         onTap: widget.onTap,
         onHover: (isHover) {

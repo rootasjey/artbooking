@@ -1,5 +1,6 @@
 import 'package:artbooking/components/upload_panel/upload_panel_body.dart';
 import 'package:artbooking/components/upload_panel/upload_panel_header.dart';
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/custom_upload_task.dart';
 import 'package:artbooking/globals/app_state.dart';
 import 'package:artbooking/globals/constants.dart';
@@ -28,14 +29,12 @@ class _UploadWindowState extends ConsumerState<UploadWindow> {
   double _height = 100.0;
 
   /// Upload's panel initial width.
-
   double _initialWidth = 260.0;
 
   /// Upload's panel initial height.
   double _initialHeight = 100.0;
 
   /// Upload's panel maximum possible width.
-
   double _maxWidth = 360.0;
 
   /// Upload's panel maximum possible height.
@@ -65,15 +64,22 @@ class _UploadWindowState extends ConsumerState<UploadWindow> {
 
     final int percent = ref.watch(AppState.uploadPercentageProvider);
 
+    final Size windowSize = MediaQuery.of(context).size;
+    final bool isMobileSize =
+        windowSize.width < Utilities.size.mobileWidthTreshold;
+
     return Card(
-      elevation: 4.0,
-      color: Constants.colors.clairPink,
+      margin: EdgeInsets.zero,
+      elevation: isMobileSize ? 0.0 : 4.0,
+      color: isMobileSize ? Colors.white : Constants.colors.clairPink,
       child: AnimatedContainer(
-        width: _width,
+        width: isMobileSize ? windowSize.width : _width,
         height: _height,
         duration: 150.milliseconds,
         child: InkWell(
-          onTap: onToggleExpanded,
+          onTap: isMobileSize
+              ? () => onShowBottomSheet(uploadTaskList)
+              : onToggleExpanded,
           child: SingleChildScrollView(
             controller: _pageScrollController,
             child: Column(
@@ -87,16 +93,36 @@ class _UploadWindowState extends ConsumerState<UploadWindow> {
                   pausedTaskCount: pausedTaskCount,
                   percent: percent,
                 ),
-                UploadWindowBody(
-                  expanded: _expanded,
-                  onToggleExpanded: onToggleExpanded,
-                  uploadTaskList: uploadTaskList,
-                ),
+                if (!isMobileSize)
+                  UploadWindowBody(
+                    expanded: _expanded,
+                    onToggleExpanded: onToggleExpanded,
+                    uploadTaskList: uploadTaskList,
+                  ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  void onShowBottomSheet(List<CustomUploadTask> uploadTaskList) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
+    Utilities.ui.showAdaptiveDialog(
+      context,
+      isMobileSize: isMobileSize,
+      builder: (BuildContext context) {
+        return Material(
+          child: UploadWindowBody(
+            expanded: true,
+            isMobileSize: isMobileSize,
+            onToggleExpanded: onToggleExpanded,
+            uploadTaskList: uploadTaskList,
+          ),
+        );
+      },
     );
   }
 
