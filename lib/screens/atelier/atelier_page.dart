@@ -1,10 +1,11 @@
+import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/atelier/atelier_page_side_menu.dart';
 import 'package:artbooking/components/upload_panel/upload_panel.dart';
 import 'package:artbooking/router/locations/atelier_location.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 
-/// Widget showing user's dashboard.
+/// User's atelier widget.
 class AtelierPage extends StatefulWidget {
   @override
   _AtelierPageState createState() => _AtelierPageState();
@@ -15,6 +16,8 @@ class _AtelierPageState extends State<AtelierPage> {
 
   @override
   Widget build(context) {
+    final bool isMobileSize = Utilities.size.isMobileSize(context);
+
     return HeroControllerScope(
       controller: HeroController(),
       child: Material(
@@ -41,8 +44,8 @@ class _AtelierPageState extends State<AtelierPage> {
               ],
             ),
             Positioned(
-              left: 16.0,
-              bottom: 16.0,
+              left: isMobileSize ? 0.0 : 16.0,
+              bottom: isMobileSize ? 0.0 : 16.0,
               child: UploadWindow(),
             ),
           ],
