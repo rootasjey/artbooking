@@ -22,6 +22,7 @@ class ApplicationBarAuthUser extends StatelessWidget {
   /// Will hide some elements if true.
   final bool isMobileSize;
 
+  /// Spacing around this widget.
   final EdgeInsets margin;
 
   /// List of widgets to display at the end of the row.

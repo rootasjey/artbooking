@@ -120,12 +120,12 @@ class ApplicationBar extends ConsumerWidget {
 
   Widget userSection(
     BuildContext context, {
-    bool minimal = false,
-    bool isAuthenticated = false,
     required WidgetRef ref,
+    bool isAuthenticated = false,
+    bool isMobileSize = false,
+    bool minimal = false,
     String initials = "",
     String avatarUrl = "",
-    bool isMobileSize = false,
   }) {
     if (isAuthenticated) {
       final EdgeInsets margin = isMobileSize
