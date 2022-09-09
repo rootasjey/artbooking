@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/actions/illustrations.dart';
 import 'package:artbooking/globals/utilities.dart';
@@ -96,15 +98,19 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
   /// A "select file/folder" window will appear. User will have to choose a file.
   /// This file will be then read, and uploaded to firebase storage;
   Future<List<FilePickerCross>> pickImage() async {
-    List<FilePickerCross>? pickerResult;
+    final List<FilePickerCross>? pickerResult =
+        await FilePickerCross.importMultipleFromStorage(
+      type: FileTypeCross.image,
+    ).catchError((error) {
+      Utilities.logger.i(error);
+      return Future.value([FilePickerCross(Uint8List(0))]);
+    });
 
-    try {
-      pickerResult = await FilePickerCross.importMultipleFromStorage(
-        type: FileTypeCross.image,
-      );
-    } on Exception catch (_) {}
+    if (pickerResult == null || pickerResult.isEmpty) {
+      return [];
+    }
 
-    if (pickerResult == null) {
+    if (pickerResult.isNotEmpty && pickerResult.first.length == 0) {
       return [];
     }
 
