@@ -10,8 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Body of `UploadPanel`.
-class UploadWindowBody extends ConsumerWidget {
-  const UploadWindowBody({
+class UploadPanelBody extends ConsumerWidget {
+  const UploadPanelBody({
     Key? key,
     required this.expanded,
     required this.uploadTaskList,

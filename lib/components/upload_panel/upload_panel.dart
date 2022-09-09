@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supercharged/supercharged.dart';
 
-class UploadWindow extends ConsumerStatefulWidget {
-  const UploadWindow({
+class UploadPanel extends ConsumerStatefulWidget {
+  const UploadPanel({
     Key? key,
   }) : super(key: key);
 
@@ -17,7 +17,7 @@ class UploadWindow extends ConsumerStatefulWidget {
   _UploadWindowState createState() => _UploadWindowState();
 }
 
-class _UploadWindowState extends ConsumerState<UploadWindow> {
+class _UploadWindowState extends ConsumerState<UploadPanel> {
   /// Grow the upload panel to a maxium size if true.
   /// Otherwise minimize the window.
   bool _expanded = false;
@@ -85,7 +85,7 @@ class _UploadWindowState extends ConsumerState<UploadWindow> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                UploadWindowHeader(
+                UploadPanelHeader(
                   pendingTaskCount: pendingTaskCount,
                   runningTaskCount: runningTaskCount,
                   successTaskCount: successTaskCount,
@@ -94,7 +94,7 @@ class _UploadWindowState extends ConsumerState<UploadWindow> {
                   percent: percent,
                 ),
                 if (!isMobileSize)
-                  UploadWindowBody(
+                  UploadPanelBody(
                     expanded: _expanded,
                     onToggleExpanded: onToggleExpanded,
                     uploadTaskList: uploadTaskList,
@@ -115,7 +115,7 @@ class _UploadWindowState extends ConsumerState<UploadWindow> {
       isMobileSize: isMobileSize,
       builder: (BuildContext context) {
         return Material(
-          child: UploadWindowBody(
+          child: UploadPanelBody(
             expanded: true,
             isMobileSize: isMobileSize,
             onToggleExpanded: onToggleExpanded,

@@ -46,7 +46,7 @@ class _AtelierPageState extends State<AtelierPage> {
             Positioned(
               left: isMobileSize ? 0.0 : 16.0,
               bottom: isMobileSize ? 0.0 : 16.0,
-              child: UploadWindow(),
+              child: UploadPanel(),
             ),
           ],
         ),

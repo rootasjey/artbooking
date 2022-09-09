@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Header of `UploadPanel`.
-class UploadWindowHeader extends ConsumerWidget {
-  const UploadWindowHeader({
+class UploadPanelHeader extends ConsumerWidget {
+  const UploadPanelHeader({
     Key? key,
     required this.abortedTaskCount,
     required this.pausedTaskCount,
