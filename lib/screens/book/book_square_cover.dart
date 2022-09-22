@@ -77,7 +77,6 @@ class _BookSquareCoverState extends State<BookSquareCover> {
                 image: ExtendedNetworkImageProvider(
                   widget.book.getCoverLink(),
                   cache: true,
-                  cacheKey: widget.book.id,
                   imageCacheName: widget.book.id,
                 ),
                 height: 260.0,

@@ -383,7 +383,8 @@ class _IllustrationCardState extends State<IllustrationCard>
   }
 
   Widget imageCard({bool usingAsDropTarget = false}) {
-    final String imageUrl = widget.illustration.getThumbnail();
+    final Illustration illustration = widget.illustration;
+    final String imageUrl = illustration.getThumbnail();
     final Color primaryColor = Theme.of(context).primaryColor;
 
     BorderSide borderSide = BorderSide.none;
@@ -408,8 +409,7 @@ class _IllustrationCardState extends State<IllustrationCard>
         height: widget.size,
         cache: true,
         clearMemoryCacheWhenDispose: true,
-        imageCacheName: widget.illustration.id,
-        cacheKey: widget.illustration.id,
+        imageCacheName: illustration.id,
         loadStateChanged: (state) {
           switch (state.extendedImageLoadState) {
             case LoadState.loading:
@@ -480,7 +480,7 @@ class _IllustrationCardState extends State<IllustrationCard>
       );
     }
 
-    if (widget.illustration.id.isEmpty) {
+    if (illustration.id.isEmpty) {
       cardChild = Opacity(
         opacity: 0.4,
         child: cardChild,

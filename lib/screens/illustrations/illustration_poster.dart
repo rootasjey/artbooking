@@ -138,7 +138,6 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
                   _imageUrl,
                   cache: true,
                   imageCacheName: widget.illustration.id,
-                  cacheKey: widget.illustration.id,
                 ),
                 fit: BoxFit.cover,
                 child: InkWell(
