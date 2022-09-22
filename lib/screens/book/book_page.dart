@@ -1603,7 +1603,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
           .read(AppState.uploadTaskListProvider.notifier)
           .pickImageAndSetAsBookCover(bookId: book.id);
 
-      if (operationResult.success) {
+      if (operationResult.success || operationResult.ignore) {
         return;
       }
 

@@ -1,14 +1,18 @@
 import 'dart:convert';
 
-import 'package:file_picker_cross/file_picker_cross.dart';
+import 'package:file_picker/file_picker.dart';
 
 /// An operation response when trying to upload a custom cover for a book.
 class UploadCoverResponse {
   UploadCoverResponse({
     required this.success,
     required this.errorMessage,
+    this.ignore = false,
     this.file,
   });
+
+  /// This error can be ignore if true (Probably because of user cancel).
+  final bool ignore;
 
   /// The operation succeeded if true.
   final bool success;
@@ -17,12 +21,12 @@ class UploadCoverResponse {
   final String errorMessage;
 
   /// File which was selected if any.
-  final FilePickerCross? file;
+  final PlatformFile? file;
 
   UploadCoverResponse copyWith({
     bool? success,
     String? errorMessage,
-    FilePickerCross? file,
+    PlatformFile? file,
   }) {
     return UploadCoverResponse(
       success: success ?? this.success,

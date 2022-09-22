@@ -42,7 +42,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:desktop_drop/src/drop_target.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:file_picker_cross/file_picker_cross.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_improved_scrolling/flutter_improved_scrolling.dart';
@@ -1060,12 +1060,12 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       return;
     }
 
-    final List<FilePickerCross> files = [];
+    final List<PlatformFile> files = [];
 
     for (final file in dropDoneDetails.files) {
       final int length = await file.length();
 
-      if (length > 25000000) {
+      if (length > Constants.maxFileSize) {
         context.showErrorBar(
           content: Text(
             "illustration_upload_size_limit".tr(
@@ -1090,14 +1090,15 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         continue;
       }
 
-      final FilePickerCross filePickerCross = FilePickerCross(
-        await file.readAsBytes(),
+      final PlatformFile platformFile = PlatformFile(
+        name: file.name,
+        size: await file.length(),
         path: file.path,
-        type: FileTypeCross.image,
-        fileExtension: extension,
+        bytes: await file.readAsBytes(),
+        readStream: file.openRead(),
       );
 
-      files.add(filePickerCross);
+      files.add(platformFile);
     }
 
     showCreateBookDialog(files: files);
@@ -1113,13 +1114,16 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     setState(() => _isDraggingFile = false);
   }
 
+  /// Callback fired when one or severals files are dropped on a book.
+  /// An illustration will be created for each image file,
+  /// and then will be added to the target book.
   void onDragFileOnBookDone(Book book, DropDoneDetails dropDoneDetails) async {
-    final List<FilePickerCross> files = [];
+    final List<PlatformFile> files = [];
 
     for (final file in dropDoneDetails.files) {
       final int length = await file.length();
 
-      if (length > 25000000) {
+      if (length > Constants.maxFileSize) {
         context.showErrorBar(
           content: Text(
             "illustration_upload_size_limit".tr(
@@ -1144,14 +1148,15 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         continue;
       }
 
-      final FilePickerCross filePickerCross = FilePickerCross(
-        await file.readAsBytes(),
+      final PlatformFile platformFile = PlatformFile(
+        name: file.name,
+        size: await file.length(),
         path: file.path,
-        type: FileTypeCross.image,
-        fileExtension: extension,
+        bytes: await file.readAsBytes(),
+        readStream: file.openRead(),
       );
 
-      files.add(filePickerCross);
+      files.add(platformFile);
     }
 
     ref
@@ -1535,7 +1540,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     showVisibilityDialog(book, index);
   }
 
-  void showCreateBookDialog({List<FilePickerCross> files = const []}) {
+  void showCreateBookDialog({List<PlatformFile> files = const []}) {
     final _nameController = TextEditingController();
     final _descriptionController = TextEditingController();
 

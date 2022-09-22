@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/actions/illustrations.dart';
+import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/cloud_functions/illustrations_response.dart';
 import 'package:artbooking/types/cloud_functions/upload_cover_response.dart';
@@ -9,7 +10,7 @@ import 'package:artbooking/types/custom_upload_task.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/src/public_ext.dart';
-import 'package:file_picker_cross/file_picker_cross.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -97,39 +98,30 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
 
   /// A "select file/folder" window will appear. User will have to choose a file.
   /// This file will be then read, and uploaded to firebase storage;
-  Future<List<FilePickerCross>> pickImage() async {
-    final List<FilePickerCross>? pickerResult =
-        await FilePickerCross.importMultipleFromStorage(
-      type: FileTypeCross.image,
-    ).catchError((error) {
-      Utilities.logger.i(error);
-      return Future.value([FilePickerCross(Uint8List(0))]);
-    });
+  Future<FilePickerResult?> pickImage() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowedExtensions: Constants.allowedImageExt,
+      allowMultiple: true,
+      type: FileType.custom,
+      withData: true,
+    );
 
-    if (pickerResult == null || pickerResult.isEmpty) {
-      return [];
+    if (result == null || result.count == 0) {
+      return result;
     }
 
-    if (pickerResult.isNotEmpty && pickerResult.first.length == 0) {
-      return [];
+    result.files.retainWhere(_checkSize);
+    for (final PlatformFile file in result.files) {
+      _uploadIllustration(file);
     }
 
-    final List<FilePickerCross> passedFiles = pickerResult
-        .where(_checkSize)
-        .where((file) => file.path != null)
-        .toList();
-
-    for (FilePickerCross passedFile in passedFiles) {
-      _uploadIllustration(passedFile);
-    }
-
-    return passedFiles;
+    return result;
   }
 
   /// Receive a single file
   /// and try to upload it as the new illustration's version.
-  Future<FilePickerCross?> handleDropForNewVersion(
-    FilePickerCross file,
+  Future<PlatformFile?> handleDropForNewVersion(
+    PlatformFile file,
     Illustration illustration,
   ) async {
     if (file.path == null || !_checkSize(file)) {
@@ -142,80 +134,68 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
 
   /// A "select file/folder" window will appear. User will have to choose a file.
   /// This file will be used as the new version for the existing illustration;
-  Future<FilePickerCross?> pickImageForNewVersion(
+  Future<FilePickerResult?> pickImageForNewVersion(
     Illustration illustration,
   ) async {
-    FilePickerCross? pickerResult;
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowedExtensions: Constants.allowedImageExt,
+      allowMultiple: false,
+      type: FileType.custom,
+      withData: true,
+    );
 
-    try {
-      pickerResult = await FilePickerCross.importFromStorage(
-        type: FileTypeCross.image,
-      );
-    } on Exception catch (_) {}
-
-    if (pickerResult == null ||
-        pickerResult.path == null ||
-        !_checkSize(pickerResult)) {
-      return null;
+    if (result == null || result.count == 0) {
+      return result;
     }
 
-    _createNewIllustrationVersion(pickerResult, illustration);
-    return pickerResult;
+    result.files.retainWhere(_checkSize);
+    _createNewIllustrationVersion(result.files.first, illustration);
+    return result;
   }
 
   /// Receive a list of files and try to upload images and create illustrations.
-  Future<List<FilePickerCross>> handleDropFiles(
-    List<FilePickerCross> files,
+  Future handleDropFiles(
+    List<PlatformFile> files,
   ) async {
-    final List<FilePickerCross> filteredFiles = files
-        .where(_checkSize)
-        .where((FilePickerCross file) => file.path != null)
-        .toList();
+    final List<PlatformFile> filteredFiles = files.where(_checkSize).toList();
 
-    for (FilePickerCross file in filteredFiles) {
+    for (PlatformFile file in filteredFiles) {
       _uploadIllustration(file);
     }
-
-    return filteredFiles;
   }
 
   /// Receive a list of files and try to upload images and create illustrations.
-  Future<List<FilePickerCross>> handleDropFilesToBook({
-    required List<FilePickerCross> files,
+  Future<void> handleDropFilesToBook({
+    required List<PlatformFile> files,
     required String bookId,
   }) async {
-    final List<FilePickerCross> filteredFiles = files
-        .where(_checkSize)
-        .where((FilePickerCross file) => file.path != null)
-        .toList();
+    final List<PlatformFile> filteredFiles = files.where(_checkSize).toList();
 
     await _uploadIllustrationToBook(bookId: bookId, files: filteredFiles);
-    return filteredFiles;
   }
 
   /// Select an image file to upload to your illustrations collection,
   /// and add this illustration to the specified book (with its id).
-  Future<List<FilePickerCross>> pickImageAndAddToBook({
+  Future<void> pickImageAndAddToBook({
     required String bookId,
   }) async {
-    List<FilePickerCross>? pickerResult;
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowedExtensions: Constants.allowedImageExt,
+      allowMultiple: true,
+      type: FileType.custom,
+      withData: true,
+    );
 
-    try {
-      pickerResult = await FilePickerCross.importMultipleFromStorage(
-        type: FileTypeCross.image,
-      );
-    } on Exception catch (_) {}
-
-    if (pickerResult == null) {
-      return [];
+    if (result == null || result.count == 0) {
+      return;
     }
 
-    final List<FilePickerCross> passedFiles =
-        pickerResult.where(_checkSize).toList();
+    result.files.retainWhere(_checkSize);
 
-    await _uploadIllustrationToBook(bookId: bookId, files: passedFiles);
-
-    return passedFiles;
+    await _uploadIllustrationToBook(
+      bookId: bookId,
+      files: result.files,
+    );
   }
 
   /// Select an image file to upload as this book's cover,
@@ -223,17 +203,24 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     required String bookId,
   }) async {
     try {
-      FilePickerCross pickerResult = await FilePickerCross.importFromStorage(
-        type: FileTypeCross.image,
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        allowedExtensions: Constants.allowedImageExt,
+        allowMultiple: false,
+        type: FileType.custom,
+        withData: true,
       );
 
-      if (!_checkSize(pickerResult)) {
+      result?.files.retainWhere(_checkSize);
+
+      if (result == null || result.count == 0) {
         return UploadCoverResponse(
-          errorMessage: "book_set_cover_error_size_limit".tr(),
-          file: pickerResult,
+          errorMessage: "book_set_cover_error_no_file_selected".tr(),
+          ignore: true,
           success: false,
         );
       }
+
+      final PlatformFile file = result.files.first;
 
       final HttpsCallableResult response =
           await Utilities.cloud.fun("books-setCover").call({
@@ -244,19 +231,19 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
       if (!response.data["success"]) {
         return UploadCoverResponse(
           errorMessage: "book_set_cover_error_network".tr(),
-          file: pickerResult,
+          file: file,
           success: false,
         );
       }
 
       await _uploadBookCover(
         bookId: bookId,
-        file: pickerResult,
+        file: file,
       );
 
       return UploadCoverResponse(
         errorMessage: "",
-        file: pickerResult,
+        file: file,
         success: true,
       );
     } on Exception catch (error) {
@@ -273,10 +260,11 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
   /// Upload a file to Firebase Storage to use as a book's cover.
   Future<CustomUploadTask> _uploadBookCover({
     required String bookId,
-    required FilePickerCross file,
+    required PlatformFile file,
   }) async {
-    final String fileName =
-        file.fileName ?? "${"unknown".tr()}-${DateTime.now()}";
+    final String fileName = file.name.isNotEmpty
+        ? file.name
+        : "${"unknown".tr()}-${DateTime.now()}";
 
     final customUploadTask = CustomUploadTask(
       name: fileName,
@@ -284,7 +272,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
 
     add(customUploadTask);
 
-    final String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final String userId = FirebaseAuth.instance.currentUser?.uid ?? "";
 
     if (userId.isEmpty) {
       return customUploadTask;
@@ -298,7 +286,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
 
     final storage = FirebaseStorage.instance;
     final UploadTask uploadTask = storage.ref(cloudStorageFilePath).putData(
-        file.toUint8List(),
+        file.bytes ?? Uint8List(0),
         SettableMetadata(
           customMetadata: {
             "book_id": bookId,
@@ -341,12 +329,12 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
   /// Firebase Cloud Storage. Then add this new created illustration to
   /// an existing book.
   Future<void> _uploadIllustrationToBook({
-    required List<FilePickerCross> files,
+    required List<PlatformFile> files,
     required String bookId,
   }) async {
     final List<Future<CustomUploadTask>> futureUploads = [];
 
-    for (FilePickerCross passedFile in files) {
+    for (PlatformFile passedFile in files) {
       futureUploads.add(_uploadIllustration(passedFile));
     }
 
@@ -374,8 +362,12 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
   }
 
   /// Return true if the size is below 25Mo. Return false otherwise.
-  bool _checkSize(FilePickerCross file) {
-    if (file.length > 25 * 1024 * 1024) {
+  bool _checkSize(PlatformFile file) {
+    if (file.bytes == null) {
+      return false;
+    }
+
+    if (file.size > 25 * 1024 * 1024) {
       return false;
     }
 
@@ -383,7 +375,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
   }
 
   Future<CustomUploadTask> _createNewIllustrationVersion(
-    FilePickerCross file,
+    PlatformFile file,
     Illustration illustration,
   ) async {
     final customUploadTask = CustomUploadTask(
@@ -401,9 +393,10 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
     );
   }
 
-  Future<CustomUploadTask> _uploadIllustration(FilePickerCross file) async {
-    final String fileName =
-        file.fileName ?? "${"unknown".tr()}-${DateTime.now()}";
+  Future<CustomUploadTask> _uploadIllustration(PlatformFile file) async {
+    String fileName = file.name.isNotEmpty
+        ? file.name
+        : "${"unknown".tr()}-${DateTime.now()}";
 
     final customUploadTask = CustomUploadTask(
       name: fileName,
@@ -450,7 +443,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
   }
 
   Future<CustomUploadTask> _startStorageUpload({
-    required FilePickerCross file,
+    required PlatformFile file,
     required String fileName,
     required String illustrationId,
     required CustomUploadTask customUploadTask,
@@ -461,7 +454,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
       return customUploadTask;
     }
 
-    String extension = file.fileExtension;
+    String extension = file.extension ?? "";
 
     if (extension.isEmpty) {
       final int lastIndexDot = fileName.lastIndexOf(".") + 1;
@@ -473,7 +466,7 @@ class UploadTaskListNotifier extends StateNotifier<List<CustomUploadTask>> {
 
     final FirebaseStorage storage = FirebaseStorage.instance;
     final UploadTask uploadTask = storage.ref(cloudStorageFilePath).putData(
-        file.toUint8List(),
+        file.bytes ?? Uint8List(0),
         SettableMetadata(
           customMetadata: {
             "extension": extension,

@@ -32,6 +32,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flash/src/flash_helper.dart';
@@ -462,7 +463,7 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
     final firstFile = dropDoneDetails.files.first;
     final int length = await firstFile.length();
 
-    if (length > 25000000) {
+    if (length > Constants.maxFileSize) {
       context.showErrorBar(
         content: Text(
           "illustration_upload_size_limit".tr(
@@ -487,15 +488,16 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
       return;
     }
 
-    final FilePickerCross filePickerCross = FilePickerCross(
-      await firstFile.readAsBytes(),
+    final PlatformFile platformFile = PlatformFile(
+      name: firstFile.name,
+      size: await firstFile.length(),
       path: firstFile.path,
-      type: FileTypeCross.image,
-      fileExtension: extension,
+      bytes: await firstFile.readAsBytes(),
+      readStream: firstFile.openRead(),
     );
 
     ref.read(AppState.uploadTaskListProvider.notifier).handleDropForNewVersion(
-          filePickerCross,
+          platformFile,
           _illustration,
         );
   }
