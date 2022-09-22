@@ -24,7 +24,7 @@ class UserNotifier extends StateNotifier<User> {
     try {
       final HttpsCallableResult response =
           await Utilities.cloud.fun("users-deleteAccount").call({
-        "idToken": idToken,
+        "id_token": idToken,
       });
 
       signOut();
