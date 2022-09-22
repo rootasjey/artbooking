@@ -669,6 +669,10 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
   }
 
   void onTapUser(UserFirestore userFirestore) {
+    if (userFirestore.id.isEmpty) {
+      return;
+    }
+
     final String route = getUserRoute(userFirestore);
     Beamer.of(context).beamToNamed(
       route,
