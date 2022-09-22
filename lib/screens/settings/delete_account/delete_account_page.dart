@@ -88,7 +88,7 @@ class DeleteAccountPageState extends ConsumerState<SettingsPageDeleteAccount> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  Padding(padding: const EdgeInsets.only(top: 15.0)),
+                  Padding(padding: const EdgeInsets.only(top: 6.0)),
                   Text(
                     "• " + "account_deletion_point_2".tr(),
                     style: Utilities.fonts.body(
@@ -116,19 +116,19 @@ class DeleteAccountPageState extends ConsumerState<SettingsPageDeleteAccount> {
     setState(() => _deleting = true);
 
     try {
-      final authUser = ref.read(AppState.userProvider).authUser;
+      final User? authUser = ref.read(AppState.userProvider).authUser;
 
       if (authUser == null) {
         throw ErrorDescription("user_not_connected".tr());
       }
 
-      final credentials = EmailAuthProvider.credential(
-        email: authUser.email ?? '',
+      final AuthCredential credentials = EmailAuthProvider.credential(
+        email: authUser.email ?? "",
         password: password,
       );
 
       await authUser.reauthenticateWithCredential(credentials);
-      final idToken = await authUser.getIdToken();
+      final String idToken = await authUser.getIdToken();
 
       final CloudFunctionsResponse response =
           await ref.read(AppState.userProvider.notifier).deleteAccount(

@@ -110,7 +110,9 @@ class _SearchPageState extends State<SearchPage> {
                   searchFocusNode: _searchFocusNode,
                   searchInputController: _searchInputController,
                 ),
-                preferredSize: Size.fromHeight(180.0),
+                preferredSize: isMobileSize
+                    ? Size.fromHeight(180.0)
+                    : Size.fromHeight(190.0),
               ),
             ),
             SearchPageBody(
