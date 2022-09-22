@@ -232,6 +232,7 @@ export const deleteAccount = functions
 
     await firebaseTools.firestore
       .delete(userSnapshot.ref.path, {
+        force: true,
         project: process.env.GCLOUD_PROJECT,
         recursive: true,
         yes: true,
