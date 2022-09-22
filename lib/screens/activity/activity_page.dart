@@ -78,7 +78,9 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
               child: ActivityPageHeader(
                 isMobileSize: isMobileSize,
               ),
-              preferredSize: Size.fromHeight(110.0),
+              preferredSize: isMobileSize
+                  ? Size.fromHeight(110.0)
+                  : Size.fromHeight(140.0),
             ),
           ),
           SliverList(
