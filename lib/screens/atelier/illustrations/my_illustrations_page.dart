@@ -602,7 +602,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     );
   }
 
-  void deleteIllustration(Illustration illustration, int index) async {
+  void tryDeleteIllustration(Illustration illustration, int index) async {
     setState(() {
       _illustrations.removeAt(index);
     });
@@ -620,7 +620,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
     });
   }
 
-  void deleteGroup() async {
+  void tryDeleteIllustrationGroup() async {
     _multiSelectedItems.entries.forEach((multiSelectItem) {
       _illustrations.removeWhere((item) => item.id == multiSelectItem.key);
     });
@@ -1133,17 +1133,15 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
 
   void onConfirmDelete(Illustration illustration, int index) {
     if (_multiSelectedItems.isEmpty) {
-      deleteIllustration(illustration, index);
+      tryDeleteIllustration(illustration, index);
     } else {
       _multiSelectedItems.putIfAbsent(
         illustration.id,
         () => illustration,
       );
 
-      deleteGroup();
+      tryDeleteIllustrationGroup();
     }
-
-    Beamer.of(context).popRoute();
   }
 
   void onDoubleTapIllustrationItem(Illustration illustration, int index) {
