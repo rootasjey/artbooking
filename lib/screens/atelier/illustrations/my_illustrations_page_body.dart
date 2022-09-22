@@ -70,10 +70,13 @@ class MyIllustrationsPageBody extends StatelessWidget {
   final void Function()? onDragIllustrationCompleted;
 
   /// Callback when illustration dragging has ended.
-  final void Function(DraggableDetails)? onDragIllustrationEnd;
+  final void Function(DraggableDetails draggableDetails)? onDragIllustrationEnd;
 
   /// Callback when illustration dragging has been canceled.
-  final void Function(Velocity, Offset)? onDraggableIllustrationCanceled;
+  final void Function(
+    Velocity velocity,
+    Offset offset,
+  )? onDraggableIllustrationCanceled;
 
   /// Callback when illustration dragging has started.
   final void Function()? onDragIllustrationStarted;
@@ -82,7 +85,10 @@ class MyIllustrationsPageBody extends StatelessWidget {
   final void Function(DragUpdateDetails details)? onDragIllustrationUpdate;
 
   /// Callback when drag and dropping item on this illustration card.
-  final void Function(int, List<int>)? onDropIllustration;
+  final void Function(
+    int dropTargetIndex,
+    List<int> dragIndexes,
+  )? onDropIllustration;
 
   /// Will navigate to active illustrations tab.
   final void Function()? onGoToActiveTab;
@@ -96,7 +102,7 @@ class MyIllustrationsPageBody extends StatelessWidget {
   )? onPopupMenuItemSelected;
 
   /// Callback fired when an illustration card receives a tap event.
-  final void Function(Illustration)? onTapIllustration;
+  final void Function(Illustration illustration)? onTapIllustration;
 
   /// Callback fired to start an illustration upload.
   final void Function()? uploadIllustration;

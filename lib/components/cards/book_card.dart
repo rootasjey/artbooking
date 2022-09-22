@@ -93,10 +93,10 @@ class BookCard extends StatefulWidget {
   final void Function()? onDragCompleted;
 
   /// Callback fired on drag end .
-  final void Function(DraggableDetails)? onDragEnd;
+  final void Function(DraggableDetails draggableDetails)? onDragEnd;
 
   /// Callback fired on drag canceled.
-  final void Function(Velocity, Offset)? onDraggableCanceled;
+  final void Function(Velocity velocity, Offset offset)? onDraggableCanceled;
 
   final void Function(
     Book book,

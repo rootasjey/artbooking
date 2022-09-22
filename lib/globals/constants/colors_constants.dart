@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ColorsConstants {
+  /// All necessary colors for the app.
+  ColorsConstants();
+
   /// Color for statistics.
   final Color activity = Colors.red;
 

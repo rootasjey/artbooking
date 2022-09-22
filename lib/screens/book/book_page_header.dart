@@ -101,7 +101,9 @@ class BookPageHeader extends StatelessWidget {
   final void Function()? onUploadToThisBook;
 
   /// Callback fired when the book's visibility is updated.
-  final void Function(EnumContentVisibility)? onUpdateVisibility;
+  final void Function(
+    EnumContentVisibility contentVisibility,
+  )? onUpdateVisibility;
 
   /// Callback showing a popup/bottom sheet to share the target book
   /// on social network, by link or any other means.

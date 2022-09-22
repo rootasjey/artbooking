@@ -1,4 +1,5 @@
 class StorageKeys {
+  /// Unique keys to store and retrieve data from local storage.
   const StorageKeys();
 
   final String autoBrightness = "autoBrightness";

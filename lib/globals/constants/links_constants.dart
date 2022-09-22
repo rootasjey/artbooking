@@ -1,4 +1,5 @@
 class LinksContants {
+  /// App external links.
   const LinksContants();
 
   final String githubLink = 'https://github.com/rootasjey/artbooking';
