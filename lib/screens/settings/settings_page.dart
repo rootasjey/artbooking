@@ -16,7 +16,7 @@ import 'package:artbooking/types/user/user_social_links.dart';
 import 'package:beamer/beamer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:extended_image/extended_image.dart';
-import 'package:file_picker_cross/file_picker_cross.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
@@ -264,18 +264,32 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   void onUploadProfilePicture() async {
     try {
-      final FilePickerCross choosenFile =
-          await FilePickerCross.importFromStorage(
-        type: FileTypeCross.image,
-        fileExtension: 'jpg,jpeg,png,gif',
-      ).catchError((error) {
-        Utilities.logger.i("Probably cancelled file picker or denied right.");
-        return Future<FilePickerCross>.error(error);
-      });
+      final FilePickerResult? filePickerResult =
+          await FilePicker.platform.pickFiles(
+        allowedExtensions: ["jpg", "jpeg", "png", "gif"],
+        allowMultiple: false,
+        type: FileType.custom,
+        withData: true,
+      );
 
-      if (choosenFile.length >= 5 * 1024 * 1024) {
+      if (filePickerResult == null || filePickerResult.count == 0) {
+        return;
+      }
+
+      final PlatformFile file = filePickerResult.files.first;
+      final Uint8List? bytes = file.bytes;
+
+      if (file.size >= 5 * 1024 * 1024) {
         context.showErrorBar(
           content: Text("image_size_exceeded".tr()),
+        );
+
+        return;
+      }
+
+      if (bytes == null) {
+        context.showErrorBar(
+          content: Text("image_empty_bytes".tr()),
         );
 
         return;
@@ -288,15 +302,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         throw Exception("user_not_connected".tr());
       }
 
-      final fileName = choosenFile.fileName;
-      if (fileName == null) {
-        return;
-      }
+      final String fileName = file.name;
 
-      final extension =
-          fileName.substring(fileName.lastIndexOf('.')).replaceFirst('.', '');
+      final String extension =
+          fileName.substring(fileName.lastIndexOf(".")).replaceFirst(".", "");
 
-      final metadata = SettableMetadata(
+      final SettableMetadata metadata = SettableMetadata(
         contentType: mime(fileName),
         customMetadata: {
           "extension": extension,
@@ -309,9 +320,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       final imagePath =
           "users/${authUser.uid}/profile/picture/original.$extension";
 
-      final task = FirebaseStorage.instance
-          .ref(imagePath)
-          .putData(choosenFile.toUint8List(), metadata);
+      final UploadTask task =
+          FirebaseStorage.instance.ref(imagePath).putData(bytes, metadata);
 
       await task;
     } catch (error) {

@@ -33,7 +33,6 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
@@ -782,15 +781,6 @@ class _IllustrationPageState extends ConsumerState<IllustrationPage> {
 
       final Directory directory = await getApplicationDocumentsDirectory();
       await cleanDirectory(directory);
-
-      final FileQuotaCross quota = await FilePickerCross.quota();
-      final FullMetadata metadata = await fileRef.getMetadata();
-      final int fileSize = metadata.size ?? 0;
-
-      if (quota.remaining <= fileSize) {
-        context.showErrorBar(content: Text("share_error_remaining_space".tr()));
-        return;
-      }
 
       final String path = "${directory.absolute.path}/illustrations/"
           "ephemeral.${_illustration.extension}";
