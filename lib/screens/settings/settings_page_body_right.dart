@@ -110,8 +110,8 @@ class SettingsPageBodyRight extends ConsumerWidget {
         elevation: elevation,
         hoverColor: Constants.colors.password,
         iconData: UniconsLine.lock,
-        textTitle: "security".tr(),
-        textSubtitle: "password_update".tr(),
+        textSubtitle: "security".tr(),
+        textTitle: "password_update".tr(),
         onTap: onGoToUpdatePasssword,
       ),
       AtelierPageCard(
@@ -120,8 +120,8 @@ class SettingsPageBodyRight extends ConsumerWidget {
         elevation: elevation,
         hoverColor: Constants.colors.delete,
         iconData: UniconsLine.trash,
-        textTitle: "security".tr(),
-        textSubtitle: "account_delete".tr(),
+        textSubtitle: "security".tr(),
+        textTitle: "account_delete".tr(),
         onTap: onGoToDeleteAccount,
       ),
     ].map((child) {
