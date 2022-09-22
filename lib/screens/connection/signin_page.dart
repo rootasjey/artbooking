@@ -108,7 +108,7 @@ class _SigninPageState extends ConsumerState<SigninPage> {
         setState(() => _connecting = false);
 
         context.showErrorBar(
-          content: Text("account_doesnt_exist".tr()),
+          content: Text("account_does_not_exist".tr()),
         );
 
         return;
