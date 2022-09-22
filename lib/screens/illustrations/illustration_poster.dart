@@ -6,6 +6,7 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/screens/illustrations/illustration_poster_actions.dart';
 import 'package:artbooking/screens/illustrations/illustration_poster_description.dart';
 import 'package:artbooking/screens/illustrations/illustration_poster_story.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/json_types.dart';
 import 'package:artbooking/types/user/user_firestore.dart';
@@ -434,7 +435,7 @@ class _IllustrationPosterState extends State<IllustrationPoster> {
   /// Fetch author from Firestore doc public data (fast).
   Future<bool> fetchAuthor() async {
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final DocumentSnapshotMap snapshot = await FirebaseFirestore.instance
           .collection("users")
           .doc(widget.illustration.userId)
           .collection("user_public_fields")

@@ -48,7 +48,7 @@ class IllustrationPageBody extends StatelessWidget {
   final Function()? onGoToEditImagePage;
 
   /// Callback fired when tapping on this illustration's owner.
-  final void Function(UserFirestore)? onTapUser;
+  final void Function(UserFirestore userFirestore)? onTapUser;
 
   /// Main data. The view is based on this illustration.
   final Illustration illustration;
