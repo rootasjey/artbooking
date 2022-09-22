@@ -41,7 +41,7 @@ dependencies:
   easy_localization: 3.0.0
   expansion_tile_card: 2.0.0
   extended_image: 6.0.1
-  file_picker: 4.5.1
+  file_picker: 4.6.1
   file_picker_cross: 4.6.0
   firebase_analytics: 9.1.0
   firebase_auth: 3.3.6
