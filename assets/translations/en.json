@@ -26,7 +26,7 @@
     "cooking": "We're cooking some meal for you (not really)",
     "draw": "You can draw a tree something while we're creating your account",
     "duration": "It may takes some seconds",
-    "glad": "We're glad that you decide to join us",
+    "glad": "We're glad that you decided to join us",
     "masterpiece": "We can think about your next masterpiece during this time",
     "profile_page": "We're setting up your default profile page",
     "settings": "We're putting a default configuration for your account"
@@ -39,6 +39,7 @@
   "account_deletion_after": "What happens after?",
   "account_deletion_point_1": "Your personal data will be deleted",
   "account_deletion_point_2": "Your contest, challenges will stay on the platform",
+  "account_does_not_exist": "This account does not exist.",
   "account_recover": "Recover account",
   "action_irreversible": "This action is irreversible",
   "active": "Active",
