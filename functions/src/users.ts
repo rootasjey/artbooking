@@ -424,12 +424,12 @@ export const onCreatePublicInfo = functions
       .collection(USER_PUBLIC_FIELDS_COLLECTION_NAME)
       .doc(BASE_DOCUMENT_NAME)
       .create({
+        bio: data.bio ?? "",
         created_at: adminApp.firestore.FieldValue.serverTimestamp(),
         id: user_id_path_param,
-        location: data.location,
-        name: data.name,
-        profile_picture: data.profile_picture,
-        lore: data.lore,
+        location: data.location ?? "",
+        name: data.name ?? "",
+        profile_picture: data.profile_picture ?? "",
         social_links: data.social_links,
         type: "base",
         updated_at: adminApp.firestore.FieldValue.serverTimestamp(),
