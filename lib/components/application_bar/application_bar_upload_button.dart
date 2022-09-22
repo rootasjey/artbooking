@@ -8,7 +8,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unicons/unicons.dart';
 
 class ApplicationBarUploadButton extends ConsumerWidget {
-  const ApplicationBarUploadButton({Key? key}) : super(key: key);
+  const ApplicationBarUploadButton({
+    Key? key,
+    this.isMobileSize = false,
+  }) : super(key: key);
+
+  /// Will behave slightly differently if true.
+  /// This, in order to adapt UI to mobile size;
+  final bool isMobileSize;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -40,8 +47,8 @@ class ApplicationBarUploadButton extends ConsumerWidget {
       icon: Stack(
         children: [
           Positioned(
-            left: 4.0,
-            top: 2.0,
+            left: isMobileSize ? 4.0 : 0.0,
+            top: isMobileSize ? 2.0 : 0.0,
             child: Icon(
               UniconsLine.upload,
               color: Theme.of(context)

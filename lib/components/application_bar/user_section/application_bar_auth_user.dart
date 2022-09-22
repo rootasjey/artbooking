@@ -45,7 +45,9 @@ class ApplicationBarAuthUser extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           if (!hideSearch) ApplicationBarSearchButton(),
-          ApplicationBarUploadButton(),
+          ApplicationBarUploadButton(
+            isMobileSize: isMobileSize,
+          ),
           if (!isMobileSize) ApplicationBarLangButton(),
           ...trailing,
           AvatarMenu(
