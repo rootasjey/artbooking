@@ -9,7 +9,10 @@ class DarkElevatedButton extends StatelessWidget {
     required this.child,
   }) : super(key: key);
 
+  /// Callback fired when this widget is pressed.
   final void Function()? onPressed;
+
+  /// Child widget.
   final Widget child;
 
   @override

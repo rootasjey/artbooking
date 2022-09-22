@@ -22,8 +22,9 @@ class ApplicationBarGuestUser extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.only(
-        top: 5.0,
+      padding: EdgeInsets.only(
+        top: isMobileSize ? 5.0 : 0.0,
+        bottom: isMobileSize ? 0.0 : 6.0,
         right: 10.0,
       ),
       child: Row(
