@@ -19,13 +19,20 @@ class SettingsPageBody extends StatelessWidget {
     this.onLinkChanged,
     this.profilePictureHeroTag = "",
     this.isMobileSize = false,
+    this.windowWidth = 0.0,
   }) : super(key: key);
 
   /// If true, this widget adapt its layout to small screens.
   final bool isMobileSize;
 
-  /// Current authenticated user.
-  final UserFirestore userFirestore;
+  /// App window's width.
+  final double windowWidth;
+
+  /// Callback fired to edit our biography.
+  final void Function()? onEditBio;
+
+  /// Callback fired to edit our location.
+  final void Function()? onEditLocation;
 
   /// Callback fired when we tap on the profile picture.
   final void Function()? onEditPicture;
@@ -42,12 +49,6 @@ class SettingsPageBody extends StatelessWidget {
   /// Callback fired to navigate to email update page.
   final void Function()? onGoToUpdateEmail;
 
-  /// Callback fired to edit our location.
-  final void Function()? onEditLocation;
-
-  /// Callback fired to edit our biography.
-  final void Function()? onEditBio;
-
   /// Callback fired when a social link has changed.
   final void Function(UserSocialLinks userSocialLinks)? onLinkChanged;
 
@@ -56,6 +57,9 @@ class SettingsPageBody extends StatelessWidget {
 
   /// Hero tag to animate profile picutre on navigation.
   final String profilePictureHeroTag;
+
+  /// Current authenticated user.
+  final UserFirestore userFirestore;
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +97,7 @@ class SettingsPageBody extends StatelessWidget {
           onGoToUpdateEmail: onGoToUpdateEmail,
           onGoToUpdatePasssword: onGoToUpdatePasssword,
           onGoToUpdateUsername: onGoToUpdateUsername,
+          windowWidth: windowWidth,
         ),
       ],
     );

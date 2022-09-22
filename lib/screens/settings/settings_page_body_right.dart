@@ -12,20 +12,27 @@ class SettingsPageBodyRight extends ConsumerWidget {
   const SettingsPageBodyRight({
     Key? key,
     required this.userFirestore,
+    this.isMobileSize = false,
+    this.windowWidth = 0.0,
+    this.onEditBio,
+    this.onEditLocation,
     this.onGoToDeleteAccount,
     this.onGoToUpdatePasssword,
     this.onGoToUpdateUsername,
     this.onGoToUpdateEmail,
-    this.onEditLocation,
-    this.onEditBio,
-    this.isMobileSize = false,
   }) : super(key: key);
 
   /// If true, this widget adapt its layout to small screens.
   final bool isMobileSize;
 
-  /// Current authenticated user.
-  final UserFirestore userFirestore;
+  /// App window's width.
+  final double windowWidth;
+
+  /// Callback fired to edit our biography.
+  final void Function()? onEditBio;
+
+  /// Callback fired when we tap on the profile picture.
+  final void Function()? onEditLocation;
 
   /// Callback fired to navigate to account deletion.
   final void Function()? onGoToDeleteAccount;
@@ -39,29 +46,28 @@ class SettingsPageBodyRight extends ConsumerWidget {
   /// Callback fired to navigate to email update page.
   final void Function()? onGoToUpdateEmail;
 
-  /// Callback fired when we tap on the profile picture.
-  final void Function()? onEditLocation;
-
-  /// Callback fired to edit our biography.
-  final void Function()? onEditBio;
+  /// Current authenticated user.
+  final UserFirestore userFirestore;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final double width = MediaQuery.of(context).size.width;
     final bool expanded = ref.watch(AppState.dashboardSideMenuOpenProvider);
-    bool compact = width < 1400.0 && expanded;
+    bool compact = windowWidth < 1400.0 && expanded;
 
     if (isMobileSize) {
       compact = false;
     }
+
+    final double elevation = windowWidth < 1400.0 ? 0.0 : 2.0;
+    final bool isWide = windowWidth < 1400.0;
 
     int index = 0;
 
     final List<Widget> children = [
       AtelierPageCard(
         compact: compact,
-        isWide: isMobileSize,
-        elevation: isMobileSize ? 0.0 : 2.0,
+        isWide: isWide,
+        elevation: elevation,
         hoverColor: Constants.colors.activity,
         iconData: UniconsLine.space_key,
         textTitle: "username".tr(),
@@ -70,8 +76,8 @@ class SettingsPageBodyRight extends ConsumerWidget {
       ),
       AtelierPageCard(
         compact: compact,
-        isWide: isMobileSize,
-        elevation: isMobileSize ? 0.0 : 2.0,
+        isWide: isWide,
+        elevation: elevation,
         hoverColor: Constants.colors.email,
         iconData: UniconsLine.envelope,
         textTitle: "email".tr(),
@@ -80,8 +86,8 @@ class SettingsPageBodyRight extends ConsumerWidget {
       ),
       AtelierPageCard(
         compact: compact,
-        isWide: isMobileSize,
-        elevation: isMobileSize ? 0.0 : 2.0,
+        isWide: isWide,
+        elevation: elevation,
         hoverColor: Constants.colors.location,
         iconData: UniconsLine.location_point,
         textTitle: "location".tr(),
@@ -90,8 +96,8 @@ class SettingsPageBodyRight extends ConsumerWidget {
       ),
       AtelierPageCard(
         compact: compact,
-        isWide: isMobileSize,
-        elevation: isMobileSize ? 0.0 : 2.0,
+        isWide: isWide,
+        elevation: elevation,
         hoverColor: Constants.colors.bio,
         iconData: UniconsLine.subject,
         textTitle: "bio".tr(),
@@ -100,8 +106,8 @@ class SettingsPageBodyRight extends ConsumerWidget {
       ),
       AtelierPageCard(
         compact: compact,
-        isWide: isMobileSize,
-        elevation: isMobileSize ? 0.0 : 2.0,
+        isWide: isWide,
+        elevation: elevation,
         hoverColor: Constants.colors.password,
         iconData: UniconsLine.lock,
         textTitle: "security".tr(),
@@ -110,8 +116,8 @@ class SettingsPageBodyRight extends ConsumerWidget {
       ),
       AtelierPageCard(
         compact: compact,
-        isWide: isMobileSize,
-        elevation: isMobileSize ? 0.0 : 2.0,
+        isWide: isWide,
+        elevation: elevation,
         hoverColor: Constants.colors.delete,
         iconData: UniconsLine.trash,
         textTitle: "security".tr(),

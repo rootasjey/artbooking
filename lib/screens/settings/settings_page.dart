@@ -58,7 +58,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       );
     }
 
-    final bool isMobileSize = Utilities.size.isMobileSize(context);
+    final double windowWidth = MediaQuery.of(context).size.width;
+    final bool isMobileSize = windowWidth < Utilities.size.mobileWidthTreshold;
 
     return Scaffold(
       body: NotificationListener<ScrollNotification>(
@@ -74,7 +75,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     child: SettingsPageHeader(
                       isMobileSize: isMobileSize,
                     ),
-                    preferredSize: Size.fromHeight(120.0),
+                    preferredSize: isMobileSize
+                        ? Size.fromHeight(120.0)
+                        : Size.fromHeight(160.0),
                   ),
                 ),
                 SettingsPageBody(
@@ -90,6 +93,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   onGoToUpdateUsername: onGoToUpdateUsername,
                   onUploadPicture: onUploadProfilePicture,
                   onLinkChanged: onUrlChanged,
+                  windowWidth: windowWidth,
                 ),
               ],
             ),
