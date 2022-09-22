@@ -17,6 +17,7 @@ class ApplicationBar extends ConsumerWidget {
   ApplicationBar({
     this.minimal = false,
     this.pinned = true,
+    this.showUserSection = true,
     this.bottom,
     this.right,
   });
@@ -26,6 +27,10 @@ class ApplicationBar extends ConsumerWidget {
 
   /// Whether the app bar should remain visible at the start of the scroll view.
   final bool pinned;
+
+  /// Display user's menu if authenticated or signin/up button is not.
+  /// If this property is false, the place will be empty.
+  final bool showUserSection;
 
   /// This widget appears across the bottom of the app bar.
   final PreferredSizeWidget? bottom;
@@ -92,15 +97,16 @@ class ApplicationBar extends ConsumerWidget {
                 ],
               ),
               if (!minimal) mainSection(isMobileSize),
-              userSection(
-                context,
-                ref: ref,
-                isMobileSize: isMobileSize,
-                minimal: minimal,
-                isAuthenticated: userNotifier.isAuthenticated,
-                initials: initials,
-                avatarUrl: avatarUrl ?? "",
-              ),
+              if (showUserSection)
+                userSection(
+                  context,
+                  ref: ref,
+                  isMobileSize: isMobileSize,
+                  minimal: minimal,
+                  isAuthenticated: userNotifier.isAuthenticated,
+                  initials: initials,
+                  avatarUrl: avatarUrl ?? "",
+                ),
               if (right != null) rightWidget,
             ],
           ),

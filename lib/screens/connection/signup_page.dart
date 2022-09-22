@@ -86,6 +86,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
               iconSize: 32.0,
               padding: EdgeInsets.zero,
             ),
+            showUserSection: false,
           ),
           SignupPageBody(
             isMobileSize: isMobileSize,
