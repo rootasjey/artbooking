@@ -10,7 +10,7 @@ class BooksActions {
     required List<String> illustrationIds,
   }) async {
     try {
-      final response =
+      final HttpsCallableResult response =
           await Utilities.cloud.fun("books-addIllustrations").call({
         "book_id": bookId,
         "illustration_ids": illustrationIds,
@@ -31,7 +31,8 @@ class BooksActions {
     required bool approved,
   }) async {
     try {
-      final response = await Utilities.cloud.fun("books-approve").call({
+      final HttpsCallableResult response =
+          await Utilities.cloud.fun("books-approve").call({
         "book_id": bookId,
         "approved": approved,
       });
@@ -52,7 +53,8 @@ class BooksActions {
     List<String?> illustrationIds = const [],
   }) async {
     try {
-      final response = await Utilities.cloud.fun("books-createOne").call({
+      final HttpsCallableResult response =
+          await Utilities.cloud.fun("books-createOne").call({
         "name": name,
         "description": description,
         "illustration_ids": illustrationIds,
@@ -72,7 +74,8 @@ class BooksActions {
     required String? bookId,
   }) async {
     try {
-      final response = await Utilities.cloud.fun("books-deleteOne").call({
+      final HttpsCallableResult response =
+          await Utilities.cloud.fun("books-deleteOne").call({
         "book_id": bookId,
       });
 
@@ -90,7 +93,8 @@ class BooksActions {
     required List<String?> bookIds,
   }) async {
     try {
-      final response = await Utilities.cloud.fun("books-deleteMany").call({
+      final HttpsCallableResult response =
+          await Utilities.cloud.fun("books-deleteMany").call({
         "book_ids": bookIds,
       });
 
@@ -109,7 +113,7 @@ class BooksActions {
     required List<String?> illustrationIds,
   }) async {
     try {
-      final response =
+      final HttpsCallableResult response =
           await Utilities.cloud.fun("books-removeIllustrations").call({
         "book_id": bookId,
         "illustration_ids": illustrationIds,
@@ -132,7 +136,8 @@ class BooksActions {
     required String bookId,
   }) async {
     try {
-      final response = await Utilities.cloud.fun("books-renameOne").call({
+      final HttpsCallableResult response =
+          await Utilities.cloud.fun("books-renameOne").call({
         "name": name,
         "description": description,
         "book_id": bookId,
@@ -154,7 +159,7 @@ class BooksActions {
     required List<int> dragIndexes,
   }) async {
     try {
-      final response =
+      final HttpsCallableResult response =
           await Utilities.cloud.fun("books-reorderIllustrations").call({
         "book_id": bookId,
         "drop_index": dropIndex,

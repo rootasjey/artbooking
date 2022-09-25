@@ -364,6 +364,10 @@ class AtelierLocationContent extends BeamLocation<BeamState> {
   }
 
   EnumLicenseType getLicenseType(Object? routeState) {
+    if (routeState == null) {
+      return EnumLicenseType.user;
+    }
+
     final mapState = routeState as Map<String, dynamic>;
 
     if (mapState["type"] == "staff") {
