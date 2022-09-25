@@ -262,7 +262,7 @@
   "book_loading": "Loading book",
   "book_name": "Book's name",
   "book_no_illustration": "This book is currently empty.",
-  "book_owner_no_illustrations": "You haven't added any illustration to this book yet. You can add one from your illustrations page.",
+  "book_owner_no_illustration": "You haven't added any illustration to this book yet. You can add one from your illustrations page.",
   "book_permutation_description": "Drop this book on another one to permute them.",
   "book_rename": "Rename book",
   "book_rename_description": "Give a new name or description to this book.",
