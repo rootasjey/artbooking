@@ -835,7 +835,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
   }
 
   /// Return the query without an initial document for pagination.
-  /// This query can used to listen to documents.
+  /// This query can be used to listen to documents.
   QueryMap? getInitialListenQuery() {
     final String userId = getUserId();
 
@@ -1593,7 +1593,7 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
             _descriptionController.text,
           );
 
-          if (createdBookId.isEmpty) {
+          if (createdBookId.isEmpty || files.isEmpty) {
             return;
           }
 
