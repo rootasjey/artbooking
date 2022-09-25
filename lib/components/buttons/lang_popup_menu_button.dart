@@ -1,4 +1,4 @@
-import 'package:artbooking/components/popup_menu/popup_menu_list_tile.dart';
+import 'package:artbooking/components/popup_menu/popup_menu_toggle_item.dart';
 import 'package:artbooking/globals/constants.dart';
 import 'package:artbooking/globals/utilities.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -24,7 +24,7 @@ class LangPopupMenuButton extends StatelessWidget {
   final String lang;
 
   /// Called when language has changed.
-  final Function(String) onLangChanged;
+  final Function(String newLanguage) onLangChanged;
 
   /// Widget's opacity.
   final double opacity;
@@ -45,43 +45,45 @@ class LangPopupMenuButton extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         elevation: elevation,
-        borderRadius: BorderRadius.circular(4.0),
+        borderRadius: BorderRadius.circular(6.0),
+        clipBehavior: Clip.hardEdge,
         child: Opacity(
           opacity: opacity,
           child: PopupMenuButton<String>(
             tooltip: "language_change".tr(),
             child: outlined ? outlinedButton(context) : textButton(context),
             onSelected: onLangChanged,
-            itemBuilder: (context) => Utilities.lang.available().map(
-              (languageCode) {
-                final bool selected =
-                    context.locale.languageCode == languageCode;
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(6.0),
+            ),
+            itemBuilder: (BuildContext tcontext) {
+              int index = 0;
 
-                final Color? color = selected
-                    ? Theme.of(context).primaryColor
-                    : Theme.of(context)
-                        .textTheme
-                        .bodyText2
-                        ?.color
-                        ?.withOpacity(0.6);
+              return Utilities.lang.available().map(
+                (final String languageCode) {
+                  index++;
 
-                return PopupMenuItem(
-                  value: languageCode,
-                  child: PopupMenuListTile(
-                    title: Text(
-                      Utilities.lang.toFullString(languageCode),
-                      style: Utilities.fonts.body(
-                        color: color,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    trailing: getTrailing(
-                      selected,
-                    ),
-                  ),
-                );
-              },
-            ).toList(),
+                  final bool selected =
+                      context.locale.languageCode == languageCode;
+
+                  final Color? color = selected
+                      ? Theme.of(context).primaryColor
+                      : Theme.of(context)
+                          .textTheme
+                          .bodyText2
+                          ?.color
+                          ?.withOpacity(0.6);
+
+                  return PopupMenuToggleItem<String>(
+                    delay: Duration(milliseconds: 25 * index),
+                    textLabel: Utilities.lang.toFullString(languageCode),
+                    value: languageCode,
+                    selected: selected,
+                    foregroundColor: color,
+                  );
+                },
+              ).toList();
+            },
           ),
         ),
       ),
