@@ -324,6 +324,7 @@ export const deleteOne = functions
 
     await firebaseTools.firestore
       .delete(bookSnap.ref.path, {
+        force: true,
         project: process.env.GCLOUD_PROJECT,
         recursive: true,
         yes: true,
@@ -404,6 +405,7 @@ export const deleteMany = functions
 
         await firebaseTools.firestore
           .delete(bookSnapshot.ref.path, {
+            force: true,
             project: process.env.GCLOUD_PROJECT,
             recursive: true,
             yes: true,
