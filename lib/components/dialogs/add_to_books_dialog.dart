@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:artbooking/actions/books.dart';
 import 'package:artbooking/components/buttons/dark_elevated_button.dart';
+import 'package:artbooking/components/cards/book_tile.dart';
 import 'package:artbooking/components/dialogs/input_dialog.dart';
 import 'package:artbooking/components/dialogs/themed_dialog.dart';
 import 'package:artbooking/components/texts/outlined_text_field.dart';
@@ -18,7 +19,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash/src/flash_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:unicons/unicons.dart';
 import 'package:supercharged/supercharged.dart';
 
@@ -165,150 +165,18 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
                   final Book book = _books.elementAt(index);
-                  return bookTile(book);
+
+                  return BookTile(
+                    book: book,
+                    onTapBook: onTapBook,
+                    selected: _selectedBooks.contains(book),
+                  );
                 },
                 childCount: _books.length,
               ),
             )
           ],
         ),
-      ),
-    );
-  }
-
-  Widget bookTile(Book book) {
-    String updatedAt = "";
-
-    if (DateTime.now().difference(book.updatedAt).inDays > 60) {
-      updatedAt = "date_updated_on".tr(
-        args: [Jiffy(book.updatedAt).yMMMMEEEEd],
-      ).toLowerCase();
-    } else {
-      updatedAt = "date_updated_ago".tr(
-        args: [Jiffy(book.updatedAt).fromNow()],
-      ).toLowerCase();
-    }
-
-    final double cardWidth = 100.0;
-    final double cardHeight = 100.0;
-
-    final bool selected = _selectedBooks.contains(book);
-    final Color primaryColor = Theme.of(context).primaryColor;
-    final BorderSide borderSide = selected
-        ? BorderSide(color: primaryColor, width: 2.0)
-        : BorderSide.none;
-
-    final Color? textColor = selected ? Colors.white : null;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Stack(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: cardHeight,
-                width: cardWidth,
-                child: Card(
-                  elevation: 3.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    side: borderSide,
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: Ink.image(
-                    image: NetworkImage(book.getCoverLink()),
-                    width: cardWidth,
-                    height: cardHeight,
-                    fit: BoxFit.cover,
-                    child: InkWell(
-                      onTap: () => onTapBook(book),
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 4.0, right: 12.0),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(8.0),
-                    onTap: () => onTapBook(book),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Container(
-                        color: selected ? primaryColor : null,
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Opacity(
-                              opacity: 0.8,
-                              child: Text(
-                                book.name,
-                                maxLines: 1,
-                                style: Utilities.fonts.body(
-                                  color: textColor,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                            ),
-                            Opacity(
-                              opacity: 0.4,
-                              child: Text(
-                                book.description,
-                                maxLines: 1,
-                                style: Utilities.fonts.body(
-                                  color: textColor,
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            Opacity(
-                              opacity: 0.6,
-                              child: Text(
-                                "illustrations_count".plural(book.count),
-                                maxLines: 1,
-                                style: Utilities.fonts.body(
-                                  color: textColor,
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            Opacity(
-                              opacity: 0.3,
-                              child: Text(
-                                updatedAt,
-                                maxLines: 1,
-                                style: Utilities.fonts.body(
-                                  color: textColor,
-                                  fontSize: 13.0,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          if (selected)
-            Positioned(
-              right: 18.0,
-              top: 0.0,
-              bottom: 0.0,
-              child: Icon(
-                UniconsLine.check_circle,
-                color: textColor,
-              ),
-            ),
-        ],
       ),
     );
   }
@@ -499,7 +367,12 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
                   delegate: SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
                       final Book book = _books.elementAt(index);
-                      return bookTile(book);
+
+                      return BookTile(
+                        book: book,
+                        onTapBook: onTapBook,
+                        selected: _selectedBooks.contains(book),
+                      );
                     },
                     childCount: _books.length,
                   ),
