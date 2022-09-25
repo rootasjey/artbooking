@@ -480,7 +480,7 @@ class _IllustrationCardState extends State<IllustrationCard>
       );
     }
 
-    if (illustration.id.isEmpty) {
+    if (illustration.links.storage.isEmpty) {
       cardChild = Opacity(
         opacity: 0.4,
         child: cardChild,
@@ -662,7 +662,23 @@ class _IllustrationCardState extends State<IllustrationCard>
               widget.illustrationKey,
             );
           },
-          itemBuilder: (_) => widget.popupMenuEntries,
+          itemBuilder: (BuildContext context) {
+            final entries = widget.popupMenuEntries;
+
+            if (widget.illustration.links.storage.isNotEmpty) {
+              return entries;
+            }
+
+            return entries.filter(
+              (PopupMenuEntry<EnumIllustrationItemAction> entry) {
+                final popEntry =
+                    entry as PopupMenuItemIcon<EnumIllustrationItemAction>;
+
+                return (popEntry).value ==
+                    EnumIllustrationItemAction.removeFromBook;
+              },
+            ).toList();
+          },
         ),
       ),
     );
