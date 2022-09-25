@@ -1451,8 +1451,11 @@ class _MyBookPageState extends ConsumerState<BookPage> {
       bookId: _book.id,
     );
 
+    _bookSubscription?.cancel();
+
     Beamer.of(context).beamToNamed(
       AtelierLocationContent.booksRoute,
+      routeState: {"deletingBookId": _book.id},
     );
   }
 

@@ -497,6 +497,30 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
     );
   }
 
+  /// Check if there's a book being deleted to eagerly remove it from UI.
+  /// This method is called on route update (navgiation back from BookPage).
+  void checkDeletingBookFromNavigation() {
+    final Object? routeState =
+        context.currentBeamLocation.state.routeInformation.state;
+
+    if (routeState == null) {
+      return;
+    }
+
+    final mapState = routeState as Map<String, dynamic>;
+    final String deletingBookId = mapState["deletingBookId"] ?? "";
+
+    if (deletingBookId.isEmpty) {
+      return;
+    }
+
+    if (deletingBookId.isNotEmpty) {
+      setState(() {
+        _books.removeWhere((Book b) => b.id == deletingBookId);
+      });
+    }
+  }
+
   void clearSelection() {
     setState(() {
       _multiSelectedItems.clear();
@@ -1360,6 +1384,8 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         .location;
 
     _enableFileDrop = stringLocation == AtelierLocationContent.booksRoute;
+
+    checkDeletingBookFromNavigation();
   }
 
   /// Callback when the page scrolls up and down.
