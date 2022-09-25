@@ -221,7 +221,7 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
   QuerySnapshotStreamSubscription? _illustrationSubscription;
 
   /// Page scroll controller.
-  final _pageScrollController = ScrollController();
+  final ScrollController _pageScrollController = ScrollController();
 
   /// This illustration page owner's name.
   /// Used when the current authenticated user is different
@@ -668,7 +668,8 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
       final QueryMap query = getFetchQuery();
       final QuerySnapMap snapshot = await query.get();
 
-      // TODO: Listen to collection even if empty.
+      listenIllustrationsEvents(getListenQuery());
+
       if (snapshot.docs.isEmpty) {
         setState(() {
           _loading = false;
@@ -689,8 +690,6 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         _lastDocument = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
       });
-
-      listenIllustrationsEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
@@ -894,11 +893,41 @@ class _MyIllustrationsPageState extends ConsumerState<MyIllustrationsPage> {
         .startAfterDocument(lastDocument);
   }
 
+  /// Return the query without an initial document for pagination.
+  /// This query can be used to listen to documents.
+  QueryMap? getInitialListenQuery() {
+    final String userId = getUserId();
+
+    if (!getIsOwner()) {
+      return FirebaseFirestore.instance
+          .collection("illustrations")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", isEqualTo: "public")
+          .orderBy("user_custom_index", descending: true);
+    }
+
+    if (_selectedTab == EnumVisibilityTab.active) {
+      return FirebaseFirestore.instance
+          .collection("illustrations")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", whereIn: ["public", "private"]).orderBy(
+              "user_custom_index",
+              descending: true);
+    }
+
+    return FirebaseFirestore.instance
+        .collection("illustrations")
+        .where("user_id", isEqualTo: userId)
+        .where("visibility", isEqualTo: "archived")
+        .orderBy("user_custom_index", descending: true);
+  }
+
   /// Return the query to listen changes to.
   QueryMap? getListenQuery() {
     final DocumentSnapshot? lastDocument = _lastDocument;
+
     if (lastDocument == null) {
-      return null;
+      return getInitialListenQuery();
     }
 
     final String userId = getUserId();
