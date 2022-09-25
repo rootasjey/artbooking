@@ -379,13 +379,13 @@ class _AddToBooksDialogState extends State<AddToBooksDialog> {
 
   Widget footer({void Function()? onValidate}) {
     return Material(
-      elevation: 4.0,
+      elevation: 0.0,
       color: Constants.colors.clairPink,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
-            padding: EdgeInsets.all(12.0),
+            padding: EdgeInsets.all(6.0),
             child: widget.asBottomSheet
                 ? DarkElevatedButton(
                     onPressed: onValidate,

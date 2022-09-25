@@ -12,13 +12,13 @@ class ThemedDialog extends StatelessWidget {
     Key? key,
     required this.body,
     required this.onCancel,
-    required this.textButtonValidation,
     this.onValidate,
     this.title,
     this.focusNode,
     this.centerTitle = true,
     this.spaceActive = true,
     this.autofocus = true,
+    this.textButtonValidation = "",
     this.titleValue = "",
     this.subtitleValue = "",
     this.showDivider = false,
@@ -84,6 +84,7 @@ class ThemedDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget _titleWidget = Container();
+
     if (title != null) {
       _titleWidget = titleContainer(
         color: Theme.of(context).secondaryHeaderColor,
@@ -97,11 +98,12 @@ class ThemedDialog extends StatelessWidget {
     }
 
     Widget _footerWidget = Container();
+
     if (footer != null) {
       _footerWidget = footer as Widget;
     } else {
       _footerWidget = Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
+        padding: const EdgeInsets.only(bottom: 0.0),
         child: footerButtons(),
       );
     }
@@ -132,6 +134,11 @@ class ThemedDialog extends StatelessWidget {
               ],
             ),
           ),
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            side: BorderSide.none,
+            borderRadius: BorderRadius.circular(12.0),
+          ),
         ),
       );
     }
@@ -159,6 +166,11 @@ class ThemedDialog extends StatelessWidget {
           if (showDivider) Divider(),
           _footerWidget,
         ],
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          side: BorderSide.none,
+          borderRadius: BorderRadius.circular(12.0),
+        ),
       ),
     );
   }
@@ -178,7 +190,7 @@ class ThemedDialog extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.all(24.0),
+          padding: EdgeInsets.all(6.0),
           child: DarkElevatedButton.large(
             onPressed: onValidate,
             child: Text(textButtonValidation),
