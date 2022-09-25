@@ -65,7 +65,10 @@ class BookPageBody extends StatelessWidget {
   )? onPopupMenuItemSelected;
 
   /// Callback fired when an illustration card is tapped.
-  final void Function(String, Illustration)? onTapIllustrationCard;
+  final void Function(
+    String key,
+    Illustration illustration,
+  )? onTapIllustrationCard;
 
   /// Upload a new illustration and add it to this book.
   final void Function()? onUploadToThisBook;
@@ -74,7 +77,10 @@ class BookPageBody extends StatelessWidget {
   final void Function()? onBrowseIllustrations;
 
   /// Callback when drag and dropping item on this illustration card.
-  final void Function(int, List<int>)? onDropIllustration;
+  final void Function(
+    int dropTargetIndex,
+    List<int> dragIndexes,
+  )? onDropIllustration;
 
   /// Callback when dragging a book around.
   final void Function(DragUpdateDetails details)? onDragUpdateBook;

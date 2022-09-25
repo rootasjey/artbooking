@@ -34,9 +34,11 @@ import 'package:artbooking/globals/utilities.dart';
 import 'package:artbooking/types/enums/enum_share_content_type.dart';
 import 'package:artbooking/types/firestore/document_map.dart';
 import 'package:artbooking/types/firestore/doc_snapshot_stream_subscription.dart';
+import 'package:artbooking/types/firestore/document_snapshot_map.dart';
 import 'package:artbooking/types/illustration/illustration.dart';
 import 'package:artbooking/types/illustration/popup_entry_illustration.dart';
 import 'package:artbooking/types/illustration_map.dart';
+import 'package:artbooking/types/json_types.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -125,9 +127,10 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   ///
   /// -> for [_multiSelectedItems] allow instant access to know
   /// if an illustration is currently in multi-select.
-  final _illustrationMap = IllustrationMap();
+  final IllustrationMap _illustrationMap = IllustrationMap();
+
   // final _illustrationList = <Illustration>[];
-  final _keyboardFocusNode = FocusNode();
+  final FocusNode _keyboardFocusNode = FocusNode();
 
   /// Illustrations' ids matching [book.illustrationMap].
   /// Generated keys instead of simple ids due to possible duplicates.
@@ -184,7 +187,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   ScrollController _pageScrollController = ScrollController();
 
   /// String separator to generate unique key for illustrations.
-  final String _keySeparator = '--';
+  final String _keySeparator = "--";
 
   @override
   initState() {
@@ -428,7 +431,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
       return;
     }
 
-    final illustrationsBook = _book.illustrations;
+    final List<BookIllustration> illustrationsBook = _book.illustrations;
 
     setState(() {
       _loading = true;
@@ -452,34 +455,42 @@ class _MyBookPageState extends ConsumerState<BookPage> {
 
     for (BookIllustration bookIllustration in range) {
       try {
-        final illustrationSnapshot = await FirebaseFirestore.instance
+        final DocumentSnapshotMap illustrationSnapshot = await FirebaseFirestore
+            .instance
             .collection("illustrations")
             .doc(bookIllustration.id)
             .get();
 
-        final illustrationData = illustrationSnapshot.data();
+        final Json? illustrationData = illustrationSnapshot.data();
         if (!illustrationSnapshot.exists || illustrationData == null) {
           continue;
         }
 
         illustrationData["id"] = illustrationSnapshot.id;
-        final illustration = Illustration.fromMap(illustrationData);
+
+        final Illustration illustration = Illustration.fromMap(
+          illustrationData,
+        );
 
         _illustrationMap.putIfAbsent(
           Utilities.generateIllustrationKey(bookIllustration),
           () => illustration,
         );
-
-        setState(() => _loading = false);
       } catch (error) {
         Utilities.logger.e(error);
         illustrationsErrors.add(bookIllustration.id);
 
-        final missingIllustration = Illustration.empty();
+        final Illustration missingIllustration = Illustration.empty(
+          id: bookIllustration.id,
+          userId: _book.userId,
+        );
+
         _illustrationMap.putIfAbsent(
           Utilities.generateIllustrationKey(bookIllustration),
           () => missingIllustration,
         );
+      } finally {
+        setState(() => _loading = false);
       }
     }
 
@@ -489,7 +500,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   void fetchIllustrationsAndListenToUpdates() {
     fetchIllustrations();
 
-    final query =
+    final DocumentMap query =
         FirebaseFirestore.instance.collection("books").doc(widget.bookId);
 
     listenBook(query);
@@ -504,11 +515,13 @@ class _MyBookPageState extends ConsumerState<BookPage> {
     _endIndex = _endIndex + _limit;
     _loadingMore = true;
 
-    final range = _book.illustrations.getRange(_startIndex, _endIndex);
+    final Iterable<BookIllustration> range =
+        _book.illustrations.getRange(_startIndex, _endIndex);
 
     try {
-      for (var bookIllustration in range) {
-        final illustrationSnap = await FirebaseFirestore.instance
+      for (final BookIllustration bookIllustration in range) {
+        final DocumentSnapshotMap illustrationSnap = await FirebaseFirestore
+            .instance
             .collection("illustrations")
             .doc(bookIllustration.id)
             .get();
@@ -517,10 +530,13 @@ class _MyBookPageState extends ConsumerState<BookPage> {
           continue;
         }
 
-        final illustrationData = illustrationSnap.data()!;
-        illustrationData['id'] = illustrationSnap.id;
+        final Json illustrationData = illustrationSnap.data()!;
+        illustrationData["id"] = illustrationSnap.id;
 
-        final illustration = Illustration.fromMap(illustrationData);
+        final Illustration illustration = Illustration.fromMap(
+          illustrationData,
+        );
+
         _illustrationMap.putIfAbsent(
           Utilities.generateIllustrationKey(bookIllustration),
           () => illustration,
@@ -562,7 +578,7 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   }
 
   String getIllustratioinNavRoute(Illustration illustration) {
-    final location = Beamer.of(context)
+    final String? location = Beamer.of(context)
         .beamingHistory
         .last
         .history
@@ -632,15 +648,15 @@ class _MyBookPageState extends ConsumerState<BookPage> {
           .collection("illustrations")
           .doc(illustrationId);
 
-      final illustrationSnap = await query.get();
-      final illustrationData = illustrationSnap.data();
+      final DocumentSnapshotMap illustrationSnap = await query.get();
+      final Json? illustrationData = illustrationSnap.data();
 
       if (!illustrationSnap.exists || illustrationData == null) {
         continue;
       }
 
       illustrationData["id"] = illustrationSnap.id;
-      final illustration = Illustration.fromMap(illustrationData);
+      final Illustration illustration = Illustration.fromMap(illustrationData);
 
       setState(() {
         _illustrationMap.putIfAbsent(
@@ -689,13 +705,13 @@ class _MyBookPageState extends ConsumerState<BookPage> {
   void listenBook(DocumentReference<Map<String, dynamic>> query) {
     _bookSubscription = query.snapshots().skip(1).listen(
       (DocumentSnapshot<Map<String, dynamic>> snapshot) {
-        final bookData = snapshot.data();
+        final Json? bookData = snapshot.data();
         if (!snapshot.exists || bookData == null) {
           return;
         }
 
         setState(() {
-          bookData['id'] = snapshot.id;
+          bookData["id"] = snapshot.id;
           _book = Book.fromMap(bookData);
           _currentIllustrationKeys = _book.illustrations
               .map((bookIllustration) =>

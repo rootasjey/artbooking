@@ -18,15 +18,15 @@ class Illustration {
     required this.links,
     required this.updatedAt,
     this.artMovements = const [],
-    this.description = '',
-    this.extension = '',
-    this.id = '',
+    this.description = "",
+    this.extension = "",
+    this.id = "",
     this.liked = false,
-    this.name = '',
+    this.name = "",
     this.size = 0,
-    this.lore = '',
+    this.lore = "",
     this.topics = const [],
-    this.userId = '',
+    this.userId = "",
     this.version = 0,
     this.visibility = EnumContentVisibility.private,
     this.userCustomIndex = 0,
@@ -277,23 +277,23 @@ class Illustration {
 
   Map<String, dynamic> toMap() {
     return {
-      'art_movements': artMovements,
-      'created_at': createdAt.millisecondsSinceEpoch,
-      'description': description,
-      'dimensions': dimensions.toMap(),
-      'extension': extension,
-      'id': id,
-      'license': license.toMap(),
-      'liked': liked,
-      'name': name,
-      'lore': lore,
-      'size': size,
-      'topics': topics,
-      'updated_at': updatedAt.millisecondsSinceEpoch,
-      'user_id': userId,
-      'user_custom_index': userCustomIndex,
-      'version': version,
-      'visibility': visibility.name,
+      "art_movements": artMovements,
+      "created_at": createdAt.millisecondsSinceEpoch,
+      "description": description,
+      "dimensions": dimensions.toMap(),
+      "extension": extension,
+      "id": id,
+      "license": license.toMap(),
+      "liked": liked,
+      "name": name,
+      "lore": lore,
+      "size": size,
+      "topics": topics,
+      "updated_at": updatedAt.millisecondsSinceEpoch,
+      "user_id": userId,
+      "user_custom_index": userCustomIndex,
+      "version": version,
+      "visibility": visibility.name,
     };
   }
 
@@ -304,13 +304,13 @@ class Illustration {
 
   @override
   String toString() {
-    return 'Illustration(createdAt: $createdAt, description: $description, '
-        'dimensions: $dimensions, extension: $extension, id: $id, '
-        'license: $license, liked: $liked, name: $name, lore: $lore, '
-        'size: $size,  styles: $artMovements, topics: $topics, '
-        'updatedAt: $updatedAt, userId: $userId, '
-        'userCustomIndex: $userCustomIndex, version: $version, '
-        'visibility: $visibility)';
+    return "Illustration(createdAt: $createdAt, description: $description, "
+        "dimensions: $dimensions, extension: $extension, id: $id, "
+        "license: $license, liked: $liked, name: $name, lore: $lore, "
+        "size: $size,  styles: $artMovements, topics: $topics, "
+        "updatedAt: $updatedAt, userId: $userId, "
+        "userCustomIndex: $userCustomIndex, version: $version, "
+        "visibility: $visibility)";
   }
 
   @override

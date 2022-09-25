@@ -11,7 +11,8 @@ class IllustrationsActions {
     required bool approved,
   }) async {
     try {
-      final response = await Utilities.cloud.fun("illustrations-approve").call({
+      final HttpsCallableResult response =
+          await Utilities.cloud.fun("illustrations-approve").call({
         "illustration_id": illustrationId,
         "approved": approved,
       });
@@ -34,7 +35,7 @@ class IllustrationsActions {
     required String illustrationId,
   }) async {
     try {
-      final response =
+      final HttpsCallableResult response =
           await Utilities.cloud.fun("illustrations-checkProperties").call({
         "illustration_id": illustrationId,
       });
@@ -54,7 +55,7 @@ class IllustrationsActions {
     EnumContentVisibility visibility = EnumContentVisibility.private,
   }) async {
     try {
-      final response =
+      final HttpsCallableResult response =
           await Utilities.cloud.fun("illustrations-createOne").call({
         "name": name,
         "visibility": visibility.name,
@@ -74,7 +75,7 @@ class IllustrationsActions {
     required String illustrationId,
   }) async {
     try {
-      final response =
+      final HttpsCallableResult response =
           await Utilities.cloud.fun("illustrations-deleteOne").call({
         "illustration_id": illustrationId,
       });
@@ -93,7 +94,7 @@ class IllustrationsActions {
     required List<String?> illustrationIds,
   }) async {
     try {
-      final response =
+      final HttpsCallableResult response =
           await Utilities.cloud.fun("illustrations-deleteMany").call({
         "illustration_ids": illustrationIds,
       });
