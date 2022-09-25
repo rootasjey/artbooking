@@ -103,7 +103,7 @@ class ThemedDialog extends StatelessWidget {
       _footerWidget = footer as Widget;
     } else {
       _footerWidget = Padding(
-        padding: const EdgeInsets.only(bottom: 0.0),
+        padding: const EdgeInsets.only(bottom: 12.0),
         child: footerButtons(),
       );
     }
