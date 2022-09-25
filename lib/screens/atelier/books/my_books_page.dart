@@ -639,6 +639,8 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
       final QueryMap query = getFetchQuery();
       final QuerySnapMap snapshot = await query.get();
 
+      listenBooksEvents(getListenQuery());
+
       if (snapshot.docs.isEmpty) {
         setState(() {
           _loading = false;
@@ -659,8 +661,6 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         _lastDocument = snapshot.docs.last;
         _hasNext = snapshot.docs.length == _limit;
       });
-
-      listenBooksEvents(getListenQuery());
     } catch (error) {
       Utilities.logger.e(error);
     } finally {
@@ -834,6 +834,35 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
         .startAfterDocument(lastDocument);
   }
 
+  /// Return the query without an initial document for pagination.
+  /// This query can used to listen to documents.
+  QueryMap? getInitialListenQuery() {
+    final String userId = getUserId();
+
+    if (!getIsOwner()) {
+      return FirebaseFirestore.instance
+          .collection("books")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", isEqualTo: "public")
+          .orderBy("user_custom_index", descending: true);
+    }
+
+    if (_selectedTab == EnumVisibilityTab.active) {
+      return FirebaseFirestore.instance
+          .collection("books")
+          .where("user_id", isEqualTo: userId)
+          .where("visibility", whereIn: ["public", "private"]).orderBy(
+              "user_custom_index",
+              descending: true);
+    }
+
+    return FirebaseFirestore.instance
+        .collection("books")
+        .where("user_id", isEqualTo: userId)
+        .where("visibility", isEqualTo: "archived")
+        .orderBy("user_custom_index", descending: true);
+  }
+
   /// Return true if the current authenticated user is the owner
   /// of this illustrations page.
   bool getIsOwner() {
@@ -848,9 +877,10 @@ class _MyBooksPageState extends ConsumerState<MyBooksPage> {
 
   /// Return the query to listen changes to.
   QueryMap? getListenQuery() {
-    final lastDocument = _lastDocument;
+    final DocumentSnapshot? lastDocument = _lastDocument;
+
     if (lastDocument == null) {
-      return null;
+      return getInitialListenQuery();
     }
 
     final String userId = getUserId();
