@@ -19,7 +19,7 @@
     "deep-equal": "2.0.5",
     "firebase-admin": "10.0.2",
     "firebase-functions": "3.17.2",
-    "firebase-tools": "10.1.5",
+    "firebase-tools": "11.22.0",
     "fs-extra": "10.0.0",
     "image-size": "1.0.1",
     "sharp": "0.30.0"
